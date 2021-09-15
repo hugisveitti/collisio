@@ -64,6 +64,11 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
         vehicle.lookForwardsBackwards(false)
     }
 
+    if (mobileControls.resetVehicle) {
+        vehicle.setPosition(0, 20, 0)
+        vehicle.setRotation(0, 0, 0)
+    }
+
 
 }
 

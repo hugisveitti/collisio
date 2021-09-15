@@ -32,13 +32,16 @@ export let height = window.innerHeight
 export let isPortrait = screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary"
 
 
-export let cRadius = isPortrait ? width / 2 - 120 : height / 2 - 50
-export let cXAcc = width - 50
-export let cXDecc = width - 50
-export let cXBreak = width - 200
-export let cYDecc = height - 100
-export let cYAcc = 100
-export let cYBreak = height - 100
+export let cRadius = 50
+export let cXAcc = width - (10 + cRadius)
+export let cXDecc = width - (10 + cRadius)
+export let cXBreak = 40 + (cRadius * 4)
+export let cYAcc = 10 + (cRadius * 2)
+export let cYDecc = height - (10 + cRadius * 2)
+export let cYBreak = height - (10 + cRadius * 2)
+
+export let cXReset = cRadius + 10
+export let cYReset = height / 2
 
 
 export const changeOrientation = (canvas: HTMLCanvasElement) => {
@@ -64,12 +67,14 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
     const buttons = [
         { x: cXAcc, y: cYAcc, value: controls.isAccelerating },
         { x: cXDecc, y: cYDecc, value: controls.isDeccelerating },
-        { x: cXBreak, y: cYBreak, value: controls.breaking }
+        { x: cXBreak, y: cYBreak, value: controls.breaking },
+        { x: cXReset, y: cYReset, value: controls.resetVehicle }
     ]
 
     controls.isAccelerating = false
     controls.isDeccelerating = false
     controls.breaking = false
+    controls.resetVehicle = false
 
     for (let j = 0; j < buttons.length; j++) {
         const cY = buttons[j].y
@@ -84,6 +89,8 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
                     controls.isDeccelerating = true
                 } else if (j === 2) {
                     controls.breaking = true
+                } else if (j === 3) {
+                    controls.resetVehicle = true
                 }
             }
         }
@@ -94,13 +101,13 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
 export const handleTouchEnd = (socket: Socket, controls: MobileControls) => {
     controls.isAccelerating = false
     controls.isDeccelerating = false
+    controls.breaking = false
+    controls.resetVehicle = false
 }
 
 
 export const drawLeftArrow = (ctx: CanvasRenderingContext2D | null) => {
     if (!ctx) return
-
-
 
     if (isPortrait) {
 
@@ -237,7 +244,7 @@ export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: Mobile
     if (!ctx) return
 
     ctx.beginPath();
-    ctx.arc(cXBreak, cYDecc, cRadius, 0, 2 * Math.PI);
+    ctx.arc(cXBreak, cYBreak, cRadius, 0, 2 * Math.PI);
     ctx.stroke();
     if (controls.breaking) {
         ctx.fillStyle = "green"
@@ -249,7 +256,7 @@ export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: Mobile
 
 
     ctx.save()
-    ctx.translate(cXBreak, cYDecc)
+    ctx.translate(cXBreak, cYBreak)
     ctx.rotate(-Math.PI / 2)
     if (!controls.breaking) {
         ctx.fillStyle = "green"
@@ -259,6 +266,36 @@ export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: Mobile
 
     ctx.font = "30px Arial"
     let infoText = "STOP"
+    ctx.fillText(infoText, -15, 0)
+    ctx.restore()
+}
+
+export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
+    if (!ctx) return
+
+    ctx.beginPath();
+    ctx.arc(cXReset, cYReset, cRadius, 0, 2 * Math.PI);
+    ctx.stroke();
+    if (controls.resetVehicle) {
+        ctx.fillStyle = "green"
+    } else {
+        ctx.fillStyle = "red"
+    }
+    ctx.fill()
+
+
+
+    ctx.save()
+    ctx.translate(cXReset, cYReset)
+    ctx.rotate(-Math.PI / 2)
+    if (!controls.resetVehicle) {
+        ctx.fillStyle = "green"
+    } else {
+        ctx.fillStyle = "red"
+    }
+
+    ctx.font = "30px Arial"
+    let infoText = "Reset"
     ctx.fillText(infoText, -15, 0)
     ctx.restore()
 }

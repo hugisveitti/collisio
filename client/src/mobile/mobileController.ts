@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client"
 import { DefaultEventsMap } from "socket.io-client/build/typed-events"
-import { width, height, drawAccelerator, changeOrientation, handleTouchStart, handleTouchEnd, drawDeccelerator, MobileControls, drawBreak } from "./mobileGui"
+import { width, height, drawAccelerator, changeOrientation, handleTouchStart, handleTouchEnd, drawDeccelerator, MobileControls, drawBreak, drawResetButton } from "./mobileGui"
 
 let moreSpeed = false
 let motion: DeviceMotionEventAcceleration | null = {
@@ -84,6 +84,7 @@ const startLoop = (socket: Socket) => {
             drawAccelerator(ctx, controls)
             drawDeccelerator(ctx, controls)
             drawBreak(ctx, controls)
+            drawResetButton(ctx, controls)
             if (motion) {
                 ctx.save()
                 ctx.translate(width / 2, height / 2)
