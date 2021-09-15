@@ -92,7 +92,7 @@ class Game {
         this.roomName = roomName
         this.io = io
         this.socket = socket
-        this.gameStarted = 0
+        this.gameStarted = false
         this.team1Goals = 0
         this.team2Goals = 0
 
@@ -119,6 +119,9 @@ class Game {
         }
         player.socket.emit("room-connected", { roomName: player.roomName, isLeader: player.isLeader })
         this.alertWaitingRoom()
+        if (this.gameStarted) {
+            player.startGame()
+        }
     }
 
     alertWaitingRoom() {
@@ -128,7 +131,7 @@ class Game {
     setupControlsListener() {
         setInterval(() => {
             this.socket.emit("get-controls", { players: this.getPlayersInfo() })
-        }, 5)
+        }, 1)
     }
 
     getPlayersInfo() {
@@ -163,10 +166,11 @@ class Game {
             this.players[i].startGame()
         }
         this.setupControlsListener()
+        console.log("starting game", this.toString())
     }
 
     toString() {
-        const playersString = ""
+        let playersString = ""
         for (let player of this.players) {
             playersString += player.toString() + ", "
         }

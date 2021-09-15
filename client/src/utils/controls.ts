@@ -37,7 +37,8 @@ let angle = 40
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
     if (mobileControls.isAccelerating) {
-        vehicle.goForward(speed)
+
+        vehicle.goForward(mobileControls.beta > 30 ? speed : speed * 1.5)
     } else if (mobileControls.isDeccelerating) {
         vehicle.goBackward(speed)
     } else {

@@ -79,8 +79,6 @@ const startLoop = (socket: Socket) => {
         if (ctx) {
 
             ctx.clearRect(0, 0, width, height);
-            // drawLeftArrow(ctx)
-            // drawRightArrow(ctx)
             drawAccelerator(ctx, controls)
             drawDeccelerator(ctx, controls)
             drawBreak(ctx, controls)
