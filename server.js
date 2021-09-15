@@ -31,6 +31,10 @@ app.get("/controls", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
+app.get("/index.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/index.js"));
+})
+
 
 
 const port = process.env.PORT || 5000
