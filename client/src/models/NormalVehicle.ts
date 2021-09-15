@@ -172,9 +172,9 @@ export class NormalVehicle implements IVehicle {
         return this.vehicle.getCurrentSpeedKmHour()
     }
 
-    goForward(speed: number) {
-        this.vehicle.applyEngineForce(engineForce, BACK_LEFT)
-        this.vehicle.applyEngineForce(engineForce, BACK_RIGHT)
+    goForward(moreSpeed: boolean) {
+        this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_LEFT)
+        this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_RIGHT)
     }
     goBackward(speed: number) {
         this.vehicle.applyEngineForce(-engineForce, BACK_LEFT)

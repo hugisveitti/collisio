@@ -32,7 +32,8 @@ export class ConstraintVehicle implements IVehicle {
     }
 
 
-    goForward(speed: number) {
+    goForward(moreSpeed: boolean) {
+        const speed = 40
         this.leftBackMotor.enableAngularMotor(true, -speed, 0.25)
         this.rightBackMotor.enableAngularMotor(true, -speed, 0.25)
         this.leftFrontMotor.enableAngularMotor(true, -speed, 0.25)

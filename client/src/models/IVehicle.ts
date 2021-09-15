@@ -6,7 +6,7 @@ export interface SimpleVector {
     y: number
 }
 export interface IVehicle {
-    goForward: (speed: number) => void
+    goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void
     noForce: () => void
     turnLeft: (angle: number) => void

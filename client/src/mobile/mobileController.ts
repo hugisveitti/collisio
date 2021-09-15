@@ -2,7 +2,6 @@ import { io, Socket } from "socket.io-client"
 import { DefaultEventsMap } from "socket.io-client/build/typed-events"
 import { width, height, drawAccelerator, changeOrientation, handleTouchStart, handleTouchEnd, drawDeccelerator, MobileControls, drawBreak, drawResetButton } from "./mobileGui"
 
-let moreSpeed = false
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
     y: 0,
@@ -54,7 +53,7 @@ export const initGryoscope = (socket: Socket<DefaultEventsMap, DefaultEventsMap>
         controls.alpha = alpha
         controls.gamma = gamma
         controls.beta = beta
-        controls.moreSpeed = gamma > 0 && gamma < 40
+        controls.moreSpeed = gamma > 0 && gamma < 30
 
         orientation = {
             gamma,
@@ -98,7 +97,8 @@ const startLoop = (socket: Socket) => {
                 ctx.fillText(infoText, 0, 50)
                 ctx.restore()
             }
-            if (moreSpeed) {
+            if (controls.moreSpeed) {
+                console.log("more speed", controls.moreSpeed)
                 ctx.save()
                 ctx.translate(width / 2, height / 2)
                 ctx.rotate(-Math.PI / 2)

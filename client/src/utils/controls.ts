@@ -38,7 +38,7 @@ let angle = 40
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
     if (mobileControls.isAccelerating) {
 
-        vehicle.goForward(mobileControls.beta > 30 ? speed : speed * 1.5)
+        vehicle.goForward(mobileControls.moreSpeed)
     } else if (mobileControls.isDeccelerating) {
         vehicle.goBackward(speed)
     } else {
@@ -139,7 +139,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
     if (vehicleControls.forward) {
-        vehicle.goForward(speed)
+        vehicle.goForward(false)
     } else if (vehicleControls.backward) {
         vehicle.goBackward(speed)
     } else {

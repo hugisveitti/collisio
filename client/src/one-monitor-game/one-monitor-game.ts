@@ -103,7 +103,7 @@ export class PhysicsTest extends Scene3D {
         this.createController()
         this.loadFont()
 
-        this.physics.debug?.enable()
+        // this.physics.debug?.enable()
         //this.physics.debug?.mode(2048 + 4096)
         this.warpSpeed("-ground")
         // this.warpSpeed()

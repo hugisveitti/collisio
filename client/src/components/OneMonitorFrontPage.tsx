@@ -84,11 +84,8 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   useEffect(() => {
-    props.store.setRoomName("testRoom");
-    setPlayerName("testPlayer");
-    setTimeout(() => {
-      // connectButtonClicked();
-    }, 100);
+    // props.store.setRoomName("testRoom");
+    // setPlayerName("testPlayer");
   }, []);
 
   return (
