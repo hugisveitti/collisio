@@ -8,7 +8,7 @@ import { IGameSettings, IPlayerInfo } from "../classes/Game"
 import { SimpleCourt, SimpleCourtSettings, } from "../shared-game-components/squaredCourse"
 import { Color } from "@enable3d/three-wrapper/dist"
 import "./one-monitor-styles.css"
-
+// import "../ammo/ammo.wasm.js"
 
 
 const vechicleFov = 60
@@ -355,7 +355,7 @@ export class PhysicsTest extends Scene3D {
 
 export const startGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings) => {
     const config = { scenes: [PhysicsTest], antialias: true, }
-    PhysicsLoader("/ammo", () => {
+    PhysicsLoader("./ammo", () => {
         const project = new Project(config)
         console.log("project", project)
         console.log("project.scenes[0]", project.scenes)

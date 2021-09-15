@@ -12,23 +12,27 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(express.static(path.join(__dirname, "./client/build")));
+app.use(express.static(path.join(__dirname, "./client/src")));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
 app.get("/wait", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
 app.get("/game", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
 app.get("/controls", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
+
+app.get("/ammo.wasm.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/ammo/ammo.wasm.js"));
+})
 
 
 

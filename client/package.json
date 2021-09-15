@@ -16,8 +16,10 @@
   "dependencies": {
     "@enable3d/ammo-physics": "0.22.0-dev.1",
     "@enable3d/three-graphics": "0.22.0-dev.1",
+    "@types/filesystem": "0.0.32",
     "css-loader": "^6.2.0",
     "enable3d": "^0.21.0",
+    "fs": "0.0.1-security",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.1",
@@ -28,6 +30,7 @@
     "three": "^0.125.2"
   },
   "devDependencies": {
+    "@types/node": "^16.9.1",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
     "@types/react-router": "^5.1.16",
