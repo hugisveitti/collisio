@@ -1,0 +1,4 @@
+node_modules
+debug.log
+index.js
+package-lock.json

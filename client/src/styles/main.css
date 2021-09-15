@@ -1,0 +1,66 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+  margin: auto;
+  width: 500px;
+  max-width: 80%;
+  height: 400px;
+  margin-top: 25px;
+  background-color: #85d885;
+  text-align: center;
+  padding: 15px;
+  /* box-shadow: 1px 1px solid #5dd65d; */
+  border: 1px solid black;
+}
+
+.center {
+  margin: auto;
+  text-align: center;
+}
+
+.italics {
+  text-decoration: wavy;
+}
+
+.large-input {
+  height: 25px;
+  width: 150px;
+  margin-bottom: 25px;
+  display: inline-block;
+}
+
+#waiting-room {
+  display: none;
+}
+
+.player-name:nth-child(odd) {
+  background-color: #b0e4b0;
+}
+
+.player-name {
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+#player-list {
+  padding: 15px;
+  margin: 15px;
+}
+
+.team-select-container {
+  padding-top: 15px;
+  padding-left: 15px;
+}
+
+.player-name-span {
+}
+
+.team-select-radio-button {
+  padding-right: 15px;
+}
