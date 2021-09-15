@@ -9,6 +9,9 @@ import { getDeviceType } from "../utils/settings";
 import { waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
 
+// const logo = require("../images/caroutline.png");
+// import * as logo from "../images/caroutline.png";
+// console.log("logo", logo);
 interface IOneMonitorFrontPageProps {
   socket: Socket;
   store: IStore;
@@ -89,34 +92,44 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   }, []);
 
   return (
-    <div className="container">
-      <h1 className="center">Join room</h1>
-      <p>
-        Please type in the room name to create a room. Then all the players
-        should type in the room name and their name on their mobile device.
-      </p>
-      <input
-        className="large-input"
-        type="text"
-        placeholder="room name"
-        value={props.store.roomName}
-        onChange={(e) => props.store.setRoomName(e.target.value)}
-      />
-      <br />
+    <div>
+      <div className="container">
+        <h2 className="center">
+          Welcome to <i>Collisio</i>
+        </h2>
+        <p>
+          Create a room, you and 3 friends connect to that room with your mobile
+          phones.
+        </p>
+        <p>Its a car game where your phone is the controller.</p>
+        <h3 className="center">Create a room</h3>
+        <p>
+          Please type in the room name to create a room. Then all the players
+          should type in the room name and their name on their mobile device.
+        </p>
+        <input
+          className="large-input"
+          type="text"
+          placeholder="room name"
+          value={props.store.roomName}
+          onChange={(e) => props.store.setRoomName(e.target.value)}
+        />
+        <br />
 
-      {renderPlayerNameInput()}
+        {renderPlayerNameInput()}
 
-      <br />
-      <button
-        className="large-input"
-        id="room-name-btn"
-        onClick={connectButtonClicked}
-      >
-        Join
-      </button>
-      <hr />
-      <p>This game is in development</p>
-      <ToastContainer />
+        <br />
+        <button
+          className="large-input"
+          id="room-name-btn"
+          onClick={connectButtonClicked}
+        >
+          Join
+        </button>
+        <hr />
+        <p>This game is in development</p>
+        <ToastContainer />
+      </div>
     </div>
   );
 };
