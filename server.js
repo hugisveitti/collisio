@@ -34,7 +34,9 @@ app.get("/ammo.wasm.js", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/ammo/ammo.wasm.js"));
 })
 
-
+app.get("/hello", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/index2.html"));
+})
 
 const port = process.env.PORT || 5000
 const server = app.listen(port, () => {

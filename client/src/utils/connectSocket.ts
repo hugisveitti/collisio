@@ -23,7 +23,7 @@ export const createSocket = () => {
 
     if (deviceType === "mobile") {
         if (!window.DeviceMotionEvent) {
-            alert("Device motion not supported in the browser, please use Chrome or add 'https://' instead of 'http://'")
+            alert("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
         } else {
             console.log("device motion supported")
         }
