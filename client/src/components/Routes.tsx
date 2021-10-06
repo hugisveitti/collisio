@@ -44,7 +44,9 @@ const Routes = () => {
     gameSettings,
     setGameSettings,
   } as IStore;
-
+  if (!false) {
+    return <h1>front page</h1>;
+  }
   if (!socket) return null;
   return (
     <Router basename="/">

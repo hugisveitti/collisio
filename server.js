@@ -48,6 +48,7 @@ const GameMaster = require("./one-monitor-game/OneMonitorGame")
 const io = require("socket.io")(server, { cors: { origin: "*" } })
 const gameMaster = new GameMaster(io)
 io.on("connection", (socket) => {
+    console.log("connected")
     gameMaster.addSocket(socket)
 })
 
