@@ -5,3 +5,27 @@
   background-color: black;
   color: white;
 }
+
+#fps-count {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: black;
+  color: white;
+}
+
+#lap-time {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+}
+
+#best-lap-time {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  background-color: black;
+  color: white;
+}

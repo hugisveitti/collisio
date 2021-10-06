@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
+import { getDeviceType, startGameAuto } from "../utils/settings";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
 
@@ -32,6 +32,14 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (startGameAuto) {
+      if (props.store.players.length > 0) {
+        handleStartGame();
+      }
+    }
+  }, [props.store.players]);
 
   if (!props.store.roomName) {
     window.location.href = frontPagePath;
@@ -105,7 +113,10 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       </div>
       {deviceType === "desktop" && (
         <div>
+          <h4 className="center">Game settings</h4>
           <label>Ball radius</label>
+          <br />
+          <br />
           <input
             className="large-input"
             type="text"
@@ -118,6 +129,39 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               props.store.setGameSettings(newGameSettings);
             }}
           />
+
+          <br />
+          <h6 className="center">Type of game</h6>
+
+          <label>
+            <input
+              type="radio"
+              name="game-type"
+              onChange={() =>
+                props.store.setGameSettings({
+                  ...props.store.gameSettings,
+                  typeOfGame: "race",
+                })
+              }
+              checked={props.store.gameSettings.typeOfGame === "race"}
+            />
+            Race
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="game-type"
+              onChange={() =>
+                props.store.setGameSettings({
+                  ...props.store.gameSettings,
+                  typeOfGame: "ball",
+                })
+              }
+              checked={props.store.gameSettings.typeOfGame === "ball"}
+            />
+            Ball
+          </label>
+
           <br />
           <br />
 

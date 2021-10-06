@@ -69,13 +69,11 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
         vehicle.setPosition(0, 20, 0)
         vehicle.setRotation(0, 0, 0)
     }
-
-
 }
 
 let vehicleIdx = 0
 let lookBackwards = false
-let driveWithKeyboardEnabled = false
+let driveWithKeyboardEnabled = true
 
 
 export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[]) => {
@@ -91,12 +89,15 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
         }
     })
 
-    socket.on("get-controls", (data) => {
-        const { players } = data as { players: IPlayerInfo[] }
-        for (let i = 0; i < players.length; i++) {
-            driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
-        }
-    })
+    if (!driveWithKeyboardEnabled) {
+
+        socket.on("get-controls", (data) => {
+            const { players } = data as { players: IPlayerInfo[] }
+            for (let i = 0; i < players.length; i++) {
+                driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
+            }
+        })
+    }
 
 
 
@@ -139,7 +140,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
     if (vehicleControls.forward) {
-        vehicle.goForward(false)
+        vehicle.goForward(true)
     } else if (vehicleControls.backward) {
         vehicle.goBackward(speed)
     } else {

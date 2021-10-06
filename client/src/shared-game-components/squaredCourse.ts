@@ -123,7 +123,6 @@ export class SimpleCourt {
         y = object.y
         z = object.z
 
-
         return (x > this.courtWidth / 2 + this.rampHeightOffset + 10 || x < -this.courtWidth / 2 - this.rampHeightOffset - 10 || z > this.courtDepth / 2 + this.rampHeightOffset + 10 || z < -this.courtDepth / 2 - this.rampHeightOffset - 10)
     }
 

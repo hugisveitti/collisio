@@ -1,5 +1,5 @@
 // import THREE from "@enable3d/three-wrapper/node_modules/three";
-import { Scene3D } from "enable3d";
+import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
 import { width } from "../mobile/mobileGui";
 import { IVehicle } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
@@ -15,16 +15,19 @@ const maxSteering = 0.4
 const engineForce = 5001
 const maxBreakingForce = 100
 
-const chassisWidth = 1.8;
+const chassisWidth = 2.5;
 const chassisHeight = .6;
 const chassisLength = 4;
 const vehicleMass = 800;
+const yOrigin = .5
+
+
 export class NormalVehicle implements IVehicle {
 
     vehicle: Ammo.btRaycastVehicle
     scene: Scene3D
     tuning: Ammo.btVehicleTuning
-    chassisMesh: THREE.Mesh
+    chassisMesh: ExtendedObject3D
     wheelMeshes: THREE.Mesh[]
     color: string | number | undefined
 
@@ -44,56 +47,53 @@ export class NormalVehicle implements IVehicle {
         this.lookBackwards = false
 
 
-        const origin = new Ammo.btVector3(0, .01, 0)
+        this.chassisMesh = new ExtendedObject3D()
 
-        const geometry = new Ammo.btBoxShape(new Ammo.btVector3(chassisWidth * .5, chassisHeight * .5, chassisLength * .5))
-        const transform = new Ammo.btTransform()
 
-        transform.setIdentity()
-        transform.setOrigin(origin)
-        transform.setRotation(new Ammo.btQuaternion(0, 0, 0, 1))
+        const geometry = new THREE.BoxGeometry(1.8, .4, 3);
+        const material = new THREE.MeshLambertMaterial({ color: this.color });
+        const cubeA = new ExtendedMesh(geometry, material);
+        cubeA.position.set(0, 0.1, 0)
+        this.chassisMesh.add(cubeA)
 
-        const vehicleBody = new Ammo.btCompoundShape()
-        vehicleBody.addChildShape(transform, geometry)
+        const geometry2 = new THREE.BoxGeometry(2.5, 1, 1);
 
-        const topBoxG = new Ammo.btBoxShape(new Ammo.btVector3(chassisWidth * .25, 1, chassisWidth * .25))
-        const topBoxT = new Ammo.btTransform()
-        topBoxT.setIdentity()
-        topBoxT.setOrigin(new Ammo.btVector3(0, 1, 0))
-        topBoxT.setRotation(new Ammo.btQuaternion(0, 0, 0, 1))
-        vehicleBody.addChildShape(topBoxT, topBoxG)
+        const cubeB = new ExtendedMesh(geometry2, material);
+        cubeB.position.set(0, .5, 0)
+        this.chassisMesh.add(cubeB)
 
-        const motionState = new Ammo.btDefaultMotionState(transform)
-        const localInertia = new Ammo.btVector3(0, 10, 0)
-        vehicleBody.calculateLocalInertia(vehicleMass, localInertia)
+        const geometry3 = new THREE.BoxGeometry(1, 1, 1);
 
-        // creates the physics of the vehiclebody
-        const body = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(vehicleMass, motionState, vehicleBody, localInertia))
-        body.setActivationState(4)
+        const cubeC = new ExtendedMesh(geometry3, material);
+        cubeC.position.set(0, 1.5, 0)
+        this.chassisMesh.add(cubeC)
 
-        scene.physics.physicsWorld.addRigidBody(body)
 
-        // this creates the look, 
-        this.chassisMesh = this.createChassisMesh(chassisWidth, chassisHeight, chassisLength)
 
+        this.scene.add.existing(this.chassisMesh, {})
+        this.scene.physics.add.existing(this.chassisMesh, { mass: 1200 })
 
         this.tuning = new Ammo.btVehicleTuning()
 
         const rayCaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
-        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, body, rayCaster)
+        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.chassisMesh.body.ammo, rayCaster)
         this.vehicle.setCoordinateSystem(0, 1, 2)
+        this.chassisMesh.body.name = "vehicle"
+        this.chassisMesh.name = "vehicle"
+        console.log("this", this)
+        // this.chassisMesh.body.skipUpdate = true
 
         scene.physics.physicsWorld.addAction(this.vehicle)
 
         const wheelAxisBackPosition = -1.3
-        const wheelRadiusBack = 0.5
-        const wheelHalfTrackBack = .9
-        const wheelAxisHeightBack = -0
+        const wheelRadiusBack = 0.4
+        const wheelHalfTrackBack = 1.1
+        const wheelAxisHeightBack = 0
 
-        const wheelAxisFrontPosition = 1.3
-        const wheelRadiusFront = 0.5
-        const wheelHalfTrackFront = .9
-        const wheelAxisHeightFront = -0
+        const wheelAxisFrontPosition = 1.2
+        const wheelRadiusFront = 0.4
+        const wheelHalfTrackFront = 1.1
+        const wheelAxisHeightFront = 0
         this.wheelMeshes = []
 
 
@@ -121,6 +121,8 @@ export class NormalVehicle implements IVehicle {
             wheelRadiusBack,
             BACK_RIGHT
         )
+
+        this.setPosition(0, 3, 0)
     }
 
     setFont(font: THREE.Font) {
@@ -156,8 +158,8 @@ export class NormalVehicle implements IVehicle {
 
         this.chassisMesh.position.set(p.x(), p.y(), p.z())
         this.chassisMesh.quaternion.set(q.x(), q.y(), q.z(), q.w())
-        for (let i = 0; i < n; i++) {
-            this.vehicle.updateWheelTransform(i, true)
+        for (let i = 0; i < this.wheelMeshes.length; i++) {
+            // this.vehicle.updateWheelTransform(i, true)
             tm = this.vehicle.getWheelTransformWS(i)
             p = tm.getOrigin()
             q = tm.getRotation()
@@ -273,7 +275,7 @@ export class NormalVehicle implements IVehicle {
         const suspensionCompression = 4.4
         const suspensionRestLength = 0.1
 
-        const friction = 1000
+        const friction = 50
         const rollInfluence = 0.001
 
         const wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0)
@@ -297,44 +299,20 @@ export class NormalVehicle implements IVehicle {
         wheelInfo.set_m_frictionSlip(friction)
         wheelInfo.set_m_rollInfluence(rollInfluence)
 
-
         this.wheelMeshes.push(this.createWheelMesh(radius, width))
     }
 
     createWheelMesh(radius: number, width: number) {
-        const t = new THREE.CylinderGeometry(radius, radius, 0.2, 24, 1)
-        const mesh = new THREE.Mesh(t, new THREE.MeshPhongMaterial({ color: 0x221d40, }))
-        this.scene.add.existing(mesh)
-        return mesh
-    }
-
-    createChassisMesh(w: number, l: number, h: number) {
-        const wireframe = false
-        const shape = new THREE.BoxGeometry(w, l, h, 1, 1, 1)
-        const mesh = new THREE.Mesh()
-
-        const box = new THREE.Mesh(
-            shape, new THREE.MeshPhongMaterial({ color: 0x114433, wireframe })
+        const w = this.scene.make.cylinder({
+            radiusBottom: radius,
+            radiusTop: radius,
+            height: 0.2,
+            radiusSegments: 12
+        },
+            { lambert: { color: 'white' } }
         )
-        box.position.set(0, .3, 0)
-        mesh.add(box)
-
-        const smallCylinder = new THREE.Mesh(
-            new THREE.CylinderGeometry(.1, .2, .5, 12, 12),
-            new THREE.MeshPhongMaterial({ color: this.color })
-        )
-        smallCylinder.position.set(0, .8, 1.5)
-        mesh.add(smallCylinder)
-
-        const cone = new THREE.Mesh(
-            new THREE.CylinderGeometry(.3, .8, 1.5, 12, 12),
-            new THREE.MeshPhongMaterial({ color: this.color })
-        )
-        cone.position.set(0, 1, 0)
-        mesh.add(cone)
-
-        this.scene.add.existing(mesh)
-        return mesh as THREE.Mesh
+        this.scene.add.existing(w)
+        return w
     }
 
 }

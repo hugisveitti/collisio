@@ -5,9 +5,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
+import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
 import { waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
+import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 
 // const logo = require("../images/caroutline.png");
 // import * as logo from "../images/caroutline.png";
@@ -73,9 +74,15 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   const connectButtonClicked = () => {
-    const _roomName =
-      props.store.roomName !== "" ? props.store.roomName : "testRoom";
-    const _playerName = playerName !== "" ? playerName : "testPlayer";
+    let _roomName: string, _playerName: string;
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+      _roomName =
+        props.store.roomName !== "" ? props.store.roomName : "testRoom";
+      _playerName = playerName !== "" ? playerName : "testPlayer";
+    } else {
+      _playerName = playerName;
+      _roomName = props.store.roomName;
+    }
     if (deviceType === "desktop") {
       createRoomDesktop(_roomName);
     } else {
@@ -84,9 +91,19 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   useEffect(() => {
-    // props.store.setRoomName("testRoom");
-    // setPlayerName("testPlayer");
+    if (startGameAuto) {
+      props.store.setRoomName("testRoom");
+      setPlayerName("testPlayer");
+      setTimeout(() => {
+        connectButtonClicked();
+      }, 100);
+    }
   }, []);
+
+  if (isTestMode) {
+    startRaceTrackTest(props.socket, props.store.gameSettings);
+    return null;
+  }
 
   return (
     <div>

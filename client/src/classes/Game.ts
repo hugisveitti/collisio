@@ -16,5 +16,6 @@ export interface IPlayerInfo {
 
 export interface IGameSettings {
     ballRadius: number
+    typeOfGame: "ball" | "race"
 }
 

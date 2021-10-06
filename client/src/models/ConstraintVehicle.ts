@@ -55,13 +55,13 @@ export class ConstraintVehicle implements IVehicle {
     }
 
     turnLeft(angle: number) {
-        this.turnAxis.left.setMotorTarget(-angle, 0.5)
-        this.turnAxis.right.setMotorTarget(-angle, 0.5)
+        this.turnAxis.left.setMotorTarget(-Math.PI / 4, 0.5)
+        this.turnAxis.right.setMotorTarget(-Math.PI / 4, 0.5)
     }
 
     turnRight(angle: number) {
-        this.turnAxis.left.setMotorTarget(angle, 0.5)
-        this.turnAxis.right.setMotorTarget(angle, 0.5)
+        this.turnAxis.left.setMotorTarget(Math.PI / 4, 0.5)
+        this.turnAxis.right.setMotorTarget(Math.PI / 4, 0.5)
     }
 
     noTurn() {
@@ -95,6 +95,7 @@ export class ConstraintVehicle implements IVehicle {
 
 
     setPosition(x: number, y: number, z: number) {
+        this.frame.body.setPosition(x, y, z)
     }
     setRotation(x: number, y: number, z: number) { }
 
@@ -211,7 +212,7 @@ const axisToRotor = (rotorRight: ExtendedObject3D, rotorLeft: ExtendedObject3D, 
 }
 
 
-export const createVehicle = (scene: Scene3D, color: number | string, x: number = 0, z: number = 0) => {
+export const createConstraintVehicle = (scene: Scene3D, color: number | string, x: number = 0, z: number = 0) => {
 
 
 

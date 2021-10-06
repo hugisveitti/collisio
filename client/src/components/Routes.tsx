@@ -26,6 +26,7 @@ const Routes = () => {
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [gameSettings, setGameSettings] = useState({
     ballRadius: 1,
+    typeOfGame: "race",
   } as IGameSettings);
 
   useEffect(() => {
