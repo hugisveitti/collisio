@@ -30,25 +30,3 @@ export const createSocket = () => {
     }
     return socket
 }
-
-
-
-
-
-// const joinRoom = document.getElementById("join-room")
-
-
-
-// const testSetup = () => {
-//     const roomName = "test-room"
-//     const playerName = "huggens"
-
-//     if (deviceType === "desktop") {
-//         connectToRoomDesktop(roomName, playerName)
-//     } else {
-//         connectToRoomMobile(roomName, playerName)
-//     }
-//     createRoomConnectedListener(playerName)
-// }
-
-// testSetup()

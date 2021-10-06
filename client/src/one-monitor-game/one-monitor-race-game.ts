@@ -5,18 +5,18 @@ import { NormalVehicle } from "../models/NormalVehicle"
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { Socket } from "socket.io-client"
 import { IGameSettings, IPlayerInfo } from "../classes/Game"
-import { SimpleCourt, SimpleCourtSettings, } from "../shared-game-components/squaredCourse"
 import { Color } from "@enable3d/three-wrapper/dist"
 import "./one-monitor-styles.css"
 import { RaceCourse } from "../shared-game-components/raceCourse";
-
+import Stats from "stats.js"
 
 const vechicleFov = 60
 
 const team0Color = "blue"
 const team1Color = "red"
-const team0RotationY = 0
-const team1RotationY = 180
+
+
+const stats = new Stats()
 
 const scoreTable = document.createElement("div")
 
@@ -57,6 +57,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
     course!: RaceCourse
     views!: IView[]
     gameSettings: IGameSettings
+    raceStarted: boolean
+    checkpointCrossed: boolean[]
+    goalCrossed: boolean[]
+    timeStarted: number[]
+    bestLapTime: number[]
+    lapNumber: number[]
+    totalTime: number[]
+
 
     constructor() {
         super()
@@ -68,6 +76,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
             ballRadius: 1,
             typeOfGame: "race"
         }
+
+        this.raceStarted = false
+        this.checkpointCrossed = []
+        this.goalCrossed = []
+        this.timeStarted = []
+        this.bestLapTime = []
+        this.lapNumber = []
+        this.totalTime = []
     }
 
     setGameSettings(newGameSettings: IGameSettings) {
@@ -95,12 +111,15 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.createController()
         this.loadFont()
 
-        this.physics.debug?.enable()
+        // this.physics.debug?.enable()
         //this.physics.debug?.mode(2048 + 4096)
         this.warpSpeed("-ground")
 
         this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse()
+
+        stats.showPanel(0)
+        document.body.appendChild(stats.dom)
 
 
         document.addEventListener("keypress", (e) => {
@@ -117,7 +136,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
-
+        console.log("vehicle, name", vehicle.body.name)
+        const vehicleNumber = vehicle.body.name.slice(8, 9)
+        console.log("vehiclenumber", vehicleNumber)
     }
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D) { }
@@ -202,7 +223,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     update() {
+        stats.begin()
         this.updateVehicles()
+        stats.end()
     }
 
     resetPlayer(idx: number, y?: number) {
@@ -230,8 +253,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.vehicles = []
         for (let i = 0; i < this.players.length; i++) {
             const color = this.players[i].teamNumber === 1 ? team1Color : team0Color
-            this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName))
-            this.resetPlayers()
+            this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName, i))
+            this.vehicles[i].setPosition(163, 4, -17 - (i * 5))
+            this.vehicles[i].setRotation(0, 180, 0)
+            this.timeStarted.push(0)
+            this.checkpointCrossed.push(false)
+            this.goalCrossed.push(false)
+            this.lapNumber.push(0)
+            this.totalTime.push(0)
         }
     }
 

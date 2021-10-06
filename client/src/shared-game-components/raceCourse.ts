@@ -39,8 +39,9 @@ export class RaceCourse {
 
                 if (child.type === "Mesh" || child.type === "Group") {
                     if (child.name === "ground" || child.name.slice(0, 4) === "road") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" });
-                        (child as ExtendedObject3D).body.checkCollisions = false
+                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
+                        (child as ExtendedObject3D).body.checkCollisions = false;
+                        (child as ExtendedObject3D).body.setFriction(0)
                     } else if (child.name.slice(0, 4) === "wall") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" })
                     } else if (child.name.slice(0, 4) === "goal") {
@@ -48,7 +49,7 @@ export class RaceCourse {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 5, shape: "convex" })
                         this.goal = child as ExtendedObject3D
                     } else if (child.name.slice(0, 4) === "tire") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 0, shape: "convex" })
+                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
                     } else if (child.name === "checkered-flag") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" });
                     } else if (child.name.slice(0, 4) === "tree") {

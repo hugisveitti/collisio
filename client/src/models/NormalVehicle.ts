@@ -39,7 +39,7 @@ export class NormalVehicle implements IVehicle {
 
     lookBackwards: boolean
 
-    constructor(scene: Scene3D, color: string | number | undefined, name: string) {
+    constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber?: number) {
         this.color = color
         this.scene = scene
         this.vehicleSteering = 0
@@ -78,8 +78,8 @@ export class NormalVehicle implements IVehicle {
         const rayCaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
         this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.chassisMesh.body.ammo, rayCaster)
         this.vehicle.setCoordinateSystem(0, 1, 2)
-        this.chassisMesh.body.name = "vehicle"
-        this.chassisMesh.name = "vehicle"
+        this.chassisMesh.body.name = "vehicle-" + vehicleNumber
+        this.chassisMesh.name = "vehicle-" + vehicleNumber
         console.log("this", this)
         // this.chassisMesh.body.skipUpdate = true
 
