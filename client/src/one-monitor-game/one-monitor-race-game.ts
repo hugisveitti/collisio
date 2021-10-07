@@ -132,11 +132,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
         if (!this.raceOnGoing) return
         let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
-            const cLapTime = ((Date.now() - this.currentLapStart[i]) / 1000).toFixed(2)
+            let cLapTime = ((Date.now() - this.currentLapStart[i]) / 1000).toFixed(2)
             const bLT = this.bestLapTime[i] === Infinity ? "-" : this.bestLapTime[i]
             let totalTime = ((Date.now() - this.totalTime[i]) / 1000)
             if (this.lapNumber[i] > this.totalNumberOfLaps) {
-                "Fin"
+                cLapTime = "Fin"
                 totalTime = this.finishedTime[i]
             }
             s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime}</td><td>${totalTime.toFixed(2)}</td><td>${this.lapNumber[i]} / ${this.totalNumberOfLaps}</td></tr>`
