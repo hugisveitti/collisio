@@ -34,8 +34,8 @@ export class NormalVehicle implements IVehicle {
     name: string
     font?: THREE.Font
 
-
     lookBackwards: boolean
+    canDrive: boolean
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber?: number) {
         this.color = color
@@ -43,6 +43,7 @@ export class NormalVehicle implements IVehicle {
         this.vehicleSteering = 0
         this.name = name
         this.lookBackwards = false
+        this.canDrive = true
 
 
         this.chassisMesh = new ExtendedObject3D()
@@ -173,10 +174,13 @@ export class NormalVehicle implements IVehicle {
     }
 
     goForward(moreSpeed: boolean) {
+        if (!this.canDrive) return
         this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_LEFT)
         this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_RIGHT)
     }
+
     goBackward(speed: number) {
+        if (!this.canDrive) return
         this.vehicle.applyEngineForce(-engineForce, BACK_LEFT)
         this.vehicle.applyEngineForce(-engineForce, BACK_RIGHT)
     }

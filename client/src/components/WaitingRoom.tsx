@@ -42,7 +42,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   }, [props.store.players]);
 
   if (!props.store.roomName) {
-    // window.location.href = frontPagePath;
+    history.push(frontPagePath);
   }
 
   const sendTeamChange = (newTeamNumber: number) => {

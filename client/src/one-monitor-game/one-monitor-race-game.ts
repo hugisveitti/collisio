@@ -17,8 +17,8 @@ const possibleColors = ["red", "blue", "green", "yellow", "brown", "black", "whi
 
 
 const stats = new Stats()
-
 const scoreTable = document.createElement("div")
+const importantInfoDiv = document.createElement("div")
 
 
 const numDecimals = 2
@@ -44,8 +44,6 @@ interface IView {
     camera: THREE.PerspectiveCamera
 }
 
-
-
 export class OneMonitorRaceGameScene extends Scene3D {
 
     players!: IPlayerInfo[]
@@ -60,18 +58,22 @@ export class OneMonitorRaceGameScene extends Scene3D {
     raceStarted: boolean
     checkpointCrossed: boolean[]
     goalCrossed: boolean[]
-    timeStarted: number[]
+    timeStarted: number
     bestLapTime: number[]
     lapNumber: number[]
     totalTime: number[]
+    currentLapStart: number[]
 
 
     constructor() {
         super()
 
         scoreTable.setAttribute("id", "score-info")
-        this.updateScoreTable()
+        importantInfoDiv.setAttribute("id", "important-info")
+
         document.body.appendChild(scoreTable)
+        document.body.appendChild(importantInfoDiv)
+        importantInfoDiv.innerHTML = "Race starting in"
         this.gameSettings = {
             ballRadius: 1,
             typeOfGame: "race"
@@ -80,16 +82,50 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.raceStarted = false
         this.checkpointCrossed = []
         this.goalCrossed = []
-        this.timeStarted = []
+        this.timeStarted = 0
+        this.currentLapStart = []
         this.bestLapTime = []
         this.lapNumber = []
         this.totalTime = []
+        setTimeout(() => {
+            this.startRaceCountdown()
+        }, 2000)
     }
 
     setGameSettings(newGameSettings: IGameSettings) {
         this.gameSettings = newGameSettings
     }
 
+    startRaceCountdown() {
+        let countdown = 4
+        const timer = () => {
+            importantInfoDiv.innerHTML = countdown + ""
+            countdown -= 1
+            setTimeout(() => {
+                if (countdown > 0) {
+                    timer()
+                } else {
+                    this.raceStarted = true
+                    importantInfoDiv.innerHTML = "GO!!!!"
+                    this.startAllVehicles()
+                    this.timeStarted = Date.now()
+                    for (let i = 0; i < this.vehicles.length; i++) {
+                        this.currentLapStart.push(Date.now())
+                    }
+                    setTimeout(() => {
+                        importantInfoDiv.innerHTML = ""
+                    }, 2000)
+                }
+            }, 1000)
+        }
+        timer()
+    }
+
+    startAllVehicles() {
+        for (let i = 0; i < this.vehicles.length; i++) {
+            this.vehicles[i].canDrive = true
+        }
+    }
 
     async init() {
         this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
@@ -98,9 +134,15 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     updateScoreTable() {
-        scoreTable.innerHTML = `
-            Leaderboard
-            `
+        const currentLapTimes = []
+        let s = "<table><th>Player</th><th>Best LT</th><th>Curr LT</th><th>Ln</th>"
+        for (let i = 0; i < this.vehicles.length; i++) {
+            const cLapTime = (Date.now() - this.currentLapStart[i]) / 1000
+            currentLapTimes.push(cLapTime)
+            s += `<tr><td>${this.players[i].playerName}</td><td>${this.bestLapTime[i]}</td><td>${currentLapTimes}</td><td>${this.lapNumber[i]}</td></tr>`
+        }
+        s += "</table>"
+        scoreTable.innerHTML = s
     }
 
 
@@ -136,12 +178,21 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
-        console.log("vehicle, name", vehicle.body.name)
+
         const vehicleNumber = vehicle.body.name.slice(8, 9)
-        console.log("vehiclenumber", vehicleNumber)
+        if (this.checkpointCrossed[vehicleNumber]) {
+            this.lapNumber[vehicleNumber] += 1
+            this.checkpointCrossed[vehicleNumber] = false
+            const cLapTime = Date.now() - this.currentLapStart[vehicleNumber]
+            this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
+            this.currentLapStart[vehicleNumber] = Date.now()
+        }
     }
 
-    handleCheckpointCrossed(vehicle: ExtendedObject3D) { }
+    handleCheckpointCrossed(vehicle: ExtendedObject3D) {
+        const vehicleNumber = vehicle.body.name.slice(8, 9)
+        this.checkpointCrossed[vehicleNumber] = true
+    }
 
     createViews() {
 
@@ -224,6 +275,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     update() {
         stats.begin()
+        this.updateScoreTable()
         this.updateVehicles()
         stats.end()
     }
@@ -256,11 +308,12 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName, i))
             this.vehicles[i].setPosition(163, 4, -17 - (i * 5))
             this.vehicles[i].setRotation(0, 180, 0)
-            this.timeStarted.push(0)
+            this.vehicles[i].canDrive = false
             this.checkpointCrossed.push(false)
             this.goalCrossed.push(false)
-            this.lapNumber.push(0)
+            this.lapNumber.push(1)
             this.totalTime.push(0)
+            this.bestLapTime.push(Infinity)
         }
     }
 

@@ -29,3 +29,15 @@
   background-color: black;
   color: white;
 }
+
+#important-info {
+  color: rgb(155, 41, 41);
+  text-shadow: 1px 1px white;
+  font-size: 64px;
+  position: absolute;
+
+  left: 1%;
+  right: 1%;
+  top: 50px;
+  text-align: center;
+}

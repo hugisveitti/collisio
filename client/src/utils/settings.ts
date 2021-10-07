@@ -24,6 +24,8 @@ export const getDeviceType = () => {
 
 export const baseurl = "http://localhost:5000/"
 
-export const startGameAuto = true
-export const isTestMode = false;
+// if not development then always false, otherwise set by me...
+// this isnt just crap code
+export const startGameAuto = process.env.NODE_ENV !== "development" ? false : false
+export const isTestMode = process.env.NODE_ENV !== "development" ? false : false;
 // export const devMode = true

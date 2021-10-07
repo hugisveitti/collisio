@@ -16,6 +16,7 @@ export class ConstraintVehicle implements IVehicle {
     rightFrontMotor: Ammo.btHingeConstraint
     frame: ExtendedObject3D
     turnAxis: TurnAxis
+    canDrive: boolean
     constructor(leftBackMotor: Ammo.btHingeConstraint,
         rightBackMotor: Ammo.btHingeConstraint,
         leftFrontMotor: Ammo.btHingeConstraint,
@@ -29,6 +30,7 @@ export class ConstraintVehicle implements IVehicle {
         this.rightFrontMotor = rightFrontMotor
         this.frame = frame
         this.turnAxis = turnAxis
+        this.canDrive = true
     }
 
 

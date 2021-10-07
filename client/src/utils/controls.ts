@@ -40,8 +40,10 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
     }
 
     if (mobileControls.resetVehicle) {
-        vehicle.setPosition(0, 20, 0)
-        vehicle.setRotation(0, 0, 0)
+        const { x, z } = vehicle.getPosition()
+        const rot = vehicle.getRotation()
+        vehicle.setPosition(x, 20, z)
+        vehicle.setRotation(0, rot.y, 0)
     }
 }
 

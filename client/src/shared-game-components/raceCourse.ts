@@ -80,7 +80,6 @@ export class RaceCourse {
         }
         if (this.checkpoint) {
             this.checkpoint.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
-                console.log("checkpoint")
                 if (otherObject.name.slice(0, 7) === "vehicle") {
                     this.checkpointCrossedCallback(otherObject)
                 }

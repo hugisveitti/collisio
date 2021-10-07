@@ -6,6 +6,7 @@ export interface SimpleVector {
     y: number
 }
 export interface IVehicle {
+    canDrive: boolean
     goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void
     noForce: () => void
@@ -25,4 +26,5 @@ export interface IVehicle {
     setFont: (font: THREE.Font) => void
 
     lookForwardsBackwards: (lookBackwards: boolean) => void
+
 }

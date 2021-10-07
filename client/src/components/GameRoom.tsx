@@ -1,4 +1,6 @@
 import React from "react";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
 import { startRaceGameOneMonitor } from "../one-monitor-game/one-monitor-race-game";
@@ -15,6 +17,13 @@ const GameRoom = (props: IGameRoom) => {
   // if (!props.store.roomName) {
   //   window.location.href = frontPagePath;
   // }
+
+  const history = useHistory();
+  if (!props.store.roomName) {
+    history.push(frontPagePath);
+    toast.warn("No room connection");
+    return null;
+  }
   if (props.store?.gameSettings?.typeOfGame === "ball") {
     startBallGameOneMonitor(
       props.socket,
