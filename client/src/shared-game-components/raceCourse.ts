@@ -1,7 +1,5 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { Texture, GLTFLoader, GLTF, FBXLoader } from "@enable3d/three-wrapper/dist";
-import THREE, { Object3D, ObjectLoader } from "@enable3d/three-wrapper/node_modules/three";
-//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTF, GLTFLoader } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 

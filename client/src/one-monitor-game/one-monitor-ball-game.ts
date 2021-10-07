@@ -1,13 +1,14 @@
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d"
-import { IVehicle, SimpleVector } from "../models/IVehicle"
-import { addControls, VehicleControls, } from "../utils/controls"
-import { NormalVehicle } from "../models/NormalVehicle"
+import { Color } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { Socket } from "socket.io-client"
-import { IGameSettings, IPlayerInfo } from "../classes/Game"
-import { SimpleCourt, SimpleCourtSettings, } from "../shared-game-components/squaredCourse"
-import { Color } from "@enable3d/three-wrapper/dist"
-import "./one-monitor-styles.css"
+import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
+import { Socket } from "socket.io-client";
+import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { IVehicle, SimpleVector } from "../models/IVehicle";
+import { NormalVehicle } from "../models/NormalVehicle";
+import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/squaredCourse";
+import { addControls } from "../utils/controls";
+import { VehicleControls } from "../utils/ControlsClasses";
+import "./one-monitor-styles.css";
 // import "../ammo/ammo.wasm.js"
 
 

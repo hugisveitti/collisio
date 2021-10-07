@@ -1,8 +1,6 @@
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d"
 import { IVehicle, SimpleVector } from "../models/IVehicle"
-import { addControls, VehicleControls, } from "../utils/controls"
 import { createNormalVehicle, } from "../models/NormalVehicle"
-// import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import { IGameSettings, IPlayerInfo } from "../classes/Game"
@@ -12,6 +10,7 @@ import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera";
 import { OrbitControls } from "@enable3d/three-wrapper/dist/index";
 import { createConstraintVehicle } from "../models/ConstraintVehicle"
 import Stats from "stats.js"
+import { VehicleControls } from "../utils/ControlsClasses"
 
 
 const vechicleFov = 60

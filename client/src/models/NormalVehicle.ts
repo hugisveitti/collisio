@@ -1,8 +1,6 @@
-// import THREE from "@enable3d/three-wrapper/node_modules/three";
-import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
-import { width } from "../mobile/mobileGui";
-import { IVehicle } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
+import { IVehicle } from "./IVehicle";
 
 
 const FRONT_LEFT = 0
@@ -299,10 +297,10 @@ export class NormalVehicle implements IVehicle {
         wheelInfo.set_m_frictionSlip(friction)
         wheelInfo.set_m_rollInfluence(rollInfluence)
 
-        this.wheelMeshes.push(this.createWheelMesh(radius, width))
+        this.wheelMeshes.push(this.createWheelMesh(radius))
     }
 
-    createWheelMesh(radius: number, width: number) {
+    createWheelMesh(radius: number) {
         const w = this.scene.make.cylinder({
             radiusBottom: radius,
             radiusTop: radius,

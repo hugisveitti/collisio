@@ -11,16 +11,29 @@ interface IGameRoom {
 }
 
 const GameRoom = (props: IGameRoom) => {
-  if (!props.store.roomName) {
-    window.location.href = frontPagePath;
+  if (!false) {
+    // window.location.href = frontPagePath;
+
+    console.log("yo");
   }
-  if (props.store.gameSettings.typeOfGame === "ball") {
+  // return (
+  //   <div>
+  //     <h4>Game Room</h4>
+  //     <p>This component is in the gameroom</p>
+  //   </div>
+  // );
+
+  // if (!props.store.roomName) {
+  //   window.location.href = frontPagePath;
+  // }
+  if (props.store?.gameSettings?.typeOfGame === "ball") {
     startBallGameOneMonitor(
       props.socket,
       props.store.players,
       props.store.gameSettings
     );
-  } else {
+  }
+  if (props.store?.gameSettings?.typeOfGame === "race") {
     startRaceGameOneMonitor(
       props.socket,
       props.store.players,

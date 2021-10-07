@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { Socket } from "socket.io-client";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Socket } from "socket.io-client";
 import "../styles/main.css";
+import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
 import { waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
-import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 
 // const logo = require("../images/caroutline.png");
 // import * as logo from "../images/caroutline.png";

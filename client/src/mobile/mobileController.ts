@@ -1,6 +1,6 @@
-import { io, Socket } from "socket.io-client"
-import { DefaultEventsMap } from "socket.io-client/build/typed-events"
-import { width, height, drawAccelerator, changeOrientation, handleTouchStart, handleTouchEnd, drawDeccelerator, MobileControls, drawBreak, drawResetButton } from "./mobileGui"
+import { Socket } from "socket.io-client"
+import { MobileControls } from "../utils/ControlsClasses"
+import { handleTouchStart, handleTouchEnd, drawAccelerator, drawDeccelerator, drawBreak, drawResetButton } from "./mobileGui"
 
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
@@ -25,10 +25,17 @@ let orientation: IOrientation = {
 
 let ctx: CanvasRenderingContext2D | null
 
-export const initGryoscope = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
+const height = window.innerHeight
+const width = window.innerWidth
+
+export const initGryoscope = (socket: Socket) => {
 
     const canvas = document.createElement("canvas")
     canvas.setAttribute("id", "controller-canvas")
+    alert("height " + height)
+
+
+
     canvas.height = height
     canvas.width = width
     ctx = canvas.getContext("2d")
@@ -40,10 +47,6 @@ export const initGryoscope = (socket: Socket<DefaultEventsMap, DefaultEventsMap>
     }
     )
     window.addEventListener("touchend", () => handleTouchEnd(socket, controls))
-    window.addEventListener("orientationchange", () => {
-        changeOrientation(canvas)
-    })
-
 
     window.addEventListener("deviceorientation", (e: DeviceOrientationEvent) => {
         const gamma = e.gamma ?? 0

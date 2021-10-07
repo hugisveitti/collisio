@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
@@ -42,11 +42,10 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   }, [props.store.players]);
 
   if (!props.store.roomName) {
-    window.location.href = frontPagePath;
+    // window.location.href = frontPagePath;
   }
 
   const sendTeamChange = (newTeamNumber: number) => {
-    console.log("team change");
     props.socket.emit("team-change", { newTeamNumber });
   };
 

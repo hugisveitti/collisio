@@ -1,30 +1,9 @@
 import { Socket } from "socket.io-client"
 import { IPlayerInfo } from "../classes/Game"
-import { MobileControls } from "../mobile/mobileGui"
 import { IVehicle } from "../models/IVehicle"
+import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 
 
-
-
-export class VehicleControls {
-    left: boolean
-    forward: boolean
-    backward: boolean
-    right: boolean
-    steerValue: number
-    break: boolean
-
-
-
-    constructor() {
-        this.left = false
-        this.right = false
-        this.forward = false
-        this.backward = false
-        this.steerValue = 0
-        this.break = false
-    }
-}
 
 
 

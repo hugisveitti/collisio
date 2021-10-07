@@ -1,64 +1,20 @@
 import { Socket } from "socket.io-client"
-import { DefaultEventsMap } from "socket.io-client/build/typed-events"
+import { MobileControls } from "../utils/ControlsClasses"
 
+const width = window.innerWidth
+const height = window.innerHeight
 
-export class MobileControls {
+export const cRadius = 50
+export const cXAcc = width - (10 + cRadius)
+export const cXDecc = width - (10 + cRadius)
+export const cXBreak = 40 + (cRadius * 4)
+export const cYAcc = 10 + (cRadius * 2)
+export const cYDecc = height - (10 + cRadius * 2)
+export const cYBreak = height - (10 + cRadius * 2)
 
-    moreSpeed: boolean
-    beta: number
-    alpha: number
-    gamma: number
-    isAccelerating: boolean
-    isDeccelerating: boolean
-    breaking: boolean
-    lookBackwards: boolean
-    resetVehicle: boolean
+export const cXReset = cRadius + 10
+export const cYReset = height / 2
 
-    constructor() {
-        this.moreSpeed = false
-        this.beta = 0
-        this.gamma = 0
-        this.alpha = 0
-        this.isAccelerating = false
-        this.isDeccelerating = false
-        this.breaking = false
-        this.lookBackwards = false
-        this.resetVehicle = false
-    }
-}
-
-export let width = window.innerWidth
-export let height = window.innerHeight
-export let isPortrait = screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary"
-
-
-export let cRadius = 50
-export let cXAcc = width - (10 + cRadius)
-export let cXDecc = width - (10 + cRadius)
-export let cXBreak = 40 + (cRadius * 4)
-export let cYAcc = 10 + (cRadius * 2)
-export let cYDecc = height - (10 + cRadius * 2)
-export let cYBreak = height - (10 + cRadius * 2)
-
-export let cXReset = cRadius + 10
-export let cYReset = height / 2
-
-
-export const changeOrientation = (canvas: HTMLCanvasElement) => {
-    isPortrait = screen.orientation.type === "portrait-primary" || screen.orientation.type === "portrait-secondary"
-    width = window.innerWidth
-    height = window.innerHeight
-    console.log("w", width)
-
-    // canvas.height = isPortrait ? height : width
-    // canvas.width = isPortrait ? width : height
-    canvas.height = height
-    canvas.width = width
-    cRadius = isPortrait ? width / 2 - 50 : height / 2 - 50
-    // cXDecc = width / 2
-    cYDecc = height - 100
-    cYAcc = 100
-}
 
 export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: MobileControls) => {
 
@@ -109,77 +65,45 @@ export const handleTouchEnd = (socket: Socket, controls: MobileControls) => {
 export const drawLeftArrow = (ctx: CanvasRenderingContext2D | null) => {
     if (!ctx) return
 
-    if (isPortrait) {
 
-        /**left arrow */
-        ctx.beginPath()
-        ctx.moveTo(width / 2, 10)
-        ctx.lineTo(width / 2, 200)
-        ctx.stroke()
+    /**left arrow */
+    ctx.beginPath()
+    ctx.moveTo(width / 2, 10)
+    ctx.lineTo(width / 2, 200)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width / 2, 10)
-        ctx.lineTo(width / 2 - 40, 80)
-        ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(width / 2, 10)
+    ctx.lineTo(width / 2 - 40, 80)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width / 2, 10)
-        ctx.lineTo(width / 2 + 40, 80)
-        ctx.stroke()
-    } else {
-        /**left arrow */
-        ctx.beginPath()
-        ctx.moveTo(10, height / 2)
-        ctx.lineTo(200, height / 2)
-        ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(width / 2, 10)
+    ctx.lineTo(width / 2 + 40, 80)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(10, height / 2)
-        ctx.lineTo(80, height / 2 - 40)
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.moveTo(10, height / 2)
-        ctx.lineTo(80, height / 2 + 40)
-        ctx.stroke()
-    }
 }
 
 export const drawRightArrow = (ctx: CanvasRenderingContext2D | null) => {
     if (!ctx) return
 
-    if (isPortrait) {
 
-        ctx.beginPath()
-        ctx.moveTo(width / 2, height - 10)
-        ctx.lineTo(width / 2, height - 200)
-        ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width / 2, height - 10)
-        ctx.lineTo(width / 2 - 40, height - 80)
-        ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(width / 2, height - 10)
+    ctx.lineTo(width / 2, height - 200)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width / 2, height - 10)
-        ctx.lineTo(width / 2 + 40, height - 80)
-        ctx.stroke()
-    } else {
-        ctx.beginPath()
-        ctx.moveTo(width - 10, height / 2)
-        ctx.lineTo(width - 200, height / 2)
-        ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(width / 2, height - 10)
+    ctx.lineTo(width / 2 - 40, height - 80)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width - 10, height / 2)
-        ctx.lineTo(width - 80, height / 2 - 40)
-        ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(width / 2, height - 10)
+    ctx.lineTo(width / 2 + 40, height - 80)
+    ctx.stroke()
 
-        ctx.beginPath()
-        ctx.moveTo(width - 10, height / 2)
-        ctx.lineTo(width - 80, height / 2 + 40)
-        ctx.stroke()
-    }
 }
 
 export const drawAccelerator = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {

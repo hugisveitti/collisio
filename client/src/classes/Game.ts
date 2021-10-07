@@ -1,5 +1,4 @@
-import { MobileControls } from "../mobile/mobileGui"
-import { VehicleControls } from "../utils/controls"
+import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
 
 

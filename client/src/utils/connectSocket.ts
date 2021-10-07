@@ -1,4 +1,3 @@
-import { getDeviceType } from "./settings";
 import { io } from "socket.io-client"
 
 export interface ISocketCallback {
@@ -7,9 +6,8 @@ export interface ISocketCallback {
     data: any
 }
 
-export const createSocket = () => {
+export const createSocket = (deviceType: string) => {
 
-    const deviceType = getDeviceType()
     const socket = io()
 
 

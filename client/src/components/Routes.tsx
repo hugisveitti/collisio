@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  useHistory,
-} from "react-router-dom";
-import socketIOClient, { Socket } from "socket.io-client";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Socket } from "socket.io-client";
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
+import { getDeviceType } from "../utils/settings";
 import ControlsRoom from "./ControlsRoom";
 import GameRoom from "./GameRoom";
 import OneMonitorFrontPage from "./OneMonitorFrontPage";
@@ -29,8 +25,9 @@ const Routes = () => {
     typeOfGame: "race",
   } as IGameSettings);
 
+  const deviceType = getDeviceType();
   useEffect(() => {
-    const newSocket = createSocket();
+    const newSocket = createSocket(deviceType);
     setSocket(newSocket);
   }, []);
 

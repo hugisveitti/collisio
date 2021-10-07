@@ -1,14 +1,15 @@
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d"
-import { IVehicle, SimpleVector } from "../models/IVehicle"
-import { addControls, VehicleControls, } from "../utils/controls"
-import { NormalVehicle } from "../models/NormalVehicle"
+import { Color } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { Socket } from "socket.io-client"
-import { IGameSettings, IPlayerInfo } from "../classes/Game"
-import { Color } from "@enable3d/three-wrapper/dist"
-import "./one-monitor-styles.css"
+import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
+import { Socket } from "socket.io-client";
+import Stats from "stats.js";
+import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { IVehicle, SimpleVector } from "../models/IVehicle";
+import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
-import Stats from "stats.js"
+import { addControls } from "../utils/controls";
+import { VehicleControls } from "../utils/ControlsClasses";
+import "./one-monitor-styles.css";
 
 const vechicleFov = 60
 
@@ -99,8 +100,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     updateScoreTable() {
         scoreTable.innerHTML = `
-        Leaderboard
-        `
+            Leaderboard
+            `
     }
 
 
@@ -112,7 +113,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.loadFont()
 
         // this.physics.debug?.enable()
-        //this.physics.debug?.mode(2048 + 4096)
+        // this.physics.debug?.mode(2048 + 4096)
         this.warpSpeed("-ground")
 
         this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
@@ -193,7 +194,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     checkVehicleOutOfBounds(idx: number) {
         const pos = this.vehicles[idx].getPosition()
         if (this.course.checkIfObjectOutOfBounds(pos)) {
-            this.resetPlayer(idx, 20)
+            this.resetPlayer(idx, 20, 0, 0)
         }
     }
 
@@ -228,12 +229,12 @@ export class OneMonitorRaceGameScene extends Scene3D {
         stats.end()
     }
 
-    resetPlayer(idx: number, y?: number) {
+    resetPlayer(idx: number, y?: number, x?: number, z?: number) {
         const zPos = 10
 
 
         const cW = Math.random() * 20 - 10
-        this.vehicles[idx].setPosition(cW, y ?? 4, zPos)
+        this.vehicles[idx].setPosition(x ?? cW, y ?? 4, z ?? zPos)
         this.vehicles[idx].setRotation(0, 0, 0)
     }
 
@@ -272,8 +273,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
             this.font = response;
             if (this.font) {
-
-
                 for (let i = 0; i < this.vehicles.length; i++)
                     this.vehicles[i].setFont(this.font as THREE.Font)
             }

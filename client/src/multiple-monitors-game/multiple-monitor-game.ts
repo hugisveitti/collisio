@@ -1,12 +1,13 @@
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, } from "enable3d"
 import { IVehicle, SimpleVector } from "../models/IVehicle"
-import { addControls, VehicleControls, } from "../utils/controls"
+import { addControls, } from "../utils/controls"
 import { NormalVehicle } from "../models/NormalVehicle"
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { PerspectiveCamera } from "three"
 import { Socket } from "socket.io-client"
 import { IPlayerInfo } from "../classes/Game"
 import { SimpleCourt, SimpleCourtSettings, } from "../shared-game-components/squaredCourse"
+import { VehicleControls } from "../utils/ControlsClasses";
 
 const speedometer = document.getElementById("speedometer")
 const positionInfo = document.getElementById("position-info")
