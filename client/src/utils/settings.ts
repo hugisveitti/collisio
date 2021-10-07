@@ -26,6 +26,6 @@ export const baseurl = "http://localhost:5000/"
 
 // if not development then always false, otherwise set by me...
 // this isnt just crap code
-export const startGameAuto = process.env.NODE_ENV !== "development" ? false : false
+export const startGameAuto = process.env.NODE_ENV !== "development" ? false : false;
 export const isTestMode = process.env.NODE_ENV !== "development" ? false : false;
 // export const devMode = true

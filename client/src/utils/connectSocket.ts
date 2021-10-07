@@ -1,3 +1,4 @@
+import { toast } from "react-toastify"
 import { io } from "socket.io-client"
 
 export interface ISocketCallback {
@@ -26,5 +27,11 @@ export const createSocket = (deviceType: string) => {
             console.log("device motion supported")
         }
     }
+
+
+    socket.on("disconnect", () => {
+        toast.error("Connection lost, you will probably have to refresh")
+    })
+
     return socket
 }

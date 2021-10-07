@@ -7,7 +7,7 @@ import "../styles/main.css";
 import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
-import { waitingRoomPath } from "./Routes";
+import { controlsRoomPath, waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
 
 // const logo = require("../images/caroutline.png");
@@ -29,7 +29,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         <input
           className="large-input"
           type="text"
-          placeholder="player name"
+          placeholder="Player Name"
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
         />
@@ -101,7 +101,11 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   }, []);
 
   if (isTestMode) {
-    startRaceTrackTest(props.socket, props.store.gameSettings);
+    if (deviceType === "desktop") {
+      startRaceTrackTest(props.socket, props.store.gameSettings);
+    } else {
+      history.push(controlsRoomPath);
+    }
     return null;
   }
 
@@ -111,20 +115,12 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         <h2 className="center">
           Welcome to <i>Collisio</i>
         </h2>
-        <p>
-          Create a room, you and 3 friends connect to that room with your mobile
-          phones.
-        </p>
-        <p>Its a car game where your phone is the controller.</p>
-        <h3 className="center">Create a room</h3>
-        <p>
-          Please type in the room name to create a room. Then all the players
-          should type in the room name and their name on their mobile device.
-        </p>
+        <br />
+        <br />
         <input
           className="large-input"
           type="text"
-          placeholder="room name"
+          placeholder="Room Name"
           value={props.store.roomName}
           onChange={(e) => props.store.setRoomName(e.target.value)}
         />
@@ -138,10 +134,24 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           id="room-name-btn"
           onClick={connectButtonClicked}
         >
-          Join
+          {deviceType === "desktop" ? "Create Room" : "Join Room"}
         </button>
+        <p>
+          Create a room, you and 3 friends connect to that room with your mobile
+          phones.
+        </p>
+        <p>Its a car game where your phone is the controller.</p>
+        <h3 className="center">Create a room</h3>
+        <p>
+          Please type in the room name to create a room. Then all the players
+          should type in the room name and their name on their mobile device.
+        </p>
         <hr />
         <p>This game is in development</p>
+        <p>
+          On mobile please have your phone in portrait and lock the screen
+          switch
+        </p>
         <ToastContainer />
       </div>
     </div>

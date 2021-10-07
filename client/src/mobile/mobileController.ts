@@ -1,3 +1,4 @@
+import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
 import { handleTouchStart, handleTouchEnd, drawAccelerator, drawDeccelerator, drawBreak, drawResetButton } from "./mobileGui"
@@ -28,23 +29,7 @@ let ctx: CanvasRenderingContext2D | null
 const height = window.innerHeight
 const width = window.innerWidth
 
-export const initGryoscope = (socket: Socket) => {
-
-    const canvas = document.createElement("canvas")
-    canvas.setAttribute("id", "controller-canvas")
-
-    canvas.height = height
-    canvas.width = width
-    ctx = canvas.getContext("2d")
-
-    document.body.appendChild(canvas)
-
-    window.addEventListener("touchstart", (e) => {
-        handleTouchStart(e, socket, controls)
-    }
-    )
-    window.addEventListener("touchend", () => handleTouchEnd(socket, controls))
-
+const createDeviceOrientationListener = () => {
     window.addEventListener("deviceorientation", (e: DeviceOrientationEvent) => {
         const gamma = e.gamma ?? 0
         const beta = e.beta ?? 0
@@ -61,16 +46,70 @@ export const initGryoscope = (socket: Socket) => {
             alpha
         }
 
-    }, true)
 
+    }, true)
+}
+
+export const initGryoscope = (socket: Socket) => {
+    document.body.setAttribute("overflow", "hidden")
+
+    const canvas = document.createElement("canvas")
+    canvas.setAttribute("id", "controller-canvas")
+
+    canvas.height = height
+    canvas.width = width
+    ctx = canvas.getContext("2d")
+
+    document.body.appendChild(canvas)
+
+    window.addEventListener("touchstart", (e) => {
+        handleTouchStart(e, socket, controls)
+    }
+    )
+    window.addEventListener("touchend", () => handleTouchEnd(socket, controls))
+
+    createDeviceOrientationListener()
+
+    // Something needs to be in fullscreen to lock the element.
+    // document.body.requestFullscreen().then(() => {
+    //     screen.orientation.lock("portrait").then(() => {
+    //         console.log("screen orientation locked")
+    //     }).catch((e) => {
+    //         console.log(e)
+    //     })
+    // }).catch((e) => {
+    //     console.log("req fullscreen error", e)
+    // })
+
+    screen.orientation.addEventListener("change", () => {
+        createScreenError()
+    })
+    createScreenError()
 
     startLoop(socket)
 }
 
+const createScreenError = () => {
+    if (screen.orientation.type.slice(0, 9) === "landscape") {
+        toast.error("Please use portrait mode and lock your screen.")
+    }
+}
+
+
 const startLoop = (socket: Socket) => {
-    console.log("starting loop")
-    console.log(ctx)
+    let controlsZeroCounter = 0
     const loop = () => {
+        if (controls.beta === 0 && controls.alpha === 0 && controls.gamma === 0) {
+            controlsZeroCounter += 1;
+            if (controlsZeroCounter === 1000) {
+                console.log("creating new orientation listener")
+                createDeviceOrientationListener()
+                controlsZeroCounter = 0
+            }
+        } else {
+            controlsZeroCounter = 0
+        }
+
         socket.emit("send-controls", controls)
 
 
@@ -98,7 +137,6 @@ const startLoop = (socket: Socket) => {
                 ctx.restore()
             }
             if (controls.moreSpeed) {
-                console.log("more speed", controls.moreSpeed)
                 ctx.save()
                 ctx.translate(width / 2, height / 2)
                 ctx.rotate(-Math.PI / 2)
@@ -113,5 +151,6 @@ const startLoop = (socket: Socket) => {
         }
 
     }
+
     loop()
 }

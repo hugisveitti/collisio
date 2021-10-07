@@ -3,7 +3,7 @@ import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import Stats from "stats.js";
-import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { defaultGameSettings, IGameSettings, IPlayerInfo } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
@@ -13,26 +13,12 @@ import "./one-monitor-styles.css";
 
 const vechicleFov = 60
 
-const possibleColors = ["red", "blue", "green", "yellow", "brown", "black", "white"]
+const possibleColors = [0x9e4018, 0x0d2666, 0x1d8a47, 0x61f72a, "brown", "black", "white"]
 
 
 const stats = new Stats()
 const scoreTable = document.createElement("div")
 const importantInfoDiv = document.createElement("div")
-
-
-const numDecimals = 2
-const getSimpleVectorString = (vec: SimpleVector) => {
-    if (!vec) return ""
-    return `x: ${vec.x.toFixed(numDecimals)} y: ${vec.y.toFixed(numDecimals)} z: ${vec.z.toFixed(numDecimals)}`
-}
-
-const simpleVecDistance = (vec1: SimpleVector, vec2: SimpleVector) => {
-    const x = vec1.x - vec2.x
-    const y = vec1.y - vec2.y
-    const z = vec1.z - vec2.z
-    return Math.sqrt((x * x) + (z * z) + (y * y))
-}
 
 interface IView {
     left: number,
@@ -55,7 +41,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
     course!: RaceCourse
     views!: IView[]
     gameSettings: IGameSettings
-    raceStarted: boolean
     checkpointCrossed: boolean[]
     goalCrossed: boolean[]
     timeStarted: number
@@ -64,6 +49,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
     totalTime: number[]
     currentLapStart: number[]
     courseLoaded: boolean
+
+    totalNumberOfLaps: number
+    raceOnGoing: boolean
 
 
     constructor() {
@@ -74,13 +62,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         document.body.appendChild(scoreTable)
         document.body.appendChild(importantInfoDiv)
-        importantInfoDiv.innerHTML = "Loading course..."
-        this.gameSettings = {
-            ballRadius: 1,
-            typeOfGame: "race"
-        }
 
-        this.raceStarted = false
+        this.gameSettings = defaultGameSettings
+
         this.checkpointCrossed = []
         this.goalCrossed = []
         this.timeStarted = 0
@@ -89,15 +73,20 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.lapNumber = []
         this.totalTime = []
         this.courseLoaded = false
+        this.vehicles = []
+        this.totalNumberOfLaps = 3
+        this.raceOnGoing = false
+        this.loadFont()
 
     }
 
     setGameSettings(newGameSettings: IGameSettings) {
         this.gameSettings = newGameSettings
+        this.totalNumberOfLaps = this.gameSettings.numberOfLaps
     }
 
     startRaceCountdown() {
-        let countdown = 4
+        let countdown = 5
         const timer = () => {
             importantInfoDiv.innerHTML = countdown + ""
             countdown -= 1
@@ -105,13 +94,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 if (countdown > 0) {
                     timer()
                 } else {
-                    this.raceStarted = true
                     importantInfoDiv.innerHTML = "GO!!!!"
                     this.startAllVehicles()
                     this.timeStarted = Date.now()
-                    for (let i = 0; i < this.vehicles.length; i++) {
-                        this.currentLapStart.push(Date.now())
-                    }
+                    this.raceOnGoing = true
+
                     setTimeout(() => {
                         importantInfoDiv.innerHTML = ""
                     }, 2000)
@@ -124,6 +111,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
     startAllVehicles() {
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].canDrive = true
+            this.currentLapStart.push(Date.now())
+            this.totalTime.push(Date.now())
+            const p = this.course.goal.position
+            this.vehicles[i].setCheckpointPositionRotation({ position: { x: p.x + 10, y: 4, z: p.z + 10 }, rotation: { x: 0, y: 180, z: 0 } })
         }
     }
 
@@ -134,24 +125,34 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     updateScoreTable() {
-        const currentLapTimes = []
-        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>Ln</th>"
+        if (!this.raceOnGoing) return
+        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
             const cLapTime = (Date.now() - this.currentLapStart[i]) / 1000
-            currentLapTimes.push(cLapTime)
-            s += `<tr><td>${this.players[i].playerName}</td><td>${this.bestLapTime[i]}</td><td>${currentLapTimes}</td><td>${this.lapNumber[i]}</td></tr>`
+            const bLT = this.bestLapTime[i] === Infinity ? "-" : this.bestLapTime[i]
+            const totalTime = (Date.now() - this.totalTime[i]) / 1000
+            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime.toFixed(2)}</td><td>${totalTime.toFixed(2)}</td><td>${this.lapNumber[i]} / ${this.totalNumberOfLaps}</td></tr>`
         }
         s += "</table>"
         scoreTable.innerHTML = s
     }
 
+    restartGame() {
+        this.raceOnGoing = false
+        const restartInSeconds = 3
+        importantInfoDiv.innerHTML = "Restarting game in " + 3 + " seconds.."
+        for (let i = 0; i < this.vehicles.length; i++) {
+            this.vehicles[i].canDrive = false
+            // this.vehicles[i].totalStop()
+        }
+        setTimeout(() => {
+            this.createVehicles()
+            this.startRaceCountdown()
+        }, restartInSeconds * 1000)
+    }
 
     async create() {
 
-        this.createVehicles()
-        this.createViews()
-        this.createController()
-        this.loadFont()
 
         // this.physics.debug?.enable()
         // this.physics.debug?.mode(2048 + 4096)
@@ -160,6 +161,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             this.courseLoaded = true
+            this.createVehicles()
+            this.createViews()
+            this.createController()
             importantInfoDiv.innerHTML = "Race starting in"
         })
 
@@ -169,7 +173,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
-                this.resetPlayers()
+                this.restartGame()
             }
         })
         window.addEventListener("resize", () => this.onWindowResize())
@@ -192,12 +196,21 @@ export class OneMonitorRaceGameScene extends Scene3D {
             const cLapTime = (Date.now() - this.currentLapStart[vehicleNumber]) / 1000
             this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
             this.currentLapStart[vehicleNumber] = Date.now()
+            const p = this.course.goal.position
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x + 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 180 } })
+            if (this.lapNumber[vehicleNumber] > this.totalNumberOfLaps && this.raceOnGoing) {
+                const totalTime = (Date.now() - this.totalTime[vehicleNumber]) / 1000
+                importantInfoDiv.innerHTML = `Race over <br /> ${this.players[vehicleNumber].playerName} won with total time ${totalTime} <br /> Press 'r' to reset game`
+                this.raceOnGoing = false
+            }
         }
     }
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D) {
         const vehicleNumber = vehicle.body.name.slice(8, 9)
         this.checkpointCrossed[vehicleNumber] = true
+        const p = this.course.checkpoint.position
+        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x - 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 0 } })
     }
 
     createViews() {
@@ -250,12 +263,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
     checkVehicleOutOfBounds(idx: number) {
         const pos = this.vehicles[idx].getPosition()
         if (this.course.checkIfObjectOutOfBounds(pos)) {
-            this.resetPlayer(idx, 20, 0, 0)
+            this.resetPlayer(idx)
         }
     }
 
     updateVehicles() {
-
         for (let i = 0; i < this.views.length; i++) {
 
             this.vehicles[i].update()
@@ -276,12 +288,15 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.renderer.render(this.scene, this.views[i].camera);
 
             this.checkVehicleOutOfBounds(i)
+
+            if (!this.vehicles[i].canDrive) {
+                this.vehicles[i].totalStop()
+            }
         }
     }
 
     update() {
         if (this.courseLoaded) {
-
             stats.begin()
             this.updateScoreTable()
             this.updateVehicles()
@@ -289,13 +304,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
         }
     }
 
-    resetPlayer(idx: number, y?: number, x?: number, z?: number) {
-        const zPos = 10
-
-
-        const cW = Math.random() * 20 - 10
-        this.vehicles[idx].setPosition(x ?? cW, y ?? 4, z ?? zPos)
-        this.vehicles[idx].setRotation(0, 0, 0)
+    resetPlayer(idx: number) {
+        this.vehicles[idx].resetPosition()
     }
 
 
@@ -311,17 +321,27 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     createVehicles() {
-        this.vehicles = []
+        this.checkpointCrossed = []
+        this.goalCrossed = []
+        this.lapNumber = []
+        this.totalTime = []
+        this.bestLapTime = []
+        this.currentLapStart = []
         for (let i = 0; i < this.players.length; i++) {
             const color = possibleColors[i]
-            this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName, i))
-            this.vehicles[i].setPosition(163, 4, -17 - (i * 5))
+            if (i >= this.vehicles.length) {
+                const newVehicle = new NormalVehicle(this, color, this.players[i].playerName, i)
+                this.vehicles.push(newVehicle)
+                if (this.font) {
+                    newVehicle.setFont(this.font as THREE.Font)
+                }
+            }
+            this.vehicles[i].setPosition(158 + (i * 5), 4, -17)
             this.vehicles[i].setRotation(0, 180, 0)
             this.vehicles[i].canDrive = false
             this.checkpointCrossed.push(false)
             this.goalCrossed.push(false)
             this.lapNumber.push(1)
-            this.totalTime.push(0)
             this.bestLapTime.push(Infinity)
         }
     }
@@ -333,10 +353,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
 
             this.font = response;
-            if (this.font) {
-                for (let i = 0; i < this.vehicles.length; i++)
-                    this.vehicles[i].setFont(this.font as THREE.Font)
-            }
+
         });
 
     }

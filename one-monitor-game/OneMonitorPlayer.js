@@ -67,7 +67,9 @@ class Player {
 
     startGame() {
         this.setupControler()
-        this.socket.emit("handle-game-starting", { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
+        if (this.game) {
+            this.socket.emit("handle-game-starting", { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
+        }
     }
 
     setupTeamChangeListener() {

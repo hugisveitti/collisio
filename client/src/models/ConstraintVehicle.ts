@@ -1,6 +1,6 @@
 import { ExtendedObject3D, Scene3D } from "enable3d"
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { IVehicle } from "./IVehicle"
+import { IPositionRotation, IVehicle } from "./IVehicle"
 
 const boxDim = { depth: 1, height: 1, width: 1 }
 
@@ -71,6 +71,14 @@ export class ConstraintVehicle implements IVehicle {
         this.turnAxis.right.setMotorTarget(0, 0.5)
     }
 
+    turn(angle: number) {
+        console.log("turn has not been implemented for constraint vehicle")
+    }
+
+    totalStop() {
+        console.log("total stop not implemented")
+    }
+
     // Some typescript error trying to set it to PerspectiveCamera
     addCamera(camera: any) {
         this.frame.add(camera)
@@ -119,6 +127,14 @@ export class ConstraintVehicle implements IVehicle {
 
     lookForwardsBackwards(lookBackwards: boolean) {
         console.log("lookForwardsBackwards not implemented")
+    }
+
+    resetPosition() {
+        console.log("reset position not implemented")
+    }
+
+    setCheckpointPositionRotation(positionRotation: IPositionRotation) {
+        console.log("set checkpoint not implemented for constraint vehicle")
     }
 }
 

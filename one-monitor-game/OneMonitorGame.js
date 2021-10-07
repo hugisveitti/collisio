@@ -67,7 +67,9 @@ class GameMaster {
                     console.log("disconnected from desktop")
                     delete this.rooms[roomName]
                 } else {
+                    console.log("disconnected from mobile")
                     if (player) {
+                        console.log(`player ${player.playerName} disconnected`)
                         player.isConnected = false
                     }
                 }
@@ -161,11 +163,11 @@ class Game {
     }
 
     startGame() {
+        this.setupControlsListener()
         this.gameStarted = true
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].startGame()
         }
-        this.setupControlsListener()
         console.log("starting game", this.toString())
     }
 

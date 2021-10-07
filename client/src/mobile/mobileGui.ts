@@ -7,7 +7,7 @@ const height = window.innerHeight
 export const cRadius = 50
 export const cXAcc = width - (10 + cRadius)
 export const cXDecc = width - (10 + cRadius)
-export const cXBreak = 40 + (cRadius * 4)
+export const cXBreak = (cRadius * 4)
 export const cYAcc = 10 + (cRadius * 2)
 export const cYDecc = height - (10 + cRadius * 2)
 export const cYBreak = height - (10 + cRadius * 2)
@@ -131,7 +131,7 @@ export const drawAccelerator = (ctx: CanvasRenderingContext2D | null, controls: 
 
     ctx.font = "30px Arial"
     let infoText = "Forward"
-    ctx.fillText(infoText, -15, 0)
+    ctx.fillText(infoText, -45, 10)
     ctx.restore()
 }
 
@@ -159,7 +159,7 @@ export const drawDeccelerator = (ctx: CanvasRenderingContext2D | null, controls:
 
     ctx.font = "30px Arial"
     let infoText = "Backward"
-    ctx.fillText(infoText, -15, 0)
+    ctx.fillText(infoText, -45, 10)
     ctx.restore()
 }
 
@@ -190,7 +190,7 @@ export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: Mobile
 
     ctx.font = "30px Arial"
     let infoText = "STOP"
-    ctx.fillText(infoText, -15, 0)
+    ctx.fillText(infoText, -32, 10)
     ctx.restore()
 }
 
@@ -207,8 +207,6 @@ export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: 
     }
     ctx.fill()
 
-
-
     ctx.save()
     ctx.translate(cXReset, cYReset)
     ctx.rotate(-Math.PI / 2)
@@ -220,6 +218,6 @@ export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: 
 
     ctx.font = "30px Arial"
     let infoText = "Reset"
-    ctx.fillText(infoText, -15, 0)
+    ctx.fillText(infoText, -32, 10)
     ctx.restore()
 }

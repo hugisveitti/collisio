@@ -23,6 +23,7 @@ const Routes = () => {
   const [gameSettings, setGameSettings] = useState({
     ballRadius: 1,
     typeOfGame: "race",
+    numberOfLaps: 3,
   } as IGameSettings);
 
   const deviceType = getDeviceType();

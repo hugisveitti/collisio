@@ -5,6 +5,12 @@ export interface SimpleVector {
     z: number
     y: number
 }
+
+export interface IPositionRotation {
+    position: SimpleVector
+    rotation: SimpleVector
+}
+
 export interface IVehicle {
     canDrive: boolean
     goForward: (moreSpeed: boolean) => void
@@ -13,7 +19,9 @@ export interface IVehicle {
     turnLeft: (angle: number) => void
     turnRight: (angle: number) => void
     noTurn: () => void
+    turn: (angle: number) => void
     break: (notBreak?: boolean) => void
+    totalStop: () => void
 
     addCamera: (camera: any) => void
     cameraLookAt: (camera: any) => void
@@ -26,5 +34,8 @@ export interface IVehicle {
     setFont: (font: THREE.Font) => void
 
     lookForwardsBackwards: (lookBackwards: boolean) => void
+
+    resetPosition: () => void
+    setCheckpointPositionRotation: (positionRotation: IPositionRotation) => void
 
 }

@@ -73,6 +73,7 @@ export class PhysicsTest extends Scene3D {
         document.body.appendChild(scoreTable)
         this.gameSettings = {
             ballRadius: 1,
+            numberOfLaps: 0,
             typeOfGame: "ball"
         }
     }

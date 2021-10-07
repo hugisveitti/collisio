@@ -11,7 +11,6 @@ let angle = 40
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
     if (mobileControls.isAccelerating) {
-
         vehicle.goForward(mobileControls.moreSpeed)
     } else if (mobileControls.isDeccelerating) {
         vehicle.goBackward(speed)
@@ -24,14 +23,8 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
     } else {
         vehicle.break(true)
     }
+    vehicle.turn(mobileControls.beta)
 
-    if (mobileControls.beta > 4) {
-        vehicle.turnLeft(mobileControls.beta)
-    } else if (mobileControls.beta < -4) {
-        vehicle.turnRight(mobileControls.beta)
-    } else {
-        vehicle.noTurn()
-    }
 
     if (mobileControls.lookBackwards) {
         vehicle.lookForwardsBackwards(true)
@@ -40,10 +33,7 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
     }
 
     if (mobileControls.resetVehicle) {
-        const { x, z } = vehicle.getPosition()
-        const rot = vehicle.getRotation()
-        vehicle.setPosition(x, 20, z)
-        vehicle.setRotation(0, rot.y, 0)
+        vehicle.resetPosition()
     }
 }
 
@@ -66,7 +56,6 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
     })
 
     if (!driveWithKeyboardEnabled) {
-
         socket.on("get-controls", (data) => {
             const { players } = data as { players: IPlayerInfo[] }
             for (let i = 0; i < players.length; i++) {

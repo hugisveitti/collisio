@@ -16,5 +16,11 @@ export interface IPlayerInfo {
 export interface IGameSettings {
     ballRadius: number
     typeOfGame: "ball" | "race"
+    numberOfLaps: number
 }
 
+export const defaultGameSettings: IGameSettings = {
+    ballRadius: 1,
+    typeOfGame: "race",
+    numberOfLaps: 3
+}

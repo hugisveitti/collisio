@@ -113,21 +113,43 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       {deviceType === "desktop" && (
         <div>
           <h4 className="center">Game settings</h4>
-          <label>Ball radius</label>
-          <br />
-          <br />
-          <input
-            className="large-input"
-            type="text"
-            value={props.store.gameSettings.ballRadius}
-            onChange={(ev) => {
-              const newGameSettings = {
-                ...props.store.gameSettings,
-                ballRadius: +ev.target.value,
-              } as IGameSettings;
-              props.store.setGameSettings(newGameSettings);
-            }}
-          />
+          {props.store.gameSettings.typeOfGame === "ball" ? (
+            <>
+              <label>Ball radius</label>
+              <br />
+              <br />
+              <input
+                className="large-input"
+                type="text"
+                value={props.store.gameSettings.ballRadius}
+                onChange={(ev) => {
+                  const newGameSettings = {
+                    ...props.store.gameSettings,
+                    ballRadius: +ev.target.value,
+                  } as IGameSettings;
+                  props.store.setGameSettings(newGameSettings);
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <label>Number of laps</label>
+              <br />
+              <br />
+              <input
+                className="large-input"
+                type="text"
+                value={props.store.gameSettings.numberOfLaps}
+                onChange={(ev) => {
+                  const newGameSettings = {
+                    ...props.store.gameSettings,
+                    numberOfLaps: +ev.target.value,
+                  } as IGameSettings;
+                  props.store.setGameSettings(newGameSettings);
+                }}
+              />
+            </>
+          )}
 
           <br />
           <h6 className="center">Type of game</h6>

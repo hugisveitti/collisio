@@ -1,9 +1,21 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { GLTF, GLTFLoader } from "@enable3d/three-wrapper/dist";
+import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 
+const manager = new LoadingManager()
 
+const loadDiv = document.createElement("div")
+loadDiv.setAttribute("id", "load-screen")
+document.body.appendChild(loadDiv)
+manager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
+    loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
+
+}
+
+manager.onLoad = () => {
+    loadDiv.innerHTML = ""
+}
 
 export class RaceCourse {
 
@@ -25,11 +37,10 @@ export class RaceCourse {
         this.trackWidth = 50
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
-
     }
 
     createCourse(courseLoadedCallback: () => void) {
-        const loader = new GLTFLoader()
+        const loader = new GLTFLoader(manager)
         loader.load("models/track.gltf", (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
             console.log("gltf", gltf)
@@ -54,10 +65,12 @@ export class RaceCourse {
                         const tree = child as ExtendedObject3D
                         // create a simple box for collision with the tree trunk
                         const { x, z } = tree.position
-                        this.scene.physics.add.box({ height: 4, depth: .3, width: .3, y: 2, z, x, collisionFlags: 1, }, { lambert: { wireframe: true } })
+                        this.scene.physics.add.box({ height: 4, depth: .3, width: .3, y: 2, z, x, collisionFlags: 1, }, { basic: { color: 0x011f0a } })
                     } else if (child.name === "checkpoint") {
                         this.checkpoint = child as ExtendedObject3D
                         this.scene.physics.add.existing(child as ExtendedObject3D, { collisionFlags: 5, shape: "convex" })
+                    } else if (child.name === "stytta") {
+                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave", breakable: true })
                     } else {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
                     }
