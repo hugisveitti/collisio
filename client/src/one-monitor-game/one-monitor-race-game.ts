@@ -165,6 +165,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.createViews()
             this.createController()
             importantInfoDiv.innerHTML = "Race starting in"
+            setTimeout(() => {
+                this.startRaceCountdown()
+            }, 2000)
         })
 
         stats.showPanel(0)
@@ -177,9 +180,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             }
         })
         window.addEventListener("resize", () => this.onWindowResize())
-        setTimeout(() => {
-            this.startRaceCountdown()
-        }, 2000)
+
     }
 
 
