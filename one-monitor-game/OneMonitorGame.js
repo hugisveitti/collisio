@@ -133,7 +133,7 @@ class Game {
     setupControlsListener() {
         setInterval(() => {
             this.socket.emit("get-controls", { players: this.getPlayersInfo() })
-        }, 1)
+        }, 10)
     }
 
     getPlayersInfo() {

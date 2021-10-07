@@ -113,7 +113,7 @@ const startLoop = (socket: Socket) => {
         socket.emit("send-controls", controls)
 
 
-        requestAnimationFrame(loop)
+        // requestAnimationFrame(loop)
         if (ctx) {
 
             ctx.clearRect(0, 0, width, height);
@@ -151,6 +151,9 @@ const startLoop = (socket: Socket) => {
         }
 
     }
+    setInterval(() => {
+        loop()
 
-    loop()
+        // set fps
+    }, 1000 / 30)
 }
