@@ -52,7 +52,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     totalNumberOfLaps: number
     raceOnGoing: boolean
-
+    winner: string
+    winTime: number
 
     constructor() {
         super()
@@ -77,6 +78,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.totalNumberOfLaps = 3
         this.raceOnGoing = false
         this.loadFont()
+        this.winner = ""
+        this.winTime = -1
+
 
     }
 
@@ -139,6 +143,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     restartGame() {
         this.raceOnGoing = false
+        this.winner = ""
+        this.winTime = -1
         const restartInSeconds = 3
         importantInfoDiv.innerHTML = "Restarting game in " + 3 + " seconds.."
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -201,9 +207,26 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x + 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 180 } })
             if (this.lapNumber[vehicleNumber] > this.totalNumberOfLaps && this.raceOnGoing) {
                 const totalTime = (Date.now() - this.totalTime[vehicleNumber]) / 1000
-                importantInfoDiv.innerHTML = `Race over <br /> ${this.players[vehicleNumber].playerName} won with total time ${totalTime} <br /> Press 'r' to reset game`
-                this.raceOnGoing = false
+                if (this.winner === "") {
+                    this.winner = this.players[vehicleNumber].playerName
+                    this.winTime = totalTime
+                }
+
+                this.checkRaceOver()
             }
+        }
+    }
+
+    checkRaceOver() {
+        let isRaceOver = true
+        for (let i = 0; i < this.vehicles.length; i++) {
+            if (this.lapNumber[i] <= this.totalNumberOfLaps) {
+                isRaceOver = false
+            }
+        }
+        if (isRaceOver) {
+            importantInfoDiv.innerHTML = `Race over <br /> ${this.winner} won with total time ${this.winTime} <br /> Press 'r' to reset game`
+            this.raceOnGoing = false
         }
     }
 
