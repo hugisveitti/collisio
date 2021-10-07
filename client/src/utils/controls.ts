@@ -4,8 +4,6 @@ import { IVehicle } from "../models/IVehicle"
 import { MobileControls, VehicleControls } from "./ControlsClasses"
 
 
-
-
 let speed = 40
 let maxAngle = 0.4
 let angle = 40
@@ -60,8 +58,8 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
         } else if (ev.key === "o") {
             lookBackwards = !lookBackwards
         } else if (ev.key === "u") {
-            console.log("driving with keyboard enabled")
             driveWithKeyboardEnabled = !driveWithKeyboardEnabled
+            console.log("driving with keyboard enabled", driveWithKeyboardEnabled)
         }
     })
 

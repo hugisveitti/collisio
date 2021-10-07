@@ -11,18 +11,7 @@ interface IGameRoom {
 }
 
 const GameRoom = (props: IGameRoom) => {
-  if (!false) {
-    // window.location.href = frontPagePath;
-
-    console.log("yo");
-  }
-  // return (
-  //   <div>
-  //     <h4>Game Room</h4>
-  //     <p>This component is in the gameroom</p>
-  //   </div>
-  // );
-
+  // this breaks iphone
   // if (!props.store.roomName) {
   //   window.location.href = frontPagePath;
   // }
@@ -32,8 +21,7 @@ const GameRoom = (props: IGameRoom) => {
       props.store.players,
       props.store.gameSettings
     );
-  }
-  if (props.store?.gameSettings?.typeOfGame === "race") {
+  } else if (props.store?.gameSettings?.typeOfGame === "race") {
     startRaceGameOneMonitor(
       props.socket,
       props.store.players,
