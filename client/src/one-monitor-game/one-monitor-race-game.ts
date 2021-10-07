@@ -183,7 +183,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         if (this.checkpointCrossed[vehicleNumber]) {
             this.lapNumber[vehicleNumber] += 1
             this.checkpointCrossed[vehicleNumber] = false
-            const cLapTime = Date.now() - this.currentLapStart[vehicleNumber]
+            const cLapTime = (Date.now() - this.currentLapStart[vehicleNumber]) / 1000
             this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
             this.currentLapStart[vehicleNumber] = Date.now()
         }

@@ -19,6 +19,8 @@ const chassisLength = 4;
 const vehicleMass = 800;
 const yOrigin = .5
 
+// how to determine this value?
+const turnDivder = 150
 
 export class NormalVehicle implements IVehicle {
 
@@ -185,9 +187,9 @@ export class NormalVehicle implements IVehicle {
         this.vehicle.applyEngineForce(-engineForce, BACK_RIGHT)
     }
     noForce() {
-        if (Math.abs(this.vehicle.getCurrentSpeedKmHour()) < 1) {
-            return
-        }
+        // if (Math.abs(this.vehicle.getCurrentSpeedKmHour()) < 1) {
+        //     return
+        // }
         this.vehicle.applyEngineForce(0, BACK_LEFT)
         this.vehicle.applyEngineForce(0, BACK_RIGHT)
     }
@@ -206,8 +208,8 @@ export class NormalVehicle implements IVehicle {
             this.vehicleSteering += steeringIncrement
         }
 
-        this.vehicle.setSteeringValue(angle / 100, FRONT_LEFT)
-        this.vehicle.setSteeringValue(angle / 100, FRONT_RIGHT)
+        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
+        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
     }
 
     turnRight(angle: number) {
@@ -216,9 +218,8 @@ export class NormalVehicle implements IVehicle {
             this.vehicleSteering -= steeringIncrement
         }
 
-
-        this.vehicle.setSteeringValue(angle / 100, FRONT_LEFT)
-        this.vehicle.setSteeringValue(angle / 100, FRONT_RIGHT)
+        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
+        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
     }
     noTurn() {
         if (Math.abs(this.vehicleSteering) < steeringIncrement - 0.001) return
