@@ -49,6 +49,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     totalTime: number[]
     currentLapStart: number[]
     courseLoaded: boolean
+    finishedTime: number[]
 
     totalNumberOfLaps: number
     raceOnGoing: boolean
@@ -80,8 +81,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.loadFont()
         this.winner = ""
         this.winTime = -1
-
-
+        this.finishedTime = []
     }
 
     setGameSettings(newGameSettings: IGameSettings) {
@@ -132,10 +132,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
         if (!this.raceOnGoing) return
         let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
-            const cLapTime = (Date.now() - this.currentLapStart[i]) / 1000
+            const cLapTime = ((Date.now() - this.currentLapStart[i]) / 1000).toFixed(2)
             const bLT = this.bestLapTime[i] === Infinity ? "-" : this.bestLapTime[i]
-            const totalTime = (Date.now() - this.totalTime[i]) / 1000
-            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime.toFixed(2)}</td><td>${totalTime.toFixed(2)}</td><td>${this.lapNumber[i]} / ${this.totalNumberOfLaps}</td></tr>`
+            let totalTime = ((Date.now() - this.totalTime[i]) / 1000)
+            if (this.lapNumber[i] > this.totalNumberOfLaps) {
+                "Fin"
+                totalTime = this.finishedTime[i]
+            }
+            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime}</td><td>${totalTime.toFixed(2)}</td><td>${this.lapNumber[i]} / ${this.totalNumberOfLaps}</td></tr>`
         }
         s += "</table>"
         scoreTable.innerHTML = s
@@ -207,6 +211,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x + 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 180 } })
             if (this.lapNumber[vehicleNumber] > this.totalNumberOfLaps && this.raceOnGoing) {
                 const totalTime = (Date.now() - this.totalTime[vehicleNumber]) / 1000
+                this.finishedTime[vehicleNumber] = totalTime
                 if (this.winner === "") {
                     this.winner = this.players[vehicleNumber].playerName
                     this.winTime = totalTime
@@ -351,6 +356,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.totalTime = []
         this.bestLapTime = []
         this.currentLapStart = []
+        this.finishedTime = []
         for (let i = 0; i < this.players.length; i++) {
             const color = possibleColors[i]
             if (i >= this.vehicles.length) {
@@ -367,6 +373,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.goalCrossed.push(false)
             this.lapNumber.push(1)
             this.bestLapTime.push(Infinity)
+            this.finishedTime.push(0)
         }
     }
 
