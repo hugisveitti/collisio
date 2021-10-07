@@ -1,7 +1,7 @@
 import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
-import { handleTouchStart, handleTouchEnd, drawAccelerator, drawDeccelerator, drawBreak, drawResetButton } from "./mobileGui"
+import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, handleTouchEnd, handleTouchStart } from "./mobileGui"
 
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
@@ -29,6 +29,12 @@ let ctx: CanvasRenderingContext2D | null
 const height = window.innerHeight
 const width = window.innerWidth
 
+// const createScreenError = () => {
+//     if (screen.orientation.type.slice(0, 9) === "landscape") {
+//         toast.error("Please use portrait mode and lock your screen.")
+//     }
+// }
+
 const createDeviceOrientationListener = () => {
     window.addEventListener("deviceorientation", (e: DeviceOrientationEvent) => {
         const gamma = e.gamma ?? 0
@@ -45,8 +51,6 @@ const createDeviceOrientationListener = () => {
             beta,
             alpha
         }
-
-
     }, true)
 }
 
@@ -81,19 +85,15 @@ export const initGryoscope = (socket: Socket) => {
     //     console.log("req fullscreen error", e)
     // })
 
-    screen.orientation.addEventListener("change", () => {
-        createScreenError()
-    })
-    createScreenError()
+    // screen.orientation.addEventListener("change", () => {
+    //     createScreenError()
+    // })
+    // createScreenError()
 
     startLoop(socket)
 }
 
-const createScreenError = () => {
-    if (screen.orientation.type.slice(0, 9) === "landscape") {
-        toast.error("Please use portrait mode and lock your screen.")
-    }
-}
+
 
 
 const startLoop = (socket: Socket) => {

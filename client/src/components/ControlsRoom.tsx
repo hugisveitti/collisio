@@ -13,12 +13,12 @@ interface IControlsRoomProps {
 }
 
 const ControlsRoom = (props: IControlsRoomProps) => {
-  const history = useHistory();
-  if (!props.store.roomName && !isTestMode) {
-    history.push(frontPagePath);
-    toast.warn("No room connection, redirecting to frontpage");
-    return null;
-  }
+  // const history = useHistory();
+  // if (!props.store.roomName && !isTestMode) {
+  //   history.push(frontPagePath);
+  //   toast.warn("No room connection, redirecting to frontpage");
+  //   return null;
+  // }
 
   useEffect(() => {
     initGryoscope(props.socket);

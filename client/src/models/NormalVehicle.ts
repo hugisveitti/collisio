@@ -11,7 +11,7 @@ const steeringIncrement = 0.02
 const maxSteering = 0.4
 
 const engineForce = 5001
-const maxBreakingForce = 100
+const maxBreakingForce = 200
 
 const chassisWidth = 2.5;
 const chassisHeight = .6;
