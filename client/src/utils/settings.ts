@@ -24,6 +24,6 @@ export const getDeviceType = () => {
 
 export const baseurl = "http://localhost:5000/"
 
-export const startGameAuto = false
+export const startGameAuto = true
 export const isTestMode = false;
 // export const devMode = true

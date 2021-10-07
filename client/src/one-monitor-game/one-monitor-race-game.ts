@@ -13,8 +13,7 @@ import "./one-monitor-styles.css";
 
 const vechicleFov = 60
 
-const team0Color = "blue"
-const team1Color = "red"
+const possibleColors = ["red", "blue", "green", "yellow", "brown", "black", "white"]
 
 
 const stats = new Stats()
@@ -253,7 +252,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     createVehicles() {
         this.vehicles = []
         for (let i = 0; i < this.players.length; i++) {
-            const color = this.players[i].teamNumber === 1 ? team1Color : team0Color
+            const color = possibleColors[i]
             this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName, i))
             this.vehicles[i].setPosition(163, 4, -17 - (i * 5))
             this.vehicles[i].setRotation(0, 180, 0)

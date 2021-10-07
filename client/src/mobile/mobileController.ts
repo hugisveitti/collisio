@@ -32,9 +32,6 @@ export const initGryoscope = (socket: Socket) => {
 
     const canvas = document.createElement("canvas")
     canvas.setAttribute("id", "controller-canvas")
-    alert("height " + height)
-
-
 
     canvas.height = height
     canvas.width = width

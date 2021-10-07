@@ -49,7 +49,7 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 let vehicleIdx = 0
 let lookBackwards = false
-let driveWithKeyboardEnabled = true
+let driveWithKeyboardEnabled = false
 
 
 export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[]) => {
@@ -61,7 +61,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
             lookBackwards = !lookBackwards
         } else if (ev.key === "u") {
             console.log("driving with keyboard enabled")
-            driveWithKeyboardEnabled = true
+            driveWithKeyboardEnabled = !driveWithKeyboardEnabled
         }
     })
 

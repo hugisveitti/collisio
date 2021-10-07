@@ -9,7 +9,8 @@ interface IControlsRoomProps {
 
 const ControlsRoom = (props: IControlsRoomProps) => {
   if (!props.store.roomName) {
-    //window.location.href = frontPagePath;
+    // breaks the webpage on iphone
+    // window.location.href = frontPagePath;
   }
   initGryoscope(props.socket);
   return null;
