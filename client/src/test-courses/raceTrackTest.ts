@@ -119,7 +119,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.warpSpeed("-ground")
 
         this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse()
+        this.course.createCourse(() => {
+            console.log("course loaded")
+        })
 
 
         document.addEventListener("keypress", (e) => {

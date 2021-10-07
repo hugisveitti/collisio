@@ -28,7 +28,7 @@ export class RaceCourse {
 
     }
 
-    createCourse() {
+    createCourse(courseLoadedCallback: () => void) {
         const loader = new GLTFLoader()
         loader.load("models/track.gltf", (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
@@ -67,6 +67,7 @@ export class RaceCourse {
                 }
             }
             this.setupCollisionListeners()
+            courseLoadedCallback()
         })
     }
 

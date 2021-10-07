@@ -63,6 +63,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     lapNumber: number[]
     totalTime: number[]
     currentLapStart: number[]
+    courseLoaded: boolean
 
 
     constructor() {
@@ -73,7 +74,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         document.body.appendChild(scoreTable)
         document.body.appendChild(importantInfoDiv)
-        importantInfoDiv.innerHTML = "Race starting in"
+        importantInfoDiv.innerHTML = "Loading course..."
         this.gameSettings = {
             ballRadius: 1,
             typeOfGame: "race"
@@ -87,9 +88,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.bestLapTime = []
         this.lapNumber = []
         this.totalTime = []
-        setTimeout(() => {
-            this.startRaceCountdown()
-        }, 2000)
+        this.courseLoaded = false
+
     }
 
     setGameSettings(newGameSettings: IGameSettings) {
@@ -135,7 +135,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     updateScoreTable() {
         const currentLapTimes = []
-        let s = "<table><th>Player</th><th>Best LT</th><th>Curr LT</th><th>Ln</th>"
+        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
             const cLapTime = (Date.now() - this.currentLapStart[i]) / 1000
             currentLapTimes.push(cLapTime)
@@ -158,7 +158,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.warpSpeed("-ground")
 
         this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse()
+        this.course.createCourse(() => {
+            this.courseLoaded = true
+            importantInfoDiv.innerHTML = "Race starting in"
+        })
 
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
@@ -170,6 +173,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
             }
         })
         window.addEventListener("resize", () => this.onWindowResize())
+        setTimeout(() => {
+            this.startRaceCountdown()
+        }, 2000)
     }
 
 
@@ -274,10 +280,13 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     update() {
-        stats.begin()
-        this.updateScoreTable()
-        this.updateVehicles()
-        stats.end()
+        if (this.courseLoaded) {
+
+            stats.begin()
+            this.updateScoreTable()
+            this.updateVehicles()
+            stats.end()
+        }
     }
 
     resetPlayer(idx: number, y?: number, x?: number, z?: number) {
