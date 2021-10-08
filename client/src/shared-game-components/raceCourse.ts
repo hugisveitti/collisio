@@ -3,11 +3,17 @@ import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 
-const manager = new LoadingManager()
 
 const loadDiv = document.createElement("div")
 loadDiv.setAttribute("id", "load-screen")
 document.body.appendChild(loadDiv)
+
+const manager = new LoadingManager()
+
+manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
+    loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
+}
+
 manager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
     loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
 
@@ -47,16 +53,20 @@ export class RaceCourse {
             for (let child of gltf.scene.children) {
 
                 if (child.type === "Mesh" || child.type === "Group") {
-                    if (child.name === "ground" || child.name.slice(0, 4) === "road") {
+                    if (child.name === "ground") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
                         (child as ExtendedObject3D).body.checkCollisions = false;
-                        (child as ExtendedObject3D).body.setFriction(0)
+                    } else if (child.name.slice(0, 4) === "road") {
+                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
+                        (child as ExtendedObject3D).body.checkCollisions = false;
+                        // (child as ExtendedObject3D).body.setGravity(0, -100, 0)
                     } else if (child.name.slice(0, 4) === "wall") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" })
                     } else if (child.name.slice(0, 4) === "goal") {
                         // Collision flag 5 is GHOST STATIC, see docs https://enable3d.io/docs.html#physics-body
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 5, shape: "convex" })
                         this.goal = child as ExtendedObject3D
+                        //this.goal.body.setBounciness(1)
                     } else if (child.name.slice(0, 4) === "tire") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
                     } else if (child.name === "checkered-flag") {

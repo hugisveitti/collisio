@@ -11,11 +11,11 @@ const steeringIncrement = 0.02
 const maxSteering = 0.4
 
 const engineForce = 5001
-const maxBreakingForce = 200
+const maxBreakingForce = 100
 
-const chassisWidth = 2.5;
+const chassisWidth = 1.8;
 const chassisHeight = .6;
-const chassisLength = 4;
+const chassisLength = 3;
 const vehicleMass = 800;
 const yOrigin = .5
 
@@ -58,13 +58,13 @@ export class NormalVehicle implements IVehicle {
         this.chassisMesh = new ExtendedObject3D()
 
 
-        const geometry = new THREE.BoxGeometry(1.8, .4, 3);
+        const geometry = new THREE.BoxGeometry(chassisWidth, .4, chassisLength);
         const material = new THREE.MeshLambertMaterial({ color: this.color });
         const cubeA = new ExtendedMesh(geometry, material);
         cubeA.position.set(0, 0.1, 0)
         this.chassisMesh.add(cubeA)
 
-        const geometry2 = new THREE.BoxGeometry(2.5, 1, 1);
+        const geometry2 = new THREE.BoxGeometry(chassisWidth, 1, chassisLength);
 
         const cubeB = new ExtendedMesh(geometry2, material);
         cubeB.position.set(0, .5, 0)
@@ -76,10 +76,22 @@ export class NormalVehicle implements IVehicle {
         cubeC.position.set(0, 1.5, 0)
         this.chassisMesh.add(cubeC)
 
+        const antG = new THREE.BoxGeometry(.05, 1, .05)
+        const antM = new THREE.MeshLambertMaterial({ color: "black" })
+        const antenna = new ExtendedMesh(antG, antM)
+        antenna.position.set(.6, 1.5, .85)
+        this.chassisMesh.add(antenna)
+
+        const exhG = new THREE.CylinderGeometry(.15, .15, .5, 12, 1., false)
+        const exhM = new THREE.MeshLambertMaterial({ color: "gray" })
+        const exhaust = new ExtendedMesh(exhG, exhM)
+        exhaust.rotateX(Math.PI / 2)
+        exhaust.position.set(-chassisWidth + 1.3, .1, -chassisLength / 2)
+        this.chassisMesh.add(exhaust)
 
 
         this.scene.add.existing(this.chassisMesh, {})
-        this.scene.physics.add.existing(this.chassisMesh, { mass: 1200 })
+        this.scene.physics.add.existing(this.chassisMesh, { mass: vehicleMass })
 
         this.tuning = new Ammo.btVehicleTuning()
 

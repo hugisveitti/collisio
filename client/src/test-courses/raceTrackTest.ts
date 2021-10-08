@@ -104,6 +104,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
+        this.physics.setGravity(0, -20, 0)
+        console.log("physics", this.physics)
+
     }
 
     updateScoreTable() {
@@ -112,9 +115,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         `
     }
 
-    piss() {
-        console.log("piss")
-    }
+
 
     async preload() {
 

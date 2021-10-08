@@ -126,6 +126,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+        // this gravity seems to work better
+        this.physics.setGravity(0, -20, 0)
     }
 
     updateScoreTable() {
