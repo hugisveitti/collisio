@@ -84,6 +84,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.finishedTime = []
     }
 
+    isPlayerFinished(idx: number) {
+        return this.lapNumber[idx] > this.totalNumberOfLaps
+    }
+
     setGameSettings(newGameSettings: IGameSettings) {
         this.gameSettings = newGameSettings
         this.totalNumberOfLaps = this.gameSettings.numberOfLaps
@@ -138,7 +142,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             let cLapTime = ((Date.now() - this.currentLapStart[i]) / 1000).toFixed(2)
             const bLT = this.bestLapTime[i] === Infinity ? "-" : this.bestLapTime[i]
             let totalTime = ((Date.now() - this.totalTime[i]) / 1000)
-            if (this.lapNumber[i] > this.totalNumberOfLaps) {
+            if (this.isPlayerFinished(i)) {
                 cLapTime = "Fin"
                 totalTime = this.finishedTime[i]
             }
@@ -165,13 +169,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     async create() {
-
+        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+        this.scene.add(hLight)
 
         // this.physics.debug?.enable()
         // this.physics.debug?.mode(2048 + 4096)
         this.warpSpeed("-ground")
 
-        this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             this.courseLoaded = true
             this.createVehicles()
@@ -211,8 +216,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
             this.currentLapStart[vehicleNumber] = Date.now()
             const p = this.course.goal.position
-            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x + 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 180 } })
-            if (this.lapNumber[vehicleNumber] > this.totalNumberOfLaps && this.raceOnGoing) {
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: 180 } })
+            if (this.isPlayerFinished(+vehicleNumber) && this.raceOnGoing) {
                 const totalTime = (Date.now() - this.totalTime[vehicleNumber]) / 1000
                 this.finishedTime[vehicleNumber] = totalTime
                 if (this.winner === "") {
@@ -242,7 +247,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         const vehicleNumber = vehicle.body.name.slice(8, 9)
         this.checkpointCrossed[vehicleNumber] = true
         const p = this.course.checkpoint.position
-        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x - 10, y: 4, z: p.z + 10 }, rotation: { x: 0, z: 0, y: 0 } })
+        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: 0 } })
     }
 
     createViews() {
@@ -369,7 +374,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
                     newVehicle.setFont(this.font as THREE.Font)
                 }
             }
-            this.vehicles[i].setPosition(158 + (i * 5), 4, -17)
+            const p = this.course.goal.position
+            const xP = p.x + 6
+            this.vehicles[i].setPosition(xP + (i * 5), 4, p.z + 10)
             this.vehicles[i].setRotation(0, 180, 0)
             this.vehicles[i].canDrive = false
             this.checkpointCrossed.push(false)

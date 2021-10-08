@@ -148,6 +148,20 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
                   props.store.setGameSettings(newGameSettings);
                 }}
               />
+              <br />
+              <select
+                name="race-track"
+                onChange={(e) => {
+                  const newGameSettings = {
+                    ...props.store.gameSettings,
+                    trackName: e.target.value,
+                  } as IGameSettings;
+                  props.store.setGameSettings(newGameSettings);
+                }}
+              >
+                <option value="track">Simple track</option>
+                <option value="town-track">Town track</option>
+              </select>
             </>
           )}
 

@@ -32,22 +32,26 @@ export class RaceCourse {
     goal?: ExtendedObject3D
     ground?: ExtendedObject3D
     checkpoint?: ExtendedObject3D
+    trackName: string
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
 
 
-    constructor(scene: Scene3D, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
+    constructor(scene: Scene3D, trackName: string, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
         this.scene = scene
         this.courseWidth = 500
         this.courseDepth = 500
         this.trackWidth = 50
+        this.trackName = trackName
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
     }
 
     createCourse(courseLoadedCallback: () => void) {
         const loader = new GLTFLoader(manager)
-        loader.load("models/track.gltf", (gltf: GLTF) => {
+        // const trackName = "track"
+        const trackName = "town-track"
+        loader.load(`models/${this.trackName}.gltf`, (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
             console.log("gltf", gltf)
             for (let child of gltf.scene.children) {

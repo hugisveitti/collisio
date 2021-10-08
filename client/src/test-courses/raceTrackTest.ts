@@ -83,14 +83,13 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     }
 
-
-
     createVehicle() {
         this.vehicle = createNormalVehicle(this, "blue", "test")
         this.vehicle.addCamera(this.camera)
         this.camera.position.set(0, 15, -23)
-        this.vehicle.setPosition(163, 4, -17)
-        this.vehicle.setRotation(0, 180, 0)
+        const p = this.course.goal.position
+        this.vehicle.setCheckpointPositionRotation({ position: { x: p.x + 10, y: 3, z: p.z + 10 }, rotation: { x: 0, y: 180, z: 0 } })
+        this.vehicle.resetPosition()
         this.createController()
     }
 
@@ -117,6 +116,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
 
+    async create() {
+        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+        this.scene.add(hLight)
+    }
+
     async preload() {
 
         this.loadFont()
@@ -124,7 +128,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         this.warpSpeed("-ground")
 
-        this.course = new RaceCourse(this, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             console.log("course loaded")
             this.canStartUpdate = true

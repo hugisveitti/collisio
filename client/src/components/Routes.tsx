@@ -24,6 +24,7 @@ const Routes = () => {
     ballRadius: 1,
     typeOfGame: "race",
     numberOfLaps: 3,
+    trackName: "track",
   } as IGameSettings);
 
   const deviceType = getDeviceType();
