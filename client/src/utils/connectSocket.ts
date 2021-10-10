@@ -25,25 +25,19 @@ export const createSocket = (deviceType: string) => {
         console.log("dm", dm)
         //  navigator.permissions.query({ name: "magnetometer" })
         // DeviceOrientationEvent.requestPermission()
-        window.ondeviceorientation = () => {
-            console.log("device orientation")
-        }
-        // console.log(typeof (DeviceMotionEvent.requestPermission))
-        if (DeviceOrientationEvent && typeof ((DeviceOrientationEvent as any).requestPermission) === "function") {
-            (DeviceOrientationEvent as any).requestPermission().then(res => {
-                if (res !== "granted") {
-                    alert("you need to grant permission")
-                }
-            })
 
-        } else {
-            alert("device orientation not available")
-        }
-        try {
-            window.DeviceOrientationEvent.requestPermission()
-        } catch {
-            //    alert("request permission not a function")
-        }
+        // console.log(typeof (DeviceMotionEvent.requestPermission))
+        // if (DeviceOrientationEvent && typeof ((DeviceOrientationEvent as any).requestPermission) === "function") {
+        //     (DeviceOrientationEvent as any).requestPermission().then(res => {
+        //         if (res !== "granted") {
+        //             alert("you need to grant permission")
+        //         }
+        //     })
+
+        // } else {
+        //     alert("device orientation not available")
+        // }
+
         if (!window.DeviceMotionEvent) {
             alert("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
         } else {
