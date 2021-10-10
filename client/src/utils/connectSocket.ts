@@ -28,11 +28,21 @@ export const createSocket = (deviceType: string) => {
         window.ondeviceorientation = () => {
             console.log("device orientation")
         }
-        try {
+        // console.log(typeof (DeviceMotionEvent.requestPermission))
+        if (DeviceOrientationEvent && typeof ((DeviceOrientationEvent as any).requestPermission) === "function") {
+            (DeviceOrientationEvent as any).requestPermission().then(res => {
+                if (res !== "granted") {
+                    alert("you need to grant permission")
+                }
+            })
 
-            DeviceOrientationEvent.requestPermission()
+        } else {
+            alert("device orientation not available")
+        }
+        try {
+            window.DeviceOrientationEvent.requestPermission()
         } catch {
-            alert("request permission not a function")
+            //    alert("request permission not a function")
         }
         if (!window.DeviceMotionEvent) {
             alert("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
