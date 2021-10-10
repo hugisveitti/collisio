@@ -74,7 +74,8 @@ export class PhysicsTest extends Scene3D {
         this.gameSettings = {
             ballRadius: 1,
             numberOfLaps: 0,
-            typeOfGame: "ball"
+            typeOfGame: "ball",
+            trackName: "track"
         }
     }
 

@@ -4,19 +4,23 @@ import { MobileControls } from "../utils/ControlsClasses"
 const width = window.innerWidth
 const height = window.innerHeight
 
-export const cRadius = 50
-export const cXAcc = width - (10 + cRadius)
-export const cXDecc = width - (10 + cRadius)
-export const cXBreak = (cRadius * 4)
-export const cYAcc = 10 + (cRadius * 2)
-export const cYDecc = height - (10 + cRadius * 2)
-export const cYBreak = height - (10 + cRadius * 2)
+const cRadius = 50
+const cXAcc = width - (10 + cRadius)
+const cXDecc = width - (10 + cRadius)
+const cXBreak = (cRadius * 4)
+const cYAcc = 10 + (cRadius * 2)
+const cYDecc = height - (10 + cRadius * 2)
+const cYBreak = height - (10 + cRadius * 2)
 
-export const cXReset = cRadius + 10
-export const cYReset = height / 2
+const cXReset = cRadius + 10
+const cYReset = height / 2
 
+const cXResetOrient = cRadius + 10
+const cYResetOrient = 10 + (cRadius * 2)
 
-export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: MobileControls) => {
+export type touchActions = "forward" | "backward" | "break" | "reset" | "resetOrientation"
+
+export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: MobileControls, callback: (action: touchActions) => void) => {
 
 
 
@@ -24,7 +28,8 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
         { x: cXAcc, y: cYAcc, value: controls.isAccelerating },
         { x: cXDecc, y: cYDecc, value: controls.isDeccelerating },
         { x: cXBreak, y: cYBreak, value: controls.breaking },
-        { x: cXReset, y: cYReset, value: controls.resetVehicle }
+        { x: cXReset, y: cYReset, value: controls.resetVehicle },
+        { x: cXResetOrient, y: cYResetOrient, value: undefined }
     ]
 
     controls.isAccelerating = false
@@ -41,12 +46,16 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
             if (x > cX - cRadius && x < cX + cRadius && y > cY - cRadius && y < cY + cRadius) {
                 if (j === 0) {
                     controls.isAccelerating = true
+
                 } else if (j === 1) {
                     controls.isDeccelerating = true
                 } else if (j === 2) {
                     controls.breaking = true
                 } else if (j === 3) {
                     controls.resetVehicle = true
+                } else if (j === 4) {
+
+                    callback("resetOrientation")
                 }
             }
         }
@@ -62,145 +71,36 @@ export const handleTouchEnd = (socket: Socket, controls: MobileControls) => {
 }
 
 
-export const drawLeftArrow = (ctx: CanvasRenderingContext2D | null) => {
-    if (!ctx) return
-
-
-    /**left arrow */
-    ctx.beginPath()
-    ctx.moveTo(width / 2, 10)
-    ctx.lineTo(width / 2, 200)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(width / 2, 10)
-    ctx.lineTo(width / 2 - 40, 80)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(width / 2, 10)
-    ctx.lineTo(width / 2 + 40, 80)
-    ctx.stroke()
-
-}
-
-export const drawRightArrow = (ctx: CanvasRenderingContext2D | null) => {
-    if (!ctx) return
-
-
-
-    ctx.beginPath()
-    ctx.moveTo(width / 2, height - 10)
-    ctx.lineTo(width / 2, height - 200)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(width / 2, height - 10)
-    ctx.lineTo(width / 2 - 40, height - 80)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(width / 2, height - 10)
-    ctx.lineTo(width / 2 + 40, height - 80)
-    ctx.stroke()
-
-}
-
 export const drawAccelerator = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    /** draw circle */
-    if (!ctx) return
+    drawButton(ctx, controls, "isAccelerating", cXAcc, cYAcc, "Forward")
 
-    ctx.beginPath();
-    ctx.arc(cXAcc, cYAcc, cRadius, 0, 2 * Math.PI);
-    ctx.stroke();
-    if (controls.isAccelerating) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-    ctx.fill()
-
-    ctx.save()
-    ctx.translate(cXAcc, cYAcc)
-    ctx.rotate(-Math.PI / 2)
-    if (!controls.isAccelerating) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-
-    ctx.font = "30px Arial"
-    let infoText = "Forward"
-    ctx.fillText(infoText, -45, 10)
-    ctx.restore()
 }
 
 export const drawDeccelerator = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    if (!ctx) return
-
-    ctx.beginPath();
-    ctx.arc(cXDecc, cYDecc, cRadius, 0, 2 * Math.PI);
-    ctx.stroke();
-    if (controls.isDeccelerating) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-    ctx.fill()
-
-    ctx.save()
-    ctx.translate(cXDecc, cYDecc)
-    ctx.rotate(-Math.PI / 2)
-    if (!controls.isDeccelerating) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-
-    ctx.font = "30px Arial"
-    let infoText = "Backward"
-    ctx.fillText(infoText, -45, 10)
-    ctx.restore()
+    drawButton(ctx, controls, "isDeccelerating", cXDecc, cYDecc, "Backward")
 }
 
 
 export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    if (!ctx) return
-
-    ctx.beginPath();
-    ctx.arc(cXBreak, cYBreak, cRadius, 0, 2 * Math.PI);
-    ctx.stroke();
-    if (controls.breaking) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-    ctx.fill()
-
-
-
-    ctx.save()
-    ctx.translate(cXBreak, cYBreak)
-    ctx.rotate(-Math.PI / 2)
-    if (!controls.breaking) {
-        ctx.fillStyle = "green"
-    } else {
-        ctx.fillStyle = "red"
-    }
-
-    ctx.font = "30px Arial"
-    let infoText = "STOP"
-    ctx.fillText(infoText, -32, 10)
-    ctx.restore()
+    drawButton(ctx, controls, "breaking", cXBreak, cYBreak, "Break")
 }
 
 export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
+    drawButton(ctx, controls, "resetVehicle", cXReset, cYReset, "Reset")
+}
+
+export const drawResetOrientations = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
+    drawButton(ctx, controls, undefined, cXResetOrient, cYResetOrient, "Reset Orient")
+}
+
+
+const drawButton = (ctx: CanvasRenderingContext2D | null, controls: MobileControls, key: keyof MobileControls | undefined, x: number, y: number, text: string) => {
     if (!ctx) return
 
     ctx.beginPath();
-    ctx.arc(cXReset, cYReset, cRadius, 0, 2 * Math.PI);
+    ctx.arc(x, y, cRadius, 0, 2 * Math.PI);
     ctx.stroke();
-    if (controls.resetVehicle) {
+    if (key && controls[key]) {
         ctx.fillStyle = "green"
     } else {
         ctx.fillStyle = "red"
@@ -208,16 +108,16 @@ export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: 
     ctx.fill()
 
     ctx.save()
-    ctx.translate(cXReset, cYReset)
+    ctx.translate(x, y)
     ctx.rotate(-Math.PI / 2)
-    if (!controls.resetVehicle) {
+    if (!key || !controls[key]) {
         ctx.fillStyle = "green"
     } else {
         ctx.fillStyle = "red"
     }
 
     ctx.font = "30px Arial"
-    let infoText = "Reset"
-    ctx.fillText(infoText, -32, 10)
+
+    ctx.fillText(text, -32, 10)
     ctx.restore()
 }

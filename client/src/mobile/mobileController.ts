@@ -1,7 +1,7 @@
 import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
-import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, handleTouchEnd, handleTouchStart } from "./mobileGui"
+import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, drawResetOrientations, handleTouchEnd, handleTouchStart, touchActions } from "./mobileGui"
 
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
@@ -25,7 +25,7 @@ let orientation: IOrientation = {
 }
 
 let ctx: CanvasRenderingContext2D | null
-
+let deviceorientationCreated = false
 const height = window.innerHeight
 const width = window.innerWidth
 
@@ -36,6 +36,12 @@ const width = window.innerWidth
 // }
 
 const createDeviceOrientationListener = () => {
+    if (deviceorientationCreated) {
+        toast("Creating new device orientation listener")
+    } else {
+        deviceorientationCreated = true
+    }
+
     window.addEventListener("deviceorientation", (e: DeviceOrientationEvent) => {
         const gamma = e.gamma ?? 0
         const beta = e.beta ?? 0
@@ -67,7 +73,11 @@ export const initGryoscope = (socket: Socket) => {
     document.body.appendChild(canvas)
 
     window.addEventListener("touchstart", (e) => {
-        handleTouchStart(e, socket, controls)
+        handleTouchStart(e, socket, controls, (touchAction: touchActions) => {
+            if (touchAction === "resetOrientation") {
+                createDeviceOrientationListener()
+            }
+        })
     }
     )
     window.addEventListener("touchend", () => handleTouchEnd(socket, controls))
@@ -121,6 +131,7 @@ const startLoop = (socket: Socket) => {
             drawDeccelerator(ctx, controls)
             drawBreak(ctx, controls)
             drawResetButton(ctx, controls)
+            drawResetOrientations(ctx, controls)
             if (motion) {
                 ctx.save()
                 ctx.translate(width / 2, height / 2)

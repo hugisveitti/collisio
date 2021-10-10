@@ -17,7 +17,7 @@ export interface IGameSettings {
     ballRadius: number
     typeOfGame: "ball" | "race"
     numberOfLaps: number
-    trackName: string
+    trackName: "track" | "town-track"
 }
 
 export const defaultGameSettings: IGameSettings = {
