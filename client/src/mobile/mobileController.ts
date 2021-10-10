@@ -36,6 +36,9 @@ const width = window.innerWidth
 // }
 
 const createDeviceOrientationListener = () => {
+    if (!window.DeviceMotionEvent) {
+        toast.error("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
+    }
     if (deviceorientationCreated) {
         toast("Creating new device orientation listener")
     } else {
