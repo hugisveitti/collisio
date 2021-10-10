@@ -21,6 +21,19 @@ export const createSocket = (deviceType: string) => {
     })
 
     if (deviceType === "mobile") {
+        const dm = new DeviceOrientationEvent("dm")
+        console.log("dm", dm)
+        //  navigator.permissions.query({ name: "magnetometer" })
+        // DeviceOrientationEvent.requestPermission()
+        window.ondeviceorientation = () => {
+            console.log("device orientation")
+        }
+        try {
+
+            DeviceOrientationEvent.requestPermission()
+        } catch {
+            alert("request permission not a function")
+        }
         if (!window.DeviceMotionEvent) {
             alert("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
         } else {
