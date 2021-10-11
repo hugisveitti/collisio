@@ -13,11 +13,25 @@
 </body>
 <script>
   const op = document.getElementById("orient-permission")
+
   op.addEventListener("click", () => {
+    console.log(DeviceOrientationEvent)
+    console.log(DeviceMotionEvent)
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
 
+      DeviceOrientationEvent.requestPermission().then(res => {
+        console.log("device orientation", res)
+      })
+    } else {
+      alert("device orientation request not a function")
+    }
+    Notification.requestPermission().then(res => {
+      console.log("geo location res", res)
+    })
+    return
 
-    if (DeviceMotionEvent.requestPermission) {
-      DeviceMotionEvent.requestPermission()
+    if (DeviceOrientationEvent.requestPermission) {
+      DeviceOrientationEvent.requestPermission()
         .then(response => {
           if (response == "granted") {
             alert("Device orientation permission granted")

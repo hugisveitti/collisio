@@ -124,6 +124,7 @@ class Game {
         if (this.gameStarted) {
             player.startGame()
         }
+
     }
 
     alertWaitingRoom() {
