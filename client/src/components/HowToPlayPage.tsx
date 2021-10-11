@@ -5,6 +5,7 @@ import mobileGUI from "../images/mobile-gui.PNG";
 import noTurnImage from "../images/phone-orientation-noTurn.PNG";
 import leftTurnImage from "../images/phone-orientation-leftTurn.PNG";
 import rightTurnImage from "../images/phone-orientation-rightTurn.PNG";
+import gameplayImage from "../images/gameplay.PNG";
 
 interface IHowToPlayProps {}
 
@@ -26,8 +27,11 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
       <hr />
       <h3 className="center">Steering with your phone</h3>
       <p>First you need to lock your phone in portrait mode.</p>
+      <h4>The desktop</h4>
+      <img src={gameplayImage} className="info-image" alt="" />
+      <p>On your desktop computer (or tablet) you will see the above image.</p>
 
-      <h4>The controller</h4>
+      <h4>The controller (your mobile)</h4>
       <img src={mobileGUI} className="info-image" alt="" />
       <p>
         The controller looks like the image above. Press the 'forward' button to
@@ -47,6 +51,15 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
       <p>To turn right tilt your phone like in the image above.</p>
 
       <hr />
+
+      <iframe
+        src="https://www.youtube.com/embed/D8y3gDlX5YU"
+        title="YouTube video player"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        style={{ margin: "auto", display: "block" }}
+      ></iframe>
+
+      <br />
       <button onClick={() => history.goBack()}>
         Go back to room selection
       </button>

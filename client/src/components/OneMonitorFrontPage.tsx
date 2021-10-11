@@ -164,7 +164,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         </button>
         <p>
           Create a room, you and 3 friends connect to that room with your mobile
-          phones.
+          phones. But you can also play alone.
         </p>
         <p>Its a car game where your phone is the controller.</p>
         <h3 className="center">Create a room</h3>
