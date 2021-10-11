@@ -8,42 +8,41 @@
 </head>
 
 <body>
-  <button id="orient-permission">permission</button>
+
   <div id="root"></div>
 </body>
 <script>
   const op = document.getElementById("orient-permission")
 
-  op.addEventListener("click", () => {
-    console.log(DeviceOrientationEvent)
-    console.log(DeviceMotionEvent)
-    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+  // op.addEventListener("click", () => {
+  //   console.log(DeviceOrientationEvent)
+  //   console.log(DeviceMotionEvent)
+  //   if (typeof DeviceOrientationEvent.requestPermission === "function") {
+  //     DeviceOrientationEvent.requestPermission().then(res => {
+  //       console.log("device orientation", res)
+  //     })
+  //   } else {
+  //     alert("device orientation request not a function")
+  //   }
+  //   Notification.requestPermission().then(res => {
+  //     console.log("geo location res", res)
+  //   })
+  //   return
 
-      DeviceOrientationEvent.requestPermission().then(res => {
-        console.log("device orientation", res)
-      })
-    } else {
-      alert("device orientation request not a function")
-    }
-    Notification.requestPermission().then(res => {
-      console.log("geo location res", res)
-    })
-    return
+  // })
+  if (DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") {
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response == "granted") {
+          alert("Device orientation permission granted")
+        } else {
+          alert('Device orientation permission not granted');
+        }
+      }).catch((err) => { console.log(err) });
+  } else {
+    alert("Device motion permission access method not available");
+  }
 
-    if (DeviceOrientationEvent.requestPermission) {
-      DeviceOrientationEvent.requestPermission()
-        .then(response => {
-          if (response == "granted") {
-            alert("Device orientation permission granted")
-          } else {
-            alert('Device orientation permission not granted');
-          }
-        }).catch((err) => { console.log(err) });
-    } else {
-      alert("Device motion permission access method not available");
-    }
-
-  })
 
 </script>
 <script src="./index.js"></script>
