@@ -67,6 +67,8 @@ export const initGryoscope = (socket: Socket) => {
     document.body.setAttribute("overflow", "hidden")
 
     const canvas = document.createElement("canvas")
+    canvas.onselectstart = () => false
+
     canvas.setAttribute("id", "controller-canvas")
 
     canvas.height = height

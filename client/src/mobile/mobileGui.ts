@@ -54,7 +54,6 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
                 } else if (j === 3) {
                     controls.resetVehicle = true
                 } else if (j === 4) {
-
                     callback("resetOrientation")
                 }
             }

@@ -6,6 +6,7 @@ import { createSocket } from "../utils/connectSocket";
 import { getDeviceType } from "../utils/settings";
 import ControlsRoom from "./ControlsRoom";
 import GameRoom from "./GameRoom";
+import HowToPlayPage from "./HowToPlayPage";
 import OneMonitorFrontPage from "./OneMonitorFrontPage";
 import { IStore } from "./store";
 import WaitingRoom from "./WaitingRoom";
@@ -14,6 +15,7 @@ export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
 export const gameRoomPath = "/game";
 export const controlsRoomPath = "/controls";
+export const howToPlayPagePath = "/how-to-play";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -72,6 +74,10 @@ const Routes = () => {
           render={(props) => (
             <ControlsRoom {...props} socket={socket} store={store} />
           )}
+        />
+        <Route
+          path={howToPlayPagePath}
+          render={(props) => <HowToPlayPage {...props} />}
         />
       </Switch>
     </Router>

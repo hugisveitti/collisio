@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
@@ -7,8 +8,9 @@ import "../styles/main.css";
 import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
-import { controlsRoomPath, waitingRoomPath } from "./Routes";
+import { controlsRoomPath, howToPlayPagePath, waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
+import logo from "../images/caroutline.png";
 
 // const logo = require("../images/caroutline.png");
 // import * as logo from "../images/caroutline.png";
@@ -49,13 +51,16 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const renderPlayerNameInput = () => {
     if (deviceType === "mobile") {
       return (
-        <input
-          className="large-input"
-          type="text"
-          placeholder="Player Name"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-        />
+        <>
+          <input
+            className="large-input"
+            type="text"
+            placeholder="Player Name"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+          />
+          <br />
+        </>
       );
     }
     return null;
@@ -138,8 +143,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         <h2 className="center">
           Welcome to <i>Collisio</i>
         </h2>
-        <br />
-        <br />
+        <img src={logo} className="image-logo" alt="" />
         <input
           className="large-input"
           type="text"
@@ -151,7 +155,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 
         {renderPlayerNameInput()}
 
-        <br />
         <button
           className="large-input"
           id="room-name-btn"
@@ -170,6 +173,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           should type in the room name and their name on their mobile device.
         </p>
         <hr />
+        <Link to={howToPlayPagePath}>See how to play game.</Link>
         <p>This game is in development</p>
         <p>
           On mobile please have your phone in portrait and lock the screen
