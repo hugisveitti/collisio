@@ -11,6 +11,7 @@ import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
 import { controlsRoomPath, howToPlayPagePath, waitingRoomPath } from "./Routes";
 import { IStore } from "./store";
 import logo from "../images/caroutline.png";
+import LoginComponent from "./LoginComponent";
 
 // const logo = require("../images/caroutline.png");
 // import * as logo from "../images/caroutline.png";
@@ -25,7 +26,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const [playerName, setPlayerName] = useState("");
   const history = useHistory();
 
-  useEffect(() => {
+  const requestDeviceOrientation = () => {
     if (
       DeviceOrientationEvent &&
       typeof DeviceOrientationEvent["requestPermission"] === "function"
@@ -44,9 +45,10 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           console.log(err);
         });
     } else {
+      toast("Device motion permission access method not available.");
       console.log("Device motion permission access method not available");
     }
-  }, []);
+  };
 
   const renderPlayerNameInput = () => {
     if (deviceType === "mobile") {
@@ -162,6 +164,13 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         >
           {deviceType === "desktop" ? "Create Room" : "Join Room"}
         </button>
+        <br />
+        {deviceType === "mobile" && (
+          <button style={{ padding: 10 }} onClick={requestDeviceOrientation}>
+            Request device orientation
+          </button>
+        )}
+        <br />
         <p>
           Create a room, you and 3 friends connect to that room with your mobile
           phones. But you can also play alone.
@@ -181,6 +190,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         </p>
         <ToastContainer />
       </div>
+      <LoginComponent />
     </div>
   );
 };
