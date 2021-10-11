@@ -8,10 +8,14 @@
 </head>
 
 <body>
+  <button id="orient-permission">permission</button>
   <div id="root"></div>
 </body>
 <script>
-  if (window.DeviceMotionEvent && deviceType === "mobile") {
+  const op = document.getElementById("orient-permission")
+  op.addEventListener("click", () => {
+
+
     if (DeviceMotionEvent.requestPermission) {
       DeviceMotionEvent.requestPermission()
         .then(response => {
@@ -24,9 +28,8 @@
     } else {
       alert("Device motion permission access method not available");
     }
-  } else {
-    console.log("Desktop")
-  }
+
+  })
 
 </script>
 <script src="./index.js"></script>
