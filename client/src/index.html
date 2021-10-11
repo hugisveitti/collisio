@@ -11,22 +11,21 @@
   <div id="root"></div>
 </body>
 <script>
-  if (DeviceMotionEvent.requestPermission) {
-    DeviceMotionEvent.requestPermission()
-      .then(response => {
-        if (response == "granted") {
-          window.addEventListener("deviceorientation", function (e) {
-            const { alpha, beta, gamma } = e;
-            document.getElementById("alpha").innerText = alpha.toFixed(0);
-            document.getElementById("beta").innerText = beta.toFixed(0);
-            document.getElementById("gamma").innerText = gamma.toFixed(0);
-          });
-        } else {
-          alert('Device orientation permission not granted');
-        }
-      }).catch((err) => { console.log(err) });
+  if (window.DeviceMotionEvent && deviceType === "mobile") {
+    if (DeviceMotionEvent.requestPermission) {
+      DeviceMotionEvent.requestPermission()
+        .then(response => {
+          if (response == "granted") {
+            alert("Device orientation permission granted")
+          } else {
+            alert('Device orientation permission not granted');
+          }
+        }).catch((err) => { console.log(err) });
+    } else {
+      alert("Device motion permission access method not available");
+    }
   } else {
-    alert("Device motion permission access method not available");
+    console.log("Desktop")
   }
 
 </script>
