@@ -23,6 +23,29 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const [playerName, setPlayerName] = useState("");
   const history = useHistory();
 
+  useEffect(() => {
+    if (
+      DeviceOrientationEvent &&
+      typeof DeviceOrientationEvent["requestPermission"] === "function"
+    ) {
+      DeviceOrientationEvent["requestPermission"]()
+        .then((response) => {
+          if (response == "granted") {
+            console.log("deivce permission granted, do nothing");
+          } else {
+            toast.error(
+              "You need to grant permission to the device's orientation to be able to play the game, please refresh the page."
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("Device motion permission access method not available");
+    }
+  }, []);
+
   const renderPlayerNameInput = () => {
     if (deviceType === "mobile") {
       return (
