@@ -10,6 +10,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   CardMedia,
   CircularProgress,
   Input,
@@ -21,6 +22,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   createAccountWithEmail,
   signInWithEmail,
@@ -35,8 +37,8 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   container: {
-    width: 300,
-    maxWidth: "80%",
+    width: 400,
+    maxWidth: "90%",
     margin: "auto",
     marginBottom: 25,
   },
@@ -80,6 +82,18 @@ const LoginComponent = (props: ILoginComponent) => {
     return (
       <div className={classes.container}>
         <Card>
+          <CardHeader
+            subheader={<>Welcome {user.displayName ?? displayName}.</>}
+            action={
+              <Button
+                startIcon={<LogoutIcon />}
+                size="small"
+                onClick={() => signOut()}
+              >
+                Logout
+              </Button>
+            }
+          />
           <CardContent>
             {user.photoURL && (
               <CardMedia
@@ -88,20 +102,17 @@ const LoginComponent = (props: ILoginComponent) => {
                 image={user.photoURL}
               />
             )}
-            <Typography color="text.secondary">
-              Welcome {user.displayName ?? displayName}.
-            </Typography>
-            <Link to={privateProfilePagePath}>Go to profile page</Link>
-            <CardActions>
-              <Button
-                startIcon={<LogoutIcon />}
-                size="small"
-                onClick={() => signOut()}
-              >
-                Logout
-              </Button>
-            </CardActions>
           </CardContent>
+          <CardActions>
+            <Button size="small" startIcon={<PersonIcon />} variant="outlined">
+              <Link
+                style={{ textDecoration: "none" }}
+                to={privateProfilePagePath}
+              >
+                Go to profile page
+              </Link>
+            </Button>
+          </CardActions>
         </Card>
       </div>
     );

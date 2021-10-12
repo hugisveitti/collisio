@@ -1,13 +1,19 @@
+import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
+import { Button, Modal, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
+import logo from "../images/caroutline.png";
+import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
+import LoginComponent from "./LoginComponent";
 import {
   controlsRoomPath,
   highscorePagePath,
@@ -15,12 +21,6 @@ import {
   waitingRoomPath,
 } from "./Routes";
 import { IStore } from "./store";
-import logo from "../images/caroutline.png";
-import LoginComponent from "./LoginComponent";
-import { UserContext } from "../providers/UserProvider";
-import { Button, Modal, Typography } from "@mui/material";
-import { createFakeHighscoreData } from "../tests/fakeData";
-import { Box } from "@mui/system";
 
 interface IOneMonitorFrontPageProps {
   socket: Socket;
@@ -286,16 +286,30 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           should type in the room name and their name on their mobile device.
         </p>
         <hr />
-        <Link to={howToPlayPagePath}>See how to play game.</Link>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<VideogameAssetIcon />}
+        >
+          <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
+            See how to play game.
+          </Link>
+        </Button>
         <p>This game is in development</p>
         <p>
           On mobile please have your phone in portrait and lock the screen
           switch
         </p>
         <br />
-        <Link to={highscorePagePath}>
-          <Button variant="contained">See Highscores</Button>
-        </Link>
+        <Button
+          variant="contained"
+          startIcon={<SportsScoreIcon />}
+          size="small"
+        >
+          <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
+            See Highscores
+          </Link>
+        </Button>
         <ToastContainer />
       </div>
       <LoginComponent setPlayerName={setPlayerName} />
