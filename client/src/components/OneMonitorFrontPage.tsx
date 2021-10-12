@@ -51,7 +51,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 
   const checkIfNeedOrientaitonPrompt = (e: DeviceOrientationEvent) => {
     const { beta, gamma, alpha } = e;
-    console.log("dev or", e);
+
     if (beta || gamma || alpha) {
       setNeedToAskOrientPermission(false);
       window.removeEventListener(
@@ -95,7 +95,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           console.log(err);
         });
     } else {
-      toast("Device motion permission access method not available.");
+      //    toast("Device motion permission access method not available.");
       console.log("Device motion permission access method not available");
     }
   };
