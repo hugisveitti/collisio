@@ -38,9 +38,9 @@ const HighscorePage = (props: IHighscorePage) => {
       setNumberOfLapsKey(_numberOfLapsKeys[0]);
       setTrackKey(_trackKeys[0]);
 
+      setHighscoreDict(_highscoreDict);
       setNumberOfLapsKeys(_numberOfLapsKeys);
       setTrackKeys(_trackKeys);
-      setHighscoreDict(_highscoreDict);
 
       setHighscoreHasLoaded(true);
     });
@@ -58,7 +58,7 @@ const HighscorePage = (props: IHighscorePage) => {
       <h1>Highscores</h1>
       <Link to={frontPagePath}>Back to front page</Link>
 
-      {!highscoreHasLoaded ? (
+      {!highscoreHasLoaded || highscoreDict === undefined ? (
         <div
           style={{
             marginTop: 25,
@@ -132,12 +132,23 @@ const HighscorePage = (props: IHighscorePage) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {highscoreDict[trackKey][numberOfLapsKey].map((playerData) => (
-                  <HighscorePageTableRow
-                    key={`${playerData.gameId}-${playerData.playerName}`}
-                    playerData={playerData}
-                  />
-                ))}
+                {!(numberOfLapsKey in highscoreDict[trackKey]) ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      No one has recorded with the combination of this track and
+                      these number of laps
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  highscoreDict[trackKey][numberOfLapsKey].map(
+                    (playerData, i) => (
+                      <HighscorePageTableRow
+                        key={`${playerData.gameId}-${playerData.playerName}-${i}`}
+                        playerData={playerData}
+                      />
+                    )
+                  )
+                )}
               </TableBody>
             </Table>
           </TableContainer>

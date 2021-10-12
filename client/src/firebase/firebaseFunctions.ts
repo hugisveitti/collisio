@@ -71,12 +71,14 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
             const scores = snap.val() as HighscoreStoreDict
             const trackKeys = Object.keys(scores)
             const trackDict = {}
-            let numberOfLapsKeys: string[]
+
+            let numberOfLapsKeys: string[] = []
 
             for (let trackKey of trackKeys) {
                 trackDict[trackKey] = {}
-                numberOfLapsKeys = Object.keys(scores[trackKey])
-                for (let numberOfLapsKey of numberOfLapsKeys) {
+                const currNumberOfLapsKeys = Object.keys(scores[trackKey])
+                numberOfLapsKeys = numberOfLapsKeys.concat(currNumberOfLapsKeys)
+                for (let numberOfLapsKey of currNumberOfLapsKeys) {
                     // const trackNumberScores = scores[trackKey][numberOfLapsKey]
                     const gamesData: IEndOfGameInfoPlayer[] = []
                     const playerKeys = Object.keys(scores[trackKey][numberOfLapsKey])
@@ -93,6 +95,10 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
                     trackDict[trackKey][numberOfLapsKey] = gamesData
                 }
             }
+            numberOfLapsKeys.sort()
+            numberOfLapsKeys = [...new Set(numberOfLapsKeys)]
+
+
             callback(trackDict, trackKeys, numberOfLapsKeys)
 
         } else {
