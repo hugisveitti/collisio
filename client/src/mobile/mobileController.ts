@@ -35,6 +35,24 @@ const width = window.innerWidth
 //     }
 // }
 
+const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
+    const gamma = e.gamma ?? 0
+    const beta = e.beta ?? 0
+    const alpha = e.alpha ?? 0
+
+    controls.alpha = alpha
+    controls.gamma = gamma
+    controls.beta = beta
+    controls.moreSpeed = gamma > 0 && gamma < 30
+
+    orientation = {
+        gamma,
+        beta,
+        alpha
+    }
+}
+
+
 const createDeviceOrientationListener = () => {
     if (!window.DeviceMotionEvent) {
         toast.error("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
@@ -45,22 +63,7 @@ const createDeviceOrientationListener = () => {
         deviceorientationCreated = true
     }
 
-    window.addEventListener("deviceorientation", (e: DeviceOrientationEvent) => {
-        const gamma = e.gamma ?? 0
-        const beta = e.beta ?? 0
-        const alpha = e.alpha ?? 0
-
-        controls.alpha = alpha
-        controls.gamma = gamma
-        controls.beta = beta
-        controls.moreSpeed = gamma > 0 && gamma < 30
-
-        orientation = {
-            gamma,
-            beta,
-            alpha
-        }
-    }, true)
+    window.addEventListener("deviceorientation", deviceOrientationHandler)
 }
 
 export const initGryoscope = (socket: Socket) => {
@@ -80,6 +83,7 @@ export const initGryoscope = (socket: Socket) => {
     window.addEventListener("touchstart", (e) => {
         handleTouchStart(e, socket, controls, (touchAction: touchActions) => {
             if (touchAction === "resetOrientation") {
+                window.removeEventListener("deviceorientation", deviceOrientationHandler)
                 createDeviceOrientationListener()
             }
         })
