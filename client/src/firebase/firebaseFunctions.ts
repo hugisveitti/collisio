@@ -1,6 +1,7 @@
 import { child, get, push, ref, set, update } from "firebase/database"
-import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, TrackType } from "../classes/Game";
-import { database, gameDataRefPath, highscoreRefPath, usersRefPath } from "./firebaseInit"
+import { toast } from "react-toastify";
+import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo, TrackType } from "../classes/Game";
+import { database, gameDataRefPath, highscoreRefPath, userGamesRefPath, usersRefPath } from "./firebaseInit"
 
 
 export interface IUser {
@@ -41,7 +42,8 @@ export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
 
 
 
-
+const userGamePlayerInfoPath = "player-info"
+const userGameGameInfoPath = "player-info"
 
 export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: IEndOfGameInfoGame) => {
     const newGameKey = push(child(ref(database), gameDataRefPath)).key;
@@ -49,7 +51,8 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
     updates[gameDataRefPath + "/" + newGameKey] = gameInfo
     for (let i = 0; i < playerGameInfo.length; i++) {
         if (playerGameInfo[i].playerId) {
-            updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + newGameKey] = playerGameInfo[i]
+            updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = playerGameInfo[i]
+            updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGameGameInfoPath] = gameInfo
             updates[highscoreRefPath + "/" + gameInfo.trackType + "/" + gameInfo.numberOfLaps + "/" + playerGameInfo[i].playerId + "/" + newGameKey] = playerGameInfo[i]
         }
     }
@@ -104,6 +107,29 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
         } else {
             callback({}, [], [])
             console.log("no highscores")
+        }
+    })
+}
+
+export interface IPlayerGameData {
+    playerInfo: IEndOfGameInfoPlayer
+    gameInfo: IEndOfGameInfoGame
+}
+
+export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
+    get(ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)).then(snap => {
+        if (snap.exists()) {
+            const data = snap.val()
+            const gamesData = [] as IPlayerGameData[]
+            const keys = Object.keys(data)
+            for (let key of keys) {
+                gamesData.push({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
+            }
+            callback(gamesData)
+
+        } else {
+            callback(undefined)
+            console.log("player game data does not exists")
         }
     })
 }

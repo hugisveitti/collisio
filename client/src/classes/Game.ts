@@ -43,13 +43,18 @@ export interface IEndOfGameInfoPlayer {
     date: Date
 }
 
+export interface IPlayerGameInfo {
+    totalTime: number
+    lapTimes: number[]
+    id: string
+    name: string
+}
+
 // info about the game
 export interface IEndOfGameInfoGame {
-    playerNames: string[]
+
     numberOfLaps: number
-    playerIds: (string | undefined)[]
-    playerTotalTimes: number[]
-    playerLapTimes: number[][]
+    playersInfo: IPlayerGameInfo[]
     trackType: TrackType
     gameId: string
     roomName: string

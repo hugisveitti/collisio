@@ -1,4 +1,4 @@
-import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, TrackType } from "../classes/Game";
+import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo, TrackType } from "../classes/Game";
 import { saveGameData } from "../firebase/firebaseFunctions";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
@@ -41,9 +41,11 @@ export const createFakeHighscoreData = () => {
         const playerLapTimes = []
 
         const playerData: IEndOfGameInfoPlayer[] = []
+
+        const playerGameInfos: IPlayerGameInfo[] = []
         for (let player of players) {
             playerNames.push(player.playerName)
-            playerIds.push(player.playerId)
+            playerIds.push(player.playerId ?? "undefined")
             const lapTimes = []
             let tt = 0
             let bestLapTime = 100000
@@ -67,13 +69,16 @@ export const createFakeHighscoreData = () => {
                 numberOfLaps,
                 date: new Date()
             })
+            playerGameInfos.push({
+                id: player.playerId ?? "undefined",
+                name: player.playerName,
+                lapTimes,
+                totalTime: tt
+            })
         }
         const gameData: IEndOfGameInfoGame = {
-            playerNames,
+            playersInfo: playerGameInfos,
             numberOfLaps,
-            playerIds,
-            playerLapTimes,
-            playerTotalTimes,
             gameId,
             roomName,
             trackType,

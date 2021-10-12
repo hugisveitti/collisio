@@ -30,6 +30,8 @@ import {
 import { UserContext } from "../providers/UserProvider";
 import { Password } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import { privateProfilePagePath } from "./Routes";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   container: {
@@ -89,7 +91,7 @@ const LoginComponent = (props: ILoginComponent) => {
             <Typography color="text.secondary">
               Welcome {user.displayName ?? displayName}.
             </Typography>
-
+            <Link to={privateProfilePagePath}>Go to profile page</Link>
             <CardActions>
               <Button
                 startIcon={<LogoutIcon />}

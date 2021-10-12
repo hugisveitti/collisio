@@ -18,12 +18,10 @@ import { IStore } from "./store";
 import logo from "../images/caroutline.png";
 import LoginComponent from "./LoginComponent";
 import { UserContext } from "../providers/UserProvider";
-import { Button } from "@mui/material";
+import { Button, Modal, Typography } from "@mui/material";
 import { createFakeHighscoreData } from "../tests/fakeData";
+import { Box } from "@mui/system";
 
-// const logo = require("../images/caroutline.png");
-// import * as logo from "../images/caroutline.png";
-// console.log("logo", logo);
 interface IOneMonitorFrontPageProps {
   socket: Socket;
   store: IStore;
@@ -34,12 +32,15 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const [playerName, setPlayerName] = useState("");
   const [needToAskOrientPermission, setNeedToAskOrientPermission] =
     useState(true);
+
+  const [notLoggedInModalOpen, setNotLoggedInModelOpen] = useState(false);
+  const [showLoginInModal, setShowLoginInModal] = useState(false);
   const history = useHistory();
 
   const user = useContext(UserContext);
 
   useEffect(() => {
-    // createFakeHighscoreData();
+    //createFakeHighscoreData();
   }, []);
 
   useEffect(() => {
@@ -134,9 +135,13 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         const { message } = data;
         toast.error(message);
       } else {
-        toast.success(data.message);
-        props.store.setPlayer(data.data.player);
-        goToWaitingRoom();
+        if (user) {
+          toast.success(data.message);
+          props.store.setPlayer(data.data.player);
+          goToWaitingRoom();
+        } else {
+          setNotLoggedInModelOpen(true);
+        }
       }
     });
   };
@@ -181,6 +186,46 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   }, []);
 
+  const renderNotLoggedInModal = () => {
+    return (
+      <Modal
+        open={notLoggedInModalOpen}
+        onClose={() => setNotLoggedInModelOpen(false)}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "75%",
+            backgroundColor: "#eeebdf",
+            border: "2px solid #000",
+            padding: 10,
+          }}
+        >
+          <Typography>
+            You are not logged in. To use features such as saving highscore you
+            need to be logged in.
+          </Typography>
+          <br />
+          <br />
+          {showLoginInModal ? (
+            <LoginComponent setPlayerName={setPlayerName} />
+          ) : (
+            <Button
+              variant="contained"
+              onClick={() => setShowLoginInModal(true)}
+            >
+              Login
+            </Button>
+          )}
+          <Button onClick={() => goToWaitingRoom()}>Continue as a Guest</Button>
+        </div>
+      </Modal>
+    );
+  };
+
   if (isTestMode) {
     if (deviceType === "desktop") {
       startRaceTrackTest(props.socket, props.store.gameSettings);
@@ -192,6 +237,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 
   return (
     <div>
+      {renderNotLoggedInModal()}
       <div className="container">
         <h2 className="center">
           Welcome to <i>Collisio</i>

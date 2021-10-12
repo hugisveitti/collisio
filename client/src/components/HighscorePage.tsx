@@ -114,7 +114,7 @@ const HighscorePage = (props: IHighscorePage) => {
                 ))}
               </Select>
             </FormControl>
-            <Tooltip title="Each track and number of laps has its own highscore table">
+            <Tooltip title="Each track and number of laps combination has its own highscore table.">
               <IconButton>
                 <HelpOutlineIcon />
               </IconButton>

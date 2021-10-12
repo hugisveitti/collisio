@@ -9,6 +9,7 @@ import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import OneMonitorFrontPage from "./OneMonitorFrontPage";
+import PrivateProfilePage from "./PrivateProfilePage";
 import { IStore } from "./store";
 import WaitingRoom from "./WaitingRoom";
 
@@ -18,6 +19,8 @@ export const gameRoomPath = "/game";
 export const controlsRoomPath = "/controls";
 export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
+export const privateProfilePagePath = "/private-profile";
+export const publicProfilePagePath = "/public-profile/:id";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -84,6 +87,10 @@ const Routes = () => {
         <Route
           path={highscorePagePath}
           render={(props) => <HighscorePage {...props} />}
+        />
+        <Route
+          path={privateProfilePagePath}
+          render={(props) => <PrivateProfilePage {...props} />}
         />
       </Switch>
     </Router>

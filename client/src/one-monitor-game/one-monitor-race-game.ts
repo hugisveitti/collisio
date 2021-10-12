@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import Stats from "stats.js";
-import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerInfo } from "../classes/Game";
+import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerGameInfo, IPlayerInfo } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
@@ -412,6 +412,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     prepareEndOfGameData() {
+        const playerGameInfos: IPlayerGameInfo[] = []
         const playersData: IEndOfGameInfoPlayer[] = []
         for (let i = 0; i < this.vehicles.length; i++) {
             const playerData: IEndOfGameInfoPlayer = {
@@ -426,14 +427,17 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 date: new Date()
             }
             playersData.push(playerData)
+            playerGameInfos.push({
+                id: this.players[i].id ?? "undefined",
+                name: this.players[i].playerName,
+                totalTime: this.finishedTime[i],
+                lapTimes: this.lapTimes[i]
+            })
         }
 
         const endOfGameInfo: IEndOfGameInfoGame = {
-            playerNames: this.players.map(p => p.playerName),
+            playersInfo: playerGameInfos,
             numberOfLaps: this.totalNumberOfLaps,
-            playerIds: this.players.map(p => p.id ?? null), // I think firebase supports null but not undefined
-            playerTotalTimes: this.finishedTime,
-            playerLapTimes: this.lapTimes,
             trackType: this.gameSettings.trackName,
             gameId: this.gameId,
             roomName: this.roomName,
