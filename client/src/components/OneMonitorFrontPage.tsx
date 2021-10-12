@@ -40,10 +40,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const user = useContext(UserContext);
 
   useEffect(() => {
-    //createFakeHighscoreData();
-  }, []);
-
-  useEffect(() => {
     if (user?.displayName) {
       setPlayerName(user.displayName);
     }
@@ -95,7 +91,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           console.log(err);
         });
     } else {
-      //    toast("Device motion permission access method not available.");
       console.log("Device motion permission access method not available");
     }
   };
