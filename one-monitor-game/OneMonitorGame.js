@@ -44,13 +44,13 @@ class GameMaster {
                     }
                 })
             } else {
-                socket.on("player-connected", ({ roomName: _roomName, playerName: _playerName }) => {
+                socket.on("player-connected", ({ roomName: _roomName, playerName: _playerName, id }) => {
                     if (!this.roomExists(_roomName)) {
                         socket.emit("player-connected-callback", { message: "Room does not exist, please connect to a desktop first.", status: errorStatus })
                     } else {
                         roomName = _roomName
                         playerName = _playerName
-                        player = new Player(socket, playerName)
+                        player = new Player(socket, playerName, id)
                         this.rooms[roomName].addPlayer(player)
                         socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo() } })
                         socket.join(roomName)

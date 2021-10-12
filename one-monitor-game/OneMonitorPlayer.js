@@ -13,13 +13,15 @@ class Player {
     mobileControls
     VehicleControls
     playerNumber
+    id
 
 
 
-    constructor(socket, playerName) {
+    constructor(socket, playerName, id) {
         this.socket = socket
         this.playerName = playerName
         this.teamNumber = 1
+        this.id = id
 
         this.mobileControls = new MobileControls()
         this.VehicleControls = new VehicleControls()
@@ -61,7 +63,8 @@ class Player {
             teamNumber: this.teamNumber,
             teamName: this.teamNumber,
             mobileControls: this.mobileControls,
-            playerNumber: this.playerNumber
+            playerNumber: this.playerNumber,
+            id: this.id
         }
     }
 

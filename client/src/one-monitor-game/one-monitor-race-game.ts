@@ -1,15 +1,17 @@
 import { Color } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { v4 as uuid } from "uuid"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import Stats from "stats.js";
-import { defaultGameSettings, IGameSettings, IPlayerInfo } from "../classes/Game";
+import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerInfo } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addControls } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./one-monitor-styles.css";
+import { saveGameData } from "../firebase/firebaseFunctions";
 
 const vechicleFov = 60
 
@@ -55,6 +57,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
     raceOnGoing: boolean
     winner: string
     winTime: number
+    lapTimes: number[][]
+
+    gameId: string
+    roomName!: string
 
     constructor() {
         super()
@@ -82,15 +88,19 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.winner = ""
         this.winTime = -1
         this.finishedTime = []
+        this.gameId = uuid()
     }
 
     isPlayerFinished(idx: number) {
         return this.lapNumber[idx] > this.totalNumberOfLaps
     }
 
-    setGameSettings(newGameSettings: IGameSettings) {
+
+
+    setGameSettings(newGameSettings: IGameSettings, roomName: string) {
         this.gameSettings = newGameSettings
         this.totalNumberOfLaps = this.gameSettings.numberOfLaps
+        this.roomName = roomName
     }
 
     startRaceCountdown() {
@@ -213,6 +223,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.lapNumber[vehicleNumber] += 1
             this.checkpointCrossed[vehicleNumber] = false
             const cLapTime = (Date.now() - this.currentLapStart[vehicleNumber]) / 1000
+            this.lapTimes[vehicleNumber].push(cLapTime)
             this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
             this.currentLapStart[vehicleNumber] = Date.now()
             const p = this.course.goal.position
@@ -224,7 +235,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
                     this.winner = this.players[vehicleNumber].playerName
                     this.winTime = totalTime
                 }
-
                 this.checkRaceOver()
             }
         }
@@ -240,6 +250,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         if (isRaceOver) {
             importantInfoDiv.innerHTML = `Race over <br /> ${this.winner} won with total time ${this.winTime} <br /> Press 'r' to reset game`
             this.raceOnGoing = false
+            this.prepareEndOfGameData()
         }
     }
 
@@ -365,6 +376,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.bestLapTime = []
         this.currentLapStart = []
         this.finishedTime = []
+        this.lapTimes = []
         for (let i = 0; i < this.players.length; i++) {
             const color = possibleColors[i]
             if (i >= this.vehicles.length) {
@@ -384,6 +396,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.lapNumber.push(1)
             this.bestLapTime.push(Infinity)
             this.finishedTime.push(0)
+            this.lapTimes.push([])
         }
     }
 
@@ -396,12 +409,43 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.font = response;
 
         });
+    }
 
+    prepareEndOfGameData() {
+        const playersData: IEndOfGameInfoPlayer[] = []
+        for (let i = 0; i < this.vehicles.length; i++) {
+            const playerData: IEndOfGameInfoPlayer = {
+                totalTime: this.finishedTime[i],
+                numberOfLaps: this.totalNumberOfLaps,
+                playerName: this.players[i].playerName,
+                playerId: this.players[i].id,
+                bestLapTime: this.bestLapTime[i],
+                trackType: this.gameSettings.trackName,
+                lapTimes: this.lapTimes[i],
+                gameId: this.gameId,
+                date: new Date()
+            }
+            playersData.push(playerData)
+        }
+
+        const endOfGameInfo: IEndOfGameInfoGame = {
+            playerNames: this.players.map(p => p.playerName),
+            numberOfLaps: this.totalNumberOfLaps,
+            playerIds: this.players.map(p => p.id ?? null), // I think firebase supports null but not undefined
+            playerTotalTimes: this.finishedTime,
+            playerLapTimes: this.lapTimes,
+            trackType: this.gameSettings.trackName,
+            gameId: this.gameId,
+            roomName: this.roomName,
+            date: new Date()
+        }
+
+        saveGameData(playersData, endOfGameInfo)
     }
 }
 
 
-export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings) => {
+export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomName: string) => {
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
@@ -414,7 +458,7 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         // hacky way to get the project's scene
         (project.scenes.get(key) as OneMonitorRaceGameScene).setSocket(socket);
         (project.scenes.get(key) as OneMonitorRaceGameScene).setPlayers(players);
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings);
+        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomName);
         return project
     })
 

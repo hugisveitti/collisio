@@ -1,22 +1,35 @@
-import React, { useContext } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import {
   Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
+  CircularProgress,
+  Input,
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import GoogleIcon from "@mui/icons-material/Google";
-import FacebookIcon from "@mui/icons-material/Facebook";
+import EmailIcon from "@mui/icons-material/Email";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import {
-  auth,
-  signInWithFacebook,
+  createAccountWithEmail,
+  signInWithEmail,
   signInWithGoogle,
   signOut,
-} from "../firebase/firebaseFunctions";
+} from "../firebase/firebaseInit";
 import { UserContext } from "../providers/UserProvider";
+import { Password } from "@mui/icons-material";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles({
   container: {
@@ -27,12 +40,39 @@ const useStyles = makeStyles({
   },
 });
 
-const LoginComponent = () => {
+interface ILoginComponent {
+  setPlayerName: Dispatch<SetStateAction<string>>;
+}
+
+const LoginComponent = (props: ILoginComponent) => {
   const classes = useStyles();
   const user = useContext(UserContext);
-  console.log("user", user);
-  const u = auth.currentUser;
-  console.log("u", u);
+
+  const [creatingAccountWithEmail, setCreatingAccountWithEmail] =
+    useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+
+  const [isSigningIn, setIsSigningIn] = useState(true);
+
+  useEffect(() => {
+    if (user !== null) {
+      setIsSigningIn(false);
+    }
+  }, [user]);
+
+  if (isSigningIn) {
+    return (
+      <div className={classes.container}>
+        <Card>
+          <CardContent style={{ textAlign: "center" }}>
+            <CircularProgress />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (user) {
     return (
@@ -47,11 +87,15 @@ const LoginComponent = () => {
               />
             )}
             <Typography color="text.secondary">
-              Welcome {user.displayName}.
+              Welcome {user.displayName ?? displayName}.
             </Typography>
 
             <CardActions>
-              <Button size="small" onClick={() => signOut()}>
+              <Button
+                startIcon={<LogoutIcon />}
+                size="small"
+                onClick={() => signOut()}
+              >
                 Logout
               </Button>
             </CardActions>
@@ -75,6 +119,7 @@ const LoginComponent = () => {
             onClick={(e) => {
               e.preventDefault();
               signInWithGoogle();
+              setIsSigningIn(true);
             }}
             variant="contained"
             style={{ backgroundColor: "#de5246", marginTop: 15 }}
@@ -82,7 +127,7 @@ const LoginComponent = () => {
           >
             Sign in with Google
           </Button>
-          <br />
+          {/* 
           <Button
             onClick={(e) => {
               e.preventDefault();
@@ -93,7 +138,83 @@ const LoginComponent = () => {
             variant="contained"
           >
             Sign in with Facebook
-          </Button>
+          </Button> */}
+          <br />
+          {creatingAccountWithEmail ? (
+            <>
+              <Input
+                style={{ marginTop: 25 }}
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                style={{ marginTop: 15 }}
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={password.length < 6}
+              />
+              <Input
+                style={{ marginTop: 15 }}
+                placeholder="Displayname"
+                value={displayName}
+                onChange={(e) => {
+                  setDisplayName(e.target.value);
+                  props.setPlayerName(e.target.value);
+                }}
+              />
+              <br />
+              <br />
+              <Button
+                style={{ marginRight: 5 }}
+                variant="contained"
+                startIcon={<LoginIcon />}
+                onClick={() => {
+                  if (password.length < 6) {
+                    toast.error("The password must be atleast 6 characters.");
+                    return;
+                  }
+                  setIsSigningIn(true);
+                  signInWithEmail(email, password);
+                }}
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => {
+                  if (password.length < 6) {
+                    toast.error("The password must be atleast 6 characters.");
+                    return;
+                  }
+                  if (displayName === "") {
+                    toast.error("The display name cannot be empty.");
+                    return;
+                  }
+                  setIsSigningIn(true);
+                  createAccountWithEmail(email, password, displayName);
+                }}
+                variant="outlined"
+                startIcon={<ControlPointIcon />}
+              >
+                Sign up
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => setCreatingAccountWithEmail(true)}
+              variant="contained"
+              startIcon={<EmailIcon />}
+              style={{
+                backgroundColor: "#abdbe3",
+                marginTop: 15,
+                color: "black",
+              }}
+            >
+              Sign in with email
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

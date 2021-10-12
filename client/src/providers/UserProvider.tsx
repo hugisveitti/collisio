@@ -1,7 +1,9 @@
 import { User } from "@firebase/auth";
+import { ref, set } from "@firebase/database";
 import React, { createContext, useEffect, useState } from "react";
+import { createDBUser, getDBUser, IUser } from "../firebase/firebaseFunctions";
 
-import { auth } from "../firebase/firebaseFunctions";
+import { auth, database, usersRefPath } from "../firebase/firebaseInit";
 
 interface IUserProvider {
   children: any;
@@ -11,20 +13,24 @@ interface MyUser extends User {
   idToken: string;
 }
 
-export const UserContext = createContext(null as null | MyUser);
+export const UserContext = createContext(null as null | IUser);
 
 const UserProvider = (props: IUserProvider) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
     auth.onAuthStateChanged((userAuth) => {
-      console.log("auth stated changed", userAuth);
-      if (auth.currentUser) {
-        auth.currentUser.getIdToken(true).then((userIdToken) => {
-          const newUser = { ...userAuth, idToken: userIdToken } as MyUser;
-          setUser(newUser);
-        });
+      if (auth.currentUser && !user) {
+        const userInfo = {
+          displayName: auth.currentUser.displayName,
+          uid: auth.currentUser.uid,
+          photoURL: auth.currentUser.photoURL,
+          email: auth.currentUser.email,
+        };
+        setUser(userInfo);
+        createDBUser(userInfo);
       } else {
-        setUser(null);
+        // change from null to undefined triggers useEffect in LoginComponent
+        setUser(undefined);
       }
     });
   }, []);

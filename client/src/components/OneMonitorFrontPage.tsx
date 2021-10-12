@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -8,10 +8,18 @@ import "../styles/main.css";
 import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
-import { controlsRoomPath, howToPlayPagePath, waitingRoomPath } from "./Routes";
+import {
+  controlsRoomPath,
+  highscorePagePath,
+  howToPlayPagePath,
+  waitingRoomPath,
+} from "./Routes";
 import { IStore } from "./store";
 import logo from "../images/caroutline.png";
 import LoginComponent from "./LoginComponent";
+import { UserContext } from "../providers/UserProvider";
+import { Button } from "@mui/material";
+import { createFakeHighscoreData } from "../tests/fakeData";
 
 // const logo = require("../images/caroutline.png");
 // import * as logo from "../images/caroutline.png";
@@ -24,9 +32,49 @@ interface IOneMonitorFrontPageProps {
 const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const deviceType = getDeviceType();
   const [playerName, setPlayerName] = useState("");
+  const [needToAskOrientPermission, setNeedToAskOrientPermission] =
+    useState(true);
   const history = useHistory();
 
+  const user = useContext(UserContext);
+
+  useEffect(() => {
+    // createFakeHighscoreData();
+  }, []);
+
+  useEffect(() => {
+    if (user?.displayName) {
+      setPlayerName(user.displayName);
+    }
+  }, [user]);
+
+  const checkIfNeedOrientaitonPrompt = (e: DeviceOrientationEvent) => {
+    const { beta, gamma, alpha } = e;
+    console.log("dev or", e);
+    if (beta || gamma || alpha) {
+      setNeedToAskOrientPermission(false);
+      window.removeEventListener(
+        "deviceorientation",
+        checkIfNeedOrientaitonPrompt
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (deviceType === "desktop") {
+      setNeedToAskOrientPermission(false);
+    } else {
+      window.addEventListener(
+        "deviceorientation",
+        checkIfNeedOrientaitonPrompt
+      );
+    }
+  }, []);
+
   const requestDeviceOrientation = () => {
+    if (!needToAskOrientPermission) {
+      return;
+    }
     if (
       DeviceOrientationEvent &&
       typeof DeviceOrientationEvent["requestPermission"] === "function"
@@ -35,6 +83,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         .then((response) => {
           if (response == "granted") {
             console.log("deivce permission granted, do nothing");
+            setNeedToAskOrientPermission(false);
           } else {
             toast.error(
               "You need to grant permission to the device's orientation to be able to play the game, please refresh the page."
@@ -60,6 +109,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
             placeholder="Player Name"
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
+            disabled={!!user}
           />
           <br />
         </>
@@ -73,22 +123,22 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   const connectToRoomMobile = (roomName: string, playerName: string) => {
-    props.socket.emit("player-connected", { roomName, playerName });
-    if (deviceType === "mobile") {
-      props.socket.once(
-        "player-connected-callback",
-        (data: ISocketCallback) => {
-          if (data.status === "error") {
-            const { message } = data;
-            toast.error(message);
-          } else {
-            toast.success(data.message);
-            props.store.setPlayer(data.data.player);
-            goToWaitingRoom();
-          }
-        }
-      );
-    }
+    props.socket.emit("player-connected", {
+      roomName,
+      playerName,
+      id: user?.uid,
+    });
+
+    props.socket.once("player-connected-callback", (data: ISocketCallback) => {
+      if (data.status === "error") {
+        const { message } = data;
+        toast.error(message);
+      } else {
+        toast.success(data.message);
+        props.store.setPlayer(data.data.player);
+        goToWaitingRoom();
+      }
+    });
   };
 
   const createRoomDesktop = (roomName: string) => {
@@ -117,6 +167,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       createRoomDesktop(_roomName);
     } else {
       connectToRoomMobile(_roomName, _playerName);
+      requestDeviceOrientation();
     }
   };
 
@@ -188,9 +239,13 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
           On mobile please have your phone in portrait and lock the screen
           switch
         </p>
+        <br />
+        <Link to={highscorePagePath}>
+          <Button variant="contained">See Highscores</Button>
+        </Link>
         <ToastContainer />
       </div>
-      <LoginComponent />
+      <LoginComponent setPlayerName={setPlayerName} />
     </div>
   );
 };

@@ -34,6 +34,10 @@ app.get("/how-to-play", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
+app.get("/highscores", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+});
+
 app.get("/ammo.wasm.js", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/ammo/ammo.wasm.js"));
 })

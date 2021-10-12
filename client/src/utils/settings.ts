@@ -1,6 +1,8 @@
-let deviceType: string
 
-export const getDeviceType = () => {
+let deviceType: "desktop" | "mobile"
+
+
+export const getDeviceType = (): "desktop" | "mobile" => {
     if (deviceType) {
         return deviceType
     }

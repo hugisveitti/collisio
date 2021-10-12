@@ -34,7 +34,8 @@ const GameRoom = (props: IGameRoom) => {
     startRaceGameOneMonitor(
       props.socket,
       props.store.players,
-      props.store.gameSettings
+      props.store.gameSettings,
+      props.store.roomName
     );
   }
 
