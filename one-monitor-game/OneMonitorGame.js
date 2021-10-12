@@ -59,7 +59,11 @@ class GameMaster {
             }
 
             socket.on("in-waiting-room", () => {
-                this.rooms[roomName].alertWaitingRoom()
+                if (this.rooms[roomName]) {
+                    this.rooms[roomName].alertWaitingRoom()
+                } else {
+                    console.log("no room called", roomName)
+                }
             })
 
             socket.on("disconnect", () => {
