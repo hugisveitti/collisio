@@ -1,7 +1,7 @@
 import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
-import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, drawResetOrientations, handleTouchEnd, handleTouchStart, touchActions } from "./mobileGui"
+import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, drawResetOrientations, handleTouchEnd, handleTouchStart, isPortrait, touchActions } from "./mobileGui"
 
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
@@ -26,8 +26,27 @@ let orientation: IOrientation = {
 
 let ctx: CanvasRenderingContext2D | null
 let deviceorientationCreated = false
-const height = window.innerHeight
-const width = window.innerWidth
+let canvas: HTMLCanvasElement
+
+let width = screen.width
+let height = screen.height - 50
+
+window.addEventListener("orientationchange", () => {
+    height = screen.height - 50
+    width = screen.width
+
+    const screenWidthBigger = screen.height < screen.width
+    const windowWidthBigger = window.innerHeight < window.innerWidth
+
+    if (screenWidthBigger !== windowWidthBigger) {
+        console.log("screen and window resolution not the same")
+    }
+
+    canvas.height = height
+    canvas.width = width
+})
+
+
 
 // const createScreenError = () => {
 //     if (screen.orientation.type.slice(0, 9) === "landscape") {
@@ -69,7 +88,7 @@ const createDeviceOrientationListener = () => {
 export const initGryoscope = (socket: Socket) => {
     document.body.setAttribute("overflow", "hidden")
 
-    const canvas = document.createElement("canvas")
+    canvas = document.createElement("canvas")
     canvas.onselectstart = () => false
 
     canvas.setAttribute("id", "controller-canvas")
@@ -144,7 +163,9 @@ const startLoop = (socket: Socket) => {
             if (motion) {
                 ctx.save()
                 ctx.translate(width / 2, height / 2)
-                ctx.rotate(-Math.PI / 2)
+                if (isPortrait) {
+                    ctx.rotate(-Math.PI / 2)
+                }
 
                 ctx.font = "30px Arial"
                 let infoText = "alpha: " + Math.round(orientation.alpha)
@@ -159,7 +180,9 @@ const startLoop = (socket: Socket) => {
             if (controls.moreSpeed) {
                 ctx.save()
                 ctx.translate(width / 2, height / 2)
-                ctx.rotate(-Math.PI / 2)
+                if (isPortrait) {
+                    ctx.rotate(-Math.PI / 2)
+                }
 
                 ctx.font = "60px Arial"
                 let infoText = "MORE SPEED!"

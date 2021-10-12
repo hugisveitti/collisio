@@ -57,7 +57,10 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
         }
     }
 
-    update(ref(database), updates)
+    update(ref(database), updates).catch((err) => {
+        console.log("error saving race", err)
+        toast("Error saving race")
+    })
 }
 
 
