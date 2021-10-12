@@ -43,7 +43,7 @@ export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
 
 
 const userGamePlayerInfoPath = "player-info"
-const userGameGameInfoPath = "player-info"
+const userGameGameInfoPath = "game-info"
 
 export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: IEndOfGameInfoGame) => {
     const newGameKey = push(child(ref(database), gameDataRefPath)).key;

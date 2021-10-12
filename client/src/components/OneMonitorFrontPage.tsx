@@ -135,13 +135,9 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         const { message } = data;
         toast.error(message);
       } else {
-        if (user) {
-          toast.success(data.message);
-          props.store.setPlayer(data.data.player);
-          goToWaitingRoom();
-        } else {
-          setNotLoggedInModelOpen(true);
-        }
+        toast.success(data.message);
+        props.store.setPlayer(data.data.player);
+        goToWaitingRoom();
       }
     });
   };
@@ -171,8 +167,12 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     if (deviceType === "desktop") {
       createRoomDesktop(_roomName);
     } else {
-      connectToRoomMobile(_roomName, _playerName);
-      requestDeviceOrientation();
+      if (user) {
+        connectToRoomMobile(_roomName, _playerName);
+        requestDeviceOrientation();
+      } else {
+        setNotLoggedInModelOpen(true);
+      }
     }
   };
 
@@ -220,7 +220,14 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
               Login
             </Button>
           )}
-          <Button onClick={() => goToWaitingRoom()}>Continue as a Guest</Button>
+          <Button
+            onClick={() => {
+              connectToRoomMobile(props.store.roomName, playerName);
+              requestDeviceOrientation();
+            }}
+          >
+            Continue as a Guest
+          </Button>
         </div>
       </Modal>
     );
