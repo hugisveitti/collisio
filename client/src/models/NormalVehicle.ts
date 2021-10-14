@@ -1,5 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
+import { IVehicleSettings } from '../classes/User';
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 
 
@@ -23,7 +24,7 @@ const yOrigin = .5
 const turnDivder = 150
 
 
-
+const radiantMultiplier = 0.0174532925
 
 export class NormalVehicle implements IVehicle {
 
@@ -46,7 +47,7 @@ export class NormalVehicle implements IVehicle {
     isPaused: boolean
     mass: number
     engineForce: number
-    radMult: number
+    steeringSensitivity: number
 
 
 
@@ -59,7 +60,7 @@ export class NormalVehicle implements IVehicle {
         this.canDrive = true
         this.isPaused = false
         this.engineForce = 5000
-        this.radMult = 0.0174532925 * 0.1
+        this.steeringSensitivity = 0.5 * radiantMultiplier
 
         this.checkpointPositionRotation = {
             position: { x: 0, y: 4, z: 0 }, rotation: { x: 0, y: 0, z: 0 }
@@ -182,6 +183,8 @@ export class NormalVehicle implements IVehicle {
     }
 
 
+
+
     update() {
         let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
         const n = this.vehicle.getNumWheels()
@@ -259,8 +262,8 @@ export class NormalVehicle implements IVehicle {
         if (this.canDrive) {
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
-            this.vehicle.setSteeringValue(angle * this.radMult, FRONT_LEFT)
-            this.vehicle.setSteeringValue(angle * this.radMult, FRONT_RIGHT)
+            this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
+            this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
         } else {
             this.vehicle.setSteeringValue(0, FRONT_LEFT)
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)
@@ -271,8 +274,8 @@ export class NormalVehicle implements IVehicle {
         if (this.vehicleSteering < maxSteering) {
             this.vehicleSteering += steeringIncrement
         }
-        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
-        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+        this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
+        this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
     }
 
 
@@ -281,8 +284,8 @@ export class NormalVehicle implements IVehicle {
         if (Math.abs(this.vehicleSteering) < maxSteering) {
             this.vehicleSteering -= steeringIncrement
         }
-        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
-        this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+        this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
+        this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
     }
 
     noTurn() {
@@ -387,6 +390,11 @@ export class NormalVehicle implements IVehicle {
         const { position, rotation } = this.checkpointPositionRotation
         this.setPosition(position.x, position.y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
+    }
+
+    updateVehicleSettings(vehicleSettings: IVehicleSettings) {
+        this.engineForce = vehicleSettings.engineForce
+        this.steeringSensitivity = radiantMultiplier * vehicleSettings.steeringSensitivity
     }
 }
 

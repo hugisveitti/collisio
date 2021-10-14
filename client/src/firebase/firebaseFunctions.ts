@@ -1,7 +1,8 @@
-import { child, get, push, ref, set, update } from "firebase/database"
+import { child, get, push, ref, set, update, onValue } from "firebase/database";
 import { toast } from "react-toastify";
-import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo, TrackType } from "../classes/Game";
-import { database, gameDataRefPath, highscoreRefPath, userGamesRefPath, usersRefPath } from "./firebaseInit"
+import { IEndOfGameInfoGame, IEndOfGameInfoPlayer } from "../classes/Game";
+import { IUserSettings } from "../classes/User";
+import { database, gameDataRefPath, highscoreRefPath, userGamesRefPath, usersRefPath } from "./firebaseInit";
 
 
 export interface IUser {
@@ -32,12 +33,16 @@ export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) 
 }
 
 export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
-    get(ref(database, usersRefPath + "/" + userId)).then(snapshot => {
+    const dbRef = ref(database, usersRefPath + "/" + userId)
+
+    onValue(dbRef, snapshot => {
         const user = snapshot.val()
         if (user) {
             callback(user)
         }
-    })
+    }, err => {
+        console.log("Error getting db user", err)
+    }, { onlyOnce: true })
 }
 
 
@@ -135,4 +140,27 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
             console.log("player game data does not exists")
         }
     })
+}
+
+const userSettingsRef = "settings"
+
+export const setDBUserSettings = (userId: string, settings: IUserSettings) => {
+    set(ref(database, usersRefPath + "/" + userId + "/" + userSettingsRef), settings).catch(err => {
+        console.log("Error saving user settings", err)
+        toast.error("Error saving user settings", err)
+    })
+}
+
+
+export const getDBUserSettings = (userId: string, callback: (settings: IUserSettings | undefined) => void) => {
+    const settingsRef = ref(database, usersRefPath + "/" + userId + "/" + userSettingsRef)
+    onValue(settingsRef, snap => {
+        if (snap.exists()) {
+            callback(snap.val())
+        } else {
+            callback(undefined)
+        }
+    }, err => {
+        console.log("Error getting user settings", err)
+    }, { onlyOnce: true })
 }

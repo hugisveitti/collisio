@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
@@ -67,6 +68,10 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   return (
     <div className="container">
       <h1 className="center">Waiting room</h1>
+      <br />
+      <Link to={frontPagePath}>Back to front page</Link>
+
+      <br />
       <br />
 
       <h3 className="center">Players in {props.store.roomName}</h3>
@@ -142,7 +147,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               <br />
               <input
                 className="large-input"
-                type="text"
+                type="number"
                 value={props.store.gameSettings.numberOfLaps}
                 onChange={(ev) => {
                   const newGameSettings = {

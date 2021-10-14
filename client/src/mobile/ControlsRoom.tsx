@@ -1,13 +1,16 @@
 import { Modal } from "@mui/material";
-import React, { useEffect, useState } from "react";
+
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { isTestMode } from "../utils/settings";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
-import "./mobileController.css";
+import { UserContext } from "../providers/UserProvider";
 import { MobileControls } from "../utils/ControlsClasses";
+import { isTestMode } from "../utils/settings";
+import "./ControlsRoom.css";
+import ControllerSettingsComponent from "./ControllerSettingsComponent";
 
 interface IControlsRoomProps {
   socket: Socket;
@@ -18,6 +21,8 @@ const controller = new MobileControls();
 
 const ControlsRoom = (props: IControlsRoomProps) => {
   const history = useHistory();
+  const user = useContext(UserContext);
+
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const [forward, setForward] = useState(false);
@@ -41,6 +46,18 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     toast.warn("No room connection, redirecting to frontpage");
     return null;
   }
+
+  const handleQuitGame = () => {
+    console.log("quit game");
+    history.push(frontPagePath);
+    props.socket.emit("quit-game");
+  };
+
+  const handleUserLoggedIn = () => {
+    console.log("handle user logged in");
+    console.log("user", user);
+  };
+
   const handleDeviceOrientChange = () => {
     setIsPortrait(screen.orientation.type.slice(0, 8) === "portrait");
   };
@@ -56,6 +73,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
       // set fps
     }, 1000 / 30);
+    console.log("user", user);
   }, []);
 
   const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
@@ -97,27 +115,48 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const breakStyles = isPortrait
     ? { ...rotateText, right: 145, bottom: 35 }
     : { left: 35, bottom: 145 };
+
+  const settingsStyles = isPortrait
+    ? { ...rotateText, left: 145, top: "50%" }
+    : { left: "50%", top: 145 };
   const resetStyles = isPortrait
     ? { ...rotateText, left: 35, top: "50%" }
     : { left: "50%", top: 35 };
+
+  const modalStyles = isPortrait
+    ? {
+        transform: "translate(-50%, -50%) rotate(-90deg)",
+      }
+    : { transform: "translate(-50%, -50%)" };
 
   return (
     <React.Fragment>
       <Modal
         open={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "75%",
-          backgroundColor: "#eeebdf",
-          border: "2px solid #000",
-          padding: 10,
-        }}
       >
-        <div>Settings modal</div>
+        <div
+          style={{
+            ...modalStyles,
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "75%",
+            backgroundColor: "#eeebdf",
+            border: "2px solid #000",
+            padding: 10,
+          }}
+        >
+          <ControllerSettingsComponent
+            onClose={() => {
+              handleButtonAction(false, "pause", setSettingsModalOpen);
+            }}
+            setSettingsModalOpen={setSettingsModalOpen}
+            quitGame={handleQuitGame}
+            userLoggedIn={handleUserLoggedIn}
+            socket={props.socket}
+          />
+        </div>
       </Modal>
 
       <div
@@ -158,6 +197,17 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         }}
       >
         Break
+      </div>
+      <div
+        className="controller-btn"
+        onClick={() => handleButtonAction(true, "pause", setSettingsModalOpen)}
+        style={{
+          ...settingsStyles,
+          color: downColor,
+          backgroundColor: upColor,
+        }}
+      >
+        Settings
       </div>
       <div
         className="controller-btn"

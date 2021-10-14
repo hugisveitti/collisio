@@ -1,4 +1,5 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { IVehicleSettings } from '../classes/User';
 
 export interface SimpleVector {
     x: number
@@ -42,5 +43,6 @@ export interface IVehicle {
 
     resetPosition: () => void
     setCheckpointPositionRotation: (positionRotation: IPositionRotation) => void
+    updateVehicleSettings: (vehicleSettings: IVehicleSettings) => void
 
 }

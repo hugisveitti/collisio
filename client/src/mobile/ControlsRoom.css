@@ -1,0 +1,60 @@
+#controller-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#controller-settings-modal {
+  /* width: 50%; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: "#eeebdf";
+  border: "2px solid #000";
+  padding: 10;
+}
+
+.controller-btn {
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  color: green;
+  border-radius: 15px;
+  text-align: center;
+  vertical-align: middle;
+  position: absolute;
+}
+
+#orientation-info {
+  width: 100px;
+  height: 100px;
+  color: black;
+  position: absolute;
+
+  top: 0px;
+  left: 0px;
+}
+
+#more-speed-info {
+  width: 100px;
+  height: 100px;
+  color: black;
+  position: absolute;
+
+  top: 0px;
+  left: 55px;
+  font-size: 32px;
+}
+
+#orientation-info,
+#more-speed-info,
+.controller-btn {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

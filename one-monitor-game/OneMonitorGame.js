@@ -180,6 +180,11 @@ class Game {
         this.socket.emit("player-disconnected", { playerName })
     }
 
+    userSettingsChanged(data) {
+        console.log("user settings in onemonitor game", data)
+        this.socket.emit("usersettings-changed", data)
+    }
+
     toString() {
         let playersString = ""
         for (let player of this.players) {

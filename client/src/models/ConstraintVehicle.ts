@@ -1,6 +1,7 @@
 import { ExtendedObject3D, Scene3D } from "enable3d"
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { IPositionRotation, IVehicle } from "./IVehicle"
+import { IVehicleSettings } from "../classes/User";
 
 const boxDim = { depth: 1, height: 1, width: 1 }
 
@@ -152,6 +153,10 @@ export class ConstraintVehicle implements IVehicle {
 
     setCheckpointPositionRotation(positionRotation: IPositionRotation) {
         console.log("set checkpoint not implemented for constraint vehicle")
+    }
+
+    updateVehicleSettings(vehicleSettings: IVehicleSettings) {
+        console.log("updateVehicleSettings(vehicleSettings: IVehicleSettings) not implemented")
     }
 }
 

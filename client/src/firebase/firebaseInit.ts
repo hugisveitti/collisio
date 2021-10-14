@@ -36,10 +36,18 @@ export const gameDataRefPath = "game-data"
 export const userGamesRefPath = "games"
 
 
-export const signInWithGoogle = () => {
+export const signInWithGoogle = (usePopup?: boolean) => {
+    if (usePopup) {
+        signInWithPopup(auth, googleProvider).then(user => {
+            console.log("new user", user)
+        }).catch((err) => {
+            toast.error("Error logging in with Google.")
+            console.log("error logging in", err)
+        })
+    }
+
     signInWithRedirect(auth, googleProvider).then(user => {
         console.log("new user", user)
-
     }).catch((err) => {
         toast.error("Error logging in with Google.")
         console.log("error logging in", err)

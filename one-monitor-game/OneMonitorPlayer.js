@@ -1,4 +1,4 @@
-const { VehicleControls, MobileControls } = require("../utils/controls")
+const { VehicleControls, MobileControls, UserSettings } = require("../utils/controls")
 
 class Player {
 
@@ -14,8 +14,7 @@ class Player {
     VehicleControls
     playerNumber
     id
-
-
+    userSettings
 
     constructor(socket, playerName, id) {
         this.socket = socket
@@ -25,11 +24,21 @@ class Player {
 
         this.mobileControls = new MobileControls()
         this.VehicleControls = new VehicleControls()
+        this.userSettings = new UserSettings()
         this.isConnected = true
 
         this.setupControler()
         this.setupTeamChangeListener()
 
+        this.setupQuitGameListener()
+        this.setupUserSettingsListener()
+
+    }
+
+    setupQuitGameListener() {
+        this.socket.on("quit-game", () => {
+            this.game.playerDisconnected(this.playerName)
+        })
     }
 
     leaderStartsGame() {
@@ -71,6 +80,15 @@ class Player {
         }
     }
 
+
+
+    setupUserSettingsListener() {
+        this.socket.on("settings-changed", (newUserSettings) => {
+            this.userSettings = newUserSettings
+            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
+        })
+    }
+
     startGame() {
         this.setupControler()
         if (this.game) {
@@ -86,7 +104,6 @@ class Player {
     }
 
     toString() {
-
         return `${this.playerName} in team: ${this.teamNumber}`
     }
 }

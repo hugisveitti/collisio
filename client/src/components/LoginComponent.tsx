@@ -30,7 +30,6 @@ import {
   signOut,
 } from "../firebase/firebaseInit";
 import { UserContext } from "../providers/UserProvider";
-import { Password } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import { privateProfilePagePath } from "./Routes";
 import { Link } from "react-router-dom";
@@ -45,7 +44,8 @@ const useStyles = makeStyles({
 });
 
 interface ILoginComponent {
-  setPlayerName: Dispatch<SetStateAction<string>>;
+  setPlayerName?: Dispatch<SetStateAction<string>>;
+  signInWithPopup?: boolean;
 }
 
 const LoginComponent = (props: ILoginComponent) => {
@@ -131,7 +131,7 @@ const LoginComponent = (props: ILoginComponent) => {
           <Button
             onClick={(e) => {
               e.preventDefault();
-              signInWithGoogle();
+              signInWithGoogle(props.signInWithPopup);
               setIsSigningIn(true);
             }}
             variant="contained"
@@ -175,7 +175,9 @@ const LoginComponent = (props: ILoginComponent) => {
                 value={displayName}
                 onChange={(e) => {
                   setDisplayName(e.target.value);
-                  props.setPlayerName(e.target.value);
+                  if (props.setPlayerName) {
+                    props.setPlayerName(e.target.value);
+                  }
                 }}
               />
               <br />

@@ -12,6 +12,7 @@ import { addControls } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./one-monitor-styles.css";
 import { saveGameData } from "../firebase/firebaseFunctions";
+import { IUserSettings } from "../classes/User";
 
 const vechicleFov = 60
 
@@ -21,6 +22,11 @@ const possibleColors = [0x9e4018, 0x0d2666, 0x1d8a47, 0x61f72a, "brown", "black"
 const stats = new Stats()
 const scoreTable = document.createElement("div")
 const importantInfoDiv = document.createElement("div")
+
+interface IUserSettingsMessage {
+    playerNumber: number
+    userSettings: IUserSettings
+}
 
 interface IView {
     left: number,
@@ -61,6 +67,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     gameId: string
     roomName!: string
+    escPress: () => void
 
     constructor() {
         super()
@@ -95,12 +102,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
         return this.lapNumber[idx] > this.totalNumberOfLaps
     }
 
-
-
-    setGameSettings(newGameSettings: IGameSettings, roomName: string) {
+    setGameSettings(newGameSettings: IGameSettings, roomName: string, escPress: () => void) {
         this.gameSettings = newGameSettings
         this.totalNumberOfLaps = this.gameSettings.numberOfLaps
         this.roomName = roomName
+        this.escPress = escPress
     }
 
     startRaceCountdown() {
@@ -228,8 +234,24 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 }
             }
         })
-        window.addEventListener("resize", () => this.onWindowResize())
 
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                this.escPress()
+                for (let vehicle of this.vehicles) {
+                    vehicle.pause()
+                }
+            }
+        })
+
+        window.addEventListener("resize", () => this.onWindowResize())
+    }
+
+    unpauseGame() {
+        console.log("unpause game in class called")
+        for (let vehicle of this.vehicles) {
+            vehicle.unpause()
+        }
     }
 
 
@@ -322,6 +344,15 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     setSocket(socket: Socket) {
         this.socket = socket
+        this.userSettingsListener()
+    }
+
+    // 
+    userSettingsListener() {
+        this.socket.on("usersettings-changed", (data: IUserSettingsMessage) => {
+            console.log("user sett change data in game", data)
+            this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
+        })
     }
 
     createController() {
@@ -470,7 +501,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 }
 
 
-export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomName: string) => {
+export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomName: string, escPress: () => void,) => {
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
@@ -483,7 +514,9 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         // hacky way to get the project's scene
         (project.scenes.get(key) as OneMonitorRaceGameScene).setSocket(socket);
         (project.scenes.get(key) as OneMonitorRaceGameScene).setPlayers(players);
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomName);
+        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomName, escPress);
+        //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
+
         return project
     })
 
