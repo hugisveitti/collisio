@@ -48,10 +48,8 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   }, []);
 
   useEffect(() => {
-    console.log("useR", user);
     if (user) {
       getDBUserSettings(user.uid, (settings) => {
-        console.log("user settings", settings);
         if (!settings) {
           setDBUserSettings(user.uid, defaultUserSettings);
           setUserSettings(defaultUserSettings);
@@ -129,8 +127,8 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           onBlur={saveUserSettingsToBD}
         />
       </Grid>
-      <Grid item xs={9}></Grid>
-      <Grid item xs={3}>
+      <Grid item xs={3}></Grid>
+      <Grid item xs={9}>
         <Button onClick={props.quitGame} startIcon={<ExitToAppIcon />}>
           Quit game
         </Button>

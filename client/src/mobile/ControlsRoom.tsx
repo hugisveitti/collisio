@@ -125,9 +125,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const modalStyles = isPortrait
     ? {
-        transform: "translate(-50%, -50%) rotate(-90deg)",
+        transform: "rotate(-90deg)",
+        bottom: "50%",
       }
-    : { transform: "translate(-50%, -50%)" };
+    : { transform: "", top: 50 };
 
   return (
     <React.Fragment>
@@ -139,10 +140,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
           style={{
             ...modalStyles,
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: "85%",
-            height: "85%",
+
+            //left: "50%",
+            // width: "85%",
+            // height: "85%",
             backgroundColor: "#eeebdf",
             border: "2px solid #000",
             padding: 10,

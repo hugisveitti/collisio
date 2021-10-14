@@ -16,8 +16,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           transform: "translate(-50%, -50%)",
           position: "absolute",
           top: "50%",
-          left: "50%",
-          width: "75%",
+
           backgroundColor: "#eeebdf",
           border: "2px solid #000",
           padding: 10,
