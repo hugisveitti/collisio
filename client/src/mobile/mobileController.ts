@@ -96,7 +96,6 @@ export interface GyroscopeConfig {
 }
 
 export const initGryoscope = (config: GyroscopeConfig) => {
-    document.body.setAttribute("overflow", "hidden")
 
     canvas = document.createElement("canvas")
     canvas.onselectstart = () => false

@@ -105,6 +105,12 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     startRaceCountdown() {
         let countdown = 5
+
+        // makes vehicle fall
+        for (let vehcile of this.vehicles) {
+            vehcile.start()
+        }
+
         const timer = () => {
             importantInfoDiv.innerHTML = countdown + ""
             countdown -= 1
