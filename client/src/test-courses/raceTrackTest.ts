@@ -88,7 +88,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
         this.physics.setGravity(0, -20, 0)
-        console.log("physics", this.physics)
     }
 
     async preload() {
@@ -112,7 +111,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
 
-                console.log("rrr")
                 this.resetPlayer(0)
             } else if (e.key === "t") {
                 this.vehicle.chassisMesh.body.setCollisionFlags(0)
@@ -263,7 +261,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
 export const startRaceTrackTest = (socket: Socket, gameSettings: IGameSettings) => {
-    console.log("start race track test")
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true, randomStuff: "hello" }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)

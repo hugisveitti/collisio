@@ -47,7 +47,6 @@ export class RaceCourse {
         this.trackName = trackName
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
-        console.log("constructing raceCourse")
     }
 
     createCourse(courseLoadedCallback: () => void) {
@@ -90,7 +89,6 @@ export class RaceCourse {
                     } else if (child.name === "stytta") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave", breakable: true })
                     } else if (child.name.includes("spawn")) {
-                        console.log("spawn")
                         if (child.name.slice(0, 4) === "goal") {
                             this.goalSpawn = (child as ExtendedObject3D)
                         } else if (child.name.slice(0, 10) === "checkpoint") {
