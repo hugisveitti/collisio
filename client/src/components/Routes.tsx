@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client";
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType } from "../utils/settings";
-import ControlsRoom from "./ControlsRoom";
+import ControlsRoom from "../mobile/ControlsRoom";
 import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";

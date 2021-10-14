@@ -10,15 +10,15 @@ let angle = 40
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
-    if (mobileControls.isAccelerating) {
+    if (mobileControls.forward) {
         vehicle.goForward(mobileControls.moreSpeed)
-    } else if (mobileControls.isDeccelerating) {
+    } else if (mobileControls.backward) {
         vehicle.goBackward(speed)
     } else {
         vehicle.noForce()
     }
 
-    if (mobileControls.breaking) {
+    if (mobileControls.break) {
         vehicle.break()
     } else {
         vehicle.break(true)
@@ -37,32 +37,16 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
     }
 }
 
-let vehicleIdx = 0
-let lookBackwards = false
-let driveWithKeyboardEnabled = false
 
 
 export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[]) => {
-    document.addEventListener("keypress", (ev) => {
-        if (ev.key === "p") {
-            vehicleIdx += 1
-            vehicleIdx = vehicleIdx % vehicles.length
-        } else if (ev.key === "o") {
-            lookBackwards = !lookBackwards
-        } else if (ev.key === "u") {
-            driveWithKeyboardEnabled = !driveWithKeyboardEnabled
-            console.log("driving with keyboard enabled", driveWithKeyboardEnabled)
+    socket.on("get-controls", (data) => {
+        const { players } = data as { players: IPlayerInfo[] }
+        for (let i = 0; i < players.length; i++) {
+            driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
         }
     })
 
-    if (!driveWithKeyboardEnabled) {
-        socket.on("get-controls", (data) => {
-            const { players } = data as { players: IPlayerInfo[] }
-            for (let i = 0; i < players.length; i++) {
-                driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
-            }
-        })
-    }
 
 
 
@@ -87,18 +71,12 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
             default:
                 break;
         }
-        // doesn't work
-        // vehicles[vehicleIdx].lookForwardsBackwards(lookBackwards)
     }
 
     document.addEventListener("keydown", e => keyAction(e, true))
     document.addEventListener("keyup", e => keyAction(e, false))
 
-    if (driveWithKeyboardEnabled) {
-        setInterval(() => {
-            driveVehicleWithKeyboard(vehicles[vehicleIdx], vehicleControls)
-        }, 5)
-    }
+
 
 }
 

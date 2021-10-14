@@ -29,10 +29,10 @@ class Player {
 
         this.setupControler()
         this.setupTeamChangeListener()
+
     }
 
     leaderStartsGame() {
-        console.log("leader started game")
         this.game.startGame()
     }
 
@@ -47,6 +47,9 @@ class Player {
 
     setGame(game) {
         this.game = game
+        this.socket.on("disconnect", () => {
+            this.game.playerDisconnected(this.playerName)
+        })
     }
 
     setupControler() {

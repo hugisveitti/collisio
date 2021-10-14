@@ -1,25 +1,36 @@
+
+
 export class MobileControls {
 
     moreSpeed: boolean
     beta: number
     alpha: number
     gamma: number
-    isAccelerating: boolean
-    isDeccelerating: boolean
-    breaking: boolean
+    forward: boolean
+    backward: boolean
+    break: boolean
     lookBackwards: boolean
     resetVehicle: boolean
+    pause: boolean
 
-    constructor() {
+    constructor(data?: Object) {
         this.moreSpeed = false
         this.beta = 0
         this.gamma = 0
         this.alpha = 0
-        this.isAccelerating = false
-        this.isDeccelerating = false
-        this.breaking = false
+        this.forward = false
+        this.backward = false
+        this.break = false
         this.lookBackwards = false
         this.resetVehicle = false
+        this.pause = false
+
+        if (data) {
+            const keys = Object.keys(data)
+            for (let key of keys) {
+                this[key] = data[key]
+            }
+        }
     }
 }
 

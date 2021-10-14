@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
@@ -19,6 +19,12 @@ const GameRoom = (props: IGameRoom) => {
   // }
 
   const history = useHistory();
+  useEffect(() => {
+    props.socket.on("player-disconnected", ({ playerName }) => {
+      toast.warn(`${playerName} disconnected from game`);
+    });
+  }, []);
+
   if (!props.store.roomName) {
     history.push(frontPagePath);
     toast.warn("No room connection, redirecting to frontpage");

@@ -1,7 +1,9 @@
+import React from "react"
 import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
-import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, drawResetOrientations, handleTouchEnd, handleTouchStart, isPortrait, touchActions } from "./mobileGui"
+import { getDeviceType } from "../utils/settings"
+import { drawAccelerator, drawBreak, drawDeccelerator, drawResetButton, handleTouchEnd, handleTouchStart, touchActions, isPortrait, getWidthHeight, drawSettings } from "./mobileGui"
 
 let motion: DeviceMotionEventAcceleration | null = {
     x: 0,
@@ -28,31 +30,34 @@ let ctx: CanvasRenderingContext2D | null
 let deviceorientationCreated = false
 let canvas: HTMLCanvasElement
 
-let width = screen.width
-let height = screen.height - 50
-
-window.addEventListener("orientationchange", () => {
-    height = screen.height - 50
-    width = screen.width
-
-    const screenWidthBigger = screen.height < screen.width
-    const windowWidthBigger = window.innerHeight < window.innerWidth
-
-    if (screenWidthBigger !== windowWidthBigger) {
-        console.log("screen and window resolution not the same")
-    }
-
-    canvas.height = height
-    canvas.width = width
-})
 
 
+let { width, height } = getWidthHeight()
 
-// const createScreenError = () => {
-//     if (screen.orientation.type.slice(0, 9) === "landscape") {
-//         toast.error("Please use portrait mode and lock your screen.")
-//     }
-// }
+if (getDeviceType() === "mobile") {
+
+    window.addEventListener("orientationchange", () => {
+        const { width: _w, height: _h } = getWidthHeight()
+        width = _w
+        height = _h
+        const screenWidthBigger = screen.height < screen.width
+        const windowWidthBigger = window.innerHeight < window.innerWidth
+
+        console.log("window dim", window.innerWidth, window.innerHeight)
+        console.log("screen dim", screen.width, screen.height)
+
+
+        if (screenWidthBigger !== windowWidthBigger) {
+            console.log("screen and window resolution not the same")
+        }
+
+        canvas.height = height
+        canvas.width = width
+    })
+
+
+}
+
 
 const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
     const gamma = e.gamma ?? 0
@@ -85,7 +90,12 @@ const createDeviceOrientationListener = () => {
     window.addEventListener("deviceorientation", deviceOrientationHandler)
 }
 
-export const initGryoscope = (socket: Socket) => {
+export interface GyroscopeConfig {
+    socket: Socket
+    setSettingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const initGryoscope = (config: GyroscopeConfig) => {
     document.body.setAttribute("overflow", "hidden")
 
     canvas = document.createElement("canvas")
@@ -100,35 +110,20 @@ export const initGryoscope = (socket: Socket) => {
     document.body.appendChild(canvas)
 
     window.addEventListener("touchstart", (e) => {
-        handleTouchStart(e, socket, controls, (touchAction: touchActions) => {
-            if (touchAction === "resetOrientation") {
-                window.removeEventListener("deviceorientation", deviceOrientationHandler)
-                createDeviceOrientationListener()
+        handleTouchStart(e, config.socket, controls, (touchAction: touchActions) => {
+            if (touchAction === "settings") {
+                config.setSettingsModalOpen(true)
+                // window.removeEventListener("deviceorientation", deviceOrientationHandler)
+                // createDeviceOrientationListener()
             }
         })
     }
     )
-    window.addEventListener("touchend", () => handleTouchEnd(socket, controls))
+    window.addEventListener("touchend", () => handleTouchEnd(config.socket, controls))
 
     createDeviceOrientationListener()
 
-    // Something needs to be in fullscreen to lock the element.
-    // document.body.requestFullscreen().then(() => {
-    //     screen.orientation.lock("portrait").then(() => {
-    //         console.log("screen orientation locked")
-    //     }).catch((e) => {
-    //         console.log(e)
-    //     })
-    // }).catch((e) => {
-    //     console.log("req fullscreen error", e)
-    // })
-
-    // screen.orientation.addEventListener("change", () => {
-    //     createScreenError()
-    // })
-    // createScreenError()
-
-    startLoop(socket)
+    startLoop(config.socket)
 }
 
 
@@ -150,8 +145,6 @@ const startLoop = (socket: Socket) => {
 
         socket.emit("send-controls", controls)
 
-
-        // requestAnimationFrame(loop)
         if (ctx) {
 
             ctx.clearRect(0, 0, width, height);
@@ -159,7 +152,7 @@ const startLoop = (socket: Socket) => {
             drawDeccelerator(ctx, controls)
             drawBreak(ctx, controls)
             drawResetButton(ctx, controls)
-            drawResetOrientations(ctx, controls)
+            drawSettings(ctx, controls)
             if (motion) {
                 ctx.save()
                 ctx.translate(width / 2, height / 2)

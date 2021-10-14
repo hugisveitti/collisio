@@ -176,6 +176,10 @@ class Game {
         console.log("starting game", this.toString())
     }
 
+    playerDisconnected(playerName) {
+        this.socket.emit("player-disconnected", { playerName })
+    }
+
     toString() {
         let playersString = ""
         for (let player of this.players) {

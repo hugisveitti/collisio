@@ -13,6 +13,8 @@ export interface IPositionRotation {
 
 export interface IVehicle {
     canDrive: boolean
+    isPaused: boolean
+    mass: number
     goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void
     noForce: () => void
@@ -21,7 +23,10 @@ export interface IVehicle {
     noTurn: () => void
     turn: (angle: number) => void
     break: (notBreak?: boolean) => void
-    totalStop: () => void
+    stop: () => void
+    start: () => void
+    pause: () => void
+    unpause: () => void
 
     addCamera: (camera: any) => void
     cameraLookAt: (camera: any) => void

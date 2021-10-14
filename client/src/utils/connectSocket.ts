@@ -15,6 +15,8 @@ export const createSocket = (deviceType: string) => {
     socket.on("connect", () => {
         if (deviceType === "desktop") {
             socket.emit("device-type", "desktop")
+
+
         } else {
             socket.emit("device-type", "mobile")
         }
@@ -31,6 +33,7 @@ export const createSocket = (deviceType: string) => {
 
     socket.on("disconnect", () => {
         toast.error("Connection lost, you will probably have to refresh")
+
     })
 
     return socket

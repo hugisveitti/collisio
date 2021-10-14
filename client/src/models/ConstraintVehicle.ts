@@ -17,6 +17,8 @@ export class ConstraintVehicle implements IVehicle {
     frame: ExtendedObject3D
     turnAxis: TurnAxis
     canDrive: boolean
+    isPaused: boolean
+    mass: number
     constructor(leftBackMotor: Ammo.btHingeConstraint,
         rightBackMotor: Ammo.btHingeConstraint,
         leftFrontMotor: Ammo.btHingeConstraint,
@@ -31,6 +33,8 @@ export class ConstraintVehicle implements IVehicle {
         this.frame = frame
         this.turnAxis = turnAxis
         this.canDrive = true
+        this.isPaused = false
+        this.mass = 800
     }
 
 
@@ -75,8 +79,21 @@ export class ConstraintVehicle implements IVehicle {
         console.log("turn has not been implemented for constraint vehicle")
     }
 
-    totalStop() {
-        console.log("total stop not implemented")
+
+    stop() {
+        console.log("stop not impl")
+    }
+
+    start() {
+        console.log("start not impl")
+    }
+
+    pause() {
+        console.log("pause not impl")
+    }
+
+    unpause() {
+        console.log("unpause not impl")
     }
 
     // Some typescript error trying to set it to PerspectiveCamera
@@ -164,12 +181,12 @@ const createRotor = (x: number, z: number, scene: Scene3D) => {
 
 }
 
-const createVehicleFrame = (z: number, x: number, scene: Scene3D, color: string | number | undefined) => {
+const createVehicleFrame = (z: number, x: number, scene: Scene3D, color: string | number | undefined, mass: number) => {
     let wireframe = false
     const frame = new ExtendedObject3D()
 
     const cylinder = scene.add.cylinder(
-        { y: 1, width: 1.8, mass: 800, height: 2.5 },
+        { y: 1, width: 1.8, mass, height: 2.5 },
         { lambert: { wireframe, color } }
     )
     frame.add(cylinder)
@@ -290,7 +307,7 @@ export const createConstraintVehicle = (scene: Scene3D, color: number | string, 
     axisToRotor(rotorFrontRight, rotorFrontLeft, axisFrontSteer, 0.4, 1, scene)
 
     //let m0 = undefined
-    const frame = createVehicleFrame(z, x, scene, color)
+    const frame = createVehicleFrame(z, x, scene, color, 800)
 
     scene.physics.add.existing(frame)
 

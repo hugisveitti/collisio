@@ -129,6 +129,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     startAllVehicles() {
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].canDrive = true
+            this.vehicles[i].unpause()
             this.currentLapStart.push(Date.now())
             this.totalTime.push(Date.now())
             const p = this.course.goal.position
@@ -142,6 +143,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
         // this gravity seems to work better
+        // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
     }
 
@@ -169,8 +171,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
         const restartInSeconds = 3
         importantInfoDiv.innerHTML = "Restarting game in " + 3 + " seconds.."
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].canDrive = false
-            // this.vehicles[i].totalStop()
+            // this.vehicles[i].canDrive = false
+            this.vehicles[i].pause()
         }
         setTimeout(() => {
             this.createVehicles()
@@ -205,6 +207,19 @@ export class OneMonitorRaceGameScene extends Scene3D {
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
                 this.restartGame()
+            } else if (e.key === "p") {
+                // all or non paused
+                let isPaused = this.vehicles[0].isPaused
+                console.log("is paused", isPaused)
+                for (let vehicle of this.vehicles) {
+                    if (isPaused) {
+                        importantInfoDiv.innerHTML = ""
+                        vehicle.unpause()
+                    } else {
+                        importantInfoDiv.innerHTML = "GAME PAUSED"
+                        vehicle.pause()
+                    }
+                }
             }
         })
         window.addEventListener("resize", () => this.onWindowResize())
@@ -337,9 +352,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
             this.checkVehicleOutOfBounds(i)
 
-            if (!this.vehicles[i].canDrive) {
-                this.vehicles[i].totalStop()
-            }
+            // if (!this.vehicles[i].canDrive) {
+            //     this.vehicles[i].stop()
+            // } else {
+            //     this.vehicles[i].start()
+            // }
         }
     }
 
@@ -356,13 +373,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.vehicles[idx].resetPosition()
     }
 
-
     resetPlayers() {
         for (let i = 0; i < this.vehicles.length; i++) {
             this.resetPlayer(i)
         }
     }
-
 
     setPlayers(players: IPlayerInfo[]) {
         this.players = players
@@ -453,9 +468,9 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
-        console.log("project", project)
-        console.log("project.scenes[0]", project.scenes)
-        console.log("project.scenes[0]", project.scenes.keys().next().value)
+        // console.log("project", project)
+        // console.log("project.scenes[0]", project.scenes)
+        // console.log("project.scenes[0]", project.scenes.keys().next().value)
 
         const key = project.scenes.keys().next().value;
 

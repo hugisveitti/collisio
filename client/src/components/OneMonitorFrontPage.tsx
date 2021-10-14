@@ -227,13 +227,16 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       </Modal>
     );
   };
-
-  if (isTestMode) {
-    if (deviceType === "desktop") {
-      startRaceTrackTest(props.socket, props.store.gameSettings);
-    } else {
-      history.push(controlsRoomPath);
+  useEffect(() => {
+    if (isTestMode) {
+      if (deviceType === "desktop") {
+        startRaceTrackTest(props.socket, props.store.gameSettings);
+      } else {
+        history.push(controlsRoomPath);
+      }
     }
+  }, []);
+  if (isTestMode) {
     return null;
   }
 

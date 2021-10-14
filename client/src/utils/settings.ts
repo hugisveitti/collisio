@@ -31,5 +31,6 @@ export const baseurl = "http://localhost:5000/"
 export const startGameAuto = process.env.NODE_ENV !== "development" ? false : false;
 
 // test mode is using raceTrackTest.ts
+// and possible to see the mobile controller right away
 export const isTestMode = process.env.NODE_ENV !== "development" ? false : false;
 // export const devMode = true

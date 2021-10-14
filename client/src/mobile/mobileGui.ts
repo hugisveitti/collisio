@@ -1,17 +1,30 @@
 import { Socket } from "socket.io-client"
 import { MobileControls } from "../utils/ControlsClasses"
+import { getDeviceType } from "../utils/settings"
 
-export let width = screen.width
-export let height = screen.height
-export let isPortrait = width < height
+
 
 const cRadius = 50
+export let isPortrait = true
+let height = 0;
+let width = 0
+
+export const getWidthHeight = () => {
+    return {
+        width: screen.width - 50,
+        height: screen.height - 50
+    }
+}
 
 const getButtonsPos = () => {
+    const { width: _w, height: _h } = getWidthHeight()
+    width = _w
+    height = _h
+
 
     let cXAcc = width - (10 + cRadius)
     let cXDecc = width - (10 + cRadius)
-    let cXBreak = (cRadius * 4)
+    let cXBreak = width - (20 + (cRadius * 3))
     let cYAcc = 10 + (cRadius * 2)
     let cYDecc = height - (10 + cRadius * 2)
     let cYBreak = height - (10 + cRadius * 2)
@@ -19,17 +32,17 @@ const getButtonsPos = () => {
     let cXReset = cRadius + 10
     let cYReset = height / 2
 
-    let cXResetOrient = cRadius + 10
-    let cYResetOrient = 10 + (cRadius * 2)
+    let cXSettings = cRadius + 10
+    let cYSettings = 10 + (cRadius * 2)
 
 
     let accPos = { x: cXAcc, y: cYAcc, px: cXAcc, py: cYAcc, lx: width - (2 * cRadius), ly: height - (10 + cRadius) }
     let breakPos = { x: cXBreak, y: cYBreak, px: cXBreak, py: cYBreak, lx: (cRadius * 2), ly: height - (20 + (cRadius * 3)) }
     let deccPos = { x: cXDecc, y: cYDecc, px: cXDecc, py: cYDecc, lx: (cRadius * 2), ly: height - (10 + cRadius) }
     let resetPos = { x: cXReset, y: cYReset, px: cXReset, py: cYReset, lx: width / 2, ly: cRadius + 10 }
-    let resetOrientPos = { x: cXResetOrient, y: cYResetOrient, px: cXResetOrient, py: cYResetOrient, lx: width - (65 + cRadius), ly: 15 + cRadius }
+    let settingsPos = { x: cXSettings, y: cYSettings, px: cXSettings, py: cYSettings, lx: width - (65 + cRadius), ly: 15 + cRadius }
 
-    return [accPos, deccPos, breakPos, resetPos, resetOrientPos]
+    return [accPos, deccPos, breakPos, resetPos, settingsPos]
 }
 
 let buttonsPos = getButtonsPos()
@@ -58,27 +71,20 @@ const handleOrientationChanged = () => {
         }
     }
 }
-handleOrientationChanged()
+if (getDeviceType() === "mobile") {
 
-window.addEventListener("orientationchange", handleOrientationChanged)
+    handleOrientationChanged()
 
-export type touchActions = "forward" | "backward" | "break" | "reset" | "resetOrientation"
+    window.addEventListener("orientationchange", handleOrientationChanged)
+}
+
+export type touchActions = "forward" | "backward" | "break" | "reset" | "settings"
 
 export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: MobileControls, callback: (action: touchActions) => void) => {
 
-
-
-    // const buttons = [
-    //     { x: cXAcc, y: cYAcc, value: controls.isAccelerating },
-    //     { x: cXDecc, y: cYDecc, value: controls.isDeccelerating },
-    //     { x: cXBreak, y: cYBreak, value: controls.breaking },
-    //     { x: cXReset, y: cYReset, value: controls.resetVehicle },
-    //     { x: cXResetOrient, y: cYResetOrient, value: undefined }
-    // ]
-
-    controls.isAccelerating = false
-    controls.isDeccelerating = false
-    controls.breaking = false
+    controls.forward = false
+    controls.backward = false
+    controls.break = false
     controls.resetVehicle = false
 
     for (let j = 0; j < buttonsPos.length; j++) {
@@ -89,16 +95,15 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
             const y = e.touches[i].clientY
             if (x > cX - cRadius && x < cX + cRadius && y > cY - cRadius && y < cY + cRadius) {
                 if (j === 0) {
-                    controls.isAccelerating = true
+                    controls.forward = true
                 } else if (j === 1) {
-                    controls.isDeccelerating = true
+                    controls.backward = true
                 } else if (j === 2) {
-                    controls.breaking = true
-                    console.log("breaking")
+                    controls.break = true
                 } else if (j === 3) {
                     controls.resetVehicle = true
                 } else if (j === 4) {
-                    callback("resetOrientation")
+                    callback("settings")
                 }
             }
         }
@@ -107,33 +112,33 @@ export const handleTouchStart = (e: TouchEvent, socket: Socket, controls: Mobile
 }
 
 export const handleTouchEnd = (socket: Socket, controls: MobileControls) => {
-    controls.isAccelerating = false
-    controls.isDeccelerating = false
-    controls.breaking = false
+    controls.forward = false
+    controls.backward = false
+    controls.break = false
     controls.resetVehicle = false
 }
 
 
 export const drawAccelerator = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    drawButton(ctx, controls, "isAccelerating", buttonsPos[0].x, buttonsPos[0].y, "Forward")
+    drawButton(ctx, controls, "backward", buttonsPos[0].x, buttonsPos[0].y, "Forward")
 
 }
 
 export const drawDeccelerator = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    drawButton(ctx, controls, "isDeccelerating", buttonsPos[1].x, buttonsPos[1].y, "Backward")
+    drawButton(ctx, controls, "forward", buttonsPos[1].x, buttonsPos[1].y, "Backward")
 }
 
 
 export const drawBreak = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    drawButton(ctx, controls, "breaking", buttonsPos[2].x, buttonsPos[2].y, "Break")
+    drawButton(ctx, controls, "break", buttonsPos[2].x, buttonsPos[2].y, "Break")
 }
 
 export const drawResetButton = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
     drawButton(ctx, controls, "resetVehicle", buttonsPos[3].x, buttonsPos[3].y, "Reset")
 }
 
-export const drawResetOrientations = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
-    drawButton(ctx, controls, undefined, buttonsPos[4].x, buttonsPos[4].y, "Reset Orient")
+export const drawSettings = (ctx: CanvasRenderingContext2D | null, controls: MobileControls) => {
+    drawButton(ctx, controls, undefined, buttonsPos[4].x, buttonsPos[4].y, "Settings")
 }
 
 

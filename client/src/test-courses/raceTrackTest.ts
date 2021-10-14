@@ -1,6 +1,6 @@
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d"
-import { IVehicle, SimpleVector } from "../models/IVehicle"
-import { createNormalVehicle, } from "../models/NormalVehicle"
+import { SimpleVector } from "../models/IVehicle"
+import { createNormalVehicle, NormalVehicle, } from "../models/NormalVehicle"
 import { THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import { defaultGameSettings, IGameSettings, IPlayerInfo } from "../classes/Game"
@@ -8,10 +8,9 @@ import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls";
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera";
 import { OrbitControls } from "@enable3d/three-wrapper/dist/index";
-import { createConstraintVehicle } from "../models/ConstraintVehicle"
 import Stats from "stats.js"
 import { VehicleControls } from "../utils/ControlsClasses"
-
+import "../one-monitor-game/one-monitor-styles.css";
 
 const vechicleFov = 60
 
@@ -40,7 +39,7 @@ let rs = false
 
 export class OneMonitorRaceGameScene extends Scene3D {
 
-    vehicle?: IVehicle
+    vehicle?: NormalVehicle
 
     font?: THREE.Font
     textMesh?: any
@@ -56,7 +55,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     canStartUpdate: boolean
 
     constructor() {
-        super()
+        super({ key: "OneMonitorRaceGameScene" })
 
         scoreTable.setAttribute("id", "score-info")
         lapTimeDiv.setAttribute("id", "lap-time")
@@ -80,7 +79,63 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
+    }
 
+    async init() {
+        this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
+        this.renderer.setPixelRatio(1)
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+
+        this.physics.setGravity(0, -20, 0)
+        console.log("physics", this.physics)
+    }
+
+    async preload() {
+
+        this.loadFont()
+        // this.physics.debug?.enable()
+
+        this.warpSpeed("-ground")
+
+        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course.createCourse(() => {
+            this.canStartUpdate = true
+            this.createVehicle()
+        })
+
+
+
+        const controls = new OrbitControls(this.camera, this.renderer.domElement);
+        window.addEventListener("resize", () => this.onWindowResize())
+
+        document.addEventListener("keypress", (e) => {
+            if (e.key === "r") {
+
+                console.log("rrr")
+                this.resetPlayer(0)
+            } else if (e.key === "t") {
+                this.vehicle.chassisMesh.body.setCollisionFlags(0)
+            } else if (e.key === "p") {
+                if (this.vehicle.isPaused) {
+                    this.vehicle.unpause()
+                } else {
+                    this.vehicle.pause()
+                }
+            } else if (e.key === "m") {
+                this.vehicle.engineForce -= 500
+            }
+            else if (e.key === "n") {
+
+                this.vehicle.engineForce += 500
+                console.log("vehicle engine force", this.vehicle.engineForce)
+            }
+        })
+    }
+
+    async create() {
+        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+        this.scene.add(hLight)
     }
 
     createVehicle() {
@@ -97,65 +152,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.gameSettings = newGameSettings
     }
 
-
-    async init() {
-        this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
-        this.renderer.setPixelRatio(1)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-
-        this.physics.setGravity(0, -20, 0)
-        console.log("physics", this.physics)
-
-    }
-
     updateScoreTable() {
         scoreTable.innerHTML = `
         Leaderboard
         `
-    }
-
-
-
-    async create() {
-        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
-        this.scene.add(hLight)
-    }
-
-    async preload() {
-
-        this.loadFont()
-        // this.physics.debug?.enable()
-
-        this.warpSpeed("-ground")
-
-        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse(() => {
-            console.log("course loaded")
-            this.canStartUpdate = true
-            //   this.renderer.setAnimationLoop(() => this.update())
-            this.createVehicle()
-        })
-
-
-
-        const controls = new OrbitControls(this.camera, this.renderer.domElement);
-        window.addEventListener("resize", () => this.onWindowResize())
-
-        document.addEventListener("keypress", (e) => {
-            if (e.key === "r") {
-                console.log("rrr")
-                this.resetPlayer(0)
-            }
-            if (e.key === "n") {
-                if (currVechicleType === "normal") {
-                    currVechicleType = "constraint"
-                    this.vehicle = createConstraintVehicle(this, "red")
-                } else {
-                    currVechicleType = "normal"
-                    this.vehicle = createNormalVehicle(this, "red", "testt")
-                }
-            }
-        })
     }
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
@@ -184,6 +184,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     onWindowResize() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
         if (this.camera.type === "PerspectiveCamera") {
             (this.camera as unknown as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
         }
@@ -212,6 +213,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     updateVehicles() {
+
         if (this.vehicle) {
             this.vehicle.update()
             this.vehicle.cameraLookAt(this.camera)
@@ -219,10 +221,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
 
+
+
     update() {
         if (this.canStartUpdate) {
-
-
+            console.log("updating")
             stats.begin()
             this.updateVehicles()
             if (this.vehicle) {
@@ -243,10 +246,16 @@ export class OneMonitorRaceGameScene extends Scene3D {
     resetPlayer(idx: number, y?: number) {
 
         if (this.vehicle) {
-            const { x, z } = this.vehicle.getPosition()
-            const rot = this.vehicle.getRotation()
-            this.vehicle.setPosition(x, 4, z)
-            this.vehicle.setRotation(0, rot.y, 0)
+
+
+            console.log(this.vehicle.chassisMesh.body)
+
+            const p = this.course.goal.position
+            console.log("goal pos", p)
+            console.log("goal rotation", this.course.goal.rotation)
+            console.log("checkpoint rotation", this.course.checkpoint.rotation)
+            this.vehicle.setCheckpointPositionRotation({ position: p, rotation: { x: 0, y: 180, z: 0 } })
+            this.vehicle.resetPosition()
         }
     }
 
@@ -268,13 +277,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
 export const startRaceTrackTest = (socket: Socket, gameSettings: IGameSettings) => {
-
-    const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
+    console.log("start race track test")
+    const config = { scenes: [OneMonitorRaceGameScene], antialias: true, randomStuff: "hello" }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
-        console.log("project", project)
-        console.log("project.scenes[0]", project.scenes)
-        console.log("project.scenes[0]", project.scenes.keys().next().value)
 
         const key = project.scenes.keys().next().value;
 

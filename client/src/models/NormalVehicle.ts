@@ -10,17 +10,18 @@ const BACK_RIGHT = 3
 const steeringIncrement = 0.02
 const maxSteering = 0.4
 
-const engineForce = 5001
+
 const maxBreakingForce = 100
 
 const chassisWidth = 1.8;
 const chassisHeight = .6;
 const chassisLength = 3;
-const vehicleMass = 800;
+
 const yOrigin = .5
 
 // how to determine this value?
 const turnDivder = 150
+
 
 
 
@@ -42,6 +43,12 @@ export class NormalVehicle implements IVehicle {
     canDrive: boolean
 
     checkpointPositionRotation: IPositionRotation
+    isPaused: boolean
+    mass: number
+    engineForce: number
+    radMult: number
+
+
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber?: number) {
         this.color = color
@@ -50,10 +57,15 @@ export class NormalVehicle implements IVehicle {
         this.name = name
         this.lookBackwards = false
         this.canDrive = true
+        this.isPaused = false
+        this.engineForce = 5000
+        this.radMult = 0.0174532925 * 0.1
+
         this.checkpointPositionRotation = {
             position: { x: 0, y: 4, z: 0 }, rotation: { x: 0, y: 0, z: 0 }
         }
 
+        this.mass = 800
 
         this.chassisMesh = new ExtendedObject3D()
 
@@ -91,7 +103,7 @@ export class NormalVehicle implements IVehicle {
 
 
         this.scene.add.existing(this.chassisMesh, {})
-        this.scene.physics.add.existing(this.chassisMesh, { mass: vehicleMass })
+        this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass })
 
         this.tuning = new Ammo.btVehicleTuning()
 
@@ -100,8 +112,7 @@ export class NormalVehicle implements IVehicle {
         this.vehicle.setCoordinateSystem(0, 1, 2)
         this.chassisMesh.body.name = "vehicle-" + vehicleNumber
         this.chassisMesh.name = "vehicle-" + vehicleNumber
-        console.log("this", this)
-        // this.chassisMesh.body.skipUpdate = true
+
 
         scene.physics.physicsWorld.addAction(this.vehicle)
 
@@ -200,20 +211,18 @@ export class NormalVehicle implements IVehicle {
 
     goForward(moreSpeed: boolean) {
         if (!this.canDrive) return
-        this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_LEFT)
-        this.vehicle.applyEngineForce(moreSpeed ? engineForce * 1.5 : engineForce, BACK_RIGHT)
+        this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_LEFT)
+        this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_RIGHT)
     }
 
     goBackward(speed: number) {
         if (!this.canDrive) return
-        this.vehicle.applyEngineForce(-engineForce, BACK_LEFT)
-        this.vehicle.applyEngineForce(-engineForce, BACK_RIGHT)
+        this.vehicle.applyEngineForce(-this.engineForce, BACK_LEFT)
+        this.vehicle.applyEngineForce(-this.engineForce, BACK_RIGHT)
     }
 
     noForce() {
-        // if (Math.abs(this.vehicle.getCurrentSpeedKmHour()) < 1) {
-        //     return
-        // }
+
         this.vehicle.applyEngineForce(0, BACK_LEFT)
         this.vehicle.applyEngineForce(0, BACK_RIGHT)
     }
@@ -226,19 +235,32 @@ export class NormalVehicle implements IVehicle {
         this.vehicle.setBrake(breakForce, FRONT_LEFT)
     }
 
-    totalStop() {
-        const breakForce = 1000
-        this.vehicle.setBrake(breakForce, BACK_RIGHT)
-        this.vehicle.setBrake(breakForce, BACK_LEFT)
-        this.vehicle.setBrake(breakForce, FRONT_RIGHT)
-        this.vehicle.setBrake(breakForce, FRONT_LEFT)
+    stop() {
+        this.chassisMesh.body.setCollisionFlags(1)
+        this.chassisMesh.body.setVelocity(0, 0, 0)
+        this.chassisMesh.body.setAngularVelocity(0, 0, 0)
+    }
 
+    start() {
+        this.chassisMesh.body.setCollisionFlags(0)
+    }
+
+    pause() {
+        this.isPaused = true
+        this.chassisMesh.body.setCollisionFlags(1)
+    }
+
+    unpause() {
+        this.isPaused = false
+        this.chassisMesh.body.setCollisionFlags(0)
     }
 
     turn(angle: number) {
         if (this.canDrive) {
-            this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
-            this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
+            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+            this.vehicle.setSteeringValue(angle * this.radMult, FRONT_LEFT)
+            this.vehicle.setSteeringValue(angle * this.radMult, FRONT_RIGHT)
         } else {
             this.vehicle.setSteeringValue(0, FRONT_LEFT)
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)
@@ -252,6 +274,8 @@ export class NormalVehicle implements IVehicle {
         this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
         this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
     }
+
+
 
     turnRight(angle: number) {
         if (Math.abs(this.vehicleSteering) < maxSteering) {
@@ -275,12 +299,12 @@ export class NormalVehicle implements IVehicle {
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
     }
 
-    addCamera(camera: THREE.PerspectiveCamera) {
+    addCamera(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
         this.chassisMesh.add(camera)
 
     }
 
-    cameraLookAt(camera: THREE.PerspectiveCamera) {
+    cameraLookAt(camera: THREE.PerspectiveCamera | THREE.OrthographicCamera) {
         camera.lookAt(this.chassisMesh.position.clone())
     }
 
@@ -358,11 +382,12 @@ export class NormalVehicle implements IVehicle {
     }
 
     resetPosition() {
+        this.chassisMesh.body.setAngularVelocity(0, 0, 0)
+        this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
         this.setPosition(position.x, position.y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
     }
-
 }
 
 

@@ -30,6 +30,10 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       props.socket.on("handle-game-starting", () => {
         history.push(controlsRoomPath);
       });
+    } else {
+      props.socket.on("player-disconnected", ({ playerName }) => {
+        toast.warn(`${playerName} disconnected from waiting room`);
+      });
     }
   }, []);
 

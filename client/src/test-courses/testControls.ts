@@ -4,25 +4,21 @@ import { IVehicle } from "../models/IVehicle"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 
 
-
-
-
 let speed = 40
 let maxAngle = 0.4
 let angle = 40
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
-    if (mobileControls.isAccelerating) {
-
+    if (mobileControls.forward) {
         vehicle.goForward(mobileControls.moreSpeed)
-    } else if (mobileControls.isDeccelerating) {
+    } else if (mobileControls.backward) {
         vehicle.goBackward(speed)
     } else {
         vehicle.noForce()
     }
 
-    if (mobileControls.breaking) {
+    if (mobileControls.break) {
         vehicle.break()
     } else {
         vehicle.break(true)
@@ -122,10 +118,10 @@ export const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls:
     }
 
     if (vehicleControls.left) {
-        vehicle.turnLeft(angle)
+        vehicle.turn(angle)
     } else if (vehicleControls.right) {
-        vehicle.turnRight(-angle)
+        vehicle.turn(-angle)
     } else {
-        vehicle.noTurn()
+        vehicle.turn(0)
     }
 }

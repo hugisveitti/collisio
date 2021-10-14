@@ -45,6 +45,7 @@ export class RaceCourse {
         this.trackName = trackName
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
+        console.log("constructing raceCourse")
     }
 
     createCourse(courseLoadedCallback: () => void) {
@@ -58,6 +59,7 @@ export class RaceCourse {
 
                 if (child.type === "Mesh" || child.type === "Group") {
                     if (child.name === "ground") {
+
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
                         (child as ExtendedObject3D).body.checkCollisions = false;
                     } else if (child.name.slice(0, 4) === "road") {
