@@ -98,7 +98,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         this.warpSpeed("-ground")
 
-        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, "town-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             this.canStartUpdate = true
             this.createVehicle()
@@ -122,13 +122,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 } else {
                     this.vehicle.pause()
                 }
-            } else if (e.key === "m") {
-                this.vehicle.engineForce -= 500
-            }
-            else if (e.key === "n") {
-
-                this.vehicle.engineForce += 500
-                console.log("vehicle engine force", this.vehicle.engineForce)
             }
         })
     }
@@ -173,12 +166,15 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 this.bestLapTime = this.currentLaptime
             }
             bestLapTimeDiv.innerHTML = `Best lap time ${this.bestLapTime.toFixed(2)}`
+            this.vehicle.setCheckpointPositionRotation({ position: this.course.goalSpawn.position, rotation: this.course.goalSpawn.rotation })
 
         }
     }
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D) {
         this.checkpointCrossed = true
+        const p = this.course.checkpointSpawn.position
+        this.vehicle.setCheckpointPositionRotation({ position: p, rotation: this.course.checkpointSpawn.rotation })
     }
 
 
@@ -225,7 +221,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     update() {
         if (this.canStartUpdate) {
-            console.log("updating")
             stats.begin()
             this.updateVehicles()
             if (this.vehicle) {
@@ -246,15 +241,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
     resetPlayer(idx: number, y?: number) {
 
         if (this.vehicle) {
-
-
-            console.log(this.vehicle.chassisMesh.body)
-
-            const p = this.course.goal.position
-            console.log("goal pos", p)
-            console.log("goal rotation", this.course.goal.rotation)
-            console.log("checkpoint rotation", this.course.checkpoint.rotation)
-            this.vehicle.setCheckpointPositionRotation({ position: p, rotation: { x: 0, y: 180, z: 0 } })
             this.vehicle.resetPosition()
         }
     }

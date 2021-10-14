@@ -269,7 +269,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.lapTimes[vehicleNumber].push(cLapTime)
             this.bestLapTime[vehicleNumber] = Math.min(this.bestLapTime[vehicleNumber], cLapTime)
             this.currentLapStart[vehicleNumber] = Date.now()
-            const p = this.course.goal.position
+            const p = this.course.goalSpawn.position
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: 180 } })
             if (this.isPlayerFinished(+vehicleNumber) && this.raceOnGoing) {
                 const totalTime = (Date.now() - this.totalTime[vehicleNumber]) / 1000
@@ -300,7 +300,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     handleCheckpointCrossed(vehicle: ExtendedObject3D) {
         const vehicleNumber = vehicle.body.name.slice(8, 9)
         this.checkpointCrossed[vehicleNumber] = true
-        const p = this.course.checkpoint.position
+        const p = this.course.checkpointSpawn.position
         this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: 0 } })
     }
 

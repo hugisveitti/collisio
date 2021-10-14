@@ -30,8 +30,10 @@ export class RaceCourse {
     courseDepth: number
     trackWidth: number
     goal?: ExtendedObject3D
+    goalSpawn?: ExtendedObject3D
     ground?: ExtendedObject3D
     checkpoint?: ExtendedObject3D
+    checkpointSpawn?: ExtendedObject3D
     trackName: string
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
@@ -68,7 +70,7 @@ export class RaceCourse {
                         // (child as ExtendedObject3D).body.setGravity(0, -100, 0)
                     } else if (child.name.slice(0, 4) === "wall") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" })
-                    } else if (child.name.slice(0, 4) === "goal") {
+                    } else if (child.name === "goal") {
                         // Collision flag 5 is GHOST STATIC, see docs https://enable3d.io/docs.html#physics-body
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 5, shape: "convex" })
                         this.goal = child as ExtendedObject3D
@@ -87,7 +89,15 @@ export class RaceCourse {
                         this.scene.physics.add.existing(child as ExtendedObject3D, { collisionFlags: 5, shape: "convex" })
                     } else if (child.name === "stytta") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave", breakable: true })
-                    } else {
+                    } else if (child.name.includes("spawn")) {
+                        console.log("spawn")
+                        if (child.name.slice(0, 4) === "goal") {
+                            this.goalSpawn = (child as ExtendedObject3D)
+                        } else if (child.name.slice(0, 10) === "checkpoint") {
+                            this.checkpointSpawn = (child as ExtendedObject3D)
+                        }
+                    }
+                    else {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
                     }
                     // child.visible = false
