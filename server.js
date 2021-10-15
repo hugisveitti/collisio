@@ -14,15 +14,25 @@ app.use(function (req, res, next) {
 
 app.use(express.static(path.join(__dirname, "./client/src")));
 
+
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
+// There must be some better way to do this shit
 app.get("/wait", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 
+app.get("/wait/:gameId", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+});
+
 app.get("/game", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+});
+
+app.get("/game/:id", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/src/index.html"));
 });
 

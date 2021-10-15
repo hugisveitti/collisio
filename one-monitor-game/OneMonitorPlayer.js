@@ -33,7 +33,19 @@ class Player {
         this.setupQuitGameListener()
         this.setupUserSettingsListener()
         this.setupReconnectListener()
+        this.setupWaitingRoomListener
 
+    }
+
+    setupWaitingRoomListener() {
+        this.socket.on("in-waiting-room", () => {
+            this.game.alertWaitingRoom()
+        })
+    }
+
+    sendGameSettings(gameSettings) {
+        console.log("sending new game settings")
+        this.socket.emit("game-settings-changed", { gameSettings })
     }
 
     setupQuitGameListener() {
@@ -58,6 +70,7 @@ class Player {
     setGame(game) {
         this.game = game
         this.socket.on("disconnect", () => {
+            console.log(`player ${this.playerName} disconnected`)
             this.game.playerDisconnected(this.playerName)
             this.isConnected = false
         })
@@ -87,8 +100,6 @@ class Player {
             id: this.id
         }
     }
-
-
 
     setupUserSettingsListener() {
         this.socket.on("settings-changed", (newUserSettings) => {
