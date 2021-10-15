@@ -30,6 +30,7 @@ import {
 } from "./Routes";
 import { IStore } from "./store";
 import NotLoggedInModal from "./NotLoggedInModal";
+import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 
 interface IOneMonitorFrontPageProps {
   socket: Socket;
@@ -48,7 +49,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 
   const user = useContext(UserContext);
 
-  const checkIfNeedOrientaitonPrompt = (e: DeviceOrientationEvent) => {
+  const checkIfNeedOrientaitonPrompt = (e: IDeviceOrientationEvent) => {
     const { beta, gamma, alpha } = e;
 
     if (beta || gamma || alpha) {
@@ -102,7 +103,10 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     if (!needToAskOrientPermission) {
       return;
     }
+
+    // I think it is only needed for iphones
     if (
+      navigator.userAgent.toLowerCase().includes("iphone") &&
       DeviceOrientationEvent &&
       typeof DeviceOrientationEvent["requestPermission"] === "function"
     ) {

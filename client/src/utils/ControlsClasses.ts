@@ -1,4 +1,8 @@
-
+export interface IDeviceOrientationEvent {
+    gamma: number
+    beta: number
+    alpha: number
+}
 
 export class MobileControls {
 

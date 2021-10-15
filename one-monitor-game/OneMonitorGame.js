@@ -200,7 +200,7 @@ class Game {
     }
 
     userSettingsChanged(data) {
-        this.socket.emit("usersettings-changed", data)
+        this.socket.emit("user-settings-changed", data)
     }
 
     toString() {

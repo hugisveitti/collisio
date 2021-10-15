@@ -98,7 +98,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
     if (!onMobile) return;
     console.log("user", user);
 
-    if (!user) {
+    if (!user && !props.store.player) {
       setDisplayNameModalOpen(true);
     } else {
       if (!props.store.player) {
@@ -156,11 +156,11 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
         onClose={() => {
           let _displayName = displayName;
           if (displayName === "") {
-            _displayName = "Clown-" + (Math.random() * 10).toFixed(0);
+            _displayName = "Clown-" + (Math.random() * 1000).toFixed(0);
             setDisplayName(_displayName);
           }
           setDisplayNameModalOpen(false);
-          connectToRoom("Clown-" + (Math.random() * 10).toFixed(0));
+          connectToRoom(_displayName);
         }}
       >
         <div

@@ -44,7 +44,6 @@ class Player {
     }
 
     sendGameSettings(gameSettings) {
-        console.log("sending new game settings")
         this.socket.emit("game-settings-changed", { gameSettings })
     }
 
@@ -102,7 +101,9 @@ class Player {
     }
 
     setupUserSettingsListener() {
+        console.log("setting up settings listenert")
         this.socket.on("settings-changed", (newUserSettings) => {
+            console.log("new user settings", newUserSettings)
             this.userSettings = newUserSettings
             this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
         })

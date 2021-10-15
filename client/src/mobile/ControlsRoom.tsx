@@ -1,5 +1,4 @@
 import { Modal } from "@mui/material";
-
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,8 +8,8 @@ import { IStore } from "../components/store";
 import { UserContext } from "../providers/UserProvider";
 import { MobileControls } from "../utils/ControlsClasses";
 import { isTestMode } from "../utils/settings";
-import "./ControlsRoom.css";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
+import "./ControlsRoom.css";
 
 interface IControlsRoomProps {
   socket: Socket;
@@ -41,12 +40,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const upColor = "red";
   const [isPortrait, setIsPortrait] = useState(false);
 
-  if (!props.store.roomId && !isTestMode) {
-    history.push(frontPagePath);
-    toast.warn("No room connection, redirecting to frontpage");
-    return null;
-  }
-
   const handleQuitGame = () => {
     console.log("quit game");
     history.push(frontPagePath);
@@ -59,22 +52,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const handleDeviceOrientChange = () => {
-    setIsPortrait(screen.orientation.type.slice(0, 8) === "portrait");
+    if (screen.orientation?.type) {
+      setIsPortrait(screen.orientation.type.slice(0, 8) === "portrait");
+    } else {
+      toast(`screen.orientation.angle ${window.orientation}`);
+      setIsPortrait(window.orientation === 0);
+    }
   };
-
-  useEffect(() => {
-    // initGryoscope({ socket: props.socket, setSettingsModalOpen });
-    handleDeviceOrientChange();
-    window.addEventListener("orientationchange", handleDeviceOrientChange);
-    window.addEventListener("deviceorientation", deviceOrientationHandler);
-
-    setInterval(() => {
-      props.socket.emit("send-controls", controller);
-
-      // set fps
-    }, 1000 / 30);
-    console.log("user", user);
-  }, []);
 
   const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
     const gamma = e.gamma ?? 0;
@@ -94,6 +78,25 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
   };
 
+  if (!props.store?.roomId && !isTestMode) {
+    // history.push(frontPagePath);
+    // toast.warn("No room connection, redirecting to frontpage");
+    // return null;
+  }
+
+  useEffect(() => {
+    handleDeviceOrientChange();
+    window.addEventListener("orientationchange", handleDeviceOrientChange);
+    window.addEventListener("deviceorientation", deviceOrientationHandler);
+
+    setInterval(() => {
+      props.socket.emit("send-controls", controller);
+
+      // set fps
+    }, 1000 / 30);
+    console.log("user", user);
+  }, []);
+
   // how to set key
   const handleButtonAction = (
     b: boolean,
@@ -103,6 +106,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     action(b);
     controller[key] = b;
   };
+
+  // return (
+  //   <div>
+  //     handleUserLoggedIn
+  //     <h1>HERERER</h1>
+  //   </div>
+  // );
 
   const rotateText = { transform: "rotate(-90deg)" };
   const forwardStyles = isPortrait
@@ -123,13 +133,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     ? { ...rotateText, left: 35, top: "50%" }
     : { left: "50%", top: 35 };
 
-  const modalStyles = isPortrait
-    ? {
-        transform: "rotate(-90deg)",
-        bottom: "50%",
-      }
-    : { transform: "", top: 50 };
-
   return (
     <React.Fragment>
       <Modal
@@ -138,12 +141,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       >
         <div
           style={{
-            ...modalStyles,
+            top: 50,
             position: "absolute",
-
-            //left: "50%",
-            // width: "85%",
-            // height: "85%",
             backgroundColor: "#eeebdf",
             border: "2px solid #000",
             padding: 10,

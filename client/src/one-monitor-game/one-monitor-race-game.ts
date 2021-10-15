@@ -139,6 +139,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     startAllVehicles() {
+
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].canDrive = true
             this.vehicles[i].unpause()
@@ -347,9 +348,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.userSettingsListener()
     }
 
-    // 
+
     userSettingsListener() {
-        this.socket.on("usersettings-changed", (data: IUserSettingsMessage) => {
+        this.socket.on("user-settings-changed", (data: IUserSettingsMessage) => {
             console.log("user sett change data in game", data)
             this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
         })
@@ -516,7 +517,7 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         (project.scenes.get(key) as OneMonitorRaceGameScene).setPlayers(players);
         (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomId, escPress);
         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
-
+        console.log("starting game, players", players)
         return project
     })
 
