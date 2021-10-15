@@ -109,7 +109,7 @@ const LoginComponent = (props: ILoginComponent) => {
                 style={{ textDecoration: "none" }}
                 to={privateProfilePagePath}
               >
-                Go to profile page
+                Profile page
               </Link>
             </Button>
           </CardActions>

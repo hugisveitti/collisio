@@ -15,6 +15,7 @@ import WaitingRoom from "./WaitingRoom";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
+export const waitingRoomGameIdPath = "/wait/:roomId";
 export const gameRoomPath = "/game";
 export const controlsRoomPath = "/controls";
 export const howToPlayPagePath = "/how-to-play";
@@ -63,7 +64,8 @@ const Routes = () => {
           )}
         />
         <Route
-          path={waitingRoomPath}
+          // the order matters, the :Id must be first
+          path={[waitingRoomGameIdPath, waitingRoomPath]}
           render={(props) => (
             <WaitingRoom {...props} socket={socket} store={store} />
           )}

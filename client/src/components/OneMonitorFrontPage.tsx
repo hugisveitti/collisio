@@ -67,6 +67,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   }, [user]);
 
   useEffect(() => {
+    /** Just for development  */
     if (startGameAuto) {
       props.store.setRoomId("testRoom");
       setPlayerName("testPlayer");
@@ -81,6 +82,8 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
         history.push(controlsRoomPath);
       }
     }
+    /**************** */
+
     if (deviceType === "desktop") {
       setNeedToAskOrientPermission(false);
     } else {
@@ -122,9 +125,9 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   };
 
-  const goToWaitingRoom = () => {
+  const goToWaitingRoom = (roomId: string) => {
     console.log("go to waiting room", history, waitingRoomPath);
-    history.push(waitingRoomPath);
+    history.push(waitingRoomPath + "/" + roomId);
   };
 
   const connectToRoomMobile = (roomId: string, playerName: string) => {
@@ -141,7 +144,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       } else {
         toast.success(data.message);
         props.store.setPlayer(data.data.player);
-        goToWaitingRoom();
+        goToWaitingRoom(roomId);
       }
     });
   };
@@ -153,7 +156,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       if (response.status === "success") {
         const { roomId } = response.data;
         props.store.setRoomId(roomId);
-        goToWaitingRoom();
+        goToWaitingRoom(roomId);
       } else {
         toast.error(response.message);
       }
@@ -235,7 +238,7 @@ need to be logged in."
               size="large"
               startIcon={<VideogameAssetIcon />}
             >
-              {deviceType === "desktop" ? "Start Game" : "Join Room"}
+              {deviceType === "desktop" ? "Create Game" : "Join Game"}
             </Button>
           </Grid>
           <Grid item xs={12}>
@@ -256,7 +259,7 @@ need to be logged in."
           <Grid item xs={12}>
             <Button variant="outlined" size="small" startIcon={<HelpIcon />}>
               <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
-                See how to play game.
+                How to play game.
               </Link>
             </Button>
           </Grid>
@@ -273,7 +276,7 @@ need to be logged in."
           size="small"
         >
           <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
-            See Highscores
+            Highscores
           </Link>
         </Button>
         <ToastContainer />

@@ -1,220 +1,327 @@
-import React, { useEffect } from "react";
+import {
+  Button,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+import QRCode from "qrcode";
+import { Link, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
-import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { IPlayerInfo } from "../classes/Game";
+import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
-import { getDeviceType, startGameAuto } from "../utils/settings";
-import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
+import { getDeviceType } from "../utils/settings";
+import { controlsRoomPath, frontPagePath } from "./Routes";
 import { IStore } from "./store";
+import GameSettingsComponent from "./GameSettingsComponent";
 
 interface IWaitingRoomProps {
   socket: Socket;
   store: IStore;
 }
 
+interface WaitParamType {
+  roomId: string;
+}
+
 const WaitingRoom = (props: IWaitingRoomProps) => {
   const history = useHistory();
-  const deviceType = getDeviceType();
+  const [userLoading, setUserLoading] = useState(true);
+  const [displayNameModalOpen, setDisplayNameModalOpen] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const [connectingGuest, setConnectingGuest] = useState(false);
+  const [roomQrCode, setRoomQrCode] = useState("");
 
-  if (!props.store.roomId) {
+  const onMobile = getDeviceType() === "mobile";
+  const user = useContext(UserContext);
+
+  const params = useParams<WaitParamType>();
+  const roomId = params?.roomId;
+
+  if (!onMobile && !props.store.roomId) {
     history.push(frontPagePath);
+    return null;
   }
 
+  const getPlayersInRoom = () => {
+    props.socket.emit("get-players-in-room", { roomId });
+    props.socket.once(
+      "get-players-in-room-callback",
+      (response: ISocketCallback) => {
+        if (response.status === "error") {
+          toast.error(response.message);
+        } else {
+          props.store.setPlayers(response.data.players);
+        }
+      }
+    );
+  };
+
+  const connectToRoom = (_displayName: string) => {
+    setConnectingGuest(true);
+    console.log("display name", _displayName);
+    props.socket.emit("player-connected", {
+      roomId,
+      playerName: _displayName,
+      id: undefined,
+    });
+    props.socket.once(
+      "player-connected-callback",
+      (response: ISocketCallback) => {
+        if (response.status === "success") {
+          props.store.setPlayer(response.data.player);
+          props.store.setRoomId(roomId);
+          props.store.setPlayers(response.data.players);
+          setConnectingGuest(false);
+
+          setDisplayNameModalOpen(false);
+        } else {
+          toast.error(response.message);
+          setConnectingGuest(false);
+        }
+      }
+    );
+  };
+
   useEffect(() => {
+    if (!onMobile) return;
+    console.log("user", user);
+
+    if (!user) {
+      setDisplayNameModalOpen(true);
+    } else {
+      if (!props.store.player) {
+        connectToRoom(user.displayName);
+      }
+      setDisplayNameModalOpen(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setUserLoading(false);
+    }, 1000);
+
     props.socket.on("player-joined", ({ players: _players }) => {
       props.store.setPlayers(_players);
     });
 
     props.socket.emit("in-waiting-room");
-    if (deviceType === "mobile") {
-      props.socket.on("handle-game-starting", () => {
+    if (onMobile) {
+      props.socket.once("handle-game-starting", () => {
         history.push(controlsRoomPath);
+      });
+
+      getPlayersInRoom();
+      props.socket.on("game-settings-changed", (data) => {
+        console.log("game settings changed");
+        props.store.setGameSettings(data.gameSettings);
       });
     } else {
       props.socket.on("player-disconnected", ({ playerName }) => {
         toast.warn(`${playerName} disconnected from waiting room`);
       });
+
+      // only generate qr code on desktop
+      QRCode.toDataURL(window.location.href)
+        .then((url) => {
+          setRoomQrCode(url);
+        })
+        .catch((err) => {
+          console.log("error generating qr code", err);
+        });
     }
   }, []);
-
-  useEffect(() => {
-    if (startGameAuto) {
-      if (props.store.players.length > 0) {
-        handleStartGame();
-      }
-    }
-  }, [props.store.players]);
 
   const sendTeamChange = (newTeamNumber: number) => {
     props.socket.emit("team-change", { newTeamNumber });
   };
 
-  const handleStartGame = () => {
-    props.socket.emit("handle-start-game");
-    props.socket.once("handle-start-game-callback", (data: ISocketCallback) => {
-      if (data.status === "success") {
-        history.push(gameRoomPath);
-      } else {
-        toast.error(data.message);
-      }
-    });
+  const renderDisplayNameModal = () => {
+    if (userLoading) return null;
+    return (
+      <Modal
+        open={displayNameModalOpen}
+        onClose={() => {
+          let _displayName = displayName;
+          if (displayName === "") {
+            _displayName = "Clown-" + (Math.random() * 10).toFixed(0);
+            setDisplayName(_displayName);
+          }
+          setDisplayNameModalOpen(false);
+          connectToRoom("Clown-" + (Math.random() * 10).toFixed(0));
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "75%",
+            backgroundColor: "#eeebdf",
+            border: "2px solid #000",
+            padding: 10,
+          }}
+        >
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography>
+                You are not logged in, please type in your name or log in.
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Enter your name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <LoadingButton
+                loading={connectingGuest}
+                variant="outlined"
+                onClick={() => connectToRoom(displayName)}
+              >
+                Submit
+              </LoadingButton>
+            </Grid>
+            <Grid item xs={6}>
+              <Button variant="contained">Login</Button>
+            </Grid>
+          </Grid>
+        </div>
+      </Modal>
+    );
+  };
+
+  const renderTeamSelect = (player: IPlayerInfo, i: number) => {
+    if (props.store.gameSettings.typeOfGame !== "ball") return null;
+    if (onMobile && props.store.player?.playerNumber === player.playerNumber) {
+      return (
+        <div className="team-select-container">
+          <label className="team-select-radio-button">
+            <input
+              type="radio"
+              id="team0"
+              name={`team-pick-${i}`}
+              value={0}
+              checked={player.teamNumber === 0}
+              onChange={() => {
+                sendTeamChange(0);
+              }}
+            />
+            Team 0
+          </label>
+          <label className="team-select-radio-button">
+            <input
+              type="radio"
+              id="team1"
+              name={`team-pick-${i}`}
+              value={1}
+              checked={player.teamNumber === 1}
+              onChange={() => {
+                sendTeamChange(1);
+              }}
+            />
+            Team 1
+          </label>
+        </div>
+      );
+    }
+    return (
+      <span className="team-select-container">TEAM: {player.teamNumber}</span>
+    );
   };
 
   return (
-    <div className="container">
-      <h1 className="center">Waiting room</h1>
-      <br />
-      <Link to={frontPagePath}>Back to front page</Link>
-
-      <br />
-      <br />
-
-      <h3 className="center">Players in room {props.store.roomId}</h3>
-      <div id="player-list">
-        {props.store.players.map((player: IPlayerInfo, i: number) => {
-          return (
-            <div className="player-name" key={player.playerName}>
-              <span className="player-name-span">{player.playerName}</span>
-              {deviceType === "mobile" &&
-              props.store.player?.playerNumber === player.playerNumber ? (
-                <div className="team-select-container">
-                  <label className="team-select-radio-button">
-                    <input
-                      type="radio"
-                      id="team0"
-                      name={`team-pick-${i}`}
-                      value={0}
-                      checked={player.teamNumber === 0}
-                      onChange={() => {
-                        sendTeamChange(0);
-                      }}
-                    />
-                    Team 0
-                  </label>
-                  <label className="team-select-radio-button">
-                    <input
-                      type="radio"
-                      id="team1"
-                      name={`team-pick-${i}`}
-                      value={1}
-                      checked={player.teamNumber === 1}
-                      onChange={() => {
-                        sendTeamChange(1);
-                      }}
-                    />
-                    Team 1
-                  </label>
-                </div>
-              ) : (
-                <span className="team-select-container">
-                  TEAM: {player.teamNumber}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      {deviceType === "desktop" && (
-        <div>
-          <h4 className="center">Game settings</h4>
-          {props.store.gameSettings.typeOfGame === "ball" ? (
-            <>
-              <label>Ball radius</label>
-              <br />
-              <br />
-              <input
-                className="large-input"
-                type="text"
-                value={props.store.gameSettings.ballRadius}
-                onChange={(ev) => {
-                  const newGameSettings = {
-                    ...props.store.gameSettings,
-                    ballRadius: +ev.target.value,
-                  } as IGameSettings;
-                  props.store.setGameSettings(newGameSettings);
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <label>Number of laps</label>
-              <br />
-              <br />
-              <input
-                className="large-input"
-                type="number"
-                value={props.store.gameSettings.numberOfLaps}
-                onChange={(ev) => {
-                  const newGameSettings = {
-                    ...props.store.gameSettings,
-                    numberOfLaps: +ev.target.value,
-                  } as IGameSettings;
-                  props.store.setGameSettings(newGameSettings);
-                }}
-              />
-              <br />
-              <select
-                name="race-track"
-                onChange={(e) => {
-                  const newGameSettings = {
-                    ...props.store.gameSettings,
-                    trackName: e.target.value,
-                  } as IGameSettings;
-                  props.store.setGameSettings(newGameSettings);
-                }}
-              >
-                <option value="track">Simple track</option>
-                <option value="town-track">Town track</option>
-              </select>
-            </>
+    <React.Fragment>
+      {renderDisplayNameModal()}
+      <div className="container">
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <h1 className="center">Waiting room</h1>
+          </Grid>
+          <Grid item xs={12}>
+            <h3>{roomId}</h3>
+          </Grid>
+          <Grid item xs={12}>
+            <Link to={frontPagePath}>Back to front page</Link>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography component="span">
+              Link to room: {window.location.href}
+            </Typography>{" "}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("Link copied!");
+              }}
+            >
+              Copy
+            </button>
+          </Grid>
+          {roomQrCode && (
+            <Grid item xs={12}>
+              <img src={roomQrCode} alt="" />
+            </Grid>
           )}
 
-          <br />
-          <h6 className="center">Type of game</h6>
+          <Grid item xs={12}>
+            <Typography>
+              On your mobile, either scan the QR code, copy the link to room and
+              paste it in your phone or write the room id '{roomId}' in input on
+              the front page.
+            </Typography>
+          </Grid>
+        </Grid>
 
-          <label>
-            <input
-              type="radio"
-              name="game-type"
-              onChange={() =>
-                props.store.setGameSettings({
-                  ...props.store.gameSettings,
-                  typeOfGame: "race",
-                })
-              }
-              checked={props.store.gameSettings.typeOfGame === "race"}
-            />
-            Race
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="game-type"
-              onChange={() =>
-                props.store.setGameSettings({
-                  ...props.store.gameSettings,
-                  typeOfGame: "ball",
-                })
-              }
-              checked={props.store.gameSettings.typeOfGame === "ball"}
-            />
-            Ball
-          </label>
+        <h3 className="center">Players in room {props.store.roomId}</h3>
 
-          <br />
-          <br />
-
-          <button className="large-input" onClick={handleStartGame}>
-            Start game
-          </button>
-        </div>
-      )}
+        <List>
+          {props.store.players.map((player: IPlayerInfo, i: number) => {
+            return (
+              <React.Fragment key={player.playerName}>
+                <ListItem>
+                  <ListItemText
+                    primary={
+                      player.playerNumber ===
+                      props.store.player?.playerNumber ? (
+                        <strong>{player.playerName}</strong>
+                      ) : (
+                        player.playerName
+                      )
+                    }
+                  />
+                  {renderTeamSelect(player, i)}
+                </ListItem>
+                {i !== props.store.players.length - 1 && <Divider />}
+              </React.Fragment>
+            );
+          })}
+        </List>
+        {props.store.players.length === 0 && (
+          <Grid item xs={12}>
+            <Typography>No players connected</Typography>
+          </Grid>
+        )}
+        {!onMobile && (
+          <GameSettingsComponent socket={props.socket} store={props.store} />
+        )}
+      </div>
       <ToastContainer />
-    </div>
+    </React.Fragment>
   );
 };
 

@@ -128,37 +128,45 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
   };
 
   return (
-    <div
+    <Grid
+      container
+      spacing={3}
       style={{
         margin: "auto",
-        marginBottom: 15,
-        marginTop: 15,
         width: "80%",
-        maxWidth: 500,
+        //   marginBottom: 15,
+        //   marginTop: 15,
+        //   maxWidth: 500,
       }}
     >
-      <div style={{ margin: 15 }}>
-        <Link to={frontPagePath}>Back to front page</Link>
-      </div>
-
-      {!user ? (
-        <div
-          style={{
-            margin: 75,
-            textAlign: "center",
-          }}
-        >
-          <span>Loading your profile...</span>
-          <br />
-          <br />
-          <CircularProgress />
+      <Grid item xs={12} sm={3}>
+        <div style={{ margin: 15 }}>
+          <Link to={frontPagePath}>Back to front page</Link>
         </div>
-      ) : (
-        <Card>{inEditMode ? renderEditInfo() : renderStaticInfo()}</Card>
-      )}
 
-      {user && <GameDataComponent userId={user.uid} />}
-    </div>
+        {!user ? (
+          <div
+            style={{
+              margin: 75,
+              textAlign: "center",
+            }}
+          >
+            <span>Loading your profile...</span>
+            <br />
+            <br />
+            <CircularProgress />
+          </div>
+        ) : (
+          <Card>{inEditMode ? renderEditInfo() : renderStaticInfo()}</Card>
+        )}
+      </Grid>
+
+      {user && (
+        <Grid item xs={12} sm={9}>
+          <GameDataComponent userId={user.uid} />
+        </Grid>
+      )}
+    </Grid>
   );
 };
 
