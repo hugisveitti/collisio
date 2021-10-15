@@ -8,9 +8,11 @@ import {
   TextField,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { defaultUserSettings, IVehicleSettings } from "../classes/User";
 import NotLoggedInModal from "../components/NotLoggedInModal";
+import { frontPagePath } from "../components/Routes";
 import {
   getDBUserSettings,
   setDBUserSettings,
@@ -21,8 +23,9 @@ import { UserContext } from "../providers/UserProvider";
 interface IControllerSettingsComponent {
   setSettingsModalOpen: any;
   onClose: () => void;
-  quitGame: () => void;
+
   userLoggedIn: () => void;
+  resetOrientation: () => void;
   socket: Socket;
 }
 
@@ -88,6 +91,12 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
         </IconButton>
       </Grid>
       <Grid item xs={6}>
+        <Button variant="outlined" onClick={props.resetOrientation}>
+          Reset orientation
+        </Button>
+      </Grid>
+      <Grid item xs={6} />
+      <Grid item xs={6}>
         <TextField
           fullWidth
           type="number"
@@ -129,9 +138,9 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       </Grid>
       <Grid item xs={3}></Grid>
       <Grid item xs={9}>
-        <Button onClick={props.quitGame} startIcon={<ExitToAppIcon />}>
-          Quit game
-        </Button>
+        <Link to={frontPagePath} style={{ textDecoration: "none" }}>
+          <Button startIcon={<ExitToAppIcon />}>Quit game</Button>
+        </Link>
       </Grid>
     </Grid>
   );

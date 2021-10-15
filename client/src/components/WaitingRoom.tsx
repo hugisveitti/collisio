@@ -142,6 +142,9 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
           console.log("error generating qr code", err);
         });
     }
+    return () => {
+      props.socket.off("player-disconnected");
+    };
   }, []);
 
   const sendTeamChange = (newTeamNumber: number) => {

@@ -14,7 +14,9 @@ export interface IUser {
 
 export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) => {
     // only create if not exists
-    get(ref(database, usersRefPath + "/" + userData.uid)).then(snapshot => {
+    const dbUserRef = (ref(database, usersRefPath + "/" + userData.uid))
+
+    onValue(dbUserRef, snapshot => {
         if (!snapshot.exists()) {
             set(ref(database, usersRefPath + "/" + userData.uid), userData).catch((err) => {
                 console.log("Error setting db user", err);
@@ -27,9 +29,9 @@ export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) 
                 callback(snapshot.val())
             }
         }
-    }).catch(err => {
+    }, err => {
         console.log("Error getting DBUser in create", err)
-    })
+    }, { onlyOnce: true })
 }
 
 export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
@@ -125,7 +127,9 @@ export interface IPlayerGameData {
 }
 
 export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
-    get(ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)).then(snap => {
+    const playerDataRef = (ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath))
+
+    onValue(playerDataRef, snap => {
         if (snap.exists()) {
             const data = snap.val()
             const gamesData = [] as IPlayerGameData[]
@@ -139,7 +143,9 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
             callback(undefined)
             console.log("player game data does not exists")
         }
-    })
+    }, err => {
+        console.log("Error getting player data", err)
+    }, { onlyOnce: true })
 }
 
 const userSettingsRef = "settings"

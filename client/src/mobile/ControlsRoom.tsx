@@ -40,12 +40,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const upColor = "red";
   const [isPortrait, setIsPortrait] = useState(false);
 
-  const handleQuitGame = () => {
-    console.log("quit game");
-    history.push(frontPagePath);
-    props.socket.emit("quit-game");
-  };
-
   const handleUserLoggedIn = () => {
     console.log("handle user logged in");
     console.log("user", user);
@@ -55,7 +49,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     if (screen.orientation?.type) {
       setIsPortrait(screen.orientation.type.slice(0, 8) === "portrait");
     } else {
-      toast(`screen.orientation.angle ${window.orientation}`);
       setIsPortrait(window.orientation === 0);
     }
   };
@@ -79,14 +72,22 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   if (!props.store?.roomId && !isTestMode) {
-    // history.push(frontPagePath);
-    // toast.warn("No room connection, redirecting to frontpage");
-    // return null;
+    history.push(frontPagePath);
+    toast.warn("No room connection, redirecting to frontpage");
+    return null;
   }
+
+  const resetDeviceOrientationListener = () => {
+    toast("Resetting orientation");
+    window.removeEventListener("deviceorientation", deviceOrientationHandler);
+    window.addEventListener("deviceorientation", deviceOrientationHandler);
+  };
 
   useEffect(() => {
     handleDeviceOrientChange();
+    // for portait mode
     window.addEventListener("orientationchange", handleDeviceOrientChange);
+    // for gamma, beta, alpha
     window.addEventListener("deviceorientation", deviceOrientationHandler);
 
     setInterval(() => {
@@ -95,6 +96,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       // set fps
     }, 1000 / 30);
     console.log("user", user);
+    return () => {
+      window.removeEventListener("deviceorientation", deviceOrientationHandler);
+      window.removeEventListener("orientationchange", handleDeviceOrientChange);
+    };
   }, []);
 
   // how to set key
@@ -106,13 +111,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     action(b);
     controller[key] = b;
   };
-
-  // return (
-  //   <div>
-  //     handleUserLoggedIn
-  //     <h1>HERERER</h1>
-  //   </div>
-  // );
 
   const rotateText = { transform: "rotate(-90deg)" };
   const forwardStyles = isPortrait
@@ -153,9 +151,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
               handleButtonAction(false, "pause", setSettingsModalOpen);
             }}
             setSettingsModalOpen={setSettingsModalOpen}
-            quitGame={handleQuitGame}
             userLoggedIn={handleUserLoggedIn}
             socket={props.socket}
+            resetOrientation={resetDeviceOrientationListener}
           />
         </div>
       </Modal>

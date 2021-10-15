@@ -130,7 +130,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   const goToWaitingRoom = (roomId: string) => {
-    console.log("go to waiting room", history, waitingRoomPath);
     history.push(waitingRoomPath + "/" + roomId);
   };
 
@@ -156,7 +155,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const createRoomDesktop = (roomId: string) => {
     props.socket.emit("create-room", { roomId });
     props.socket.once("create-room-callback", (response: ISocketCallback) => {
-      console.log("room created callback", response);
       if (response.status === "success") {
         const { roomId } = response.data;
         props.store.setRoomId(roomId);
@@ -168,7 +166,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   const connectButtonClicked = () => {
-    console.log("connect button clicked");
     let _roomId: string, _playerName: string;
     if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
       _roomId = props.store.roomId !== "" ? props.store.roomId : "testRoom";
