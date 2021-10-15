@@ -79,7 +79,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       </div>
     );
   }
-
+  /** Add reset orientation device */
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>

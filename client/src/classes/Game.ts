@@ -57,6 +57,6 @@ export interface IEndOfGameInfoGame {
     playersInfo: IPlayerGameInfo[]
     trackType: TrackType
     gameId: string
-    roomName: string
+    roomId: string
     date: Date
 }

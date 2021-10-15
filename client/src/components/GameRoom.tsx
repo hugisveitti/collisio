@@ -15,7 +15,7 @@ interface IGameRoom {
 
 const GameRoom = (props: IGameRoom) => {
   // this breaks iphone
-  // if (!props.store.roomName) {
+  // if (!props.store.roomId) {
   //   window.location.href = frontPagePath;
   // }
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -32,7 +32,7 @@ const GameRoom = (props: IGameRoom) => {
       toast.warn(`${playerName} disconnected from game`);
     });
 
-    if (!props.store.roomName) {
+    if (!props.store.roomId) {
       history.push(frontPagePath);
       toast.warn("No room connection, redirecting to frontpage");
       return null;
@@ -48,7 +48,7 @@ const GameRoom = (props: IGameRoom) => {
         props.socket,
         props.store.players,
         props.store.gameSettings,
-        props.store.roomName,
+        props.store.roomId,
         handleEscPressed
         // (_unpauseFunc) => setUnpauseGameFunc(_unpauseFunc)
       );

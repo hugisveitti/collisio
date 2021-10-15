@@ -41,7 +41,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const upColor = "red";
   const [isPortrait, setIsPortrait] = useState(false);
 
-  if (!props.store.roomName && !isTestMode) {
+  if (!props.store.roomId && !isTestMode) {
     history.push(frontPagePath);
     toast.warn("No room connection, redirecting to frontpage");
     return null;

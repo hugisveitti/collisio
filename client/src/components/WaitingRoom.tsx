@@ -20,8 +20,11 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const deviceType = getDeviceType();
 
+  if (!props.store.roomId) {
+    history.push(frontPagePath);
+  }
+
   useEffect(() => {
-    console.log("creating player joined");
     props.socket.on("player-joined", ({ players: _players }) => {
       props.store.setPlayers(_players);
     });
@@ -45,10 +48,6 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       }
     }
   }, [props.store.players]);
-
-  if (!props.store.roomName) {
-    history.push(frontPagePath);
-  }
 
   const sendTeamChange = (newTeamNumber: number) => {
     props.socket.emit("team-change", { newTeamNumber });
@@ -74,7 +73,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       <br />
       <br />
 
-      <h3 className="center">Players in {props.store.roomName}</h3>
+      <h3 className="center">Players in room {props.store.roomId}</h3>
       <div id="player-list">
         {props.store.players.map((player: IPlayerInfo, i: number) => {
           return (

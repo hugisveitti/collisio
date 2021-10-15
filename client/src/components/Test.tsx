@@ -9,7 +9,7 @@ import { getDeviceType } from "../utils/settings";
 
 const Test = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
-  const [roomName, setRoomName] = useState("testRoom");
+  const [roomId, setRoomId] = useState("testRoom");
   const [players, setPlayers] = useState([
     {
       playerName: "testsen",
@@ -35,8 +35,8 @@ const Test = () => {
   }, []);
 
   const store = {
-    roomName,
-    setRoomName,
+    roomId,
+    setRoomId,
     players,
     setPlayers,
     player,

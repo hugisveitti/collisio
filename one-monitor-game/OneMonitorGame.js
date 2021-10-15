@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const Player = require("./OneMonitorPlayer")
 
 const successStatus = "success"
@@ -12,20 +13,32 @@ class GameMaster {
         this.rooms = {}
     }
 
-    roomExists = (roomName) => {
-        const roomNames = Object.keys(this.rooms)
-        for (let i = 0; i < roomNames.length; i++) {
-            if (roomName === roomNames[i]) {
+    roomExists = (roomId) => {
+        const roomIds = Object.keys(this.rooms)
+        for (let i = 0; i < roomIds.length; i++) {
+            if (roomId === roomIds[i]) {
                 return true
             }
         }
         return false
     }
 
+    setupCreateRoomListener(socket) {
+        socket.on("create-room", () => {
+            // increadably unlikly two games get same uuid
+            // one room can play many games
+            const roomId = uuidv4().slice(0, 4)
+            this.rooms[roomId] = new Game(roomId, this.io, socket)
+            socket.join(roomId)
+            socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to room.", data: { roomId } })
+
+        })
+    }
+
     addSocket(socket) {
         let deviceType
         let playerName
-        let roomName
+        let roomId
         let player
 
         socket.once("device-type", (_deviceType) => {
@@ -33,43 +46,38 @@ class GameMaster {
             console.log("In one monitor game connection from", deviceType)
 
             if (deviceType === "desktop") {
-                socket.on("room-created", ({ roomName: _roomName }) => {
-                    if (this.roomExists(_roomName)) {
-                        socket.emit("room-created-callback", { status: errorStatus, message: "Room exists" })
-                    } else {
-                        roomName = _roomName
-                        this.rooms[roomName] = new Game(roomName, this.io, socket)
-                        socket.join(roomName)
-                        socket.emit("room-created-callback", { status: successStatus, message: "Successfully connected to room." })
-                    }
-                })
+
+                this.setupCreateRoomListener(socket)
+
             } else {
-                socket.on("player-connected", ({ roomName: _roomName, playerName: _playerName, id }) => {
-                    if (!this.roomExists(_roomName)) {
+                socket.on("player-connected", ({ roomId: _roomId, playerName: _playerName, id }) => {
+                    if (!this.roomExists(_roomId)) {
                         socket.emit("player-connected-callback", { message: "Room does not exist, please connect to a desktop first.", status: errorStatus })
                     } else {
-                        roomName = _roomName
+                        roomId = _roomId
                         playerName = _playerName
                         player = new Player(socket, playerName, id)
-                        this.rooms[roomName].addPlayer(player)
+                        this.rooms[roomId].addPlayer(player)
                         socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo() } })
-                        socket.join(roomName)
+                        socket.join(roomId)
                     }
                 })
             }
 
-            socket.on("in-waiting-room", () => {
-                if (this.rooms[roomName]) {
-                    this.rooms[roomName].alertWaitingRoom()
+            socket.once("in-waiting-room", () => {
+                if (this.rooms[roomId]) {
+                    this.rooms[roomId].alertWaitingRoom()
                 } else {
-                    console.log("no room called", roomName)
+                    console.log("There is no room with id", roomId)
                 }
             })
+
+
 
             socket.on("disconnect", () => {
                 if (deviceType === "desktop") {
                     console.log("disconnected from desktop")
-                    delete this.rooms[roomName]
+                    delete this.rooms[roomId]
                 } else {
                     console.log("disconnected from mobile")
                     if (player) {
@@ -85,7 +93,7 @@ class GameMaster {
 
 class Game {
     players
-    roomName
+    roomId
     io
     socket
     gameStarted
@@ -93,9 +101,9 @@ class Game {
     team2Goals
     maxGoals
 
-    constructor(roomName, io, socket) {
+    constructor(roomId, io, socket) {
         this.players = []
-        this.roomName = roomName
+        this.roomId = roomId
         this.io = io
         this.socket = socket
         this.gameStarted = false
@@ -123,7 +131,7 @@ class Game {
                 player.setLeader(player)
             }
         }
-        player.socket.emit("room-connected", { roomName: player.roomName, isLeader: player.isLeader })
+        player.socket.emit("room-connected", { roomId: player.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()
         if (this.gameStarted) {
             player.startGame()
@@ -132,7 +140,7 @@ class Game {
     }
 
     alertWaitingRoom() {
-        this.io.to(this.roomName).emit("player-joined", { players: this.getPlayersInfo() })
+        this.io.to(this.roomId).emit("player-joined", { players: this.getPlayersInfo() })
     }
 
     setupControlsListener() {
@@ -190,7 +198,7 @@ class Game {
         for (let player of this.players) {
             playersString += player.toString() + ", "
         }
-        return this.roomName + ": " + playersString
+        return this.roomId + ": " + playersString
     }
 }
 

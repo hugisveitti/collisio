@@ -1,6 +1,14 @@
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import HelpIcon from "@mui/icons-material/Help";
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
-import { Button, Modal, Typography } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Grid,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
@@ -21,6 +29,7 @@ import {
   waitingRoomPath,
 } from "./Routes";
 import { IStore } from "./store";
+import NotLoggedInModal from "./NotLoggedInModal";
 
 interface IOneMonitorFrontPageProps {
   socket: Socket;
@@ -39,12 +48,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 
   const user = useContext(UserContext);
 
-  useEffect(() => {
-    if (user?.displayName) {
-      setPlayerName(user.displayName);
-    }
-  }, [user]);
-
   const checkIfNeedOrientaitonPrompt = (e: DeviceOrientationEvent) => {
     const { beta, gamma, alpha } = e;
 
@@ -58,6 +61,26 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   useEffect(() => {
+    if (user?.displayName) {
+      setPlayerName(user.displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (startGameAuto) {
+      props.store.setRoomId("testRoom");
+      setPlayerName("testPlayer");
+      setTimeout(() => {
+        connectButtonClicked();
+      }, 100);
+    }
+    if (isTestMode) {
+      if (deviceType === "desktop") {
+        startRaceTrackTest(props.socket, props.store.gameSettings);
+      } else {
+        history.push(controlsRoomPath);
+      }
+    }
     if (deviceType === "desktop") {
       setNeedToAskOrientPermission(false);
     } else {
@@ -67,6 +90,10 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       );
     }
   }, []);
+
+  if (isTestMode) {
+    return null;
+  }
 
   const requestDeviceOrientation = () => {
     if (!needToAskOrientPermission) {
@@ -95,32 +122,14 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   };
 
-  const renderPlayerNameInput = () => {
-    if (deviceType === "mobile") {
-      return (
-        <>
-          <input
-            className="large-input"
-            type="text"
-            placeholder="Player Name"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            disabled={!!user}
-          />
-          <br />
-        </>
-      );
-    }
-    return null;
-  };
-
   const goToWaitingRoom = () => {
+    console.log("go to waiting room", history, waitingRoomPath);
     history.push(waitingRoomPath);
   };
 
-  const connectToRoomMobile = (roomName: string, playerName: string) => {
+  const connectToRoomMobile = (roomId: string, playerName: string) => {
     props.socket.emit("player-connected", {
-      roomName,
+      roomId,
       playerName,
       id: user?.uid,
     });
@@ -137,33 +146,35 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     });
   };
 
-  const createRoomDesktop = (roomName: string) => {
-    props.socket.emit("room-created", { roomName });
-    props.socket.once("room-created-callback", (data: ISocketCallback) => {
-      console.log("room created callback", data);
-      if (data.status === "success") {
+  const createRoomDesktop = (roomId: string) => {
+    props.socket.emit("create-room", { roomId });
+    props.socket.once("create-room-callback", (response: ISocketCallback) => {
+      console.log("room created callback", response);
+      if (response.status === "success") {
+        const { roomId } = response.data;
+        props.store.setRoomId(roomId);
         goToWaitingRoom();
       } else {
-        toast.error(data.message);
+        toast.error(response.message);
       }
     });
   };
 
   const connectButtonClicked = () => {
-    let _roomName: string, _playerName: string;
+    console.log("connect button clicked");
+    let _roomId: string, _playerName: string;
     if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-      _roomName =
-        props.store.roomName !== "" ? props.store.roomName : "testRoom";
+      _roomId = props.store.roomId !== "" ? props.store.roomId : "testRoom";
       _playerName = playerName !== "" ? playerName : "testPlayer";
     } else {
       _playerName = playerName;
-      _roomName = props.store.roomName;
+      _roomId = props.store.roomId;
     }
     if (deviceType === "desktop") {
-      createRoomDesktop(_roomName);
+      createRoomDesktop(_roomId);
     } else {
       if (user) {
-        connectToRoomMobile(_roomName, _playerName);
+        connectToRoomMobile(_roomId, _playerName);
         requestDeviceOrientation();
       } else {
         setNotLoggedInModelOpen(true);
@@ -171,128 +182,85 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   };
 
-  useEffect(() => {
-    if (startGameAuto) {
-      props.store.setRoomName("testRoom");
-      setPlayerName("testPlayer");
-      setTimeout(() => {
-        connectButtonClicked();
-      }, 100);
-    }
-  }, []);
-
-  const renderNotLoggedInModal = () => {
-    return (
-      <Modal
-        open={notLoggedInModalOpen}
-        onClose={() => setNotLoggedInModelOpen(false)}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "75%",
-            backgroundColor: "#eeebdf",
-            border: "2px solid #000",
-            padding: 10,
-          }}
-        >
-          <Typography>
-            You are not logged in. To use features such as saving highscore you
-            need to be logged in.
-          </Typography>
-          <br />
-          <br />
-          {showLoginInModal ? (
-            <LoginComponent setPlayerName={setPlayerName} />
-          ) : (
-            <Button
-              variant="contained"
-              onClick={() => setShowLoginInModal(true)}
-            >
-              Login
-            </Button>
-          )}
-          <Button
-            onClick={() => {
-              connectToRoomMobile(props.store.roomName, playerName);
-              requestDeviceOrientation();
-            }}
-          >
-            Continue as a Guest
-          </Button>
-        </div>
-      </Modal>
-    );
-  };
-  useEffect(() => {
-    if (isTestMode) {
-      if (deviceType === "desktop") {
-        startRaceTrackTest(props.socket, props.store.gameSettings);
-      } else {
-        history.push(controlsRoomPath);
-      }
-    }
-  }, []);
-  if (isTestMode) {
-    return null;
-  }
-
   return (
     <div>
-      {renderNotLoggedInModal()}
+      <NotLoggedInModal
+        open={notLoggedInModalOpen}
+        onClose={() => setNotLoggedInModelOpen(false)}
+        infoText="You are not logged in. To use features such as saving highscore you
+need to be logged in."
+        onContinoueAsGuest={() => {
+          connectToRoomMobile(props.store.roomId, playerName);
+          requestDeviceOrientation();
+        }}
+      />
       <div className="container">
-        <h2 className="center">
-          Welcome to <i>Collisio</i>
-        </h2>
-        <img src={logo} className="image-logo" alt="" />
-        <input
-          className="large-input"
-          type="text"
-          placeholder="Room Name"
-          value={props.store.roomName}
-          onChange={(e) => props.store.setRoomName(e.target.value)}
-        />
-        <br />
+        <Grid container spacing={5}>
+          <Grid item xs={12}>
+            <h2 className="center">
+              Welcome to <i>Collisio</i>
+            </h2>
+          </Grid>
+          <Grid item xs={12}>
+            <img src={logo} className="image-logo" alt="" />
+          </Grid>
 
-        {renderPlayerNameInput()}
+          {deviceType === "mobile" && (
+            <>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Player Name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  disabled={!!user}
+                  fullWidth
+                />
+              </Grid>
 
-        <button
-          className="large-input"
-          id="room-name-btn"
-          onClick={connectButtonClicked}
-        >
-          {deviceType === "desktop" ? "Create Room" : "Join Room"}
-        </button>
-        <br />
-        {deviceType === "mobile" && (
-          <button style={{ padding: 10 }} onClick={requestDeviceOrientation}>
-            Request device orientation
-          </button>
-        )}
-        <br />
-        <p>
-          Create a room, you and 3 friends connect to that room with your mobile
-          phones. But you can also play alone.
-        </p>
-        <p>Its a car game where your phone is the controller.</p>
-        <h3 className="center">Create a room</h3>
-        <p>
-          Please type in the room name to create a room. Then all the players
-          should type in the room name and their name on their mobile device.
-        </p>
-        <hr />
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<VideogameAssetIcon />}
-        >
-          <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
-            See how to play game.
-          </Link>
-        </Button>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Room id"
+                  value={props.store.roomId}
+                  onChange={(e) => props.store.setRoomId(e.target.value)}
+                />
+              </Grid>
+            </>
+          )}
+
+          <Grid item xs={12}>
+            <Button
+              onClick={connectButtonClicked}
+              variant="contained"
+              size="large"
+              startIcon={<VideogameAssetIcon />}
+            >
+              {deviceType === "desktop" ? "Start Game" : "Join Room"}
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography color="gray">
+              Create a room, you and 3 friends connect to that room with your
+              mobile phones. But you can also play alone.
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <p>Its a car game where your phone is the controller.</p>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Divider variant="middle" />
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="outlined" size="small" startIcon={<HelpIcon />}>
+              <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
+                See how to play game.
+              </Link>
+            </Button>
+          </Grid>
+        </Grid>
         <p>This game is in development</p>
         <p>
           On mobile please have your phone in portrait and lock the screen

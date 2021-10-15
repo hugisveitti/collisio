@@ -66,7 +66,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     lapTimes: number[][]
 
     gameId: string
-    roomName!: string
+    roomId!: string
     escPress: () => void
 
     constructor() {
@@ -102,10 +102,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
         return this.lapNumber[idx] > this.totalNumberOfLaps
     }
 
-    setGameSettings(newGameSettings: IGameSettings, roomName: string, escPress: () => void) {
+    setGameSettings(newGameSettings: IGameSettings, roomId: string, escPress: () => void) {
         this.gameSettings = newGameSettings
         this.totalNumberOfLaps = this.gameSettings.numberOfLaps
-        this.roomName = roomName
+        this.roomId = roomId
         this.escPress = escPress
     }
 
@@ -492,7 +492,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             numberOfLaps: this.totalNumberOfLaps,
             trackType: this.gameSettings.trackName,
             gameId: this.gameId,
-            roomName: this.roomName,
+            roomId: this.roomId,
             date: new Date()
         }
 
@@ -501,7 +501,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 }
 
 
-export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomName: string, escPress: () => void,) => {
+export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void,) => {
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
@@ -514,7 +514,7 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         // hacky way to get the project's scene
         (project.scenes.get(key) as OneMonitorRaceGameScene).setSocket(socket);
         (project.scenes.get(key) as OneMonitorRaceGameScene).setPlayers(players);
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomName, escPress);
+        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomId, escPress);
         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
 
         return project

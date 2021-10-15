@@ -10,10 +10,10 @@ class GameMaster {
         this.io = io
     }
 
-    roomExists = (roomName) => {
-        const roomNames = Object.keys(this.rooms)
-        for (let i = 0; i < roomNames.length; i++) {
-            if (roomName === roomNames[i]) {
+    roomExists = (roomId) => {
+        const roomIds = Object.keys(this.rooms)
+        for (let i = 0; i < roomIds.length; i++) {
+            if (roomId === roomIds[i]) {
                 return true
             }
         }
@@ -23,7 +23,7 @@ class GameMaster {
     addSocket(socket) {
         let deviceType
         let playerName
-        let roomName
+        let roomId
         let player
 
         socket.once("device-type", (_deviceType) => {
@@ -31,37 +31,37 @@ class GameMaster {
             console.log("connection from", deviceType)
         })
 
-        socket.once("room-connection", ({ roomName: _roomName, playerName: _playerName }) => {
+        socket.once("room-connection", ({ roomId: _roomId, playerName: _playerName }) => {
             playerName = _playerName
-            roomName = _roomName
-            console.log("joining", roomName, playerName)
+            roomId = _roomId
+            console.log("joining", roomId, playerName)
 
-            socket.join(roomName)
-            const player = new Player(playerName, socket, roomName)
-            if (!this.roomExists(roomName)) {
-                this.rooms[roomName] = new Game(roomName, this.io, player)
+            socket.join(roomId)
+            const player = new Player(playerName, socket, roomId)
+            if (!this.roomExists(roomId)) {
+                this.rooms[roomId] = new Game(roomId, this.io, player)
             }
 
-            this.rooms[roomName].addPlayer(player)
+            this.rooms[roomId].addPlayer(player)
         })
 
         // The user simply puts his name in again
-        socket.on("mobile-room-connection", ({ roomName, playerName }) => {
-            if (this.roomExists(roomName)) {
+        socket.on("mobile-room-connection", ({ roomId, playerName }) => {
+            if (this.roomExists(roomId)) {
 
-                const players = this.rooms[roomName].players
+                const players = this.rooms[roomId].players
 
                 for (let i = 0; i < players.length; i++) {
                     if (playerName === players[i].playerName) {
-                        this.rooms[roomName].players[i].setMobileSocket(socket)
-                        player = this.rooms[roomName].players[i]
+                        this.rooms[roomId].players[i].setMobileSocket(socket)
+                        player = this.rooms[roomId].players[i]
 
                     }
                 }
                 if (player) {
-                    socket.join(roomName)
-                    socket.emit("room-connected", { roomName, isLeader: player.isLeader })
-                    this.rooms[roomName].alertWaitingRoom()
+                    socket.join(roomId)
+                    socket.emit("room-connected", { roomId, isLeader: player.isLeader })
+                    this.rooms[roomId].alertWaitingRoom()
                 } else {
                     socket.emit("mobile-room-connection-error", { message: "Player not found", status: "error" })
                 }
@@ -92,7 +92,7 @@ class GameMaster {
 
 class Game {
     players
-    roomName
+    roomId
     io
     leader
     gameStarted
@@ -100,9 +100,9 @@ class Game {
     team2Goals
     maxGoals
     ballPosition
-    constructor(roomName, io, leader) {
+    constructor(roomId, io, leader) {
         this.players = []
-        this.roomName = roomName
+        this.roomId = roomId
         this.io = io
 
         this.maxGoals = 5
@@ -144,12 +144,12 @@ class Game {
             this.players.push(player)
             player.setGame(this)
         }
-        player.desktopSocket.emit("room-connected", { roomName: player.roomName, isLeader: player.isLeader })
+        player.desktopSocket.emit("room-connected", { roomId: player.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()
     }
 
     alertWaitingRoom() {
-        this.io.to(this.roomName).emit("player-joined", { players: this.getPlayersInfo(), canStartGame: this.canStartGame() })
+        this.io.to(this.roomId).emit("player-joined", { players: this.getPlayersInfo(), canStartGame: this.canStartGame() })
     }
 
     getPlayersInfo() {
@@ -172,7 +172,7 @@ class Game {
     sendControls() {
         console.log("setup controllers")
         setInterval(() => {
-            this.io.to(this.roomName).emit("get-controls", { players: this.getPlayersInfo() })
+            this.io.to(this.roomId).emit("get-controls", { players: this.getPlayersInfo() })
         }, 1)
     }
 

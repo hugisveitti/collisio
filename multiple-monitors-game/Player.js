@@ -4,7 +4,7 @@ class Player {
     playerName
     desktopSocket
     mobileSocket
-    roomName
+    roomId
     team
     isLeader
     bothConnected
@@ -17,10 +17,10 @@ class Player {
     isDektopConnected
     isMobileConnected
 
-    constructor(playerName, desktopSocket, roomName) {
+    constructor(playerName, desktopSocket, roomId) {
         this.playerName = playerName
         this.desktopSocket = desktopSocket
-        this.roomName = roomName
+        this.roomId = roomId
 
         this.vehicleControls = new VehicleControls()
         this.mobileControls = new MobileControls()

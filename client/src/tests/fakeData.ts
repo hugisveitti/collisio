@@ -34,7 +34,7 @@ export const createFakeHighscoreData = () => {
         const trackType: TrackType = possibleTracks[Math.floor(Math.random() * possibleTracks.length)]
         const gameId = `test-fakeGameId-${trackType}-${i}`
         const numberOfLaps = Math.floor((Math.random() * 6) + 2)
-        const roomName = "test"
+        const roomId = "test"
         const playerNames = []
         const playerIds = []
         const playerTotalTimes = []
@@ -80,7 +80,7 @@ export const createFakeHighscoreData = () => {
             playersInfo: playerGameInfos,
             numberOfLaps,
             gameId,
-            roomName,
+            roomId,
             trackType,
             date: new Date()
         }

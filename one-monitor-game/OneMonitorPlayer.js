@@ -32,6 +32,7 @@ class Player {
 
         this.setupQuitGameListener()
         this.setupUserSettingsListener()
+        this.setupReconnectListener()
 
     }
 
@@ -58,6 +59,13 @@ class Player {
         this.game = game
         this.socket.on("disconnect", () => {
             this.game.playerDisconnected(this.playerName)
+            this.isConnected = false
+        })
+    }
+
+    setupReconnectListener() {
+        this.socket.on("player-reconnect", () => {
+            console.log("player reconnected not implemented")
         })
     }
 

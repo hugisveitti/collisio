@@ -24,7 +24,7 @@ export const publicProfilePagePath = "/public-profile/:id";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
-  const [roomName, setRoomName] = useState("");
+  const [roomId, setRoomId] = useState("");
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [gameSettings, setGameSettings] = useState({
@@ -41,8 +41,8 @@ const Routes = () => {
   }, []);
 
   const store = {
-    roomName,
-    setRoomName,
+    roomId,
+    setRoomId,
     players,
     setPlayers,
     player,
