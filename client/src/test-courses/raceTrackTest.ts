@@ -3,7 +3,7 @@ import { SimpleVector } from "../models/IVehicle"
 import { createNormalVehicle, NormalVehicle, } from "../models/NormalVehicle"
 import { THREE } from "enable3d"
 import { Socket } from "socket.io-client"
-import { defaultGameSettings, IGameSettings, IPlayerInfo } from "../classes/Game"
+import { defaultGameSettings, IGameSettings } from "../classes/Game"
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls";
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera";
@@ -21,21 +21,8 @@ const bestLapTimeDiv = document.createElement("div")
 const stats = new Stats()
 
 const numDecimals = 2
-const getSimpleVectorString = (vec: SimpleVector) => {
-    if (!vec) return ""
-    return `x: ${vec.x.toFixed(numDecimals)} y: ${vec.y.toFixed(numDecimals)} z: ${vec.z.toFixed(numDecimals)}`
-}
 
-const simpleVecDistance = (vec1: SimpleVector, vec2: SimpleVector) => {
-    const x = vec1.x - vec2.x
-    const y = vec1.y - vec2.y
-    const z = vec1.z - vec2.z
-    return Math.sqrt((x * x) + (z * z) + (y * y))
-}
 
-// contraint
-let currVechicleType = "normal"
-let rs = false
 
 export class OneMonitorRaceGameScene extends Scene3D {
 
@@ -93,11 +80,45 @@ export class OneMonitorRaceGameScene extends Scene3D {
     async preload() {
 
         this.loadFont()
-        // this.physics.debug?.enable()
+        this.physics.debug?.enable()
 
-        this.warpSpeed("-ground")
+        // this.warpSpeed("-ground")
+        //   this.warpSpeed("sky")
+        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+        this.scene.add(hLight)
 
-        this.course = new RaceCourse(this, "town-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        const vertexShader = '\n\n\t\t\tvarying vec3 vWorldPosition;\n\n\t\t\tvoid main() {\n\n\t\t\t\tvec4 worldPosition = modelMatrix * vec4( position, 1.0 );\n\t\t\t\tvWorldPosition = worldPosition.xyz;\n\n\t\t\t\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\n\t\t\t}\n\n\t\t'
+        const fragmentShader = '\n\n\t\t\tuniform vec3 topColor;\n\t\t\tuniform vec3 bottomColor;\n\t\t\tuniform float offset;\n\t\t\tuniform float exponent;\n\n\t\t\tvarying vec3 vWorldPosition;\n\n\t\t\tvoid main() {\n\n\t\t\t\tfloat h = normalize( vWorldPosition + offset ).y;\n\t\t\t\tgl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );\n\n\t\t\t}\n\n\t\t'
+        const uniforms = {
+            "topColor": { value: new THREE.Color(0x0077ff) },
+            "bottomColor": { value: new THREE.Color(0xffffff) },
+            "offset": { value: 33 },
+            "exponent": { value: 0.6 }
+        };
+        uniforms["topColor"].value.copy(new THREE.Color(0x0077ff));
+        // uniforms["topColor"].value.copy(hLight.color);
+
+        // this.scene.fog.color.copy(uniforms["bottomColor"].value);
+
+        const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
+        const skyMat = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            side: THREE.BackSide
+        });
+
+        const sky = new THREE.Mesh(skyGeo, skyMat);
+        this.scene.add(sky);
+
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, .1)
+        dirLight.position.set(0, 1200, -250)
+
+        this.scene.add(dirLight)
+
+
+        this.course = new RaceCourse(this, "grandi", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             this.canStartUpdate = true
             this.createVehicle()
@@ -125,16 +146,16 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     async create() {
-        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
-        this.scene.add(hLight)
+
     }
 
     createVehicle() {
         this.vehicle = createNormalVehicle(this, "blue", "test")
         this.vehicle.addCamera(this.camera)
         this.camera.position.set(0, 15, -23)
-        const p = this.course.goal.position
-        this.vehicle.setCheckpointPositionRotation({ position: { x: p.x + 10, y: 3, z: p.z + 10 }, rotation: { x: 0, y: 180, z: 0 } })
+        const p = this.course.goalSpawn.position
+        const r = this.course.goalSpawn.rotation
+        this.vehicle.setCheckpointPositionRotation({ position: { x: 158, y: 3, z: -72 }, rotation: { x: 0, y: r.y, z: 0 } })
         this.vehicle.resetPosition()
         this.createController()
     }

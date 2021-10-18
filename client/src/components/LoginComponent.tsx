@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Input,
   Typography,
+  Grid,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -36,10 +37,8 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   container: {
-    width: 400,
-    maxWidth: "90%",
-    margin: "auto",
-    marginBottom: 25,
+    backgroundColor: "#da5e58",
+    minWidth: 300,
   },
 });
 
@@ -78,158 +77,123 @@ const LoginComponent = (props: ILoginComponent) => {
     );
   }
 
-  if (user) {
-    return (
-      <div className={classes.container}>
-        <Card>
-          <CardHeader
-            subheader={<>Welcome {user.displayName ?? displayName}.</>}
-            action={
-              <Button
-                startIcon={<LogoutIcon />}
-                size="small"
-                onClick={() => signOut()}
-              >
-                Logout
-              </Button>
-            }
-          />
-          <CardContent>
-            {user.photoURL && (
-              <CardMedia
-                component="img"
-                style={{ height: 50, width: "auto" }}
-                image={user.photoURL}
-              />
-            )}
-          </CardContent>
-          <CardActions>
-            <Button size="small" startIcon={<PersonIcon />} variant="outlined">
-              <Link
-                style={{ textDecoration: "none" }}
-                to={privateProfilePagePath}
-              >
-                Profile page
-              </Link>
-            </Button>
-          </CardActions>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className={classes.container}>
       <Card variant="outlined">
+        <CardHeader
+          title="Login"
+          subheader="Login or signup with one of the methods below."
+        />
+
         <CardContent>
-          <Typography variant="h5" component="div">
-            Login
-          </Typography>
-          <Typography>
-            To be able to save your highscore you need to login.
-          </Typography>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              signInWithGoogle(props.signInWithPopup);
-              setIsSigningIn(true);
-            }}
-            variant="contained"
-            style={{ backgroundColor: "#de5246", marginTop: 15 }}
-            startIcon={<GoogleIcon />}
-          >
-            Sign in with Google
-          </Button>
-          {/* 
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              signInWithFacebook();
-            }}
-            style={{ backgroundColor: "#4267B2", marginTop: 15 }}
-            startIcon={<FacebookIcon />}
-            variant="contained"
-          >
-            Sign in with Facebook
-          </Button> */}
-          <br />
-          {creatingAccountWithEmail ? (
-            <>
-              <Input
-                style={{ marginTop: 25 }}
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Input
-                style={{ marginTop: 15 }}
-                placeholder="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                error={password.length < 6}
-              />
-              <Input
-                style={{ marginTop: 15 }}
-                placeholder="Displayname"
-                value={displayName}
-                onChange={(e) => {
-                  setDisplayName(e.target.value);
-                  if (props.setPlayerName) {
-                    props.setPlayerName(e.target.value);
-                  }
-                }}
-              />
-              <br />
-              <br />
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
               <Button
-                style={{ marginRight: 5 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  signInWithGoogle(props.signInWithPopup);
+                  setIsSigningIn(true);
+                }}
                 variant="contained"
-                startIcon={<LoginIcon />}
-                onClick={() => {
-                  if (password.length < 6) {
-                    toast.error("The password must be atleast 6 characters.");
-                    return;
-                  }
-                  setIsSigningIn(true);
-                  signInWithEmail(email, password);
-                }}
+                style={{ backgroundColor: "#de5246", marginTop: 15 }}
+                startIcon={<GoogleIcon />}
               >
-                Login
+                Sign in with Google
               </Button>
-              <Button
-                onClick={() => {
-                  if (password.length < 6) {
-                    toast.error("The password must be atleast 6 characters.");
-                    return;
-                  }
-                  if (displayName === "") {
-                    toast.error("The display name cannot be empty.");
-                    return;
-                  }
-                  setIsSigningIn(true);
-                  createAccountWithEmail(email, password, displayName);
-                }}
-                variant="outlined"
-                startIcon={<ControlPointIcon />}
-              >
-                Sign up
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={() => setCreatingAccountWithEmail(true)}
-              variant="contained"
-              startIcon={<EmailIcon />}
-              style={{
-                backgroundColor: "#abdbe3",
-                marginTop: 15,
-                color: "black",
-              }}
-            >
-              Sign in with email
-            </Button>
-          )}
+            </Grid>
+
+            {creatingAccountWithEmail ? (
+              <React.Fragment>
+                <Grid item xs={12} sm={12}>
+                  <Input
+                    style={{ marginTop: 25 }}
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Input
+                    style={{ marginTop: 15 }}
+                    placeholder="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    error={password.length < 6}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Input
+                    style={{ marginTop: 15 }}
+                    placeholder="Displayname"
+                    value={displayName}
+                    onChange={(e) => {
+                      setDisplayName(e.target.value);
+                      if (props.setPlayerName) {
+                        props.setPlayerName(e.target.value);
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Button
+                    style={{ marginRight: 5 }}
+                    variant="contained"
+                    startIcon={<LoginIcon />}
+                    onClick={() => {
+                      if (password.length < 6) {
+                        toast.error(
+                          "The password must be atleast 6 characters."
+                        );
+                        return;
+                      }
+                      setIsSigningIn(true);
+                      signInWithEmail(email, password);
+                    }}
+                  >
+                    Login
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={8}>
+                  <Button
+                    onClick={() => {
+                      if (password.length < 6) {
+                        toast.error(
+                          "The password must be atleast 6 characters."
+                        );
+                        return;
+                      }
+                      if (displayName === "") {
+                        toast.error("The display name cannot be empty.");
+                        return;
+                      }
+                      setIsSigningIn(true);
+                      createAccountWithEmail(email, password, displayName);
+                    }}
+                    variant="outlined"
+                    startIcon={<ControlPointIcon />}
+                  >
+                    Sign up
+                  </Button>
+                </Grid>
+              </React.Fragment>
+            ) : (
+              <Grid item xs={12}>
+                <Button
+                  onClick={() => setCreatingAccountWithEmail(true)}
+                  variant="contained"
+                  startIcon={<EmailIcon />}
+                  style={{
+                    backgroundColor: "#abdbe3",
+                    marginTop: 15,
+                    color: "black",
+                  }}
+                >
+                  Sign up or sign in with email
+                </Button>
+              </Grid>
+            )}
+          </Grid>
         </CardContent>
       </Card>
     </div>

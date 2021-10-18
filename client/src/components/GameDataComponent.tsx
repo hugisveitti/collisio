@@ -16,6 +16,8 @@ import {
   getPlayerGameData,
   IPlayerGameData,
 } from "../firebase/firebaseFunctions";
+import { inputBackgroundColor } from "../providers/theme";
+import GameDataTableRow from "./GameDataTableRow";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 
 interface IGameDataComponent {
@@ -51,7 +53,7 @@ const GameDataComponent = (props: IGameDataComponent) => {
 
   console.log("gamesData", gamesData);
   return (
-    <Card style={{ marginTop: 25 }}>
+    <Card style={{ backgroundColor: inputBackgroundColor }}>
       <CardHeader subheader="Your game data" />
       <CardContent>
         {!gamesData ? (
@@ -62,7 +64,9 @@ const GameDataComponent = (props: IGameDataComponent) => {
               <TableHead>
                 <TableRow>
                   <TableCell />
-                  <TableCell component="th">Player name</TableCell>
+                  <TableCell component="th">Date</TableCell>
+                  <TableCell component="th">Track name</TableCell>
+                  <TableCell component="th">No. laps</TableCell>
                   <TableCell component="th">Total time</TableCell>
                   <TableCell component="th">Best lap time</TableCell>
                 </TableRow>
@@ -71,10 +75,7 @@ const GameDataComponent = (props: IGameDataComponent) => {
                 {(gamesData as IPlayerGameData[]).map((p, i) => {
                   const key = `${p.gameInfo.gameId}-${i}`;
                   return (
-                    <HighscorePageTableRow
-                      key={key}
-                      playerData={p.playerInfo}
-                    />
+                    <GameDataTableRow key={key} playerData={p.playerInfo} />
                   );
                 })}
               </TableBody>

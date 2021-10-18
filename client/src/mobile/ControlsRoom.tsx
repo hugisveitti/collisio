@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
+import { getDBUserSettings } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import { MobileControls } from "../utils/ControlsClasses";
 import { isTestMode } from "../utils/settings";
@@ -72,9 +73,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   if (!props.store?.roomId && !isTestMode) {
-    history.push(frontPagePath);
-    toast.warn("No room connection, redirecting to frontpage");
-    return null;
+    // history.push(frontPagePath);
+    // toast.warn("No room connection, redirecting to frontpage");
+    // return null;
   }
 
   const resetDeviceOrientationListener = () => {
@@ -101,6 +102,21 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       window.removeEventListener("orientationchange", handleDeviceOrientChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      getDBUserSettings(user.uid, (settings) => {
+        if (settings) {
+          setTimeout(() => {
+            // hacky way
+            // should have some emit from the game to the devices telling them to send info such as userSettings
+            // 5000 ms then send it is hackkkky
+            props.socket.emit("settings-changed", settings);
+          }, 5000);
+        }
+      });
+    }
+  }, [user]);
 
   // how to set key
   const handleButtonAction = (
@@ -131,6 +147,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     ? { ...rotateText, left: 35, top: "50%" }
     : { left: "50%", top: 35 };
 
+  const infoStyles = isPortrait
+    ? {
+        left: 0,
+      }
+    : {
+        right: 0,
+      };
+
   return (
     <React.Fragment>
       <Modal
@@ -139,8 +163,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       >
         <div
           style={{
-            top: 50,
-            position: "absolute",
+            // top: 50,
+            // position: "absolute",
+            marginTop: 50,
             backgroundColor: "#eeebdf",
             border: "2px solid #000",
             padding: 10,
@@ -223,7 +248,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       <div
         id="orientation-info"
         style={{
+          ...infoStyles,
           transform: isPortrait ? "rotate(-90deg)" : "",
+          top: 0,
         }}
       >
         Beta:{orientation.beta.toFixed(0)}
@@ -236,6 +263,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       <div
         id="more-speed-info"
         style={{
+          ...infoStyles,
+          top: 0,
           transform: isPortrait ? "rotate(-90deg)" : "",
         }}
       >

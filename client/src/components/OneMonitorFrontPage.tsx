@@ -31,6 +31,7 @@ import {
 import { IStore } from "./store";
 import NotLoggedInModal from "./NotLoggedInModal";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
+import AppContainer from "../containers/AppContainer";
 
 interface IOneMonitorFrontPageProps {
   socket: Socket;
@@ -187,7 +188,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   };
 
   return (
-    <div>
+    <AppContainer>
       <NotLoggedInModal
         open={notLoggedInModalOpen}
         onClose={() => setNotLoggedInModelOpen(false)}
@@ -239,17 +240,22 @@ need to be logged in."
               size="large"
               startIcon={<VideogameAssetIcon />}
             >
-              {deviceType === "desktop" ? "Create Game" : "Join Game"}
+              {deviceType === "desktop" ? "Create a Game" : "Join a Game"}
             </Button>
           </Grid>
           <Grid item xs={12}>
             <Typography color="gray">
               Create a room, you and 3 friends connect to that room with your
-              mobile phones. But you can also play alone.
+              mobile phones. You can also play singleplayer and compete againt
+              highscores.
             </Typography>
           </Grid>
+
           <Grid item xs={12}>
-            <p>Its a car game where your phone is the controller.</p>
+            <p>
+              A car game where your phone is the controller. No installations,
+              no fuss, just a desktop browser and a smartphone browser.
+            </p>
           </Grid>
         </Grid>
 
@@ -257,33 +263,36 @@ need to be logged in."
           <Grid item xs={12}>
             <Divider variant="middle" />
           </Grid>
-          <Grid item xs={12}>
-            <Button variant="outlined" size="small" startIcon={<HelpIcon />}>
-              <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
+          <Grid item xs={false} sm={false} xl={4} />
+          <Grid item xs={12} sm={6} xl={2}>
+            <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
+              <Button variant="contained" size="small" startIcon={<HelpIcon />}>
                 How to play game.
-              </Link>
-            </Button>
+              </Button>
+            </Link>
+          </Grid>
+          <Grid item xs={12} sm={6} xl={2}>
+            <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
+              <Button
+                variant="contained"
+                startIcon={<SportsScoreIcon />}
+                size="small"
+              >
+                Highscores
+              </Button>
+            </Link>
+          </Grid>
+          <Grid item xs={false} sm={false} xl={4} />
+          <Grid item xs={12}>
+            <p>
+              This game is in development. If you have suggestions please email
+              hugiholm1 [at] gmail.com
+            </p>
           </Grid>
         </Grid>
-        <p>This game is in development</p>
-        <p>
-          On mobile please have your phone in portrait and lock the screen
-          switch
-        </p>
-        <br />
-        <Button
-          variant="contained"
-          startIcon={<SportsScoreIcon />}
-          size="small"
-        >
-          <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
-            Highscores
-          </Link>
-        </Button>
         <ToastContainer />
       </div>
-      <LoginComponent setPlayerName={setPlayerName} />
-    </div>
+    </AppContainer>
   );
 };
 

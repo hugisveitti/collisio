@@ -41,6 +41,7 @@ export interface IEndOfGameInfoPlayer {
     trackType: TrackType
     gameId: string
     date: Date
+    private: boolean
 }
 
 export interface IPlayerGameInfo {

@@ -79,7 +79,9 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
 type HighscoreStoreDict = { [trackKey: string]: { [numberOfLapsKey: number]: { [playerKeys: string]: { [gameKey: string]: IEndOfGameInfoPlayer } } } }
 type HighscoreDict = { [trackKey: string]: { [numberOfLapsKey: number]: IEndOfGameInfoPlayer[] } }
 export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys: string[], numberOfLapsKeys: string[]) => void) => {
-    get(ref(database, highscoreRefPath)).then((snap) => {
+    const highscoreRef = ref(database, highscoreRefPath)
+
+    onValue(highscoreRef, (snap) => {
         if (snap.exists()) {
             const scores = snap.val() as HighscoreStoreDict
             const trackKeys = Object.keys(scores)
@@ -118,7 +120,9 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
             callback({}, [], [])
             console.log("no highscores")
         }
-    })
+    }, (err) => {
+        console.log("Error getting highscores", err)
+    }, { onlyOnce: true })
 }
 
 export interface IPlayerGameData {
@@ -135,8 +139,9 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
             const gamesData = [] as IPlayerGameData[]
             const keys = Object.keys(data)
             for (let key of keys) {
-                gamesData.push({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
+                gamesData.unshift({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
             }
+
             callback(gamesData)
 
         } else {
@@ -162,6 +167,7 @@ export const getDBUserSettings = (userId: string, callback: (settings: IUserSett
     const settingsRef = ref(database, usersRefPath + "/" + userId + "/" + userSettingsRef)
     onValue(settingsRef, snap => {
         if (snap.exists()) {
+            console.log("get db settings", snap.val())
             callback(snap.val())
         } else {
             callback(undefined)

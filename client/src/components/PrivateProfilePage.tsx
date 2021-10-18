@@ -4,11 +4,8 @@ import {
   CardHeader,
   CardMedia,
   CircularProgress,
-  FormControl,
   Grid,
   IconButton,
-  Input,
-  InputLabel,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,11 +19,17 @@ import { Link } from "react-router-dom";
 import { updateProfile } from "@firebase/auth";
 import { auth } from "../firebase/firebaseInit";
 import GameDataComponent from "./GameDataComponent";
+import AppContainer from "../containers/AppContainer";
+import { inputBackgroundColor, themeOptions } from "../providers/theme";
 
 const useStyles = makeStyles({
-  profileInput: {
-    marginTop: 25,
-    width: 250,
+  container: {
+    padding: 25,
+    marginTop: 0,
+    backgroundColor: themeOptions.palette.secondary.dark,
+  },
+  input: {
+    backgroundColor: themeOptions.palette.secondary.light,
   },
 });
 
@@ -39,7 +42,6 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
   const [editUser, setEditUser] = useState(undefined);
 
   useEffect(() => {
-    console.log("user changed", user);
     if (user) {
       setEditUser(user);
     }
@@ -69,7 +71,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
               <Typography>Email: {editUser.email}</Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography>Display name:{editUser.displayName}</Typography>
+              <Typography>Display name: {editUser.displayName}</Typography>
             </Grid>
           </Grid>
         </CardContent>
@@ -103,6 +105,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
           <Grid container rowSpacing={3}>
             <Grid item xs={12}>
               <TextField
+                className={classes.input}
                 label="Photo URL"
                 variant="outlined"
                 id="photo-url"
@@ -119,6 +122,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 onChange={(e) => {
                   updateEditUser(e.target.value, "displayName");
                 }}
+                className={classes.input}
               />
             </Grid>
           </Grid>
@@ -128,45 +132,54 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
   };
 
   return (
-    <Grid
-      container
-      spacing={3}
-      style={{
-        margin: "auto",
-        width: "80%",
-        //   marginBottom: 15,
-        //   marginTop: 15,
-        //   maxWidth: 500,
-      }}
-    >
-      <Grid item xs={12} sm={3}>
-        <div style={{ margin: 15 }}>
-          <Link to={frontPagePath}>Back to front page</Link>
-        </div>
-
-        {!user ? (
-          <div
-            style={{
-              margin: 75,
-              textAlign: "center",
-            }}
-          >
-            <span>Loading your profile...</span>
-            <br />
-            <br />
-            <CircularProgress />
+    <AppContainer>
+      <Grid
+        container
+        spacing={3}
+        className={classes.container}
+        style={{ marginTop: 0 }}
+      >
+        <Grid item xs={12} sm={12} md={3}>
+          <div style={{ margin: 15 }}>
+            <Link to={frontPagePath}>Back to front page</Link>
           </div>
-        ) : (
-          <Card>{inEditMode ? renderEditInfo() : renderStaticInfo()}</Card>
+
+          {!user ? (
+            <div
+              style={{
+                margin: 75,
+                textAlign: "center",
+              }}
+            >
+              <span>Loading your profile...</span>
+              <br />
+              <br />
+              <CircularProgress />
+            </div>
+          ) : (
+            <Card
+              style={{
+                backgroundColor: inputBackgroundColor,
+              }}
+            >
+              {inEditMode ? renderEditInfo() : renderStaticInfo()}
+            </Card>
+          )}
+        </Grid>
+
+        {user && (
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={9}
+            style={{ backgroundColor: "inherit" }}
+          >
+            <GameDataComponent userId={user.uid} />
+          </Grid>
         )}
       </Grid>
-
-      {user && (
-        <Grid item xs={12} sm={9}>
-          <GameDataComponent userId={user.uid} />
-        </Grid>
-      )}
-    </Grid>
+    </AppContainer>
   );
 };
 

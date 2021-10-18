@@ -62,7 +62,9 @@ export class RaceCourse {
                     if (child.name === "ground") {
 
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
+
                         (child as ExtendedObject3D).body.checkCollisions = false;
+                        (child as ExtendedObject3D).receiveShadow = true
                     } else if (child.name.slice(0, 4) === "road") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
                         (child as ExtendedObject3D).body.checkCollisions = false;
@@ -73,6 +75,8 @@ export class RaceCourse {
                         // Collision flag 5 is GHOST STATIC, see docs https://enable3d.io/docs.html#physics-body
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 5, shape: "convex" })
                         this.goal = child as ExtendedObject3D
+                        this.goal.receiveShadow = true
+                        this.goal.castShadow = true
                         //this.goal.body.setBounciness(1)
                     } else if (child.name.slice(0, 4) === "tire") {
                         this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })

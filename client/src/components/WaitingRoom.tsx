@@ -21,10 +21,11 @@ import { IPlayerInfo } from "../classes/Game";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
-import { controlsRoomPath, frontPagePath } from "./Routes";
+import { getDeviceType, startGameAuto } from "../utils/settings";
+import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
 import GameSettingsComponent from "./GameSettingsComponent";
+import AppContainer from "../containers/AppContainer";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -70,7 +71,6 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
 
   const connectToRoom = (_displayName: string) => {
     setConnectingGuest(true);
-    console.log("display name", _displayName);
     props.socket.emit("player-connected", {
       roomId,
       playerName: _displayName,
@@ -96,7 +96,6 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     if (!onMobile) return;
-    console.log("user", user);
 
     if (!user && !props.store.player) {
       setDisplayNameModalOpen(true);
@@ -150,6 +149,27 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   const sendTeamChange = (newTeamNumber: number) => {
     props.socket.emit("team-change", { newTeamNumber });
   };
+
+  const handleStartGame = () => {
+    props.socket.emit("handle-start-game");
+    props.socket.once("handle-start-game-callback", (data: ISocketCallback) => {
+      if (data.status === "success") {
+        history.push(gameRoomPath);
+      } else {
+        toast.error(data.message);
+      }
+    });
+  };
+
+  useEffect(() => {
+    /***** For development */
+    if (startGameAuto) {
+      if (props.store.players.length > 0) {
+        handleStartGame();
+      }
+    }
+    /****** */
+  }, [props.store.players]);
 
   const renderDisplayNameModal = () => {
     if (userLoading) return null;
@@ -249,7 +269,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   };
 
   return (
-    <React.Fragment>
+    <AppContainer>
       {renderDisplayNameModal()}
       <div className="container">
         <Grid container spacing={3}>
@@ -288,43 +308,70 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               the front page.
             </Typography>
           </Grid>
-        </Grid>
-
-        <h3 className="center">Players in room {props.store.roomId}</h3>
-
-        <List>
-          {props.store.players.map((player: IPlayerInfo, i: number) => {
-            return (
-              <React.Fragment key={player.playerName}>
-                <ListItem>
-                  <ListItemText
-                    primary={
-                      player.playerNumber ===
-                      props.store.player?.playerNumber ? (
-                        <strong>{player.playerName}</strong>
-                      ) : (
-                        player.playerName
-                      )
-                    }
-                  />
-                  {renderTeamSelect(player, i)}
-                </ListItem>
-                {i !== props.store.players.length - 1 && <Divider />}
-              </React.Fragment>
-            );
-          })}
-        </List>
-        {props.store.players.length === 0 && (
           <Grid item xs={12}>
-            <Typography>No players connected</Typography>
+            <h3 className="center">Players in room {props.store.roomId}</h3>
           </Grid>
-        )}
-        {!onMobile && (
-          <GameSettingsComponent socket={props.socket} store={props.store} />
-        )}
+          <Grid item xs={false} sm={3} />
+          {props.store.players.length > 0 ? (
+            <Grid item xs={12} sm={6}>
+              <List
+                style={{
+                  backgroundColor: "wheat",
+                }}
+              >
+                {props.store.players.map((player: IPlayerInfo, i: number) => {
+                  return (
+                    <React.Fragment key={player.playerName}>
+                      <ListItem>
+                        <ListItemText
+                          primary={
+                            player.playerNumber ===
+                            props.store.player?.playerNumber ? (
+                              <strong>{player.playerName}</strong>
+                            ) : (
+                              player.playerName
+                            )
+                          }
+                        />
+                        {renderTeamSelect(player, i)}
+                      </ListItem>
+                      {i !== props.store.players.length - 1 && <Divider />}
+                    </React.Fragment>
+                  );
+                })}
+              </List>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={6}>
+              <Typography
+                style={{
+                  backgroundColor: "wheat",
+                }}
+              >
+                No players connected
+              </Typography>
+            </Grid>
+          )}
+          <Grid item xs={false} sm={3} />
+
+          {!onMobile && (
+            <React.Fragment>
+              <Grid item xs={12}>
+                <Button variant="contained" onClick={handleStartGame}>
+                  Start game
+                </Button>
+              </Grid>
+              <Divider variant="middle" style={{ margin: 15 }} />
+              <GameSettingsComponent
+                socket={props.socket}
+                store={props.store}
+              />
+            </React.Fragment>
+          )}
+        </Grid>
       </div>
       <ToastContainer />
-    </React.Fragment>
+    </AppContainer>
   );
 };
 

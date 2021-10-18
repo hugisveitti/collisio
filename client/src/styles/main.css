@@ -6,17 +6,12 @@ body {
 }
 
 .container {
-  margin: auto;
-  width: 500px;
-  max-width: 80%;
-
-  margin-top: 25px;
-  margin-bottom: 25px;
-  background-color: #85d885;
+  /* background-color:  #85d885; */
+  background-color: #dbb165;
+  /* background-color: #f5cdb6; */
   text-align: center;
   padding: 15px;
   /* box-shadow: 1px 1px solid #5dd65d; */
-  border: 1px solid black;
 }
 
 .center {

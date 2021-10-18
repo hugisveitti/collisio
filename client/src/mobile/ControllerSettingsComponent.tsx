@@ -58,6 +58,11 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           setUserSettings(defaultUserSettings);
         } else {
           setUserSettings(settings);
+          // send to the game
+          console.log("settings", settings);
+          setTimeout(() => {
+            props.socket.emit("settings-changed", settings);
+          }, 2000);
         }
       });
     }
