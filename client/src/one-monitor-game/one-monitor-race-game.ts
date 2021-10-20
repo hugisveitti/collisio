@@ -280,7 +280,11 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.winTime = -1
         const restartInSeconds = 3
         importantInfoDiv.innerHTML = "Restarting game in " + 3 + " seconds.."
+        const p = this.course.goalSpawn.position
+        const r = this.course.goalSpawn.rotation
         for (let i = 0; i < this.vehicles.length; i++) {
+            this.vehicles[i].setCheckpointPositionRotation({ position: { x: p.x + (i * 5) - 10, y: 1, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+            this.vehicles[i].resetPosition()
             this.vehicles[i].stop()
         }
         setTimeout(() => {
@@ -314,6 +318,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
                     newVehicle.setFont(this.font as THREE.Font)
                 }
             }
+
+
 
 
             this.vehicles[i].canDrive = false
