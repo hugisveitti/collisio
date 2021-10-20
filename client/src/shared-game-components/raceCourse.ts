@@ -1,5 +1,5 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
+import { GLTF, GLTFLoader, LoadingManager, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 
@@ -154,16 +154,23 @@ export class RaceCourse {
             "rock": {
                 collisionFlags: 1,
                 shape: "convex",
-                bounciness: 0.7
+                bounciness: 0.7,
+                castsShadow: true,
+                receiveShadow: true
             },
             "barn": {
                 collisionFlags: 1,
                 shape: "concave",
-                bounciness: 0.7
-            }, "house": {
+                bounciness: 0.7,
+                castsShadow: true,
+                receiveShadow: true
+            },
+            "house": {
                 collisionFlags: 1,
                 shape: "concave",
-                bounciness: 0.7
+                bounciness: 0.7,
+                castsShadow: true,
+                receiveShadow: true
             }
 
         } as { [key: string]: IGameItem }
@@ -193,7 +200,7 @@ export class RaceCourse {
 
                                 this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape });
                                 (child as ExtendedObject3D).castShadow = Boolean(gameItems[key].castsShadow);
-                                (child as ExtendedObject3D).receiveShadow = Boolean(gameItems[key].receiveShadow)
+                                (child as ExtendedObject3D).receiveShadow = Boolean(gameItems[key].receiveShadow);
 
                                 if (gameItems[key].bounciness) {
                                     (child as ExtendedObject3D).body.setBounciness(gameItems[key].bounciness)

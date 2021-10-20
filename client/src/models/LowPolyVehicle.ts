@@ -303,7 +303,6 @@ export class LowPolyVehicle implements IVehicle {
         if (this.canDrive) {
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
-            console.log("angle * this.steeringSensitivity", angle * this.steeringSensitivity)
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
         } else {

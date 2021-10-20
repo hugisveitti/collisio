@@ -73,9 +73,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   if (!props.store?.roomId && !isTestMode) {
-    // history.push(frontPagePath);
-    // toast.warn("No room connection, redirecting to frontpage");
-    // return null;
+    history.push(frontPagePath);
+    toast.warn("No room connection, redirecting to frontpage");
+    return null;
   }
 
   const resetDeviceOrientationListener = () => {

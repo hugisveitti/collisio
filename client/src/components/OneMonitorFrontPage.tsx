@@ -86,8 +86,8 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
     if (isTestMode) {
       if (deviceType === "desktop") {
-        //startLowPolyTest(props.socket, props.store.gameSettings);
-        startRaceTrackTest(props.socket, props.store.gameSettings);
+        startLowPolyTest(props.socket, props.store.gameSettings);
+        // startRaceTrackTest(props.socket, props.store.gameSettings);
       } else {
         history.push(controlsRoomPath);
       }

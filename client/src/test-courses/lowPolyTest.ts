@@ -81,14 +81,30 @@ export class LowPolyTestScene extends Scene3D {
     async preload() {
 
         this.loadFont()
-        // this.physics.debug?.enable()
-        await this.warpSpeed('-ground')
+        // this.phywwwwwwsics.debug?.enable()
+        const { lights } = await this.warpSpeed('-ground', "-light")
+        // this.dirLight = lights.directionalLight
+        //const helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
+        // this.scene.add(helper)
+        // this.scene.add(this.dirLight.target)
+
+        console.log("lights", lights)
+
+        const pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+        pLight.position.set(100, 150, 100);
+        this.scene.add(pLight);
+        pLight.castShadow = true
+        pLight.shadow.bias = 0.1
+        console.log("plight", pLight)
 
 
+        const hLight = new THREE.HemisphereLight(0xffffff, 1)
+        hLight.position.set(0, 1, 0)
+        this.scene.add(hLight)
 
-
-
-
+        const aLight = new THREE.AmbientLight(0xffffff, 1)
+        aLight.position.set(0, 0, 0)
+        this.scene.add(aLight)
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         window.addEventListener("resize", () => this.onWindowResize())
@@ -113,7 +129,7 @@ export class LowPolyTestScene extends Scene3D {
     }
 
     async create() {
-        this.course = new RaceCourse(this, "low-poly-2", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             loadLowPolyVehicleModels((tire, chassis) => {
                 this.vehicle.addModels(tire, chassis)
@@ -126,6 +142,7 @@ export class LowPolyTestScene extends Scene3D {
 
                 this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
                 this.vehicle.resetPosition()
+                // this.dirLight.target = this.vehicle.chassisMesh
                 this.camera.position.set(0, 10, -25)
 
 

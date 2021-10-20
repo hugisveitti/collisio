@@ -104,12 +104,24 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     async create() {
-        const hLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
-        this.scene.add(hLight)
 
         // this.physics.debug?.enable()
         // this.physics.debug?.mode(2048 + 4096)
-        this.warpSpeed("-ground")
+        this.warpSpeed("-ground", "-light")
+        const pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+        pLight.position.set(100, 150, 100);
+        pLight.castShadow = true
+        pLight.shadow.bias = 0.1
+
+
+
+        const hLight = new THREE.HemisphereLight(0xffffff, 1)
+        hLight.position.set(0, 1, 0)
+        this.scene.add(hLight)
+
+        const aLight = new THREE.AmbientLight(0xffffff, 1)
+        aLight.position.set(0, 0, 0)
+        this.scene.add(aLight)
 
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
@@ -401,7 +413,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
             }
 
             view.camera.up.fromArray(view.up)
-            view.camera.position.set(0, 15, -23)
+            view.camera.position.set(0, 10, -25)
+            // view.camera.position.set(0, 15, -23)
 
             this.vehicles[i].addCamera(view.camera)
             this.views.push(view)
