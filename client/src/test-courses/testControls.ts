@@ -6,7 +6,7 @@ import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 
 let speed = 40
 let maxAngle = 0.4
-let angle = 40
+let angle = 3
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {

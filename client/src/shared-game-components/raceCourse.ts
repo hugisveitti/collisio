@@ -49,62 +49,165 @@ export class RaceCourse {
         this.checkpointCrossedCallback = checkpointCrossedCallback
     }
 
+
+
     createCourse(courseLoadedCallback: () => void) {
+
+        interface IGameItem {
+            collisionFlags: number,
+            shape: "convex" | "concave",
+            receiveShadow?: boolean,
+            notAddPhysics?: boolean,
+            castsShadow?: boolean,
+            /** see enable3d bounciness  */
+            bounciness?: number
+            isCourseObject?: boolean
+            exactMatch?: boolean
+            objectName?: string
+        }
+        const gameItems = {
+            "ground": {
+                collisionFlags: 1,
+                shape: "concave",
+                receiveShadow: true,
+                bounciness: .1
+            },
+            "road": {
+                collisionFlags: 5,
+                shape: "convex",
+                notAddPhysics: true
+            },
+            "checkered-flag": {
+                collisionFlags: 1,
+                shape: "convex"
+            },
+            "checkpoint": {
+                collisionFlags: 5,
+                shape: "convex",
+                isCourseObject: true,
+                exactMatch: true,
+                objectName: "checkpoint"
+            },
+            "goal": {
+                collisionFlags: 5,
+                shape: "convex",
+                isCourseObject: true,
+                exactMatch: true,
+                objectName: "goal"
+            },
+            "tree": {
+                collisionFlags: 1,
+                shape: "concave",
+                castsShadow: true,
+                receiveShadow: true
+            },
+            "pine": {
+                collisionFlags: 1,
+                shape: "concave",
+                castsShadow: true,
+                receiveShadow: true
+            },
+            "leaf": {
+                collisionFlags: 1,
+                shape: "concave",
+                castsShadow: true,
+                receiveShadow: true
+            },
+            "checkpoint-spawn": {
+                collisionFlags: -1,
+                shape: "concave",
+                notAddPhysics: true,
+                isCourseObject: true,
+                exactMatch: true,
+                objectName: "checkpointSpawn"
+            },
+            "goal-spawn": {
+                collisionFlags: -1,
+                shape: "concave",
+                notAddPhysics: true,
+                isCourseObject: true,
+                exactMatch: true,
+                objectName: "goalSpawn"
+            },
+            "bridge": {
+                collisionFlags: 1,
+                shape: "concave"
+            },
+            "pavement-marking": {
+                collisionFlags: 5,
+                shape: "concave"
+            },
+            "fence": {
+                collisionFlags: 1,
+                shape: "concave",
+                castsShadow: true,
+                receiveShadow: true,
+                bounciness: 0.5
+            },
+            "wall": {
+                collisionFlags: 1,
+                shape: "concave",
+                castsShadow: true,
+                receiveShadow: true,
+                bounciness: 0.5
+            },
+            "rock": {
+                collisionFlags: 1,
+                shape: "convex",
+                bounciness: 0.7
+            },
+            "barn": {
+                collisionFlags: 1,
+                shape: "concave",
+                bounciness: 0.7
+            }, "house": {
+                collisionFlags: 1,
+                shape: "concave",
+                bounciness: 0.7
+            }
+
+        } as { [key: string]: IGameItem }
+
         const loader = new GLTFLoader(manager)
         // const trackName = "track"
         const trackName = "town-track"
         loader.load(`models/${this.trackName}.gltf`, (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
             console.log("gltf", gltf)
+            const itemKeys = Object.keys(gameItems)
+
+            const keyNameMatch = (key: string, name: string) => {
+                if (gameItems[key].exactMatch) {
+                    return key === name
+                }
+                return name.includes(key)
+            }
+
             for (let child of gltf.scene.children) {
 
                 if (child.type === "Mesh" || child.type === "Group") {
-                    if (child.name === "ground") {
 
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
+                    for (let key of itemKeys) {
+                        if (keyNameMatch(key, child.name)) {
+                            if (!Boolean(gameItems[key].notAddPhysics)) {
 
-                        (child as ExtendedObject3D).body.checkCollisions = false;
-                        (child as ExtendedObject3D).receiveShadow = true
-                    } else if (child.name.slice(0, 4) === "road") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" });
-                        (child as ExtendedObject3D).body.checkCollisions = false;
-                        // (child as ExtendedObject3D).body.setGravity(0, -100, 0)
-                    } else if (child.name.slice(0, 4) === "wall") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave" })
-                    } else if (child.name === "goal") {
-                        // Collision flag 5 is GHOST STATIC, see docs https://enable3d.io/docs.html#physics-body
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 5, shape: "convex" })
-                        this.goal = child as ExtendedObject3D
-                        this.goal.receiveShadow = true
-                        this.goal.castShadow = true
-                        //this.goal.body.setBounciness(1)
-                    } else if (child.name.slice(0, 4) === "tire") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
-                    } else if (child.name === "checkered-flag") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" });
-                    } else if (child.name.slice(0, 4) === "tree") {
-                        const tree = child as ExtendedObject3D
-                        // create a simple box for collision with the tree trunk
-                        const { x, z } = tree.position
-                        this.scene.physics.add.box({ height: 4, depth: .3, width: .3, y: 2, z, x, collisionFlags: 1, }, { basic: { color: 0x011f0a } })
-                    } else if (child.name === "checkpoint") {
-                        this.checkpoint = child as ExtendedObject3D
-                        this.scene.physics.add.existing(child as ExtendedObject3D, { collisionFlags: 5, shape: "convex" })
-                    } else if (child.name === "stytta") {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "concave", breakable: true })
-                    } else if (child.name.includes("spawn")) {
-                        if (child.name.slice(0, 4) === "goal") {
-                            this.goalSpawn = (child as ExtendedObject3D)
-                        } else if (child.name.slice(0, 10) === "checkpoint") {
-                            this.checkpointSpawn = (child as ExtendedObject3D)
+                                this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape });
+                                (child as ExtendedObject3D).castShadow = Boolean(gameItems[key].castsShadow);
+                                (child as ExtendedObject3D).receiveShadow = Boolean(gameItems[key].receiveShadow)
+
+                                if (gameItems[key].bounciness) {
+                                    (child as ExtendedObject3D).body.setBounciness(gameItems[key].bounciness)
+                                }
+                            } else {
+                            }
+                            if (gameItems[key].isCourseObject) {
+                                // hacky ????
+                                const code = `this.${gameItems[key].objectName} = child`
+                                eval(code)
+                            }
+                            // child.visible = false
                         }
                     }
-                    else {
-                        this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: 1, shape: "convex" })
-                    }
-                    // child.visible = false
-                } else if (child.type === "Object3D") {
-                    //   this.scene.add.existing(child as Object3D)
                 }
             }
             this.setupCollisionListeners()

@@ -105,7 +105,10 @@ class Player {
         this.socket.on("settings-changed", (newUserSettings) => {
             console.log("new user settings", newUserSettings)
             this.userSettings = newUserSettings
-            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
+            // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
+            if (this.game) {
+                this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
+            }
         })
     }
 

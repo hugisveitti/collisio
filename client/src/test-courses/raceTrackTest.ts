@@ -11,6 +11,7 @@ import { OrbitControls } from "@enable3d/three-wrapper/dist/index";
 import Stats from "stats.js"
 import { VehicleControls } from "../utils/ControlsClasses"
 import "../one-monitor-game/one-monitor-styles.css";
+import { createLowPolyVehicle } from "../models/LowPolyVehicle"
 
 const vechicleFov = 60
 
@@ -40,6 +41,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     timeStarted: number
     bestLapTime: number
     canStartUpdate: boolean
+    dirLight: THREE.DirectionalLight
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -112,13 +114,13 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.scene.add(sky);
 
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, .1)
-        dirLight.position.set(0, 1200, -250)
+        this.dirLight = new THREE.DirectionalLight(0xffffff, .1)
+        this.dirLight.position.set(0, 1200, -250)
 
-        this.scene.add(dirLight)
+        this.scene.add(this.dirLight)
 
 
-        this.course = new RaceCourse(this, "grandi", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, "track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
             this.canStartUpdate = true
             this.createVehicle()
@@ -158,6 +160,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.vehicle.setCheckpointPositionRotation({ position: { x: 158, y: 3, z: -72 }, rotation: { x: 0, y: r.y, z: 0 } })
         this.vehicle.resetPosition()
         this.createController()
+
+
     }
 
     setGameSettings(newGameSettings: IGameSettings) {

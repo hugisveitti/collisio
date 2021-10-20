@@ -32,7 +32,7 @@ const Routes = () => {
     ballRadius: 1,
     typeOfGame: "race",
     numberOfLaps: 3,
-    trackName: "track",
+    trackName: "low-poly-farm-track",
   } as IGameSettings);
 
   const deviceType = getDeviceType();

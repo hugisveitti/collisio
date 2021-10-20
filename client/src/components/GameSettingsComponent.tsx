@@ -130,6 +130,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                       }}
                       value={props.store.gameSettings.trackName}
                     >
+                      <MenuItem value="low-poly-farm-track">
+                        Low poly farm track
+                      </MenuItem>
                       <MenuItem value="track">Simple track</MenuItem>
                       <MenuItem value="town-track">Town track</MenuItem>
                     </Select>

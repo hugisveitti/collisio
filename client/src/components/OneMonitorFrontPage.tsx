@@ -1,27 +1,25 @@
-import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import HelpIcon from "@mui/icons-material/Help";
+import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
-import {
-  Button,
-  Divider,
-  Grid,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Divider, Grid, TextField, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
+import AppContainer from "../containers/AppContainer";
 import logo from "../images/caroutline.png";
+import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
+import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
+import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
-import LoginComponent from "./LoginComponent";
+import NotLoggedInModal from "./NotLoggedInModal";
 import {
   controlsRoomPath,
   highscorePagePath,
@@ -29,17 +27,26 @@ import {
   waitingRoomPath,
 } from "./Routes";
 import { IStore } from "./store";
-import NotLoggedInModal from "./NotLoggedInModal";
-import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
-import AppContainer from "../containers/AppContainer";
 
 interface IOneMonitorFrontPageProps {
   socket: Socket;
   store: IStore;
 }
 
+const useStyles = makeStyles({
+  container: {
+    padding: 25,
+    marginTop: 0,
+    backgroundColor: themeOptions.palette.secondary.dark,
+  },
+  input: {
+    backgroundColor: themeOptions.palette.secondary.light,
+  },
+});
+
 const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
   const deviceType = getDeviceType();
+  const classes = useStyles();
   const [playerName, setPlayerName] = useState("");
   const [needToAskOrientPermission, setNeedToAskOrientPermission] =
     useState(true);
@@ -79,6 +86,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
     if (isTestMode) {
       if (deviceType === "desktop") {
+        //startLowPolyTest(props.socket, props.store.gameSettings);
         startRaceTrackTest(props.socket, props.store.gameSettings);
       } else {
         history.push(controlsRoomPath);
@@ -209,6 +217,12 @@ need to be logged in."
           <Grid item xs={12}>
             <img src={logo} className="image-logo" alt="" />
           </Grid>
+          <Grid item xs={12}>
+            <h3>
+              Important! If you are using an iphone you will probably need to
+              use the Google Chrome browser for the game to function properly.
+            </h3>
+          </Grid>
 
           {deviceType === "mobile" && (
             <>
@@ -219,11 +233,15 @@ need to be logged in."
                   onChange={(e) => setPlayerName(e.target.value)}
                   disabled={!!user}
                   fullWidth
+                  className={classes.input}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <TextField
+                  style={{
+                    backgroundColor: inputBackgroundColor,
+                  }}
                   fullWidth
                   label="Room id"
                   value={props.store.roomId}

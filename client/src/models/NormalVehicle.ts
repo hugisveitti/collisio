@@ -260,8 +260,7 @@ export class NormalVehicle implements IVehicle {
 
     turn(angle: number) {
         if (this.canDrive) {
-            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
-            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
         } else {
@@ -399,7 +398,7 @@ export class NormalVehicle implements IVehicle {
 }
 
 
-export function createNormalVehicle(scene: Scene3D, color: string | number | undefined, name: string,) {
+export function createNormalVehicle(scene: Scene3D, color: string | number | undefined, name: string) {
     const vehicle = new NormalVehicle(scene, color, name)
     return vehicle
 }

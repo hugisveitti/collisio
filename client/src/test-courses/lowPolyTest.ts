@@ -1,0 +1,346 @@
+import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
+import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
+import { Socket } from "socket.io-client"
+import Stats from "stats.js"
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
+import { isNumber } from "util"
+import { defaultGameSettings, IGameSettings } from "../classes/Game"
+import { IVehicle } from "../models/IVehicle"
+import { createLowPolyVehicle, loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle"
+import "../one-monitor-game/one-monitor-styles.css"
+import { VehicleControls } from "../utils/ControlsClasses"
+import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
+import "./lowPolyTest.css"
+import { RaceCourse } from "../shared-game-components/raceCourse"
+
+const vechicleFov = 60
+
+
+const scoreTable = document.createElement("div")
+const lapTimeDiv = document.createElement("div")
+const bestLapTimeDiv = document.createElement("div")
+const stats = new Stats()
+
+
+
+
+export class LowPolyTestScene extends Scene3D {
+
+    vehicle?: LowPolyVehicle
+
+    font?: THREE.Font
+    textMesh?: any
+    socket!: Socket
+    vehicleControls!: VehicleControls
+    // course!: RaceCourse
+    gameSettings: IGameSettings
+    raceStarted: boolean
+    checkpointCrossed: boolean
+    currentLaptime: number
+    timeStarted: number
+    bestLapTime: number
+    canStartUpdate: boolean
+    course: RaceCourse
+    dirLight: THREE.DirectionalLight
+
+    constructor() {
+        super({ key: "OneMonitorRaceGameScene" })
+
+        scoreTable.setAttribute("id", "score-info")
+        lapTimeDiv.setAttribute("id", "lap-time")
+        bestLapTimeDiv.setAttribute("id", "best-lap-time")
+
+
+        this.updateScoreTable()
+        document.body.appendChild(scoreTable)
+        document.body.append(lapTimeDiv)
+        document.body.append(bestLapTimeDiv)
+
+        this.raceStarted = false
+        this.checkpointCrossed = false
+        this.bestLapTime = 10000
+        this.canStartUpdate = false
+
+        this.gameSettings = defaultGameSettings
+
+        this.currentLaptime = 0
+        this.timeStarted = 0
+
+        stats.showPanel(0)
+        document.body.appendChild(stats.dom)
+    }
+
+    async init() {
+        this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
+        this.renderer.setPixelRatio(1)
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+        this.physics.setGravity(0, -20, 0)
+    }
+
+    async preload() {
+
+        this.loadFont()
+        // this.physics.debug?.enable()
+        await this.warpSpeed('-ground')
+
+
+
+
+
+
+
+        const controls = new OrbitControls(this.camera, this.renderer.domElement);
+        window.addEventListener("resize", () => this.onWindowResize())
+
+        document.addEventListener("keypress", (e) => {
+            if (e.key === "r") {
+
+                this.resetPlayer(0)
+            } else if (e.key === "t") {
+                //  this.vehicle.chassisMesh.body.setCollisionFlags(0)
+            } else if (e.key === "p") {
+                if (this.vehicle.isPaused) {
+                    this.vehicle.unpause()
+                } else {
+                    this.vehicle.pause()
+                }
+            }
+        })
+
+        this.vehicle = new LowPolyVehicle(this, "blue", "test low", 0)
+
+    }
+
+    async create() {
+        this.course = new RaceCourse(this, "low-poly-2", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course.createCourse(() => {
+            loadLowPolyVehicleModels((tire, chassis) => {
+                this.vehicle.addModels(tire, chassis)
+
+                console.log("adding low poly", tire, chassis, this.canStartUpdate)
+                this.createController()
+                this.vehicle.addCamera(this.camera)
+                const p = this.course.checkpointSpawn.position
+                const r = this.course.checkpointSpawn.rotation
+
+                this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
+                this.vehicle.resetPosition()
+                this.camera.position.set(0, 10, -25)
+
+
+
+                const engineInputDiv = document.createElement("div")
+                engineInputDiv.setAttribute("class", "vehicle-input")
+                engineInputDiv.innerHTML = "Engine force"
+
+                const engineInput = document.createElement("input")
+                engineInput.setAttribute("type", "number")
+                engineInput.setAttribute("placeholder", "engine force")
+
+                engineInput.setAttribute("value", this.vehicle.engineForce + "")
+
+                engineInput.addEventListener("input", (e) => {
+                    console.log("e", e)
+                    if (e.target instanceof HTMLInputElement) {
+                        e.target.value
+                        //console.log("target", target)
+                        if (!isNaN(+e.target.value)) {
+                            this.vehicle.updateVehicleSettings({
+                                engineForce: +e.target.value,
+                                steeringSensitivity: this.vehicle.steeringSensitivity
+                            })
+                        }
+                    }
+                })
+                engineInputDiv.appendChild(engineInput)
+                document.body.appendChild(engineInputDiv)
+
+                const massInputDiv = document.createElement("div")
+                massInputDiv.setAttribute("class", "vehicle-input")
+                massInputDiv.setAttribute("style", "top:25px;")
+                massInputDiv.innerHTML = "Mass"
+                const massInput = document.createElement("input")
+                massInput.setAttribute("type", "number")
+                massInput.setAttribute("placeholder", "mass")
+
+                massInput.setAttribute("value", this.vehicle.mass + "")
+                massInput.addEventListener("input", (e) => {
+                    console.log("e", e)
+                    if (e.target instanceof HTMLInputElement) {
+                        e.target.value
+                        //console.log("target", target)
+                        if (!isNaN(+e.target.value)) {
+                            this.vehicle.updateMass(
+                                +e.target.value
+
+                            )
+                        }
+                    }
+                })
+                massInputDiv.appendChild(massInput)
+                document.body.appendChild(massInputDiv)
+
+                const breakInputDiv = document.createElement("div")
+                breakInputDiv.setAttribute("class", "vehicle-input")
+                breakInputDiv.setAttribute("style", "top:50px;")
+                breakInputDiv.innerHTML = "Break force"
+                const breakInput = document.createElement("input")
+
+                breakInput.setAttribute("type", "number")
+                breakInput.setAttribute("placeholder", "break")
+                breakInput.setAttribute("value", this.vehicle.breakingForce + "")
+                breakInput.addEventListener("input", (e) => {
+                    if (e.target instanceof HTMLInputElement) {
+                        e.target.value
+                        //console.log("target", target)
+                        if (!isNaN(+e.target.value)) {
+                            this.vehicle.updateBreakingForce(
+                                +e.target.value
+
+                            )
+                        }
+                    }
+                })
+
+                breakInputDiv.appendChild(breakInput)
+                document.body.appendChild(breakInputDiv)
+
+                const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 0, y: 4, z: 0 })
+                ball.body.setBounciness(1)
+                this.canStartUpdate = true
+
+            })
+        })
+    }
+
+    handleGoalCrossed(o: ExtendedObject3D) {
+        const p = this.course.goalSpawn.position
+        const r = this.course.goalSpawn.rotation
+        this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+        this.checkpointCrossed = false
+    }
+
+    handleCheckpointCrossed(o: ExtendedObject3D) {
+        if (!this.checkpointCrossed) {
+
+            const p = this.course.checkpointSpawn.position
+            const r = this.course.checkpointSpawn.rotation
+
+            this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+        }
+        this.checkpointCrossed = true
+    }
+
+    async createVehicle() {
+
+        // const p = this.course.goalSpawn.position
+        // const r = this.course.goalSpawn.rotation
+
+    }
+
+    setGameSettings(newGameSettings: IGameSettings) {
+        this.gameSettings = newGameSettings
+    }
+
+    updateScoreTable() {
+        scoreTable.innerHTML = `
+        Leaderboard
+        `
+    }
+
+
+
+    onWindowResize() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        if (this.camera.type === "PerspectiveCamera") {
+            (this.camera as unknown as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
+        }
+        this.camera.updateProjectionMatrix();
+    }
+
+
+    setSocket(socket: Socket) {
+        this.socket = socket
+    }
+
+    createController() {
+        if (this.vehicle) {
+            this.vehicleControls = new VehicleControls()
+            addTestControls(this.vehicleControls, this.socket, this.vehicle)
+        }
+    }
+
+
+    updateVehicles() {
+
+        if (this.vehicle) {
+            this.vehicle.update()
+            this.vehicle.cameraLookAt(this.camera)
+        }
+    }
+
+    update() {
+        if (this.canStartUpdate) {
+            stats.begin()
+            this.updateVehicles()
+            if (this.vehicle) {
+                testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
+                const pos = this.vehicle.getPosition()
+                scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
+                <br />
+                km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
+                `
+                const p = this.vehicle.getPosition()
+
+            }
+            stats.end()
+
+            if (this.raceStarted) {
+                lapTimeDiv.innerHTML = ((Date.now() - this.timeStarted) / 1000).toFixed(2)
+            }
+        }
+
+    }
+
+    resetPlayer(idx: number, y?: number) {
+
+        if (this.vehicle) {
+
+            this.vehicle.resetPosition()
+        }
+    }
+
+
+    loadFont() {
+        const fontName = "helvetiker"
+        const fontWeight = "regular"
+        const loader = new THREE.FontLoader();
+        loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
+
+            this.font = response;
+            if (this.font && this.vehicle) {
+                this.vehicle.setFont(this.font)
+            }
+        });
+    }
+
+}
+
+
+export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings) => {
+    const config = { scenes: [LowPolyTestScene], antialias: true, randomStuff: "hello" }
+    PhysicsLoader("./ammo", () => {
+        const project = new Project(config)
+
+        const key = project.scenes.keys().next().value;
+
+        // hacky way to get the project's scene
+        (project.scenes.get(key) as LowPolyTestScene).setSocket(socket);
+        // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
+        (project.scenes.get(key) as LowPolyTestScene).setGameSettings(gameSettings);
+        return project
+    })
+
+}

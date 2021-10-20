@@ -26,6 +26,7 @@ import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
 import GameSettingsComponent from "./GameSettingsComponent";
 import AppContainer from "../containers/AppContainer";
+import { inputBackgroundColor } from "../providers/theme";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -206,6 +207,9 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                style={{
+                  backgroundColor: inputBackgroundColor,
+                }}
                 label="Enter your name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -306,6 +310,13 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               On your mobile, either scan the QR code, copy the link to room and
               paste it in your phone or write the room id '{roomId}' in input on
               the front page.
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography color="textSecondary">
+              You can press 'r' to reset the game and 'p' to pause and unpause
+              the game.
             </Typography>
           </Grid>
           <Grid item xs={12}>
