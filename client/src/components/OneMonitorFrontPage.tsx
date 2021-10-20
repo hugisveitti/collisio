@@ -281,15 +281,15 @@ need to be logged in."
           <Grid item xs={12}>
             <Divider variant="middle" />
           </Grid>
-          <Grid item xs={false} sm={false} xl={4} />
-          <Grid item xs={12} sm={6} xl={2}>
+          <Grid item xs={false} sm={1} lg={4} xl={4} />
+          <Grid item xs={12} sm={5} lg={2} xl={2}>
             <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
               <Button variant="contained" size="small" startIcon={<HelpIcon />}>
-                How to play game.
+                How to play game
               </Button>
             </Link>
           </Grid>
-          <Grid item xs={12} sm={6} xl={2}>
+          <Grid item xs={12} sm={5} lg={2} xl={2}>
             <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
               <Button
                 variant="contained"
@@ -300,7 +300,7 @@ need to be logged in."
               </Button>
             </Link>
           </Grid>
-          <Grid item xs={false} sm={false} xl={4} />
+          <Grid item xs={false} sm={1} lg={4} xl={4} />
           <Grid item xs={12}>
             <p>
               This game is in development. If you have suggestions please email

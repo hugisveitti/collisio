@@ -54,7 +54,7 @@ export class LowPolyVehicle implements IVehicle {
     vehicle: Ammo.btRaycastVehicle
     wheelMeshes: ExtendedObject3D[] = []
 
-    steeringSensitivity = 0.2
+    steeringSensitivity = 0.005
     engineForce = 5000
     vehicleSteering = 0
     breakingForce = 100
@@ -303,6 +303,7 @@ export class LowPolyVehicle implements IVehicle {
         if (this.canDrive) {
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
+            console.log("angle * this.steeringSensitivity", angle * this.steeringSensitivity)
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
             this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
         } else {

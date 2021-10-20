@@ -119,7 +119,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 for (let i = 0; i < this.vehicles.length; i++) {
                     this.vehicles[i].setCheckpointPositionRotation({ position: { x: p.x + (i * 5) - 10, y: 1, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
                     this.vehicles[i].resetPosition()
-                    this.vehicles[i].stop()
+                    this.vehicles[i].pause()
                 }
                 this.createViews()
                 this.createController()

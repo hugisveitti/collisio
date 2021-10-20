@@ -23,7 +23,7 @@ export interface IUserSettings {
 }
 
 export const defaultVehicleSettings = {
-    steeringSensitivity: 0.2,
+    steeringSensitivity: 0.005,
     engineForce: 5000
 } as IVehicleSettings
 
