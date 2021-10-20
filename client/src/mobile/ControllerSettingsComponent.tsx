@@ -43,7 +43,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
 
   useEffect(() => {
     auth.onAuthStateChanged((userAuth) => {
-      console.log("user auth");
       if (user) {
         props.userLoggedIn();
       }

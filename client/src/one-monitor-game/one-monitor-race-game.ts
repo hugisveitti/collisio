@@ -69,6 +69,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     gameId: string
     roomId!: string
     escPress: () => void
+    pLight: THREE.PointLight
 
     constructor() {
         super()
@@ -103,17 +104,19 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.gameId = uuid()
     }
 
-    async create() {
 
-        // this.physics.debug?.enable()
-        // this.physics.debug?.mode(2048 + 4096)
-        this.warpSpeed("-ground", "-light")
-        const pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
-        pLight.position.set(100, 150, 100);
-        pLight.castShadow = true
-        pLight.shadow.bias = 0.1
+    async preload() {
+        const { lights } = await this.warpSpeed("-ground",)
+        console.log("lights", lights)
+        this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+        // pLight.position.set(100, 150, 100);
+        this.pLight.castShadow = true
+        this.pLight.shadow.bias = 0.1
 
-
+        console.log("plight", this.pLight)
+        const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
+        this.scene.add(helper)
+        console.log("plight helper", helper)
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
         hLight.position.set(0, 1, 0)
@@ -122,6 +125,16 @@ export class OneMonitorRaceGameScene extends Scene3D {
         const aLight = new THREE.AmbientLight(0xffffff, 1)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
+
+
+        const controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    }
+
+    async create() {
+
+        // this.physics.debug?.enable()
+        // this.physics.debug?.mode(2048 + 4096)
+
 
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
@@ -175,6 +188,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         })
 
         window.addEventListener("resize", () => this.onWindowResize())
+        if (this.pLight) {
+            this.pLight.position.set(100, 150, 100);
+        }
     }
 
     async init() {
@@ -185,6 +201,9 @@ export class OneMonitorRaceGameScene extends Scene3D {
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
+        if (this.pLight) {
+            this.pLight.position.set(100, 150, 100);
+        }
     }
 
     isPlayerFinished(idx: number) {
@@ -400,6 +419,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             }
             const fov = vechicleFov
             // for some reason the last view needs to use the Scene's camera
+            // maybe remove camera from warpSpeed ("-camera")
             const camera = i === n - 1 ? this.camera as THREE.PerspectiveCamera : new THREE.PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, 10000)
 
             const view = {
@@ -461,6 +481,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.renderer.setScissorTest(true);
             this.renderer.setClearColor(new Color(255, 255, 255))
 
+
             this.views[i].camera.aspect = width / height;
             this.views[i].camera.updateProjectionMatrix();
             this.renderer.render(this.scene, this.views[i].camera);
@@ -470,6 +491,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     update() {
+
         if (this.courseLoaded) {
             stats.begin()
             this.updateScoreTable()

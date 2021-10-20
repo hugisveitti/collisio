@@ -43,7 +43,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const handleUserLoggedIn = () => {
     console.log("handle user logged in");
-    console.log("user", user);
   };
 
   const handleDeviceOrientChange = () => {
@@ -96,7 +95,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
       // set fps
     }, 1000 / 30);
-    console.log("user", user);
+
     return () => {
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
       window.removeEventListener("orientationchange", handleDeviceOrientChange);

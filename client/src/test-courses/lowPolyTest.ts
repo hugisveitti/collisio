@@ -41,7 +41,7 @@ export class LowPolyTestScene extends Scene3D {
     bestLapTime: number
     canStartUpdate: boolean
     course: RaceCourse
-    dirLight: THREE.DirectionalLight
+    pLight: THREE.PointLight
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -84,18 +84,22 @@ export class LowPolyTestScene extends Scene3D {
         // this.phywwwwwwsics.debug?.enable()
         const { lights } = await this.warpSpeed('-ground', "-light")
         // this.dirLight = lights.directionalLight
-        //const helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
+        // const helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
         // this.scene.add(helper)
         // this.scene.add(this.dirLight.target)
 
         console.log("lights", lights)
 
-        const pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
-        pLight.position.set(100, 150, 100);
-        this.scene.add(pLight);
-        pLight.castShadow = true
-        pLight.shadow.bias = 0.1
-        console.log("plight", pLight)
+        this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+        // this.pLight.position.set(100, 150, 100);
+
+        this.scene.add(this.pLight);
+        this.pLight.castShadow = true
+        this.pLight.shadow.bias = 0.1
+        console.log("plight", this.pLight)
+        const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
+        this.scene.add(helper)
+        console.log("plight helper", helper)
 
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
@@ -300,6 +304,9 @@ export class LowPolyTestScene extends Scene3D {
 
     update() {
         if (this.canStartUpdate) {
+            if (this.pLight) {
+                this.pLight.position.set(0, 100, Math.floor(Math.random() * 100))
+            }
             stats.begin()
             this.updateVehicles()
             if (this.vehicle) {
@@ -322,9 +329,7 @@ export class LowPolyTestScene extends Scene3D {
     }
 
     resetPlayer(idx: number, y?: number) {
-
         if (this.vehicle) {
-
             this.vehicle.resetPosition()
         }
     }
