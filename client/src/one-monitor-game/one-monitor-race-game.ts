@@ -15,6 +15,7 @@ import { saveGameData } from "../firebase/firebaseFunctions";
 import { IUserSettings } from "../classes/User";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle";
 import { GameTime } from "./GameTimeClass";
+import { startGameAuto } from "../utils/settings";
 
 const vechicleFov = 60
 
@@ -203,7 +204,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             importantInfoDiv.innerHTML = "GAME PAUSED <br /> Press 'p' to unpause."
         }
 
-        console.log("is paused", isPaused)
+
         for (let i = 0; i < this.vehicles.length; i++) {
             if (isPaused) {
                 this.gameTimers[i].start()
@@ -225,7 +226,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     startRaceCountdown() {
-        let countdown = 2
+        let countdown = startGameAuto ? 1 : 3
 
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
@@ -276,11 +277,12 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     restartGame() {
+        console.log("restart game")
         this.raceOnGoing = false
         this.winner = ""
         this.winTime = -1
         const restartInSeconds = 3
-        importantInfoDiv.innerHTML = "Restarting game in " + 3 + " seconds.."
+        importantInfoDiv.innerHTML = "Restarting game in " + restartInSeconds + " seconds.."
         const p = this.course.goalSpawn.position
         const r = this.course.goalSpawn.rotation
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -288,6 +290,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
             this.vehicles[i].resetPosition()
             this.vehicles[i].stop()
         }
+
+
         setTimeout(() => {
             this.createVehicles(() => {
                 this.startRaceCountdown()

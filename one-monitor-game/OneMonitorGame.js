@@ -24,15 +24,7 @@ class GameMaster {
     }
 
     setupCreateRoomListener(desktopSocket) {
-        desktopSocket.on("create-room", () => {
-            // increadably unlikly two games get same uuid
-            // one room can play many games
-            const roomId = uuidv4().slice(0, 4)
-            this.rooms[roomId] = new Game(roomId, this.io, desktopSocket)
-            desktopSocket.join(roomId)
-            desktopSocket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
 
-        })
     }
 
     setupPlayerConnectedListener(mobileSocket) {
@@ -51,12 +43,29 @@ class GameMaster {
         let playerName
         let roomId
         let player
+        console.log("adding socket, games", Object.keys(this.rooms))
 
         socket.once("device-type", (_deviceType) => {
             deviceType = _deviceType
             console.log("In one monitor game connection from", deviceType)
             if (deviceType === "desktop") {
-                this.setupCreateRoomListener(socket)
+                socket.on("create-room", () => {
+                    // increadably unlikly two games get same uuid
+                    // one room can play many games
+                    roomId = uuidv4().slice(0, 4)
+                    this.rooms[roomId] = new Game(roomId, this.io, socket)
+                    socket.join(roomId)
+                    socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
+                })
+                socket.on("disconnect", () => {
+
+                    console.log("disconnected from desktop", roomId)
+                    if (roomId) {
+
+                        this.rooms[roomId].isConnected = false
+                        delete this.rooms[roomId]
+                    }
+                })
             } else {
                 this.setupPlayerConnectedListener(socket)
             }
@@ -75,12 +84,7 @@ class GameMaster {
                 socket.emit("get-players-in-room-callback", { message, status, data: { players } })
             })
 
-            socket.on("disconnect", () => {
-                if (deviceType === "desktop") {
-                    console.log("disconnected from desktop")
-                    delete this.rooms[roomId]
-                }
-            })
+
         })
     }
 }
@@ -96,6 +100,7 @@ class Game {
     team2Goals
     maxGoals
     gameSettings
+    isConnected
 
     constructor(roomId, io, socket) {
         this.players = []
@@ -106,6 +111,7 @@ class Game {
         this.gameStarted = false
         this.team1Goals = 0
         this.team2Goals = 0
+        this.isConnected = true
 
         this.setupStartGameListener()
         this.setupGameSettingsListener()

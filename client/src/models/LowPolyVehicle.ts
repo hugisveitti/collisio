@@ -529,15 +529,16 @@ export class LowPolyVehicle implements IVehicle {
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
         this.vehicleSettings = vehicleSettings
         this.engineForce = vehicleSettings.engineForce
+        console.log("update vehicle settings", vehicleSettings)
         this.steeringSensitivity = vehicleSettings.steeringSensitivity
-        this.cameraFollowSpeed = vehicleSettings.cameraFollowSpeed
-        this.mass = vehicleSettings.mass
-        this.useChaseCamera = vehicleSettings.useChaseCamera
+        // this.cameraFollowSpeed = vehicleSettings.cameraFollowSpeed
+        // this.mass = vehicleSettings.mass
+        // this.useChaseCamera = vehicleSettings.useChaseCamera
 
-        this.chassisMesh.remove(this.camera)
-        if (!this.useChaseCamera) {
-            this.chassisMesh.add(this.camera)
-        }
+        // this.chassisMesh.remove(this.camera)
+        // if (!this.useChaseCamera) {
+        //     this.chassisMesh.add(this.camera)
+        // }
 
     };
 
@@ -546,10 +547,7 @@ export class LowPolyVehicle implements IVehicle {
         let inertia = new Ammo.btVector3(1, 1, 1)
         this.vehicle.getRigidBody()
         this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(mass, inertia)
-
         this.vehicle.getRigidBody().setMassProps(this.mass, inertia)
-
-
     }
 
     updateBreakingForce(breakingForce: number) {
