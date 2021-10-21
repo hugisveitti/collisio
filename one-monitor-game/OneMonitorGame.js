@@ -36,14 +36,12 @@ class GameMaster {
     }
 
     setupPlayerConnectedListener(mobileSocket) {
-        mobileSocket.on("player-connected", ({ roomId, playerName, id }) => {
+        mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated }) => {
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit("player-connected-callback", { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else {
-                const player = new Player(mobileSocket, playerName, id)
+                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated)
                 this.rooms[roomId].addPlayer(player)
-                mobileSocket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.rooms[roomId].getPlayersInfo() } })
-                mobileSocket.join(roomId)
             }
         })
     }
@@ -57,7 +55,6 @@ class GameMaster {
         socket.once("device-type", (_deviceType) => {
             deviceType = _deviceType
             console.log("In one monitor game connection from", deviceType)
-
             if (deviceType === "desktop") {
                 this.setupCreateRoomListener(socket)
             } else {
@@ -118,20 +115,35 @@ class Game {
         let playerExists = false
 
         for (let i = 0; i < this.players.length; i++) {
-            if (this.players[i].playerName === player.playerName) {
-                this.players[i].socket = player.socket
+            if (this.players[i].id === player.id) {
+                this.players[i].setSocket(player.socket)
+
                 playerExists = true
             }
         }
 
-        if (!playerExists) {
-            this.players.push(player)
-            player.setGame(this)
-            player.playerNumber = this.players.length - 1
-            if (this.players.length === 1) {
-                player.setLeader(player)
+        if (this.gameStarted) {
+            if (!playerExists) {
+                player.socket.emit("player-connected-callback", { status: errorStatus, message: "The game you are trying to connect to has already started." })
+                return
+            } else {
+                player.socket.emit("player-connected-callback", { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo() } })
+                player.socket.emit("handle-game-starting")
+                return
             }
         }
+
+
+        this.players.push(player)
+        player.setGame(this)
+        player.playerNumber = this.players.length - 1
+        if (this.players.length === 1) {
+            player.setLeader(player)
+        }
+
+
+        player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo() } })
+        player.socket.join(player.roomId)
         player.socket.emit("room-connected", { roomId: player.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()
         if (this.gameStarted) {
@@ -147,7 +159,6 @@ class Game {
     setupGameSettingsListener() {
         this.socket.on("game-settings-changed", (data) => {
             this.gameSettings = data.gameSettings
-            console.log("game sett change data", data)
             for (let player of this.players) {
                 player.sendGameSettings(this.gameSettings)
             }
@@ -195,8 +206,20 @@ class Game {
         console.log("starting game", this.toString())
     }
 
-    playerDisconnected(playerName) {
+
+    // if game hasn't started, remove player from game
+    playerDisconnected(playerName, playerId) {
         this.socket.emit("player-disconnected", { playerName })
+        if (!this.gameStarted) {
+            for (let i = 0; i < this.players.length; i++) {
+                // change to id's and give un auth players id's
+                if (this.players[i].id === playerId) {
+                    this.players.splice(i, i + 1)
+                    break;
+                }
+            }
+        }
+        this.alertWaitingRoom()
     }
 
     userSettingsChanged(data) {

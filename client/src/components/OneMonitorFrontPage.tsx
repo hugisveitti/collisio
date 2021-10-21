@@ -9,13 +9,14 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
+import { v4 as uuid } from "uuid";
+import { IPlayerConnection } from "../classes/Game";
 import AppContainer from "../containers/AppContainer";
 import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { startLowPolyTest } from "../test-courses/lowPolyTest";
-import { startRaceTrackTest } from "../test-courses/raceTrackTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
@@ -146,8 +147,9 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     props.socket.emit("player-connected", {
       roomId,
       playerName,
-      id: user?.uid,
-    });
+      playerId: user?.uid ?? uuid(),
+      isAuthenticated: Boolean(user),
+    } as IPlayerConnection);
 
     props.socket.once("player-connected-callback", (data: ISocketCallback) => {
       if (data.status === "error") {

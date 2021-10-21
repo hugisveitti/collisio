@@ -1,3 +1,4 @@
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Button,
   Divider,
@@ -9,24 +10,24 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { useHistory } from "react-router";
 import QRCode from "qrcode";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { Link, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
-import { IPlayerInfo } from "../classes/Game";
+import { v4 as uuid } from "uuid";
+import { IPlayerConnection, IPlayerInfo } from "../classes/Game";
+import AppContainer from "../containers/AppContainer";
+import { inputBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
 import { getDeviceType, startGameAuto } from "../utils/settings";
+import GameSettingsComponent from "./GameSettingsComponent";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
-import GameSettingsComponent from "./GameSettingsComponent";
-import AppContainer from "../containers/AppContainer";
-import { inputBackgroundColor } from "../providers/theme";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -75,8 +76,9 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
     props.socket.emit("player-connected", {
       roomId,
       playerName: _displayName,
-      id: undefined,
-    });
+      playerId: user?.uid ?? uuid(),
+      isAuthenticated: false,
+    } as IPlayerConnection);
     props.socket.once(
       "player-connected-callback",
       (response: ISocketCallback) => {
@@ -85,7 +87,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
           props.store.setRoomId(roomId);
           props.store.setPlayers(response.data.players);
           setConnectingGuest(false);
-
+          toast.success(response.message);
           setDisplayNameModalOpen(false);
         } else {
           toast.error(response.message);

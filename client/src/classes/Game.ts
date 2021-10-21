@@ -1,17 +1,25 @@
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
-
+export interface IPlayerConnection {
+    playerName: string
+    playerId: string
+    roomId: string
+    /** auth */
+    isAuthenticated: boolean
+}
 
 export interface IPlayerInfo {
     playerName: string
-    bothConnected: boolean
+    /** only for multiple monitor games */
+    bothConnected?: boolean
     isLeader: boolean
     teamName: string
     playerNumber: number
     mobileControls: MobileControls
     vehicleControls: VehicleControls
-    teamNumber: number
-    id?: string
+    /** only for ball game */
+    teamNumber?: number
+    id: string
 }
 
 export type TrackType = "track" | "town-track" | "low-poly-farm-track"

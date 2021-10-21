@@ -15,12 +15,14 @@ class Player {
     playerNumber
     id
     userSettings
+    isAuthenticated
 
-    constructor(socket, playerName, id) {
+    constructor(socket, playerName, id, isAuthenticated) {
         this.socket = socket
         this.playerName = playerName
         this.teamNumber = 1
         this.id = id
+        this.isAuthenticated = isAuthenticated
 
         this.mobileControls = new MobileControls()
         this.VehicleControls = new VehicleControls()
@@ -37,6 +39,12 @@ class Player {
 
     }
 
+
+    setSocket(newSocket) {
+        this.socket = newSocket
+        this.setupControler()
+    }
+
     setupWaitingRoomListener() {
         this.socket.on("in-waiting-room", () => {
             this.game.alertWaitingRoom()
@@ -49,7 +57,7 @@ class Player {
 
     setupQuitGameListener() {
         this.socket.on("quit-game", () => {
-            this.game.playerDisconnected(this.playerName)
+            this.game.playerDisconnected(this.playerName, this.id)
         })
     }
 
@@ -69,8 +77,7 @@ class Player {
     setGame(game) {
         this.game = game
         this.socket.on("disconnect", () => {
-            console.log(`player ${this.playerName} disconnected`)
-            this.game.playerDisconnected(this.playerName)
+            this.game.playerDisconnected(this.playerName, this.id)
             this.isConnected = false
         })
     }
@@ -96,14 +103,13 @@ class Player {
             teamName: this.teamNumber,
             mobileControls: this.mobileControls,
             playerNumber: this.playerNumber,
-            id: this.id
+            id: this.id,
+            isAuthenticated: this.isAuthenticated
         }
     }
 
     setupUserSettingsListener() {
-        console.log("setting up settings listenert")
         this.socket.on("settings-changed", (newUserSettings) => {
-            console.log("new user settings", newUserSettings)
             this.userSettings = newUserSettings
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (this.game) {
