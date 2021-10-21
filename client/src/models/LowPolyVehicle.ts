@@ -5,8 +5,11 @@ import { ExtendedMesh, Scene3D } from "enable3d";
 import { IVehicleSettings } from "../classes/User";
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { GameTime } from "../one-monitor-game/GameTimeClass";
+import { CameraAltRounded, SingleBed } from "@mui/icons-material";
 
 
+const cameraOffset = 20
 
 let wheelRadius = .36
 let wheelRadiusS = .36
@@ -32,7 +35,7 @@ let maxSuspensionForce = 50000.0;
 let connectionHeight = 2.5;
 let suspensionDamping = 4;
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
-
+let targetPos: THREE.Vector3
 
 const ACTIVE_TAG = 1;
 const ISLAND_SLEEPING = 2;
@@ -68,6 +71,10 @@ export class LowPolyVehicle implements IVehicle {
     badRotationTicks = 0
     modelsLoaded = false
 
+    gameTime: GameTime
+
+    cameraDir = new THREE.Vector3()
+    cameraFollowSpeed = 0.3
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number) {
@@ -79,8 +86,7 @@ export class LowPolyVehicle implements IVehicle {
         this.isPaused = false
         this.mass = 800
         this.vehicleNumber = vehicleNumber
-
-
+        this.gameTime = new GameTime()
     }
 
     addModels(tire: ExtendedObject3D, chassis: ExtendedObject3D) {
@@ -333,10 +339,86 @@ export class LowPolyVehicle implements IVehicle {
         this.isPaused = false
         this.chassisMesh.body.setCollisionFlags(0)
     };
-    addCamera(camera: any) {
-        this.chassisMesh.add(camera)
+    addCamera(camera: THREE.PerspectiveCamera) {
+        //      this.chassisMesh.add(camera)
+
     };
-    cameraLookAt(camera: any) {
+    cameraLookAt(camera: THREE.PerspectiveCamera) {
+
+
+        const r = this.chassisMesh.rotation
+        const p = this.getPosition()
+
+
+        // this is for the follow camera effect
+        targetPos = new THREE.Vector3(
+
+            p.x - ((Math.sin(r.y) * cameraOffset)),
+            p.y + 10,
+            p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
+        )
+
+
+        this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
+        this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
+        this.cameraDir.y = camera.position.y
+
+
+
+        camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+
+        camera.updateProjectionMatrix()
+
+
+        /** Don't let camera go into the ground
+         * This code could be better
+         */
+
+        // if the vehicle is starting to go on its back
+        // and the world coords is under chassis
+        /** also allow camera follow option? */
+        // if (wp.y < chassY + 3 && this.badRotationTicks > 2) {
+        //     console.log("camera too low", wp.y, chassY)
+
+        //     const r = this.getRotation()
+
+        //     //   const ltw = camera.localToWorld(camera.position)
+        //     // console.log("ltw", ltw)
+
+        //     wp.setY(10)
+        //     camera.updateProjectionMatrix()
+        //     console.log("camera", camera)
+
+
+        //     //            const wtl = camera.worldToLocal(camera.position)
+        //     //   console.log("wtl", wtl)
+        //     // if (wp.y < 0) {
+
+
+        //     // } else {
+        //     //     camera.position.set(p.x, p.y *= .05, p.z)
+        //     // }
+        //     // if the vehicle is not flipped and the camera is not in the correct place
+        // } else if (p.y < 10 && this.badRotationTicks < 2) {
+
+        //     if (Math.abs(p.y) < (0.1)) {
+        //         console.log("less than 0.1 but not bad rot")
+        //         camera.position.set(p.x, p.y += 0.5, p.z)
+
+        //     } else if (p.y > -0) {
+
+        //         camera.position.set(p.x, p.y *= 1.1, p.z)
+        //     } else {
+        //         camera.position.set(p.x, p.y *= .95, p.z)
+
+        //     }
+        // }
+        // // if camera is too much higher than the chassis
+        // else if (wp.y > chassY + 15 && this.badRotationTicks < 2) {
+        //     const p = camera.position
+        //     camera.position.set(p.x, p.y *= .9, p.z)
+        // } else {
+        // }
         camera.lookAt(this.chassisMesh.position.clone())
     };
     update() {
@@ -378,7 +460,8 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 10) {
-            this.setRotation(0, this.getRotation().y, 0)
+            // make this flip smoother ??
+            this.setRotation(0, this.getRotation().y + Math.PI, 0)
         }
 
     };
@@ -443,6 +526,10 @@ export class LowPolyVehicle implements IVehicle {
 
     updateBreakingForce(breakingForce: number) {
         this.breakingForce = breakingForce
+    }
+
+    setCameraFollowSpeed(cameraFollowSpeed: number) {
+        this.cameraFollowSpeed = cameraFollowSpeed
     }
 
 }

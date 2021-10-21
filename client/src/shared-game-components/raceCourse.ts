@@ -86,6 +86,8 @@ export class RaceCourse {
                 shape: "convex",
                 isCourseObject: true,
                 exactMatch: true,
+                castsShadow: true,
+                receiveShadow: true,
                 objectName: "checkpoint"
             },
             "goal": {
@@ -93,7 +95,9 @@ export class RaceCourse {
                 shape: "convex",
                 isCourseObject: true,
                 exactMatch: true,
-                objectName: "goal"
+                objectName: "goal",
+                castsShadow: true,
+                receiveShadow: true,
             },
             "tree": {
                 collisionFlags: 1,

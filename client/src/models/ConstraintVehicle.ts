@@ -10,7 +10,10 @@ interface TurnAxis {
     left: Ammo.btHingeConstraint
     right: Ammo.btHingeConstraint
 }
-export class ConstraintVehicle implements IVehicle {
+
+/** did implement the IVehicle */
+/** but i am pretty sure I won't continue with this class */
+export class ConstraintVehicle {
     leftBackMotor: Ammo.btHingeConstraint
     rightBackMotor: Ammo.btHingeConstraint
     leftFrontMotor: Ammo.btHingeConstraint
@@ -20,6 +23,8 @@ export class ConstraintVehicle implements IVehicle {
     canDrive: boolean
     isPaused: boolean
     mass: number
+
+
     constructor(leftBackMotor: Ammo.btHingeConstraint,
         rightBackMotor: Ammo.btHingeConstraint,
         leftFrontMotor: Ammo.btHingeConstraint,

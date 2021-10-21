@@ -3,15 +3,13 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
-import { isNumber } from "util"
 import { defaultGameSettings, IGameSettings } from "../classes/Game"
-import { IVehicle } from "../models/IVehicle"
-import { createLowPolyVehicle, loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle"
+import { loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle"
 import "../one-monitor-game/one-monitor-styles.css"
-import { VehicleControls } from "../utils/ControlsClasses"
-import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
-import "./lowPolyTest.css"
 import { RaceCourse } from "../shared-game-components/raceCourse"
+import { VehicleControls } from "../utils/ControlsClasses"
+import "./lowPolyTest.css"
+import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
 
 const vechicleFov = 60
 
@@ -36,6 +34,7 @@ export class LowPolyTestScene extends Scene3D {
     gameSettings: IGameSettings
     raceStarted: boolean
     checkpointCrossed: boolean
+    goalCrossed: boolean
     currentLaptime: number
     timeStarted: number
     bestLapTime: number
@@ -58,6 +57,7 @@ export class LowPolyTestScene extends Scene3D {
 
         this.raceStarted = false
         this.checkpointCrossed = false
+        this.goalCrossed = false
         this.bestLapTime = 10000
         this.canStartUpdate = false
 
@@ -91,7 +91,7 @@ export class LowPolyTestScene extends Scene3D {
         console.log("lights", lights)
 
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
-        // this.pLight.position.set(100, 150, 100);
+        this.pLight.position.set(100, 150, 100);
 
         this.scene.add(this.pLight);
         this.pLight.castShadow = true
@@ -110,6 +110,7 @@ export class LowPolyTestScene extends Scene3D {
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
 
+
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         window.addEventListener("resize", () => this.onWindowResize())
 
@@ -122,9 +123,15 @@ export class LowPolyTestScene extends Scene3D {
             } else if (e.key === "p") {
                 if (this.vehicle.isPaused) {
                     this.vehicle.unpause()
+                    this.vehicle.gameTime.start()
                 } else {
                     this.vehicle.pause()
+                    this.vehicle.gameTime.stop()
+
                 }
+            } else if (e.key === "o") {
+                this.vehicle.setPosition(0, 4, 0)
+                this.vehicle.setRotation(Math.PI, 0, 0)
             }
         })
 
@@ -138,11 +145,10 @@ export class LowPolyTestScene extends Scene3D {
             loadLowPolyVehicleModels((tire, chassis) => {
                 this.vehicle.addModels(tire, chassis)
 
-                console.log("adding low poly", tire, chassis, this.canStartUpdate)
                 this.createController()
-                this.vehicle.addCamera(this.camera)
-                const p = this.course.checkpointSpawn.position
-                const r = this.course.checkpointSpawn.rotation
+                this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+                const p = this.course.goalSpawn.position
+                const r = this.course.goalSpawn.rotation
 
                 this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
                 this.vehicle.resetPosition()
@@ -236,15 +242,25 @@ export class LowPolyTestScene extends Scene3D {
     }
 
     handleGoalCrossed(o: ExtendedObject3D) {
-        const p = this.course.goalSpawn.position
-        const r = this.course.goalSpawn.rotation
-        this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
-        this.checkpointCrossed = false
+        if (!this.goalCrossed) {
+            const p = this.course.goalSpawn.position
+            const r = this.course.goalSpawn.rotation
+            this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+            this.checkpointCrossed = false
+
+            if (!this.raceStarted) {
+                this.vehicle.gameTime.start();
+                this.raceStarted = true
+            } else {
+                this.vehicle.gameTime.lapDone()
+            }
+        }
+        this.goalCrossed = true
     }
 
     handleCheckpointCrossed(o: ExtendedObject3D) {
         if (!this.checkpointCrossed) {
-
+            this.goalCrossed = false
             const p = this.course.checkpointSpawn.position
             const r = this.course.checkpointSpawn.rotation
 
@@ -298,15 +314,13 @@ export class LowPolyTestScene extends Scene3D {
 
         if (this.vehicle) {
             this.vehicle.update()
-            this.vehicle.cameraLookAt(this.camera)
+            this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
         }
     }
 
     update() {
         if (this.canStartUpdate) {
-            if (this.pLight) {
-                this.pLight.position.set(0, 100, Math.floor(Math.random() * 100))
-            }
+
             stats.begin()
             this.updateVehicles()
             if (this.vehicle) {
@@ -322,7 +336,8 @@ export class LowPolyTestScene extends Scene3D {
             stats.end()
 
             if (this.raceStarted) {
-                lapTimeDiv.innerHTML = ((Date.now() - this.timeStarted) / 1000).toFixed(2)
+                lapTimeDiv.innerHTML = this.vehicle.gameTime.getCurrentLapTime() + ""
+                bestLapTimeDiv.innerHTML = this.vehicle.gameTime.getBestLapTime() + ""
             }
         }
 

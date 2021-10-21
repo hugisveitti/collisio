@@ -1,5 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { IVehicleSettings } from '../classes/User';
+import { GameTime } from '../one-monitor-game/GameTimeClass';
 
 export interface SimpleVector {
     x: number
@@ -16,6 +17,9 @@ export interface IVehicle {
     canDrive: boolean
     isPaused: boolean
     mass: number
+    /** to track the time */
+    gameTime: GameTime
+
     goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void
     noForce: () => void

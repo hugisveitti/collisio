@@ -1,6 +1,7 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicleSettings } from '../classes/User';
+import { GameTime } from '../one-monitor-game/GameTimeClass';
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 
 
@@ -48,6 +49,7 @@ export class NormalVehicle implements IVehicle {
     mass: number
     engineForce: number
     steeringSensitivity: number
+    gameTime: GameTime
 
 
 
@@ -62,6 +64,7 @@ export class NormalVehicle implements IVehicle {
         this.engineForce = 5000
         this.steeringSensitivity = 0.5 * radiantMultiplier
 
+        this.gameTime = new GameTime()
         this.checkpointPositionRotation = {
             position: { x: 0, y: 4, z: 0 }, rotation: { x: 0, y: 0, z: 0 }
         }

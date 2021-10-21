@@ -29,7 +29,9 @@ const GameRoom = (props: IGameRoom) => {
 
   useEffect(() => {
     props.socket.on("player-disconnected", ({ playerName }) => {
-      toast.warn(`${playerName} disconnected from game`);
+      toast.warn(
+        `${playerName} disconnected from game, logged in players can reconnect!`
+      );
     });
 
     if (!props.store.roomId) {

@@ -32,5 +32,5 @@ export const startGameAuto = process.env.NODE_ENV !== "development" ? false : fa
 
 // test mode is using raceTrackTest.ts
 // and possible to see the mobile controller right away
-export const isTestMode = process.env.NODE_ENV !== "development" ? false : false;
+export const isTestMode = process.env.NODE_ENV !== "development" ? false : true;
 // export const devMode = true
