@@ -376,8 +376,7 @@ export class LowPolyVehicle implements IVehicle {
 
             this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
             this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
-            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * this.cameraFollowSpeed))
-
+            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.05)) // have the y dir change slower?
 
 
 
@@ -481,7 +480,8 @@ export class LowPolyVehicle implements IVehicle {
             // make this flip smoother ??
             this.stop()
             this.start()
-            this.setRotation(0, this.getRotation().y, 0)
+
+            this.setRotation(0, this.chassisMesh.rotation.y, 0)
         }
 
     };
@@ -513,7 +513,9 @@ export class LowPolyVehicle implements IVehicle {
     setFont(font: Font) {
         this.font = font
     };
+
     lookForwardsBackwards(lookBackwards: boolean) { };
+
     resetPosition() {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
