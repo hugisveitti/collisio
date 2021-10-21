@@ -1,5 +1,9 @@
 import * as THREE from "@enable3d/three-wrapper/node_modules/three"
 
+const around = (num: number) => {
+    return Math.floor(num * 100) / 100
+}
+
 export class GameTime {
 
     lapNumber: number
@@ -12,6 +16,7 @@ export class GameTime {
     isCheckpointCrossed: boolean
     totalNumberOfLaps: number
     lapTimes: number[]
+    totalTime: number
 
     constructor(totalNumberOfLaps: number) {
         this.totalNumberOfLaps = totalNumberOfLaps
@@ -22,6 +27,7 @@ export class GameTime {
         this.currentLapTime = 0
         this.isCheckpointCrossed = false
         this.lapTimes = []
+        this.totalTime = 0
     }
 
     start() {
@@ -39,29 +45,27 @@ export class GameTime {
 
     getCurrentLapTime() {
         if (this.isPaused) return this.currentLapTime
-        return Math.round((this.currentLapTime + this.clock.getElapsedTime()) * 100) / 100
+        return around(this.currentLapTime + this.clock.getElapsedTime())
     }
 
     lapDone() {
         const lapTime = this.getCurrentLapTime()
+        this.lapTimes.push(lapTime)
+        this.totalTime += lapTime
         this.bestLapTime = Math.min(lapTime, this.bestLapTime)
-        this.lapNumber += 1
         this.clock.stop()
         this.clock.start()
-        this.lapTimes.push(lapTime)
         this.currentLapTime = 0
         this.isCheckpointCrossed = false
         if (this.finished()) {
             this.stop()
+        } else {
+            this.lapNumber += 1
         }
     }
 
     getTotalTime() {
-        let total = 0
-        for (let lapTime of this.lapTimes) {
-            total += lapTime
-        }
-        return Math.floor(total + this.getCurrentLapTime() * 100) / 100
+        return this.totalTime + this.currentLapTime
     }
 
     checkpointCrossed() {
@@ -82,5 +86,9 @@ export class GameTime {
 
     restart() {
         this.clock.stop()
+        this.totalTime = 0
+        this.lapNumber = 1
+        this.lapTimes = []
+        this.bestLapTime = Infinity
     }
 }

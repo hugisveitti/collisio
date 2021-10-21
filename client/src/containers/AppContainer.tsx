@@ -21,6 +21,7 @@ import { UserContext } from "../providers/UserProvider";
 import { signOut } from "../firebase/firebaseInit";
 import { useHistory } from "react-router";
 import {
+  frontPagePath,
   highscorePagePath,
   howToPlayPagePath,
   privateProfilePagePath,
@@ -82,7 +83,12 @@ const AppContainer = (props: IAppContainer) => {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1 }}
+              onClick={() => history.push(frontPagePath)}
+            >
               Collisio
             </Typography>
             {renderLoginLogoutButton()}

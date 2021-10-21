@@ -73,10 +73,11 @@ export class RaceCourse {
                 bounciness: .1
             },
             "road": {
-                collisionFlags: 5,
+                collisionFlags: 1,
                 shape: "convex",
                 notAddPhysics: false,
                 receiveShadow: true,
+                bounciness: .1
             },
             "checkered-flag": {
                 collisionFlags: 1,

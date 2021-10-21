@@ -15,6 +15,7 @@ import NotLoggedInModal from "../components/NotLoggedInModal";
 import { frontPagePath } from "../components/Routes";
 import {
   getDBUserSettings,
+  IUser,
   setDBUserSettings,
 } from "../firebase/firebaseFunctions";
 import { auth } from "../firebase/firebaseInit";
@@ -27,10 +28,11 @@ interface IControllerSettingsComponent {
   userLoggedIn: () => void;
   resetOrientation: () => void;
   socket: Socket;
+  user: IUser;
 }
 
 const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
-  const user = useContext(UserContext);
+  const user = props.user;
 
   const [userSettings, setUserSettings] = useState(undefined);
 
@@ -40,14 +42,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       props.socket.emit("settings-changed", userSettings);
     }
   };
-
-  useEffect(() => {
-    auth.onAuthStateChanged((userAuth) => {
-      if (user) {
-        props.userLoggedIn();
-      }
-    });
-  }, []);
 
   useEffect(() => {
     if (user) {

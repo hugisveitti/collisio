@@ -41,9 +41,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const upColor = "red";
   const [isPortrait, setIsPortrait] = useState(false);
 
-  const handleUserLoggedIn = () => {
-    console.log("handle user logged in");
-  };
+  const handleUserLoggedIn = () => {};
 
   const handleDeviceOrientChange = () => {
     if (screen.orientation?.type) {
@@ -80,7 +78,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");
     window.removeEventListener("deviceorientation", deviceOrientationHandler);
-    window.addEventListener("deviceorientation", deviceOrientationHandler);
+    setTimeout(() => {
+      window.addEventListener("deviceorientation", deviceOrientationHandler);
+    }, 100);
   };
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       props.socket.emit("send-controls", controller);
 
       // set fps
-    }, 1000 / 30);
+    }, 1000 / 45);
 
     return () => {
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
@@ -158,12 +158,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     <React.Fragment>
       <Modal
         open={settingsModalOpen}
-        onClose={() => setSettingsModalOpen(false)}
+        onClose={() => {
+          setSettingsModalOpen(false);
+        }}
       >
         <div
           style={{
-            // top: 50,
-            // position: "absolute",
             marginTop: 50,
             backgroundColor: "#eeebdf",
             border: "2px solid #000",
@@ -178,6 +178,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             userLoggedIn={handleUserLoggedIn}
             socket={props.socket}
             resetOrientation={resetDeviceOrientationListener}
+            user={user}
           />
         </div>
       </Modal>

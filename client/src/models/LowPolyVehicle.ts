@@ -76,7 +76,7 @@ export class LowPolyVehicle implements IVehicle {
     cameraDir = new THREE.Vector3()
     cameraFollowSpeed = 0.3
 
-    useChaseCamera = false
+    useChaseCamera = true
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number) {
@@ -272,8 +272,6 @@ export class LowPolyVehicle implements IVehicle {
 
         this.wheelMeshes.push(this.createWheelMesh(radius))
 
-
-        // this.wheelMeshes.push(this.createWheelMesh())
     }
 
     createWheelMesh(radius: number) {
@@ -525,6 +523,8 @@ export class LowPolyVehicle implements IVehicle {
 
         this.engineForce = vehicleSettings.engineForce
         this.steeringSensitivity = vehicleSettings.steeringSensitivity
+
+
     };
 
     updateMass(mass: number) {

@@ -7,9 +7,9 @@ import { MobileControls, VehicleControls } from "./ControlsClasses"
 let speed = 40
 let maxAngle = 0.4
 let angle = 40
+let gameIsPaused = false
 
-
-export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
+export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, callback?: any) => {
     if (mobileControls.forward) {
         vehicle.goForward(mobileControls.moreSpeed)
     } else if (mobileControls.backward) {
@@ -35,15 +35,27 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
     if (mobileControls.resetVehicle) {
         vehicle.resetPosition()
     }
+
+    if (callback && mobileControls.pause) {
+        if (!gameIsPaused) {
+            callback(true)
+        }
+        gameIsPaused = mobileControls.pause
+    } else if (callback && !mobileControls.pause) {
+        if (gameIsPaused) {
+            callback(false)
+        }
+        gameIsPaused = false
+    }
 }
 
 
 
-export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[]) => {
+export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[], callback?: () => void) => {
     socket.on("get-controls", (data) => {
         const { players } = data as { players: IPlayerInfo[] }
         for (let i = 0; i < players.length; i++) {
-            driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
+            driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)
         }
     })
 

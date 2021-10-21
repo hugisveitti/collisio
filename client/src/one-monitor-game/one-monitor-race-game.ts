@@ -250,10 +250,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
     updateScoreTable() {
-        if (!this.raceOnGoing) return
+
         let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
-            let cLapTime = this.gameTimers[i].getCurrentLapTime().toFixed(2) // ((Date.now() - this.currentLapStart[i]) / 1000).toFixed(2)
+            let cLapTime = this.gameTimers[i].getCurrentLapTime().toFixed(2)
             const bLT = this.gameTimers[i].getBestLapTime() === Infinity ? "-" : this.gameTimers[i].getBestLapTime()
             let totalTime = this.gameTimers[i].getTotalTime()
             if (this.gameTimers[i].finished()) {
@@ -319,7 +319,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
             loadLowPolyVehicleModels((tire, chassises) => {
                 for (let i = 0; i < this.vehicles.length; i++) {
                     // only 4 colors of chassis
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 2].clone())
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 4].clone())
                 }
 
                 this.courseLoaded = true
