@@ -57,7 +57,7 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
     const updates = {}
     updates[gameDataRefPath + "/" + newGameKey] = gameInfo
     for (let i = 0; i < playerGameInfo.length; i++) {
-        if (playerGameInfo[i].playerId) {
+        if (playerGameInfo[i].isAuthenticated) {
             updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = playerGameInfo[i]
             updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGameGameInfoPath] = gameInfo
             updates[highscoreRefPath + "/" + gameInfo.trackType + "/" + gameInfo.numberOfLaps + "/" + playerGameInfo[i].playerId + "/" + newGameKey] = playerGameInfo[i]

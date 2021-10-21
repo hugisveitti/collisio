@@ -64,7 +64,7 @@ export class NormalVehicle implements IVehicle {
         this.engineForce = 5000
         this.steeringSensitivity = 0.5 * radiantMultiplier
 
-        this.gameTime = new GameTime()
+        this.gameTime = new GameTime(5)
         this.checkpointPositionRotation = {
             position: { x: 0, y: 4, z: 0 }, rotation: { x: 0, y: 0, z: 0 }
         }

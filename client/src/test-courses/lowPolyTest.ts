@@ -95,7 +95,7 @@ export class LowPolyTestScene extends Scene3D {
 
         this.scene.add(this.pLight);
         this.pLight.castShadow = true
-        this.pLight.shadow.bias = 0.1
+        this.pLight.shadow.bias = 0.01
         console.log("plight", this.pLight)
         const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
         this.scene.add(helper)
@@ -330,8 +330,6 @@ export class LowPolyTestScene extends Scene3D {
                 <br />
                 km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
                 `
-                const p = this.vehicle.getPosition()
-
             }
             stats.end()
 

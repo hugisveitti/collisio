@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
+import { getDeviceType, startGameAuto } from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
 import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
@@ -12,6 +12,7 @@ import OneMonitorFrontPage from "./OneMonitorFrontPage";
 import PrivateProfilePage from "./PrivateProfilePage";
 import { IStore } from "./store";
 import WaitingRoom from "./WaitingRoom";
+import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -39,6 +40,18 @@ const Routes = () => {
   useEffect(() => {
     const newSocket = createSocket(deviceType);
     setSocket(newSocket);
+    if (startGameAuto) {
+      const nplayer = {
+        playerName: "tester",
+        isLeader: true,
+        playerNumber: 0,
+        teamName: "no team",
+        mobileControls: new MobileControls(),
+        vehicleControls: new VehicleControls(),
+        id: "1",
+      } as IPlayerInfo;
+      setPlayers([nplayer]);
+    }
   }, []);
 
   const store = {

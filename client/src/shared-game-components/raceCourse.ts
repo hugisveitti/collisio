@@ -75,7 +75,8 @@ export class RaceCourse {
             "road": {
                 collisionFlags: 5,
                 shape: "convex",
-                notAddPhysics: true
+                notAddPhysics: false,
+                receiveShadow: true,
             },
             "checkered-flag": {
                 collisionFlags: 1,
@@ -139,7 +140,8 @@ export class RaceCourse {
             },
             "pavement-marking": {
                 collisionFlags: 5,
-                shape: "concave"
+                shape: "concave",
+                receiveShadow: true
             },
             "fence": {
                 collisionFlags: 1,

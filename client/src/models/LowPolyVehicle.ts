@@ -88,16 +88,18 @@ export class LowPolyVehicle implements IVehicle {
         this.isPaused = false
         this.mass = 800
         this.vehicleNumber = vehicleNumber
-        this.gameTime = new GameTime()
+        this.gameTime = new GameTime(5)
     }
 
     addModels(tire: ExtendedObject3D, chassis: ExtendedObject3D) {
 
         this.tire = tire
         this.chassisMesh = chassis
+        this.tire.receiveShadow = this.tire.castShadow = true
+        this.chassisMesh.receiveShadow = this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
 
-        this.chassisMesh
+        console.log("chassi mesh", this.chassisMesh)
 
         this.createVehicle()
     }
@@ -369,7 +371,8 @@ export class LowPolyVehicle implements IVehicle {
 
             this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
             this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
-            this.cameraDir.y = camera.position.y
+            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * this.cameraFollowSpeed))
+
 
 
 
@@ -444,7 +447,6 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.quaternion.set(q.x(), q.y(), q.z(), q.w())
         if (Math.abs(q.z()) > 0.1 || Math.abs(q.x()) > 0.1) {
             this.badRotationTicks += 1
-            console.log("bad rotation ticks")
         } else {
             this.badRotationTicks = 0
         }
@@ -470,9 +472,11 @@ export class LowPolyVehicle implements IVehicle {
             }
         }
 
-        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 10) {
+        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 20) {
             // make this flip smoother ??
-            this.setRotation(0, this.getRotation().y + Math.PI, 0)
+            this.stop()
+            this.start()
+            this.setRotation(0, this.getRotation().y, 0)
         }
 
     };
@@ -514,7 +518,6 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     setCheckpointPositionRotation(positionRotation: IPositionRotation) {
-        console.log("setting checkpint", positionRotation)
         this.checkpointPositionRotation = positionRotation
     };
 
@@ -560,20 +563,18 @@ export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chas
                 if (child.name.includes("chassis")) {
                     let chassis = (child as ExtendedObject3D);
                     chassis.geometry.center();
-                    chassis.receiveShadow = chassis.castShadow = true;
+
                     chassises.push(chassis)
                 }
                 else if (child.name === "tire") {
                     tire = (child as ExtendedObject3D)
-                    tire.receiveShadow = tire.castShadow = true
+
                     tire.geometry.center()
                 }
             }
         }
 
 
-        console.log("chassis", chassises)
-        console.log("tire", tire)
 
         callback(tire, chassises)
     })

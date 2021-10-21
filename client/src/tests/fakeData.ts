@@ -68,7 +68,8 @@ export const createFakeHighscoreData = () => {
                 totalTime: tt,
                 numberOfLaps,
                 date: new Date(),
-                private: false
+                private: false,
+                isAuthenticated: true,
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",

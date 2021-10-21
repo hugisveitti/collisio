@@ -20,6 +20,7 @@ export interface IPlayerInfo {
     /** only for ball game */
     teamNumber?: number
     id: string
+    isAuthenticated: boolean
 }
 
 export type TrackType = "track" | "town-track" | "low-poly-farm-track"
@@ -50,6 +51,7 @@ export interface IEndOfGameInfoPlayer {
     gameId: string
     date: Date
     private: boolean
+    isAuthenticated: boolean
 }
 
 export interface IPlayerGameInfo {

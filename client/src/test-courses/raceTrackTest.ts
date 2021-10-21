@@ -82,7 +82,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     async preload() {
 
         this.loadFont()
-        this.physics.debug?.enable()
+        // this.physics.debug?.enable()
 
         // this.warpSpeed("-ground")
         //   this.warpSpeed("sky")

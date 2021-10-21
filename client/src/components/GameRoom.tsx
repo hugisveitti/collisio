@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
 import { startRaceGameOneMonitor } from "../one-monitor-game/one-monitor-race-game";
+import { startGameAuto } from "../utils/settings";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
@@ -34,7 +35,7 @@ const GameRoom = (props: IGameRoom) => {
       );
     });
 
-    if (!props.store.roomId) {
+    if (!props.store.roomId && !startGameAuto) {
       history.push(frontPagePath);
       toast.warn("No room connection, redirecting to frontpage");
       return null;
