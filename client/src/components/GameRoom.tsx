@@ -3,7 +3,10 @@ import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
-import { startRaceGameOneMonitor } from "../one-monitor-game/one-monitor-race-game";
+import {
+  OneMonitorRaceGameScene,
+  startRaceGameOneMonitor,
+} from "../one-monitor-game/one-monitor-race-game";
 import { startGameAuto } from "../utils/settings";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "./Routes";
@@ -20,12 +23,13 @@ const GameRoom = (props: IGameRoom) => {
   //   window.location.href = frontPagePath;
   // }
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [gameObject, setGameObject] = useState({} as OneMonitorRaceGameScene);
 
   const history = useHistory();
 
   const handleEscPressed = () => {
     // basically have to create a modal in the game class and show it there...
-    // setSettingsModalOpen(true);
+    setSettingsModalOpen(true);
   };
 
   useEffect(() => {
@@ -52,8 +56,10 @@ const GameRoom = (props: IGameRoom) => {
         props.store.players,
         props.store.gameSettings,
         props.store.roomId,
-        handleEscPressed
-        // (_unpauseFunc) => setUnpauseGameFunc(_unpauseFunc)
+        handleEscPressed,
+        (_gameObject) => {
+          setGameObject(_gameObject);
+        }
       );
     }
   }, []);
@@ -61,9 +67,13 @@ const GameRoom = (props: IGameRoom) => {
   return (
     <React.Fragment>
       <GameSettingsModal
+        gameObject={gameObject}
         open={settingsModalOpen}
         onClose={() => {
           setSettingsModalOpen(false);
+          if (gameObject) {
+            gameObject.togglePauseGame();
+          }
         }}
       />
       <ToastContainer />

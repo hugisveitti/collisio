@@ -1,14 +1,19 @@
-import { Grid, IconButton, Modal } from "@mui/material";
+import { Button, Grid, IconButton, Modal } from "@mui/material";
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link } from "react-router-dom";
 import { frontPagePath } from "./Routes";
+import { OneMonitorRaceGameScene } from "../one-monitor-game/one-monitor-race-game";
 
 interface IGameSettingsModal {
   open: boolean;
   onClose: () => void;
+  gameObject: OneMonitorRaceGameScene;
 }
+
 const GameSettingsModal = (props: IGameSettingsModal) => {
+  if (!props.gameObject) return null;
+  console.log("props.gameObject.useShadows ", props.gameObject.useShadows);
   return (
     <Modal open={props.open} onClose={props.onClose}>
       <div
@@ -16,8 +21,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           transform: "translate(-50%, -50%)",
           position: "absolute",
           top: "50%",
-          //marginTop: 50,
-
+          left: "50%",
           backgroundColor: "#eeebdf",
           border: "2px solid #000",
           padding: 10,
@@ -36,6 +40,16 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
 
           <Grid item xs={12}>
             <Link to={frontPagePath}>Back to front page</Link>
+          </Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                props.gameObject.setUseShadows(!props.gameObject.useShadows);
+              }}
+            >
+              Toggle Shadows
+            </Button>
           </Grid>
         </Grid>
       </div>

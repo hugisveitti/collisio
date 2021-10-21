@@ -32,14 +32,12 @@ export class GameTime {
 
     start() {
         this.isPaused = false
-        console.log("starting game", this.currentLapTime)
         this.clock.start()
     }
 
     stop() {
         this.currentLapTime = this.getCurrentLapTime()
         this.clock.stop()
-        console.log("stopping clock curr lap time", this.currentLapTime)
         this.isPaused = true
     }
 

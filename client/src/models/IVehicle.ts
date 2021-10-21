@@ -19,6 +19,7 @@ export interface IVehicle {
     mass: number
     /** to track the time */
     gameTime: GameTime
+    vehicleSettings: IVehicleSettings
 
     goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void

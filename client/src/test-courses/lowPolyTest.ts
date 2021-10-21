@@ -174,8 +174,8 @@ export class LowPolyTestScene extends Scene3D {
                         //console.log("target", target)
                         if (!isNaN(+e.target.value)) {
                             this.vehicle.updateVehicleSettings({
+                                ...this.vehicle.vehicleSettings,
                                 engineForce: +e.target.value,
-                                steeringSensitivity: this.vehicle.steeringSensitivity
                             })
                         }
                     }

@@ -67,6 +67,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     pLight: THREE.PointLight
 
     gameTimers: GameTime[]
+    useShadows: boolean
 
     constructor() {
         super()
@@ -90,6 +91,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.finishedTime = []
         this.gameId = uuid()
         this.gameTimers = []
+        this.useShadows = false
     }
 
 
@@ -98,8 +100,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
         console.log("lights", lights)
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
-        this.pLight.castShadow = true
-        this.pLight.shadow.bias = 0.01
+        if (this.useShadows) {
+            this.pLight.castShadow = true
+            this.pLight.shadow.bias = 0.01
+        }
 
         this.scene.add(this.pLight)
 
@@ -154,14 +158,14 @@ export class OneMonitorRaceGameScene extends Scene3D {
                 this.restartGame()
             } else if (e.key === "p") {
                 // all or non paused
-                this.pauseGame()
+                this.togglePauseGame()
             }
         })
 
         window.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
                 this.escPress()
-                this.pauseGame()
+                this.togglePauseGame()
             }
         })
 
@@ -180,11 +184,20 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
     }
 
+    setUseShadows(useShadows: boolean) {
+        this.useShadows = useShadows
+
+        this.pLight.castShadow = this.useShadows
+        this.pLight.shadow.bias = 0.01
+
+
+    }
+
     isGamePaused() {
         return this.vehicles[0].isPaused
     }
 
-    pauseGame() {
+    togglePauseGame() {
 
         let isPaused = this.isGamePaused()
         if (isPaused) {
@@ -331,13 +344,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
     }
 
 
-
-    unpauseGame() {
-
-        for (let vehicle of this.vehicles) {
-            vehicle.unpause()
-        }
-    }
 
 
     onWindowResize() {
@@ -556,7 +562,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 }
 
 
-export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void,) => {
+export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void, callback: (gameObject: OneMonitorRaceGameScene) => void) => {
     const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
@@ -567,11 +573,13 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         const key = project.scenes.keys().next().value;
 
         // hacky way to get the project's scene
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setSocket(socket);
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setPlayers(players);
-        (project.scenes.get(key) as OneMonitorRaceGameScene).setGameSettings(gameSettings, roomId, escPress);
+        const gameObject = (project.scenes.get(key) as OneMonitorRaceGameScene);
+        gameObject.setSocket(socket);
+        gameObject.setPlayers(players);
+        gameObject.setGameSettings(gameSettings, roomId, escPress);
         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
         console.log("starting game, players", players)
+        callback(gameObject)
         return project
     })
 

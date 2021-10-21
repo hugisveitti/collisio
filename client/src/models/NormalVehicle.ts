@@ -1,6 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
-import { IVehicleSettings } from '../classes/User';
+import { defaultVehicleSettings, IVehicleSettings } from '../classes/User';
 import { GameTime } from '../one-monitor-game/GameTimeClass';
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 
@@ -50,6 +50,7 @@ export class NormalVehicle implements IVehicle {
     engineForce: number
     steeringSensitivity: number
     gameTime: GameTime
+    vehicleSettings: IVehicleSettings
 
 
 
@@ -63,6 +64,7 @@ export class NormalVehicle implements IVehicle {
         this.isPaused = false
         this.engineForce = 5000
         this.steeringSensitivity = 0.5 * radiantMultiplier
+        this.vehicleSettings = defaultVehicleSettings
 
         this.gameTime = new GameTime(5)
         this.checkpointPositionRotation = {

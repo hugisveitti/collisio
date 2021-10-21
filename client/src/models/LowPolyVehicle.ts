@@ -2,11 +2,12 @@ import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Font, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
 import { ExtendedMesh, Scene3D } from "enable3d";
-import { IVehicleSettings } from "../classes/User";
+import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { GameTime } from "../one-monitor-game/GameTimeClass";
-import { CameraAltRounded, SingleBed } from "@mui/icons-material";
+import { PerspectiveCamera } from "three";
+
 
 
 const cameraOffset = 20
@@ -74,9 +75,11 @@ export class LowPolyVehicle implements IVehicle {
     gameTime: GameTime
 
     cameraDir = new THREE.Vector3()
-    cameraFollowSpeed = 0.3
 
-    useChaseCamera = true
+    cameraFollowSpeed: number
+    useChaseCamera: boolean
+    vehicleSettings: IVehicleSettings
+    camera!: THREE.PerspectiveCamera
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number) {
@@ -89,6 +92,10 @@ export class LowPolyVehicle implements IVehicle {
         this.mass = 800
         this.vehicleNumber = vehicleNumber
         this.gameTime = new GameTime(5)
+        this.useChaseCamera = true
+        this.cameraFollowSpeed = 0.3
+        this.vehicleSettings = defaultVehicleSettings
+
     }
 
     addModels(tire: ExtendedObject3D, chassis: ExtendedObject3D) {
@@ -348,6 +355,7 @@ export class LowPolyVehicle implements IVehicle {
 
             this.chassisMesh.add(camera)
         }
+        this.camera = camera
 
     };
     cameraLookAt(camera: THREE.PerspectiveCamera) {
@@ -520,10 +528,17 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
-
+        this.vehicleSettings = vehicleSettings
         this.engineForce = vehicleSettings.engineForce
         this.steeringSensitivity = vehicleSettings.steeringSensitivity
+        this.cameraFollowSpeed = vehicleSettings.cameraFollowSpeed
+        this.mass = vehicleSettings.mass
+        this.useChaseCamera = vehicleSettings.useChaseCamera
 
+        this.chassisMesh.remove(this.camera)
+        if (this.useChaseCamera) {
+            this.chassisMesh.add(this.camera)
+        }
 
     };
 
