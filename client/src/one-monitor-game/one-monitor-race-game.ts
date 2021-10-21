@@ -333,9 +333,10 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         // if (this.gameSettings.trackName.includes("low-poly") && !(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
         if (!(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
-            loadLowPolyVehicleModels((tire, chassis) => {
-                for (let vehicle of this.vehicles) {
-                    (vehicle as LowPolyVehicle).addModels(tire.clone(), chassis.clone())
+            loadLowPolyVehicleModels((tire, chassises) => {
+                for (let i = 0; i < this.vehicles.length; i++) {
+                    // only 4 colors of chassis
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 4].clone())
                 }
                 console.log("vehicles", this.vehicles)
                 this.courseLoaded = true

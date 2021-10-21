@@ -1,5 +1,5 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Font } from "@enable3d/three-wrapper/dist";
+import { Font, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
 import { ExtendedMesh, Scene3D } from "enable3d";
 import { IVehicleSettings } from "../classes/User";
@@ -76,6 +76,8 @@ export class LowPolyVehicle implements IVehicle {
     cameraDir = new THREE.Vector3()
     cameraFollowSpeed = 0.3
 
+    useChaseCamera = false
+
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number) {
 
@@ -93,7 +95,9 @@ export class LowPolyVehicle implements IVehicle {
 
         this.tire = tire
         this.chassisMesh = chassis
-        this.modelsLoaded = true
+        this.modelsLoaded = true;
+
+        this.chassisMesh
 
         this.createVehicle()
     }
@@ -340,34 +344,41 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setCollisionFlags(0)
     };
     addCamera(camera: THREE.PerspectiveCamera) {
-        //      this.chassisMesh.add(camera)
+        if (!this.useChaseCamera) {
+
+            this.chassisMesh.add(camera)
+        }
 
     };
     cameraLookAt(camera: THREE.PerspectiveCamera) {
 
+        if (this.useChaseCamera) {
 
-        const r = this.chassisMesh.rotation
-        const p = this.getPosition()
-
-
-        // this is for the follow camera effect
-        targetPos = new THREE.Vector3(
-
-            p.x - ((Math.sin(r.y) * cameraOffset)),
-            p.y + 10,
-            p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
-        )
+            const r = this.chassisMesh.rotation
+            const p = this.getPosition()
 
 
-        this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
-        this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
-        this.cameraDir.y = camera.position.y
+            // this is for the follow camera effect
+            targetPos = new THREE.Vector3(
+
+                p.x - ((Math.sin(r.y) * cameraOffset)),
+                p.y + 10,
+                p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
+            )
+
+
+            this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
+            this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
+            this.cameraDir.y = camera.position.y
 
 
 
-        camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+            camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
 
-        camera.updateProjectionMatrix()
+            camera.updateProjectionMatrix()
+        } else {
+            camera.lookAt(this.chassisMesh.position.clone())
+        }
 
 
         /** Don't let camera go into the ground
@@ -538,18 +549,21 @@ export const createLowPolyVehicle = async (scene: Scene3D, color: string | numbe
 
 }
 
-export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chassis: ExtendedObject3D) => void) => {
+export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chassises: ExtendedObject3D[]) => void) => {
     const loader = new GLTFLoader()
 
     loader.load("models/simple-low-poly-car.gltf", (gltf: GLTF) => {
-        let chassis: ExtendedObject3D, tire: ExtendedObject3D;
+        let chassises = [] as ExtendedObject3D[], tire: ExtendedObject3D;
         for (let child of gltf.scene.children) {
             if (child.type === "Mesh" || child.type === "Group") {
-                if (child.name === "chassis") {
-                    chassis = (child as ExtendedObject3D)
-                    chassis.receiveShadow = chassis.castShadow = true
-                    chassis.geometry.center()
-                } else if (child.name === "tire") {
+
+                if (child.name.includes("chassis")) {
+                    let chassis = (child as ExtendedObject3D);
+                    chassis.geometry.center();
+                    chassis.receiveShadow = chassis.castShadow = true;
+                    chassises.push(chassis)
+                }
+                else if (child.name === "tire") {
                     tire = (child as ExtendedObject3D)
                     tire.receiveShadow = tire.castShadow = true
                     tire.geometry.center()
@@ -557,7 +571,11 @@ export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chas
             }
         }
 
-        callback(tire, chassis)
+
+        console.log("chassis", chassises)
+        console.log("tire", tire)
+
+        callback(tire, chassises)
     })
 
 }

@@ -142,8 +142,8 @@ export class LowPolyTestScene extends Scene3D {
     async create() {
         this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(() => {
-            loadLowPolyVehicleModels((tire, chassis) => {
-                this.vehicle.addModels(tire, chassis)
+            loadLowPolyVehicleModels((tire, chassises) => {
+                this.vehicle.addModels(tire, chassises[2])
 
                 this.createController()
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
