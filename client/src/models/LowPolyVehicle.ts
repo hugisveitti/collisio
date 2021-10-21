@@ -352,7 +352,6 @@ export class LowPolyVehicle implements IVehicle {
     };
     addCamera(camera: THREE.PerspectiveCamera) {
         if (!this.useChaseCamera) {
-
             this.chassisMesh.add(camera)
         }
         this.camera = camera
@@ -536,7 +535,7 @@ export class LowPolyVehicle implements IVehicle {
         this.useChaseCamera = vehicleSettings.useChaseCamera
 
         this.chassisMesh.remove(this.camera)
-        if (this.useChaseCamera) {
+        if (!this.useChaseCamera) {
             this.chassisMesh.add(this.camera)
         }
 

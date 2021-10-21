@@ -108,9 +108,6 @@ export class OneMonitorRaceGameScene extends Scene3D {
         this.scene.add(this.pLight)
 
 
-        const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
-        this.scene.add(helper)
-
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
         hLight.position.set(0, 1, 0)

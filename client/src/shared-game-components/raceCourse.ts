@@ -105,19 +105,18 @@ export class RaceCourse {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                receiveShadow: true
+
             },
             "pine": {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                receiveShadow: true
+
             },
             "leaf": {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                receiveShadow: true
             },
             "checkpoint-spawn": {
                 collisionFlags: -1,
@@ -148,14 +147,12 @@ export class RaceCourse {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                receiveShadow: true,
                 bounciness: 0.5
             },
             "wall": {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                receiveShadow: true,
                 bounciness: 0.5
             },
             "rock": {
@@ -163,7 +160,6 @@ export class RaceCourse {
                 shape: "convex",
                 bounciness: 0.7,
                 castsShadow: true,
-                receiveShadow: true
             },
             "barn": {
                 collisionFlags: 1,
