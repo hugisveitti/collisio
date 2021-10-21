@@ -37,8 +37,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     alpha: 0,
   });
 
-  const downColor = "green";
-  const upColor = "red";
+  // change these colors!
+  const downColor = "#005c46"; // "green";
+  const upColor = "#fcba03"; // "red";
   const [isPortrait, setIsPortrait] = useState(false);
 
   const handleUserLoggedIn = () => {};

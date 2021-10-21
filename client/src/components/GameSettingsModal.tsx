@@ -13,7 +13,6 @@ interface IGameSettingsModal {
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
   if (!props.gameObject) return null;
-  console.log("props.gameObject.useShadows ", props.gameObject.useShadows);
   return (
     <Modal open={props.open} onClose={props.onClose}>
       <div
