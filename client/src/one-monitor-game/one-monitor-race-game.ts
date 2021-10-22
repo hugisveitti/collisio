@@ -129,7 +129,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse(() => {
+        this.course.createCourse(this.useShadows, () => {
             this.createVehicles(() => {
                 const p = this.course.goalSpawn.position
                 const r = this.course.goalSpawn.rotation

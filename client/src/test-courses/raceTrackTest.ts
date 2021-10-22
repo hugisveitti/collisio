@@ -42,6 +42,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
     bestLapTime: number
     canStartUpdate: boolean
     dirLight: THREE.DirectionalLight
+    useShadows = false
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -121,7 +122,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
 
         this.course = new RaceCourse(this, "track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse(() => {
+        this.course.createCourse(this.useShadows, () => {
             this.canStartUpdate = true
             this.createVehicle()
         })

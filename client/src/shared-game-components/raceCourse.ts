@@ -51,11 +51,14 @@ export class RaceCourse {
 
 
 
-    createCourse(courseLoadedCallback: () => void) {
+    createCourse(useShadows: boolean, courseLoadedCallback: () => void) {
+
+
+        const structureBounciness = 0.2
 
         interface IGameItem {
             collisionFlags: number,
-            shape: "convex" | "concave",
+            shape: "convex" | "concave" | "box",
             receiveShadow?: boolean,
             notAddPhysics?: boolean,
             castsShadow?: boolean,
@@ -64,18 +67,20 @@ export class RaceCourse {
             isCourseObject?: boolean
             exactMatch?: boolean
             objectName?: string
+            /** for debug */
+            notVisible?: boolean
         }
         const gameItems = {
             "ground": {
                 collisionFlags: 1,
                 shape: "concave",
                 receiveShadow: true,
-                bounciness: .1
+                bounciness: .05
             },
             "road": {
                 collisionFlags: 1,
                 shape: "convex",
-                notAddPhysics: false,
+                notAddPhysics: true,
                 receiveShadow: true,
                 bounciness: .1
             },
@@ -145,33 +150,35 @@ export class RaceCourse {
             },
             "fence": {
                 collisionFlags: 1,
-                shape: "concave",
+                shape: "convex",
                 castsShadow: true,
-                bounciness: 0.5
+                bounciness: structureBounciness,
+                // notVisible: false,
+
             },
             "wall": {
                 collisionFlags: 1,
                 shape: "concave",
                 castsShadow: true,
-                bounciness: 0.5
+                bounciness: structureBounciness
             },
             "rock": {
                 collisionFlags: 1,
                 shape: "convex",
-                bounciness: 0.7,
+                bounciness: structureBounciness,
                 castsShadow: true,
             },
             "barn": {
                 collisionFlags: 1,
                 shape: "concave",
-                bounciness: 0.7,
+                bounciness: structureBounciness,
                 castsShadow: true,
                 receiveShadow: true
             },
             "house": {
                 collisionFlags: 1,
                 shape: "concave",
-                bounciness: 0.7,
+                bounciness: structureBounciness,
                 castsShadow: true,
                 receiveShadow: true
             }
@@ -199,16 +206,20 @@ export class RaceCourse {
 
                     for (let key of itemKeys) {
                         if (keyNameMatch(key, child.name)) {
-                            if (!Boolean(gameItems[key].notAddPhysics)) {
 
+                            if (!child.name.includes("ghost") && !Boolean(gameItems[key].notAddPhysics)) {
                                 this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape });
-                                (child as ExtendedObject3D).castShadow = Boolean(gameItems[key].castsShadow);
-                                (child as ExtendedObject3D).receiveShadow = Boolean(gameItems[key].receiveShadow);
-
+                                (child as ExtendedObject3D).castShadow = useShadows && Boolean(gameItems[key].castsShadow);
+                                (child as ExtendedObject3D).receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
+                                (child as ExtendedObject3D).visible = !Boolean(gameItems[key].notVisible)
                                 if (gameItems[key].bounciness) {
                                     (child as ExtendedObject3D).body.setBounciness(gameItems[key].bounciness)
                                 }
-                            } else {
+                                if (child.name.includes("hidden")) {
+                                    child.visible = false
+                                }
+                            } else if (child.name.includes("ghost")) {
+                                // this.scene.add.existing(child)
                             }
                             if (gameItems[key].isCourseObject) {
                                 // hacky ????
@@ -227,11 +238,15 @@ export class RaceCourse {
 
     setupCollisionListeners() {
         if (this.goal) {
-            this.goal.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
-                if (otherObject.name.slice(0, 7) === "vehicle") {
-                    this.goalCrossedCallback(otherObject)
-                }
-            })
+            try {
+                this.goal.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
+                    if (otherObject.name.slice(0, 7) === "vehicle") {
+                        this.goalCrossedCallback(otherObject)
+                    }
+                })
+            } catch {
+                console.log("No goal object")
+            }
         }
         if (this.checkpoint) {
             this.checkpoint.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {

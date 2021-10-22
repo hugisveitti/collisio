@@ -22,7 +22,6 @@ export interface IVehicleSettings {
     /** camera stuck behind vehicle or move more smoothly */
     useChaseCamera: boolean
 
-
     /** mass */
     mass: number
 }

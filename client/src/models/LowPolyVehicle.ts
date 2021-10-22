@@ -171,7 +171,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
         this.chassisMesh.body.setFriction(1)
-        this.chassisMesh.body.setBounciness(1)
+        this.chassisMesh.body.setBounciness(.4)
 
 
 
@@ -373,14 +373,20 @@ export class LowPolyVehicle implements IVehicle {
                 p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
             )
 
+            let a = new THREE.Vector3()
+            a.subVectors(targetPos, camera.position)
+            // console.log("length of a.y", (targetPos.y - camera.position.y))
 
             this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
             this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
-            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.05)) // have the y dir change slower?
+            // this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.05)) // have the y dir change slower?
+            this.cameraDir.y = targetPos.y
 
+            if (a.length() > 0.1) {
+                camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
 
-
-            camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+            } else {
+            }
 
             camera.updateProjectionMatrix()
         } else {
@@ -530,18 +536,25 @@ export class LowPolyVehicle implements IVehicle {
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
         this.vehicleSettings = vehicleSettings
-        this.engineForce = vehicleSettings.engineForce
-        console.log("update vehicle settings", vehicleSettings)
-        this.steeringSensitivity = vehicleSettings.steeringSensitivity
+        // this.engineForce = vehicleSettings.engineForce
+        // this.steeringSensitivity = vehicleSettings.steeringSensitivity
+        const keys = Object.keys(vehicleSettings)
+        for (let key of keys) {
+            if (vehicleSettings[key] !== undefined) {
+                this[key] = vehicleSettings[key]
+            }
+        }
+
         // this.cameraFollowSpeed = vehicleSettings.cameraFollowSpeed
         // this.mass = vehicleSettings.mass
         // this.useChaseCamera = vehicleSettings.useChaseCamera
 
-        // this.chassisMesh.remove(this.camera)
-        // if (!this.useChaseCamera) {
-        //     this.chassisMesh.add(this.camera)
-        // }
-
+        this.chassisMesh.remove(this.camera)
+        if (!this.useChaseCamera) {
+            console.log("adding camera")
+            this.camera.position.set(0, 10, -20)
+            this.chassisMesh.add(this.camera)
+        }
     };
 
     updateMass(mass: number) {

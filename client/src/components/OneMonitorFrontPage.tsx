@@ -70,45 +70,6 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   };
 
-  useEffect(() => {
-    if (user?.displayName) {
-      setPlayerName(user.displayName);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    /** Just for development  */
-    if (startGameAuto) {
-      props.store.setRoomId("testRoom");
-      setPlayerName("testPlayer");
-      setTimeout(() => {
-        connectButtonClicked();
-      }, 100);
-    }
-    if (isTestMode) {
-      if (deviceType === "desktop") {
-        startLowPolyTest(props.socket, props.store.gameSettings);
-        // startRaceTrackTest(props.socket, props.store.gameSettings);
-      } else {
-        history.push(controlsRoomPath);
-      }
-    }
-    /**************** */
-
-    if (deviceType === "desktop") {
-      setNeedToAskOrientPermission(false);
-    } else {
-      window.addEventListener(
-        "deviceorientation",
-        checkIfNeedOrientaitonPrompt
-      );
-    }
-  }, []);
-
-  if (isTestMode) {
-    return null;
-  }
-
   const requestDeviceOrientation = () => {
     if (!needToAskOrientPermission) {
       return;
@@ -196,6 +157,45 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
       }
     }
   };
+
+  useEffect(() => {
+    if (user?.displayName) {
+      setPlayerName(user.displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    /** Just for development  */
+    if (startGameAuto) {
+      props.store.setRoomId("testRoom");
+      setPlayerName("testPlayer");
+      setTimeout(() => {
+        connectButtonClicked();
+      }, 100);
+    }
+    if (isTestMode) {
+      if (deviceType === "desktop") {
+        startLowPolyTest(props.socket, props.store.gameSettings);
+        // startRaceTrackTest(props.socket, props.store.gameSettings);
+      } else {
+        history.push(controlsRoomPath);
+      }
+    }
+    /**************** */
+
+    if (deviceType === "desktop") {
+      setNeedToAskOrientPermission(false);
+    } else {
+      window.addEventListener(
+        "deviceorientation",
+        checkIfNeedOrientaitonPrompt
+      );
+    }
+  }, []);
+
+  if (isTestMode) {
+    return null;
+  }
 
   return (
     <AppContainer>

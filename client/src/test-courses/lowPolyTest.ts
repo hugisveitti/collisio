@@ -41,6 +41,7 @@ export class LowPolyTestScene extends Scene3D {
     canStartUpdate: boolean
     course: RaceCourse
     pLight: THREE.PointLight
+    useShadows: boolean
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -68,6 +69,7 @@ export class LowPolyTestScene extends Scene3D {
 
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
+        this.useShadows = true
     }
 
     async init() {
@@ -81,7 +83,7 @@ export class LowPolyTestScene extends Scene3D {
     async preload() {
 
         this.loadFont()
-        // this.phywwwwwwsics.debug?.enable()
+        // this.physics.debug?.enable()
         const { lights } = await this.warpSpeed('-ground', "-light")
         // this.dirLight = lights.directionalLight
         // const helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
@@ -94,8 +96,10 @@ export class LowPolyTestScene extends Scene3D {
         this.pLight.position.set(100, 150, 100);
 
         this.scene.add(this.pLight);
-        this.pLight.castShadow = true
-        this.pLight.shadow.bias = 0.01
+        if (this.useShadows) {
+            this.pLight.castShadow = true
+            this.pLight.shadow.bias = 0.01
+        }
         console.log("plight", this.pLight)
         const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
         this.scene.add(helper)
@@ -141,7 +145,7 @@ export class LowPolyTestScene extends Scene3D {
 
     async create() {
         this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        this.course.createCourse(() => {
+        this.course.createCourse(this.useShadows, () => {
             loadLowPolyVehicleModels((tire, chassises) => {
                 this.vehicle.addModels(tire, chassises[2])
 
@@ -232,6 +236,26 @@ export class LowPolyTestScene extends Scene3D {
 
                 breakInputDiv.appendChild(breakInput)
                 document.body.appendChild(breakInputDiv)
+
+                const useChaseCamButtontDiv = document.createElement("div")
+                useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
+                useChaseCamButtontDiv.setAttribute("style", "top:75px;")
+                useChaseCamButtontDiv.innerHTML = "Chase cam"
+                const useChaseCamButton = document.createElement("button")
+
+
+                useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
+                useChaseCamButton.addEventListener("click", (e) => {
+                    this.vehicle.updateVehicleSettings({
+                        ...this.vehicle.vehicleSettings,
+                        useChaseCamera: !this.vehicle.useChaseCamera
+                    })
+                    useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
+
+                })
+
+                useChaseCamButtontDiv.appendChild(useChaseCamButton)
+                document.body.appendChild(useChaseCamButtontDiv)
 
                 const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 0, y: 4, z: 0 })
                 ball.body.setBounciness(1)
