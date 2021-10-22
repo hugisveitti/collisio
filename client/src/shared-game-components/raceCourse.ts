@@ -2,6 +2,7 @@ import { CollisionEvent } from "@enable3d/common/dist/types";
 import { GLTF, GLTFLoader, LoadingManager, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
+import { gameItems } from "./gameItems";
 
 
 const loadDiv = document.createElement("div")
@@ -16,12 +17,19 @@ manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
 
 manager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
     loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
-
 }
 
 manager.onLoad = () => {
     loadDiv.innerHTML = ""
 }
+
+const keyNameMatch = (key: string, name: string) => {
+    if (gameItems[key].exactMatch) {
+        return key === name
+    }
+    return name.includes(key)
+}
+
 
 export class RaceCourse {
 
@@ -37,6 +45,7 @@ export class RaceCourse {
     trackName: string
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
+    gamePhysicsObjects: ExtendedObject3D[]
 
 
     constructor(scene: Scene3D, trackName: string, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
@@ -47,159 +56,38 @@ export class RaceCourse {
         this.trackName = trackName
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
+        this.gamePhysicsObjects = []
+    }
+
+    toggleShadows(useShadows: boolean) {
+
+        for (let object of this.gamePhysicsObjects) {
+            for (let key of Object.keys(gameItems)) {
+                if (keyNameMatch(key, object.name)) {
+                    object.receiveShadow = useShadows && gameItems[key].receiveShadow
+                    object.castShadow = useShadows && gameItems[key].castsShadow
+                }
+            }
+        }
     }
 
 
 
     createCourse(useShadows: boolean, courseLoadedCallback: () => void) {
 
-
-        const structureBounciness = 0.2
-
-        interface IGameItem {
-            collisionFlags: number,
-            shape: "convex" | "concave" | "box",
-            receiveShadow?: boolean,
-            notAddPhysics?: boolean,
-            castsShadow?: boolean,
-            /** see enable3d bounciness  */
-            bounciness?: number
-            isCourseObject?: boolean
-            exactMatch?: boolean
-            objectName?: string
-            /** for debug */
-            notVisible?: boolean
-        }
-        const gameItems = {
-            "ground": {
-                collisionFlags: 1,
-                shape: "concave",
-                receiveShadow: true,
-                bounciness: .05
-            },
-            "road": {
-                collisionFlags: 1,
-                shape: "convex",
-                notAddPhysics: true,
-                receiveShadow: true,
-                bounciness: .1
-            },
-            "checkered-flag": {
-                collisionFlags: 1,
-                shape: "convex"
-            },
-            "checkpoint": {
-                collisionFlags: 5,
-                shape: "convex",
-                isCourseObject: true,
-                exactMatch: true,
-                castsShadow: true,
-                receiveShadow: true,
-                objectName: "checkpoint"
-            },
-            "goal": {
-                collisionFlags: 5,
-                shape: "convex",
-                isCourseObject: true,
-                exactMatch: true,
-                objectName: "goal",
-                castsShadow: true,
-                receiveShadow: true,
-            },
-            "tree": {
-                collisionFlags: 1,
-                shape: "concave",
-                castsShadow: true,
-
-            },
-            "pine": {
-                collisionFlags: 1,
-                shape: "concave",
-                castsShadow: true,
-
-            },
-            "leaf": {
-                collisionFlags: 1,
-                shape: "concave",
-                castsShadow: true,
-            },
-            "checkpoint-spawn": {
-                collisionFlags: -1,
-                shape: "concave",
-                notAddPhysics: true,
-                isCourseObject: true,
-                exactMatch: true,
-                objectName: "checkpointSpawn"
-            },
-            "goal-spawn": {
-                collisionFlags: -1,
-                shape: "concave",
-                notAddPhysics: true,
-                isCourseObject: true,
-                exactMatch: true,
-                objectName: "goalSpawn"
-            },
-            "bridge": {
-                collisionFlags: 1,
-                shape: "concave"
-            },
-            "pavement-marking": {
-                collisionFlags: 5,
-                shape: "concave",
-                receiveShadow: true
-            },
-            "fence": {
-                collisionFlags: 1,
-                shape: "convex",
-                castsShadow: true,
-                bounciness: structureBounciness,
-                // notVisible: false,
-
-            },
-            "wall": {
-                collisionFlags: 1,
-                shape: "concave",
-                castsShadow: true,
-                bounciness: structureBounciness
-            },
-            "rock": {
-                collisionFlags: 1,
-                shape: "convex",
-                bounciness: structureBounciness,
-                castsShadow: true,
-            },
-            "barn": {
-                collisionFlags: 1,
-                shape: "concave",
-                bounciness: structureBounciness,
-                castsShadow: true,
-                receiveShadow: true
-            },
-            "house": {
-                collisionFlags: 1,
-                shape: "concave",
-                bounciness: structureBounciness,
-                castsShadow: true,
-                receiveShadow: true
-            }
-
-        } as { [key: string]: IGameItem }
-
         const loader = new GLTFLoader(manager)
-        // const trackName = "track"
-        const trackName = "town-track"
+
         loader.load(`models/${this.trackName}.gltf`, (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
             console.log("gltf", gltf)
             const itemKeys = Object.keys(gameItems)
 
-            const keyNameMatch = (key: string, name: string) => {
-                if (gameItems[key].exactMatch) {
-                    return key === name
-                }
-                return name.includes(key)
-            }
 
+            /* items named hidden-X in blender, will have physics but will be invisible
+            *  items named ghost-X in blender won't have physics but will be visible
+            *  using this we have have complex multi poly sturctures that are difficult to render like fences or tree
+            *  but then render a box in their place for the physics
+            */
             for (let child of gltf.scene.children) {
 
                 if (child.type === "Mesh" || child.type === "Group") {
@@ -218,8 +106,9 @@ export class RaceCourse {
                                 if (child.name.includes("hidden")) {
                                     child.visible = false
                                 }
+                                this.gamePhysicsObjects.push(child as ExtendedObject3D)
                             } else if (child.name.includes("ghost")) {
-                                // this.scene.add.existing(child)
+
                             }
                             if (gameItems[key].isCourseObject) {
                                 // hacky ????

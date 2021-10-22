@@ -304,17 +304,13 @@ export class LowPolyVehicle implements IVehicle {
     turnLeft(angle: number) { };
     turnRight(angle: number) { };
     noTurn() {
-        if (Math.abs(this.vehicleSteering) < steeringIncrement - 0.001) return
-        if (this.vehicleSteering > 0) {
-            this.vehicleSteering -= steeringIncrement
-        } else {
-            this.vehicleSteering += steeringIncrement
-        }
-        this.vehicle.setSteeringValue(this.vehicleSteering, FRONT_LEFT)
-        this.vehicle.setSteeringValue(this.vehicleSteering, FRONT_RIGHT)
-
+        let breakForce = 10
         this.vehicle.setSteeringValue(0, FRONT_LEFT)
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
+        // this.vehicle.setBrake(breakForce, BACK_RIGHT)
+        // this.vehicle.setBrake(breakForce, BACK_LEFT)
+        // this.vehicle.setBrake(breakForce, FRONT_RIGHT)
+        // this.vehicle.setBrake(breakForce, FRONT_LEFT)
     };
     turn(angle: number) {
         if (this.canDrive) {

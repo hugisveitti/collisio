@@ -1,4 +1,4 @@
-import { child, get, push, ref, set, update, onValue } from "firebase/database";
+import { child, get, push, ref, set, update, onValue, remove } from "firebase/database";
 import { toast } from "react-toastify";
 import { IEndOfGameInfoGame, IEndOfGameInfoPlayer } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
@@ -53,7 +53,8 @@ const userGamePlayerInfoPath = "player-info"
 const userGameGameInfoPath = "game-info"
 
 export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: IEndOfGameInfoGame) => {
-    const newGameKey = push(child(ref(database), gameDataRefPath)).key;
+    // const newGameKey = push(child(ref(database), gameDataRefPath)).key;
+    const newGameKey = gameInfo.gameId
     const updates = {}
     updates[gameDataRefPath + "/" + newGameKey] = gameInfo
     for (let i = 0; i < playerGameInfo.length; i++) {
@@ -150,7 +151,36 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
         }
     }, err => {
         console.log("Error getting player data", err)
-    }, { onlyOnce: true })
+    }, {})
+}
+
+export const deletePlayerGameData = (userId: string, gameId: string, trackName: string, numberOfLaps: number) => {
+    const highscoreRef = ref(database, highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId)
+
+
+    console.log('highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId', highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId)
+    remove(highscoreRef).then((v) => {
+        console.log("removed from highscore", v)
+    }).catch(() => {
+        console.log("error removing from highscore")
+    })
+
+
+    const playerDataRef = (ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath + "/" + gameId))
+    // console.log("playerDataRef", playerDataRef)
+    remove(playerDataRef).then((v) => {
+        toast.success("Successfully removed game data")
+        console.log("success removing game data", v)
+    }).catch(err => {
+        toast.error("Error when removing game data")
+        console.log("err when removing game data", err)
+    })
+
+    // update(playerDataRef, null).then(() => {
+    //     console.log("update game data to null")
+    // }).catch((err) => {
+    //     console.log("err updating game data to null", err)
+    // })
 }
 
 const userSettingsRef = "settings"

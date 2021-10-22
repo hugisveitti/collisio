@@ -6,7 +6,7 @@ import { MobileControls, VehicleControls } from "./ControlsClasses"
 
 let speed = 40
 let maxAngle = 0.4
-let angle = 40
+let angle = 25
 let gameIsPaused = false
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, callback?: any) => {
@@ -94,6 +94,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 
 
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
+
     if (vehicleControls.forward) {
         vehicle.goForward(true)
     } else if (vehicleControls.backward) {
@@ -109,9 +110,9 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
     }
 
     if (vehicleControls.left) {
-        vehicle.turnLeft(angle)
+        vehicle.turn(angle)
     } else if (vehicleControls.right) {
-        vehicle.turnRight(-angle)
+        vehicle.turn(-angle)
     } else {
         vehicle.noTurn()
     }

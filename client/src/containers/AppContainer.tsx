@@ -27,6 +27,7 @@ import {
   privateProfilePagePath,
 } from "../components/Routes";
 import LoginComponent from "../components/LoginComponent";
+import { ToastContainer } from "react-toastify";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
@@ -130,6 +131,7 @@ const AppContainer = (props: IAppContainer) => {
       </Modal>
 
       {props.children}
+      <ToastContainer />
     </React.Fragment>
   );
 };

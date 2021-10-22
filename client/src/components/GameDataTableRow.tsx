@@ -1,11 +1,14 @@
-import { Collapse, IconButton, TableCell, TableRow } from "@mui/material";
+import { Collapse, Icon, IconButton, TableCell, TableRow } from "@mui/material";
 import React, { useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { IEndOfGameInfoPlayer } from "../classes/Game";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { deletePlayerGameData, IUser } from "../firebase/firebaseFunctions";
 
 interface IProps {
   playerData: IEndOfGameInfoPlayer;
+  userId: string;
 }
 
 export default (props: IProps) => {
@@ -32,6 +35,20 @@ export default (props: IProps) => {
         <TableCell>{playerData.numberOfLaps}</TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
         <TableCell>{playerData.bestLapTime}</TableCell>
+        <TableCell>
+          <IconButton
+            onClick={() => {
+              deletePlayerGameData(
+                props.userId,
+                playerData.gameId,
+                playerData.trackType,
+                playerData.numberOfLaps
+              );
+            }}
+          >
+            <DeleteForeverIcon />
+          </IconButton>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>

@@ -8,7 +8,7 @@ import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSet
 import { IVehicle } from "../models/IVehicle";
 import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
-import { addControls } from "../utils/controls";
+import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./one-monitor-styles.css";
 import { saveGameData } from "../firebase/firebaseFunctions";
@@ -187,7 +187,7 @@ export class OneMonitorRaceGameScene extends Scene3D {
 
         this.pLight.castShadow = this.useShadows
         this.pLight.shadow.bias = 0.01
-
+        this.course.toggleShadows(useShadows)
 
     }
 
@@ -492,8 +492,12 @@ export class OneMonitorRaceGameScene extends Scene3D {
     update() {
         if (this.courseLoaded) {
             stats.begin()
+            if (startGameAuto) {
+                driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
+            }
             this.updateScoreTable()
             this.updateVehicles()
+
             stats.end()
         }
     }

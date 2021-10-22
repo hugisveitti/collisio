@@ -69,13 +69,18 @@ const GameDataComponent = (props: IGameDataComponent) => {
                   <TableCell component="th">No. laps</TableCell>
                   <TableCell component="th">Total time</TableCell>
                   <TableCell component="th">Best lap time</TableCell>
+                  <TableCell />
                 </TableRow>
               </TableHead>
               <TableBody>
                 {(gamesData as IPlayerGameData[]).map((p, i) => {
                   const key = `${p.gameInfo.gameId}-${i}`;
                   return (
-                    <GameDataTableRow key={key} playerData={p.playerInfo} />
+                    <GameDataTableRow
+                      key={key}
+                      playerData={p.playerInfo}
+                      userId={props.userId}
+                    />
                   );
                 })}
               </TableBody>

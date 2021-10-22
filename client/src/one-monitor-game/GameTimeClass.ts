@@ -63,7 +63,8 @@ export class GameTime {
     }
 
     getTotalTime() {
-        return this.totalTime + this.currentLapTime
+        if (this.finished()) return around(this.totalTime)
+        return this.totalTime + this.getCurrentLapTime()
     }
 
     checkpointCrossed() {
