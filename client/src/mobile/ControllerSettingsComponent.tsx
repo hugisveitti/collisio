@@ -134,6 +134,28 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           onBlur={saveUserSettingsToBD}
         />
       </Grid>
+      <Grid item xs={6}>
+        <Button
+          variant="outlined"
+          onClick={() => {
+            const newVehicleSettings = {
+              ...userSettings.vehicleSettings,
+              useChaseCamera: !userSettings.vehicleSettings.useChaseCamera,
+            } as IVehicleSettings;
+            const newUserSettings = {
+              ...userSettings,
+              vehicleSettings: newVehicleSettings,
+            };
+            setUserSettings(newUserSettings);
+            saveUserSettingsToBD();
+          }}
+        >
+          Camera chaser{" "}
+          {userSettings.vehicleSettings.useChaseCamera ? "On" : "Off"}
+        </Button>
+      </Grid>
+      <Grid item xs={12}></Grid>
+
       <Grid item xs={3}></Grid>
       <Grid item xs={9}>
         <Link to={frontPagePath} style={{ textDecoration: "none" }}>
