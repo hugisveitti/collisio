@@ -70,12 +70,20 @@ export const createFakeHighscoreData = () => {
                 date: new Date(),
                 private: false,
                 isAuthenticated: true,
+                engineForce: 100,
+                steeringSensitivity: -1,
+                breakingForce: -1,
+                vehicleType: "test"
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",
                 name: player.playerName,
                 lapTimes,
-                totalTime: tt
+                totalTime: tt,
+                engineForce: 100,
+                steeringSensitivity: -1,
+                breakingForce: -1,
+                vehicleType: "test"
             })
         }
         const gameData: IEndOfGameInfoGame = {

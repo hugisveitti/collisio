@@ -313,7 +313,7 @@ export class RaceGameScene extends Scene3D {
             if (i >= this.vehicles.length) {
                 let newVehicle: IVehicle
                 // if (this.gameSettings.trackName.includes("low-poly")) {
-                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, "normal")
+                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
                 // } else {
                 // newVehicle = new NormalVehicle(this, color, this.players[i].playerName, i)
                 // }
@@ -330,15 +330,35 @@ export class RaceGameScene extends Scene3D {
 
         // if (this.gameSettings.trackName.includes("low-poly") && !(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
         if (!(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
-            loadLowPolyVehicleModels("normal", (tire, chassises, backTire, frontTire) => {
-                for (let i = 0; i < this.vehicles.length; i++) {
-                    // only 4 colors of chassis
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 4].clone(), frontTire, backTire,)
-                }
+            const loadedVehicleModels = {}
+            // currently loading the models multiple times, which is unneccecary
+            for (let i = 0; i < this.vehicles.length; i++) {
+                // if (loadedVehicleModels[this.players[i].vehicleType] !== undefined) {
+                //     const { tires, chassises } = loadedVehicleModels[this.players[i].vehicleType];
+                //     (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
 
-                this.courseLoaded = true
-                callback()
-            })
+                // } else {
+
+
+                loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
+                    // only x colors of chassis
+                    console.log("loded poly models")
+                    loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
+
+                    if (i === this.vehicles.length - 1) {
+                        this.courseLoaded = true
+                        callback()
+                    }
+                })
+                // }
+                // if (i === this.vehicles.length - 1) {
+
+                //     this.courseLoaded = true
+                // }
+            }
+            console.log("for loop finisehd")
+
         } else {
             callback()
         }
@@ -542,14 +562,22 @@ export class RaceGameScene extends Scene3D {
                 gameId: this.gameId,
                 date: new Date(),
                 private: false,
-                isAuthenticated: this.players[i].isAuthenticated
+                isAuthenticated: this.players[i].isAuthenticated,
+                vehicleType: this.players[i].vehicleType,
+                engineForce: this.vehicles[i].engineForce,
+                breakingForce: this.vehicles[i].breakingForce,
+                steeringSensitivity: this.vehicles[i].steeringSensitivity
             }
             playersData.push(playerData)
             playerGameInfos.push({
                 id: this.players[i].id ?? "undefined",
                 name: this.players[i].playerName,
                 totalTime: this.gameTimers[i].getTotalTime(),
-                lapTimes: this.gameTimers[i].getLapTimes()
+                lapTimes: this.gameTimers[i].getLapTimes(),
+                vehicleType: this.players[i].vehicleType,
+                engineForce: this.vehicles[i].engineForce,
+                breakingForce: this.vehicles[i].breakingForce,
+                steeringSensitivity: this.vehicles[i].steeringSensitivity
             })
         }
 

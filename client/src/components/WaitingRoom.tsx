@@ -1,13 +1,18 @@
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Button,
+  CircularProgress,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Modal,
+  Select,
   TextField,
   Tooltip,
   Typography,
@@ -34,6 +39,7 @@ import GameSettingsComponent from "./GameSettingsComponent";
 import LoginComponent from "./LoginComponent";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
+import { VehicleType } from "../models/LowPolyVehicle";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -157,8 +163,8 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
     };
   }, []);
 
-  const sendTeamChange = (newTeamNumber: number) => {
-    props.socket.emit("team-change", { newTeamNumber });
+  const sendPlayerInfoChanged = (newPlayerInfo: IPlayerInfo) => {
+    props.socket.emit("player-info-change", newPlayerInfo);
   };
 
   const handleStartGame = () => {
@@ -274,7 +280,12 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               value={0}
               checked={player.teamNumber === 0}
               onChange={() => {
-                sendTeamChange(0);
+                const newPayerInfo = {
+                  ...props.store.player,
+                  teamNumber: 0,
+                } as IPlayerInfo;
+                props.store.setPlayer(newPayerInfo);
+                sendPlayerInfoChanged(newPayerInfo);
               }}
             />
             Team 0
@@ -287,7 +298,12 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               value={1}
               checked={player.teamNumber === 1}
               onChange={() => {
-                sendTeamChange(1);
+                const newPayerInfo = {
+                  ...props.store.player,
+                  teamNumber: 1,
+                } as IPlayerInfo;
+                props.store.setPlayer(newPayerInfo);
+                sendPlayerInfoChanged(newPayerInfo);
               }}
             />
             Team 1
@@ -299,6 +315,16 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
       <span className="team-select-container">TEAM: {player.teamNumber}</span>
     );
   };
+
+  if (onMobile && !props.store.player) {
+    return (
+      <AppContainer>
+        <div style={{ marginTop: 75, textAlign: "center", margin: "auto" }}>
+          <CircularProgress />
+        </div>
+      </AppContainer>
+    );
+  }
 
   return (
     <AppContainer>
@@ -422,14 +448,38 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               />
             </React.Fragment>
           )}
+          {onMobile && (
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id="vehicle-select">Vehicle</InputLabel>
+                <Select
+                  style={{
+                    backgroundColor: inputBackgroundColor,
+                  }}
+                  label="Vehicle selection"
+                  name="vehicle"
+                  onChange={(e) => {
+                    const newPayerInfo = {
+                      ...props.store.player,
+                      vehicleType: e.target.value,
+                    } as IPlayerInfo;
+                    props.store.setPlayer(newPayerInfo);
+                    sendPlayerInfoChanged(newPayerInfo);
+                  }}
+                  value={props.store.player.vehicleType}
+                >
+                  <MenuItem value="normal">Normal</MenuItem>
+                  <MenuItem value="tractor">Tractor</MenuItem>
+                  <MenuItem value="f1">F1</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
 
           {onMobile && isIphone() && (
             <React.Fragment>
               <Grid item xs={6} sm={6}>
-                <Tooltip
-                  disableFocusListener
-                  title="To activate the device orientation on iphone the user sometimes needs to press a button to request it. For development purposes this button is here."
-                >
+                <Tooltip title="To activate the device orientation on iphone the user sometimes needs to press a button to request it. For development purposes this button is here.">
                   <Button startIcon={<HelpIcon />}>What is this</Button>
                 </Tooltip>
               </Grid>

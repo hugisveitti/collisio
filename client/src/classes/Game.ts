@@ -1,4 +1,6 @@
+import { VehicleType } from "../models/LowPolyVehicle";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
+
 
 export interface IPlayerConnection {
     playerName: string
@@ -21,6 +23,7 @@ export interface IPlayerInfo {
     teamNumber?: number
     id: string
     isAuthenticated: boolean
+    vehicleType: VehicleType
 }
 
 export type TrackType = "track" | "town-track" | "low-poly-farm-track"
@@ -52,6 +55,10 @@ export interface IEndOfGameInfoPlayer {
     date: Date
     private: boolean
     isAuthenticated: boolean
+    vehicleType: VehicleType
+    engineForce: number
+    breakingForce: number
+    steeringSensitivity: number
 }
 
 export interface IPlayerGameInfo {
@@ -59,6 +66,10 @@ export interface IPlayerGameInfo {
     lapTimes: number[]
     id: string
     name: string
+    vehicleType: VehicleType
+    engineForce: number
+    breakingForce: number
+    steeringSensitivity: number
 }
 
 // info about the game

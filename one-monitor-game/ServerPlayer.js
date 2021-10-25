@@ -16,11 +16,13 @@ class Player {
     id
     userSettings
     isAuthenticated
+    vehicleType
 
     constructor(socket, playerName, id, isAuthenticated) {
         this.socket = socket
         this.playerName = playerName
         this.teamNumber = 1
+        this.vehicleType = "normal"
         this.id = id
         this.isAuthenticated = isAuthenticated
 
@@ -30,7 +32,8 @@ class Player {
         this.isConnected = true
 
         this.setupControler()
-        this.setupTeamChangeListener()
+
+        this.setupPlayerInfoListener()
 
         this.setupQuitGameListener()
         this.setupUserSettingsListener()
@@ -104,7 +107,8 @@ class Player {
             mobileControls: this.mobileControls,
             playerNumber: this.playerNumber,
             id: this.id,
-            isAuthenticated: this.isAuthenticated
+            isAuthenticated: this.isAuthenticated,
+            vehicleType: this.vehicleType
         }
     }
 
@@ -125,12 +129,24 @@ class Player {
         }
     }
 
-    setupTeamChangeListener() {
-        this.socket.on("team-change", ({ newTeamNumber }) => {
-            this.teamNumber = newTeamNumber
+    setupPlayerInfoListener() {
+        this.socket.on("player-info-change", (playerData) => {
+            const keys = Object.keys(playerData)
+            console.log("player info change", playerData)
+            for (let key of keys) {
+                if (playerData[key]) {
+                    this[key] = playerData[key]
+                }
+            }
             this.game.alertWaitingRoom()
         })
     }
+
+    // setupTeamChangeListener() {
+    //     this.socket.on("team-change", ({ newTeamNumber }) => {
+    //         this.teamNumber = newTeamNumber
+    //     })
+    // }
 
     toString() {
         return `${this.playerName} in team: ${this.teamNumber}`

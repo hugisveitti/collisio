@@ -47,11 +47,13 @@ export class NormalVehicle implements IVehicle {
     checkpointPositionRotation: IPositionRotation
     isPaused: boolean
     mass: number
-    engineForce: number
+
     steeringSensitivity: number
     gameTime: GameTime
     vehicleSettings: IVehicleSettings
-
+    engineForce: number = 5000
+    breakingForce: number = 100
+    steeringSentitivity: number = 0.05
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber?: number) {
