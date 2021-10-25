@@ -3,10 +3,7 @@ import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
-import {
-  OneMonitorRaceGameScene,
-  startRaceGameOneMonitor,
-} from "../one-monitor-game/one-monitor-race-game";
+import { RaceGameScene, startRaceGame } from "../one-monitor-game/race-game";
 import { startGameAuto } from "../utils/settings";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "./Routes";
@@ -23,7 +20,7 @@ const GameRoom = (props: IGameRoom) => {
   //   window.location.href = frontPagePath;
   // }
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [gameObject, setGameObject] = useState({} as OneMonitorRaceGameScene);
+  const [gameObject, setGameObject] = useState({} as RaceGameScene);
 
   const history = useHistory();
 
@@ -51,7 +48,7 @@ const GameRoom = (props: IGameRoom) => {
         props.store.gameSettings
       );
     } else if (props.store?.gameSettings?.typeOfGame === "race") {
-      startRaceGameOneMonitor(
+      startRaceGame(
         props.socket,
         props.store.players,
         props.store.gameSettings,

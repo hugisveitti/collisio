@@ -10,7 +10,7 @@ import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera";
 import { OrbitControls } from "@enable3d/three-wrapper/dist/index";
 import Stats from "stats.js"
 import { VehicleControls } from "../utils/ControlsClasses"
-import "../one-monitor-game/one-monitor-styles.css";
+import "../one-monitor-game/game-styles.css";
 import { createLowPolyVehicle } from "../models/LowPolyVehicle"
 
 const vechicleFov = 60

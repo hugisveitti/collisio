@@ -3,12 +3,12 @@ import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link } from "react-router-dom";
 import { frontPagePath } from "./Routes";
-import { OneMonitorRaceGameScene } from "../one-monitor-game/one-monitor-race-game";
+import { RaceGameScene } from "../one-monitor-game/race-game";
 
 interface IGameSettingsModal {
   open: boolean;
   onClose: () => void;
-  gameObject: OneMonitorRaceGameScene;
+  gameObject: RaceGameScene;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {

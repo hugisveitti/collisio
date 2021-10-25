@@ -29,7 +29,7 @@ import {
 } from "./Routes";
 import { IStore } from "./store";
 
-interface IOneMonitorFrontPageProps {
+interface FrontPageProps {
   socket: Socket;
   store: IStore;
 }
@@ -45,7 +45,7 @@ const useStyles = makeStyles({
   },
 });
 
-const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
+const FrontPage = (props: FrontPageProps) => {
   const deviceType = getDeviceType();
   const classes = useStyles();
   const [playerName, setPlayerName] = useState("");
@@ -70,34 +70,11 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     }
   };
 
-  const requestDeviceOrientation = () => {
+  const handleRequestDeviceOrientation = () => {
     if (!needToAskOrientPermission) {
       return;
     }
-
-    // I think it is only needed for iphones
-    if (
-      navigator.userAgent.toLowerCase().includes("iphone") &&
-      DeviceOrientationEvent &&
-      typeof DeviceOrientationEvent["requestPermission"] === "function"
-    ) {
-      DeviceOrientationEvent["requestPermission"]()
-        .then((response) => {
-          if (response == "granted") {
-            console.log("deivce permission granted, do nothing");
-            setNeedToAskOrientPermission(false);
-          } else {
-            toast.error(
-              "You need to grant permission to the device's orientation to be able to play the game, please refresh the page."
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.log("Device motion permission access method not available");
-    }
+    setNeedToAskOrientPermission(false);
   };
 
   const goToWaitingRoom = (roomId: string) => {
@@ -151,7 +128,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
     } else {
       if (user) {
         connectToRoomMobile(_roomId, _playerName);
-        requestDeviceOrientation();
+        handleRequestDeviceOrientation();
       } else {
         setNotLoggedInModelOpen(true);
       }
@@ -206,7 +183,7 @@ const OneMonitorFrontPage = (props: IOneMonitorFrontPageProps) => {
 need to be logged in."
         onContinoueAsGuest={() => {
           connectToRoomMobile(props.store.roomId, playerName);
-          requestDeviceOrientation();
+          handleRequestDeviceOrientation();
         }}
       />
       <div className="container">
@@ -316,4 +293,4 @@ need to be logged in."
   );
 };
 
-export default OneMonitorFrontPage;
+export default FrontPage;

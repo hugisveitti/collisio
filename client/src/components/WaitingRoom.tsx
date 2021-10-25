@@ -3,14 +3,18 @@ import {
   Button,
   Divider,
   Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
   Modal,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import QRCode from "qrcode";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import HelpIcon from "@mui/icons-material/Help";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link, useParams } from "react-router-dom";
@@ -24,8 +28,10 @@ import { inputBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
+import { requestDeviceOrientation } from "../utils/ControlsClasses";
 import { getDeviceType, startGameAuto } from "../utils/settings";
 import GameSettingsComponent from "./GameSettingsComponent";
+import LoginComponent from "./LoginComponent";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
 import { IStore } from "./store";
 
@@ -45,6 +51,8 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
   const [displayName, setDisplayName] = useState("");
   const [connectingGuest, setConnectingGuest] = useState(false);
   const [roomQrCode, setRoomQrCode] = useState("");
+  const [showLoginInComponent, setShowLoginInComponent] = useState(false);
+  const [copyTooltipOpen, setCopyTooltipOpen] = useState(false);
 
   const onMobile = getDeviceType() === "mobile";
   const user = useContext(UserContext);
@@ -173,7 +181,6 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
     }
     /****** */
   }, [props.store.players]);
-
   const renderDisplayNameModal = () => {
     if (userLoading) return null;
     return (
@@ -187,6 +194,8 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
           }
           setDisplayNameModalOpen(false);
           connectToRoom(_displayName);
+          setShowLoginInComponent(false);
+          requestDeviceOrientation();
         }}
       >
         <div
@@ -221,14 +230,31 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
               <LoadingButton
                 loading={connectingGuest}
                 variant="outlined"
-                onClick={() => connectToRoom(displayName)}
+                onClick={() => {
+                  requestDeviceOrientation();
+                  connectToRoom(displayName);
+                }}
               >
                 Submit
               </LoadingButton>
             </Grid>
-            <Grid item xs={6}>
-              <Button variant="contained">Login</Button>
-            </Grid>
+            {showLoginInComponent ? (
+              <Grid item xs={12}>
+                <LoginComponent signInWithPopup={false} />
+              </Grid>
+            ) : (
+              <Grid item xs={6}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    requestDeviceOrientation();
+                    setShowLoginInComponent(true);
+                  }}
+                >
+                  Login
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </div>
       </Modal>
@@ -292,14 +318,26 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
             <Typography component="span">
               Link to room: {window.location.href}
             </Typography>{" "}
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success("Link copied!");
-              }}
+            <Tooltip
+              title="Link copied!"
+              open={copyTooltipOpen}
+              disableFocusListener
+              disableHoverListener
+              disableTouchListener
+              onClose={() => setCopyTooltipOpen(false)}
             >
-              Copy
-            </button>
+              <IconButton
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopyTooltipOpen(true);
+                  setTimeout(() => {
+                    setCopyTooltipOpen(false);
+                  }, 2000);
+                }}
+              >
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           {roomQrCode && (
             <Grid item xs={12}>
@@ -324,48 +362,51 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
           <Grid item xs={12}>
             <h3 className="center">Players in room {props.store.roomId}</h3>
           </Grid>
-          <Grid item xs={false} sm={3} />
-          {props.store.players.length > 0 ? (
-            <Grid item xs={12} sm={6}>
-              <List
-                style={{
-                  backgroundColor: "wheat",
-                }}
-              >
-                {props.store.players.map((player: IPlayerInfo, i: number) => {
-                  return (
-                    <React.Fragment key={player.playerName}>
-                      <ListItem>
-                        <ListItemText
-                          primary={
-                            player.playerNumber ===
-                            props.store.player?.playerNumber ? (
-                              <strong>{player.playerName}</strong>
-                            ) : (
-                              player.playerName
-                            )
-                          }
-                        />
-                        {renderTeamSelect(player, i)}
-                      </ListItem>
-                      {i !== props.store.players.length - 1 && <Divider />}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </Grid>
-          ) : (
-            <Grid item xs={12} sm={6}>
-              <Typography
-                style={{
-                  backgroundColor: "wheat",
-                }}
-              >
-                No players connected
-              </Typography>
-            </Grid>
-          )}
-          <Grid item xs={false} sm={3} />
+
+          <React.Fragment>
+            <Grid item xs={1} sm={3} />
+            {props.store.players.length > 0 ? (
+              <Grid item xs={10} sm={6}>
+                <List
+                  style={{
+                    backgroundColor: "wheat",
+                  }}
+                >
+                  {props.store.players.map((player: IPlayerInfo, i: number) => {
+                    return (
+                      <React.Fragment key={player.playerName}>
+                        <ListItem>
+                          <ListItemText
+                            primary={
+                              player.playerNumber ===
+                              props.store.player?.playerNumber ? (
+                                <strong>{player.playerName}</strong>
+                              ) : (
+                                player.playerName
+                              )
+                            }
+                          />
+                          {renderTeamSelect(player, i)}
+                        </ListItem>
+                        {i !== props.store.players.length - 1 && <Divider />}
+                      </React.Fragment>
+                    );
+                  })}
+                </List>
+              </Grid>
+            ) : (
+              <Grid item xs={10} sm={6}>
+                <Typography
+                  style={{
+                    backgroundColor: "wheat",
+                  }}
+                >
+                  No players connected
+                </Typography>
+              </Grid>
+            )}
+            <Grid item xs={1} sm={3} />
+          </React.Fragment>
 
           {!onMobile && (
             <React.Fragment>
@@ -379,6 +420,27 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
                 socket={props.socket}
                 store={props.store}
               />
+            </React.Fragment>
+          )}
+
+          {onMobile && (
+            <React.Fragment>
+              <Grid item xs={6} sm={6}>
+                <Tooltip
+                  disableFocusListener
+                  title="To activate the device orientation on iphone the user sometimes needs to press a button to request it. For development purposes this button is here."
+                >
+                  <Button startIcon={<HelpIcon />}>What is this</Button>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={6} sm={6}>
+                <Button
+                  variant="outlined"
+                  onClick={() => requestDeviceOrientation()}
+                >
+                  Request device orientation
+                </Button>
+              </Grid>
             </React.Fragment>
           )}
         </Grid>

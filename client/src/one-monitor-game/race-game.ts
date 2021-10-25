@@ -10,7 +10,7 @@ import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
-import "./one-monitor-styles.css";
+import "./game-styles.css";
 import { saveGameData } from "../firebase/firebaseFunctions";
 import { IUserSettings } from "../classes/User";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle";
@@ -41,7 +41,7 @@ interface IView {
     camera: THREE.PerspectiveCamera
 }
 
-export class OneMonitorRaceGameScene extends Scene3D {
+export class RaceGameScene extends Scene3D {
 
     players!: IPlayerInfo[]
     vehicles!: IVehicle[]
@@ -567,8 +567,8 @@ export class OneMonitorRaceGameScene extends Scene3D {
 }
 
 
-export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void, callback: (gameObject: OneMonitorRaceGameScene) => void) => {
-    const config = { scenes: [OneMonitorRaceGameScene], antialias: true }
+export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void, callback: (gameObject: RaceGameScene) => void) => {
+    const config = { scenes: [RaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
         // console.log("project", project)
@@ -578,7 +578,7 @@ export const startRaceGameOneMonitor = (socket: Socket, players: IPlayerInfo[], 
         const key = project.scenes.keys().next().value;
 
         // hacky way to get the project's scene
-        const gameObject = (project.scenes.get(key) as OneMonitorRaceGameScene);
+        const gameObject = (project.scenes.get(key) as RaceGameScene);
         gameObject.setSocket(socket);
         gameObject.setPlayers(players);
         gameObject.setGameSettings(gameSettings, roomId, escPress);

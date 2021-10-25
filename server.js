@@ -70,7 +70,7 @@ const server = app.listen(port, () => {
 })
 
 
-const GameMaster = require("./one-monitor-game/OneMonitorGame")
+const GameMaster = require("./one-monitor-game/ServerGame")
 
 
 const io = require("socket.io")(server, { cors: { origin: "*" } })

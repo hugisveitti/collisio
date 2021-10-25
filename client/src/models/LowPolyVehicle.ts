@@ -12,9 +12,7 @@ import { PerspectiveCamera } from "three";
 
 const cameraOffset = 20
 
-let wheelRadius = .36
-let wheelRadiusS = .36
-let wheelWidth = .2
+
 const FRONT_LEFT = 0
 const FRONT_RIGHT = 1
 const BACK_LEFT = 2
@@ -45,6 +43,32 @@ const DISABLE_DEACTIVATION = 4;
 const DISABLE_SIMULATION = 5;
 
 
+let useBad = false
+const wheelAxisBackPosition = -1.65
+const wheelRadiusBack = 0.63 / 2
+const wheelHalfTrackBack = .9
+const wheelAxisHeightBack = useBad ? 0 : -.75
+
+const wheelAxisFrontPosition = 1.35
+const wheelRadiusFront = 0.63 / 2
+const wheelHalfTrackFront = .9
+const wheelAxisHeightFront = useBad ? 0 : -.75
+
+
+interface IVehicleConfig {
+    wheelAxisBackPosition: number
+}
+
+type VehicleType = "normal" | "tractor"
+
+const vehicleConfigs = {
+    normal: {
+        wheelAxisBackPosition: -1.65
+    },
+    tractor: {
+        wheelAxisBackPosition: -2
+    }
+} as { [key: string]: IVehicleConfig }
 
 export class LowPolyVehicle implements IVehicle {
     canDrive: boolean;
@@ -153,7 +177,7 @@ export class LowPolyVehicle implements IVehicle {
     }
 
     createVehicle() {
-        let useBad = false
+
 
         if (useBad) {
             this.chassisMesh = this.createBadChassis()
@@ -202,15 +226,6 @@ export class LowPolyVehicle implements IVehicle {
 
         this.scene.physics.physicsWorld.addAction(this.vehicle)
 
-        const wheelAxisBackPosition = -1.65
-        const wheelRadiusBack = 0.63 / 2
-        const wheelHalfTrackBack = .9
-        const wheelAxisHeightBack = useBad ? 0 : -.75
-
-        const wheelAxisFrontPosition = 1.35
-        const wheelRadiusFront = 0.63 / 2
-        const wheelHalfTrackFront = .9
-        const wheelAxisHeightFront = useBad ? 0 : -.75
         this.wheelMeshes = []
 
 

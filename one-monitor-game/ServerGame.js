@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const Player = require("./OneMonitorPlayer")
+const Player = require("./ServerPlayer")
 
 const successStatus = "success"
 const errorStatus = "error"

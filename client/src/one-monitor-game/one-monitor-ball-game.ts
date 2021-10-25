@@ -8,7 +8,7 @@ import { NormalVehicle } from "../models/NormalVehicle";
 import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/squaredCourse";
 import { addControls } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
-import "./one-monitor-styles.css";
+import "./game-styles.css";
 // import "../ammo/ammo.wasm.js"
 
 
