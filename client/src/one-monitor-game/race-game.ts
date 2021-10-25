@@ -313,7 +313,7 @@ export class RaceGameScene extends Scene3D {
             if (i >= this.vehicles.length) {
                 let newVehicle: IVehicle
                 // if (this.gameSettings.trackName.includes("low-poly")) {
-                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i)
+                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, "normal")
                 // } else {
                 // newVehicle = new NormalVehicle(this, color, this.players[i].playerName, i)
                 // }
@@ -330,10 +330,10 @@ export class RaceGameScene extends Scene3D {
 
         // if (this.gameSettings.trackName.includes("low-poly") && !(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
         if (!(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
-            loadLowPolyVehicleModels((tire, chassises) => {
+            loadLowPolyVehicleModels("normal", (tire, chassises, backTire, frontTire) => {
                 for (let i = 0; i < this.vehicles.length; i++) {
                     // only 4 colors of chassis
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 4].clone())
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tire.clone(), chassises[i % 4].clone(), frontTire, backTire,)
                 }
 
                 this.courseLoaded = true

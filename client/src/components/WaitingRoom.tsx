@@ -29,7 +29,7 @@ import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
 import { requestDeviceOrientation } from "../utils/ControlsClasses";
-import { getDeviceType, startGameAuto } from "../utils/settings";
+import { getDeviceType, isIphone, startGameAuto } from "../utils/settings";
 import GameSettingsComponent from "./GameSettingsComponent";
 import LoginComponent from "./LoginComponent";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "./Routes";
@@ -423,7 +423,7 @@ const WaitingRoom = (props: IWaitingRoomProps) => {
             </React.Fragment>
           )}
 
-          {onMobile && (
+          {onMobile && isIphone() && (
             <React.Fragment>
               <Grid item xs={6} sm={6}>
                 <Tooltip

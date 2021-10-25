@@ -2,14 +2,18 @@ import { toast } from "react-toastify";
 
 export const requestDeviceOrientation = () => {
     // I think it is only needed for iphones
+
     if (
         navigator.userAgent.toLowerCase().includes("iphone") &&
         DeviceOrientationEvent &&
-        typeof DeviceOrientationEvent["requestPermission"] === "function"
+        // @ts-ignore
+        typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
-        DeviceOrientationEvent["requestPermission"]()
+        // @ts-ignore
+        DeviceOrientationEvent.requestPermission()
             .then((response) => {
                 if (response == "granted") {
+                    toast.success("Permission granted")
                     console.log("deivce permission granted, do nothing");
                 } else {
                     toast.error(
@@ -18,9 +22,11 @@ export const requestDeviceOrientation = () => {
                 }
             })
             .catch((err) => {
+                toast.error("Error occured when asking for permission.", err)
                 console.log(err);
             });
     } else {
+        toast.warn("Device motion permission access method not available")
         console.log("Device motion permission access method not available");
     }
 }

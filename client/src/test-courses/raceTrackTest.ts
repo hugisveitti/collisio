@@ -1,17 +1,14 @@
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d"
-import { SimpleVector } from "../models/IVehicle"
-import { createNormalVehicle, NormalVehicle, } from "../models/NormalVehicle"
-import { THREE } from "enable3d"
+import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
+import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
-import { defaultGameSettings, IGameSettings } from "../classes/Game"
-import { RaceCourse } from "../shared-game-components/raceCourse";
-import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls";
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera";
-import { OrbitControls } from "@enable3d/three-wrapper/dist/index";
 import Stats from "stats.js"
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
+import { defaultGameSettings, IGameSettings } from "../classes/Game"
+import { createNormalVehicle, NormalVehicle } from "../models/NormalVehicle"
+import "../one-monitor-game/game-styles.css"
+import { RaceCourse } from "../shared-game-components/raceCourse"
 import { VehicleControls } from "../utils/ControlsClasses"
-import "../one-monitor-game/game-styles.css";
-import { createLowPolyVehicle } from "../models/LowPolyVehicle"
+import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
 
 const vechicleFov = 60
 

@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
 import { defaultGameSettings, IGameSettings } from "../classes/Game"
-import { loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle"
+import { loadLowPolyVehicleModels, LowPolyVehicle, VehicleType } from "../models/LowPolyVehicle"
 import "../one-monitor-game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/raceCourse"
 import { VehicleControls } from "../utils/ControlsClasses"
@@ -42,6 +42,7 @@ export class LowPolyTestScene extends Scene3D {
     course: RaceCourse
     pLight: THREE.PointLight
     useShadows: boolean
+    vehicleType: VehicleType
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -70,6 +71,7 @@ export class LowPolyTestScene extends Scene3D {
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
+        this.vehicleType = "tractor"
     }
 
     async init() {
@@ -83,7 +85,7 @@ export class LowPolyTestScene extends Scene3D {
     async preload() {
 
         this.loadFont()
-        // this.physics.debug?.enable()
+        this.physics.debug?.enable()
         const { lights } = await this.warpSpeed('-ground', "-light")
         // this.dirLight = lights.directionalLight
         // const helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
@@ -139,15 +141,15 @@ export class LowPolyTestScene extends Scene3D {
             }
         })
 
-        this.vehicle = new LowPolyVehicle(this, "blue", "test low", 0)
+        this.vehicle = new LowPolyVehicle(this, "blue", "test low", 0, this.vehicleType)
 
     }
 
     async create() {
         this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
-            loadLowPolyVehicleModels((tire, chassises) => {
-                this.vehicle.addModels(tire, chassises[2])
+            loadLowPolyVehicleModels(this.vehicleType, (tire, chassises, frontTire, backTire) => {
+                this.vehicle.addModels(tire, chassises[0], frontTire, backTire)
 
                 this.createController()
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)

@@ -24,6 +24,11 @@ export const getDeviceType = (): "desktop" | "mobile" => {
     return "desktop";
 };
 
+// TODO: is this a bad function?
+export const isIphone = () => {
+    return navigator.userAgent.toLowerCase().includes("iphone")
+}
+
 export const baseurl = "http://localhost:5000/"
 
 // if not development then always false, otherwise set by me...

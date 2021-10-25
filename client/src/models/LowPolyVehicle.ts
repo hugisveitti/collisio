@@ -44,29 +44,49 @@ const DISABLE_SIMULATION = 5;
 
 
 let useBad = false
-const wheelAxisBackPosition = -1.65
-const wheelRadiusBack = 0.63 / 2
-const wheelHalfTrackBack = .9
-const wheelAxisHeightBack = useBad ? 0 : -.75
 
-const wheelAxisFrontPosition = 1.35
-const wheelRadiusFront = 0.63 / 2
-const wheelHalfTrackFront = .9
-const wheelAxisHeightFront = useBad ? 0 : -.75
 
 
 interface IVehicleConfig {
     wheelAxisBackPosition: number
+    wheelRadiusBack: number
+    wheelHalfTrackBack: number
+    wheelAxisHeightBack: number
+
+    wheelAxisFrontPosition: number
+    wheelRadiusFront: number
+    wheelHalfTrackFront: number
+    wheelAxisHeightFront: number
+    path: string
 }
 
-type VehicleType = "normal" | "tractor"
+export type VehicleType = "normal" | "tractor"
 
 const vehicleConfigs = {
     normal: {
-        wheelAxisBackPosition: -1.65
+        wheelAxisBackPosition: -1.65,
+        wheelRadiusBack: 0.63 / 2,
+        wheelHalfTrackBack: .9,
+        wheelAxisHeightBack: -.75,
+
+        wheelAxisFrontPosition: 1.35,
+        wheelRadiusFront: 0.63 / 2,
+        wheelHalfTrackFront: .9,
+        wheelAxisHeightFront: -.75,
+        path: "simple-low-poly-car.gltf"
     },
     tractor: {
-        wheelAxisBackPosition: -2
+        wheelAxisBackPosition: -1.85,
+        wheelRadiusBack: 1.37 / 2,
+        wheelHalfTrackBack: .9,
+        wheelAxisHeightBack: -.75,
+
+        wheelAxisFrontPosition: 1.35,
+        wheelRadiusFront: 0.9 / 2,
+        wheelHalfTrackFront: .9,
+        wheelAxisHeightFront: -1.25,
+
+        path: "low-poly-tractor.gltf"
     }
 } as { [key: string]: IVehicleConfig }
 
@@ -74,8 +94,11 @@ export class LowPolyVehicle implements IVehicle {
     canDrive: boolean;
     isPaused: boolean;
     mass: number;
-    tire!: ExtendedObject3D
+    tire: ExtendedObject3D
     chassisMesh!: ExtendedObject3D
+    frontTire: ExtendedObject3D
+    backTire: ExtendedObject3D
+
     scene: Scene3D
     color: string | number | undefined
     name: string
@@ -104,9 +127,10 @@ export class LowPolyVehicle implements IVehicle {
     useChaseCamera: boolean
     vehicleSettings: IVehicleSettings
     camera!: THREE.PerspectiveCamera
+    vehicleType: VehicleType
 
 
-    constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number) {
+    constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
 
         this.scene = scene
         this.color = color
@@ -116,21 +140,33 @@ export class LowPolyVehicle implements IVehicle {
         this.mass = 800
         this.vehicleNumber = vehicleNumber
         this.gameTime = new GameTime(5)
-        this.useChaseCamera = true
+        this.useChaseCamera = false
         this.cameraFollowSpeed = 0.3
         this.vehicleSettings = defaultVehicleSettings
-
+        this.vehicleType = vehicleType
     }
 
-    addModels(tire: ExtendedObject3D, chassis: ExtendedObject3D) {
-
+    addModels(tire: ExtendedObject3D, chassis: ExtendedObject3D, frontTire: ExtendedObject3D, backTire: ExtendedObject3D) {
+        this.backTire = backTire
+        this.frontTire = frontTire
         this.tire = tire
         this.chassisMesh = chassis
-        this.tire.receiveShadow = this.tire.castShadow = true
+        if (this.tire) {
+            this.tire.receiveShadow = this.tire.castShadow = true
+        }
+        if (this.backTire) {
+            this.backTire.receiveShadow = this.backTire.castShadow = true
+        }
+        if (this.frontTire) {
+            this.frontTire.receiveShadow = this.frontTire.castShadow = true
+        }
         this.chassisMesh.receiveShadow = this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
 
         console.log("chassi mesh", this.chassisMesh)
+        console.log("tire", this.tire)
+        console.log("front tire", this.frontTire)
+        console.log("back tire", this.backTire)
 
         this.createVehicle()
     }
@@ -184,13 +220,15 @@ export class LowPolyVehicle implements IVehicle {
 
         }
 
-        this.scene.add.existing(this.chassisMesh, {})
+        // this.scene.add.existing(this.chassisMesh,)
+        // this.chassisMesh.rotation.set(0, 90, 0)
         if (useBad) {
 
             this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass })
         } else {
-            this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass, shape: "convex", autoCenter: false, })
+            this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass, shape: "convex", autoCenter: true, })
         }
+        this.chassisMesh.visible = false
 
 
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
@@ -228,6 +266,15 @@ export class LowPolyVehicle implements IVehicle {
 
         this.wheelMeshes = []
 
+        const wheelAxisBackPosition = vehicleConfigs[this.vehicleType].wheelAxisBackPosition
+        const wheelRadiusBack = vehicleConfigs[this.vehicleType].wheelRadiusBack
+        const wheelHalfTrackBack = vehicleConfigs[this.vehicleType].wheelHalfTrackBack
+        const wheelAxisHeightBack = vehicleConfigs[this.vehicleType].wheelAxisHeightBack
+
+        const wheelAxisFrontPosition = vehicleConfigs[this.vehicleType].wheelAxisFrontPosition
+        const wheelRadiusFront = vehicleConfigs[this.vehicleType].wheelRadiusFront
+        const wheelHalfTrackFront = vehicleConfigs[this.vehicleType].wheelHalfTrackFront
+        const wheelAxisHeightFront = vehicleConfigs[this.vehicleType].wheelAxisHeightFront
 
 
         this.addWheel(
@@ -292,14 +339,27 @@ export class LowPolyVehicle implements IVehicle {
         wheelInfo.set_m_frictionSlip(friction)
         wheelInfo.set_m_rollInfluence(rollInfluence)
 
-        this.wheelMeshes.push(this.createWheelMesh(radius))
+        this.wheelMeshes.push(this.createWheelMesh(radius, isFront))
 
     }
 
-    createWheelMesh(radius: number) {
-        const t = this.tire.clone(true)
+    createWheelMesh(radius: number, isFront: boolean) {
+        if (this.tire) {
+            const t = this.tire.clone(true)
+            this.scene.scene.add(t)
+            return t
+        }
+
+        if (isFront) {
+            const t = this.frontTire.clone(true)
+            this.scene.scene.add(t)
+            return t
+        }
+
+        const t = this.backTire.clone(true)
         this.scene.scene.add(t)
         return t
+
     }
 
     goForward(moreSpeed: boolean) {
@@ -487,7 +547,7 @@ export class LowPolyVehicle implements IVehicle {
                 this.wheelMeshes[i].position.set(p.x(), p.y(), p.z())
                 this.wheelMeshes[i].quaternion.set(q.x(), q.y(), q.z(), q.w())
                 this.vehicle.updateWheelTransform(i, true)
-                //    this.wheelMeshes[i].rotateZ(Math.PI / 2)
+                //  this.wheelMeshes[i].rotateZ(Math.PI / 2)
             } else {
 
             }
@@ -586,15 +646,13 @@ export class LowPolyVehicle implements IVehicle {
 
 }
 
-export const createLowPolyVehicle = async (scene: Scene3D, color: string | number | undefined, name: string,) => {
 
-}
-
-export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chassises: ExtendedObject3D[]) => void) => {
+export const loadLowPolyVehicleModels = (vehicleType: VehicleType, callback: (tire: ExtendedObject3D | undefined, chassises: ExtendedObject3D[], backTire: ExtendedObject3D | undefined, frontTire: ExtendedObject3D | undefined) => void) => {
     const loader = new GLTFLoader()
 
-    loader.load("models/simple-low-poly-car.gltf", (gltf: GLTF) => {
-        let chassises = [] as ExtendedObject3D[], tire: ExtendedObject3D;
+    loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {
+        let chassises = [] as ExtendedObject3D[], tire: ExtendedObject3D, frontTire: ExtendedObject3D, backTire: ExtendedObject3D;
+        console.log("vehicle children", gltf.scene.children)
         for (let child of gltf.scene.children) {
             if (child.type === "Mesh" || child.type === "Group") {
 
@@ -604,17 +662,23 @@ export const loadLowPolyVehicleModels = (callback: (tire: ExtendedObject3D, chas
 
                     chassises.push(chassis)
                 }
-                else if (child.name === "tire") {
+                else if (child.name.includes("tire")) { // === "tire") {
                     tire = (child as ExtendedObject3D)
 
                     tire.geometry.center()
+                } else if (child.name === "back-tire") {
+                    backTire = (child as ExtendedObject3D)
+                    backTire.geometry.center()
+                } else if (child.name === "front-tire") {
+                    frontTire = (child as ExtendedObject3D)
+                    frontTire.geometry.center()
                 }
             }
         }
 
 
 
-        callback(tire, chassises)
+        callback(tire, chassises, frontTire, backTire)
     })
 
 }
