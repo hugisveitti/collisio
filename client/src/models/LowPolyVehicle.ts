@@ -58,6 +58,9 @@ interface IVehicleConfig {
     wheelRadiusFront: number
     wheelHalfTrackFront: number
     wheelAxisHeightFront: number
+
+    is4x4: boolean
+
     path: string
 
     mass: number
@@ -82,6 +85,7 @@ const vehicleConfigs = {
         mass: 800,
         engineForce: 5000,
         breakingForce: 100,
+        is4x4: false,
 
         path: "simple-low-poly-car.gltf"
     },
@@ -98,7 +102,8 @@ const vehicleConfigs = {
 
         mass: 1800,
         engineForce: 8000,
-        breakingForce: 150,
+        breakingForce: 100,
+        is4x4: false,
 
         path: "low-poly-tractor.gltf"
     },
@@ -117,7 +122,8 @@ const vehicleConfigs = {
 
         mass: 1000,
         engineForce: 10000,
-        breakingForce: 200
+        breakingForce: 200,
+        is4x4: false,
 
     },
     test: {
@@ -134,6 +140,7 @@ const vehicleConfigs = {
         mass: 800,
         engineForce: 5000,
         breakingForce: 100,
+        is4x4: false,
     },
 } as { [key: string]: IVehicleConfig }
 
@@ -174,6 +181,7 @@ export class LowPolyVehicle implements IVehicle {
     vehicleSettings: IVehicleSettings
     camera: THREE.PerspectiveCamera
     vehicleType: VehicleType
+    is4x4: boolean
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
@@ -194,6 +202,7 @@ export class LowPolyVehicle implements IVehicle {
         this.mass = vehicleConfigs[this.vehicleType].mass
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
+        this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -204,7 +213,7 @@ export class LowPolyVehicle implements IVehicle {
             this.tires.push(tire.clone())
         }
 
-        this.chassisMesh = chassis
+        this.chassisMesh = chassis.clone()
         this.chassisMesh.receiveShadow = this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
 
@@ -365,7 +374,7 @@ export class LowPolyVehicle implements IVehicle {
         const suspensionCompression = 4.4
         const suspensionRestLength = 0.
 
-        const friction = 50
+        const friction = 500
         const rollInfluence = 0.01
 
         const wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0)
@@ -397,13 +406,10 @@ export class LowPolyVehicle implements IVehicle {
     createWheelMesh(radius: number, index: number) {
 
         if (this.tires.length < 4) {
-
             const t = this.tires[0].clone(true)
             this.scene.scene.add(t)
             return t
         }
-
-
 
         const t = this.tires[index]
         this.scene.scene.add(t)
@@ -412,6 +418,10 @@ export class LowPolyVehicle implements IVehicle {
 
     goForward(moreSpeed: boolean) {
         if (!this.canDrive) return
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_LEFT)
+            this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_RIGHT)
+        }
 
         this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_LEFT)
         this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_RIGHT)
@@ -420,12 +430,27 @@ export class LowPolyVehicle implements IVehicle {
 
     goBackward(speed: number) {
         if (!this.canDrive) return
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(-this.engineForce, FRONT_LEFT)
+            this.vehicle.applyEngineForce(- this.engineForce, FRONT_RIGHT)
+        }
         this.vehicle.applyEngineForce(-this.engineForce, BACK_LEFT)
         this.vehicle.applyEngineForce(-this.engineForce, BACK_RIGHT)
     };
     noForce() {
+
+
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(0, FRONT_LEFT)
+            this.vehicle.applyEngineForce(0, FRONT_RIGHT)
+        }
+
         this.vehicle.applyEngineForce(0, BACK_LEFT)
         this.vehicle.applyEngineForce(0, BACK_RIGHT)
+
+
+
+
     };
     turnLeft(angle: number) { };
     turnRight(angle: number) { };
@@ -641,9 +666,27 @@ export class LowPolyVehicle implements IVehicle {
     getCurrentSpeedKmHour() {
         return this.vehicle.getCurrentSpeedKmHour()
     };
+
     setFont(font: Font) {
         this.font = font
-    };
+        this.createNameMesh()
+    }
+
+    createNameMesh() {
+        const textGeo = new THREE.TextGeometry(this.name, {
+            font: this.font!,
+            size: 1,
+            height: 0.5,
+        })
+
+        const textMesh = new THREE.Mesh(textGeo, new THREE.MeshLambertMaterial({ color: 0x667399, }))
+        textMesh.rotateY(Math.PI)
+        this.scene.add.existing(textMesh)
+
+        textMesh.position.set(3, 3, 0)
+        this.chassisMesh.add(textMesh)
+
+    }
 
     lookForwardsBackwards(lookBackwards: boolean) { };
 

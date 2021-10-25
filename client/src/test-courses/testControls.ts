@@ -103,6 +103,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
 export const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
+
     if (vehicleControls.forward) {
         vehicle.goForward(false)
     } else if (vehicleControls.backward) {

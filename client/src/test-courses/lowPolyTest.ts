@@ -71,7 +71,7 @@ export class LowPolyTestScene extends Scene3D {
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
-        this.vehicleType = "f1"
+        this.vehicleType = "normal"
     }
 
     async init() {
@@ -84,7 +84,7 @@ export class LowPolyTestScene extends Scene3D {
 
     async preload() {
 
-        this.loadFont()
+
         this.physics.debug?.enable()
         const { lights } = await this.warpSpeed('-ground', "-light")
         // this.dirLight = lights.directionalLight
@@ -141,13 +141,14 @@ export class LowPolyTestScene extends Scene3D {
             }
         })
 
-        this.vehicle = new LowPolyVehicle(this, "blue", "test low", 0, this.vehicleType)
+        this.vehicle = new LowPolyVehicle(this, "blue", "test hugi", 0, this.vehicleType)
 
     }
 
     async create() {
         // test-course.gltf
-        this.course = new RaceCourse(this, "test-course", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        // low-poly-farm-track
+        this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
                 this.vehicle.addModels(tires, chassises[0],)
@@ -156,12 +157,12 @@ export class LowPolyTestScene extends Scene3D {
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
                 const p = this.course.goalSpawn.position
                 const r = this.course.goalSpawn.rotation
-
                 this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
                 this.vehicle.resetPosition()
                 // this.dirLight.target = this.vehicle.chassisMesh
                 this.camera.position.set(0, 10, -25)
 
+                this.loadFont()
 
 
                 const engineInputDiv = document.createElement("div")
@@ -383,6 +384,7 @@ export class LowPolyTestScene extends Scene3D {
 
             this.font = response;
             if (this.font && this.vehicle) {
+                console.log("setting font")
                 this.vehicle.setFont(this.font)
             }
         });
