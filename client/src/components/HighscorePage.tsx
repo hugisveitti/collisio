@@ -38,11 +38,14 @@ const HighscorePage = (props: IHighscorePage) => {
 
   useEffect(() => {
     getHighscore((_highscoreDict, _trackKeys, _numberOfLapsKeys) => {
-      setNumberOfLapsKey(_numberOfLapsKeys[0]);
       setTrackKey(_trackKeys[0]);
 
+      const newNumberOfLapKeys = Object.keys(_highscoreDict[_trackKeys[0]]);
+
+      setNumberOfLapsKey(newNumberOfLapKeys[0]);
+      setNumberOfLapsKeys(newNumberOfLapKeys);
+
       setHighscoreDict(_highscoreDict);
-      setNumberOfLapsKeys(_numberOfLapsKeys);
       setTrackKeys(_trackKeys);
 
       setHighscoreHasLoaded(true);
@@ -81,7 +84,7 @@ const HighscorePage = (props: IHighscorePage) => {
                       minWidth: 100,
                       backgroundColor: "wheat",
                     }}
-                    defaultValue={numberOfLapsKeys[0]}
+                    value={numberOfLapsKey}
                     onChange={(e) => {
                       setNumberOfLapsKey(e.target.value);
                     }}
@@ -100,14 +103,24 @@ const HighscorePage = (props: IHighscorePage) => {
                   <Select
                     label="Track name"
                     onChange={(e) => {
-                      setTrackKey(e.target.value);
+                      const newTrackKey = e.target.value;
+                      setTrackKey(newTrackKey);
+
+                      const newNumberOfLapKeys = Object.keys(
+                        highscoreDict[newTrackKey]
+                      );
+
+                      if (!(numberOfLapsKey in highscoreDict[newTrackKey])) {
+                        setNumberOfLapsKey(newNumberOfLapKeys[0]);
+                      }
+                      setNumberOfLapsKeys(newNumberOfLapKeys);
                     }}
                     style={{
                       minWidth: 100,
                       marginLeft: 15,
                       backgroundColor: "wheat",
                     }}
-                    defaultValue={trackKeys[0]}
+                    value={trackKey}
                   >
                     {trackKeys.map((key) => (
                       <MenuItem key={key} value={key}>

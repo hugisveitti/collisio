@@ -24,6 +24,7 @@ export interface IPlayerInfo {
     id: string
     isAuthenticated: boolean
     vehicleType: VehicleType
+    photoURL?: string
 }
 
 export type TrackType = "track" | "town-track" | "low-poly-farm-track"

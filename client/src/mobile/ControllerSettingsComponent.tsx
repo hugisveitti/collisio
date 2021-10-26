@@ -40,10 +40,10 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
 
   const [userSettings, setUserSettings] = useState(undefined);
 
-  const saveUserSettingsToBD = () => {
+  const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
     if (user) {
-      setDBUserSettings(user.uid, userSettings);
-      props.socket.emit("settings-changed", userSettings);
+      setDBUserSettings(user.uid, newUserSettings);
+      props.socket.emit("settings-changed", newUserSettings);
     }
   };
 
@@ -54,7 +54,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           setDBUserSettings(user.uid, defaultUserSettings);
           setUserSettings(defaultUserSettings);
         } else {
-          console.log("odl settings", settings);
           /** For development, when I change the vehicle settings the keys of the old settings need to be updated */
           const newVehicleSettings = {};
           const oldVehicleSettings = settings.vehicleSettings;
@@ -75,7 +74,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
             setDBUserSettings(user.uid, newUserSettings);
           }
 
-          console.log("new user settings", newUserSettings);
           setUserSettings(newUserSettings);
           // send to the game
           setTimeout(() => {
@@ -131,7 +129,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               vehicleSettings: newVehicleSettings,
             };
             setUserSettings(newUserSettings);
-            saveUserSettingsToBD();
+            saveUserSettingsToBD(newUserSettings);
           }}
         >
           Camera chaser{" "}
@@ -156,7 +154,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               vehicleSettings: newVehicleSettings,
             };
             setUserSettings(newUserSettings);
-            saveUserSettingsToBD();
+            saveUserSettingsToBD(newUserSettings);
           }}
         />
       </Grid>
@@ -178,7 +176,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               vehicleSettings: newVehicleSettings,
             };
             setUserSettings(newUserSettings);
-            saveUserSettingsToBD();
+            saveUserSettingsToBD(newUserSettings);
           }}
         />
       </Grid>

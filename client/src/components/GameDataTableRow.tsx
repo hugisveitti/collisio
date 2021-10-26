@@ -73,6 +73,7 @@ export default (props: IProps) => {
                 );
               })}
               <div>Date of race: {playerData.date}</div>
+              <div>Type of vehicle: {playerData.vehicleType ?? "-"}</div>
             </div>
           </Collapse>
         </TableCell>

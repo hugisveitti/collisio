@@ -28,11 +28,11 @@ class GameMaster {
     }
 
     setupPlayerConnectedListener(mobileSocket) {
-        mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated }) => {
+        mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated, photoURL }) => {
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit("player-connected-callback", { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else {
-                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated)
+                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
                 this.rooms[roomId].addPlayer(player)
             }
         })

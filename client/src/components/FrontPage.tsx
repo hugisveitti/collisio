@@ -87,6 +87,7 @@ const FrontPage = (props: FrontPageProps) => {
       playerName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
+      photoURL: user.photoURL,
     } as IPlayerConnection);
 
     props.socket.once("player-connected-callback", (data: ISocketCallback) => {
@@ -168,6 +169,10 @@ const FrontPage = (props: FrontPageProps) => {
         checkIfNeedOrientaitonPrompt
       );
     }
+
+    return () => {
+      props.socket.off("player-connected-callback");
+    };
   }, []);
 
   if (isTestMode) {

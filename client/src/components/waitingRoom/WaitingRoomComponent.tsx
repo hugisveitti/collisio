@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Divider,
   FormControl,
@@ -7,6 +8,7 @@ import {
   InputLabel,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemText,
   MenuItem,
   Select,
@@ -22,6 +24,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
+import FaceIcon from "@mui/icons-material/Face";
 
 import { IPlayerInfo } from "../../classes/Game";
 import { inputBackgroundColor } from "../../providers/theme";
@@ -51,17 +54,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   const roomId = props.roomId;
 
-  useEffect(() => {
-    // only generate qr code on desktop
-    QRCode.toDataURL(window.location.href)
-      .then((url) => {
-        setRoomQrCode(url);
-      })
-      .catch((err) => {
-        console.log("error generating qr code", err);
-      });
-  }, []);
-
   const sendPlayerInfoChanged = (newPlayerInfo: IPlayerInfo) => {
     props.socket.emit("player-info-change", newPlayerInfo);
   };
@@ -76,6 +68,21 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       }
     });
   };
+
+  useEffect(() => {
+    // only generate qr code on desktop
+    QRCode.toDataURL(window.location.href)
+      .then((url) => {
+        setRoomQrCode(url);
+      })
+      .catch((err) => {
+        console.log("error generating qr code", err);
+      });
+
+    return () => {
+      props.socket.off("handle-start-game-callback");
+    };
+  }, []);
 
   useEffect(() => {
     /***** For development */
@@ -211,6 +218,16 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                 return (
                   <React.Fragment key={player.playerName}>
                     <ListItem>
+                      <ListItemAvatar>
+                        {player.photoURL ? (
+                          <Avatar
+                            alt={player.playerName}
+                            src={player.photoURL}
+                          />
+                        ) : (
+                          <FaceIcon />
+                        )}
+                      </ListItemAvatar>
                       <ListItemText
                         primary={
                           player.playerNumber ===

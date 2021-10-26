@@ -17,8 +17,9 @@ class Player {
     userSettings
     isAuthenticated
     vehicleType
+    photoURL
 
-    constructor(socket, playerName, id, isAuthenticated) {
+    constructor(socket, playerName, id, isAuthenticated, photoURL) {
         this.socket = socket
         this.playerName = playerName
         this.teamNumber = 1
@@ -30,6 +31,7 @@ class Player {
         this.VehicleControls = new VehicleControls()
         this.userSettings = new UserSettings()
         this.isConnected = true
+        this.photoURL = photoURL
 
         this.setupControler()
 
@@ -108,7 +110,8 @@ class Player {
             playerNumber: this.playerNumber,
             id: this.id,
             isAuthenticated: this.isAuthenticated,
-            vehicleType: this.vehicleType
+            vehicleType: this.vehicleType,
+            photoURL: this.photoURL
         }
     }
 

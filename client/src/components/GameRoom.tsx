@@ -59,6 +59,10 @@ const GameRoom = (props: IGameRoom) => {
         }
       );
     }
+
+    return () => {
+      props.socket.off("player-disconnected");
+    };
   }, []);
 
   return (

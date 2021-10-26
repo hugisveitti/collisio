@@ -1,8 +1,8 @@
 import { Button, Grid, IconButton, Modal } from "@mui/material";
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import { Link } from "react-router-dom";
-import { frontPagePath } from "./Routes";
+import { Link, useHistory } from "react-router-dom";
+import { frontPagePath, waitingRoomPath } from "./Routes";
 import { RaceGameScene } from "../one-monitor-game/race-game";
 
 interface IGameSettingsModal {
@@ -12,6 +12,7 @@ interface IGameSettingsModal {
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
+  const history = useHistory();
   if (!props.gameObject) return null;
   return (
     <Modal open={props.open} onClose={props.onClose}>
@@ -48,6 +49,28 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               }}
             >
               Toggle Shadows
+            </Button>
+          </Grid>
+          {/* <Grid item xs={3}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                history.push(waitingRoomPath + "/" + props.gameObject.roomId);
+                // need to alert the mobile devices, clear the canvas, stop the game
+              }}
+            >
+              Back to waiting room
+            </Button>
+          </Grid> */}
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                props.gameObject.restartGame();
+                props.onClose();
+              }}
+            >
+              Reset game
             </Button>
           </Grid>
         </Grid>

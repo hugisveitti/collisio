@@ -76,7 +76,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       roomId,
       playerName: _displayName,
       playerId: user?.uid ?? uuid(),
-      isAuthenticated: false,
+      isAuthenticated: Boolean(user),
+      photoURL: user.photoURL,
     } as IPlayerConnection);
     props.socket.once(
       "player-connected-callback",
@@ -89,8 +90,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           toast.success(response.message);
           setDisplayNameModalOpen(false);
         } else {
-          toast.error(response.message);
+          //   toast.error(response.message);
           setConnectingGuest(false);
+          history.push(frontPagePath);
         }
       }
     );
@@ -135,7 +137,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       });
     }
     return () => {
+      props.socket.off("game-settings-changed");
+      props.socket.off("player-joined");
       props.socket.off("player-disconnected");
+      props.socket.off("get-players-in-room-callback");
+      props.socket.off("player-connected-callback");
     };
   }, []);
 

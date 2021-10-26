@@ -57,6 +57,7 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
     const newGameKey = gameInfo.gameId
     const updates = {}
     updates[gameDataRefPath + "/" + newGameKey] = gameInfo
+    console.log("saving player game info", playerGameInfo)
     for (let i = 0; i < playerGameInfo.length; i++) {
         if (playerGameInfo[i].isAuthenticated) {
             updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = playerGameInfo[i]
@@ -132,13 +133,16 @@ export interface IPlayerGameData {
 }
 
 export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
-    const playerDataRef = (ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath))
+    const playerDataRef = ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)
+
+    console.log('usersRefPath + "/" + userId + "/" + userGamesRefPath', usersRefPath + "/" + userId + "/" + userGamesRefPath)
 
     onValue(playerDataRef, snap => {
         if (snap.exists()) {
             const data = snap.val()
             const gamesData = [] as IPlayerGameData[]
             const keys = Object.keys(data)
+            console.log("data", data)
             for (let key of keys) {
                 gamesData.unshift({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
             }
@@ -152,6 +156,8 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
     }, err => {
         console.log("Error getting player data", err)
     }, {})
+
+    return playerDataRef
 }
 
 export const deletePlayerGameData = (userId: string, gameId: string, trackName: string, numberOfLaps: number) => {
