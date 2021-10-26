@@ -282,18 +282,22 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               label="Vehicle selection"
               name="vehicle"
               onChange={(e) => {
-                const newPayerInfo = {
-                  ...props.store.player,
-                  vehicleType: e.target.value,
-                } as IPlayerInfo;
-                props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(newPayerInfo);
+                if (!user) {
+                  toast.error("You have to log in to change vehicles");
+                } else {
+                  const newPayerInfo = {
+                    ...props.store.player,
+                    vehicleType: e.target.value,
+                  } as IPlayerInfo;
+                  props.store.setPlayer(newPayerInfo);
+                  sendPlayerInfoChanged(newPayerInfo);
+                }
               }}
               value={props.store.player.vehicleType}
             >
               <MenuItem value="normal">Normal</MenuItem>
               <MenuItem value="tractor">Tractor</MenuItem>
-              <MenuItem value="f1">F1</MenuItem>
+              <MenuItem value="f1">F1 car</MenuItem>
             </Select>
           </FormControl>
         </Grid>

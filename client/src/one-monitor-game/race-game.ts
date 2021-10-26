@@ -325,7 +325,7 @@ export class RaceGameScene extends Scene3D {
 
         const courseY = this.course.ground?.position?.y ?? 2
         let possibleStartingPos = []
-        let offset = 0
+        let offset = 1
         for (let i = 0; i < this.vehicles.length; i++) {
 
             offset *= -1
@@ -334,8 +334,10 @@ export class RaceGameScene extends Scene3D {
                 offset += (Math.sign(offset) * 5)
             }
 
+            console.log("offset", offset)
 
-            possibleStartingPos.push({ x: p.x + offset - 10, y: courseY, z: p.z + offset - 10 })
+
+            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY + 2, z: p.z + offset - 5 })
         }
 
 

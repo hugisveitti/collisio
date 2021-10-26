@@ -90,15 +90,15 @@ const vehicleConfigs = {
         path: "simple-low-poly-car.gltf"
     },
     tractor: {
-        wheelAxisBackPosition: -2.2,
-        wheelRadiusBack: 3 / 2,
-        wheelHalfTrackBack: 2,
-        wheelAxisHeightBack: -2.2,
+        wheelAxisBackPosition: -1.8,
+        wheelRadiusBack: 2.4 / 2,
+        wheelHalfTrackBack: 1.6,
+        wheelAxisHeightBack: -1.8,
 
-        wheelAxisFrontPosition: 2.5,
-        wheelRadiusFront: 2 / 2,
-        wheelHalfTrackFront: 1.7,
-        wheelAxisHeightFront: -2.5,
+        wheelAxisFrontPosition: 2.1,
+        wheelRadiusFront: 1.6 / 2,
+        wheelHalfTrackFront: 1.36,
+        wheelAxisHeightFront: -2.1,
 
         mass: 1800,
         engineForce: 8000,
@@ -698,7 +698,7 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-        this.setPosition(position.x, position.y, position.z)
+        this.setPosition(position.x, position.y + 4, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
     };
 

@@ -71,7 +71,7 @@ export class LowPolyTestScene extends Scene3D {
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
-        this.vehicleType = "normal"
+        this.vehicleType = "tractor"
     }
 
     async init() {
@@ -151,7 +151,7 @@ export class LowPolyTestScene extends Scene3D {
         this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
-                this.vehicle.addModels(tires, chassises[0],)
+                this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
 
                 this.createController()
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
