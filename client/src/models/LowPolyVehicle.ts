@@ -768,7 +768,7 @@ const tiresConfig = [
 ]
 
 
-export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void) => {
+export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void, onlyLoad?: boolean) => {
     const loader = new GLTFLoader()
 
     loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {
@@ -780,18 +780,24 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
                 if (child.name.includes("chassis")) {
                     let chassis = (child as ExtendedObject3D);
-                    chassis.geometry.center();
+                    if (!onlyLoad) {
+                        chassis.geometry.center();
+                    }
                     chassises.push(chassis)
                 }
                 else if (child.name === "tire") {
                     const tire = (child as ExtendedObject3D)
-                    tire.geometry.center()
+                    if (!onlyLoad) {
+                        tire.geometry.center()
+                    }
                     tires.push(tire)
                 } else {
                     for (let tireConfig of tiresConfig) {
                         if (child.name === tireConfig.name) {
                             tires[tireConfig.number] = (child as ExtendedObject3D)
-                            tires[tireConfig.number].geometry.center()
+                            if (!onlyLoad) {
+                                tires[tireConfig.number].geometry.center()
+                            }
                         }
                     }
                 }

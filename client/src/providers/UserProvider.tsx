@@ -1,5 +1,7 @@
 import { User } from "@firebase/auth";
 import { ref, set } from "@firebase/database";
+import { off } from "firebase/database";
+
 import React, { createContext, useEffect, useState } from "react";
 import { createDBUser, getDBUser, IUser } from "../firebase/firebaseFunctions";
 
@@ -18,7 +20,7 @@ export const UserContext = createContext(null as null | IUser);
 const UserProvider = (props: IUserProvider) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
-    auth.onAuthStateChanged((userAuth) => {
+    const authListener = auth.onAuthStateChanged((userAuth) => {
       if (auth.currentUser && !user) {
         const userInfo = {
           displayName: auth.currentUser.displayName,
@@ -33,6 +35,8 @@ const UserProvider = (props: IUserProvider) => {
         setUser(undefined);
       }
     });
+
+    return () => {};
   }, []);
 
   return (

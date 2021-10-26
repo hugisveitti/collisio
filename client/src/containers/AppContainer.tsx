@@ -16,6 +16,7 @@ import React, { useContext, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import HelpIcon from "@mui/icons-material/Help";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { UserContext } from "../providers/UserProvider";
 import { signOut } from "../firebase/firebaseInit";
@@ -25,6 +26,7 @@ import {
   highscorePagePath,
   howToPlayPagePath,
   privateProfilePagePath,
+  showRoomPagePath,
 } from "../components/Routes";
 import LoginComponent from "../components/LoginComponent";
 import { ToastContainer } from "react-toastify";
@@ -110,6 +112,12 @@ const AppContainer = (props: IAppContainer) => {
                 <SportsScoreIcon />
               </ListItemIcon>
               <ListItemText primary="Highscores" />
+            </ListItem>
+            <ListItem button onClick={() => history.push(showRoomPagePath)}>
+              <ListItemIcon>
+                <DirectionsCarIcon />
+              </ListItemIcon>
+              <ListItemText primary="Car room" />
             </ListItem>
           </List>
         </Box>

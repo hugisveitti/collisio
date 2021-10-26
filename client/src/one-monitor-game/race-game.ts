@@ -282,6 +282,8 @@ export class RaceGameScene extends Scene3D {
 
     async createVehicles(callback: () => void) {
         const loadedVehicleModels = {}
+        // get random color of chassis
+        let chassisColOffset = Math.floor(Math.random() * 4)
         for (let i = 0; i < this.players.length; i++) {
             const color = possibleColors[i]
 
@@ -298,7 +300,7 @@ export class RaceGameScene extends Scene3D {
                 // only x colors of chassis
                 console.log("loded poly models")
                 loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
-                (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
+                (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[(i + chassisColOffset) % chassises.length])
 
                 if (i === this.vehicles.length - 1) {
 

@@ -13,6 +13,7 @@ import PrivateProfilePage from "./PrivateProfilePage";
 import { IStore } from "./store";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
+import ShowRoomComponent from "./showRoom/ShowRoomComponent";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -23,6 +24,7 @@ export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
 export const privateProfilePagePath = "/private-profile";
 export const publicProfilePagePath = "/public-profile/:id";
+export const showRoomPagePath = "/show-room";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -107,6 +109,10 @@ const Routes = () => {
         <Route
           path={privateProfilePagePath}
           render={(props) => <PrivateProfilePage {...props} />}
+        />
+        <Route
+          path={showRoomPagePath}
+          render={(props) => <ShowRoomComponent {...props} />}
         />
       </Switch>
     </Router>
