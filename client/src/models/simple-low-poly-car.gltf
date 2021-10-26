@@ -33,7 +33,7 @@
         },
         {
             "mesh" : 1,
-            "name" : "front-left-tire",
+            "name" : "front-right-tire",
             "scale" : [
                 0.6317787170410156,
                 0.6317787170410156,
@@ -47,7 +47,7 @@
         },
         {
             "mesh" : 2,
-            "name" : "front-right-tire",
+            "name" : "front-left-tire",
             "scale" : [
                 0.6317780613899231,
                 0.6317787170410156,

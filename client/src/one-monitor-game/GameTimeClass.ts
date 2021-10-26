@@ -47,6 +47,7 @@ export class GameTime {
     }
 
     lapDone() {
+        if (this.finished()) return
         const lapTime = this.getCurrentLapTime()
         this.lapTimes.push(lapTime)
         this.totalTime += lapTime

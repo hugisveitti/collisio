@@ -90,7 +90,7 @@ export class RaceGameScene extends Scene3D {
         this.finishedTime = []
         this.gameId = uuid()
         this.gameTimers = []
-        this.useShadows = true
+        this.useShadows = false
     }
 
 
@@ -576,6 +576,8 @@ export class RaceGameScene extends Scene3D {
         }
 
         saveGameData(playersData, endOfGameInfo)
+        // if save then update gameId
+        this.gameId = uuid()
     }
 }
 
