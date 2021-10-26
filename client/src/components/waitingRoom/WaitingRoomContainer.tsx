@@ -77,7 +77,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       playerName: _displayName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
-      photoURL: user.photoURL,
+      photoURL: user?.photoURL,
     } as IPlayerConnection);
     props.socket.once(
       "player-connected-callback",
@@ -99,6 +99,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   };
 
   useEffect(() => {
+    console.log("on mobile", onMobile, props.store.player);
     if (!onMobile) return;
 
     if (!user && !props.store.player) {
@@ -113,10 +114,12 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     setTimeout(() => {
+      /** TODO: do this */
       setUserLoading(false);
     }, 1000);
 
     props.socket.on("player-joined", ({ players: _players }) => {
+      console.log("player joined", _players);
       props.store.setPlayers(_players);
     });
 
@@ -228,6 +231,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   return (
     <AppContainer>
       <div className="container">
+        {renderDisplayNameModal()}
         {onMobile && !props.store.player ? (
           <div
             className="container"
@@ -237,7 +241,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </div>
         ) : (
           <React.Fragment>
-            {renderDisplayNameModal()}
             <WaitingRoomComponent
               socket={props.socket}
               store={props.store}

@@ -19,7 +19,9 @@ export const gameItems = {
         collisionFlags: 1,
         shape: "concave",
         receiveShadow: true,
-        bounciness: .05
+        bounciness: .05,
+        isCourseObject: true,
+        objectName: "ground"
     },
     "road": {
         collisionFlags: 1,
@@ -37,7 +39,7 @@ export const gameItems = {
         shape: "convex",
         isCourseObject: true,
         exactMatch: true,
-        castsShadow: true,
+        castsShadow: false,
         receiveShadow: true,
         objectName: "checkpoint"
     },
@@ -47,25 +49,25 @@ export const gameItems = {
         isCourseObject: true,
         exactMatch: true,
         objectName: "goal",
-        castsShadow: true,
+        castsShadow: false,
         receiveShadow: true,
     },
     "tree": {
         collisionFlags: 1,
         shape: "concave",
-        castsShadow: true,
+        castsShadow: false,
 
     },
     "pine": {
         collisionFlags: 1,
         shape: "concave",
-        castsShadow: true,
+        castsShadow: false,
 
     },
     "leaf": {
         collisionFlags: 1,
         shape: "concave",
-        castsShadow: true,
+        castsShadow: false,
     },
     "checkpoint-spawn": {
         collisionFlags: -1,
@@ -95,35 +97,33 @@ export const gameItems = {
     "fence": {
         collisionFlags: 1,
         shape: "convex",
-        castsShadow: true,
+        castsShadow: false,
         bounciness: structureBounciness,
-
-
     },
     "wall": {
         collisionFlags: 1,
         shape: "concave",
-        castsShadow: true,
+        castsShadow: false,
         bounciness: structureBounciness
     },
     "rock": {
         collisionFlags: 1,
         shape: "convex",
         bounciness: structureBounciness,
-        castsShadow: true,
+        castsShadow: false,
     },
     "barn": {
         collisionFlags: 1,
         shape: "concave",
         bounciness: structureBounciness,
-        castsShadow: true,
+        castsShadow: false,
         receiveShadow: true
     },
     "house": {
         collisionFlags: 1,
         shape: "concave",
         bounciness: structureBounciness,
-        castsShadow: true,
+        castsShadow: false,
         receiveShadow: true
     }
 

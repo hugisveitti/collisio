@@ -149,8 +149,8 @@ class Game {
 
 
         player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo() } })
-        player.socket.join(player.roomId)
-        player.socket.emit("room-connected", { roomId: player.roomId, isLeader: player.isLeader })
+        player.socket.join(this.roomId)
+        player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()
         if (this.gameStarted) {
             player.startGame()
@@ -216,15 +216,17 @@ class Game {
     // if game hasn't started, remove player from game
     playerDisconnected(playerName, playerId) {
         this.socket.emit("player-disconnected", { playerName })
+
         if (!this.gameStarted) {
             for (let i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
-                    this.players.splice(i, i + 1)
-                    break;
+                    this.players.splice(i, 1)
+
                 }
             }
         }
+
         this.alertWaitingRoom()
     }
 

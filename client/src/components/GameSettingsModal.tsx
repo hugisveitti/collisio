@@ -62,6 +62,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               Back to waiting room
             </Button>
           </Grid> */}
+          <Grid item xs={1} />
           <Grid item xs={3}>
             <Button
               variant="contained"

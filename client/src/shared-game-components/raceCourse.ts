@@ -112,6 +112,7 @@ export class RaceCourse {
                             }
                             if (gameItems[key].isCourseObject) {
                                 // hacky ????
+
                                 const code = `this.${gameItems[key].objectName} = child`
                                 eval(code)
                             }

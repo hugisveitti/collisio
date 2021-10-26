@@ -49,6 +49,7 @@ const Routes = () => {
         mobileControls: new MobileControls(),
         vehicleControls: new VehicleControls(),
         id: "1",
+        vehicleType: "f1",
       } as IPlayerInfo;
       setPlayers([nplayer]);
     }

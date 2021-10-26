@@ -486,17 +486,21 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setVelocity(0, 0, 0)
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
     };
+
     start() {
         this.chassisMesh.body.setCollisionFlags(0)
     };
+
     pause() {
         this.isPaused = true
         this.chassisMesh.body.setCollisionFlags(1)
     };
+
     unpause() {
         this.isPaused = false
         this.chassisMesh.body.setCollisionFlags(0)
     };
+
     addCamera(camera: THREE.PerspectiveCamera) {
         if (!this.useChaseCamera) {
             this.chassisMesh.add(camera)
@@ -694,7 +698,7 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-        this.setPosition(position.x, position.y + 6, position.z)
+        this.setPosition(position.x, position.y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
     };
 
@@ -764,7 +768,7 @@ const tiresConfig = [
 ]
 
 
-export const loadLowPolyVehicleModels = (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void) => {
+export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void) => {
     const loader = new GLTFLoader()
 
     loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {

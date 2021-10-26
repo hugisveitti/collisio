@@ -90,7 +90,7 @@ export class RaceGameScene extends Scene3D {
         this.finishedTime = []
         this.gameId = uuid()
         this.gameTimers = []
-        this.useShadows = false
+        this.useShadows = true
     }
 
 
@@ -105,8 +105,6 @@ export class RaceGameScene extends Scene3D {
         }
 
         this.scene.add(this.pLight)
-
-
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
         hLight.position.set(0, 1, 0)
@@ -125,24 +123,16 @@ export class RaceGameScene extends Scene3D {
         // this.physics.debug?.enable()
         // this.physics.debug?.mode(2048 + 4096)
 
-
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             this.createVehicles(() => {
                 this.loadFont()
-                const p = this.course.goalSpawn.position
-                const r = this.course.goalSpawn.rotation
-                for (let i = 0; i < this.vehicles.length; i++) {
-                    this.vehicles[i].setCheckpointPositionRotation({ position: { x: p.x + (i * 5) - 10, y: 1, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
-                    this.vehicles[i].resetPosition()
-                    this.vehicles[i].pause()
-                }
                 this.createViews()
                 this.createController()
-                importantInfoDiv.innerHTML = "Race starting in"
-                setTimeout(() => {
-                    this.startRaceCountdown()
-                }, 2000)
+
+                this.resetVehicles()
+                this.startRaceCountdown()
+
             })
         })
 
@@ -181,13 +171,25 @@ export class RaceGameScene extends Scene3D {
 
     }
 
+    setPlayers(players: IPlayerInfo[]) {
+        this.players = players
+    }
+
+    setSocket(socket: Socket) {
+        this.socket = socket
+        this.userSettingsListener()
+    }
+
+    createController() {
+        this.vehicleControls = new VehicleControls()
+        addControls(this.vehicleControls, this.socket, this.vehicles)
+    }
+
     setUseShadows(useShadows: boolean) {
         this.useShadows = useShadows
-
         this.pLight.castShadow = this.useShadows
         this.pLight.shadow.bias = 0.01
         this.course.toggleShadows(useShadows)
-
     }
 
     isGamePaused() {
@@ -202,7 +204,6 @@ export class RaceGameScene extends Scene3D {
         } else {
             importantInfoDiv.innerHTML = "GAME PAUSED <br /> Press 'p' to unpause."
         }
-
 
         for (let i = 0; i < this.vehicles.length; i++) {
             if (isPaused) {
@@ -224,8 +225,12 @@ export class RaceGameScene extends Scene3D {
         this.escPress = escPress
     }
 
+    onWindowResize() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
     startRaceCountdown() {
-        let countdown = startGameAuto ? 1 : 3
+        let countdown = startGameAuto ? 1 : 4
 
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
@@ -259,113 +264,95 @@ export class RaceGameScene extends Scene3D {
         }
     }
 
-    updateScoreTable() {
-
-        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
-        for (let i = 0; i < this.vehicles.length; i++) {
-            let cLapTime = this.gameTimers[i].getCurrentLapTime().toFixed(2)
-            const bLT = this.gameTimers[i].getBestLapTime() === Infinity ? "-" : this.gameTimers[i].getBestLapTime()
-            let totalTime = this.gameTimers[i].getTotalTime()
-            if (this.gameTimers[i].finished()) {
-                cLapTime = "Fin"
-            }
-            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime}</td><td>${totalTime.toFixed(2)}</td><td>${this.gameTimers[i].lapNumber} / ${this.totalNumberOfLaps}</td></tr>`
-        }
-        s += "</table>"
-        scoreTable.innerHTML = s
-    }
-
     restartGame() {
-        console.log("restart game")
+
         this.raceOnGoing = false
         this.winner = ""
         this.winTime = -1
-        const restartInSeconds = 3
-        importantInfoDiv.innerHTML = "Restarting game in " + restartInSeconds + " seconds.."
-        const p = this.course.goalSpawn.position
-        const r = this.course.goalSpawn.rotation
-        for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].setCheckpointPositionRotation({ position: { x: p.x + (i * 5) - 10, y: 1, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
-            this.vehicles[i].resetPosition()
-            this.vehicles[i].stop()
-        }
 
 
+        this.resetVehicles()
+
+        const sec = 2
+        importantInfoDiv.innerHTML = "Race starting in " + sec + " seconds"
         setTimeout(() => {
-            this.createVehicles(() => {
-
-                this.startRaceCountdown()
-            })
-        }, restartInSeconds * 1000)
+            this.startRaceCountdown()
+        }, sec * 1000)
     }
 
-    createVehicles(callback: () => void) {
+    async createVehicles(callback: () => void) {
+        const loadedVehicleModels = {}
+        for (let i = 0; i < this.players.length; i++) {
+            const color = possibleColors[i]
+
+            let newVehicle: IVehicle
+            // if (this.gameSettings.trackName.includes("low-poly")) {
+            newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
+
+            this.vehicles.push(newVehicle)
 
 
+            this.gameTimers.push(new GameTime(this.totalNumberOfLaps))
+
+            await loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
+                // only x colors of chassis
+                console.log("loded poly models")
+                loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
+                (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
+
+                if (i === this.vehicles.length - 1) {
+
+                    this.courseLoaded = true
+                    callback()
+                }
+            })
+        }
+    }
+
+
+
+    resetVehicles() {
         // delete?
         for (let timer of this.gameTimers) {
             timer.stop()
         }
+
         this.gameTimers = []
+        const p = this.course.goalSpawn.position
+        const r = this.course.goalSpawn.rotation
+
+        const courseY = this.course.ground?.position?.y ?? 2
+        let possibleStartingPos = []
+        let offset = 0
+        for (let i = 0; i < this.vehicles.length; i++) {
+
+            offset *= -1
+
+            if (i % 2 !== 0) {
+                offset += (Math.sign(offset) * 5)
+            }
+
+
+            possibleStartingPos.push({ x: p.x + offset - 10, y: courseY, z: p.z + offset - 10 })
+        }
+
 
         for (let i = 0; i < this.players.length; i++) {
-            const color = possibleColors[i]
-            if (i >= this.vehicles.length) {
-                let newVehicle: IVehicle
-                // if (this.gameSettings.trackName.includes("low-poly")) {
-                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
-
-                this.vehicles.push(newVehicle)
-
-            }
             this.gameTimers.push(new GameTime(this.totalNumberOfLaps))
-
             this.vehicles[i].canDrive = false
 
-        }
+            const sI = Math.floor(Math.random() * possibleStartingPos.length)
+            const sPos = possibleStartingPos[sI]
+            possibleStartingPos.splice(sI, 1)
 
-        // if (this.gameSettings.trackName.includes("low-poly") && !(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
-        if (!(this.vehicles[0] as LowPolyVehicle).modelsLoaded) {
-            const loadedVehicleModels = {}
-            // currently loading the models multiple times, which is unneccecary
-            for (let i = 0; i < this.vehicles.length; i++) {
-                // if (loadedVehicleModels[this.players[i].vehicleType] !== undefined) {
-                //     const { tires, chassises } = loadedVehicleModels[this.players[i].vehicleType];
-                //     (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
-
-                // } else {
-
-
-                loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
-                    // only x colors of chassis
-                    console.log("loded poly models")
-                    loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[i % chassises.length])
-
-                    if (i === this.vehicles.length - 1) {
-                        this.courseLoaded = true
-                        callback()
-                    }
-                })
-                // }
-                // if (i === this.vehicles.length - 1) {
-
-                //     this.courseLoaded = true
-                // }
-            }
-            console.log("for loop finisehd")
-
-        } else {
-            callback()
+            this.vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
+            this.vehicles[i].resetPosition()
+            this.vehicles[i].pause()
         }
     }
 
 
 
-
-    onWindowResize() {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
 
@@ -455,10 +442,7 @@ export class RaceGameScene extends Scene3D {
         }
     }
 
-    setSocket(socket: Socket) {
-        this.socket = socket
-        this.userSettingsListener()
-    }
+
 
 
     userSettingsListener() {
@@ -467,16 +451,28 @@ export class RaceGameScene extends Scene3D {
         })
     }
 
-    createController() {
-        this.vehicleControls = new VehicleControls()
-        addControls(this.vehicleControls, this.socket, this.vehicles)
-    }
+
 
     checkVehicleOutOfBounds(idx: number) {
         const pos = this.vehicles[idx].getPosition()
         if (this.course.checkIfObjectOutOfBounds(pos)) {
             this.resetPlayer(idx)
         }
+    }
+
+    updateScoreTable() {
+        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
+        for (let i = 0; i < this.vehicles.length; i++) {
+            let cLapTime = this.gameTimers[i].getCurrentLapTime().toFixed(2)
+            const bLT = this.gameTimers[i].getBestLapTime() === Infinity ? "-" : this.gameTimers[i].getBestLapTime()
+            let totalTime = this.gameTimers[i].getTotalTime()
+            if (this.gameTimers[i].finished()) {
+                cLapTime = "Fin"
+            }
+            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime}</td><td>${totalTime.toFixed(2)}</td><td>${this.gameTimers[i].lapNumber} / ${this.totalNumberOfLaps}</td></tr>`
+        }
+        s += "</table>"
+        scoreTable.innerHTML = s
     }
 
     updateVehicles() {
@@ -522,27 +518,15 @@ export class RaceGameScene extends Scene3D {
         this.vehicles[idx].resetPosition()
     }
 
-    resetPlayers() {
-        for (let i = 0; i < this.vehicles.length; i++) {
-            this.resetPlayer(i)
-        }
-    }
-
-    setPlayers(players: IPlayerInfo[]) {
-        this.players = players
-    }
-
     loadFont() {
         const fontName = "helvetiker"
         const fontWeight = "regular"
         const loader = new THREE.FontLoader();
         loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
-
             this.font = response;
             for (let vehicle of this.vehicles) {
                 vehicle.setFont(this.font)
             }
-
         });
     }
 
