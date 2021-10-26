@@ -119,7 +119,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }, 1000);
 
     props.socket.on("player-joined", ({ players: _players }) => {
-      console.log("player joined", _players);
       props.store.setPlayers(_players);
     });
 
@@ -131,7 +130,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       getPlayersInRoom();
       props.socket.on("game-settings-changed", (data) => {
-        console.log("game settings changed");
         props.store.setGameSettings(data.gameSettings);
       });
     } else {

@@ -767,8 +767,15 @@ const tiresConfig = [
     },
 ]
 
+let vehicleModels = {}
 
 export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void, onlyLoad?: boolean) => {
+    if (vehicleModels[vehicleType] !== undefined) {
+        callback(vehicleModels[vehicleType].tires, vehicleModels[vehicleType].chassises)
+        console.log("getting something already gotten")
+        return
+    }
+
     const loader = new GLTFLoader()
 
     loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {
@@ -806,6 +813,7 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
 
 
+        vehicleModels[vehicleType] = { tires, chassises }
         callback(tires, chassises)
     })
 

@@ -3,28 +3,27 @@ import * as THREE from "@enable3d/three-wrapper/dist/index"
 import { loadLowPolyVehicleModels, LowPolyVehicle, VehicleType } from "../../models/LowPolyVehicle"
 import { getDeviceType } from "../../utils/settings"
 
+const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: THREE.Scene) => {
+    loadLowPolyVehicleModels(vehicleType, (tires, chassises) => {
+        const prePos = chassises[0].position
 
+        const cI = Math.abs(chassisNum % chassises.length)
+        chassises[cI].position.set(prePos.x, prePos.y, prePos.z)
+        scene.add(chassises[cI])
 
+        for (let tire of tires) {
+            const { x, y, z } = tire.position
 
-export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number) => {
+            // tire.position.set(x - prePos.x, y - prePos.y, z - prePos.z)
+            scene.add(tire)
 
-    const height = 400
-    const width = getDeviceType() === "desktop" ? window.innerWidth : screen.availWidth
+            tire.castShadow = tire.receiveShadow = true
+        }
+        scene.add(tires[0])
+    }, true)
+}
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(width, height);
-    renderer.outputEncoding = THREE.sRGBEncoding;
-
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xbfe3dd);
-    //  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-
-    const camera = new THREE.PerspectiveCamera(40, width / height, 1, 100);
-    camera.position.set(10, 5, -15);
-    camera.aspect = width / height
+const addLights = (scene: THREE.Scene) => {
 
     const pLigth = new THREE.PointLight(0xffffff, 1, 10, 0)
     pLigth.castShadow = true
@@ -36,6 +35,40 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     aLigth.position.set(5, 5, 5)
     scene.add(aLigth)
+}
+
+
+let renderer, scene: THREE.Scene
+
+
+export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number) => {
+    if (scene && renderer) {
+        scene.clear()
+        addVehicle(vehicleType, chassisNum, scene)
+        addLights(scene)
+        return undefined
+    }
+
+    const height = 400
+    const width = getDeviceType() === "desktop" ? window.innerWidth : screen.availWidth
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xbfe3dd);
+    //  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    addLights(scene)
+
+    const camera = new THREE.PerspectiveCamera(40, width / height, 1, 100);
+    camera.position.set(10, 5, -15);
+    camera.aspect = width / height
+
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0.5, 0);
@@ -43,25 +76,9 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     controls.enablePan = false;
     controls.enableDamping = true;
 
-    loadLowPolyVehicleModels(vehicleType, (tires, chassises) => {
-        const prePos = chassises[0].position
-        const ppx = prePos.x
-        console.log("pre pos", prePos, ppx)
-        const cI = Math.abs(chassisNum % chassises.length)
-        chassises[cI].position.set(prePos.x, prePos.y, prePos.z)
-        scene.add(chassises[cI])
-        console.log("chassises[0]", chassises[cI])
-        console.log("tires", tires)
-        for (let tire of tires) {
-            const { x, y, z } = tire.position
 
-            // tire.position.set(x - prePos.x, y - prePos.y, z - prePos.z)
-            scene.add(tire)
+    addVehicle(vehicleType, chassisNum, scene)
 
-            tire.castShadow = tire.receiveShadow = true
-        }
-        scene.add(tires[0])
-    }, true)
 
 
     window.onresize = function () {
@@ -73,8 +90,11 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
         renderer.setSize(window.innerWidth, window.innerHeight);
 
     };
+
     const animate = () => {
+
         requestAnimationFrame(animate);
+
 
         controls.update();
         renderer.render(scene, camera);
@@ -82,6 +102,10 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     }
 
     animate()
+    // controls.addEventListener('change', () => {
+    //     console.log("change")
+    //     animate()
+    // });
 
     return renderer
 }

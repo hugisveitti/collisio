@@ -29,21 +29,13 @@ const ShowRoomComponent = (props: IShowRoom) => {
   const classes = useStyles();
 
   useEffect(() => {
-    console.log(
-      "vehiclet",
-      possibleVehcileTypes[
-        Math.abs(vehicleTypeNum % possibleVehcileTypes.length)
-      ],
-      Math.abs(vehicleTypeNum % possibleVehcileTypes.length),
-      vehicleTypeNum
-    );
     const renderer = createShowRoomCanvas(
       possibleVehcileTypes[
         Math.abs(vehicleTypeNum % possibleVehcileTypes.length)
       ],
       chassisNum
     );
-    if (canvasWrapperRef.current) {
+    if (canvasWrapperRef.current && renderer) {
       // @ts-ignore
       while (canvasWrapperRef.current.children.length > 0) {
         // @ts-ignore
@@ -52,7 +44,9 @@ const ShowRoomComponent = (props: IShowRoom) => {
           canvasWrapperRef.current.children[0]
         );
       }
+
       // @ts-ignore
+
       canvasWrapperRef.current.appendChild(renderer.domElement);
     }
   }, [chassisNum, vehicleTypeNum]);

@@ -57,7 +57,7 @@ export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: I
     const newGameKey = gameInfo.gameId
     const updates = {}
     updates[gameDataRefPath + "/" + newGameKey] = gameInfo
-    console.log("saving player game info", playerGameInfo)
+
     for (let i = 0; i < playerGameInfo.length; i++) {
         if (playerGameInfo[i].isAuthenticated) {
             updates[usersRefPath + "/" + playerGameInfo[i].playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = playerGameInfo[i]
@@ -120,7 +120,6 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
 
         } else {
             callback({}, [], [])
-            console.log("no highscores")
         }
     }, (err) => {
         console.log("Error getting highscores", err)
@@ -135,14 +134,12 @@ export interface IPlayerGameData {
 export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
     const playerDataRef = ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)
 
-    console.log('usersRefPath + "/" + userId + "/" + userGamesRefPath', usersRefPath + "/" + userId + "/" + userGamesRefPath)
 
     onValue(playerDataRef, snap => {
         if (snap.exists()) {
             const data = snap.val()
             const gamesData = [] as IPlayerGameData[]
             const keys = Object.keys(data)
-            console.log("data", data)
             for (let key of keys) {
                 gamesData.unshift({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
             }
@@ -164,7 +161,6 @@ export const deletePlayerGameData = (userId: string, gameId: string, trackName: 
     const highscoreRef = ref(database, highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId)
 
 
-    console.log('highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId', highscoreRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId)
     remove(highscoreRef).then((v) => {
         console.log("removed from highscore", v)
     }).catch(() => {
@@ -173,20 +169,16 @@ export const deletePlayerGameData = (userId: string, gameId: string, trackName: 
 
 
     const playerDataRef = (ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath + "/" + gameId))
-    // console.log("playerDataRef", playerDataRef)
+
     remove(playerDataRef).then((v) => {
         toast.success("Successfully removed game data")
-        console.log("success removing game data", v)
+
     }).catch(err => {
         toast.error("Error when removing game data")
         console.log("err when removing game data", err)
     })
 
-    // update(playerDataRef, null).then(() => {
-    //     console.log("update game data to null")
-    // }).catch((err) => {
-    //     console.log("err updating game data to null", err)
-    // })
+
 }
 
 const userSettingsRef = "settings"
@@ -203,7 +195,6 @@ export const getDBUserSettings = (userId: string, callback: (settings: IUserSett
     const settingsRef = ref(database, usersRefPath + "/" + userId + "/" + userSettingsRef)
     onValue(settingsRef, snap => {
         if (snap.exists()) {
-            console.log("get db settings", snap.val())
             callback(snap.val())
         } else {
             callback(undefined)
