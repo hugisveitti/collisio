@@ -1,6 +1,7 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
 import { GLTF, GLTFLoader, LoadingManager, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
+import { TrackType } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../models/IVehicle";
 import { gameItems } from "./gameItems";
 
@@ -31,6 +32,7 @@ const keyNameMatch = (key: string, name: string) => {
 }
 
 
+
 export class RaceCourse {
 
     scene: Scene3D
@@ -42,13 +44,13 @@ export class RaceCourse {
     ground?: ExtendedObject3D
     checkpoint?: ExtendedObject3D
     checkpointSpawn?: ExtendedObject3D
-    trackName: string
+    trackName: TrackType
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
     gamePhysicsObjects: ExtendedObject3D[]
 
 
-    constructor(scene: Scene3D, trackName: string, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
+    constructor(scene: Scene3D, trackName: TrackType, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
         this.scene = scene
         this.courseWidth = 500
         this.courseDepth = 500

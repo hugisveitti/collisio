@@ -100,8 +100,8 @@ const vehicleConfigs = {
         wheelHalfTrackFront: 1.36,
         wheelAxisHeightFront: -2.1,
 
-        mass: 1800,
-        engineForce: 8000,
+        mass: 800,
+        engineForce: 5000,
         breakingForce: 100,
         is4x4: false,
 

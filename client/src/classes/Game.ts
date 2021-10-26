@@ -27,7 +27,7 @@ export interface IPlayerInfo {
     photoURL?: string
 }
 
-export type TrackType = "track" | "town-track" | "low-poly-farm-track"
+export type TrackType = "track" | "town-track" | "low-poly-farm-track" | "low-poly-f1-track"
 
 export interface IGameSettings {
     ballRadius: number

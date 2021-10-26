@@ -337,7 +337,7 @@ export class RaceGameScene extends Scene3D {
             console.log("offset", offset)
 
 
-            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY + 2, z: p.z + offset - 5 })
+            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY + 3, z: p.z + offset - 5 })
         }
 
 

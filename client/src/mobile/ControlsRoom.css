@@ -17,14 +17,22 @@
 }
 
 .controller-btn {
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
   color: green;
   border-radius: 15px;
   text-align: center;
   vertical-align: middle;
   position: absolute;
+}
+
+@media only screen and (max-width: 350px) {
+  .controller-btn {
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+  }
 }
 
 #orientation-info {

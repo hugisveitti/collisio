@@ -71,7 +71,7 @@ export class LowPolyTestScene extends Scene3D {
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
-        this.vehicleType = "tractor"
+        this.vehicleType = "f1"
     }
 
     async init() {

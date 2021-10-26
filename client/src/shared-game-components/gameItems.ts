@@ -25,8 +25,8 @@ export const gameItems = {
     },
     "road": {
         collisionFlags: 1,
-        shape: "convex",
-        notAddPhysics: true,
+        shape: "concave",
+        // notAddPhysics: true,
         receiveShadow: true,
         bounciness: .1
     },

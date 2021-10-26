@@ -128,6 +128,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     controller[key] = b;
   };
 
+  const btnSize = screen.availWidth < 350 ? 120 : 150;
+
   const rotateText = { transform: "rotate(-90deg)" };
   const forwardStyles = isPortrait
     ? { ...rotateText, top: 35 }
@@ -137,15 +139,19 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     : { left: 35 };
 
   const breakStyles = isPortrait
-    ? { ...rotateText, right: 145, bottom: 35 }
-    : { left: 35, bottom: 145 };
+    ? { ...rotateText, right: btnSize + 45, bottom: 35 }
+    : { left: 35, bottom: btnSize + 45 };
 
   const settingsStyles = isPortrait
-    ? { ...rotateText, left: 145, top: "50%" }
-    : { left: "50%", top: 145 };
+    ? {
+        ...rotateText,
+        left: btnSize + 45,
+        top: screen.availHeight / 2 - btnSize / 2,
+      }
+    : { left: screen.availWidth / 2 - btnSize / 2, top: 145 };
   const resetStyles = isPortrait
-    ? { ...rotateText, left: 35, top: "50%" }
-    : { left: "50%", top: 35 };
+    ? { ...rotateText, left: 35, top: screen.availHeight / 2 - btnSize / 2 }
+    : { left: screen.availWidth / 2 - btnSize / 2, top: 35 };
 
   const infoStyles = isPortrait
     ? {

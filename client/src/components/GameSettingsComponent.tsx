@@ -133,6 +133,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                       <MenuItem value="low-poly-farm-track">
                         Low poly farm track
                       </MenuItem>
+                      <MenuItem value="low-poly-f1-track">
+                        Low poly f1 track
+                      </MenuItem>
                       <MenuItem value="track">Simple track</MenuItem>
                       <MenuItem value="town-track">Town track</MenuItem>
                     </Select>
