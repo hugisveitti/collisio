@@ -15,15 +15,14 @@ export interface IVehicleSettings {
      * Used for testing vehicle
      * between 500 and 50000 ?
      */
-    engineForce: number
 
-    cameraFollowSpeed: number
+
+    chaseCameraSpeed: number
 
     /** camera stuck behind vehicle or move more smoothly */
     useChaseCamera: boolean
 
-    /** mass */
-    mass: number
+
 }
 
 export interface IUserSettings {
@@ -31,11 +30,9 @@ export interface IUserSettings {
 }
 
 export const defaultVehicleSettings = {
-    steeringSensitivity: 0.005,
-    engineForce: 5000,
-    cameraFollowSpeed: .3,
+    steeringSensitivity: 0.2,
+    chaseCameraSpeed: .3,
     useChaseCamera: true,
-    mass: 800
 } as IVehicleSettings
 
 export const defaultUserSettings = {

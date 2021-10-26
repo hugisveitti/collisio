@@ -5,12 +5,18 @@ import {
   CircularProgress,
   Grid,
   IconButton,
+  Slider,
   TextField,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { defaultUserSettings, IVehicleSettings } from "../classes/User";
+import {
+  defaultUserSettings,
+  defaultVehicleSettings,
+  IUserSettings,
+  IVehicleSettings,
+} from "../classes/User";
 import NotLoggedInModal from "../components/NotLoggedInModal";
 import { frontPagePath } from "../components/Routes";
 import {
@@ -18,8 +24,6 @@ import {
   IUser,
   setDBUserSettings,
 } from "../firebase/firebaseFunctions";
-import { auth } from "../firebase/firebaseInit";
-import { UserContext } from "../providers/UserProvider";
 
 interface IControllerSettingsComponent {
   setSettingsModalOpen: any;
@@ -50,9 +54,30 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           setDBUserSettings(user.uid, defaultUserSettings);
           setUserSettings(defaultUserSettings);
         } else {
-          setUserSettings(settings);
+          console.log("odl settings", settings);
+          /** For development, when I change the vehicle settings the keys of the old settings need to be updated */
+          const newVehicleSettings = {};
+          const oldVehicleSettings = settings.vehicleSettings;
+          let wasKeyChange = false;
+          for (let defKey of Object.keys(defaultVehicleSettings)) {
+            if (!(defKey in oldVehicleSettings)) {
+              newVehicleSettings[defKey] = defaultVehicleSettings[defKey];
+              wasKeyChange = true;
+            } else {
+              newVehicleSettings[defKey] = oldVehicleSettings[defKey];
+            }
+          }
+          const newUserSettings = {
+            ...settings,
+            vehicleSettings: newVehicleSettings,
+          } as IUserSettings;
+          if (wasKeyChange) {
+            setDBUserSettings(user.uid, newUserSettings);
+          }
+
+          console.log("new user settings", newUserSettings);
+          setUserSettings(newUserSettings);
           // send to the game
-          console.log("settings", settings);
           setTimeout(() => {
             props.socket.emit("settings-changed", settings);
           }, 2000);
@@ -93,47 +118,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           Reset orientation
         </Button>
       </Grid>
-      <Grid item xs={6} />
-      <Grid item xs={6}>
-        <TextField
-          fullWidth
-          type="number"
-          label="Steering sense"
-          defaultValue={userSettings.vehicleSettings.steeringSensitivity}
-          onChange={(e) => {
-            const newVehicleSettings = {
-              ...userSettings.vehicleSettings,
-              steeringSensitivity: +e.target.value,
-            } as IVehicleSettings;
-            const newUserSettings = {
-              ...userSettings,
-              vehicleSettings: newVehicleSettings,
-            };
-            setUserSettings(newUserSettings);
-          }}
-          onBlur={saveUserSettingsToBD}
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <TextField
-          fullWidth
-          type="number"
-          label="Engine force"
-          defaultValue={userSettings.vehicleSettings.engineForce}
-          onChange={(e) => {
-            const newVehicleSettings = {
-              ...userSettings.vehicleSettings,
-              engineForce: +e.target.value,
-            };
-            const newUserSettings = {
-              ...userSettings,
-              vehicleSettings: newVehicleSettings,
-            };
-            setUserSettings(newUserSettings);
-          }}
-          onBlur={saveUserSettingsToBD}
-        />
-      </Grid>
       <Grid item xs={6}>
         <Button
           variant="outlined"
@@ -154,6 +138,51 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           {userSettings.vehicleSettings.useChaseCamera ? "On" : "Off"}
         </Button>
       </Grid>
+      <Grid item xs={12}>
+        <span>Chase camera speed</span>
+        <Slider
+          min={0.01}
+          max={1}
+          valueLabelDisplay="auto"
+          step={0.01}
+          value={userSettings.vehicleSettings.chaseCameraSpeed}
+          onChange={(e, value) => {
+            const newVehicleSettings = {
+              ...userSettings.vehicleSettings,
+              chaseCameraSpeed: value,
+            } as IVehicleSettings;
+            const newUserSettings = {
+              ...userSettings,
+              vehicleSettings: newVehicleSettings,
+            };
+            setUserSettings(newUserSettings);
+            saveUserSettingsToBD();
+          }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <span>Steering sensitivity</span>
+        <Slider
+          min={0.01}
+          max={2}
+          valueLabelDisplay="auto"
+          step={0.01}
+          value={userSettings.vehicleSettings.steeringSensitivity}
+          onChange={(e, value) => {
+            const newVehicleSettings = {
+              ...userSettings.vehicleSettings,
+              steeringSensitivity: value,
+            } as IVehicleSettings;
+            const newUserSettings = {
+              ...userSettings,
+              vehicleSettings: newVehicleSettings,
+            };
+            setUserSettings(newUserSettings);
+            saveUserSettingsToBD();
+          }}
+        />
+      </Grid>
+
       <Grid item xs={12}></Grid>
 
       <Grid item xs={3}></Grid>

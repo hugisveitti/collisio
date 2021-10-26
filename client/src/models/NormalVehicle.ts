@@ -399,7 +399,7 @@ export class NormalVehicle implements IVehicle {
     }
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
-        this.engineForce = vehicleSettings.engineForce
+
         this.steeringSensitivity = radiantMultiplier * vehicleSettings.steeringSensitivity
     }
 }

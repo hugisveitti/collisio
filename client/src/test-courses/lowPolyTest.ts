@@ -183,6 +183,8 @@ export class LowPolyTestScene extends Scene3D {
                         if (!isNaN(+e.target.value)) {
                             this.vehicle.updateVehicleSettings({
                                 ...this.vehicle.vehicleSettings,
+                                // I think this will still work in changing the engineForce
+                                // @ts-ignore
                                 engineForce: +e.target.value,
                             })
                         }

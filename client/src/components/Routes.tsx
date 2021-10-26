@@ -11,7 +11,7 @@ import HowToPlayPage from "./HowToPlayPage";
 import OneMonitorFrontPage from "./FrontPage";
 import PrivateProfilePage from "./PrivateProfilePage";
 import { IStore } from "./store";
-import WaitingRoom from "./WaitingRoom";
+import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
 export const frontPagePath = "/";

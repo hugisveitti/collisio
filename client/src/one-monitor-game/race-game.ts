@@ -6,7 +6,6 @@ import { Socket } from "socket.io-client";
 import Stats from "stats.js";
 import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerGameInfo, IPlayerInfo } from "../classes/Game";
 import { IVehicle } from "../models/IVehicle";
-import { NormalVehicle } from "../models/NormalVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
@@ -86,7 +85,6 @@ export class RaceGameScene extends Scene3D {
         this.vehicles = []
         this.totalNumberOfLaps = 3
         this.raceOnGoing = false
-        this.loadFont()
         this.winner = ""
         this.winTime = -1
         this.finishedTime = []
@@ -131,6 +129,7 @@ export class RaceGameScene extends Scene3D {
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             this.createVehicles(() => {
+                this.loadFont()
                 const p = this.course.goalSpawn.position
                 const r = this.course.goalSpawn.rotation
                 for (let i = 0; i < this.vehicles.length; i++) {
@@ -294,12 +293,13 @@ export class RaceGameScene extends Scene3D {
 
         setTimeout(() => {
             this.createVehicles(() => {
+
                 this.startRaceCountdown()
             })
         }, restartInSeconds * 1000)
     }
 
-    async createVehicles(callback) {
+    createVehicles(callback: () => void) {
 
 
         // delete?
@@ -314,13 +314,9 @@ export class RaceGameScene extends Scene3D {
                 let newVehicle: IVehicle
                 // if (this.gameSettings.trackName.includes("low-poly")) {
                 newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
-                // } else {
-                // newVehicle = new NormalVehicle(this, color, this.players[i].playerName, i)
-                // }
+
                 this.vehicles.push(newVehicle)
-                if (this.font) {
-                    newVehicle.setFont(this.font as THREE.Font)
-                }
+
             }
             this.gameTimers.push(new GameTime(this.totalNumberOfLaps))
 
@@ -543,6 +539,9 @@ export class RaceGameScene extends Scene3D {
         loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
 
             this.font = response;
+            for (let vehicle of this.vehicles) {
+                vehicle.setFont(this.font)
+            }
 
         });
     }

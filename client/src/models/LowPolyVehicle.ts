@@ -18,7 +18,7 @@ const FRONT_RIGHT = 1
 const BACK_LEFT = 2
 const BACK_RIGHT = 3
 
-const steeringIncrement = 0.02
+const degToRad = 0.017453
 
 let suspensionStiffness = 58.0
 
@@ -158,7 +158,7 @@ export class LowPolyVehicle implements IVehicle {
     vehicle: Ammo.btRaycastVehicle
     wheelMeshes: ExtendedObject3D[] = []
 
-    steeringSensitivity = 0.005
+    steeringSensitivity = 0.5
     vehicleSteering = 0
     breakingForce: number
     engineForce: number
@@ -176,7 +176,7 @@ export class LowPolyVehicle implements IVehicle {
 
     cameraDir = new THREE.Vector3()
 
-    cameraFollowSpeed: number
+    chaseCameraSpeed: number
     useChaseCamera: boolean
     vehicleSettings: IVehicleSettings
     camera: THREE.PerspectiveCamera
@@ -194,7 +194,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicleNumber = vehicleNumber
         this.gameTime = new GameTime(5)
         this.useChaseCamera = false
-        this.cameraFollowSpeed = 0.3
+        this.chaseCameraSpeed = 0.3
         this.vehicleSettings = defaultVehicleSettings
         this.vehicleType = vehicleType
 
@@ -467,8 +467,8 @@ export class LowPolyVehicle implements IVehicle {
         if (this.canDrive) {
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
             // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
-            this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_LEFT)
-            this.vehicle.setSteeringValue(angle * this.steeringSensitivity, FRONT_RIGHT)
+            this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_LEFT)
+            this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_RIGHT)
         } else {
             this.vehicle.setSteeringValue(0, FRONT_LEFT)
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)
@@ -524,8 +524,8 @@ export class LowPolyVehicle implements IVehicle {
             a.subVectors(targetPos, camera.position)
             // console.log("length of a.y", (targetPos.y - camera.position.y))
 
-            this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.cameraFollowSpeed))
-            this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.cameraFollowSpeed))
+            this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.chaseCameraSpeed))
+            this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.chaseCameraSpeed))
             // this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.05)) // have the y dir change slower?
             this.cameraDir.y = targetPos.y
 
@@ -713,7 +713,7 @@ export class LowPolyVehicle implements IVehicle {
             }
         }
 
-        // this.cameraFollowSpeed = vehicleSettings.cameraFollowSpeed
+        // this.chaseCameraSpeed = vehicleSettings.chaseCameraSpeed
         // this.mass = vehicleSettings.mass
         // this.useChaseCamera = vehicleSettings.useChaseCamera
 
@@ -737,8 +737,8 @@ export class LowPolyVehicle implements IVehicle {
         this.breakingForce = breakingForce
     }
 
-    setCameraFollowSpeed(cameraFollowSpeed: number) {
-        this.cameraFollowSpeed = cameraFollowSpeed
+    setchaseCameraSpeed(chaseCameraSpeed: number) {
+        this.chaseCameraSpeed = chaseCameraSpeed
     }
 
 }
