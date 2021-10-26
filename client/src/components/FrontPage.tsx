@@ -201,12 +201,6 @@ need to be logged in."
           <Grid item xs={12}>
             <img src={logo} className="image-logo" alt="" />
           </Grid>
-          <Grid item xs={12}>
-            <h3>
-              Important! If you are using an iphone you will probably need to
-              use the Google Chrome browser for the game to function properly.
-            </h3>
-          </Grid>
 
           {deviceType === "mobile" && (
             <>
