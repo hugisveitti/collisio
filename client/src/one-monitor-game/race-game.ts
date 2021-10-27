@@ -11,10 +11,12 @@ import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./game-styles.css";
 import { saveGameData } from "../firebase/firebaseFunctions";
-import { IUserSettings } from "../classes/User";
-import { loadLowPolyVehicleModels, LowPolyVehicle } from "../models/LowPolyVehicle";
+import { IUserGameSettings, IUserSettings } from "../classes/User";
+import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../models/LowPolyVehicle";
 import { GameTime } from "./GameTimeClass";
 import { startGameAuto } from "../utils/settings";
+import { beepC4, beepE4 } from "../sound/soundPlayer";
+import { Howl } from "howler";
 
 const vechicleFov = 60
 
@@ -24,6 +26,13 @@ const possibleColors = [0x9e4018, 0x0d2666, 0x1d8a47, 0x61f72a, "brown", "black"
 const stats = new Stats()
 const scoreTable = document.createElement("div")
 const importantInfoDiv = document.createElement("div")
+
+const gameSong = new Howl({
+    src: ["./sound/song2.mp3"],
+    html5: true,
+    volume: .5,
+
+})
 
 interface IUserSettingsMessage {
     playerNumber: number
@@ -67,7 +76,16 @@ export class RaceGameScene extends Scene3D {
     pLight: THREE.PointLight
 
     gameTimers: GameTime[]
+
     useShadows: boolean
+    useSound: boolean
+
+    /** delete if reset */
+    countDownTimeout: NodeJS.Timeout
+    raceStartingTimeOut: NodeJS.Timeout
+
+
+    songIsPlaying: boolean
 
     constructor() {
         super()
@@ -91,12 +109,15 @@ export class RaceGameScene extends Scene3D {
         this.gameId = uuid()
         this.gameTimers = []
         this.useShadows = false
+
+
+        this.songIsPlaying = false
+
     }
 
 
     async preload() {
         const { lights } = await this.warpSpeed("-ground", "-light")
-        console.log("lights", lights)
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
         if (this.useShadows) {
@@ -185,13 +206,6 @@ export class RaceGameScene extends Scene3D {
         addControls(this.vehicleControls, this.socket, this.vehicles)
     }
 
-    setUseShadows(useShadows: boolean) {
-        this.useShadows = useShadows
-        this.pLight.castShadow = this.useShadows
-        this.pLight.shadow.bias = 0.01
-        this.course.toggleShadows(useShadows)
-    }
-
     isGamePaused() {
         return this.vehicles[0].isPaused
     }
@@ -200,8 +214,11 @@ export class RaceGameScene extends Scene3D {
 
         let isPaused = this.isGamePaused()
         if (isPaused) {
+            this.startGameSong()
             importantInfoDiv.innerHTML = ""
         } else {
+            gameSong.pause()
+            this.songIsPlaying = false
             importantInfoDiv.innerHTML = "GAME PAUSED <br /> Press 'p' to unpause."
         }
 
@@ -225,28 +242,54 @@ export class RaceGameScene extends Scene3D {
         this.escPress = escPress
     }
 
+    setUserGameSettings(userGameSettings: IUserGameSettings) {
+        for (let key of Object.keys(userGameSettings)) {
+            if (userGameSettings[key] !== undefined) {
+                this[key] = userGameSettings[key]
+            }
+        }
+        if (this.pLight && this.course) {
+            this.pLight.castShadow = this.useShadows
+            this.pLight.shadow.bias = 0.01
+            this.course.toggleShadows(this.useShadows)
+        }
+
+        if (!this.useSound) {
+            gameSong.stop()
+            this.songIsPlaying = false
+        } else {
+            this.startGameSong()
+        }
+    }
+
+
     onWindowResize() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     startRaceCountdown() {
-        let countdown = startGameAuto ? 1 : 4
-
+        let countdown = startGameAuto ? 3 : 4
+        this.startGameSong()
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
             vehcile.start()
         }
 
         const timer = () => {
+            this.playCountdownBeep()
             importantInfoDiv.innerHTML = countdown + ""
             countdown -= 1
-            setTimeout(() => {
+            this.countDownTimeout = setTimeout(() => {
                 if (countdown > 0) {
+
                     timer()
+
                 } else {
+                    this.playStartBeep()
                     importantInfoDiv.innerHTML = "GO!!!!"
                     this.startAllVehicles()
                     this.raceOnGoing = true
+
                     setTimeout(() => {
                         importantInfoDiv.innerHTML = ""
                     }, 2000)
@@ -254,6 +297,26 @@ export class RaceGameScene extends Scene3D {
             }, 1000)
         }
         timer()
+    }
+
+    playCountdownBeep() {
+        if (this.useSound) {
+            beepC4.play()
+        }
+    }
+
+    playStartBeep() {
+        if (this.useSound) {
+            beepE4.play()
+        }
+    }
+
+    startGameSong() {
+        if (this.useSound && (!gameSong.playing() || !this.songIsPlaying) && !this.isGamePaused()) {
+            console.log("starting game sound")
+            gameSong.play()
+            this.songIsPlaying = true
+        }
     }
 
     startAllVehicles() {
@@ -266,6 +329,9 @@ export class RaceGameScene extends Scene3D {
 
     restartGame() {
 
+        window.clearTimeout(this.countDownTimeout)
+        window.clearTimeout(this.raceStartingTimeOut)
+
         this.raceOnGoing = false
         this.winner = ""
         this.winTime = -1
@@ -275,7 +341,7 @@ export class RaceGameScene extends Scene3D {
 
         const sec = 2
         importantInfoDiv.innerHTML = "Race starting in " + sec + " seconds"
-        setTimeout(() => {
+        this.raceStartingTimeOut = setTimeout(() => {
             this.startRaceCountdown()
         }, sec * 1000)
     }
@@ -298,7 +364,6 @@ export class RaceGameScene extends Scene3D {
 
             await loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
                 // only x colors of chassis
-                console.log("loded poly models")
                 loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
                 (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[(i + chassisColOffset) % chassises.length])
 
@@ -333,9 +398,6 @@ export class RaceGameScene extends Scene3D {
             if (i % 2 !== 0) {
                 offset += (Math.sign(offset) * 5)
             }
-
-            console.log("offset", offset)
-
 
             possibleStartingPos.push({ x: p.x + offset - 5, y: courseY + 3, z: p.z + offset - 5 })
         }
@@ -438,7 +500,8 @@ export class RaceGameScene extends Scene3D {
             }
 
             view.camera.up.fromArray(view.up)
-            view.camera.position.set(0, 10, -25)
+            const { x, y, z } = staticCameraPos
+            view.camera.position.set(x, y, z)
 
 
             this.vehicles[i].addCamera(view.camera)
@@ -514,6 +577,10 @@ export class RaceGameScene extends Scene3D {
             this.updateScoreTable()
             this.updateVehicles()
 
+            if (!gameSong.playing()) {
+                this.startGameSong()
+            }
+
             stats.end()
         }
     }
@@ -584,13 +651,10 @@ export class RaceGameScene extends Scene3D {
 }
 
 
-export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, escPress: () => void, callback: (gameObject: RaceGameScene) => void) => {
+export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, userGameSettings: IUserGameSettings, roomId: string, escPress: () => void, callback: (gameObject: RaceGameScene) => void) => {
     const config = { scenes: [RaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
-        // console.log("project", project)
-        // console.log("project.scenes[0]", project.scenes)
-        // console.log("project.scenes[0]", project.scenes.keys().next().value)
 
         const key = project.scenes.keys().next().value;
 
@@ -599,6 +663,7 @@ export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettin
         gameObject.setSocket(socket);
         gameObject.setPlayers(players);
         gameObject.setGameSettings(gameSettings, roomId, escPress);
+        gameObject.setUserGameSettings(userGameSettings);
         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
         console.log("starting game, players", players)
         callback(gameObject)

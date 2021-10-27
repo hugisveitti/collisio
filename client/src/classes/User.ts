@@ -21,20 +21,30 @@ export interface IVehicleSettings {
 
     /** camera stuck behind vehicle or move more smoothly */
     useChaseCamera: boolean
+}
 
+export interface IUserGameSettings {
+    useSound: boolean
+    useShadows: boolean
+}
 
+const defaultUserGameSettings: IUserGameSettings = {
+    useShadows: false,
+    useSound: true
 }
 
 export interface IUserSettings {
-    vehicleSettings: IVehicleSettings
+    vehicleSettings: IVehicleSettings,
+    userGameSettings: IUserGameSettings
 }
 
 export const defaultVehicleSettings = {
-    steeringSensitivity: 0.1,
+    steeringSensitivity: 0.2,
     chaseCameraSpeed: .3,
     useChaseCamera: false,
 } as IVehicleSettings
 
 export const defaultUserSettings = {
-    vehicleSettings: defaultVehicleSettings
+    vehicleSettings: defaultVehicleSettings,
+    userGameSettings: defaultUserGameSettings
 } as IUserSettings

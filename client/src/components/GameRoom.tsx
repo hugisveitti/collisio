@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
 import { RaceGameScene, startRaceGame } from "../one-monitor-game/race-game";
+import { UserContext } from "../providers/UserProvider";
 import { startGameAuto } from "../utils/settings";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "./Routes";
@@ -22,6 +23,7 @@ const GameRoom = (props: IGameRoom) => {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [gameObject, setGameObject] = useState({} as RaceGameScene);
 
+  const user = useContext(UserContext);
   const history = useHistory();
 
   const handleEscPressed = () => {
@@ -52,6 +54,7 @@ const GameRoom = (props: IGameRoom) => {
         props.socket,
         props.store.players,
         props.store.gameSettings,
+        props.store.userSettings.userGameSettings,
         props.store.roomId,
         handleEscPressed,
         (_gameObject) => {
@@ -76,6 +79,8 @@ const GameRoom = (props: IGameRoom) => {
             gameObject.togglePauseGame();
           }
         }}
+        store={props.store}
+        userId={user?.uid}
       />
       <ToastContainer />
     </React.Fragment>

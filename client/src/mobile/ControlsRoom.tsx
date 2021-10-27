@@ -104,19 +104,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      getDBUserSettings(user.uid, (settings) => {
-        if (settings) {
-          setTimeout(() => {
-            // hacky way
-            // should have some emit from the game to the devices telling them to send info such as userSettings
-            // 5000 ms then send it is hackkkky
-            props.socket.emit("settings-changed", settings);
-          }, 5000);
-        }
-      });
-    }
-  }, [user]);
+    setTimeout(() => {
+      // hacky way
+      // should have some emit from the game to the devices telling them to send info such as userSettings
+      // 5000 ms then send it is hackkkky
+      props.socket.emit("settings-changed", props.store.userSettings);
+    }, 3000);
+  }, []);
 
   // how to set key
   const handleButtonAction = (
@@ -186,6 +180,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             socket={props.socket}
             resetOrientation={resetDeviceOrientationListener}
             user={user}
+            store={props.store}
           />
         </div>
       </Modal>

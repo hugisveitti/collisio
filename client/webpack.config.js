@@ -20,8 +20,16 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: 'images/[name].[ext]'
-        }
+        },
+
       },
+      {
+        test: /\.mp3$/,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
+      }
     ]
   },
   resolve: {

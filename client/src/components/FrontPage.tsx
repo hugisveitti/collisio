@@ -15,6 +15,7 @@ import AppContainer from "../containers/AppContainer";
 import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
+import { beepC4 } from "../sound/soundPlayer";
 import "../styles/main.css";
 import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import { ISocketCallback } from "../utils/connectSocket";
@@ -284,6 +285,16 @@ need to be logged in."
               This game is in development. If you have suggestions please email
               hugiholm1 [at] gmail.com
             </p>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                beepC4.play();
+              }}
+            >
+              Beep
+            </Button>
           </Grid>
         </Grid>
         <ToastContainer />

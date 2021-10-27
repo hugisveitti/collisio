@@ -27,7 +27,7 @@ let rollInfluence = .01
 let CUBE_HALF_EXTENTS = .96;
 let suspensionRestLength = 1.1
 let frictionSlip = 3.5
-let rearWheelFriction = 4.5
+let rearWheelFriction = 100 //4.5
 let suspensionCompression = 2.4
 let maxSuspensionTravelCm = 1500.0;
 let maxSuspensionForce = 50000.0;
@@ -42,6 +42,7 @@ const WANTS_DEACTIVATION = 3;
 const DISABLE_DEACTIVATION = 4;
 const DISABLE_SIMULATION = 5;
 
+export const staticCameraPos = { x: 0, y: 10, z: -25 }
 
 
 let useBad = false
@@ -100,10 +101,10 @@ const vehicleConfigs = {
         wheelHalfTrackFront: 1.36,
         wheelAxisHeightFront: -2.1,
 
-        mass: 800,
-        engineForce: 5000,
+        mass: 1600,
+        engineForce: 2500,
         breakingForce: 100,
-        is4x4: false,
+        is4x4: true,
 
         path: "low-poly-tractor.gltf"
     },
@@ -265,7 +266,6 @@ export class LowPolyVehicle implements IVehicle {
     }
 
     createVehicle() {
-        console.log("creating vehicle", this.vehicleType)
 
 
         if (useBad) {
@@ -294,7 +294,6 @@ export class LowPolyVehicle implements IVehicle {
         // this.chassisMesh.body.ammo.setCenterOfMassTransform(tf)
         // this.chassisMesh.body.ammo.getCenterOfMassTransform().setOrigin(new Ammo.btVector3(0, -2, 0))
 
-        // console.log("center of mass", this.chassisMesh.body.ammo.getCenterOfMassTransform().getOrigin().y())
 
 
         this.tuning = new Ammo.btVehicleTuning()
@@ -398,6 +397,8 @@ export class LowPolyVehicle implements IVehicle {
 
         wheelInfo.set_m_frictionSlip(friction)
         wheelInfo.set_m_rollInfluence(rollInfluence)
+        this.vehicle.updateSuspension(0)
+
 
         this.wheelMeshes.push(this.createWheelMesh(radius, index))
 
@@ -526,7 +527,6 @@ export class LowPolyVehicle implements IVehicle {
 
             let a = new THREE.Vector3()
             a.subVectors(targetPos, camera.position)
-            // console.log("length of a.y", (targetPos.y - camera.position.y))
 
             this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.chaseCameraSpeed))
             this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.chaseCameraSpeed))
@@ -553,20 +553,16 @@ export class LowPolyVehicle implements IVehicle {
         // and the world coords is under chassis
         /** also allow camera follow option? */
         // if (wp.y < chassY + 3 && this.badRotationTicks > 2) {
-        //     console.log("camera too low", wp.y, chassY)
 
         //     const r = this.getRotation()
 
         //     //   const ltw = camera.localToWorld(camera.position)
-        //     // console.log("ltw", ltw)
 
         //     wp.setY(10)
         //     camera.updateProjectionMatrix()
-        //     console.log("camera", camera)
 
 
         //     //            const wtl = camera.worldToLocal(camera.position)
-        //     //   console.log("wtl", wtl)
         //     // if (wp.y < 0) {
 
 
@@ -577,7 +573,6 @@ export class LowPolyVehicle implements IVehicle {
         // } else if (p.y < 10 && this.badRotationTicks < 2) {
 
         //     if (Math.abs(p.y) < (0.1)) {
-        //         console.log("less than 0.1 but not bad rot")
         //         camera.position.set(p.x, p.y += 0.5, p.z)
 
         //     } else if (p.y > -0) {
@@ -723,8 +718,8 @@ export class LowPolyVehicle implements IVehicle {
 
         this.chassisMesh.remove(this.camera)
         if (!this.useChaseCamera) {
-
-            this.camera.position.set(0, 10, -20)
+            const { x, y, z } = staticCameraPos
+            this.camera.position.set(x, y, z)
             this.chassisMesh.add(this.camera)
         }
     };
@@ -772,7 +767,6 @@ let vehicleModels = {}
 export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void, onlyLoad?: boolean) => {
     if (vehicleModels[vehicleType] !== undefined) {
         callback(vehicleModels[vehicleType].tires, vehicleModels[vehicleType].chassises)
-        console.log("getting something already gotten")
         return
     }
 
@@ -781,7 +775,6 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
     loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {
         let tires = [] as ExtendedObject3D[]
         let chassises = [] as ExtendedObject3D[]
-        console.log("vehicle children", gltf.scene.children)
         for (let child of gltf.scene.children) {
             if (child.type === "Mesh" || child.type === "Group") {
 

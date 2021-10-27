@@ -40,7 +40,7 @@ export const defaultGameSettings: IGameSettings = {
     ballRadius: 1,
     typeOfGame: "race",
     numberOfLaps: 3,
-    trackName: "track"
+    trackName: "low-poly-farm-track",
 }
 
 // info about individual players

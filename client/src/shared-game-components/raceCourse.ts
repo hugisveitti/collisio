@@ -105,6 +105,9 @@ export class RaceCourse {
                                 if (gameItems[key].bounciness) {
                                     (child as ExtendedObject3D).body.setBounciness(gameItems[key].bounciness)
                                 }
+                                if (gameItems[key].friction) {
+                                    (child as ExtendedObject3D).body.ammo.setFriction(gameItems[key].friction)
+                                }
                                 if (child.name.includes("hidden")) {
                                     child.visible = false
                                 }

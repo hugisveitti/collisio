@@ -64,12 +64,11 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
         <hr />
 
         <iframe
-          src="https://www.youtube.com/embed/D8y3gDlX5YU"
+          src="https://www.youtube.com/embed/0YBLvMXrdPo"
           title="YouTube video player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           style={{ margin: "auto", display: "block" }}
         ></iframe>
-
         <br />
         <button onClick={() => history.goBack()}>
           Go back to room selection

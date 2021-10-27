@@ -1,4 +1,6 @@
 import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { IUserSettings } from "../classes/User";
+
 
 export interface IStore {
     roomId: string
@@ -9,4 +11,6 @@ export interface IStore {
     setPlayer: React.Dispatch<React.SetStateAction<IPlayerInfo>>
     gameSettings: IGameSettings
     setGameSettings: React.Dispatch<React.SetStateAction<IGameSettings>>
+    userSettings: IUserSettings
+    setUserSettings: React.Dispatch<React.SetStateAction<IUserSettings>>
 }

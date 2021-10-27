@@ -8,6 +8,7 @@ interface IGameItem {
     castsShadow?: boolean,
     /** see enable3d bounciness  */
     bounciness?: number
+    friction?: number
     isCourseObject?: boolean
     exactMatch?: boolean
     objectName?: string
@@ -21,7 +22,8 @@ export const gameItems = {
         receiveShadow: true,
         bounciness: .05,
         isCourseObject: true,
-        objectName: "ground"
+        objectName: "ground",
+        friction: 3.0
     },
     "road": {
         collisionFlags: 1,

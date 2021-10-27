@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import {
+  defaultGameSettings,
+  IGameSettings,
+  IPlayerInfo,
+} from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, startGameAuto } from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
@@ -14,6 +18,12 @@ import { IStore } from "./store";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 import ShowRoomComponent from "./showRoom/ShowRoomComponent";
+import { UserContext } from "../providers/UserProvider";
+import {
+  getDBUserSettings,
+  setDBUserSettings,
+} from "../firebase/firebaseFunctions";
+import { defaultUserSettings } from "../classes/User";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -31,12 +41,8 @@ const Routes = () => {
   const [roomId, setRoomId] = useState("");
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
-  const [gameSettings, setGameSettings] = useState({
-    ballRadius: 1,
-    typeOfGame: "race",
-    numberOfLaps: 3,
-    trackName: "low-poly-farm-track",
-  } as IGameSettings);
+  const [userSettings, setUserSettings] = useState(defaultUserSettings);
+  const [gameSettings, setGameSettings] = useState(defaultGameSettings);
 
   const deviceType = getDeviceType();
   useEffect(() => {
@@ -51,7 +57,7 @@ const Routes = () => {
         mobileControls: new MobileControls(),
         vehicleControls: new VehicleControls(),
         id: "1",
-        vehicleType: "f1",
+        vehicleType: "tractor",
       } as IPlayerInfo;
       setPlayers([nplayer]);
     }
@@ -66,7 +72,28 @@ const Routes = () => {
     setPlayer,
     gameSettings,
     setGameSettings,
+    userSettings,
+    setUserSettings,
   } as IStore;
+
+  const user = useContext(UserContext);
+
+  useEffect(() => {
+    if (user?.uid) {
+      getDBUserSettings(user.uid, (dbUserSettings) => {
+        if (dbUserSettings) {
+          const newUserSettings = {
+            ...userSettings,
+            ...dbUserSettings,
+          };
+
+          store.setUserSettings(newUserSettings);
+        } else {
+          setDBUserSettings(user.uid, defaultUserSettings);
+        }
+      });
+    }
+  }, [user]);
 
   if (!socket) return null;
   return (

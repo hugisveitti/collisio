@@ -187,12 +187,16 @@ class Game {
 
     setupStartGameListener() {
         this.socket.once("handle-start-game", () => {
+            console.log("handle start game pressed", this.getPlayersInfo())
             if (this.players.length === 0) {
                 this.socket.emit("handle-start-game-callback", {
                     message: "No players connected, cannot start game",
                     status: errorStatus
                 })
-                this.setupStartGameListener()
+                setTimeout(() => {
+
+                    this.setupStartGameListener()
+                }, 50)
             } else {
                 this.socket.emit("handle-start-game-callback", {
                     message: "Game starting",
