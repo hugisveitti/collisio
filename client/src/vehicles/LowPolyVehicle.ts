@@ -34,7 +34,7 @@ let maxSuspensionForce = 50000.0;
 let connectionHeight = 2.5;
 let suspensionDamping = 4;
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
-let targetPos: THREE.Vector3
+let targetPos = new THREE.Vector3(0, 0, 0)
 
 const ACTIVE_TAG = 1;
 const ISLAND_SLEEPING = 2;
@@ -179,11 +179,15 @@ export class LowPolyVehicle implements IVehicle {
 
     chaseCameraSpeed: number
     useChaseCamera: boolean
+    chaseCameraTicks: number
+    prevCahseCameraPos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
     vehicleSettings: IVehicleSettings
     camera: THREE.PerspectiveCamera
     vehicleType: VehicleType
     is4x4: boolean
     isReady: boolean
+
+    vehicleInertia = new Ammo.btVector3(0, 0, 0)
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
@@ -197,6 +201,7 @@ export class LowPolyVehicle implements IVehicle {
         this.gameTime = new GameTime(5)
         this.useChaseCamera = false
         this.chaseCameraSpeed = 0.3
+        this.chaseCameraTicks = 0
         this.vehicleSettings = defaultVehicleSettings
         this.vehicleType = vehicleType
         this.isReady = false
@@ -317,6 +322,8 @@ export class LowPolyVehicle implements IVehicle {
 
 
 
+
+
         this.chassisMesh.body.name = "vehicle-" + this.vehicleNumber
         this.chassisMesh.name = "vehicle-" + this.vehicleNumber
 
@@ -365,6 +372,16 @@ export class LowPolyVehicle implements IVehicle {
             wheelRadiusBack,
             BACK_RIGHT
         )
+
+        // not sure what to have the gravity, the auto is -20
+        this.vehicle.getRigidBody().setGravity(new Ammo.btVector3(0, -25, 0))
+        this.vehicle.getRigidBody().setFriction(3.0)
+
+        // this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vehicleInertia)
+        // //   
+        // this.vehicle.getRigidBody().setMassProps(this.mass, this.vehicleInertia)
+
+
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
@@ -419,6 +436,13 @@ export class LowPolyVehicle implements IVehicle {
 
     goForward(moreSpeed: boolean) {
         if (!this.canDrive) return
+
+        if (this.getCurrentSpeedKmHour() > 300) {
+
+            console.log("forward vec", this.vehicle.getForwardVector())
+            return
+        }
+
         if (this.is4x4) {
             this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_LEFT)
             this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_RIGHT)
@@ -519,9 +543,11 @@ export class LowPolyVehicle implements IVehicle {
 
         if (this.useChaseCamera) {
 
-            const r = this.chassisMesh.rotation
-            const p = this.chassisMesh.position //this.getPosition()
 
+
+            const r = this.chassisMesh.rotation
+            // this.chassisMesh.position 
+            const p = this.getPosition()
 
             // this is for the follow camera effect
             targetPos = new THREE.Vector3(
@@ -531,23 +557,42 @@ export class LowPolyVehicle implements IVehicle {
                 p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
             )
 
+
             let a = new THREE.Vector3()
             a.subVectors(targetPos, camera.position)
 
             this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.chaseCameraSpeed))
             this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.chaseCameraSpeed))
-            // this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.05)) // have the y dir change slower?
-            this.cameraDir.y = targetPos.y
+            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.005)) // have the y dir change slower?
+
+            const cameraLookAtPos = new THREE.Vector3(0, 0, 0)
+            const cs = 0.5
+
+            cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((p.x - this.prevCahseCameraPos.x) * cs))
+            cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((p.z - this.prevCahseCameraPos.z) * cs))
+            cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((p.y - this.prevCahseCameraPos.y) * cs))
+
+
+            // cameraLookAtPos.x = (p.x + ((this.prevCahseCameraPos.x - p.x) * cs))
+            // cameraLookAtPos.z = (p.z + ((this.prevCahseCameraPos.z - p.z) * cs))
+            // cameraLookAtPos.y = (p.y + ((this.prevCahseCameraPos.y - p.y) * cs))
+
+            this.prevCahseCameraPos = cameraLookAtPos.clone()
+
 
             if (a.length() > 0.1) {
                 camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+                camera.updateProjectionMatrix()
+                camera.lookAt(cameraLookAtPos)
+                //camera.lookAt(this.chassisMesh.position.clone())
+                //  console.log("camera.lookAt(this.chassisMesh.position.clone())", camera.lookAt(this.chassisMesh.position.clone()))
 
             } else {
+
             }
 
-            camera.updateProjectionMatrix()
         } else {
-
+            camera.lookAt(this.chassisMesh.position.clone())
         }
 
 
@@ -595,7 +640,7 @@ export class LowPolyVehicle implements IVehicle {
         //     camera.position.set(p.x, p.y *= .9, p.z)
         // } else {
         // }
-        camera.lookAt(this.chassisMesh.position.clone())
+        // camera.lookAt(this.chassisMesh.position.clone())
     };
     update() {
 
@@ -734,10 +779,14 @@ export class LowPolyVehicle implements IVehicle {
 
     updateMass(mass: number) {
         this.mass = mass
-        let inertia = new Ammo.btVector3(1, 1, 1)
-        this.vehicle.getRigidBody()
-        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(mass, inertia)
-        this.vehicle.getRigidBody().setMassProps(this.mass, inertia)
+        const g = this.vehicle.getRigidBody().getGravity()
+        console.log("grav", g.x(), g.y(), g.z())
+
+        const f = this.vehicle.getRigidBody().getFriction()
+        console.log("friction", f)
+        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vehicleInertia)
+        //   
+        this.vehicle.getRigidBody().setMassProps(this.mass, this.vehicleInertia)
     }
 
     updateBreakingForce(breakingForce: number) {

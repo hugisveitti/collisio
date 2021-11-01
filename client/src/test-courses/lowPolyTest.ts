@@ -156,6 +156,7 @@ export class LowPolyTestScene extends Scene3D {
                 this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
 
                 this.createController()
+                this.vehicle.useChaseCamera = true
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
                 const p = this.course.goalSpawn.position
                 const r = this.course.goalSpawn.rotation
@@ -163,7 +164,6 @@ export class LowPolyTestScene extends Scene3D {
                 this.vehicle.resetPosition()
                 // this.dirLight.target = this.vehicle.chassisMesh
                 this.camera.position.set(0, 10, -25)
-
                 this.loadFont()
 
 
@@ -301,12 +301,7 @@ export class LowPolyTestScene extends Scene3D {
         this.checkpointCrossed = true
     }
 
-    async createVehicle() {
 
-        // const p = this.course.goalSpawn.position
-        // const r = this.course.goalSpawn.rotation
-
-    }
 
     setGameSettings(newGameSettings: IGameSettings) {
         this.gameSettings = newGameSettings
