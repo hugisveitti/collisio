@@ -1,4 +1,4 @@
-import { VehicleType } from "../models/LowPolyVehicle";
+import { VehicleType } from "../vehicles/LowPolyVehicle";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
 
@@ -27,7 +27,7 @@ export interface IPlayerInfo {
     photoURL?: string
 }
 
-export type TrackType = "track" | "town-track" | "low-poly-farm-track" | "low-poly-f1-track"
+export type TrackType = "track" | "town-track" | "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
 
 export interface IGameSettings {
     ballRadius: number

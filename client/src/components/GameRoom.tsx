@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { startBallGameOneMonitor } from "../one-monitor-game/one-monitor-ball-game";
+import { startBallGameOneMonitor } from "../one-monitor-game/ball-game";
 import { RaceGameScene, startRaceGame } from "../one-monitor-game/race-game";
 import { UserContext } from "../providers/UserProvider";
-import { startGameAuto } from "../utils/settings";
+import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
@@ -13,9 +13,11 @@ import { IStore } from "./store";
 interface IGameRoom {
   socket: Socket;
   store: IStore;
+  useTestCourse?: boolean;
 }
 
 const GameRoom = (props: IGameRoom) => {
+  console.log("game room changing? quicker change?");
   // this breaks iphone
   // if (!props.store.roomId) {
   //   window.location.href = frontPagePath;
@@ -38,7 +40,11 @@ const GameRoom = (props: IGameRoom) => {
       );
     });
 
-    if (!props.store.roomId && !startGameAuto) {
+    if (props.useTestCourse) {
+      return startLowPolyTest(props.socket, props.store.gameSettings);
+    }
+
+    if (!props.store.roomId) {
       history.push(frontPagePath);
       toast.warn("No room connection, redirecting to frontpage");
       return null;

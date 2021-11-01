@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client"
 import { IPlayerInfo } from "../classes/Game"
-import { IVehicle } from "../models/IVehicle"
+import { IVehicle } from "../vehicles/IVehicle"
 import { MobileControls, VehicleControls } from "./ControlsClasses"
 
 

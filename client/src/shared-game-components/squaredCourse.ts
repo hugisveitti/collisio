@@ -1,6 +1,6 @@
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { Texture } from "enable3d/node_modules/@enable3d/three-graphics";
-import { SimpleVector } from "../models/IVehicle";
+import { SimpleVector } from "../vehicles/IVehicle";
 
 
 export class SimpleCourtSettings {

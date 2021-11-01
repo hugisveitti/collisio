@@ -5,18 +5,18 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import Stats from "stats.js";
 import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerGameInfo, IPlayerInfo } from "../classes/Game";
-import { IVehicle } from "../models/IVehicle";
+import { IVehicle } from "../vehicles/IVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./game-styles.css";
 import { saveGameData } from "../firebase/firebaseFunctions";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../models/LowPolyVehicle";
+import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
 import { GameTime } from "./GameTimeClass";
-import { startGameAuto } from "../utils/settings";
 import { beepC4, beepE4 } from "../sound/soundPlayer";
 import { Howl } from "howler";
+import { inTestMode } from "../utils/settings";
 
 const vechicleFov = 60
 
@@ -90,6 +90,7 @@ export class RaceGameScene extends Scene3D {
 
     constructor() {
         super()
+        console.log("race game ")
 
         scoreTable.setAttribute("id", "score-info")
         importantInfoDiv.setAttribute("id", "important-info")
@@ -316,7 +317,7 @@ export class RaceGameScene extends Scene3D {
     }
 
     startRaceCountdown() {
-        let countdown = startGameAuto ? 3 : 4
+        let countdown = 4
         this.startGameSong()
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
@@ -394,10 +395,6 @@ export class RaceGameScene extends Scene3D {
             this.startRaceCountdown()
         }, sec * 1000)
     }
-
-
-
-
 
     resetVehicles() {
         // delete?
@@ -600,7 +597,7 @@ export class RaceGameScene extends Scene3D {
     update() {
         if (this.everythingReady()) {
             stats.begin()
-            if (startGameAuto) {
+            if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
             this.updateScoreTable()
@@ -613,6 +610,8 @@ export class RaceGameScene extends Scene3D {
             stats.end()
         }
     }
+
+
 
     resetPlayer(idx: number) {
         this.vehicles[idx].resetPosition()

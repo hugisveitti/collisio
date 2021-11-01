@@ -4,10 +4,10 @@ import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
 import { defaultGameSettings, IGameSettings } from "../classes/Game"
-import { loadLowPolyVehicleModels, LowPolyVehicle, VehicleType } from "../models/LowPolyVehicle"
+import { loadLowPolyVehicleModels, LowPolyVehicle, VehicleType } from "../vehicles/LowPolyVehicle"
 import "../one-monitor-game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/raceCourse"
-import { VehicleControls } from "../utils/ControlsClasses"
+import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 import "./lowPolyTest.css"
 import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
 
@@ -43,6 +43,7 @@ export class LowPolyTestScene extends Scene3D {
     pLight: THREE.PointLight
     useShadows: boolean
     vehicleType: VehicleType
+    mobileControls: MobileControls
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -72,6 +73,7 @@ export class LowPolyTestScene extends Scene3D {
         document.body.appendChild(stats.dom)
         this.useShadows = true
         this.vehicleType = "f1"
+        this.mobileControls = new MobileControls()
     }
 
     async init() {
@@ -148,7 +150,7 @@ export class LowPolyTestScene extends Scene3D {
     async create() {
         // test-course.gltf
         // low-poly-farm-track
-        this.course = new RaceCourse(this, "low-poly-farm-track", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, "test-course", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
                 this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
@@ -335,7 +337,7 @@ export class LowPolyTestScene extends Scene3D {
     createController() {
         if (this.vehicle) {
             this.vehicleControls = new VehicleControls()
-            addTestControls(this.vehicleControls, this.socket, this.vehicle)
+            addTestControls(this.vehicleControls, this.socket, this.vehicle, (mc) => this.mobileControls = mc)
         }
     }
 
@@ -354,7 +356,7 @@ export class LowPolyTestScene extends Scene3D {
             stats.begin()
             this.updateVehicles()
             if (this.vehicle) {
-                testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
+                testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls, this.mobileControls)
                 const pos = this.vehicle.getPosition()
                 scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
                 <br />

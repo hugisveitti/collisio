@@ -2,7 +2,7 @@ import { CollisionEvent } from "@enable3d/common/dist/types";
 import { GLTF, GLTFLoader, LoadingManager, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { TrackType } from "../classes/Game";
-import { IVehicle, SimpleVector } from "../models/IVehicle";
+import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./gameItems";
 
 
@@ -30,8 +30,6 @@ const keyNameMatch = (key: string, name: string) => {
     }
     return name.includes(key)
 }
-
-
 
 export class RaceCourse {
 

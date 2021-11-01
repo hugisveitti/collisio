@@ -5,10 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run bundle && npm-run-all --parallel webpack serve",
+    "testMode": "npm run bundleTest && npm-run-all --parallel webpackTest serve",
     "build": "webpack --mode=production --node-env=production",
     "serve": "cd src && live-server",
     "bundle": "webpack --config webpack.config.js",
-    "webpack": "webpack --config webpack.config.js --watch"
+    "bundleTest": "webpack --config webpack.test.js",
+    "webpack": "webpack --config webpack.config.js --watch",
+    "webpackTest": "webpack --config webpack.test.js --watch"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +52,7 @@
     "@types/react-router": "^5.1.16",
     "@types/react-router-dom": "^5.1.8",
     "@types/stats.js": "^0.17.0",
+    "@types/uuid": "^8.3.1",
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.26.1",
     "file-loader": "^6.2.0",

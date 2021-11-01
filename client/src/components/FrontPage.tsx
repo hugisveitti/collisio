@@ -16,18 +16,11 @@ import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "../styles/main.css";
-import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
-import {
-  getDeviceType,
-  isMobileTestMode,
-  isTestMode,
-  startGameAuto,
-} from "../utils/settings";
+import { getDeviceType } from "../utils/settings";
 import NotLoggedInModal from "./NotLoggedInModal";
 import {
-  controlsRoomPath,
   highscorePagePath,
   howToPlayPagePath,
   waitingRoomPath,
@@ -152,31 +145,6 @@ const FrontPage = (props: FrontPageProps) => {
   }, [user]);
 
   useEffect(() => {
-    if (isMobileTestMode) {
-      if (deviceType === "desktop") {
-        createRoomDesktopCallback();
-      } else {
-        createPlayerConnectedCallback();
-      }
-    }
-    /** Just for development  */
-    if (startGameAuto) {
-      props.store.setRoomId("testRoom");
-      setPlayerName("testPlayer");
-      setTimeout(() => {
-        connectButtonClicked();
-      }, 100);
-    }
-    if (isTestMode) {
-      if (deviceType === "desktop") {
-        startLowPolyTest(props.socket, props.store.gameSettings);
-        // startRaceTrackTest(props.socket, props.store.gameSettings);
-      } else {
-        history.push(controlsRoomPath);
-      }
-    }
-    /**************** */
-
     if (deviceType === "desktop") {
       setNeedToAskOrientPermission(false);
     } else {
@@ -190,10 +158,6 @@ const FrontPage = (props: FrontPageProps) => {
       props.socket.off("player-connected-callback");
     };
   }, []);
-
-  if (isTestMode) {
-    return null;
-  }
 
   return (
     <AppContainer>

@@ -7,11 +7,7 @@ import {
   IPlayerInfo,
 } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
-import {
-  getDeviceType,
-  isMobileTestMode,
-  startGameAuto,
-} from "../utils/settings";
+import { getDeviceType } from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
 import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
@@ -20,7 +16,6 @@ import OneMonitorFrontPage from "./FrontPage";
 import PrivateProfilePage from "./PrivateProfilePage";
 import { IStore } from "./store";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
-import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 import ShowRoomComponent from "./showRoom/ShowRoomComponent";
 import { UserContext } from "../providers/UserProvider";
 import {
@@ -48,56 +43,10 @@ const Routes = () => {
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
   const deviceType = getDeviceType();
+
   useEffect(() => {
     const newSocket = createSocket(deviceType);
     setSocket(newSocket);
-    if (startGameAuto) {
-      const nplayer = {
-        playerName: "tester",
-        isLeader: true,
-        playerNumber: 0,
-        teamName: "no team",
-        mobileControls: new MobileControls(),
-        vehicleControls: new VehicleControls(),
-        id: "1",
-        vehicleType: "f1",
-      } as IPlayerInfo;
-
-      const nplayer2 = {
-        playerName: "tester2",
-        isLeader: false,
-        playerNumber: 0,
-        teamName: "no team",
-        mobileControls: new MobileControls(),
-        vehicleControls: new VehicleControls(),
-        id: "2",
-        vehicleType: "f1",
-      } as IPlayerInfo;
-      const nplayer3 = {
-        playerName: "tester3",
-        isLeader: false,
-        playerNumber: 0,
-        teamName: "no team",
-        mobileControls: new MobileControls(),
-        vehicleControls: new VehicleControls(),
-        id: "3",
-        vehicleType: "f1",
-      } as IPlayerInfo;
-      setPlayers([nplayer, nplayer2, nplayer3]);
-    } else if (isMobileTestMode) {
-      const nplayer = {
-        playerName: "tester",
-        isLeader: true,
-        playerNumber: 0,
-        teamName: "no team",
-        mobileControls: new MobileControls(),
-        vehicleControls: new VehicleControls(),
-        id: "1",
-        vehicleType: "f1",
-      } as IPlayerInfo;
-      setPlayers([nplayer]);
-      setPlayer(nplayer);
-    }
   }, []);
 
   const store = {

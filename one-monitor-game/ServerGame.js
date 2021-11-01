@@ -3,6 +3,7 @@ const Player = require("./ServerPlayer")
 
 const successStatus = "success"
 const errorStatus = "error"
+let testRoomId = "testRoom"
 
 class GameMaster {
     rooms
@@ -23,10 +24,6 @@ class GameMaster {
         return false
     }
 
-    setupCreateRoomListener(desktopSocket) {
-
-    }
-
     setupPlayerConnectedListener(mobileSocket) {
         mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated, photoURL }) => {
             if (!this.roomExists(roomId)) {
@@ -38,36 +35,60 @@ class GameMaster {
         })
     }
 
+    createRoom(socket, roomId) {
+
+        this.rooms[roomId] = new Game(roomId, this.io, socket)
+        socket.join(roomId)
+        socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
+    }
+
     addSocket(socket) {
-        let deviceType
-        let playerName
+
         let roomId
-        let player
+        let isTestMode = false
         console.log("adding socket, games", Object.keys(this.rooms))
 
-        socket.once("device-type", (_deviceType) => {
-            deviceType = _deviceType
+        socket.once("device-type", ({ deviceType, mode }) => {
+            isTestMode = mode === "test"
+
             console.log("In one monitor game connection from", deviceType)
             if (deviceType === "desktop") {
                 socket.on("create-room", () => {
                     // increadably unlikly two games get same uuid
                     // one room can play many games
                     roomId = uuidv4().slice(0, 4)
-                    this.rooms[roomId] = new Game(roomId, this.io, socket)
-                    socket.join(roomId)
-                    socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
+                    this.createRoom(socket, roomId)
                 })
+                if (isTestMode) {
+
+                    roomId = testRoomId
+
+                    if (this.rooms[roomId]) {
+                        console.log("updating socket")
+                        this.rooms[roomId].setSocket(socket)
+                        socket.join(roomId)
+                        socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
+                    } else {
+                        this.createRoom(socket, roomId)
+                    }
+                }
                 socket.on("disconnect", () => {
-
                     console.log("disconnected from desktop", roomId)
-                    if (roomId) {
-
+                    if (roomId && !isTestMode) {
                         this.rooms[roomId].isConnected = false
                         delete this.rooms[roomId]
                     }
                 })
             } else {
-                this.setupPlayerConnectedListener(socket)
+                if (isTestMode) {
+                    if (this.rooms[testRoomId] === undefined) {
+                        this.rooms[testRoomId] = new Game(testRoomId, this.io, socket)
+                    }
+                    const player = new Player(socket, "test", "playerId", false, "")
+                    this.rooms[testRoomId].addPlayer(player)
+                } else {
+                    this.setupPlayerConnectedListener(socket)
+                }
             }
 
             socket.on("get-players-in-room", ({ roomId }) => {
@@ -117,6 +138,12 @@ class Game {
         this.setupGameSettingsListener()
     }
 
+    setSocket(socket) {
+        this.socket = socket
+        this.setupStartGameListener()
+        this.setupGameSettingsListener()
+    }
+
     addPlayer(player) {
         let playerExists = false
 
@@ -133,7 +160,7 @@ class Game {
                 player.socket.emit("player-connected-callback", { status: errorStatus, message: "The game you are trying to connect to has already started." })
                 return
             } else {
-                player.socket.emit("player-connected-callback", { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo() } })
+                player.socket.emit("player-connected-callback", { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
                 player.socket.emit("handle-game-starting")
                 return
             }
@@ -173,8 +200,16 @@ class Game {
 
     setupControlsListener() {
         setInterval(() => {
-            this.socket.emit("get-controls", { players: this.getPlayersInfo() })
+            this.socket.emit("get-controls", { players: this.getPlayersControls() })
         }, 10)
+    }
+
+    getPlayersControls() {
+        const playersControls = []
+        for (let i = 0; i < this.players.length; i++) {
+            playersControls.push(this.players[i].getPlayerControls())
+        }
+        return playersControls
     }
 
     getPlayersInfo() {
@@ -187,7 +222,6 @@ class Game {
 
     setupStartGameListener() {
         this.socket.once("handle-start-game", () => {
-            console.log("handle start game pressed", this.getPlayersInfo())
             if (this.players.length === 0) {
                 this.socket.emit("handle-start-game-callback", {
                     message: "No players connected, cannot start game",

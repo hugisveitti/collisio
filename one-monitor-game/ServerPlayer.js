@@ -115,6 +115,11 @@ class Player {
         }
     }
 
+    getPlayerControls() {
+        return { mobileControls: this.mobileControls, playerNumber: this.playerNumber }
+
+    }
+
     setupUserSettingsListener() {
         this.socket.on("settings-changed", (newUserSettings) => {
             this.userSettings = newUserSettings
@@ -135,7 +140,6 @@ class Player {
     setupPlayerInfoListener() {
         this.socket.on("player-info-change", (playerData) => {
             const keys = Object.keys(playerData)
-            console.log("player info change", playerData)
             for (let key of keys) {
                 if (playerData[key]) {
                     this[key] = playerData[key]

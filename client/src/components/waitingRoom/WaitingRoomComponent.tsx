@@ -30,16 +30,15 @@ import { IPlayerInfo } from "../../classes/Game";
 import { inputBackgroundColor } from "../../providers/theme";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
-import {
-  getDeviceType,
-  isIphone,
-  isMobileTestMode,
-  startGameAuto,
-} from "../../utils/settings";
+import { getDeviceType, isIphone } from "../../utils/settings";
 import GameSettingsComponent from "../GameSettingsComponent";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import { IUser } from "../../firebase/firebaseFunctions";
+import {
+  sendPlayerInfoChanged,
+  socketHandleStartGame,
+} from "../../utils/socketFunctions";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -59,17 +58,12 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   const roomId = props.roomId;
 
-  const sendPlayerInfoChanged = (newPlayerInfo: IPlayerInfo) => {
-    props.socket.emit("player-info-change", newPlayerInfo);
-  };
-
   const handleStartGame = () => {
-    props.socket.emit("handle-start-game");
-    props.socket.once("handle-start-game-callback", (data: ISocketCallback) => {
-      if (data.status === "success") {
+    socketHandleStartGame(props.socket, (response: ISocketCallback) => {
+      if (response.status === "success") {
         history.push(gameRoomPath);
       } else {
-        toast.error(data.message);
+        toast.error(response.message);
       }
     });
   };
@@ -84,30 +78,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         console.log("error generating qr code", err);
       });
 
-    if (isMobileTestMode) {
-      if (onMobile) {
-        sendPlayerInfoChanged(props.store.player);
-      }
-    }
     return () => {
       props.socket.off("handle-start-game-callback");
     };
   }, []);
-
-  useEffect(() => {
-    /***** For development */
-    if (startGameAuto) {
-      if (props.store.players.length > 0) {
-        handleStartGame();
-      }
-    }
-    if (isMobileTestMode && !onMobile) {
-      if (props.store.players.length > 0) {
-        handleStartGame();
-      }
-    }
-    /****** */
-  }, [props.store.players]);
 
   const renderTeamSelect = (player: IPlayerInfo, i: number) => {
     if (props.store.gameSettings.typeOfGame !== "ball") return null;
@@ -127,7 +101,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                   teamNumber: 0,
                 } as IPlayerInfo;
                 props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(newPayerInfo);
+                sendPlayerInfoChanged(props.socket, newPayerInfo);
               }}
             />
             Team 0
@@ -145,7 +119,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                   teamNumber: 1,
                 } as IPlayerInfo;
                 props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(newPayerInfo);
+                sendPlayerInfoChanged(props.socket, newPayerInfo);
               }}
             />
             Team 1
@@ -305,7 +279,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                     vehicleType: e.target.value,
                   } as IPlayerInfo;
                   props.store.setPlayer(newPayerInfo);
-                  sendPlayerInfoChanged(newPayerInfo);
+                  sendPlayerInfoChanged(props.socket, newPayerInfo);
                 }
               }}
               value={props.store.player.vehicleType}

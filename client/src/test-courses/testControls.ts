@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client"
 import { IPlayerInfo } from "../classes/Game"
-import { IVehicle } from "../models/IVehicle"
+import { IVehicle } from "../vehicles/IVehicle"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 
 
@@ -11,6 +11,7 @@ let angle = 30
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
     if (mobileControls.forward) {
+
         vehicle.goForward(mobileControls.moreSpeed)
     } else if (mobileControls.backward) {
         vehicle.goBackward(speed)
@@ -46,19 +47,23 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 let vehicleIdx = 0
 let lookBackwards = false
-let driveWithKeyboardEnabled = true
+//let driveWithKeyboardEnabled = true
 
 
-export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle) => {
+export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle, callback: (mc: MobileControls) => void) => {
 
 
-    if (!driveWithKeyboardEnabled) {
+    //  if (!driveWithKeyboardEnabled) {
 
-        socket.on("get-controls", (data) => {
-            const { players } = data as { players: IPlayerInfo[] }
-            // driveVehicle(vehicle)
-        })
-    }
+    socket.on("get-controls", (data) => {
+        const { players } = data as { players: IPlayerInfo[] }
+        for (let i = 0; i < players.length; i++) {
+            console.log("get controls", players[i].mobileControls)
+            driveVehicle(players[i].mobileControls, vehicle)
+            callback(players[i].mobileControls)
+        }
+    })
+
 
 
 
@@ -102,7 +107,13 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
 
-export const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
+export const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls, mobileControls: MobileControls) => {
+
+    const mobileKeys = Object.keys(mobileControls)
+    for (let key of mobileKeys) {
+        // basically if using mobile controls then cant use vehicle controls
+        if (mobileControls[key]) return
+    }
 
     if (vehicleControls.forward) {
         vehicle.goForward(false)

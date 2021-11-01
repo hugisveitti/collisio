@@ -3,66 +3,72 @@ const app = express();
 const path = require("path");
 
 
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 
-app.use(express.static(path.join(__dirname, "./client/src")));
+const buildFolder = "dist"
+
+app.use(express.static(path.join(__dirname, `./client/${buildFolder}`)));
+app.use(express.static(path.join(__dirname, `./client/src`)));
 
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+});
+
+app.get("/test", (req, res) => {
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/test.html`));
 });
 
 // There must be some better way to do this shit
 app.get("/wait", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/wait/:gameId", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/game", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/game/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/controls", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/how-to-play", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/highscores", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/private-profile", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/public-profile/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
-
 app.get("/show-room", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/index.html"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
 });
 
 app.get("/ammo.wasm.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "./client/src/ammo/ammo.wasm.js"));
+    res.sendFile(path.join(__dirname, `./client/${buildFolder}/ammo/ammo.wasm.js`));
 })
 
 app.get("/hello", (req, res) => {
@@ -78,10 +84,9 @@ const server = app.listen(port, () => {
 const GameMaster = require("./one-monitor-game/ServerGame")
 
 
-const io = require("socket.io")(server, { cors: { origin: "*" } })
+const io = require("socket.io")(server,) // { cors: { origin: "*" } })
 const gameMaster = new GameMaster(io)
 io.on("connection", (socket) => {
-    console.log("connected")
     gameMaster.addSocket(socket)
 })
 
