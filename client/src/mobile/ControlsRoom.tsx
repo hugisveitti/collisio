@@ -8,7 +8,7 @@ import { IStore } from "../components/store";
 import { getDBUserSettings } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import { MobileControls } from "../utils/ControlsClasses";
-import { isTestMode } from "../utils/settings";
+import { isMobileTestMode, isTestMode } from "../utils/settings";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";
 
@@ -70,7 +70,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
   };
 
-  if (!props.store?.roomId && !isTestMode) {
+  if (!props.store?.roomId && !isTestMode && !isMobileTestMode) {
     history.push(frontPagePath);
     toast.warn("No room connection, redirecting to frontpage");
     return null;

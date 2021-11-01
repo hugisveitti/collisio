@@ -15,12 +15,16 @@ import AppContainer from "../containers/AppContainer";
 import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
-import { beepC4 } from "../sound/soundPlayer";
 import "../styles/main.css";
 import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
-import { getDeviceType, isTestMode, startGameAuto } from "../utils/settings";
+import {
+  getDeviceType,
+  isMobileTestMode,
+  isTestMode,
+  startGameAuto,
+} from "../utils/settings";
 import NotLoggedInModal from "./NotLoggedInModal";
 import {
   controlsRoomPath,
@@ -82,6 +86,23 @@ const FrontPage = (props: FrontPageProps) => {
     history.push(waitingRoomPath + "/" + roomId);
   };
 
+  const createPlayerConnectedCallback = () => {
+    props.socket.once(
+      "player-connected-callback",
+      (response: ISocketCallback) => {
+        console.log("player conn res", response);
+        if (response.status === "error") {
+          const { message } = response;
+          toast.error(message);
+        } else {
+          toast.success(response.message);
+          props.store.setPlayer(response.data.player);
+          goToWaitingRoom(response.data.roomId);
+        }
+      }
+    );
+  };
+
   const connectToRoomMobile = (roomId: string, playerName: string) => {
     props.socket.emit("player-connected", {
       roomId,
@@ -91,20 +112,10 @@ const FrontPage = (props: FrontPageProps) => {
       photoURL: user?.photoURL,
     } as IPlayerConnection);
 
-    props.socket.once("player-connected-callback", (data: ISocketCallback) => {
-      if (data.status === "error") {
-        const { message } = data;
-        toast.error(message);
-      } else {
-        toast.success(data.message);
-        props.store.setPlayer(data.data.player);
-        goToWaitingRoom(roomId);
-      }
-    });
+    createPlayerConnectedCallback();
   };
 
-  const createRoomDesktop = (roomId: string) => {
-    props.socket.emit("create-room", { roomId });
+  const createRoomDesktopCallback = () => {
     props.socket.once("create-room-callback", (response: ISocketCallback) => {
       if (response.status === "success") {
         const { roomId } = response.data;
@@ -116,20 +127,17 @@ const FrontPage = (props: FrontPageProps) => {
     });
   };
 
+  const createRoomDesktop = (roomId: string) => {
+    props.socket.emit("create-room", { roomId });
+    createRoomDesktopCallback();
+  };
+
   const connectButtonClicked = () => {
-    let _roomId: string, _playerName: string;
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-      _roomId = props.store.roomId !== "" ? props.store.roomId : "testRoom";
-      _playerName = playerName !== "" ? playerName : "testPlayer";
-    } else {
-      _playerName = playerName;
-      _roomId = props.store.roomId;
-    }
     if (deviceType === "desktop") {
-      createRoomDesktop(_roomId);
+      createRoomDesktop(props.store.roomId);
     } else {
       if (user) {
-        connectToRoomMobile(_roomId, _playerName);
+        connectToRoomMobile(props.store.roomId, playerName);
         handleRequestDeviceOrientation();
       } else {
         setNotLoggedInModelOpen(true);
@@ -144,6 +152,13 @@ const FrontPage = (props: FrontPageProps) => {
   }, [user]);
 
   useEffect(() => {
+    if (isMobileTestMode) {
+      if (deviceType === "desktop") {
+        createRoomDesktopCallback();
+      } else {
+        createPlayerConnectedCallback();
+      }
+    }
     /** Just for development  */
     if (startGameAuto) {
       props.store.setRoomId("testRoom");

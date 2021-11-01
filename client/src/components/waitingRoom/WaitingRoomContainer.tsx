@@ -99,7 +99,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   };
 
   useEffect(() => {
-    console.log("on mobile", onMobile, props.store.player);
     if (!onMobile) return;
 
     if (!user && !props.store.player) {

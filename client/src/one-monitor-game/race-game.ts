@@ -28,7 +28,7 @@ const scoreTable = document.createElement("div")
 const importantInfoDiv = document.createElement("div")
 
 const gameSong = new Howl({
-    src: ["./sound/song2.mp3"],
+    src: ["/sound/song2.mp3"],
     html5: true,
     volume: .5,
 
@@ -150,7 +150,6 @@ export class RaceGameScene extends Scene3D {
             this.courseLoaded = true
             const createVehiclePromise = new Promise((resolve, reject) => {
                 this.createVehicles(() => {
-                    console.log("created vehilces")
                     resolve("successfully created all vehicles")
                 })
             })
@@ -491,7 +490,6 @@ export class RaceGameScene extends Scene3D {
     }
 
     createViews() {
-        console.log("Creating Views")
         this.views = []
         const lefts = [0, 0.5]
         const bottoms = [0, 0, 0.5, 0.5]

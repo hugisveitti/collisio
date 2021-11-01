@@ -7,7 +7,11 @@ import {
   IPlayerInfo,
 } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
-import { getDeviceType, startGameAuto } from "../utils/settings";
+import {
+  getDeviceType,
+  isMobileTestMode,
+  startGameAuto,
+} from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
 import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
@@ -43,7 +47,6 @@ const Routes = () => {
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
-
   const deviceType = getDeviceType();
   useEffect(() => {
     const newSocket = createSocket(deviceType);
@@ -81,6 +84,19 @@ const Routes = () => {
         vehicleType: "f1",
       } as IPlayerInfo;
       setPlayers([nplayer, nplayer2, nplayer3]);
+    } else if (isMobileTestMode) {
+      const nplayer = {
+        playerName: "tester",
+        isLeader: true,
+        playerNumber: 0,
+        teamName: "no team",
+        mobileControls: new MobileControls(),
+        vehicleControls: new VehicleControls(),
+        id: "1",
+        vehicleType: "f1",
+      } as IPlayerInfo;
+      setPlayers([nplayer]);
+      setPlayer(nplayer);
     }
   }, []);
 

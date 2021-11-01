@@ -1,5 +1,6 @@
 import { toast } from "react-toastify"
 import { io } from "socket.io-client"
+import { isMobileTestMode, startGameAuto } from "./settings"
 
 export interface ISocketCallback {
     message: string;
@@ -14,11 +15,9 @@ export const createSocket = (deviceType: string) => {
 
     socket.on("connect", () => {
         if (deviceType === "desktop") {
-            socket.emit("device-type", "desktop")
-
-
+            socket.emit("device-type", { deviceType: "desktop", mode: isMobileTestMode ? "test" : "not-test" })
         } else {
-            socket.emit("device-type", "mobile")
+            socket.emit("device-type", { deviceType: "mobile", mode: isMobileTestMode ? "test" : "not-test" })
         }
     })
 

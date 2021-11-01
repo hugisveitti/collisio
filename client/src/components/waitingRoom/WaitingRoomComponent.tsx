@@ -30,7 +30,12 @@ import { IPlayerInfo } from "../../classes/Game";
 import { inputBackgroundColor } from "../../providers/theme";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
-import { getDeviceType, isIphone, startGameAuto } from "../../utils/settings";
+import {
+  getDeviceType,
+  isIphone,
+  isMobileTestMode,
+  startGameAuto,
+} from "../../utils/settings";
 import GameSettingsComponent from "../GameSettingsComponent";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -79,6 +84,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         console.log("error generating qr code", err);
       });
 
+    if (isMobileTestMode) {
+      if (onMobile) {
+        sendPlayerInfoChanged(props.store.player);
+      }
+    }
     return () => {
       props.socket.off("handle-start-game-callback");
     };
@@ -87,6 +97,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   useEffect(() => {
     /***** For development */
     if (startGameAuto) {
+      if (props.store.players.length > 0) {
+        handleStartGame();
+      }
+    }
+    if (isMobileTestMode && !onMobile) {
       if (props.store.players.length > 0) {
         handleStartGame();
       }
