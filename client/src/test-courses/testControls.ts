@@ -10,55 +10,33 @@ let angle = 30
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
-    if (mobileControls.forward) {
+    if (mobileControls.f) {
 
-        vehicle.goForward(mobileControls.moreSpeed)
-    } else if (mobileControls.backward) {
-        vehicle.goBackward(speed)
+        vehicle.goForward()
+    } else if (mobileControls.b) {
+        vehicle.goBackward()
     } else {
         vehicle.noForce()
     }
 
-    if (mobileControls.break) {
-        vehicle.break()
-    } else {
-        vehicle.break(true)
-    }
 
-    if (mobileControls.beta > 4) {
-        vehicle.turnLeft(mobileControls.beta)
-    } else if (mobileControls.beta < -4) {
-        vehicle.turnRight(mobileControls.beta)
-    } else {
-        vehicle.noTurn()
-    }
 
-    if (mobileControls.lookBackwards) {
-        vehicle.lookForwardsBackwards(true)
-    } else {
-        vehicle.lookForwardsBackwards(false)
-    }
+    vehicle.turn(mobileControls.beta)
+
 
     if (mobileControls.resetVehicle) {
-        vehicle.setPosition(0, 20, 0)
-        vehicle.setRotation(0, 0, 0)
+        vehicle.resetPosition()
     }
 }
 
-let vehicleIdx = 0
-let lookBackwards = false
-//let driveWithKeyboardEnabled = true
 
 
 export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle, callback: (mc: MobileControls) => void) => {
 
 
-    //  if (!driveWithKeyboardEnabled) {
-
     socket.on("get-controls", (data) => {
         const { players } = data as { players: IPlayerInfo[] }
         for (let i = 0; i < players.length; i++) {
-            console.log("get controls", players[i].mobileControls)
             driveVehicle(players[i].mobileControls, vehicle)
             callback(players[i].mobileControls)
         }

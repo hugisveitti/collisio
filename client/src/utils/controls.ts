@@ -10,27 +10,18 @@ let angle = 25
 let gameIsPaused = false
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, callback?: any) => {
-    if (mobileControls.forward) {
-        vehicle.goForward(mobileControls.moreSpeed)
-    } else if (mobileControls.backward) {
-        vehicle.goBackward(speed)
+    if (mobileControls.f) {
+        vehicle.goForward(false)
+    } else if (mobileControls.b) {
+        vehicle.goBackward()
     } else {
         vehicle.noForce()
     }
 
-    if (mobileControls.break) {
-        vehicle.break()
-    } else {
-        vehicle.break(true)
-    }
+
     vehicle.turn(mobileControls.beta)
 
 
-    if (mobileControls.lookBackwards) {
-        vehicle.lookForwardsBackwards(true)
-    } else {
-        vehicle.lookForwardsBackwards(false)
-    }
 
     if (mobileControls.resetVehicle) {
         vehicle.resetPosition()

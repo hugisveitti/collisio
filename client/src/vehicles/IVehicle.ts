@@ -27,8 +27,8 @@ export interface IVehicle {
     /* Has model loaded */
     isReady: boolean
 
-    goForward: (moreSpeed: boolean) => void
-    goBackward: (speed: number) => void
+    goForward: (moreSpeed?: boolean) => void
+    goBackward: (speed?: number) => void
     noForce: () => void
     turnLeft: (angle: number) => void
     turnRight: (angle: number) => void

@@ -429,8 +429,14 @@ export class LowPolyVehicle implements IVehicle {
 
     };
 
-    goBackward(speed: number) {
+    goBackward() {
         if (!this.canDrive) return
+
+        if (this.getCurrentSpeedKmHour() > 10) {
+            this.break()
+            return
+        }
+
         if (this.is4x4) {
             this.vehicle.applyEngineForce(-this.engineForce, FRONT_LEFT)
             this.vehicle.applyEngineForce(- this.engineForce, FRONT_RIGHT)

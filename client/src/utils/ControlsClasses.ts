@@ -39,26 +39,27 @@ export interface IDeviceOrientationEvent {
 
 export class MobileControls {
 
-    moreSpeed: boolean
     beta: number
     alpha: number
     gamma: number
-    forward: boolean
-    backward: boolean
-    break: boolean
-    lookBackwards: boolean
+
+    /* two main buttons, f and b */
+    /** f for forward */
+    f: boolean
+    /** b for break and backward */
+    b: boolean
+
     resetVehicle: boolean
+
     pause: boolean
 
     constructor(data?: Object) {
-        this.moreSpeed = false
         this.beta = 0
         this.gamma = 0
         this.alpha = 0
-        this.forward = false
-        this.backward = false
-        this.break = false
-        this.lookBackwards = false
+        this.f = false
+        this.b = false
+
         this.resetVehicle = false
         this.pause = false
 

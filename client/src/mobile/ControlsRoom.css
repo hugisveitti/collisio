@@ -25,6 +25,7 @@
   text-align: center;
   vertical-align: middle;
   position: absolute;
+  font-size: 32px;
 }
 
 @media only screen and (max-width: 350px) {

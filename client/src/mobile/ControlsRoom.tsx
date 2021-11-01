@@ -59,8 +59,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
     controller.beta = Math.round(beta);
-    controller.moreSpeed = gamma > 0 && gamma < 30;
-    setMoreSpeed(controller.moreSpeed);
 
     setOrientation({
       gamma,
@@ -114,26 +112,24 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   // how to set key
   const handleButtonAction = (
     b: boolean,
-    key: string,
+    key: keyof MobileControls,
     action: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
     action(b);
+    // dont know why this dont work
+    // @ts-ignore
     controller[key] = b;
   };
 
   const btnSize = screen.availWidth < 350 ? 120 : 150;
 
   const rotateText = { transform: "rotate(-90deg)" };
-  const forwardStyles = isPortrait
+  const fButtonStyles = isPortrait
     ? { ...rotateText, top: 35 }
     : { bottom: 35 };
-  const backwardStyles = isPortrait
+  const bButtonStyles = isPortrait
     ? { right: 35, ...rotateText }
     : { left: 35 };
-
-  const breakStyles = isPortrait
-    ? { ...rotateText, right: btnSize + 45, bottom: 35 }
-    : { left: 35, bottom: btnSize + 45 };
 
   const settingsStyles = isPortrait
     ? {
@@ -186,43 +182,31 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
       <div
         className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "forward", setForward)}
-        onTouchEnd={() => handleButtonAction(false, "forward", setForward)}
+        onTouchStart={() => handleButtonAction(true, "f", setForward)}
+        onTouchEnd={() => handleButtonAction(false, "f", setForward)}
         style={{
-          ...forwardStyles,
-
+          ...fButtonStyles,
           right: 35,
           color: forward ? upColor : downColor,
           backgroundColor: forward ? downColor : upColor,
         }}
       >
-        Forward
+        F
       </div>
       <div
         className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "backward", setBackward)}
-        onTouchEnd={() => handleButtonAction(false, "backward", setBackward)}
+        onTouchStart={() => handleButtonAction(true, "b", setBackward)}
+        onTouchEnd={() => handleButtonAction(false, "b", setBackward)}
         style={{
           bottom: 35,
           color: backward ? upColor : downColor,
           backgroundColor: backward ? downColor : upColor,
-          ...backwardStyles,
+          ...bButtonStyles,
         }}
       >
-        Backward
+        B
       </div>
-      <div
-        className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "break", setBreaks)}
-        onTouchEnd={() => handleButtonAction(false, "break", setBreaks)}
-        style={{
-          ...breakStyles,
-          color: breaks ? upColor : downColor,
-          backgroundColor: breaks ? downColor : upColor,
-        }}
-      >
-        Break
-      </div>
+
       <div
         className="controller-btn"
         onClick={() => handleButtonAction(true, "pause", setSettingsModalOpen)}
