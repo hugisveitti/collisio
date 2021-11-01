@@ -57,9 +57,30 @@ const Routes = () => {
         mobileControls: new MobileControls(),
         vehicleControls: new VehicleControls(),
         id: "1",
-        vehicleType: "tractor",
+        vehicleType: "f1",
       } as IPlayerInfo;
-      setPlayers([nplayer]);
+
+      const nplayer2 = {
+        playerName: "tester2",
+        isLeader: false,
+        playerNumber: 0,
+        teamName: "no team",
+        mobileControls: new MobileControls(),
+        vehicleControls: new VehicleControls(),
+        id: "2",
+        vehicleType: "f1",
+      } as IPlayerInfo;
+      const nplayer3 = {
+        playerName: "tester3",
+        isLeader: false,
+        playerNumber: 0,
+        teamName: "no team",
+        mobileControls: new MobileControls(),
+        vehicleControls: new VehicleControls(),
+        id: "3",
+        vehicleType: "f1",
+      } as IPlayerInfo;
+      setPlayers([nplayer, nplayer2, nplayer3]);
     }
   }, []);
 

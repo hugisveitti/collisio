@@ -33,7 +33,7 @@ export const baseurl = "http://localhost:5000/"
 
 // if not development then always false, otherwise set by me...
 // this isnt just crap code, but it still is
-export const startGameAuto = process.env.NODE_ENV !== "development" ? false : false;
+export const startGameAuto = process.env.NODE_ENV !== "development" ? false : true;
 
 // test mode is using raceTrackTest.ts
 // and possible to see the mobile controller right away

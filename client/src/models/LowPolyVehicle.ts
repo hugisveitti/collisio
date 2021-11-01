@@ -183,6 +183,7 @@ export class LowPolyVehicle implements IVehicle {
     camera: THREE.PerspectiveCamera
     vehicleType: VehicleType
     is4x4: boolean
+    isReady: boolean
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
@@ -198,6 +199,7 @@ export class LowPolyVehicle implements IVehicle {
         this.chaseCameraSpeed = 0.3
         this.vehicleSettings = defaultVehicleSettings
         this.vehicleType = vehicleType
+        this.isReady = false
 
 
         this.mass = vehicleConfigs[this.vehicleType].mass
@@ -218,8 +220,7 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.receiveShadow = this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
 
-        console.log("chassi mesh", this.chassisMesh)
-        console.log("tires", this.tires)
+
 
         this.createVehicle()
     }
@@ -364,7 +365,6 @@ export class LowPolyVehicle implements IVehicle {
             wheelRadiusBack,
             BACK_RIGHT
         )
-
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
@@ -639,6 +639,8 @@ export class LowPolyVehicle implements IVehicle {
             this.setRotation(0, this.chassisMesh.rotation.y, 0)
         }
 
+
+
     };
     setPosition(x: number, y: number, z: number) {
         const tm = this.vehicle.getChassisWorldTransform()
@@ -807,7 +809,11 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
 
         vehicleModels[vehicleType] = { tires, chassises }
+
+
+
         callback(tires, chassises)
+
     })
 
 }

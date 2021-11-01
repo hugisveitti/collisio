@@ -28,7 +28,7 @@ const GameRoom = (props: IGameRoom) => {
 
   const handleEscPressed = () => {
     // basically have to create a modal in the game class and show it there...
-    setSettingsModalOpen(true);
+    setSettingsModalOpen(!settingsModalOpen);
   };
 
   useEffect(() => {

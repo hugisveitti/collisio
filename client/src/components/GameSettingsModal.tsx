@@ -26,7 +26,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
   };
   if (!props.gameObject) return null;
   return (
-    <Modal open={props.open} onClose={props.onClose}>
+    <Modal open={props.open} onClose={props.onClose} style={{ border: 0 }}>
       <div
         style={{
           transform: "translate(-50%, -50%)",
@@ -36,17 +36,17 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           backgroundColor: "#eeebdf",
           border: "2px solid #000",
           padding: 10,
+          outline: 0,
         }}
       >
         <Grid container spacing={3}>
-          <Grid item xs={9} />
-          <Grid item xs={3}>
+          <Grid item xs={11}>
+            <h3>Game is paused</h3>
+          </Grid>
+          <Grid item xs={1}>
             <IconButton onClick={props.onClose}>
               <CloseIcon />
             </IconButton>
-          </Grid>
-          <Grid item xs={12}>
-            <h3>Game is paused</h3>
           </Grid>
 
           <Grid item xs={12}>

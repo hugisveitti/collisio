@@ -283,18 +283,8 @@ need to be logged in."
           <Grid item xs={12}>
             <p>
               This game is in development. If you have suggestions please email
-              hugiholm1 [at] gmail.com
+              hugiholm1 [a] [t] gmail.com
             </p>
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              onClick={() => {
-                beepC4.play();
-              }}
-            >
-              Beep
-            </Button>
           </Grid>
         </Grid>
         <ToastContainer />

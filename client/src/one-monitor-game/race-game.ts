@@ -86,6 +86,7 @@ export class RaceGameScene extends Scene3D {
 
 
     songIsPlaying: boolean
+    _everythingReady = false
 
     constructor() {
         super()
@@ -146,15 +147,23 @@ export class RaceGameScene extends Scene3D {
 
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
-            this.createVehicles(() => {
+            this.courseLoaded = true
+            const createVehiclePromise = new Promise((resolve, reject) => {
+                this.createVehicles(() => {
+                    console.log("created vehilces")
+                    resolve("successfully created all vehicles")
+                })
+            })
+            createVehiclePromise.then(() => {
+
+                // adds font to vehicles, which displays names
                 this.loadFont()
                 this.createViews()
                 this.createController()
-
                 this.resetVehicles()
                 this.startRaceCountdown()
-
             })
+
         })
 
         stats.showPanel(0)
@@ -164,9 +173,6 @@ export class RaceGameScene extends Scene3D {
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
                 this.restartGame()
-            } else if (e.key === "p") {
-                // all or non paused
-                this.togglePauseGame()
             }
         })
 
@@ -192,6 +198,50 @@ export class RaceGameScene extends Scene3D {
 
     }
 
+    async createVehicles(callback: () => void) {
+        const loadedVehicleModels = {}
+        // get random color of chassis
+        let chassisColOffset = Math.floor(Math.random() * 4)
+
+        /** make this better
+         * Currently doing async loading of models, when it could be sync
+         */
+        const recursiveCreate = (i: number) => {
+
+
+            const color = possibleColors[i]
+
+            let newVehicle: IVehicle
+            newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
+            this.vehicles.push(newVehicle)
+
+
+            this.gameTimers.push(new GameTime(this.totalNumberOfLaps))
+            let loadPromise = new Promise((resolve, reject) => {
+
+                loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
+                    console.log("loaded model for player", i, this.players[i].vehicleType)
+                    // only x colors of chassis
+                    loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[(i + chassisColOffset) % chassises.length])
+                    resolve("success")
+                }, false)
+            })
+            loadPromise.then((msg) => {
+                if (i === this.players.length - 1) {
+                    callback()
+                } else {
+                    recursiveCreate(i + 1)
+                }
+            })
+
+        }
+
+        recursiveCreate(0)
+    }
+
+
+
     setPlayers(players: IPlayerInfo[]) {
         this.players = players
     }
@@ -211,7 +261,6 @@ export class RaceGameScene extends Scene3D {
     }
 
     togglePauseGame() {
-
         let isPaused = this.isGamePaused()
         if (isPaused) {
             this.startGameSong()
@@ -312,7 +361,8 @@ export class RaceGameScene extends Scene3D {
     }
 
     startGameSong() {
-        if (this.useSound && (!gameSong.playing() || !this.songIsPlaying) && !this.isGamePaused()) {
+        // not use sound right now...
+        if (!!false && this.useSound && (!gameSong.playing() || !this.songIsPlaying) && !this.isGamePaused()) {
             console.log("starting game sound")
             gameSong.play()
             this.songIsPlaying = true
@@ -346,35 +396,7 @@ export class RaceGameScene extends Scene3D {
         }, sec * 1000)
     }
 
-    async createVehicles(callback: () => void) {
-        const loadedVehicleModels = {}
-        // get random color of chassis
-        let chassisColOffset = Math.floor(Math.random() * 4)
-        for (let i = 0; i < this.players.length; i++) {
-            const color = possibleColors[i]
 
-            let newVehicle: IVehicle
-            // if (this.gameSettings.trackName.includes("low-poly")) {
-            newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)
-
-            this.vehicles.push(newVehicle)
-
-
-            this.gameTimers.push(new GameTime(this.totalNumberOfLaps))
-
-            await loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
-                // only x colors of chassis
-                loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
-                (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[(i + chassisColOffset) % chassises.length])
-
-                if (i === this.vehicles.length - 1) {
-
-                    this.courseLoaded = true
-                    callback()
-                }
-            })
-        }
-    }
 
 
 
@@ -469,7 +491,7 @@ export class RaceGameScene extends Scene3D {
     }
 
     createViews() {
-
+        console.log("Creating Views")
         this.views = []
         const lefts = [0, 0.5]
         const bottoms = [0, 0, 0.5, 0.5]
@@ -505,20 +527,16 @@ export class RaceGameScene extends Scene3D {
 
 
             this.vehicles[i].addCamera(view.camera)
+            this.vehicles[i].isReady = true
             this.views.push(view)
         }
     }
-
-
-
 
     userSettingsListener() {
         this.socket.on("user-settings-changed", (data: IUserSettingsMessage) => {
             this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
         })
     }
-
-
 
     checkVehicleOutOfBounds(idx: number) {
         const pos = this.vehicles[idx].getPosition()
@@ -568,8 +586,21 @@ export class RaceGameScene extends Scene3D {
 
     }
 
+    everythingReady(): boolean {
+        if (this._everythingReady) return true
+
+        if (!this.courseLoaded) return false
+
+        for (let vehicle of this.vehicles) {
+            if (!vehicle.isReady) return false
+        }
+
+        this._everythingReady = true
+        return true
+    }
+
     update() {
-        if (this.courseLoaded) {
+        if (this.everythingReady()) {
             stats.begin()
             if (startGameAuto) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)

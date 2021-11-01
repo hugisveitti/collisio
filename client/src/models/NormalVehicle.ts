@@ -54,6 +54,7 @@ export class NormalVehicle implements IVehicle {
     engineForce: number = 5000
     breakingForce: number = 100
     steeringSentitivity: number = 0.05
+    isReady = true
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber?: number) {

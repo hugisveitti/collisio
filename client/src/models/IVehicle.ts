@@ -24,6 +24,9 @@ export interface IVehicle {
     steeringSensitivity: number
     breakingForce: number
 
+    /* Has model loaded */
+    isReady: boolean
+
     goForward: (moreSpeed: boolean) => void
     goBackward: (speed: number) => void
     noForce: () => void
