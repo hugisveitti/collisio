@@ -96,20 +96,25 @@ export class RaceCourse {
                         if (keyNameMatch(key, child.name)) {
 
                             if (!child.name.includes("ghost") && !Boolean(gameItems[key].notAddPhysics)) {
-                                this.scene.physics.add.existing((child as ExtendedObject3D), { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape });
-                                (child as ExtendedObject3D).castShadow = useShadows && Boolean(gameItems[key].castsShadow);
-                                (child as ExtendedObject3D).receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
-                                (child as ExtendedObject3D).visible = !Boolean(gameItems[key].notVisible)
+                                const eObject = (child as ExtendedObject3D)
+                                this.scene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
+                                eObject.castShadow = useShadows && Boolean(gameItems[key].castsShadow);
+                                eObject.receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
+                                eObject.visible = !Boolean(gameItems[key].notVisible);
+                                eObject.body.checkCollisions = true
                                 if (gameItems[key].bounciness) {
-                                    (child as ExtendedObject3D).body.setBounciness(gameItems[key].bounciness)
+                                    eObject.body.setBounciness(gameItems[key].bounciness)
                                 }
                                 if (gameItems[key].friction) {
-                                    (child as ExtendedObject3D).body.ammo.setFriction(gameItems[key].friction)
+                                    eObject.body.setFriction(gameItems[key].friction)
+                                }
+                                if (gameItems[key].gravityY) {
+                                    eObject.body.setGravity(0, gameItems[key].gravityY, 0)
                                 }
                                 if (child.name.includes("hidden")) {
                                     child.visible = false
                                 }
-                                this.gamePhysicsObjects.push(child as ExtendedObject3D)
+                                this.gamePhysicsObjects.push(eObject)
                             } else if (child.name.includes("ghost")) {
 
                             }

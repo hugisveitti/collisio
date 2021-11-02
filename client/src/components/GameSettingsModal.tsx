@@ -1,19 +1,32 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, Grid, IconButton, Modal } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+} from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { IPlayerInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
 import { setDBUserSettings } from "../firebase/firebaseFunctions";
+import { IGameScene } from "../one-monitor-game/IGameScene";
 import { RaceGameScene } from "../one-monitor-game/race-game";
+import { VehicleType } from "../vehicles/VehicleConfigs";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
 
 interface IGameSettingsModal {
   open: boolean;
   onClose: () => void;
-  gameObject: RaceGameScene;
+  gameObject: IGameScene;
   store: IStore;
   userId: string | undefined;
+  isTestMode?: boolean;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -24,6 +37,22 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
       setDBUserSettings(props.userId, newUserSettings);
     }
   };
+
+  const updateSettings = (key: keyof IUserGameSettings, value: any) => {
+    const newUserGameSettings = props.store.userSettings.userGameSettings;
+
+    newUserGameSettings[key] = value;
+
+    const newUserSettings = {
+      ...props.store.userSettings,
+      userGameSettings: newUserGameSettings,
+    };
+
+    props.store.setUserSettings(newUserSettings);
+    props.gameObject.setUserGameSettings(newUserGameSettings);
+    updateDBUserSettings(newUserSettings);
+  };
+
   if (!props.gameObject) return null;
   return (
     <Modal open={props.open} onClose={props.onClose} style={{ border: 0 }}>
@@ -56,18 +85,10 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             <Button
               variant="contained"
               onClick={() => {
-                const newUserGameSettings = {
-                  ...props.store.userSettings.userGameSettings,
-                  useShadows:
-                    !props.store.userSettings.userGameSettings.useShadows,
-                };
-                const newUserSettings = {
-                  ...props.store.userSettings,
-                  userGameSettings: newUserGameSettings,
-                };
-                props.store.setUserSettings(newUserSettings);
-                props.gameObject.setUserGameSettings(newUserGameSettings);
-                updateDBUserSettings(newUserSettings);
+                updateSettings(
+                  "useShadows",
+                  !props.store.userSettings.userGameSettings.useShadows
+                );
               }}
             >
               Shadows{" "}
@@ -80,17 +101,10 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             <Button
               variant="contained"
               onClick={() => {
-                const newUserGameSettings = {
-                  ...props.store.userSettings.userGameSettings,
-                  useSound: !props.store.userSettings.userGameSettings.useSound,
-                } as IUserGameSettings;
-                const newUserSettings = {
-                  ...props.store.userSettings,
-                  userGameSettings: newUserGameSettings,
-                } as IUserSettings;
-                props.store.setUserSettings(newUserSettings);
-                props.gameObject.setUserGameSettings(newUserGameSettings);
-                updateDBUserSettings(newUserSettings);
+                updateSettings(
+                  "useSound",
+                  !props.store.userSettings.userGameSettings.useSound
+                );
               }}
             >
               Sound{" "}
@@ -122,6 +136,42 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               Reset game
             </Button>
           </Grid>
+          <Grid item xs={8} />
+          {props.isTestMode && props.store.player && (
+            <React.Fragment>
+              <Grid item xs={4}>
+                <FormControl fullWidth>
+                  <InputLabel id="vehicle-select">Vehicle</InputLabel>
+                  <Select
+                    style={{
+                      backgroundColor: "white",
+                    }}
+                    label="Vehicle selection"
+                    name="vehicle"
+                    onChange={(e) => {
+                      const newPayerInfo = {
+                        ...props.store.player,
+                        vehicleType: e.target.value,
+                      } as IPlayerInfo;
+                      props.store.setPlayer(newPayerInfo);
+
+                      if (props.gameObject.changeVehicle) {
+                        props.gameObject.changeVehicle(
+                          e.target.value as VehicleType
+                        );
+                      }
+                    }}
+                    value={props.store.player.vehicleType}
+                  >
+                    <MenuItem value="normal">Normal</MenuItem>
+                    <MenuItem value="tractor">Tractor</MenuItem>
+                    <MenuItem value="f1">F1 car</MenuItem>
+                    <MenuItem value="monsterTruck">Monster truck</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </React.Fragment>
+          )}
         </Grid>
       </div>
     </Modal>

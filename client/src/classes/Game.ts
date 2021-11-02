@@ -1,4 +1,4 @@
-import { VehicleType } from "../vehicles/LowPolyVehicle";
+import { VehicleType } from "../vehicles/VehicleConfigs";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
 

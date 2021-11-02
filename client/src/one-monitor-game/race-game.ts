@@ -17,6 +17,7 @@ import { GameTime } from "./GameTimeClass";
 import { beepC4, beepE4 } from "../sound/soundPlayer";
 import { Howl } from "howler";
 import { inTestMode } from "../utils/settings";
+import { IGameScene } from "./IGameScene";
 
 const vechicleFov = 60
 
@@ -49,7 +50,7 @@ interface IView {
     camera: THREE.PerspectiveCamera
 }
 
-export class RaceGameScene extends Scene3D {
+export class RaceGameScene extends Scene3D implements IGameScene {
 
     players!: IPlayerInfo[]
     vehicles!: IVehicle[]
@@ -695,6 +696,7 @@ export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettin
         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
         console.log("starting game, players", players)
         callback(gameObject)
+
         return project
     })
 

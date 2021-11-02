@@ -5,8 +5,8 @@ import { ExtendedMesh, Scene3D } from "enable3d";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { GameTime } from "../one-monitor-game/GameTimeClass";
-import { PerspectiveCamera } from "three";
+import { vehicleConfigs, VehicleType } from "./VehicleConfigs";
+
 
 
 
@@ -20,19 +20,19 @@ const BACK_RIGHT = 3
 
 const degToRad = 0.017453
 
-let suspensionStiffness = 58.0
+export const defaultSuspensionStiffness = 58.0
+export const defaultSuspensionDamping = 4;
+export const defaultFriction = 100
+export const defaultRollInfluence = .01
+export const defaultSuspensionCompression = 2.4
+export const defaultFrictionSlip = 3.5
 
-let rollInfluence = .01
 
 let CUBE_HALF_EXTENTS = .96;
 let suspensionRestLength = 1.1
-let frictionSlip = 3.5
-let rearWheelFriction = 100 //4.5
-let suspensionCompression = 2.4
-let maxSuspensionTravelCm = 1500.0;
+export const defaultMaxSuspensionTravelCm = 1500.0;
 let maxSuspensionForce = 50000.0;
 let connectionHeight = 2.5;
-let suspensionDamping = 4;
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 let targetPos = new THREE.Vector3(0, 0, 0)
 
@@ -47,103 +47,6 @@ export const staticCameraPos = { x: 0, y: 10, z: -25 }
 
 let useBad = false
 
-
-
-interface IVehicleConfig {
-    wheelAxisBackPosition: number
-    wheelRadiusBack: number
-    wheelHalfTrackBack: number
-    wheelAxisHeightBack: number
-
-    wheelAxisFrontPosition: number
-    wheelRadiusFront: number
-    wheelHalfTrackFront: number
-    wheelAxisHeightFront: number
-
-    is4x4: boolean
-
-    path: string
-
-    mass: number
-    engineForce: number
-    breakingForce: number
-}
-
-export type VehicleType = "normal" | "tractor" | "f1" | "test"
-
-const vehicleConfigs = {
-    normal: {
-        wheelAxisBackPosition: -1.65,
-        wheelRadiusBack: 0.63 / 2,
-        wheelHalfTrackBack: .9,
-        wheelAxisHeightBack: -.75,
-
-        wheelAxisFrontPosition: 1.35,
-        wheelRadiusFront: 0.63 / 2,
-        wheelHalfTrackFront: .9,
-        wheelAxisHeightFront: -.75,
-
-        mass: 800,
-        engineForce: 5000,
-        breakingForce: 100,
-        is4x4: false,
-
-        path: "simple-low-poly-car.gltf"
-    },
-    tractor: {
-        wheelAxisBackPosition: -1.8,
-        wheelRadiusBack: 2.4 / 2,
-        wheelHalfTrackBack: 1.6,
-        wheelAxisHeightBack: -1.8,
-
-        wheelAxisFrontPosition: 2.1,
-        wheelRadiusFront: 1.6 / 2,
-        wheelHalfTrackFront: 1.36,
-        wheelAxisHeightFront: -2.1,
-
-        mass: 1600,
-        engineForce: 2500,
-        breakingForce: 100,
-        is4x4: true,
-
-        path: "low-poly-tractor.gltf"
-    },
-    f1: {
-        path: "low-poly-f1-car.gltf",
-
-        wheelAxisBackPosition: -2.65,
-        wheelRadiusBack: 0.95 / 2,
-        wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: -.45,
-
-        wheelAxisFrontPosition: 2.75,
-        wheelRadiusFront: 0.95 / 2,
-        wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: -.45,
-
-        mass: 1000,
-        engineForce: 10000,
-        breakingForce: 200,
-        is4x4: false,
-
-    },
-    test: {
-        path: "low-poly-test-vehicle.gltf",
-        wheelAxisBackPosition: -2.5,
-        wheelRadiusBack: 0.85 / 2,
-        wheelHalfTrackBack: 3.75,
-        wheelAxisHeightBack: -1.25,
-
-        wheelAxisFrontPosition: 2,
-        wheelRadiusFront: 0.85 / 2,
-        wheelHalfTrackFront: 2.75,
-        wheelAxisHeightFront: -1.25,
-        mass: 800,
-        engineForce: 5000,
-        breakingForce: 100,
-        is4x4: false,
-    },
-} as { [key: string]: IVehicleConfig }
 
 export class LowPolyVehicle implements IVehicle {
     canDrive: boolean;
@@ -171,9 +74,9 @@ export class LowPolyVehicle implements IVehicle {
     vehicleNumber: number
     font: THREE.Font
     badRotationTicks = 0
+    useBadRotationTicks = true
     modelsLoaded = false
 
-    gameTime: GameTime
 
     cameraDir = new THREE.Vector3()
 
@@ -187,7 +90,9 @@ export class LowPolyVehicle implements IVehicle {
     is4x4: boolean
     isReady: boolean
 
-    vehicleInertia = new Ammo.btVector3(0, 0, 0)
+
+    forwardTicks = 0
+
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
@@ -198,13 +103,13 @@ export class LowPolyVehicle implements IVehicle {
         this.canDrive = true
         this.isPaused = false
         this.vehicleNumber = vehicleNumber
-        this.gameTime = new GameTime(5)
         this.useChaseCamera = false
         this.chaseCameraSpeed = 0.3
         this.chaseCameraTicks = 0
         this.vehicleSettings = defaultVehicleSettings
         this.vehicleType = vehicleType
         this.isReady = false
+
 
 
         this.mass = vehicleConfigs[this.vehicleType].mass
@@ -291,25 +196,19 @@ export class LowPolyVehicle implements IVehicle {
 
 
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
-        this.chassisMesh.body.setFriction(1)
-        this.chassisMesh.body.setBounciness(.3)
+
+        this.chassisMesh.body.setBounciness(.1)
 
         // how to lower center of mass
-        // let tf = new Ammo.btTransform()
-        // tf.setOrigin(new Ammo.btVector3(0, -2, 0))
-        // this.chassisMesh.body.ammo.setCenterOfMassTransform(tf)
-        // this.chassisMesh.body.ammo.getCenterOfMassTransform().setOrigin(new Ammo.btVector3(0, -2, 0))
-
-
 
         this.tuning = new Ammo.btVehicleTuning()
 
-        this.tuning.set_m_suspensionStiffness(suspensionStiffness);
-        this.tuning.set_m_suspensionCompression(suspensionCompression);
-        this.tuning.set_m_suspensionDamping(suspensionDamping);
-        this.tuning.set_m_maxSuspensionTravelCm(maxSuspensionTravelCm);
-        this.tuning.set_m_frictionSlip(frictionSlip);
-        this.tuning.set_m_maxSuspensionForce(maxSuspensionForce);
+        this.tuning.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness);
+        this.tuning.set_m_suspensionCompression(vehicleConfigs[this.vehicleType].suspensionCompression);
+        this.tuning.set_m_suspensionDamping(vehicleConfigs[this.vehicleType].suspensionDamping);
+        this.tuning.set_m_maxSuspensionTravelCm(vehicleConfigs[this.vehicleType].maxSuspensionTravelCm);
+        this.tuning.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip);
+        this.tuning.set_m_maxSuspensionForce(vehicleConfigs[this.vehicleType].maxSuspensionForce);
 
 
 
@@ -374,46 +273,45 @@ export class LowPolyVehicle implements IVehicle {
         )
 
         // not sure what to have the gravity, the auto is -20
-        this.vehicle.getRigidBody().setGravity(new Ammo.btVector3(0, -25, 0))
+        this.vehicle.getRigidBody().setGravity(new Ammo.btVector3(0, -30, 0))
         this.vehicle.getRigidBody().setFriction(3.0)
 
-        // this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vehicleInertia)
-        // //   
-        // this.vehicle.getRigidBody().setMassProps(this.mass, this.vehicleInertia)
+        // I suspect that 0 means infinity, so 0 inertia is actually inf intertia, and the vehicle cannot move on that axis
 
+
+        /** setting inertia */
+        const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
+        this.vehicle.getRigidBody().setMassProps(this.mass, new Ammo.btVector3(x, y, z))
+        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, new Ammo.btVector3(x, y, z))
 
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
-        const suspensionStiffness = 50
-        const suspensionDamping = 2.3
-        const suspensionCompression = 4.4
-        const suspensionRestLength = 0.
 
-        const friction = 500
-        const rollInfluence = 0.01
 
         const wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0)
         const wheelAxelCS = new Ammo.btVector3(-1, 0, 0)
+
 
 
         const wheelInfo = this.vehicle.addWheel(
             pos,
             wheelDirectionCS0,
             wheelAxelCS,
-            suspensionRestLength,
+            vehicleConfigs[this.vehicleType].suspensionRestLength,
             radius,
             this.tuning,
             isFront
         )
 
+        // wheelInfo.set_m_suspensionRestLength1(2)
+        wheelInfo.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness ?? defaultSuspensionStiffness)
 
-        wheelInfo.set_m_suspensionStiffness(suspensionStiffness)
-        wheelInfo.set_m_wheelsDampingRelaxation(suspensionDamping)
-        wheelInfo.set_m_wheelsDampingCompression(suspensionCompression)
+        wheelInfo.set_m_wheelsDampingRelaxation(vehicleConfigs[this.vehicleType].suspensionDamping ?? defaultSuspensionDamping)
+        wheelInfo.set_m_wheelsDampingCompression(vehicleConfigs[this.vehicleType].suspensionDamping ?? defaultSuspensionCompression)
 
-        wheelInfo.set_m_frictionSlip(friction)
-        wheelInfo.set_m_rollInfluence(rollInfluence)
+        wheelInfo.set_m_frictionSlip(defaultFrictionSlip)
+        wheelInfo.set_m_rollInfluence(defaultRollInfluence)
         this.vehicle.updateSuspension(0)
 
 
@@ -434,22 +332,26 @@ export class LowPolyVehicle implements IVehicle {
         return t
     }
 
+
+
     goForward(moreSpeed: boolean) {
         if (!this.canDrive) return
 
+        let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
         if (this.getCurrentSpeedKmHour() > 300) {
-
-            console.log("forward vec", this.vehicle.getForwardVector())
-            return
+            const fv = this.vehicle.getForwardVector()
+            eF = 0
         }
+
+
 
         if (this.is4x4) {
-            this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_LEFT)
-            this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, FRONT_RIGHT)
+            this.vehicle.applyEngineForce(eF, FRONT_LEFT)
+            this.vehicle.applyEngineForce(eF, FRONT_RIGHT)
         }
 
-        this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_LEFT)
-        this.vehicle.applyEngineForce(moreSpeed ? this.engineForce * 1.5 : this.engineForce, BACK_RIGHT)
+        this.vehicle.applyEngineForce(eF, BACK_LEFT)
+        this.vehicle.applyEngineForce(eF, BACK_RIGHT)
 
     };
 
@@ -572,11 +474,6 @@ export class LowPolyVehicle implements IVehicle {
             cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((p.z - this.prevCahseCameraPos.z) * cs))
             cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((p.y - this.prevCahseCameraPos.y) * cs))
 
-
-            // cameraLookAtPos.x = (p.x + ((this.prevCahseCameraPos.x - p.x) * cs))
-            // cameraLookAtPos.z = (p.z + ((this.prevCahseCameraPos.z - p.z) * cs))
-            // cameraLookAtPos.y = (p.y + ((this.prevCahseCameraPos.y - p.y) * cs))
-
             this.prevCahseCameraPos = cameraLookAtPos.clone()
 
 
@@ -682,20 +579,23 @@ export class LowPolyVehicle implements IVehicle {
             }
         }
 
-        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 20) {
+        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 20 && this.useBadRotationTicks) {
             // make this flip smoother ??
             this.stop()
             this.start()
 
             this.setRotation(0, this.chassisMesh.rotation.y, 0)
+            this.setPosition(undefined, 5, undefined)
         }
 
 
 
+
     };
-    setPosition(x: number, y: number, z: number) {
+    setPosition(x: number | undefined, y: number | undefined, z: number | undefined) {
         const tm = this.vehicle.getChassisWorldTransform()
-        tm.setOrigin(new Ammo.btVector3(x, y, z))
+        const p = tm.getOrigin()
+        tm.setOrigin(new Ammo.btVector3(x ?? p.x(), y ?? p.y(), z ?? p.z()))
     };
 
     getPosition() {
@@ -776,22 +676,6 @@ export class LowPolyVehicle implements IVehicle {
             this.chassisMesh.add(this.camera)
         }
     };
-
-    updateMass(mass: number) {
-        this.mass = mass
-        const g = this.vehicle.getRigidBody().getGravity()
-        console.log("grav", g.x(), g.y(), g.z())
-
-        const f = this.vehicle.getRigidBody().getFriction()
-        console.log("friction", f)
-        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vehicleInertia)
-        //   
-        this.vehicle.getRigidBody().setMassProps(this.mass, this.vehicleInertia)
-    }
-
-    updateBreakingForce(breakingForce: number) {
-        this.breakingForce = breakingForce
-    }
 
     setchaseCameraSpeed(chaseCameraSpeed: number) {
         this.chaseCameraSpeed = chaseCameraSpeed

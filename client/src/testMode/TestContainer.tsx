@@ -65,6 +65,7 @@ const TestContainer = () => {
     setPlayers([nplayer]);
     // setPlayer(nplayer);
     setRoomId("testRoom");
+    setPlayer(nplayer);
 
     if (onMobile) {
       socket.emit("player-connected", {
@@ -114,7 +115,7 @@ const TestContainer = () => {
       {onMobile ? (
         <ControlsRoom socket={socket} store={store} />
       ) : (
-        <GameRoom store={store} socket={socket} useTestCourse />
+        <GameRoom store={store} socket={socket} useTestCourse isTestMode />
       )}
       <ToastContainer />
     </React.Fragment>

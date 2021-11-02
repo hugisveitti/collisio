@@ -9,9 +9,14 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { VehicleType } from "../../vehicles/LowPolyVehicle";
+import { VehicleType } from "../../vehicles/VehicleConfigs";
 
-const possibleVehcileTypes: VehicleType[] = ["f1", "tractor", "normal"];
+const possibleVehcileTypes: VehicleType[] = [
+  "f1",
+  "tractor",
+  "normal",
+  "monsterTruck",
+];
 
 const useStyles = makeStyles({
   arrowContainer: {

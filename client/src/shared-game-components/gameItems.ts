@@ -14,6 +14,8 @@ interface IGameItem {
     objectName?: string
     /** for debug */
     notVisible?: boolean
+    mass?: number
+    gravityY?: number
 }
 export const gameItems = {
     "ground": {
@@ -127,6 +129,17 @@ export const gameItems = {
         bounciness: structureBounciness,
         castsShadow: false,
         receiveShadow: true
+    },
+    "traffic-cone": {
+        // collisionFlag:0, cannot have convex shape (I think)
+        collisionFlags: 0,
+        shape: "convex",
+        bounciness: .5,
+        castsShadow: true,
+        receiveShadow: false,
+        mass: 2,
+        notAddPhysics: false,
+        gravityY: -50
     }
 
 } as { [key: string]: IGameItem }

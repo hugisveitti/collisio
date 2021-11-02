@@ -17,8 +17,7 @@ export interface IVehicle {
     canDrive: boolean
     isPaused: boolean
     mass: number
-    /** to track the time */
-    gameTime: GameTime
+
     vehicleSettings: IVehicleSettings
     engineForce: number
     steeringSensitivity: number
