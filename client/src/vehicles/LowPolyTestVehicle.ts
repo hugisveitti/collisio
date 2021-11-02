@@ -140,6 +140,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
             wheelInfo.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip)
             wheelInfo.set_m_rollInfluence(vehicleConfigs[this.vehicleType].rollInfluence)
+            //    wheelInfo.updateWheel(this.vehicle.getRigidBody(), this.vehicle.getRigidBody().)
             this.vehicle.updateSuspension(0)
         }
     }

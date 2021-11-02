@@ -71,6 +71,7 @@ export class LowPolyVehicle implements IVehicle {
     checkpointPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
 
     tuning: Ammo.btVehicleTuning
+    raycaster: Ammo.btDefaultVehicleRaycaster
     vehicleNumber: number
     font: THREE.Font
     badRotationTicks = 0
@@ -92,6 +93,8 @@ export class LowPolyVehicle implements IVehicle {
 
 
     forwardTicks = 0
+
+
 
 
 
@@ -212,9 +215,9 @@ export class LowPolyVehicle implements IVehicle {
 
 
 
-        const rayCaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
+        this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
 
-        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.chassisMesh.body.ammo, rayCaster)
+        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.chassisMesh.body.ammo, this.raycaster)
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
         this.chassisMesh.body.skipUpdate = true
         this.vehicle.setCoordinateSystem(0, 1, 2)
@@ -339,11 +342,12 @@ export class LowPolyVehicle implements IVehicle {
 
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
         if (this.getCurrentSpeedKmHour() > 300) {
-            const fv = this.vehicle.getForwardVector()
+
             eF = 0
         }
-
-
+        if (this.getCurrentSpeedKmHour() < 2) {
+            this.break(true)
+        }
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -362,28 +366,30 @@ export class LowPolyVehicle implements IVehicle {
             this.break()
             return
         }
-
+        this.break(true)
         if (this.is4x4) {
             this.vehicle.applyEngineForce(-this.engineForce, FRONT_LEFT)
-            this.vehicle.applyEngineForce(- this.engineForce, FRONT_RIGHT)
+            this.vehicle.applyEngineForce(-this.engineForce, FRONT_RIGHT)
         }
+
         this.vehicle.applyEngineForce(-this.engineForce, BACK_LEFT)
         this.vehicle.applyEngineForce(-this.engineForce, BACK_RIGHT)
     };
+
     noForce() {
+        this.break(true)
+        let slowBreakForce = 1000
+        slowBreakForce *= -Math.sign(this.getCurrentSpeedKmHour())
+        if (Math.abs(this.getCurrentSpeedKmHour()) < 10) slowBreakForce = 0
 
 
         if (this.is4x4) {
-            this.vehicle.applyEngineForce(0, FRONT_LEFT)
-            this.vehicle.applyEngineForce(0, FRONT_RIGHT)
+            this.vehicle.applyEngineForce(slowBreakForce, FRONT_LEFT)
+            this.vehicle.applyEngineForce(slowBreakForce, FRONT_RIGHT)
         }
 
-        this.vehicle.applyEngineForce(0, BACK_LEFT)
-        this.vehicle.applyEngineForce(0, BACK_RIGHT)
-
-
-
-
+        this.vehicle.applyEngineForce(slowBreakForce, BACK_LEFT)
+        this.vehicle.applyEngineForce(slowBreakForce, BACK_RIGHT)
     };
     turnLeft(angle: number) { };
     turnRight(angle: number) { };
@@ -391,10 +397,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.vehicle.setSteeringValue(0, FRONT_LEFT)
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
-        // this.vehicle.setBrake(breakForce, BACK_RIGHT)
-        // this.vehicle.setBrake(breakForce, BACK_LEFT)
-        // this.vehicle.setBrake(breakForce, FRONT_RIGHT)
-        // this.vehicle.setBrake(breakForce, FRONT_LEFT)
+
     };
     turn(angle: number) {
         if (this.canDrive) {
@@ -407,6 +410,7 @@ export class LowPolyVehicle implements IVehicle {
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)
         }
     };
+
     break(notBreak?: boolean) {
         const breakForce = notBreak ? 0 : this.breakingForce
         this.vehicle.setBrake(breakForce, BACK_RIGHT)
@@ -414,6 +418,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicle.setBrake(breakForce, FRONT_RIGHT)
         this.vehicle.setBrake(breakForce, FRONT_LEFT)
     };
+
     stop() {
         this.chassisMesh.body.setCollisionFlags(1)
         this.chassisMesh.body.setVelocity(0, 0, 0)

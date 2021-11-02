@@ -10,13 +10,19 @@ let angle = 30
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
+    let btnDown = false
     if (mobileControls.f) {
-
-        vehicle.goForward()
-    } else if (mobileControls.b) {
+        vehicle.goForward(false)
+        btnDown = true
+    }
+    if (mobileControls.b) {
         vehicle.goBackward()
-    } else {
+        btnDown = true
+    }
+
+    if (!btnDown) {
         vehicle.noForce()
+        // vehicle.break(false)
     }
 
 
@@ -33,14 +39,15 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle, callback: (mc: MobileControls) => void) => {
 
-
-    socket.on("get-controls", (data) => {
-        const { players } = data as { players: IPlayerInfo[] }
-        for (let i = 0; i < players.length; i++) {
-            driveVehicle(players[i].mobileControls, vehicle)
-            callback(players[i].mobileControls)
-        }
-    })
+    setInterval(() => {
+        socket.once("get-controls", (data) => {
+            const { players } = data as { players: IPlayerInfo[] }
+            for (let i = 0; i < players.length; i++) {
+                driveVehicle(players[i].mobileControls, vehicle)
+                callback(players[i].mobileControls)
+            }
+        })
+    }, 1000 / 120)
 
 
 

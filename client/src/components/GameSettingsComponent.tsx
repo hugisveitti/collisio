@@ -16,24 +16,41 @@ import {
 import React from "react";
 import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";
+import { IPreGameSettings } from "../classes/Game";
+import { IUserSettings } from "../classes/User";
+import { setDBUserSettings } from "../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../providers/theme";
 import { IStore } from "./store";
 
-interface IGameSettingsComponent {
+interface IPreGameSettingsComponent {
   socket: Socket;
   store: IStore;
+  userId: string | undefined;
 }
 
-const GameSettingsComponent = (props: IGameSettingsComponent) => {
+const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
   const history = useHistory();
 
-  const updateGameSettings = (key: string, value: any) => {
-    const newGameSettings = { ...props.store.gameSettings };
-    newGameSettings[key] = value;
-    props.store.setGameSettings(newGameSettings);
+  const updateGameSettings = (key: keyof IPreGameSettings, value: any) => {
+    const newPreGameSettings = { ...props.store.preGameSettings };
+    // @ts-ignore
+    newPreGameSettings[key] = value;
+    const newUserSettings: IUserSettings = {
+      ...props.store.userSettings,
+      preGameSettings: newPreGameSettings,
+    };
+
+    props.store.setUserSettings(newUserSettings);
+
+    props.store.setPreGameSettings(newPreGameSettings);
+
     props.socket.emit("game-settings-changed", {
-      gameSettings: newGameSettings,
+      gameSettings: newPreGameSettings,
     });
+
+    if (props.userId) {
+      setDBUserSettings(props.userId, newUserSettings);
+    }
   };
 
   return (
@@ -59,10 +76,10 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     value="race"
                     control={
                       <Radio
-                        onChange={() =>
-                          updateGameSettings("typeOfGame", "race")
+                        onChange={() => updateGameSettings("gameType", "race")}
+                        checked={
+                          props.store.preGameSettings.gameType === "race"
                         }
-                        checked={props.store.gameSettings.typeOfGame === "race"}
                       />
                     }
                     label="Race"
@@ -71,10 +88,10 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     value="ball"
                     control={
                       <Radio
-                        onChange={() =>
-                          updateGameSettings("typeOfGame", "ball")
+                        onChange={() => updateGameSettings("gameType", "ball")}
+                        checked={
+                          props.store.preGameSettings.gameType === "ball"
                         }
-                        checked={props.store.gameSettings.typeOfGame === "ball"}
                       />
                     }
                     label="Ball"
@@ -82,7 +99,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 </RadioGroup>
               </FormControl>
             </Grid>
-            {props.store.gameSettings.typeOfGame === "ball" ? (
+            {props.store.preGameSettings.gameType === "ball" ? (
               <React.Fragment>
                 <Grid item xs={false} sm={4} xl={5} />
                 <Grid item xs={12} sm={4} xl={2}>
@@ -90,7 +107,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     fullWidth
                     type="number"
                     label="Ball radius"
-                    value={props.store.gameSettings.ballRadius}
+                    value={props.store.preGameSettings.ballRadius}
                     style={{ backgroundColor: inputBackgroundColor }}
                     onChange={(ev) => {
                       updateGameSettings("ballRadius", +ev.target.value);
@@ -107,7 +124,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     fullWidth
                     label="No. of laps"
                     type="number"
-                    value={props.store.gameSettings.numberOfLaps}
+                    value={props.store.preGameSettings.numberOfLaps}
                     onChange={(ev) => {
                       updateGameSettings("numberOfLaps", +ev.target.value);
                     }}
@@ -128,7 +145,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                       onChange={(e) => {
                         updateGameSettings("trackName", e.target.value);
                       }}
-                      value={props.store.gameSettings.trackName}
+                      value={props.store.preGameSettings.trackName}
                     >
                       <MenuItem value="low-poly-farm-track">
                         Low poly farm track

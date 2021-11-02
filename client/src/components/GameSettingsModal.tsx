@@ -20,7 +20,7 @@ import { VehicleType } from "../vehicles/VehicleConfigs";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
 
-interface IGameSettingsModal {
+interface IPreGameSettingsModal {
   open: boolean;
   onClose: () => void;
   gameObject: IGameScene;
@@ -29,7 +29,7 @@ interface IGameSettingsModal {
   isTestMode?: boolean;
 }
 
-const GameSettingsModal = (props: IGameSettingsModal) => {
+const GameSettingsModal = (props: IPreGameSettingsModal) => {
   const history = useHistory();
 
   const updateDBUserSettings = (newUserSettings: IUserSettings) => {

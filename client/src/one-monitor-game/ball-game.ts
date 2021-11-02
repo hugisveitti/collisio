@@ -2,7 +2,7 @@ import { Color } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
-import { IGameSettings, IPlayerInfo } from "../classes/Game";
+import { IPreGameSettings, IPlayerInfo } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/squaredCourse";
 import { addControls } from "../utils/controls";
@@ -61,7 +61,7 @@ export class PhysicsTest extends Scene3D {
     views!: IView[]
     team0Goals: number
     team1Goals: number
-    gameSettings: IGameSettings
+    gameSettings: IPreGameSettings
 
     constructor() {
         super()
@@ -73,12 +73,12 @@ export class PhysicsTest extends Scene3D {
         this.gameSettings = {
             ballRadius: 1,
             numberOfLaps: 0,
-            typeOfGame: "ball",
+            gameType: "ball",
             trackName: "track"
         }
     }
 
-    setGameSettings(newGameSettings: IGameSettings) {
+    setGameSettings(newGameSettings: IPreGameSettings) {
         this.gameSettings = newGameSettings
     }
 
@@ -356,7 +356,7 @@ export class PhysicsTest extends Scene3D {
 }
 
 
-export const startBallGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings) => {
+export const startBallGameOneMonitor = (socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings) => {
     const config = { scenes: [PhysicsTest], antialias: true, }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)

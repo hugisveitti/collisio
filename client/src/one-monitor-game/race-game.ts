@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import Stats from "stats.js";
-import { defaultGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IGameSettings, IPlayerGameInfo, IPlayerInfo } from "../classes/Game";
+import { defaultPreGameSettings, IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPreGameSettings, IPlayerGameInfo, IPlayerInfo } from "../classes/Game";
 import { IVehicle } from "../vehicles/IVehicle";
 import { RaceCourse } from "../shared-game-components/raceCourse";
 import { addControls, driveVehicleWithKeyboard } from "../utils/controls";
@@ -60,7 +60,7 @@ export class RaceGameScene extends Scene3D implements IGameScene {
     vehicleControls!: VehicleControls
     course!: RaceCourse
     views!: IView[]
-    gameSettings: IGameSettings
+    gameSettings: IPreGameSettings
 
     courseLoaded: boolean
     finishedTime: number[]
@@ -99,7 +99,7 @@ export class RaceGameScene extends Scene3D implements IGameScene {
         document.body.appendChild(scoreTable)
         document.body.appendChild(importantInfoDiv)
 
-        this.gameSettings = defaultGameSettings
+        this.gameSettings = defaultPreGameSettings
 
 
         this.courseLoaded = false
@@ -285,7 +285,7 @@ export class RaceGameScene extends Scene3D implements IGameScene {
 
 
 
-    setGameSettings(newGameSettings: IGameSettings, roomId: string, escPress: () => void) {
+    setGameSettings(newGameSettings: IPreGameSettings, roomId: string, escPress: () => void) {
         this.gameSettings = newGameSettings
         this.totalNumberOfLaps = this.gameSettings.numberOfLaps
         this.roomId = roomId
@@ -680,7 +680,7 @@ export class RaceGameScene extends Scene3D implements IGameScene {
 }
 
 
-export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, userGameSettings: IUserGameSettings, roomId: string, escPress: () => void, callback: (gameObject: RaceGameScene) => void) => {
+export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, escPress: () => void, callback: (gameObject: RaceGameScene) => void) => {
     const config = { scenes: [RaceGameScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)

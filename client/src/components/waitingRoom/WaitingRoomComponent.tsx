@@ -3,14 +3,19 @@ import {
   Button,
   Divider,
   FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
   Grid,
   IconButton,
   InputLabel,
   List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
   ListItemText,
   MenuItem,
+  RadioGroup,
   Select,
   Tooltip,
   Typography,
@@ -34,11 +39,13 @@ import { getDeviceType, isIphone } from "../../utils/settings";
 import GameSettingsComponent from "../GameSettingsComponent";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import { IUser } from "../../firebase/firebaseFunctions";
+import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
 import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
+import { IVehicleSettings } from "../../classes/User";
+import { VehicleType } from "../../vehicles/VehicleConfigs";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -83,53 +90,55 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
     };
   }, []);
 
+  const updateUserVehicleSettings = (
+    key: keyof IVehicleSettings,
+    value: any
+  ) => {
+    const newVehcileSettings = props.store.userSettings.vehicleSettings;
+    // @ts-ignore
+    newVehcileSettings[key] = value;
+
+    const newUserSettings = {
+      ...props.store.userSettings,
+      vehicleSettings: newVehcileSettings,
+    };
+
+    props.store.setUserSettings(newUserSettings);
+
+    if (user.uid) {
+      setDBUserSettings(user.uid, newUserSettings);
+    }
+  };
+
   const renderTeamSelect = (player: IPlayerInfo, i: number) => {
-    if (props.store.gameSettings.typeOfGame !== "ball") return null;
+    if (props.store.preGameSettings.gameType !== "ball") return null;
     if (onMobile && props.store.player?.playerNumber === player.playerNumber) {
       return (
-        <div className="team-select-container">
-          <label className="team-select-radio-button">
-            <input
-              type="radio"
-              id="team0"
-              name={`team-pick-${i}`}
-              value={0}
-              checked={player.teamNumber === 0}
-              onChange={() => {
-                const newPayerInfo = {
+        <ListItemText>
+          <FormControl>
+            <FormLabel component="legend">Team</FormLabel>
+            <RadioGroup
+              defaultValue={1}
+              onChange={(e, val) => {
+                const newPlayerInfo: IPlayerInfo = {
                   ...props.store.player,
-                  teamNumber: 0,
-                } as IPlayerInfo;
-                props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(props.socket, newPayerInfo);
+                  teamNumber: +val,
+                  teamName: val,
+                };
+
+                props.store.setPlayer(newPlayerInfo);
+
+                sendPlayerInfoChanged(props.socket, newPlayerInfo);
               }}
-            />
-            Team 0
-          </label>
-          <label className="team-select-radio-button">
-            <input
-              type="radio"
-              id="team1"
-              name={`team-pick-${i}`}
-              value={1}
-              checked={player.teamNumber === 1}
-              onChange={() => {
-                const newPayerInfo = {
-                  ...props.store.player,
-                  teamNumber: 1,
-                } as IPlayerInfo;
-                props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(props.socket, newPayerInfo);
-              }}
-            />
-            Team 1
-          </label>
-        </div>
+            >
+              <FormControlLabel label="0" value={0} control={<Radio />} />
+              <FormControlLabel label="1" value={1} control={<Radio />} />
+            </RadioGroup>
+          </FormControl>
+        </ListItemText>
       );
     }
-    return (
-      <span className="team-select-container">TEAM: {player.teamNumber}</span>
-    );
+    return <ListItemText primary={`Team ${player.teamNumber}`} />;
   };
 
   return (
@@ -138,7 +147,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <h1 className="center">Waiting room</h1>
       </Grid>
       <Grid item xs={12}>
-        <h3>{roomId}</h3>
+        <h2>{roomId}</h2>
       </Grid>
       <Grid item xs={12}>
         <Link to={frontPagePath}>Back to front page</Link>
@@ -195,9 +204,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       </Grid>
 
       <React.Fragment>
-        <Grid item xs={1} sm={3} />
+        <Grid item xs={1} sm={2} />
         {props.store.players.length > 0 ? (
-          <Grid item xs={10} sm={6}>
+          <Grid item xs={10} sm={8}>
             <List
               style={{
                 backgroundColor: "wheat",
@@ -227,6 +236,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                           )
                         }
                       />
+                      <ListItemText primary={player.vehicleType} />
+
                       {renderTeamSelect(player, i)}
                     </ListItem>
                     {i !== props.store.players.length - 1 && <Divider />}
@@ -236,7 +247,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </List>
           </Grid>
         ) : (
-          <Grid item xs={10} sm={6}>
+          <Grid item xs={10} sm={8}>
             <Typography
               style={{
                 backgroundColor: "wheat",
@@ -246,7 +257,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </Typography>
           </Grid>
         )}
-        <Grid item xs={1} sm={3} />
+        <Grid item xs={1} sm={2} />
       </React.Fragment>
 
       {!onMobile && (
@@ -257,7 +268,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </Button>
           </Grid>
           <Divider variant="middle" style={{ margin: 15 }} />
-          <GameSettingsComponent socket={props.socket} store={props.store} />
+          <GameSettingsComponent
+            socket={props.socket}
+            store={props.store}
+            userId={user.uid}
+          />
         </React.Fragment>
       )}
       {onMobile && (
@@ -280,6 +295,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                   } as IPlayerInfo;
                   props.store.setPlayer(newPayerInfo);
                   sendPlayerInfoChanged(props.socket, newPayerInfo);
+
+                  updateUserVehicleSettings(
+                    "vehicleType",
+                    e.target.value as VehicleType
+                  );
                 }
               }}
               value={props.store.player.vehicleType}

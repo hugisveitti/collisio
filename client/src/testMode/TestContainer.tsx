@@ -3,7 +3,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import {
   IPlayerInfo,
-  defaultGameSettings,
+  defaultPreGameSettings,
   IPlayerConnection,
 } from "../classes/Game";
 import { defaultUserSettings } from "../classes/User";
@@ -22,7 +22,9 @@ const TestContainer = () => {
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
-  const [gameSettings, setGameSettings] = useState(defaultGameSettings);
+  const [preGameSettings, setPreGameSettings] = useState(
+    defaultPreGameSettings
+  );
 
   const [canStartGame, setCanStartGame] = useState(false);
 
@@ -98,8 +100,8 @@ const TestContainer = () => {
     setPlayers,
     player,
     setPlayer,
-    gameSettings,
-    setGameSettings,
+    preGameSettings,
+    setPreGameSettings,
     userSettings,
     setUserSettings,
   } as IStore;

@@ -138,10 +138,11 @@ class Player {
     }
 
     setupPlayerInfoListener() {
-        this.socket.on("player-info-change", (playerData) => {
+        this.socket.on("player-info-changed", (playerData) => {
             const keys = Object.keys(playerData)
+
             for (let key of keys) {
-                if (playerData[key]) {
+                if (playerData[key] !== undefined) {
                     this[key] = playerData[key]
                 }
             }

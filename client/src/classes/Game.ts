@@ -28,17 +28,18 @@ export interface IPlayerInfo {
 }
 
 export type TrackType = "track" | "town-track" | "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
+export type GameType = "ball" | "race"
 
-export interface IGameSettings {
+export interface IPreGameSettings {
     ballRadius: number
-    typeOfGame: "ball" | "race"
+    gameType: GameType
     numberOfLaps: number
     trackName: TrackType
 }
 
-export const defaultGameSettings: IGameSettings = {
+export const defaultPreGameSettings: IPreGameSettings = {
     ballRadius: 1,
-    typeOfGame: "race",
+    gameType: "race",
     numberOfLaps: 3,
     trackName: "low-poly-farm-track",
 }

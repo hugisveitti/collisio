@@ -12,7 +12,7 @@ import { v4 as uuid } from "uuid";
 import { useHistory, useParams } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { IPlayerConnection } from "../../classes/Game";
+import { IPlayerConnection, IPlayerInfo } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
@@ -24,6 +24,8 @@ import { frontPagePath, controlsRoomPath } from "../Routes";
 import { IStore } from "../store";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 import "../../styles/main.css";
+import { getDBUserSettings } from "../../firebase/firebaseFunctions";
+import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 
 interface WaitParamType {
   roomId: string;
@@ -83,6 +85,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       "player-connected-callback",
       (response: ISocketCallback) => {
         if (response.status === "success") {
+          console.log("setting playuer", props.store);
           props.store.setPlayer(response.data.player);
           props.store.setRoomId(roomId);
           props.store.setPlayers(response.data.players);
@@ -117,7 +120,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       setUserLoading(false);
     }, 1000);
 
-    props.socket.on("player-joined", ({ players: _players }) => {
+    props.socket.on("waiting-room-alert", ({ players: _players }) => {
       props.store.setPlayers(_players);
     });
 
@@ -129,7 +132,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       getPlayersInRoom();
       props.socket.on("game-settings-changed", (data) => {
-        props.store.setGameSettings(data.gameSettings);
+        props.store.setPreGameSettings(data.gameSettings);
       });
     } else {
       props.socket.on("player-disconnected", ({ playerName }) => {
@@ -138,12 +141,29 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
     return () => {
       props.socket.off("game-settings-changed");
-      props.socket.off("player-joined");
+      props.socket.off("waiting-room-alert");
       props.socket.off("player-disconnected");
       props.socket.off("get-players-in-room-callback");
       props.socket.off("player-connected-callback");
     };
   }, []);
+
+  useEffect(() => {
+    if (props.store.userSettings && props.store.player) {
+      /** maybe need some more efficient way to use save data */
+      const newPlayer: IPlayerInfo = {
+        ...props.store.player,
+        vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
+      };
+
+      props.store.setPlayer(newPlayer);
+      sendPlayerInfoChanged(props.socket, newPlayer);
+    }
+
+    if (props.store.userSettings.preGameSettings && !onMobile) {
+      props.store.setPreGameSettings(props.store.userSettings.preGameSettings);
+    }
+  }, [props.store.userSettings]);
 
   const renderDisplayNameModal = () => {
     if (userLoading) return null;

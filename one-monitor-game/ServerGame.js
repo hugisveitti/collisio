@@ -186,7 +186,7 @@ class Game {
     }
 
     alertWaitingRoom() {
-        this.io.to(this.roomId).emit("player-joined", { players: this.getPlayersInfo() })
+        this.io.to(this.roomId).emit("waiting-room-alert", { players: this.getPlayersInfo() })
     }
 
     setupGameSettingsListener() {
@@ -201,7 +201,8 @@ class Game {
     setupControlsListener() {
         setInterval(() => {
             this.socket.emit("get-controls", { players: this.getPlayersControls() })
-        }, 10)
+            // set fps
+        }, 1000 / 120)
     }
 
     getPlayersControls() {
@@ -247,7 +248,6 @@ class Game {
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].startGame()
         }
-        console.log("starting game", this.toString())
     }
 
 

@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import {
-  defaultGameSettings,
-  IGameSettings,
+  defaultPreGameSettings,
+  IPreGameSettings,
   IPlayerInfo,
 } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
@@ -41,7 +41,9 @@ const Routes = () => {
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
-  const [gameSettings, setGameSettings] = useState(defaultGameSettings);
+  const [preGameSettings, setPreGameSettings] = useState(
+    defaultPreGameSettings
+  );
   const deviceType = getDeviceType();
 
   useEffect(() => {
@@ -56,8 +58,8 @@ const Routes = () => {
     setPlayers,
     player,
     setPlayer,
-    gameSettings,
-    setGameSettings,
+    preGameSettings,
+    setPreGameSettings,
     userSettings,
     setUserSettings,
   } as IStore;

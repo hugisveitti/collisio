@@ -44,7 +44,7 @@ const GameRoom = (props: IGameRoom) => {
     if (props.useTestCourse) {
       return startLowPolyTest(
         props.socket,
-        props.store.gameSettings,
+        props.store.preGameSettings,
         handleEscPressed,
         (gameObject) => {
           setGameObject(gameObject);
@@ -57,17 +57,17 @@ const GameRoom = (props: IGameRoom) => {
       toast.warn("No room connection, redirecting to frontpage");
       return null;
     }
-    if (props.store?.gameSettings?.typeOfGame === "ball") {
+    if (props.store?.preGameSettings?.gameType === "ball") {
       startBallGameOneMonitor(
         props.socket,
         props.store.players,
-        props.store.gameSettings
+        props.store.preGameSettings
       );
-    } else if (props.store?.gameSettings?.typeOfGame === "race") {
+    } else if (props.store?.preGameSettings?.gameType === "race") {
       startRaceGame(
         props.socket,
         props.store.players,
-        props.store.gameSettings,
+        props.store.preGameSettings,
         props.store.userSettings.userGameSettings,
         props.store.roomId,
         handleEscPressed,

@@ -3,7 +3,7 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
-import { defaultGameSettings, IGameSettings } from "../classes/Game"
+import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
 import { VehicleType } from "../vehicles/VehicleConfigs";
 import "../one-monitor-game/game-styles.css"
@@ -38,7 +38,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     socket!: Socket
     vehicleControls!: VehicleControls
     // course!: RaceCourse
-    gameSettings: IGameSettings
+    gameSettings: IPreGameSettings
     raceStarted: boolean
     checkpointCrossed: boolean
     goalCrossed: boolean
@@ -75,7 +75,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.bestLapTime = 10000
         this.canStartUpdate = false
 
-        this.gameSettings = defaultGameSettings
+        this.gameSettings = defaultPreGameSettings
 
         this.currentLaptime = 0
         this.timeStarted = 0
@@ -414,7 +414,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
 
 
-    setGameSettings(newGameSettings: IGameSettings, escPress: () => void) {
+    setGameSettings(newGameSettings: IPreGameSettings, escPress: () => void) {
         this.gameSettings = newGameSettings
         this.escPress = escPress
     }
@@ -545,7 +545,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 }
 
 
-export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
+export const startLowPolyTest = (socket: Socket, gameSettings: IPreGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
     const config = { scenes: [LowPolyTestScene], antialias: true, randomStuff: "hello" }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)

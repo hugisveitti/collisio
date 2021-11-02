@@ -92,7 +92,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       props.socket.emit("send-controls", controller);
 
       // set fps
-    }, 1000 / 45);
+    }, 1000 / 120);
 
     return () => {
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
