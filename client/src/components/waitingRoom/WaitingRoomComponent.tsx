@@ -105,7 +105,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
     props.store.setUserSettings(newUserSettings);
 
-    if (user.uid) {
+    if (user?.uid) {
       setDBUserSettings(user.uid, newUserSettings);
     }
   };
@@ -271,7 +271,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           <GameSettingsComponent
             socket={props.socket}
             store={props.store}
-            userId={user.uid}
+            userId={user?.uid}
           />
         </React.Fragment>
       )}
