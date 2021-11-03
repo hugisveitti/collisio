@@ -12,14 +12,13 @@ import {
   ListItemIcon,
   Modal,
 } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import HelpIcon from "@mui/icons-material/Help";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { UserContext } from "../providers/UserProvider";
-import { signOut } from "../firebase/firebaseInit";
+
 import { useHistory } from "react-router";
 import {
   frontPagePath,
@@ -30,16 +29,21 @@ import {
 } from "../components/Routes";
 import LoginComponent from "../components/LoginComponent";
 import { ToastContainer } from "react-toastify";
+import { IUser } from "../firebase/firebaseFunctions";
+import { UserContext } from "../providers/UserProvider";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
 }
 
 const AppContainer = (props: IAppContainer) => {
-  const user = useContext(UserContext);
   const history = useHistory();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const user = useContext(UserContext);
+  useEffect(() => {
+    console.log("user display name changed");
+  }, [user?.displayName]);
 
   const renderLoginLogoutButton = () => {
     if (user) {
@@ -57,9 +61,6 @@ const AppContainer = (props: IAppContainer) => {
             >
               {user.displayName}
             </Typography>
-          </Button>
-          <Button color="inherit" onClick={signOut}>
-            Logout
           </Button>
         </React.Fragment>
       );

@@ -364,7 +364,7 @@ export class RaceGameScene extends Scene3D implements IGameScene {
     startGameSong() {
         // not use sound right now...
         if (!!false && this.useSound && (!gameSong.playing() || !this.songIsPlaying) && !this.isGamePaused()) {
-            console.log("starting game sound")
+
             gameSong.play()
             this.songIsPlaying = true
         }

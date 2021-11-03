@@ -4,6 +4,11 @@ import { IEndOfGameInfoGame, IEndOfGameInfoPlayer } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { database, gameDataRefPath, highscoreRefPath, userGamesRefPath, usersRefPath } from "./firebaseInit";
 
+const availableRoomsRefPath = "available-rooms"
+const profilesRefPath = "profiles"
+
+const userGamePlayerInfoPath = "player-info"
+const userGameGameInfoPath = "game-info"
 
 export interface IUser {
     displayName: string
@@ -47,10 +52,26 @@ export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
     }, { onlyOnce: true })
 }
 
+export interface IProfile {
+    displayName: string
+    photoURL: string
+    uid: string
+}
 
+export const setDBUserProfile = (userId: string, data: IProfile) => {
+    set(ref(database, profilesRefPath + "/" + userId), data)
+}
 
-const userGamePlayerInfoPath = "player-info"
-const userGameGameInfoPath = "game-info"
+export const getDBUserProfile = (userId: string, callback: (data: IProfile | undefined) => void) => {
+    const profileRef = ref(database, profilesRefPath + "/" + userId)
+    onValue(profileRef, (snap => {
+        if (snap.exists()) {
+            callback(snap.val())
+        } else {
+            callback(undefined)
+        }
+    }), { onlyOnce: true })
+}
 
 export const saveGameData = (playerGameInfo: IEndOfGameInfoPlayer[], gameInfo: IEndOfGameInfoGame) => {
     // const newGameKey = push(child(ref(database), gameDataRefPath)).key;
@@ -107,7 +128,7 @@ export const getHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys
                         }
                     }
                     gamesData.sort((a: IEndOfGameInfoPlayer, b: IEndOfGameInfoPlayer) => {
-                        return a.bestLapTime - b.bestLapTime
+                        return a.totalTime - b.totalTime
                     })
                     trackDict[trackKey][numberOfLapsKey] = gamesData
                 }
@@ -202,4 +223,40 @@ export const getDBUserSettings = (userId: string, callback: (settings: IUserSett
     }, err => {
         console.log("Error getting user settings", err)
     }, { onlyOnce: true })
+}
+
+
+export interface AvailableRoomsFirebaseObject {
+    roomId: string
+    displayName: string
+}
+
+export const addToAvailableRooms = (userId: string, object: AvailableRoomsFirebaseObject) => {
+
+    set(ref(database, availableRoomsRefPath + "/" + userId), object).catch(err => {
+        console.log("error adding room to available rooms", object.roomId, userId, err)
+    })
+}
+
+export const removeFromAvailableRooms = (userId: string) => {
+    set(ref(database, availableRoomsRefPath + "/" + userId), null).catch(err => {
+        console.log("error removing room to available rooms", userId, err)
+    })
+}
+
+
+export const createAvailableRoomsListeners = (userId: string, callback: (roomIds: AvailableRoomsFirebaseObject[]) => void) => {
+    const availableRoomsRef = ref(database, availableRoomsRefPath + "/" + userId)
+
+    onValue(availableRoomsRef, (snap) => {
+        if (snap.exists()) {
+            // TODO: include friends 
+            const roomId = snap.val() as AvailableRoomsFirebaseObject
+            callback([roomId])
+        } else {
+            callback([])
+        }
+    })
+
+    return availableRoomsRef
 }

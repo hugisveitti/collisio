@@ -24,7 +24,11 @@ import { frontPagePath, controlsRoomPath } from "../Routes";
 import { IStore } from "../store";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 import "../../styles/main.css";
-import { getDBUserSettings } from "../../firebase/firebaseFunctions";
+import {
+  addToAvailableRooms,
+  getDBUserSettings,
+  removeFromAvailableRooms,
+} from "../../firebase/firebaseFunctions";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 
 interface WaitParamType {
@@ -139,6 +143,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         toast.warn(`${playerName} disconnected from waiting room`);
       });
     }
+
     return () => {
       props.socket.off("game-settings-changed");
       props.socket.off("waiting-room-alert");
@@ -164,6 +169,26 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.store.setPreGameSettings(props.store.userSettings.preGameSettings);
     }
   }, [props.store.userSettings]);
+
+  useEffect(() => {
+    if (!onMobile && user && props.store.roomId) {
+      addToAvailableRooms(user.uid, {
+        roomId: props.store.roomId,
+        displayName: user.displayName,
+      });
+    }
+    window.onbeforeunload = () => {
+      if (user && !onMobile) {
+        removeFromAvailableRooms(user.uid);
+      }
+    };
+
+    return () => {
+      if (user && !onMobile) {
+        removeFromAvailableRooms(user.uid);
+      }
+    };
+  }, [user.uid]);
 
   const renderDisplayNameModal = () => {
     if (userLoading) return null;

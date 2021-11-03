@@ -13,7 +13,7 @@ import GameRoom from "./GameRoom";
 import HighscorePage from "./HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import OneMonitorFrontPage from "./FrontPage";
-import PrivateProfilePage from "./PrivateProfilePage";
+import PrivateProfilePage from "./profile/PrivateProfilePage";
 import { IStore } from "./store";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 import ShowRoomComponent from "./showRoom/ShowRoomComponent";

@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const { MobileControls } = require('../utils/controls');
 const Player = require("./ServerPlayer")
 
 const successStatus = "success"
@@ -8,10 +9,13 @@ let testRoomId = "testRoom"
 class GameMaster {
     rooms
     io
+    testRoom
+
 
     constructor(io) {
         this.io = io
         this.rooms = {}
+        this.testRoom = new TestRoom()
     }
 
     roomExists = (roomId) => {
@@ -37,6 +41,7 @@ class GameMaster {
 
     createRoom(socket, roomId) {
 
+
         this.rooms[roomId] = new Game(roomId, this.io, socket)
         socket.join(roomId)
         socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
@@ -46,68 +51,119 @@ class GameMaster {
 
         let roomId
         let isTestMode = false
+        let onMobile
         console.log("adding socket, games", Object.keys(this.rooms))
 
         socket.once("device-type", ({ deviceType, mode }) => {
             isTestMode = mode === "test"
-
-            console.log("In one monitor game connection from", deviceType)
-            if (deviceType === "desktop") {
-                socket.on("create-room", () => {
-                    // increadably unlikly two games get same uuid
-                    // one room can play many games
-                    roomId = uuidv4().slice(0, 4)
-                    this.createRoom(socket, roomId)
-                })
-                if (isTestMode) {
-
-                    roomId = testRoomId
-
-                    if (this.rooms[roomId]) {
-                        console.log("updating socket")
-                        this.rooms[roomId].setSocket(socket)
-                        socket.join(roomId)
-                        socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
-                    } else {
-                        this.createRoom(socket, roomId)
-                    }
+            onMobile = deviceType === "mobile"
+            if (isTestMode) {
+                console.log("In testmode from", deviceType)
+                if (onMobile) {
+                    this.testRoom.setMobileSocket(socket)
+                } else {
+                    this.testRoom.setDesktopSocket(socket)
                 }
-                socket.on("disconnect", () => {
-                    console.log("disconnected from desktop", roomId)
-                    if (roomId && !isTestMode) {
-                        this.rooms[roomId].isConnected = false
-                        delete this.rooms[roomId]
-                    }
-                })
             } else {
-                if (isTestMode) {
-                    if (this.rooms[testRoomId] === undefined) {
-                        this.rooms[testRoomId] = new Game(testRoomId, this.io, socket)
-                    }
-                    const player = new Player(socket, "test", "playerId", false, "")
-                    this.rooms[testRoomId].addPlayer(player)
+
+
+
+                console.log("Connection from", deviceType)
+                if (deviceType === "desktop") {
+                    socket.on("create-room", () => {
+                        // increadably unlikly two games get same uuid
+                        // one room can play many games
+                        roomId = uuidv4().slice(0, 4)
+                        this.createRoom(socket, roomId)
+                    })
+
+                    socket.on("disconnect", () => {
+                        console.log("disconnected from desktop", roomId)
+                        if (roomId && !isTestMode) {
+                            this.rooms[roomId].isConnected = false
+                            delete this.rooms[roomId]
+                        }
+                    })
                 } else {
+
                     this.setupPlayerConnectedListener(socket)
+
                 }
+
+                socket.on("get-players-in-room", ({ roomId }) => {
+                    let message, status, players
+                    if (this.rooms[roomId]) {
+                        players = this.rooms[roomId].getPlayersInfo()
+                        message = "Players in room fetched"
+                        status = successStatus
+                    } else {
+                        players = []
+                        message = "Room with given id does not exist"
+                        status = errorStatus
+                    }
+                    socket.emit("get-players-in-room-callback", { message, status, data: { players } })
+                })
+
             }
+        })
+    }
+}
 
-            socket.on("get-players-in-room", ({ roomId }) => {
-                let message, status, players
-                if (this.rooms[roomId]) {
-                    players = this.rooms[roomId].getPlayersInfo()
-                    message = "Players in room fetched"
-                    status = successStatus
-                } else {
-                    players = []
-                    message = "Room with given id does not exist"
-                    status = errorStatus
-                }
-                socket.emit("get-players-in-room-callback", { message, status, data: { players } })
-            })
+class TestRoom {
 
+    players
+    desktopSocket
+    mobileSocket
+    isConnected
+    mobileControls
+    vehicleType
+    userSettings
+
+    constructor() {
+        this.mobileControls = new MobileControls()
+    }
+
+    setDesktopSocket(socket) {
+        this.desktopSocket = socket
+        this.setupControlsListener()
+        this.desktopSocket.on("disconnected", () => {
+            console.log("test room desktop disconnected") +
+                this.desktopSocket.off("get-controls")
+        })
+    }
+
+    setMobileSocket(mobileSocket) {
+        this.mobileSocket = mobileSocket
+        this.mobileSocket.on("send-controls", (mobileControls) => {
+            this.mobileControls = mobileControls
+        })
+        this.setupUserSettingsListener()
+    }
+
+    setupControlsListener() {
+        setInterval(() => {
+            this.desktopSocket.emit("get-controls", { mobileControls: this.mobileControls })
+            // set fps
+        }, 1000 / 120)
+    }
+
+    setupUserSettingsListener() {
+        this.mobileSocket.on("settings-changed", (newUserSettings) => {
+            this.userSettings = newUserSettings
+            // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
+
+            this.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
 
         })
     }
+
+    userSettingsChanged(data) {
+        if (this.desktopSocket) {
+            this.desktopSocket.emit("user-settings-changed", data)
+        }
+    }
+
+
 }
 
 
@@ -175,7 +231,7 @@ class Game {
         }
 
 
-        player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo() } })
+        player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
         player.socket.join(this.roomId)
         player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()

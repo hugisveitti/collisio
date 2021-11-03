@@ -46,6 +46,7 @@ import {
 } from "../../utils/socketFunctions";
 import { IVehicleSettings } from "../../classes/User";
 import { VehicleType } from "../../vehicles/VehicleConfigs";
+import VehicleSelect from "../inputs/VehicleSelect";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -277,38 +278,26 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       )}
       {onMobile && (
         <Grid item xs={12}>
-          <FormControl fullWidth>
-            <InputLabel id="vehicle-select">Vehicle</InputLabel>
-            <Select
-              style={{
-                backgroundColor: inputBackgroundColor,
-              }}
-              label="Vehicle selection"
-              name="vehicle"
-              onChange={(e) => {
-                if (!user) {
-                  toast.error("You have to log in to change vehicles");
-                } else {
-                  const newPayerInfo = {
-                    ...props.store.player,
-                    vehicleType: e.target.value,
-                  } as IPlayerInfo;
-                  props.store.setPlayer(newPayerInfo);
-                  sendPlayerInfoChanged(props.socket, newPayerInfo);
+          <VehicleSelect
+            onChange={(vehicleType) => {
+              if (!user) {
+                toast.error("You have to log in to change vehicles");
+              } else {
+                const newPayerInfo = {
+                  ...props.store.player,
+                  vehicleType,
+                } as IPlayerInfo;
+                props.store.setPlayer(newPayerInfo);
+                sendPlayerInfoChanged(props.socket, newPayerInfo);
 
-                  updateUserVehicleSettings(
-                    "vehicleType",
-                    e.target.value as VehicleType
-                  );
-                }
-              }}
-              value={props.store.player.vehicleType}
-            >
-              <MenuItem value="normal">Normal</MenuItem>
-              <MenuItem value="tractor">Tractor</MenuItem>
-              <MenuItem value="f1">F1 car</MenuItem>
-            </Select>
-          </FormControl>
+                updateUserVehicleSettings(
+                  "vehicleType",
+                  vehicleType as VehicleType
+                );
+              }
+            }}
+            value={props.store.player.vehicleType}
+          />
         </Grid>
       )}
 

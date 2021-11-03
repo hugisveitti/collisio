@@ -19,6 +19,7 @@ import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 import { getDeviceType } from "../utils/settings";
+import AvailableRoomsComponent from "./AvailableRoomsComponent";
 import NotLoggedInModal from "./NotLoggedInModal";
 import {
   highscorePagePath,
@@ -184,6 +185,11 @@ need to be logged in."
 
           {deviceType === "mobile" && (
             <>
+              {user && (
+                <Grid item xs={12} sm={6}>
+                  <AvailableRoomsComponent userId={user.uid} />
+                </Grid>
+              )}
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Player Name"

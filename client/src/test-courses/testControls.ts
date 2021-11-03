@@ -9,7 +9,7 @@ let speed = 40
 let maxAngle = 0.4
 let angle = 30
 
-let driveWithKeyboard = !!window.localStorage.getItem("driveWithKeyboard3") ? eval(window.localStorage.getItem("driveWithKeyboard3")) : false
+let driveWithKeyboard = !!window.localStorage.getItem("driveWithKeyboard") ? eval(window.localStorage.getItem("driveWithKeyboard")) : false
 if (!eval(window.localStorage.getItem("k-info-done"))) {
     window.localStorage.setItem("k-info-done", "true")
     toast("Press 'k' to enable driving with keyboard")

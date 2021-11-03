@@ -21,6 +21,8 @@ const UserProvider = (props: IUserProvider) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
     const authListener = auth.onAuthStateChanged((userAuth) => {
+      console.log("auth change", userAuth);
+
       if (auth.currentUser && !user) {
         const userInfo = {
           displayName: auth.currentUser.displayName,

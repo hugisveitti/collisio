@@ -150,11 +150,7 @@ class Player {
         })
     }
 
-    // setupTeamChangeListener() {
-    //     this.socket.on("team-change", ({ newTeamNumber }) => {
-    //         this.teamNumber = newTeamNumber
-    //     })
-    // }
+
 
     toString() {
         return `${this.playerName} in team: ${this.teamNumber}`
