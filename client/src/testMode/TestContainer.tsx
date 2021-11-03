@@ -15,6 +15,7 @@ import { createSocket, ISocketCallback } from "../utils/connectSocket";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 import { getDeviceType } from "../utils/settings";
 import { socketHandleStartGame } from "../utils/socketFunctions";
+import { VehicleType } from "../vehicles/VehicleConfigs";
 
 const TestContainer = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -62,7 +63,8 @@ const TestContainer = () => {
       mobileControls: new MobileControls(),
       vehicleControls: new VehicleControls(),
       id: "1",
-      vehicleType: "f1",
+      vehicleType:
+        (window.localStorage.getItem("vehicleType") as VehicleType) ?? "f1",
     } as IPlayerInfo;
     setPlayers([nplayer]);
     // setPlayer(nplayer);

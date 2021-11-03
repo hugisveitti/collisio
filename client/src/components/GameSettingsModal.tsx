@@ -11,12 +11,17 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { IPlayerInfo } from "../classes/Game";
+import {
+  allTrackTypes,
+  IPlayerInfo,
+  IPreGameSettings,
+  TrackType,
+} from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
 import { setDBUserSettings } from "../firebase/firebaseFunctions";
 import { IGameScene } from "../one-monitor-game/IGameScene";
 import { RaceGameScene } from "../one-monitor-game/race-game";
-import { VehicleType } from "../vehicles/VehicleConfigs";
+import { allVehicleTypes, VehicleType } from "../vehicles/VehicleConfigs";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
 
@@ -163,10 +168,48 @@ const GameSettingsModal = (props: IPreGameSettingsModal) => {
                     }}
                     value={props.store.player.vehicleType}
                   >
-                    <MenuItem value="normal">Normal</MenuItem>
-                    <MenuItem value="tractor">Tractor</MenuItem>
-                    <MenuItem value="f1">F1 car</MenuItem>
-                    <MenuItem value="monsterTruck">Monster truck</MenuItem>
+                    {allVehicleTypes.map((v) => (
+                      <MenuItem key={v.name} value={v.type}>
+                        {v.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <FormControl fullWidth>
+                  <InputLabel id="track-select">Track</InputLabel>
+                  <Select
+                    style={{
+                      backgroundColor: "white",
+                    }}
+                    label="Track selection"
+                    name="track"
+                    onChange={(e) => {
+                      const newPreGameSettings: IPreGameSettings = {
+                        ...props.store.userSettings.preGameSettings,
+                        trackName: e.target.value as TrackType,
+                      };
+
+                      const newUserSettings: IUserSettings = {
+                        ...props.store.userSettings,
+                        preGameSettings: newPreGameSettings,
+                      };
+                      props.store.setUserSettings(newUserSettings);
+
+                      if (props.gameObject.setUserGameSettings) {
+                        props.gameObject.changeTrack(
+                          e.target.value as TrackType
+                        );
+                      }
+                    }}
+                    value={props.store.userSettings.preGameSettings.trackName}
+                  >
+                    {allTrackTypes.map((t) => (
+                      <MenuItem key={t.name} value={t.type}>
+                        {t.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>

@@ -1,6 +1,7 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { GLTF, GLTFLoader, LoadingManager, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
+import { GLTF, GLTFLoader, LoadingManager, Group } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
+
 import { TrackType } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./gameItems";
@@ -45,8 +46,13 @@ export class RaceCourse {
     trackName: TrackType
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
+
+    /** all of the objects with physics */
     gamePhysicsObjects: ExtendedObject3D[]
 
+    /** all of the objects added to the scene */
+
+    courseScene: Group
 
     constructor(scene: Scene3D, trackName: TrackType, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
         this.scene = scene
@@ -79,6 +85,7 @@ export class RaceCourse {
 
         loader.load(`models/${this.trackName}.gltf`, (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
+            this.courseScene = gltf.scene
             console.log("gltf", gltf)
             const itemKeys = Object.keys(gameItems)
 
@@ -163,5 +170,13 @@ export class RaceCourse {
 
     checkIfObjectOutOfBounds(pos: SimpleVector) {
         return false
+    }
+
+
+    clearCourse() {
+        this.scene.scene.remove(this.courseScene)
+        for (let obj of this.gamePhysicsObjects) {
+            this.scene.physics.destroy(obj)
+        }
     }
 }

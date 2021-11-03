@@ -20,19 +20,7 @@ const BACK_RIGHT = 3
 
 const degToRad = 0.017453
 
-export const defaultSuspensionStiffness = 58.0
-export const defaultSuspensionDamping = 4;
-export const defaultFriction = 100
-export const defaultRollInfluence = .01
-export const defaultSuspensionCompression = 2.4
-export const defaultFrictionSlip = 3.5
 
-
-let CUBE_HALF_EXTENTS = .96;
-let suspensionRestLength = 1.1
-export const defaultMaxSuspensionTravelCm = 1500.0;
-let maxSuspensionForce = 50000.0;
-let connectionHeight = 2.5;
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 let targetPos = new THREE.Vector3(0, 0, 0)
 
@@ -93,9 +81,6 @@ export class LowPolyVehicle implements IVehicle {
 
 
     forwardTicks = 0
-
-
-
 
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
@@ -308,13 +293,13 @@ export class LowPolyVehicle implements IVehicle {
         )
 
         // wheelInfo.set_m_suspensionRestLength1(2)
-        wheelInfo.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness ?? defaultSuspensionStiffness)
+        wheelInfo.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness)
 
-        wheelInfo.set_m_wheelsDampingRelaxation(vehicleConfigs[this.vehicleType].suspensionDamping ?? defaultSuspensionDamping)
-        wheelInfo.set_m_wheelsDampingCompression(vehicleConfigs[this.vehicleType].suspensionDamping ?? defaultSuspensionCompression)
+        wheelInfo.set_m_wheelsDampingRelaxation(vehicleConfigs[this.vehicleType].suspensionDamping)
+        wheelInfo.set_m_wheelsDampingCompression(vehicleConfigs[this.vehicleType].suspensionDamping)
 
-        wheelInfo.set_m_frictionSlip(defaultFrictionSlip)
-        wheelInfo.set_m_rollInfluence(defaultRollInfluence)
+        wheelInfo.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip)
+        wheelInfo.set_m_rollInfluence(vehicleConfigs[this.vehicleType].rollInfluence)
         this.vehicle.updateSuspension(0)
 
 
@@ -545,6 +530,7 @@ export class LowPolyVehicle implements IVehicle {
         // camera.lookAt(this.chassisMesh.position.clone())
     };
     update() {
+
 
 
         // this.vehicle.updateWheelTransform(4, true)

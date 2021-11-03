@@ -3,9 +3,9 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
-import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
+import { defaultPreGameSettings, IPreGameSettings, TrackType } from "../classes/Game"
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
-import { VehicleType } from "../vehicles/VehicleConfigs";
+import { defaultVehicleConfig, IVehicleConfig, VehicleType } from "../vehicles/VehicleConfigs";
 import "../one-monitor-game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/raceCourse"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
@@ -15,7 +15,7 @@ import { IGameScene } from "../one-monitor-game/IGameScene"
 import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../one-monitor-game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
-import { SimpleVector } from "../vehicles/IVehicle"
+import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
 
 const vechicleFov = 60
 
@@ -54,7 +54,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     gameTime: GameTime
     escPress: () => void
     isPaused = false
-
+    trackType: TrackType
+    usingDebug: boolean
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -89,6 +90,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.mobileControls = new MobileControls()
 
         this.gameTime = new GameTime(3)
+        this.trackType = window.localStorage.getItem("trackType") as TrackType ?? "test-course"
+        this.usingDebug = eval(window.localStorage.getItem("usingDebug")) ?? true
     }
 
     async init() {
@@ -174,13 +177,27 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     async create() {
         // test-course.gltf
         // low-poly-farm-track
-        this.course = new RaceCourse(this, "test-course", (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, this.trackType, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             this.createVehicle()
         })
     }
 
-    createVehcileInput(value: number, top: number, innerHtml: string, onChange: (val: number) => void) {
+    changeTrack(trackType: TrackType) {
+        this.trackType = trackType
+        window.localStorage.setItem("trackType", trackType)
+        this.canStartUpdate = false
+        this.course.clearCourse()
+        // this.scene.clear()
+        this.create()
+
+    }
+
+    createVehcileInput(value: number | SimpleVector | boolean | string, top: number, innerHtml: string, onChange: (val: number | SimpleVector) => void) {
+        if (instanceOfSimpleVector(value)) {
+            this.createXYZInput(value, top, innerHtml, onChange)
+        }
+
         const inputDiv = document.createElement("div")
         inputDiv.setAttribute("class", "vehicle-input")
         inputDiv.setAttribute("style", `top:${top}px;`)
@@ -269,11 +286,11 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         vehicleInputsContainer.appendChild(inputDiv)
     }
 
+
+
     async createVehicle() {
 
-        while (vehicleInputsContainer.children.length > 0) {
-            vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
-        }
+
 
         loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
             this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
@@ -290,89 +307,127 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             this.camera.position.set(0, 10, -25)
             this.loadFont()
 
-            let topOffset = 25
-            let top = 0
-            this.createVehcileInput(this.vehicle.engineForce, top, "Engine force", (val) => {
-                this.vehicle.updateVehicleSettings({
-                    ...this.vehicle.vehicleSettings,
-                    // I think this will still work in changing the engineForce
-                    // @ts-ignore
-                    engineForce: val,
+
+            const createVehicleInputButtons = () => {
+
+
+                while (vehicleInputsContainer.children.length > 0) {
+                    vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
+                }
+
+                let key: keyof IVehicleConfig = "engineForce"
+
+                let topOffset = 25
+                let top = 0
+                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => {
+                    this.vehicle.updateVehicleSettings({
+                        ...this.vehicle.vehicleSettings,
+                        // I think this will still work in changing the engineForce
+                        // @ts-ignore
+                        engineForce: val,
+                    })
                 })
-            })
-
-            top += topOffset
-            this.createVehcileInput(this.vehicle.mass, top, "Mass", (val) => this.vehicle.updateMass(val))
-
-            top += topOffset
-
-            this.createVehcileInput(this.vehicle.breakingForce, top, "Break force", (val) => this.vehicle.updateBreakingForce(val))
-
-            top += topOffset
-
-            /** Suspension damping */
-            this.createVehcileInput(this.vehicle.getSuspensionDamping(), top, "suspension damping", (val) => this.vehicle.setSuspensionDamping(val))
-
-            top += topOffset
-            /** Suspension stiffness */
-            this.createVehcileInput(this.vehicle.getSuspensionStiffness(), top, "suspension stiffness", (val) => this.vehicle.setSuspensionStiffness(val))
-
-            top += topOffset
-            /** Suspension stiffness */
-            this.createVehcileInput(this.vehicle.getSuspensionCompression(), top, "suspension compression", (val) => this.vehicle.setSuspensionCompression(val))
-
-            top += topOffset
-            /** Suspension stiffness */
-            this.createVehcileInput(this.vehicle.getSuspensionRestLength(), top, "suspension rest length", (val) => this.vehicle.setSuspensionRestLength(val))
-
-            top += topOffset
-            /** Suspension max travel cm */
-            this.createVehcileInput(this.vehicle.getMaxSuspensionTravelCm(), top, "suspension max travel cm", (val) => this.vehicle.setMaxSuspensionTravelCm(val))
-
-            top += topOffset
-            /** Suspension max force */
-            this.createVehcileInput(this.vehicle.getMaxSuspensionForce(), top, "suspension max force", (val) => this.vehicle.setMaxSuspensionForce(val))
-
-            top += topOffset
-            /** Roll influence */
-            this.createVehcileInput(this.vehicle.getRollInfluence(), top, "Roll Influence", (val) => this.vehicle.setRollInfluence(val))
-
-            top += topOffset
-            /** Friction slip */
-            this.createVehcileInput(this.vehicle.getFrictionSlip(), top, "Friction slip", (val) => this.vehicle.setFrictionSlip(val))
 
 
-            top += topOffset
-            const useChaseCamButtontDiv = document.createElement("div")
-            useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
-            useChaseCamButtontDiv.setAttribute("style", `top:${top}px;`)
-            useChaseCamButtontDiv.innerHTML = "Chase cam"
-            const useChaseCamButton = document.createElement("button")
+
+                key = "mass"
+                top += topOffset
+                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => this.vehicle.updateMass(val as number))
+
+                key = "breakingForce"
+                top += topOffset
+                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => this.vehicle.setVehicleConfigKey(key, val))
+
+                // top += topOffset
+                // this.createVehcileInput(this.vehicle.breakingForce, top, "Break force", (val) => this.vehicle.updateBreakingForce(val))
 
 
-            useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
-            useChaseCamButton.addEventListener("click", (e) => {
-                window.localStorage.setItem("useChaseCamera", (!this.vehicle.useChaseCamera).toString())
-                this.vehicle.updateVehicleSettings({
-                    ...this.vehicle.vehicleSettings,
-                    useChaseCamera: !this.vehicle.useChaseCamera
+                /** These cannot be mass and inertia */
+                const keys = ["suspensionDamping", "suspensionStiffness", "suspensionCompression", "suspensionRestLength", "maxSuspensionTravelCm", "maxSuspensionForce", "rollInfluence", "frictionSlip"]
+                for (let key of keys) {
+                    key = key as keyof IVehicleConfig
+                    top += topOffset
+                    if (!(key in defaultVehicleConfig)) {
+                        console.warn(key, "is not a part the VehicleConfig")
+                    }
+                    this.createVehcileInput(this.vehicle.getVehicleConfigKey(key as keyof IVehicleConfig), top, key, (val) => this.vehicle.setVehicleConfigKey(key as keyof IVehicleConfig, val))
+
+                }
+
+
+                top += topOffset
+                this.createXYZInput(this.vehicle.getInertia(), top, "inertia", (newI) => {
+                    this.vehicle.setInertia(newI)
                 })
+
+                top += topOffset
+                this.createXYZInput(this.vehicle.getCenterOfMass(), top, "Set position", (newCM) => {
+                    this.vehicle.setCenterOfMass(newCM)
+                })
+
+
+                top += topOffset
+                const useChaseCamButtontDiv = document.createElement("div")
+                useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
+                useChaseCamButtontDiv.setAttribute("style", `top:${top}px;`)
+                useChaseCamButtontDiv.innerHTML = "Chase cam"
+                const useChaseCamButton = document.createElement("button")
+
+
                 useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
+                useChaseCamButton.addEventListener("click", (e) => {
+                    window.localStorage.setItem("useChaseCamera", (!this.vehicle.useChaseCamera).toString())
+                    this.vehicle.updateVehicleSettings({
+                        ...this.vehicle.vehicleSettings,
+                        useChaseCamera: !this.vehicle.useChaseCamera
+                    })
+                    useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
 
-            })
+                })
 
-            useChaseCamButtontDiv.appendChild(useChaseCamButton)
-            vehicleInputsContainer.appendChild(useChaseCamButtontDiv)
+                useChaseCamButtontDiv.appendChild(useChaseCamButton)
+                vehicleInputsContainer.appendChild(useChaseCamButtontDiv)
 
-            top += topOffset
-            this.createXYZInput(this.vehicle.getInertia(), top, "inertia", (newI) => {
-                this.vehicle.setInertia(newI)
-            })
+                top += topOffset
+                const resetDefaultBtnDiv = document.createElement("div")
+                resetDefaultBtnDiv.setAttribute("class", "vehicle-input")
+                resetDefaultBtnDiv.setAttribute("style", `top:${top}px;`)
+                resetDefaultBtnDiv.innerHTML = "Reset to default"
+                const resetDefaultBtn = document.createElement("button")
 
-            top += topOffset
-            this.createXYZInput(this.vehicle.getCenterOfMass(), top, "Set position", (newCM) => {
-                this.vehicle.setCenterOfMass(newCM)
-            })
+
+                resetDefaultBtn.innerHTML = "RESET "
+                resetDefaultBtn.addEventListener("click", (e) => {
+                    this.vehicle.resetConfigToDefault()
+                    createVehicleInputButtons()
+
+                })
+                resetDefaultBtnDiv.appendChild(resetDefaultBtn)
+                vehicleInputsContainer.appendChild(resetDefaultBtnDiv)
+
+                top += topOffset
+                const debugBtnDiv = document.createElement("div")
+                debugBtnDiv.setAttribute("class", "vehicle-input")
+                debugBtnDiv.setAttribute("style", `top:${top}px;`)
+                debugBtnDiv.innerHTML = "use debug "
+                const debugBtn = document.createElement("button")
+
+
+                debugBtn.innerHTML = `Debug ${this.usingDebug ? "ON" : "OFF"}`
+                debugBtn.addEventListener("click", (e) => {
+                    this.usingDebug = !this.usingDebug
+                    window.localStorage.setItem("usingDebug", this.usingDebug + "")
+                    if (this.usingDebug) {
+                        this.physics.debug.enable()
+                    } else {
+                        this.physics.debug.disable()
+                    }
+
+                })
+                debugBtnDiv.appendChild(debugBtn)
+                vehicleInputsContainer.appendChild(debugBtnDiv)
+            }
+            createVehicleInputButtons()
 
             const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 0, y: 4, z: 0 })
             ball.body.setBounciness(1)

@@ -1,6 +1,16 @@
 import { SimpleVector } from "./IVehicle"
 
-interface IVehicleConfig {
+export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck"
+
+export const allVehicleTypes: { name: string, type: VehicleType }[] = [
+    { name: "Normal", type: "normal" },
+    { name: "Tractor", type: "tractor" },
+    { name: "F1", type: "f1" },
+    { name: "Monster truck", type: "monsterTruck" },
+    { name: "test", type: "test" }
+]
+
+export interface IVehicleConfig {
     wheelAxisBackPosition: number
     wheelRadiusBack: number
     wheelHalfTrackBack: number
@@ -30,7 +40,7 @@ interface IVehicleConfig {
     inertia: SimpleVector
 }
 
-const defaultVehicleConfig: IVehicleConfig = {
+export const defaultVehicleConfig: IVehicleConfig = {
     wheelAxisBackPosition: -1,
     wheelRadiusBack: 1,
     wheelHalfTrackBack: 1,
@@ -47,20 +57,18 @@ const defaultVehicleConfig: IVehicleConfig = {
 
     mass: 1000,
     engineForce: 5000,
-    breakingForce: 100,
+    breakingForce: 200,
     suspensionStiffness: 100,
-    suspensionDamping: 5,
+    suspensionDamping: 4,
     suspensionCompression: 2.4,
-    suspensionRestLength: 0.35,
-    maxSuspensionTravelCm: 300,
+    suspensionRestLength: 1.1,
+    maxSuspensionTravelCm: 1500,
     maxSuspensionForce: 50000,
-    frictionSlip: 3.5,
+    frictionSlip: 8.5,
     rollInfluence: .01,
-    inertia: { x: 15000, y: 10000, z: 50000 }
+    inertia: { x: 12000, y: 2000, z: 12000 }
 }
 
-
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck"
 
 export const vehicleConfigs = {
     normal: {
@@ -68,12 +76,12 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.65,
         wheelRadiusBack: 0.63 / 2,
         wheelHalfTrackBack: .9,
-        wheelAxisHeightBack: -.75,
+        wheelAxisHeightBack: 0,
 
         wheelAxisFrontPosition: 1.35,
         wheelRadiusFront: 0.63 / 2,
         wheelHalfTrackFront: .9,
-        wheelAxisHeightFront: -.75,
+        wheelAxisHeightFront: 0,
 
         mass: 800,
         engineForce: 5000,
@@ -82,19 +90,19 @@ export const vehicleConfigs = {
 
         path: "simple-low-poly-car.gltf",
 
-        suspensionRestLength: 0.4,
+
     },
     tractor: {
         ...defaultVehicleConfig,
         wheelAxisBackPosition: -1.8,
         wheelRadiusBack: 2.4 / 2,
         wheelHalfTrackBack: 1.6,
-        wheelAxisHeightBack: -1.8,
+        wheelAxisHeightBack: -.7,
 
         wheelAxisFrontPosition: 2.1,
         wheelRadiusFront: 1.6 / 2,
         wheelHalfTrackFront: 1.36,
-        wheelAxisHeightFront: -2.1,
+        wheelAxisHeightFront: -1,
 
         mass: 1600,
         engineForce: 5000,
@@ -108,22 +116,19 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.9,
         wheelRadiusBack: 1.5 / 2,
         wheelHalfTrackBack: 1.2,
-        wheelAxisHeightBack: -.8,
+        wheelAxisHeightBack: 0,
 
         wheelAxisFrontPosition: 1.55,
         wheelRadiusFront: 1.5 / 2,
         wheelHalfTrackFront: 1.2,
-        wheelAxisHeightFront: -.8,
+        wheelAxisHeightFront: 0,
 
         mass: 1000,
         engineForce: 5000,
         breakingForce: 100,
         is4x4: true,
 
-        suspensionStiffness: 100,
-        suspensionDamping: 4.6,
-        suspensionCompression: 8.8,
-        suspensionRestLength: 0.8,
+
 
         path: "low-poly-monster-truck.gltf"
     },
@@ -134,17 +139,15 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -2.65,
         wheelRadiusBack: 0.95 / 2,
         wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: 0,
+        wheelAxisHeightBack: .5,
 
         wheelAxisFrontPosition: 2.75,
         wheelRadiusFront: 0.95 / 2,
         wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: 0,
-
-        suspensionRestLength: .6,
+        wheelAxisHeightFront: .5,
 
 
-        frictionSlip: 2,
+
 
         mass: 1000,
         engineForce: 10000,

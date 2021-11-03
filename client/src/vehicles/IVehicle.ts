@@ -8,6 +8,10 @@ export interface SimpleVector {
     y: number
 }
 
+export const instanceOfSimpleVector = (object: any): object is SimpleVector => {
+    return typeof object === "object" && ('x' in object && 'y' in object && 'z' in object)
+}
+
 export interface IPositionRotation {
     position: SimpleVector
     rotation: SimpleVector
