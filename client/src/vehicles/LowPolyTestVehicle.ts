@@ -1,6 +1,6 @@
 import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
-import { defaultVehicleConfig, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
+import { defaultVehicleConfig, initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 export class LowPolyTestVehicle extends LowPolyVehicle {
 
@@ -32,6 +32,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
         } else {
             this.setLocalStorage(key, value)
         }
+        // this is for engineForce
         // @ts-ignore
         vehicleConfigs[this.vehicleType][key] = value
         if (this[key] !== undefined) {
@@ -100,11 +101,13 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
 
     resetConfigToDefault() {
-        for (let key in defaultVehicleConfig) {
-            if (instanceOfSimpleVector(defaultVehicleConfig[key])) {
-                this.setLocalStorageVec(key as keyof IVehicleConfig, defaultVehicleConfig[key])
+        console.log("initial vehicle configs", initialVehicleConfigs[this.vehicleType])
+        for (let key in initialVehicleConfigs[this.vehicleType]) {
+            if (instanceOfSimpleVector(initialVehicleConfigs[this.vehicleType][key])) {
+                // @ts-ignore
+                this.setLocalStorageVec(key as keyof IVehicleConfig, initialVehicleConfigs[this.vehicleType][key] as SimpleVector)
             } else {
-                this.setLocalStorage(key as keyof IVehicleConfig, defaultVehicleConfig[key])
+                this.setLocalStorage(key as keyof IVehicleConfig, initialVehicleConfigs[this.vehicleType][key])
             }
         }
     }

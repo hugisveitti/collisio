@@ -27,7 +27,7 @@ const TestContainer = () => {
     defaultPreGameSettings
   );
 
-  const [canStartGame, setCanStartGame] = useState(false);
+  const [canStartGame, setCanStartGame] = useState(true);
 
   const deviceType = getDeviceType();
   const onMobile = deviceType === "mobile";
@@ -71,28 +71,28 @@ const TestContainer = () => {
     setRoomId("testRoom");
     setPlayer(nplayer);
 
-    if (onMobile) {
-      socket.emit("player-connected", {
-        roomId,
-        playerName: nplayer.id,
-        playerId: nplayer.id,
-        isAuthenticated: false,
-        photoURL: "",
-      } as IPlayerConnection);
+    // if (onMobile) {
+    //   socket.emit("player-connected", {
+    //     roomId,
+    //     playerName: nplayer.id,
+    //     playerId: nplayer.id,
+    //     isAuthenticated: false,
+    //     photoURL: "",
+    //   } as IPlayerConnection);
 
-      socket.once("player-connected-callback", (response: ISocketCallback) => {
-        if (response.status === "error") {
-          const { message } = response;
-          toast.error(message);
-        } else {
-          toast.success(response.message);
-          store.setPlayer(response.data.player);
-        }
-      });
-    } else {
-      socket.emit("create-room", { roomId });
-      createRoomDesktopCallback();
-    }
+    //   socket.once("player-connected-callback", (response: ISocketCallback) => {
+    //     if (response.status === "error") {
+    //       const { message } = response;
+    //       toast.error(message);
+    //     } else {
+    //       toast.success(response.message);
+    //       store.setPlayer(response.data.player);
+    //     }
+    //   });
+    // } else {
+    //   socket.emit("create-room", { roomId });
+    //   createRoomDesktopCallback();
+    // }
   }, [socket]);
 
   const store = {
@@ -111,8 +111,8 @@ const TestContainer = () => {
   if (!socket) return <span>Loading test setup...</span>;
   if (onMobile && !store.player) return <span>Loading test setup...</span>;
 
-  if (!onMobile && !canStartGame)
-    return <span>Loading test setup desktop...</span>;
+  // if (!onMobile && !canStartGame)
+  //   return <span>Loading test setup desktop...</span>;
 
   return (
     <React.Fragment>

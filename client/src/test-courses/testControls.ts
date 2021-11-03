@@ -2,11 +2,26 @@ import { Socket } from "socket.io-client"
 import { IPlayerInfo } from "../classes/Game"
 import { IVehicle } from "../vehicles/IVehicle"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
+import { toast } from "react-toastify"
 
 
 let speed = 40
 let maxAngle = 0.4
 let angle = 30
+
+let driveWithKeyboard = !!window.localStorage.getItem("driveWithKeyboard3") ? eval(window.localStorage.getItem("driveWithKeyboard3")) : false
+if (!eval(window.localStorage.getItem("k-info-done"))) {
+    window.localStorage.setItem("k-info-done", "true")
+    toast("Press 'k' to enable driving with keyboard")
+}
+
+window.addEventListener("keypress", (e) => {
+    if (e.key === "k") {
+        driveWithKeyboard = !driveWithKeyboard
+        window.localStorage.setItem("driveWithKeyboard", driveWithKeyboard + "")
+        toast("K pressed, driveWithKeyboard", driveWithKeyboard)
+    }
+})
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
@@ -41,11 +56,13 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
     setInterval(() => {
         socket.once("get-controls", (data) => {
-            const { players } = data as { players: IPlayerInfo[] }
-            for (let i = 0; i < players.length; i++) {
-                driveVehicle(players[i].mobileControls, vehicle)
-                callback(players[i].mobileControls)
+            const { mobileControls } = data as { mobileControls: MobileControls }
+            if (!driveWithKeyboard) {
+
+                driveVehicle(mobileControls, vehicle)
+                callback(mobileControls)
             }
+
         })
     }, 1000 / 120)
 
@@ -94,11 +111,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 export const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls, mobileControls: MobileControls) => {
 
-    const mobileKeys = Object.keys(mobileControls)
-    for (let key of mobileKeys) {
-        // basically if using mobile controls then cant use vehicle controls
-        if (mobileControls[key]) return
-    }
+    if (!driveWithKeyboard) return
 
     if (vehicleControls.forward) {
         vehicle.goForward(false)

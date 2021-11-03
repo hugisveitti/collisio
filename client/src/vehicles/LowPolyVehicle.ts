@@ -217,6 +217,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
         this.scene.physics.physicsWorld.addAction(this.vehicle)
+        console.log("vehilce config", vehicleConfigs[this.vehicleType])
 
         this.wheelMeshes = []
 

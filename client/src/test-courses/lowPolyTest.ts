@@ -104,8 +104,9 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
     async preload() {
 
-
-        this.physics.debug?.enable()
+        if (this.usingDebug) {
+            this.physics.debug?.enable()
+        }
         await this.warpSpeed('-ground', "-light")
 
 
@@ -118,10 +119,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
-        console.log("plight", this.pLight)
         const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
         this.scene.add(helper)
-        console.log("plight helper", helper)
 
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
@@ -320,12 +319,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
                 let topOffset = 25
                 let top = 0
                 this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => {
-                    this.vehicle.updateVehicleSettings({
-                        ...this.vehicle.vehicleSettings,
-                        // I think this will still work in changing the engineForce
-                        // @ts-ignore
-                        engineForce: val,
-                    })
+                    this.vehicle.setVehicleConfigKey("engineForce", val)
                 })
 
 
@@ -550,7 +544,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
             this.font = response;
             if (this.font && this.vehicle) {
-                console.log("setting font")
+
                 this.vehicle.setFont(this.font)
             }
         });

@@ -124,9 +124,15 @@ export const vehicleConfigs = {
         wheelAxisHeightFront: 0,
 
         mass: 1000,
-        engineForce: 5000,
-        breakingForce: 100,
+        engineForce: 9000,
+        breakingForce: 200,
         is4x4: true,
+        inertia: { x: 3000, y: 2000, z: 3000 },
+        suspensionRestLength: 1.5,
+
+        maxSuspensionTravelCm: 1500,
+        suspensionStiffness: 65,
+        suspensionDamping: 10,
 
 
 
@@ -154,6 +160,8 @@ export const vehicleConfigs = {
         breakingForce: 200,
         is4x4: false,
 
+        inertia: { x: 3000, y: 2000, z: 4000 }
+
     },
     test: {
         ...defaultVehicleConfig,
@@ -173,3 +181,7 @@ export const vehicleConfigs = {
         is4x4: false,
     },
 } as { [key: string]: IVehicleConfig }
+
+// deep copy
+/** TODO: not this */
+export const initialVehicleConfigs = JSON.parse(JSON.stringify(vehicleConfigs)) as { [key: string]: IVehicleConfig }

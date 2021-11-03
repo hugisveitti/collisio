@@ -98,7 +98,7 @@ const FrontPage = (props: FrontPageProps) => {
 
   const connectToRoomMobile = (roomId: string, playerName: string) => {
     props.socket.emit("player-connected", {
-      roomId,
+      roomId: roomId.toLowerCase(),
       playerName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
