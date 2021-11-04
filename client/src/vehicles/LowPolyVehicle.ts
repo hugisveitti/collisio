@@ -185,7 +185,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
 
-        this.chassisMesh.body.setBounciness(.1)
+        this.chassisMesh.body.setBounciness(.05)
 
         // how to lower center of mass
 
@@ -272,6 +272,8 @@ export class LowPolyVehicle implements IVehicle {
         const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
         this.vehicle.getRigidBody().setMassProps(this.mass, new Ammo.btVector3(x, y, z))
         this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, new Ammo.btVector3(x, y, z))
+
+        this.isReady = true
 
     }
 
@@ -398,6 +400,7 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     break(notBreak?: boolean) {
+
         const breakForce = notBreak ? 0 : this.breakingForce
         this.vehicle.setBrake(breakForce, BACK_RIGHT)
         this.vehicle.setBrake(breakForce, BACK_LEFT)

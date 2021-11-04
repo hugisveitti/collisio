@@ -11,9 +11,13 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     }
 
     getLocalStorageVec(key: keyof IVehicleConfig) {
+        if (!window.localStorage.getItem(`${key}-${this.vehicleType}-x`)) {
+            return undefined
+        }
         const x = +window.localStorage.getItem(`${key}-${this.vehicleType}-x`)
         const y = +window.localStorage.getItem(`${key}-${this.vehicleType}-y`)
         const z = +window.localStorage.getItem(`${key}-${this.vehicleType}-z`)
+
 
         return { x, y, z } as SimpleVector
     }
@@ -55,9 +59,6 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     }
 
 
-
-
-
     setInertia(inertia: SimpleVector) {
 
         vehicleConfigs[this.vehicleType].inertia = inertia
@@ -69,7 +70,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     }
 
     getInertia(): SimpleVector {
-        const i = this.getLocalStorageVec("inertia") ?? vehicleConfigs[this.vehicleType].inertia
+        let i = this.getLocalStorageVec("inertia") ?? vehicleConfigs[this.vehicleType].inertia
         this.setInertia(i)
 
         return i

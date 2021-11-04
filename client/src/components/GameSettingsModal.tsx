@@ -197,7 +197,7 @@ const GameSettingsModal = (props: IPreGameSettingsModal) => {
                       };
                       props.store.setUserSettings(newUserSettings);
 
-                      if (props.gameObject.setUserGameSettings) {
+                      if (props.gameObject.changeTrack) {
                         props.gameObject.changeTrack(
                           e.target.value as TrackType
                         );

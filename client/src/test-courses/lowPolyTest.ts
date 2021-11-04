@@ -10,7 +10,7 @@ import "../one-monitor-game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/RaceCourse"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 import "./lowPolyTest.css"
-import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"
+import { addTestControls } from "./testControls"
 import { IGameScene } from "../one-monitor-game/IGameScene"
 import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../one-monitor-game/GameTimeClass"
@@ -187,12 +187,12 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         window.localStorage.setItem("trackType", trackType)
         this.canStartUpdate = false
         this.course.clearCourse()
-        // this.scene.clear()
         this.create()
 
     }
 
     createVehcileInput(value: number | SimpleVector | boolean | string, top: number, innerHtml: string, onChange: (val: number | SimpleVector) => void) {
+
         if (instanceOfSimpleVector(value)) {
             this.createXYZInput(value, top, innerHtml, onChange)
         }
@@ -220,6 +220,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     createXYZInput(currVec: SimpleVector, top: number, innerHtml: string, onChange: (vec: SimpleVector) => void) {
+
         let cVec = currVec
         let inputWidth = 60
         const inputDiv = document.createElement("div")
@@ -292,9 +293,11 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
 
         loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
+
             this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
-            console.log("vehicle", this.vehicle)
-            this.createController()
+
+
+
             const useChaseCamera = window.localStorage.getItem("useChaseCamera")
             this.vehicle.useChaseCamera = eval(useChaseCamera)
             this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
@@ -331,9 +334,6 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
                 key = "breakingForce"
                 top += topOffset
                 this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => this.vehicle.setVehicleConfigKey(key, val))
-
-                // top += topOffset
-                // this.createVehcileInput(this.vehicle.breakingForce, top, "Break force", (val) => this.vehicle.updateBreakingForce(val))
 
 
                 /** These cannot be mass and inertia */
@@ -426,9 +426,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 0, y: 4, z: 0 })
             ball.body.setBounciness(1)
 
-            this.canStartUpdate = true
             this.vehicle.useBadRotationTicks = false
 
+            this.canStartUpdate = true
+            this.createController()
 
         })
     }
@@ -491,28 +492,34 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     createController() {
+
+
         if (this.vehicle) {
             this.vehicleControls = new VehicleControls()
-            addTestControls(this.vehicleControls, this.socket, this.vehicle, (mc) => this.mobileControls = mc)
+
+
+            addTestControls(this.vehicleControls, this.socket, this.vehicle,)
+
         }
     }
 
 
     updateVehicles() {
 
-        if (this.vehicle) {
-            this.vehicle.update()
-            this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
-        }
+
+        this.vehicle.update()
+        this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+
     }
 
     update() {
+
         if (this.canStartUpdate) {
 
             stats.begin()
-            this.updateVehicles()
             if (this.vehicle) {
-                testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls, this.mobileControls)
+                this.updateVehicles()
+                // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
                 scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
                 <br />
