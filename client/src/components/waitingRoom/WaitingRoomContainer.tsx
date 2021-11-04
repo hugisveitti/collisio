@@ -188,7 +188,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         removeFromAvailableRooms(user.uid);
       }
     };
-  }, [user.uid]);
+  }, [user?.uid]);
 
   const renderDisplayNameModal = () => {
     if (userLoading) return null;

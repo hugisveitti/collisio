@@ -1,3 +1,4 @@
+import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { CollisionEvent } from "@enable3d/common/dist/types";
 import { GLTF, GLTFLoader, LoadingManager, Group } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
@@ -5,6 +6,7 @@ import { ExtendedObject3D, Scene3D } from "enable3d";
 import { TrackType } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./gameItems";
+import { IRaceCourse } from "./ICourse";
 
 
 const loadDiv = document.createElement("div")
@@ -32,18 +34,20 @@ const keyNameMatch = (key: string, name: string) => {
     return name.includes(key)
 }
 
-export class RaceCourse {
+export class RaceCourse implements IRaceCourse {
 
     scene: Scene3D
     courseWidth: number
     courseDepth: number
     trackWidth: number
-    goal?: ExtendedObject3D
-    goalSpawn?: ExtendedObject3D
-    ground?: ExtendedObject3D
-    checkpoint?: ExtendedObject3D
-    checkpointSpawn?: ExtendedObject3D
+    goal: ExtendedObject3D
+    goalSpawn: ExtendedObject3D
+    ground: ExtendedObject3D
+    checkpoint: ExtendedObject3D
+    checkpointSpawn: ExtendedObject3D
     trackName: TrackType
+    startRotation: THREE.Euler
+    startPosition: THREE.Vector3
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void
 
@@ -159,6 +163,10 @@ export class RaceCourse {
                     this.checkpointCrossedCallback(otherObject)
                 }
             })
+        }
+        if (this.goalSpawn) {
+            this.startPosition = this.goalSpawn.position
+            this.startRotation = this.goalSpawn.rotation
         }
     }
 

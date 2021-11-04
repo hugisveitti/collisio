@@ -1,10 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
-const { MobileControls } = require('../utils/controls');
 const Player = require("./ServerPlayer")
+const TestRoom = require("./TestRoom")
 
 const successStatus = "success"
 const errorStatus = "error"
-let testRoomId = "testRoom"
+
 
 class GameMaster {
     rooms
@@ -15,6 +15,7 @@ class GameMaster {
     constructor(io) {
         this.io = io
         this.rooms = {}
+        /** only one test room */
         this.testRoom = new TestRoom()
     }
 
@@ -39,16 +40,15 @@ class GameMaster {
         })
     }
 
+
     createRoom(socket, roomId) {
-
-
         this.rooms[roomId] = new Game(roomId, this.io, socket)
         socket.join(roomId)
         socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
     }
 
-    addSocket(socket) {
 
+    addSocket(socket) {
         let roomId
         let isTestMode = false
         let onMobile
@@ -65,9 +65,6 @@ class GameMaster {
                     this.testRoom.setDesktopSocket(socket)
                 }
             } else {
-
-
-
                 console.log("Connection from", deviceType)
                 if (deviceType === "desktop") {
                     socket.on("create-room", () => {
@@ -109,62 +106,7 @@ class GameMaster {
     }
 }
 
-class TestRoom {
 
-    players
-    desktopSocket
-    mobileSocket
-    isConnected
-    mobileControls
-    vehicleType
-    userSettings
-
-    constructor() {
-        this.mobileControls = new MobileControls()
-    }
-
-    setDesktopSocket(socket) {
-        this.desktopSocket = socket
-        this.setupControlsListener()
-        this.desktopSocket.on("disconnected", () => {
-            console.log("test room desktop disconnected") +
-                this.desktopSocket.off("get-controls")
-        })
-    }
-
-    setMobileSocket(mobileSocket) {
-        this.mobileSocket = mobileSocket
-        this.mobileSocket.on("send-controls", (mobileControls) => {
-            this.mobileControls = mobileControls
-        })
-        this.setupUserSettingsListener()
-    }
-
-    setupControlsListener() {
-        setInterval(() => {
-            this.desktopSocket.emit("get-controls", { mobileControls: this.mobileControls })
-            // set fps
-        }, 1000 / 120)
-    }
-
-    setupUserSettingsListener() {
-        this.mobileSocket.on("settings-changed", (newUserSettings) => {
-            this.userSettings = newUserSettings
-            // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
-
-            this.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
-
-        })
-    }
-
-    userSettingsChanged(data) {
-        if (this.desktopSocket) {
-            this.desktopSocket.emit("user-settings-changed", data)
-        }
-    }
-
-
-}
 
 
 class Game {

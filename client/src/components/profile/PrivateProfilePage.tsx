@@ -155,39 +155,47 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
         style={{ marginTop: 0 }}
       >
         <Grid item xs={12} sm={12} md={3}>
-          <div style={{ margin: 15 }}>
-            <Link to={frontPagePath}>Back to front page</Link>
-          </div>
+          <Grid spacing={3} container>
+            <Grid item xs={12}>
+              <div style={{ margin: 15 }}>
+                <Link to={frontPagePath}>Back to front page</Link>
+              </div>
 
-          {!user ? (
-            <div
-              style={{
-                margin: 75,
-                textAlign: "center",
-              }}
-            >
-              <span>Loading your profile...</span>
-              <br />
-              <br />
-              <span>You might not be logged in...</span>
-              <br />
-              <br />
-              <CircularProgress />
-            </div>
-          ) : (
-            <>
-              <Card
-                style={{
-                  backgroundColor: inputBackgroundColor,
-                }}
-              >
-                {inEditMode ? renderEditInfo() : renderStaticInfo()}
-              </Card>
-            </>
-          )}
+              {!user ? (
+                <div
+                  style={{
+                    margin: 75,
+                    textAlign: "center",
+                  }}
+                >
+                  <span>Loading your profile...</span>
+                  <br />
+                  <br />
+                  <span>You might not be logged in...</span>
+                  <br />
+                  <br />
+                  <CircularProgress />
+                </div>
+              ) : (
+                <>
+                  <Card
+                    style={{
+                      backgroundColor: inputBackgroundColor,
+                    }}
+                  >
+                    {inEditMode ? renderEditInfo() : renderStaticInfo()}
+                  </Card>
+                </>
+              )}
+            </Grid>
+
+            {user && (
+              <Grid item xs={12}>
+                <UserSettingsComponent userId={user.uid} />
+              </Grid>
+            )}
+          </Grid>
         </Grid>
-
-        {user && <UserSettingsComponent userId={user.uid} />}
 
         {user && (
           <React.Fragment>
@@ -201,7 +209,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
               <GameDataComponent userId={user.uid} />
             </Grid>
             <Grid item xs={2}>
-              <Button color="inherit" onClick={signOut}>
+              <Button color="inherit" onClick={signOut} variant="contained">
                 Logout
               </Button>
             </Grid>

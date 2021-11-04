@@ -12,6 +12,8 @@ const path = require("path");
 //     next();
 // });
 
+
+
 const buildFolder = "dist"
 
 app.use(express.static(path.join(__dirname, `./client/${buildFolder}`)));

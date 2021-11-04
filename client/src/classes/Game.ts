@@ -1,7 +1,7 @@
 import { VehicleType } from "../vehicles/VehicleConfigs";
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
 
-export type TrackType = "track" | "town-track" | "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
+export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
 export type GameType = "ball" | "race"
 
 export const allTrackTypes: { name: string, type: TrackType }[] = [
@@ -10,8 +10,6 @@ export const allTrackTypes: { name: string, type: TrackType }[] = [
     },
     { name: "Farm track", type: "low-poly-farm-track" },
     { name: "F1 track", type: "low-poly-f1-track" },
-    { name: "ugly Simple", type: "track" },
-    { name: "ugly town track", type: "town-track" }
 ]
 
 export interface IPlayerConnection {

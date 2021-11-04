@@ -26,7 +26,7 @@ const players = [
 ]
 
 const numberOfFakeGames = 30
-const possibleTracks: TrackType[] = ["track", "town-track"]
+const possibleTracks: TrackType[] = ["low-poly-f1-track", "low-poly-farm-track"]
 
 export const createFakeHighscoreData = () => {
     console.log("Creating fake data")

@@ -10,6 +10,11 @@ export interface ISocketCallback {
 
 export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
+    // not secure, device orientation wont work
+    if (window.location.href.includes("http://") && !window.location.href.includes("localhost")) {
+        window.location.href = "https://" + window.location.href.slice(7, window.location.href.length)
+    }
+
     const socket = io()
 
 

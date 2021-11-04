@@ -20,7 +20,7 @@ import {
 import { IUserGameSettings, IUserSettings } from "../classes/User";
 import { setDBUserSettings } from "../firebase/firebaseFunctions";
 import { IGameScene } from "../one-monitor-game/IGameScene";
-import { RaceGameScene } from "../one-monitor-game/race-game";
+import { RaceGameScene } from "../one-monitor-game/RaceGameScene";
 import { allVehicleTypes, VehicleType } from "../vehicles/VehicleConfigs";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";

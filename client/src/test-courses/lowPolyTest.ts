@@ -7,7 +7,7 @@ import { defaultPreGameSettings, IPreGameSettings, TrackType } from "../classes/
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
 import { defaultVehicleConfig, IVehicleConfig, VehicleType } from "../vehicles/VehicleConfigs";
 import "../one-monitor-game/game-styles.css"
-import { RaceCourse } from "../shared-game-components/raceCourse"
+import { RaceCourse } from "../shared-game-components/RaceCourse"
 import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 import "./lowPolyTest.css"
 import { addTestControls, testDriveVehicleWithKeyboard } from "./testControls"

@@ -148,13 +148,11 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                       value={props.store.preGameSettings.trackName}
                     >
                       <MenuItem value="low-poly-farm-track">
-                        Low poly farm track
+                        Farm track
                       </MenuItem>
-                      <MenuItem value="low-poly-f1-track">
-                        Low poly f1 track
-                      </MenuItem>
-                      <MenuItem value="track">Simple track</MenuItem>
-                      <MenuItem value="town-track">Town track</MenuItem>
+                      <MenuItem value="low-poly-f1-track">F1 track</MenuItem>
+                      {/* <MenuItem value="track">Simple track</MenuItem>
+                      <MenuItem value="town-track">Town track</MenuItem> */}
                     </Select>
                   </FormControl>
                 </Grid>

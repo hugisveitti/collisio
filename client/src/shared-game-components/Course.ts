@@ -1,0 +1,1 @@
+/** class that TrafficSchoolCourse and RaceCourse extend */

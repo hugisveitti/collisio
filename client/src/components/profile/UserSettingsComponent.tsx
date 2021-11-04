@@ -55,8 +55,6 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
   };
 
   const renderStaticInfo = () => {
-    console.log("veh", vehicleSettings);
-    console.log("uhset veh", userSettings);
     if (!vehicleSettings?.vehicleType) return null;
     return (
       <>
@@ -90,15 +88,13 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
   if (!userSettings) return null;
 
   return (
-    <Grid item xs={12} sm={12} md={3}>
-      <Card
-        style={{
-          backgroundColor: inputBackgroundColor,
-        }}
-      >
-        {renderStaticInfo()}
-      </Card>
-    </Grid>
+    <Card
+      style={{
+        backgroundColor: inputBackgroundColor,
+      }}
+    >
+      {renderStaticInfo()}
+    </Card>
   );
 };
 

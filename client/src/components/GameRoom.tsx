@@ -4,7 +4,10 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../one-monitor-game/ball-game";
 import { IGameScene } from "../one-monitor-game/IGameScene";
-import { RaceGameScene, startRaceGame } from "../one-monitor-game/race-game";
+import {
+  RaceGameScene,
+  startRaceGame,
+} from "../one-monitor-game/RaceGameScene";
 import { UserContext } from "../providers/UserProvider";
 import { startLowPolyTest } from "../test-courses/lowPolyTest";
 import GameSettingsModal from "./GameSettingsModal";

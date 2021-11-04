@@ -32,21 +32,6 @@ const TestContainer = () => {
   const deviceType = getDeviceType();
   const onMobile = deviceType === "mobile";
 
-  const createRoomDesktopCallback = () => {
-    socket.once("create-room-callback", (response: ISocketCallback) => {
-      if (response.status === "success") {
-        const { roomId } = response.data;
-        store.setRoomId(roomId);
-        socketHandleStartGame(socket, (res) => {
-          console.log("starting test game", res);
-          setCanStartGame(true);
-        });
-      } else {
-        toast.error(response.message);
-      }
-    });
-  };
-
   useEffect(() => {
     const newSocket = createSocket(deviceType, "test");
     setSocket(newSocket);
@@ -71,28 +56,11 @@ const TestContainer = () => {
     setRoomId("testRoom");
     setPlayer(nplayer);
 
-    // if (onMobile) {
-    //   socket.emit("player-connected", {
-    //     roomId,
-    //     playerName: nplayer.id,
-    //     playerId: nplayer.id,
-    //     isAuthenticated: false,
-    //     photoURL: "",
-    //   } as IPlayerConnection);
+    socket.on("test-made-connection", () => {
+      toast("A test connection was made");
+    });
 
-    //   socket.once("player-connected-callback", (response: ISocketCallback) => {
-    //     if (response.status === "error") {
-    //       const { message } = response;
-    //       toast.error(message);
-    //     } else {
-    //       toast.success(response.message);
-    //       store.setPlayer(response.data.player);
-    //     }
-    //   });
-    // } else {
-    //   socket.emit("create-room", { roomId });
-    //   createRoomDesktopCallback();
-    // }
+    return () => {};
   }, [socket]);
 
   const store = {
