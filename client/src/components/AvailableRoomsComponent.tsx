@@ -13,10 +13,12 @@ import {
   AvailableRoomsFirebaseObject,
   createAvailableRoomsListeners,
 } from "../firebase/firebaseFunctions";
-import { waitingRoomPath } from "./Routes";
+import { IStore } from "./store";
 
 interface IAvailableRoomsComponent {
   userId: string;
+  store: IStore;
+  connectButtonClicked: (roomId: string) => void;
 }
 
 const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
@@ -56,7 +58,8 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
               <ListItemButton
                 style={{ textAlign: "center" }}
                 onClick={() => {
-                  history.push(waitingRoomPath + "/" + availRoom.roomId);
+                  props.store.setRoomId(availRoom.roomId);
+                  props.connectButtonClicked(availRoom.roomId);
                 }}
               >
                 <Button variant="outlined">Join</Button>

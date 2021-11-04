@@ -20,14 +20,6 @@ import { GameTime } from "./GameTimeClass";
 const stats = new Stats()
 const scoreTable = document.createElement("div")
 
-const gameSong = new Howl({
-    src: ["/sound/song2.mp3"],
-    html5: true,
-    volume: .5,
-
-})
-
-
 
 export class RaceGameScene extends GameScene { // extends Scene3D implements IGameScene {
 
@@ -90,7 +82,18 @@ export class RaceGameScene extends GameScene { // extends Scene3D implements IGa
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
             vehcile.start()
+
         }
+
+        /** hacky way to make vehicles stopp
+         * TODO: not this, find a way to make vechicles reliably start on the ground paused..
+         */
+        setTimeout(() => {
+            for (let vehcile of this.vehicles) {
+                vehcile.stop()
+
+            }
+        }, (2) * 1000)
 
         const timer = () => {
             this.playCountdownBeep()

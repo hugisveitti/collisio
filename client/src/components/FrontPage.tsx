@@ -126,12 +126,12 @@ const FrontPage = (props: FrontPageProps) => {
     createRoomDesktopCallback();
   };
 
-  const connectButtonClicked = () => {
+  const connectButtonClicked = (roomId: string) => {
     if (deviceType === "desktop") {
-      createRoomDesktop(props.store.roomId);
+      createRoomDesktop(roomId);
     } else {
       if (user) {
-        connectToRoomMobile(props.store.roomId, playerName);
+        connectToRoomMobile(roomId, playerName);
         handleRequestDeviceOrientation();
       } else {
         setNotLoggedInModelOpen(true);
@@ -187,7 +187,11 @@ need to be logged in."
             <>
               {user && (
                 <Grid item xs={12} sm={6}>
-                  <AvailableRoomsComponent userId={user.uid} />
+                  <AvailableRoomsComponent
+                    store={props.store}
+                    connectButtonClicked={connectButtonClicked}
+                    userId={user.uid}
+                  />
                 </Grid>
               )}
               <Grid item xs={12} sm={6}>
@@ -217,7 +221,7 @@ need to be logged in."
 
           <Grid item xs={12}>
             <Button
-              onClick={connectButtonClicked}
+              onClick={() => connectButtonClicked(props.store.roomId)}
               variant="contained"
               size="large"
               startIcon={<VideogameAssetIcon />}
