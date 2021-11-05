@@ -101,13 +101,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     // for gamma, beta, alpha
     window.addEventListener("deviceorientation", deviceOrientationHandler);
 
-    setInterval(() => {
+    const sendControlsInterval = setInterval(() => {
       props.socket.emit("send-controls", controller);
 
       // set fps
     }, 1000 / 120);
 
     return () => {
+      window.clearInterval(sendControlsInterval);
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
       window.removeEventListener("orientationchange", handleDeviceOrientChange);
     };

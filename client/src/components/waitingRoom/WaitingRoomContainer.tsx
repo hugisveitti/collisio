@@ -25,7 +25,6 @@ import WaitingRoomComponent from "./WaitingRoomComponent";
 import "../../styles/main.css";
 import {
   addToAvailableRooms,
-  getDBUserSettings,
   removeFromAvailableRooms,
 } from "../../firebase/firebaseFunctions";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
@@ -57,11 +56,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
-
-  if (!onMobile && !props.store.roomId) {
-    history.push(frontPagePath);
-    return null;
-  }
 
   const getPlayersInRoom = () => {
     props.socket.emit("get-players-in-room", { roomId });
@@ -120,7 +114,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
-    setTimeout(() => {
+    const userLoadingTimout = setTimeout(() => {
       /** TODO: do this */
       setUserLoading(false);
     }, 1000);
@@ -139,6 +133,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.socket.on("game-settings-changed", (data) => {
         props.store.setPreGameSettings(data.gameSettings);
       });
+
+      props.socket.on("game-disconnected", () => {
+        toast.error("Game disconnected");
+        /** go to front page? */
+      });
     } else {
       props.socket.on("player-disconnected", ({ playerName }) => {
         toast.warn(`${playerName} disconnected from waiting room`);
@@ -146,6 +145,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
+      window.clearTimeout(userLoadingTimout);
+      props.socket.emit("left-waiting-room", {});
       props.socket.off("game-settings-changed");
       props.socket.off("waiting-room-alert");
       props.socket.off("player-disconnected");
@@ -254,6 +255,12 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       </BasicModal>
     );
   };
+
+  /** usering loading be */
+  if (!onMobile && !props.store.roomId) {
+    history.push(frontPagePath);
+    return null;
+  }
 
   return (
     <AppContainer>
