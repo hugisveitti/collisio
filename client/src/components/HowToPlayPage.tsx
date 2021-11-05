@@ -9,6 +9,8 @@ import rightTurnImage from "../images/phone-orientation-rightTurn.PNG";
 import gameplayImage from "../images/gameplay.PNG";
 import connectWithLogin from "../images/connect-with-login.PNG";
 import connectWithRoomId from "../images/connect-with-roomid.PNG";
+import vehicleSelect1 from "../images/vehicle-select-1.PNG";
+import vehicleSelect2 from "../images/vehicle-select-2.PNG";
 
 import alphaGIF from "../images/alpha.gif";
 import betaGIF from "../images/beta.gif";
@@ -321,12 +323,46 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
             </Grid>
           </HowToPlayItem>
 
+          <HowToPlayItem header="Selecting vehicles">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  To select a different vehicle, when in the waiting room, go to
+                  the bottom and select your vehicle of choice. Note to select
+                  vehicles other than the "normal" you will have to have a
+                  premium account (which currently is just being logged in).
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={vehicleSelect1} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  After pressing vehicles you can select your desired vehicle.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={vehicleSelect2} component="img" />
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
           <Grid item xs={12}>
             <iframe
               src="https://www.youtube.com/embed/0YBLvMXrdPo"
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               style={{ margin: "auto", display: "block" }}
+              allowFullScreen
+            ></iframe>
+          </Grid>
+          <Grid item xs={12}>
+            <iframe
+              src="https://www.youtube.com/embed/CNxlUfQencs"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{ margin: "auto", display: "block" }}
+              allowFullScreen
             ></iframe>
           </Grid>
         </Grid>
