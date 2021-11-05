@@ -17,24 +17,23 @@
 }
 
 .controller-btn {
-  width: 150px;
+  /* width: 150px;
   height: 150px;
-  line-height: 150px;
+  line-height: 150px; */
   color: green;
   border-radius: 15px;
   text-align: center;
   vertical-align: middle;
   position: absolute;
-  font-size: 32px;
 }
 
-@media only screen and (max-width: 350px) {
+/* @media only screen and (max-width: 350px) {
   .controller-btn {
     width: 120px;
     height: 120px;
     line-height: 120px;
   }
-}
+} */
 
 #orientation-info {
   width: 100px;

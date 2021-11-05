@@ -21,7 +21,7 @@ const stats = new Stats()
 const scoreTable = document.createElement("div")
 
 
-export class RaceGameScene extends GameScene { // extends Scene3D implements IGameScene {
+export class RaceGameScene extends GameScene {
 
     vehicleControls!: VehicleControls
 

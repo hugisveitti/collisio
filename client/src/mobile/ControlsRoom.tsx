@@ -5,9 +5,13 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
+import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { getDBUserSettings } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
-import { MobileControls } from "../utils/ControlsClasses";
+import {
+  MobileControls,
+  setHasAskedDeviceOrientation,
+} from "../utils/ControlsClasses";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";
 
@@ -40,6 +44,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const downColor = "#005c46"; // "green";
   const upColor = "#fcba03"; // "red";
   const [isPortrait, setIsPortrait] = useState(false);
+  /** used to see if device orientation isnt working */
+  const [deviceOrientationAsked, setDeviceOrientationAsked] = useState(false);
 
   const handleUserLoggedIn = () => {};
 
@@ -55,6 +61,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     const gamma = e.gamma ?? 0;
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
+    if (e.gamma === null && e.beta === 0 && e.alpha === null) {
+      if (!deviceOrientationAsked) {
+        // this is hacky, just so the prompt doesnt go crazy
+        setDeviceOrientationAsked(true);
+        setHasAskedDeviceOrientation(false);
+      }
+    }
 
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
@@ -122,6 +135,21 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const btnSize = screen.availWidth < 350 ? 120 : 150;
+  const utilBtnSize = screen.availWidth < 350 ? 60 : 90;
+
+  const btnSizeStyle: React.CSSProperties = {
+    width: btnSize,
+    height: btnSize,
+    lineHeight: btnSize + "px",
+    fontSize: 32,
+  };
+
+  const utilbtnSizeStyle: React.CSSProperties = {
+    width: utilBtnSize,
+    height: utilBtnSize,
+    lineHeight: utilBtnSize + "px",
+    fontSize: 16,
+  };
 
   const rotateText = { transform: "rotate(-90deg)" };
   const fButtonStyles = isPortrait
@@ -157,6 +185,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         onClose={() => {
           setSettingsModalOpen(false);
         }}
+        style={{ border: 0 }}
       >
         <div
           style={{
@@ -185,6 +214,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         onTouchStart={() => handleButtonAction(true, "f", setForward)}
         onTouchEnd={() => handleButtonAction(false, "f", setForward)}
         style={{
+          ...btnSizeStyle,
           ...fButtonStyles,
           right: 35,
           color: forward ? upColor : downColor,
@@ -198,10 +228,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         onTouchStart={() => handleButtonAction(true, "b", setBackward)}
         onTouchEnd={() => handleButtonAction(false, "b", setBackward)}
         style={{
+          ...btnSizeStyle,
+          ...bButtonStyles,
           bottom: 35,
           color: backward ? upColor : downColor,
           backgroundColor: backward ? downColor : upColor,
-          ...bButtonStyles,
         }}
       >
         B
@@ -212,6 +243,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         onClick={() => handleButtonAction(true, "pause", setSettingsModalOpen)}
         style={{
           ...settingsStyles,
+          ...utilbtnSizeStyle,
           color: downColor,
           backgroundColor: upColor,
         }}
@@ -223,9 +255,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         onTouchStart={() => handleButtonAction(true, "resetVehicle", setReset)}
         onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
         style={{
+          ...resetStyles,
+          ...utilbtnSizeStyle,
           color: reset ? upColor : downColor,
           backgroundColor: reset ? downColor : upColor,
-          ...resetStyles,
         }}
       >
         Reset
@@ -256,6 +289,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         {moreSpeed && <span>MORE SPEED</span>}
       </div>
       <ToastContainer />
+      <DeviceOrientationPermissionComponent onMobile={true} onIphone={true} />
     </React.Fragment>
   );
 };

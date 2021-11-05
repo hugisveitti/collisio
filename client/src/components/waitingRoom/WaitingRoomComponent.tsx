@@ -1,3 +1,6 @@
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import FaceIcon from "@mui/icons-material/Face";
+import HelpIcon from "@mui/icons-material/Help";
 import {
   Avatar,
   Button,
@@ -5,48 +8,39 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Radio,
   Grid,
   IconButton,
-  InputLabel,
   List,
   ListItem,
   ListItemAvatar,
-  ListItemButton,
   ListItemText,
-  MenuItem,
+  Radio,
   RadioGroup,
-  Select,
   Tooltip,
   Typography,
 } from "@mui/material";
 import QRCode from "qrcode";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import HelpIcon from "@mui/icons-material/Help";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
-import FaceIcon from "@mui/icons-material/Face";
-
 import { IPlayerInfo } from "../../classes/Game";
-import { inputBackgroundColor } from "../../providers/theme";
+import { IVehicleSettings } from "../../classes/User";
+import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
-import GameSettingsComponent from "../GameSettingsComponent";
-import { frontPagePath, gameRoomPath } from "../Routes";
-import { IStore } from "../store";
-import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
 import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
-import { IVehicleSettings } from "../../classes/User";
 import { VehicleType } from "../../vehicles/VehicleConfigs";
 import VehicleSelect from "../inputs/VehicleSelect";
+import { frontPagePath, gameRoomPath } from "../Routes";
+import { IStore } from "../store";
+import PreGameSettingsComponent from "./PreGameSettingsComponent";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -269,7 +263,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </Button>
           </Grid>
           <Divider variant="middle" style={{ margin: 15 }} />
-          <GameSettingsComponent
+          <PreGameSettingsComponent
             socket={props.socket}
             store={props.store}
             userId={user?.uid}
@@ -311,7 +305,15 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           <Grid item xs={6} sm={6}>
             <Button
               variant="outlined"
-              onClick={() => requestDeviceOrientation()}
+              onClick={() =>
+                requestDeviceOrientation((permissionGranted, message) => {
+                  if (permissionGranted) {
+                    toast.success(message);
+                  } else {
+                    toast.error(message);
+                  }
+                })
+              }
             >
               Request device orientation
             </Button>

@@ -1,6 +1,14 @@
-import { toast } from "react-toastify";
 
-export const requestDeviceOrientation = () => {
+
+export const hasAskedDeviceOrientation = eval(
+    window.localStorage.getItem("hasAskedDeviceOrientation")
+);
+
+export const setHasAskedDeviceOrientation = (b: boolean) => {
+    window.localStorage.setItem("hasAskedDeviceOrientation", b + "")
+}
+
+export const requestDeviceOrientation = (callback: (permissionGranted: boolean, message: string) => void) => {
     // I think it is only needed for iphones
 
     if (
@@ -13,20 +21,17 @@ export const requestDeviceOrientation = () => {
         DeviceOrientationEvent.requestPermission()
             .then((response) => {
                 if (response == "granted") {
-                    toast.success("Permission granted")
-                    console.log("deivce permission granted, do nothing");
+                    setHasAskedDeviceOrientation(true)
+                    callback(true, "Permission granted!")
                 } else {
-                    toast.error(
-                        "You need to grant permission to the device's orientation to be able to play the game, please refresh the page."
-                    );
+                    callback(false, "Permission not granted.")
                 }
             })
             .catch((err) => {
-                toast.error("Error occured when asking for permission.", err)
-                console.log(err);
+                callback(false, "Error occured when asking for permission")
             });
     } else {
-        toast.warn("Device motion permission access method not available")
+        callback(false, "Permission access not available, you might not need to worry.")
         console.log("Device motion permission access method not available");
     }
 }

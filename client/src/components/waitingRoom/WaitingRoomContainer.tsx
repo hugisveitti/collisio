@@ -17,8 +17,7 @@ import AppContainer from "../../containers/AppContainer";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { ISocketCallback } from "../../utils/connectSocket";
-import { requestDeviceOrientation } from "../../utils/ControlsClasses";
-import { getDeviceType } from "../../utils/settings";
+import { getDeviceType, isIphone } from "../../utils/settings";
 import LoginComponent from "../LoginComponent";
 import { frontPagePath, controlsRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -30,6 +29,8 @@ import {
   removeFromAvailableRooms,
 } from "../../firebase/firebaseFunctions";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
+import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
+import BasicModal from "../modal/BasicModal";
 
 interface WaitParamType {
   roomId: string;
@@ -193,7 +194,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const renderDisplayNameModal = () => {
     if (userLoading) return null;
     return (
-      <Modal
+      <BasicModal
         open={displayNameModalOpen}
         onClose={() => {
           let _displayName = displayName;
@@ -204,69 +205,53 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           setDisplayNameModalOpen(false);
           connectToRoom(_displayName);
           setShowLoginInComponent(false);
-          requestDeviceOrientation();
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "75%",
-            backgroundColor: "#eeebdf",
-            border: "2px solid #000",
-            padding: 10,
-          }}
-        >
-          <Grid container spacing={3}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Typography>
+              You are not logged in, please type in your name or log in.
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              style={{
+                backgroundColor: inputBackgroundColor,
+              }}
+              label="Enter your name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <LoadingButton
+              loading={connectingGuest}
+              variant="outlined"
+              onClick={() => {
+                connectToRoom(displayName);
+              }}
+            >
+              Submit
+            </LoadingButton>
+          </Grid>
+          {showLoginInComponent ? (
             <Grid item xs={12}>
-              <Typography>
-                You are not logged in, please type in your name or log in.
-              </Typography>
+              <LoginComponent signInWithPopup={false} />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                style={{
-                  backgroundColor: inputBackgroundColor,
-                }}
-                label="Enter your name"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-            </Grid>
+          ) : (
             <Grid item xs={6}>
-              <LoadingButton
-                loading={connectingGuest}
-                variant="outlined"
+              <Button
+                variant="contained"
                 onClick={() => {
-                  requestDeviceOrientation();
-                  connectToRoom(displayName);
+                  setShowLoginInComponent(true);
                 }}
               >
-                Submit
-              </LoadingButton>
+                Login
+              </Button>
             </Grid>
-            {showLoginInComponent ? (
-              <Grid item xs={12}>
-                <LoginComponent signInWithPopup={false} />
-              </Grid>
-            ) : (
-              <Grid item xs={6}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    requestDeviceOrientation();
-                    setShowLoginInComponent(true);
-                  }}
-                >
-                  Login
-                </Button>
-              </Grid>
-            )}
-          </Grid>
-        </div>
-      </Modal>
+          )}
+        </Grid>
+      </BasicModal>
     );
   };
 
@@ -292,6 +277,10 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </React.Fragment>
         )}
       </div>
+      <DeviceOrientationPermissionComponent
+        onMobile={onMobile}
+        onIphone={isIphone()}
+      />
       <ToastContainer />
     </AppContainer>
   );

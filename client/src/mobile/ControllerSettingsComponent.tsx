@@ -70,7 +70,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   /** Add reset orientation device */
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
+      <Grid item xs={12} style={{ textAlign: "right" }}>
         <IconButton onClick={() => props.setSettingsModalOpen(false)}>
           <CloseIcon />
         </IconButton>
@@ -154,8 +154,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
 
       <Grid item xs={12}></Grid>
 
-      <Grid item xs={3}></Grid>
-      <Grid item xs={9}>
+      <Grid item xs={12} style={{ textAlign: "center" }}>
         <Link to={frontPagePath} style={{ textDecoration: "none" }}>
           <Button startIcon={<ExitToAppIcon />}>Quit game</Button>
         </Link>
