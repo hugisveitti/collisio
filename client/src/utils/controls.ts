@@ -51,15 +51,18 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, 
 
 export const addControls = (vehicleControls: VehicleControls, socket: Socket, vehicles: IVehicle[], callback?: () => void) => {
 
-    setInterval(() => {
+    /** I currently have 2 setIntervals that deal with the controls
+     * 
+     * In the ControlsRoom to send from device
+     * In ServerGame.js to send from server, I need the one in the Server since if we have multiple players the data needs to be collected from all players and sent
+     */
 
-        socket.once("get-controls", (data) => {
-            const { players } = data as { players: IPlayerInfo[] }
-            for (let i = 0; i < players.length; i++) {
-                driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)
-            }
-        })
-    }, 1000 / 120)
+    socket.on("get-controls", (data) => {
+        const { players } = data as { players: IPlayerInfo[] }
+        for (let i = 0; i < players.length; i++) {
+            driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)
+        }
+    })
 
 
 

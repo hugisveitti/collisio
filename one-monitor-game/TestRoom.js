@@ -45,7 +45,7 @@ class TestRoom {
         setInterval(() => {
             this.desktopSocket.emit("get-controls", { mobileControls: this.mobileControls })
             // set fps
-        }, 1000 / 120)
+        }, 1000 / 90)
     }
 
     setupUserSettingsListener() {

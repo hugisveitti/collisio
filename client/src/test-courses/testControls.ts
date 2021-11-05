@@ -82,15 +82,12 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
     setInterval(() => {
-
-
         if (!driveWithKeyboard) {
             socket.once("get-controls", (data) => {
                 const { mobileControls } = data as { mobileControls: MobileControls }
                 if (mobileControls?.f !== undefined) {
                     driveVehicle(mobileControls, vehicle)
                 }
-
             })
         } else {
             testDriveVehicleWithKeyboard(vehicle, vehicleControls)

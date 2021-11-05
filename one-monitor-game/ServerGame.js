@@ -228,9 +228,10 @@ class Game {
 
     setupControlsListener() {
         this.getControlsInterval = setInterval(() => {
+
             this.socket.emit("get-controls", { players: this.getPlayersControls() })
             // set fps
-        }, 1000 / 120)
+        }, 1000 / 60)
     }
 
     getPlayersControls() {

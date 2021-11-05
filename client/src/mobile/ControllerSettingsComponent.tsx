@@ -6,25 +6,15 @@ import {
   Grid,
   IconButton,
   Slider,
-  TextField,
 } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import {
-  defaultUserSettings,
-  defaultVehicleSettings,
-  IUserSettings,
-  IVehicleSettings,
-} from "../classes/User";
+import { IUserSettings, IVehicleSettings } from "../classes/User";
 import NotLoggedInModal from "../components/NotLoggedInModal";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
-import {
-  getDBUserSettings,
-  IUser,
-  setDBUserSettings,
-} from "../firebase/firebaseFunctions";
+import { IUser, setDBUserSettings } from "../firebase/firebaseFunctions";
 
 interface IControllerSettingsComponent {
   setSettingsModalOpen: any;

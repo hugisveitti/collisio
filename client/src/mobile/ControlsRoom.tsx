@@ -12,6 +12,7 @@ import {
   MobileControls,
   setHasAskedDeviceOrientation,
 } from "../utils/ControlsClasses";
+import { isIphone } from "../utils/settings";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";
 
@@ -105,7 +106,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       props.socket.emit("send-controls", controller);
 
       // set fps
-    }, 1000 / 120);
+    }, 1000 / 60);
 
     return () => {
       window.clearInterval(sendControlsInterval);
@@ -194,6 +195,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             backgroundColor: "#eeebdf",
             border: "2px solid #000",
             padding: 10,
+            outline: 0,
           }}
         >
           <ControllerSettingsComponent
@@ -290,7 +292,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         {moreSpeed && <span>MORE SPEED</span>}
       </div>
       <ToastContainer />
-      <DeviceOrientationPermissionComponent onMobile={true} onIphone={true} />
+      <DeviceOrientationPermissionComponent
+        onMobile={true}
+        onIphone={isIphone()}
+      />
     </React.Fragment>
   );
 };

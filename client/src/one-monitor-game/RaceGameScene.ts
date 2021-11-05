@@ -47,6 +47,9 @@ export class RaceGameScene extends GameScene {
         this.winner = ""
         this.winTime = -1
         this.gameTimers = []
+
+        stats.showPanel(0)
+        document.body.appendChild(stats.dom)
     }
 
     async create() {

@@ -186,7 +186,7 @@ need to be logged in."
           {deviceType === "mobile" && (
             <>
               {user && (
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <AvailableRoomsComponent
                     store={props.store}
                     connectButtonClicked={connectButtonClicked}

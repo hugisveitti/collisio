@@ -1,6 +1,30 @@
 const express = require("express");
 const app = express();
 const path = require("path");
+const si = require('systeminformation');
+
+// promises style - new since version 3
+si.cpu()
+    .then(data => {
+        console.log("####CPU Info#####")
+        console.log(data)
+        console.log("#####END CPU INFO#####")
+    })
+    .catch(error => console.error(error));
+
+const byteToGig = (byte) => {
+    return byte / (1024 ** 3)
+}
+
+si.mem()
+    .then(data => {
+        console.log("####Memory Info#####")
+        console.log("Total", byteToGig(data.total))
+        console.log("Free", byteToGig(data.free))
+        console.log("#####END Memory INFO#####")
+    })
+    .catch(error => console.error(error));
+
 
 
 // app.use(function (req, res, next) {

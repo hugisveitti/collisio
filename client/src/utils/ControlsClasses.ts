@@ -33,6 +33,7 @@ export const requestDeviceOrientation = (callback: (permissionGranted: boolean, 
     } else {
         callback(false, "Permission access not available, you might not need to worry.")
         console.log("Device motion permission access method not available");
+        setHasAskedDeviceOrientation(true)
     }
 }
 

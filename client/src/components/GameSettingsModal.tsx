@@ -74,10 +74,10 @@ const GameSettingsModal = (props: IPreGameSettingsModal) => {
         }}
       >
         <Grid container spacing={3}>
-          <Grid item xs={11}>
+          <Grid item xs={6}>
             <h3>Game is paused</h3>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={6} style={{ textAlign: "right" }}>
             <IconButton onClick={props.onClose}>
               <CloseIcon />
             </IconButton>
