@@ -81,6 +81,7 @@ const GameRoom = (props: IGameRoom) => {
     }
 
     return () => {
+      props.socket.emit("quit-room");
       props.socket.off("player-disconnected");
     };
   }, []);

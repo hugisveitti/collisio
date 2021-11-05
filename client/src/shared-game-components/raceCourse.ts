@@ -5,7 +5,7 @@ import { ExtendedObject3D, Scene3D } from "enable3d";
 
 import { TrackType } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
-import { gameItems } from "./gameItems";
+import { gameItems } from "./GameItems";
 import { IRaceCourse } from "./ICourse";
 
 

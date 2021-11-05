@@ -10,7 +10,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { useHistory, useParams } from "react-router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IPlayerConnection, IPlayerInfo } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
@@ -135,6 +135,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       });
 
       props.socket.on("game-disconnected", () => {
+        console.log("game disconnected was called");
         toast.error("Game disconnected");
         /** go to front page? */
       });
@@ -288,7 +289,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         onMobile={onMobile}
         onIphone={isIphone()}
       />
-      <ToastContainer />
     </AppContainer>
   );
 };

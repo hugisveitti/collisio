@@ -40,5 +40,9 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
     })
 
+    window.onbeforeunload = () => {
+        socket.emit("quit-room")
+    }
+
     return socket
 }

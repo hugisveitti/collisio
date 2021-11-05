@@ -4,7 +4,7 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IPreGameSettings, IPlayerInfo } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
-import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/squaredCourse";
+import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/SquaredCourse";
 import { addControls } from "../utils/controls";
 import { VehicleControls } from "../utils/ControlsClasses";
 import "./game-styles.css";

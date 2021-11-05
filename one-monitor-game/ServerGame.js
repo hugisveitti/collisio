@@ -42,7 +42,10 @@ class GameMaster {
 
 
     createRoom(socket, roomId) {
-        this.rooms[roomId] = new Game(roomId, this.io, socket)
+        this.rooms[roomId] = new Game(roomId, this.io, socket, () => {
+            delete this.rooms[roomId]
+            roomId = undefined
+        })
         socket.join(roomId)
         socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
     }
@@ -115,25 +118,52 @@ class Game {
     io
     socket
     gameStarted
-    team1Goals
-    team2Goals
-    maxGoals
+
+
     gameSettings
     isConnected
+    deleteRoomCallback
+    getControlsInterval
 
-    constructor(roomId, io, socket) {
+    constructor(roomId, io, socket, deleteRoomCallback) {
         this.players = []
         this.gameSettings = {}
         this.roomId = roomId
         this.io = io
         this.socket = socket
         this.gameStarted = false
-        this.team1Goals = 0
-        this.team2Goals = 0
-        this.isConnected = true
 
+        this.isConnected = true
+        this.deleteRoomCallback = deleteRoomCallback
+
+        this.setupLeftWaitingRoomListener()
         this.setupStartGameListener()
         this.setupGameSettingsListener()
+    }
+
+
+    setupLeftWaitingRoomListener() {
+        this.socket.once("left-waiting-room", () => {
+            if (!this.gameStarted) {
+                /** if game hasnt started delete game */
+                console.log("game disconnected in game")
+                for (let player of this.players) {
+                    player.gameDisconnected()
+                }
+                this.deleteRoomCallback()
+            }
+        })
+    }
+
+    setupQuitRoom() {
+        this.socket.once("quit-room", () => {
+            console.log("quiting room")
+            clearInterval(this.getControlsInterval)
+            for (let player of this.players) {
+                player.gameDisconnected()
+            }
+            this.deleteRoomCallback()
+        })
     }
 
     setSocket(socket) {
@@ -197,7 +227,7 @@ class Game {
     }
 
     setupControlsListener() {
-        setInterval(() => {
+        this.getControlsInterval = setInterval(() => {
             this.socket.emit("get-controls", { players: this.getPlayersControls() })
             // set fps
         }, 1000 / 120)
@@ -258,7 +288,6 @@ class Game {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
                     this.players.splice(i, 1)
-
                 }
             }
         }

@@ -40,10 +40,25 @@ class Player {
         this.setupQuitGameListener()
         this.setupUserSettingsListener()
         this.setupReconnectListener()
-        this.setupWaitingRoomListener
+        this.setupWaitingRoomListener()
+        this.setupLeftWaitingRoomListener()
 
     }
 
+    gameDisconnected() {
+        console.log("game disconnected in plauyer")
+        this.socket.emit("game-disconnected", { message: "Use some message?" })
+        // this.disconnected()
+    }
+
+    setupLeftWaitingRoomListener() {
+        this.socket.on("left-waiting-room", () => {
+            /** if game hasnt started delete game */
+            if (!this.game.gameStarted) {
+                this.disconnected()
+            }
+        })
+    }
 
     setSocket(newSocket) {
         this.socket = newSocket
@@ -60,9 +75,14 @@ class Player {
         this.socket.emit("game-settings-changed", { gameSettings })
     }
 
+    disconnected() {
+        this.game.playerDisconnected(this.playerName, this.id)
+        this.isConnected = false
+    }
+
     setupQuitGameListener() {
         this.socket.on("quit-game", () => {
-            this.game.playerDisconnected(this.playerName, this.id)
+            this.disconnected()
         })
     }
 
@@ -82,8 +102,7 @@ class Player {
     setGame(game) {
         this.game = game
         this.socket.on("disconnect", () => {
-            this.game.playerDisconnected(this.playerName, this.id)
-            this.isConnected = false
+            this.disconnected()
         })
     }
 
