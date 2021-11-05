@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import "../styles/main.css";
@@ -7,8 +7,61 @@ import noTurnImage from "../images/phone-orientation-noTurn.PNG";
 import leftTurnImage from "../images/phone-orientation-leftTurn.PNG";
 import rightTurnImage from "../images/phone-orientation-rightTurn.PNG";
 import gameplayImage from "../images/gameplay.PNG";
+import connectWithLogin from "../images/connect-with-login.PNG";
+import connectWithRoomId from "../images/connect-with-roomid.PNG";
+
+import alphaGIF from "../images/alpha.gif";
+import betaGIF from "../images/beta.gif";
+import gammaGIF from "../images/gamma.gif";
+
 import AppContainer from "../containers/AppContainer";
 import { frontPagePath } from "./Routes";
+import {
+  CardContent,
+  CardHeader,
+  Grid,
+  Card,
+  IconButton,
+  Typography,
+  Collapse,
+  CardMedia,
+  Divider,
+  List,
+  ListItemText,
+  ListItem,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import {
+  containerBackgroundColor,
+  inputBackgroundColor,
+} from "../providers/theme";
+
+interface IHowToPlayItem {
+  header: string;
+  children: JSX.Element;
+}
+const HowToPlayItem = (props: IHowToPlayItem) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Grid item xs={12}>
+      <Card style={{ backgroundColor: inputBackgroundColor }}>
+        <CardHeader
+          subheader={props.header}
+          action={
+            <IconButton onClick={() => setOpen(!open)}>
+              {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          }
+        />
+        <Collapse in={open}>
+          <CardContent>{props.children}</CardContent>
+        </Collapse>
+      </Card>
+    </Grid>
+  );
+};
 
 interface IHowToPlayProps {}
 
@@ -16,63 +69,267 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
   const history = useHistory();
   return (
     <AppContainer>
-      <div className="container">
-        <h2 className="center">How to play</h2>
+      <div style={{ backgroundColor: containerBackgroundColor, padding: 15 }}>
+        <Grid container spacing={1} style={{ maxWidth: 600, margin: "auto" }}>
+          <Grid item xs={12}>
+            <h2 className="center">How to play</h2>
+          </Grid>
 
-        <div style={{ margin: 15 }}>
-          <Link to={frontPagePath}>Back to front page</Link>
-        </div>
+          <Grid item xs={12}>
+            <Link to={frontPagePath}>Back to front page</Link>
+          </Grid>
 
-        <h3 className="center">Connecting to a game</h3>
-        <p>
-          On the front page, write a room name. This name is used to connect
-          your phone and computer.
-          <i>
-            In the future this will be generated for you and possibly a QR code
-            to scan from your phone.
-          </i>
-        </p>
+          <HowToPlayItem header="Connecting to a room">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  During this tutorial we will talk about rooms and games. You
+                  create a room on your desktop browser and then on your mobile
+                  you connect to that room. Upto four people can connect to a
+                  room at the same time. Many games can be played in one room.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  There are a few ways to create a room. First on your desktop
+                  press "Create game", this button is only visible on your
+                  desktop, not your mobile.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>Logging in on both mobile and desktop</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={connectWithLogin} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  If you are logged in on the same account on your phone and
+                  desktop, then after creating a game on your desktop you can
+                  see the game on your mobile on the frontpage.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
 
-        <hr />
-        <h3 className="center">Steering with your phone</h3>
-        <p>First you need to lock your phone in portrait mode.</p>
-        <h4>The desktop</h4>
-        <img src={gameplayImage} className="info-image" alt="" />
-        <p>
-          On your desktop computer (or tablet) you will see the above image.
-        </p>
+              <Grid item xs={12}>
+                <Typography>Scanning the QR code</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  After creating a game a QR code is generated for that room,
+                  which you can scan with your phone to enter the room.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
 
-        <h4>The controller (your mobile)</h4>
-        <img src={mobileGUI} className="info-image" alt="" />
-        <p>
-          The controller looks like the image above. Press the 'forward' button
-          to go forward.
-        </p>
+              <Grid item xs={12}>
+                <Typography>Entering the room id</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={connectWithRoomId} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  You can enter the room id into the "Room id" input area on
+                  your mobile. Alternatively you can copy the link and paste it
+                  into your phone's browser.
+                </Typography>
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
 
-        <h4>Steering</h4>
+          <HowToPlayItem header="Game play">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  The game works by using your phone to steer a vehicle that is
+                  displayed on a desktop. The idea is to simulate driving a real
+                  vehicle, so grab your phone as you would grap a steering
+                  wheel.
+                </Typography>
+                <Typography color="InfoText">
+                  You then compete against your friends for highscores.
+                </Typography>
+              </Grid>
 
-        <img src={noTurnImage} className="info-image-small" alt="" />
-        <p>To begin with align your phone like the image above.</p>
-        <img src={leftTurnImage} className="info-image-small" alt="" />
-        <p>
-          To turn left tilt your phone like in the image. This is to emulate a
-          steering wheel in a car.
-        </p>
-        <img src={rightTurnImage} className="info-image-small" alt="" />
-        <p>To turn right tilt your phone like in the image above.</p>
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
 
-        <hr />
+              <Grid item xs={12}>
+                <Typography component="h3">The desktop</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={gameplayImage} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  On your desktop computer (or tablet) you will see the above
+                  image.
+                </Typography>
+              </Grid>
 
-        <iframe
-          src="https://www.youtube.com/embed/0YBLvMXrdPo"
-          title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          style={{ margin: "auto", display: "block" }}
-        ></iframe>
-        <br />
-        <button onClick={() => history.goBack()}>
-          Go back to room selection
-        </button>
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography component="h3">
+                  The controller (your mobile)
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={mobileGUI} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  The controller looks like the image above. There are four
+                  buttons, 'F', 'B', 'reset' and 'settings'
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <List>
+                  <ListItem>
+                    <ListItemText
+                      primary="F"
+                      secondary="F stands for Forward, you can think of it like an accelerator"
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary="B"
+                      secondary="B stands for break or backwards. When going forward it works like a break. When you are still it works like the reverse gear."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary="Reset"
+                      secondary="If your vehicle goes in some unwanted state such as lands on its back or gets stuck, the pressing the reset button will get you back to a checkpoint position."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary="Settings"
+                      secondary="If you would like to change some settings such as steering sensitivity these can be changed in the settings."
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  It is recommended that your phone is locked in portait mode.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  There have been some issues with mobile browsers and the
+                  orientation, the game works on Google Chrome and Safari on
+                  iOS.
+                </Typography>
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <HowToPlayItem header="Steering">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <img src={noTurnImage} className="info-image-small" alt="" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  To begin with align your phone like the image above.
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <img src={leftTurnImage} className="info-image-small" alt="" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  To turn left tilt your phone like in the image. This is to
+                  emulate a steering wheel in a car.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+              <Grid item xs={12}>
+                <img src={rightTurnImage} className="info-image-small" alt="" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  To turn right tilt your phone like in the image above.
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography component="h3">More on Steering</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  Your phone knows about its orientation relative to the world.
+                  There are 3 axis your phone can rotate by and there correspond
+                  to value, these values and axis are:
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                Beta
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={betaGIF} component="img" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+
+              <Grid item xs={12}>
+                Alpha
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={alphaGIF} component="img" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider variant="middle" />
+              </Grid>
+
+              <Grid item xs={12}>
+                Gamma
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={gammaGIF} component="img" />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  The vehicle is steered by turing your phone like demonstrated
+                  in the first image, so the beta value dictates the steering.
+                </Typography>
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <Grid item xs={12}>
+            <iframe
+              src="https://www.youtube.com/embed/0YBLvMXrdPo"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{ margin: "auto", display: "block" }}
+            ></iframe>
+          </Grid>
+        </Grid>
       </div>
     </AppContainer>
   );

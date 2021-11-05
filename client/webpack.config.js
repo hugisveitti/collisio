@@ -1,8 +1,11 @@
 const path = require('path')
 
+// if issue with images go to "import-png.d.ts"
 module.exports = {
   mode: 'development',
-  entry: { index: './src/index.tsx' },
+  entry: {
+    index: './src/index.tsx',
+  },
   devtool: 'inline-source-map',
   devServer: {
     static: './dist'
@@ -19,8 +22,8 @@ module.exports = {
         use: ["style-loader", "css-loader"]
       },
       {
-        test: /\.(png|jpg|PNG)$/i,
-        loader: 'file-loader',
+        test: /\.(png|jpg|PNG|gif|GIF)$/i,
+        loader: 'url-loader',
         options: {
           name: 'images/[name].[ext]'
         },
