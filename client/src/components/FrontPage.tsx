@@ -20,6 +20,7 @@ import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 import { getDeviceType } from "../utils/settings";
 import AvailableRoomsComponent from "./AvailableRoomsComponent";
+import CookiePrompt from "./CookiePrompt";
 import DonateButton from "./DonateButton";
 import NotLoggedInModal from "./NotLoggedInModal";
 import {
@@ -288,6 +289,7 @@ need to be logged in."
           </Grid>
         </Grid>
       </div>
+      <CookiePrompt />
     </AppContainer>
   );
 };
