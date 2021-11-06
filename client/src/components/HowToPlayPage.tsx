@@ -11,13 +11,14 @@ import connectWithLogin from "../images/connect-with-login.PNG";
 import connectWithRoomId from "../images/connect-with-roomid.PNG";
 import vehicleSelect1 from "../images/vehicle-select-1.PNG";
 import vehicleSelect2 from "../images/vehicle-select-2.PNG";
+import splitScreenImage from "../images/split-screen.PNG";
 
 import alphaGIF from "../images/alpha.gif";
 import betaGIF from "../images/beta.gif";
 import gammaGIF from "../images/gamma.gif";
 
 import AppContainer from "../containers/AppContainer";
-import { frontPagePath } from "./Routes";
+import { frontPagePath, highscorePagePath } from "./Routes";
 import {
   CardContent,
   CardHeader,
@@ -343,6 +344,53 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
               </Grid>
               <Grid item xs={12}>
                 <CardMedia src={vehicleSelect2} component="img" />
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <HowToPlayItem header="In-game settings and pausing a game">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                While in game, then you can press the 'Escape' (Esc) key on your
+                keyboard to pause the game and bring up a small menu.
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <HowToPlayItem header="Playing split screen">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  To play split screen, make upto four players connect to the
+                  same room.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  Playing splitscreen can be demanding for your computer, so you
+                  might want to close all other applications.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CardMedia src={splitScreenImage} component="img" />
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <HowToPlayItem header="Highscore">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  If you are logged in, then your score will automatically be
+                  recorded on the highscore charts which can be viewed on the{" "}
+                  <Link to={highscorePagePath}>highscore page</Link>
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  The highscores are sorted in a way such that each 'track' &
+                  'number-of-laps' pair has its own highscore list.
+                </Typography>
               </Grid>
             </Grid>
           </HowToPlayItem>

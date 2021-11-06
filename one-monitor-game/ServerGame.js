@@ -4,6 +4,7 @@ const TestRoom = require("./TestRoom")
 
 const successStatus = "success"
 const errorStatus = "error"
+const maxNumberOfPlayersInRoom = 4
 
 
 class GameMaster {
@@ -29,10 +30,16 @@ class GameMaster {
         return false
     }
 
+    isRoomFull = (roomId) => {
+        return this.rooms[roomId].isFull()
+    }
+
     setupPlayerConnectedListener(mobileSocket) {
         mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated, photoURL }) => {
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit("player-connected-callback", { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
+            } else if (this.isRoomFull(roomId)) {
+                mobileSocket.emit("player-connected-callback", { message: `Room is full. There can be a maximum of ${maxNumberOfPlayersInRoom} in one room.`, status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
                 this.rooms[roomId].addPlayer(player)
@@ -277,6 +284,10 @@ class Game {
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].startGame()
         }
+    }
+
+    isFull() {
+        return this.players.length >= maxNumberOfPlayersInRoom
     }
 
 

@@ -84,7 +84,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       "player-connected-callback",
       (response: ISocketCallback) => {
         if (response.status === "success") {
-          console.log("setting playuer", props.store);
           props.store.setPlayer(response.data.player);
           props.store.setRoomId(roomId);
           props.store.setPlayers(response.data.players);
@@ -92,7 +91,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           toast.success(response.message);
           setDisplayNameModalOpen(false);
         } else {
-          //   toast.error(response.message);
+          toast.error(response.message);
           setConnectingGuest(false);
           history.push(frontPagePath);
         }
