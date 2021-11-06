@@ -20,6 +20,7 @@ import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
 import { getDeviceType } from "../utils/settings";
 import AvailableRoomsComponent from "./AvailableRoomsComponent";
+import DonateButton from "./DonateButton";
 import NotLoggedInModal from "./NotLoggedInModal";
 import {
   highscorePagePath,
@@ -274,6 +275,16 @@ need to be logged in."
               This game is in development. If you have suggestions please email
               hugiholm1 [a] [t] gmail.com
             </p>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography>
+              Currently I am a single developer running this project. If you
+              wish to donate to the project and help it grow, that would be
+              greatly appreciated.
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <DonateButton />
           </Grid>
         </Grid>
       </div>
