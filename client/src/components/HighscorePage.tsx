@@ -19,11 +19,34 @@ import {
 import React, { useEffect, useState } from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Link } from "react-router-dom";
-import { getHighscore } from "../firebase/firebaseFunctions";
+import { getHighscore, IPlayerGameData } from "../firebase/firebaseFunctions";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 import { frontPagePath } from "./Routes";
 import AppContainer from "../containers/AppContainer";
 import "../styles/main.css";
+import { IEndOfGameInfoPlayer } from "../classes/Game";
+
+const stringInList = (s: string, sList: string[]) => {
+  for (let i = 0; i < sList.length; i++) {
+    if (s === sList[i]) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/** only display each player once */
+const filterHighscoreList = (highscoreList: IEndOfGameInfoPlayer[]) => {
+  const uniquePlayerIds: string[] = [];
+  const uniqueList: IEndOfGameInfoPlayer[] = [];
+  for (let item of highscoreList) {
+    if (!stringInList(item.playerId, uniquePlayerIds)) {
+      uniqueList.push(item);
+      uniquePlayerIds.push(item.playerId);
+    }
+  }
+  return uniqueList;
+};
 
 interface IHighscorePage {}
 
@@ -38,11 +61,28 @@ const HighscorePage = (props: IHighscorePage) => {
 
   useEffect(() => {
     getHighscore((_highscoreDict, _trackKeys, _numberOfLapsKeys) => {
-      setTrackKey(_trackKeys[0]);
+      const storageTrackKey = window.localStorage.getItem("highscoreTrackKey");
+      let cTrackKey =
+        storageTrackKey && storageTrackKey in _highscoreDict
+          ? storageTrackKey
+          : _trackKeys[0];
 
-      const newNumberOfLapKeys = Object.keys(_highscoreDict[_trackKeys[0]]);
+      setTrackKey(cTrackKey);
 
-      setNumberOfLapsKey(newNumberOfLapKeys[0]);
+      const newNumberOfLapKeys = Object.keys(_highscoreDict[cTrackKey]);
+
+      const storageNumberOfLapsKey = window.localStorage.getItem(
+        "highscoreNumberOfLapsKey"
+      );
+
+      const cNumberOfLapsKey =
+        storageNumberOfLapsKey &&
+        storageNumberOfLapsKey in _highscoreDict[cTrackKey]
+          ? storageNumberOfLapsKey
+          : newNumberOfLapKeys[0];
+
+      setNumberOfLapsKey(cNumberOfLapsKey);
+
       setNumberOfLapsKeys(newNumberOfLapKeys);
 
       setHighscoreDict(_highscoreDict);
@@ -51,6 +91,8 @@ const HighscorePage = (props: IHighscorePage) => {
       setHighscoreHasLoaded(true);
     });
   }, []);
+
+  /** use window.localStorage to remember what user was looking at */
 
   return (
     <AppContainer>
@@ -87,6 +129,10 @@ const HighscorePage = (props: IHighscorePage) => {
                     value={numberOfLapsKey}
                     onChange={(e) => {
                       setNumberOfLapsKey(e.target.value);
+                      window.localStorage.setItem(
+                        "highscoreNumberOfLapsKey",
+                        e.target.value
+                      );
                     }}
                   >
                     {numberOfLapsKeys.map((key) => (
@@ -114,6 +160,10 @@ const HighscorePage = (props: IHighscorePage) => {
                         setNumberOfLapsKey(newNumberOfLapKeys[0]);
                       }
                       setNumberOfLapsKeys(newNumberOfLapKeys);
+                      window.localStorage.setItem(
+                        "highscoreTrackKey",
+                        newTrackKey
+                      );
                     }}
                     style={{
                       minWidth: 100,
@@ -164,14 +214,14 @@ const HighscorePage = (props: IHighscorePage) => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        highscoreDict[trackKey][numberOfLapsKey].map(
-                          (playerData, i) => (
-                            <HighscorePageTableRow
-                              key={`${playerData.gameId}-${playerData.playerName}-${i}`}
-                              playerData={playerData}
-                            />
-                          )
-                        )
+                        filterHighscoreList(
+                          highscoreDict[trackKey][numberOfLapsKey]
+                        ).map((playerData, i) => (
+                          <HighscorePageTableRow
+                            key={`${playerData.gameId}-${playerData.playerName}-${i}`}
+                            playerData={playerData}
+                          />
+                        ))
                       )}
                     </TableBody>
                   </Table>

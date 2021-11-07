@@ -1,5 +1,5 @@
 import { VehicleType } from "../vehicles/VehicleConfigs"
-import { defaultPreGameSettings, GameType, IPreGameSettings, TrackType } from "./Game"
+import { defaultPreGameSettings, IPreGameSettings } from "./Game"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3
@@ -28,10 +28,16 @@ export interface IVehicleSettings {
     vehicleType: VehicleType
 }
 
+export const defaultVehicleSettings = {
+    steeringSensitivity: 0.2,
+    chaseCameraSpeed: .3,
+    useChaseCamera: false,
+    vehicleType: "normal"
+} as IVehicleSettings
+
 export interface IUserGameSettings {
     useSound: boolean
     useShadows: boolean
-
 }
 
 const defaultUserGameSettings: IUserGameSettings = {
@@ -45,12 +51,7 @@ export interface IUserSettings {
     preGameSettings: IPreGameSettings
 }
 
-export const defaultVehicleSettings = {
-    steeringSensitivity: 0.2,
-    chaseCameraSpeed: .3,
-    useChaseCamera: false,
-    vehicleType: "normal"
-} as IVehicleSettings
+
 
 export const defaultUserSettings = {
     vehicleSettings: defaultVehicleSettings,

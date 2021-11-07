@@ -1,6 +1,11 @@
 import { Button, Collapse, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
+/**
+ * TODO:
+ * Need to learn how to have the user decide how many cookies she would like to use
+ */
+
 const CookiePrompt = () => {
   const [showPrompt, setShowPrompt] = useState(true);
 
