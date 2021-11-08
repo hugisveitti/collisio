@@ -40,61 +40,61 @@ si.mem()
 
 const buildFolder = "dist"
 
-app.use(express.static(path.join(__dirname, `./client/${buildFolder}`)));
-app.use(express.static(path.join(__dirname, `./client/src`)));
+app.use(express.static(path.join(__dirname, `./public/${buildFolder}`)));
+app.use(express.static(path.join(__dirname, `./public/src`)));
 
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/test", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/test.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/test.html`));
 });
 
 // There must be some better way to do this shit
 app.get("/wait", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/wait/:gameId", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/game", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/game/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/controls", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/how-to-play", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/highscores", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/private-profile", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/public-profile/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/show-room", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/index.html`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/index.html`));
 });
 
 app.get("/ammo.wasm.js", (req, res) => {
-    res.sendFile(path.join(__dirname, `./client/${buildFolder}/ammo/ammo.wasm.js`));
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/ammo/ammo.wasm.js`));
 })
 
 app.get("/hello", (req, res) => {
