@@ -1,7 +1,7 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh, ExtendedObject3D, Scene3D } from "enable3d";
 import { defaultVehicleSettings, IVehicleSettings } from '../classes/User';
-import { GameTime } from '../one-monitor-game/GameTimeClass';
+import { GameTime } from '../game/GameTimeClass';
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 
 

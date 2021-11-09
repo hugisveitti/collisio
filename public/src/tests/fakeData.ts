@@ -1,4 +1,4 @@
-import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo } from "../classes/Game";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { saveGameData } from "../firebase/firebaseFunctions";
 import { TrackType } from "../shared-backend/shared-stuff";
 
@@ -41,7 +41,7 @@ export const createFakeHighscoreData = () => {
         const playerTotalTimes = []
         const playerLapTimes = []
 
-        const playerData: IEndOfGameInfoPlayer[] = []
+        const playerData: IEndOfRaceInfoPlayer[] = []
 
         const playerGameInfos: IPlayerGameInfo[] = []
         for (let player of players) {
@@ -87,7 +87,7 @@ export const createFakeHighscoreData = () => {
                 vehicleType: "test"
             })
         }
-        const gameData: IEndOfGameInfoGame = {
+        const gameData: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
             numberOfLaps,
             gameId,
@@ -99,6 +99,8 @@ export const createFakeHighscoreData = () => {
         console.log("###saving data")
         console.log("GAMEDATA", gameData)
         console.log("PlayerDATA", playerData)
-        saveGameData(playerData, gameData)
+        saveGameData(playerData, gameData, (gameDataInfo) => {
+            console.log("interesting game data in fake data", gameDataInfo)
+        })
     }
 }

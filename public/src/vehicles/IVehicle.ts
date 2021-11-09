@@ -1,6 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { IVehicleSettings } from '../classes/User';
-import { GameTime } from '../one-monitor-game/GameTimeClass';
+import { GameTime } from '../game/GameTimeClass';
 
 export interface SimpleVector {
     x: number

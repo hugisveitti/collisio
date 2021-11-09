@@ -127,7 +127,7 @@ export const gameItems = {
         collisionFlags: 1,
         shape: "concave",
         bounciness: structureBounciness,
-        castsShadow: false,
+        castsShadow: false, /**this should be precalculated */
         receiveShadow: true
     },
     "traffic-cone": {

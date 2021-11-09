@@ -1,31 +1,9 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 /** toDO fix this shit */
 var express = require("express");
-var path = __importStar(require("path"));
-var si = __importStar(require("systeminformation"));
+var path = require("path");
+var si = require("systeminformation");
 var app = express();
 // promises style - new since version 3
 si.cpu()
@@ -33,8 +11,7 @@ si.cpu()
     console.log("####CPU Info#####");
     console.log(data);
     console.log("#####END CPU INFO#####");
-})
-    .catch(function (error) { return console.error(error); });
+})["catch"](function (error) { return console.error(error); });
 var byteToGig = function (byte) {
     return byte / (Math.pow(1024, 3));
 };
@@ -44,8 +21,7 @@ si.mem()
     console.log("Total", byteToGig(data.total));
     console.log("Free", byteToGig(data.free));
     console.log("#####END Memory INFO#####");
-})
-    .catch(function (error) { return console.error(error); });
+})["catch"](function (error) { return console.error(error); });
 var port = process.env.PORT || 5000;
 // app.use(function (_:Request, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
@@ -59,11 +35,14 @@ var buildFolder = "dist";
 app.use(express.static(path.join(__dirname, "../public/" + buildFolder)));
 app.use(express.static(path.join(__dirname, "../public/src")));
 var indexHTMLPath = "../public/" + buildFolder + "/index.html";
+app.get("/test", function (_, res) {
+    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
+});
+app.get("/ammo.wasm.js", function (_, res) {
+    res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
+});
 app.get("/", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/test", function (_, res) {
-    res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/test.html"));
 });
 // There must be some better way to do this shit
 app.get("/wait", function (_, res) {
@@ -75,9 +54,9 @@ app.get("/wait/:gameId", function (_, res) {
 app.get("/game", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
-app.get("/game/:id", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+// app.get("/game/:id", (_: Request, res: Response) => {
+//     res.sendFile(path.join(__dirname, indexHTMLPath));
+// });
 app.get("/controls", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
@@ -96,18 +75,12 @@ app.get("/public-profile/:id", function (_, res) {
 app.get("/show-room", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
-app.get("/ammo.wasm.js", function (_, res) {
-    res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
-});
-app.get("/hello", function (_, res) {
-    res.send("hello please");
-});
 var server = app.listen(port, function () {
     console.log("listening on port " + port);
 });
-var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
+var ServerGame_1 = require("./one-monitor-game/ServerGame");
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
-var gameMaster = new ServerGame_1.default(io);
+var gameMaster = new ServerGame_1["default"](io);
 io.on("connection", function (socket) {
     gameMaster.addSocket(socket);
 });

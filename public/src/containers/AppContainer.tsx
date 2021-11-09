@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   Modal,
 } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import HelpIcon from "@mui/icons-material/Help";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
@@ -41,9 +41,6 @@ const AppContainer = (props: IAppContainer) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const user = useContext(UserContext);
-  useEffect(() => {
-    console.log("user display name changed");
-  }, [user?.displayName]);
 
   const renderLoginLogoutButton = () => {
     if (user) {

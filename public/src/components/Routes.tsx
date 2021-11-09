@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { defaultPreGameSettings } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
+import { getDeviceType, inTestMode } from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
-import GameRoom from "./GameRoom";
+import GameRoom from "./gameRoom/GameRoom";
 import HighscorePage from "./HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import OneMonitorFrontPage from "./FrontPage";
@@ -20,7 +20,11 @@ import {
 } from "../firebase/firebaseFunctions";
 import { defaultUserSettings } from "../classes/User";
 import { CircularProgress } from "@mui/material";
-import { IPlayerInfo } from "../shared-backend/shared-stuff";
+import {
+  IPlayerInfo,
+  MobileControls,
+  VehicleControls,
+} from "../shared-backend/shared-stuff";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -47,6 +51,24 @@ const Routes = () => {
   useEffect(() => {
     const newSocket = createSocket(deviceType);
     setSocket(newSocket);
+
+    if (inTestMode) {
+      const _player: IPlayerInfo = {
+        playerName: "test",
+        isLeader: true,
+        teamName: "test",
+        playerNumber: 0,
+        mobileControls: new MobileControls(),
+        vehicleControls: new VehicleControls(),
+        teamNumber: 0,
+        id: "0",
+        isAuthenticated: false,
+        vehicleType: "f1",
+        isConnected: true,
+      };
+      setPlayers([_player]);
+      setPlayer(_player);
+    }
   }, []);
 
   const store = {
@@ -63,7 +85,6 @@ const Routes = () => {
   } as IStore;
 
   const user = useContext(UserContext);
-  console.log("routes!");
   useEffect(() => {
     if (user?.uid) {
       getDBUserSettings(user.uid, (dbUserSettings) => {
@@ -83,7 +104,7 @@ const Routes = () => {
 
   if (!socket) return <CircularProgress />;
   return (
-    <Router basename="/">
+    <Router>
       <Switch>
         <Route
           exact

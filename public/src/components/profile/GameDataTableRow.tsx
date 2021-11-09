@@ -2,12 +2,12 @@ import { Collapse, Icon, IconButton, TableCell, TableRow } from "@mui/material";
 import React, { useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { IEndOfGameInfoPlayer } from "../../classes/Game";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { deletePlayerGameData, IUser } from "../../firebase/firebaseFunctions";
 
 interface IProps {
-  playerData: IEndOfGameInfoPlayer;
+  playerData: IEndOfRaceInfoPlayer;
   userId: string;
 }
 

@@ -19,12 +19,15 @@ import {
 import React, { useEffect, useState } from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Link } from "react-router-dom";
-import { getHighscore, IPlayerGameData } from "../firebase/firebaseFunctions";
+import {
+  getAllHighscore,
+  getUniqueHighscore,
+} from "../firebase/firebaseFunctions";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 import { frontPagePath } from "./Routes";
 import AppContainer from "../containers/AppContainer";
 import "../styles/main.css";
-import { IEndOfGameInfoPlayer } from "../classes/Game";
+import { IEndOfRaceInfoPlayer } from "../classes/Game";
 
 const stringInList = (s: string, sList: string[]) => {
   for (let i = 0; i < sList.length; i++) {
@@ -36,9 +39,9 @@ const stringInList = (s: string, sList: string[]) => {
 };
 
 /** only display each player once */
-const filterHighscoreList = (highscoreList: IEndOfGameInfoPlayer[]) => {
+const filterHighscoreList = (highscoreList: IEndOfRaceInfoPlayer[]) => {
   const uniquePlayerIds: string[] = [];
-  const uniqueList: IEndOfGameInfoPlayer[] = [];
+  const uniqueList: IEndOfRaceInfoPlayer[] = [];
   for (let item of highscoreList) {
     if (!stringInList(item.playerId, uniquePlayerIds)) {
       uniqueList.push(item);
@@ -60,7 +63,9 @@ const HighscorePage = (props: IHighscorePage) => {
   const [highscoreHasLoaded, setHighscoreHasLoaded] = useState(false);
 
   useEffect(() => {
-    getHighscore((_highscoreDict, _trackKeys, _numberOfLapsKeys) => {
+    getUniqueHighscore((_highscoreDict) => {
+      const _trackKeys = Object.keys(_highscoreDict);
+      console.log("track keys", _trackKeys);
       const storageTrackKey = window.localStorage.getItem("highscoreTrackKey");
       let cTrackKey =
         storageTrackKey && storageTrackKey in _highscoreDict
@@ -92,6 +97,11 @@ const HighscorePage = (props: IHighscorePage) => {
     });
   }, []);
 
+  // console.log(
+  //   "highscoreDict[trackKey][numberOfLapsKey]",
+  //   highscoreDict?[trackKey]?[numberOfLapsKey]
+  // );
+  console.log("more", highscoreDict, trackKey, numberOfLapsKey);
   /** use window.localStorage to remember what user was looking at */
 
   return (
@@ -214,14 +224,18 @@ const HighscorePage = (props: IHighscorePage) => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        filterHighscoreList(
+                        Object.keys(
                           highscoreDict[trackKey][numberOfLapsKey]
-                        ).map((playerData, i) => (
-                          <HighscorePageTableRow
-                            key={`${playerData.gameId}-${playerData.playerName}-${i}`}
-                            playerData={playerData}
-                          />
-                        ))
+                        ).map((userId: string, i) => {
+                          const playerData =
+                            highscoreDict[trackKey][numberOfLapsKey][userId];
+                          return (
+                            <HighscorePageTableRow
+                              key={`${playerData.gameId}-${playerData.playerName}-${i}`}
+                              playerData={playerData}
+                            />
+                          );
+                        })
                       )}
                     </TableBody>
                   </Table>

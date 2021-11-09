@@ -51,13 +51,19 @@ app.use(express.static(path.join(__dirname, `../public/src`)));
 
 const indexHTMLPath = `../public/${buildFolder}/index.html`
 
+app.get("/test", (_: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
+});
+
+app.get("/ammo.wasm.js", (_: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, `./public/${buildFolder}/ammo/ammo.wasm.js`));
+})
+
+
 app.get("/", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("/test", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, `./public/${buildFolder}/test.html`));
-});
 
 // There must be some better way to do this shit
 app.get("/wait", (_: Request, res: Response) => {
@@ -72,9 +78,9 @@ app.get("/game", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("/game/:id", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+// app.get("/game/:id", (_: Request, res: Response) => {
+//     res.sendFile(path.join(__dirname, indexHTMLPath));
+// });
 
 app.get("/controls", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
@@ -100,13 +106,8 @@ app.get("/show-room", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("/ammo.wasm.js", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, `./public/${buildFolder}/ammo/ammo.wasm.js`));
-})
 
-app.get("/hello", (_: Request, res: Response) => {
-    res.send("hello please")
-})
+
 
 const server = app.listen(port, () => {
     console.log(`listening on port ${port}`)

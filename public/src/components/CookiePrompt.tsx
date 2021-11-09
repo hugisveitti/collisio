@@ -1,4 +1,4 @@
-import { Button, Collapse, Grid, Typography } from "@mui/material";
+import { Button, Slide, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 /**
@@ -7,17 +7,19 @@ import React, { useEffect, useState } from "react";
  */
 
 const CookiePrompt = () => {
-  const [showPrompt, setShowPrompt] = useState(true);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
-    const hasShownPrompt = window.localStorage.getItem("cookiePrompt");
-    setShowPrompt(!eval(hasShownPrompt));
+    setTimeout(() => {
+      const hasShownPrompt = window.localStorage.getItem("cookiePrompt");
+      setShowPrompt(!eval(hasShownPrompt));
+    }, 2000);
   }, []);
 
   if (!showPrompt) return null;
 
   return (
-    <Collapse in={showPrompt} easing="exit">
+    <Slide in={showPrompt} direction="up">
       <Grid
         container
         spacing={1}
@@ -51,7 +53,7 @@ const CookiePrompt = () => {
           </Button>
         </Grid>
       </Grid>
-    </Collapse>
+    </Slide>
   );
 };
 

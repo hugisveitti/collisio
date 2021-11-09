@@ -29,11 +29,6 @@ getRedirectResult(auth).then(res => {
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
-export const usersRefPath = "users"
-export const highscoreRefPath = "highscore"
-export const playerGameDataRefPath = "player-game-data"
-export const gameDataRefPath = "game-data"
-export const userGamesRefPath = "games"
 
 
 export const signInWithGoogle = (usePopup?: boolean) => {

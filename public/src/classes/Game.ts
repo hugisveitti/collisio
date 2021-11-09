@@ -33,7 +33,7 @@ export const defaultPreGameSettings: IPreGameSettings = {
 }
 
 // info about individual players
-export interface IEndOfGameInfoPlayer {
+export interface IEndOfRaceInfoPlayer {
     totalTime: number
     numberOfLaps: number
     playerId?: string
@@ -63,7 +63,7 @@ export interface IPlayerGameInfo {
 }
 
 // info about the game
-export interface IEndOfGameInfoGame {
+export interface IEndOfRaceInfoGame {
 
     numberOfLaps: number
     playersInfo: IPlayerGameInfo[]
@@ -72,3 +72,15 @@ export interface IEndOfGameInfoGame {
     roomId: string
     date: Date
 }
+
+/** while race is going on */
+export interface IRaceTimeInfo {
+    playerName: string
+    bestLapTime: number
+    totalTime: number
+    currentLapTime: number
+    lapNumber: number /**  show "current lap / totalNumberOfLaps" */
+    numberOfLaps: number
+}
+
+

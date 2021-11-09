@@ -3,7 +3,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { defaultPreGameSettings } from "../classes/Game";
 import { defaultUserSettings } from "../classes/User";
-import GameRoom from "../components/GameRoom";
+import GameRoom from "../components/gameRoom/GameRoom";
 // import GameRoom from "../components/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";

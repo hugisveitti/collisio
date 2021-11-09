@@ -2,10 +2,10 @@ import { Collapse, IconButton, TableCell, TableRow } from "@mui/material";
 import React, { useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { IEndOfGameInfoPlayer } from "../classes/Game";
+import { IEndOfRaceInfoPlayer } from "../classes/Game";
 
 interface IProps {
-  playerData: IEndOfGameInfoPlayer;
+  playerData: IEndOfRaceInfoPlayer;
 }
 
 export default (props: IProps) => {
