@@ -11,17 +11,16 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
-import {
-  allTrackTypes,
-  IPlayerInfo,
-  IPreGameSettings,
-  TrackType,
-} from "../classes/Game";
+import { allTrackTypes, IPreGameSettings } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
 import { setDBUserSettings } from "../firebase/firebaseFunctions";
 import { IGameScene } from "../one-monitor-game/IGameScene";
-import { RaceGameScene } from "../one-monitor-game/RaceGameScene";
-import { allVehicleTypes, VehicleType } from "../vehicles/VehicleConfigs";
+import {
+  IPlayerInfo,
+  TrackType,
+  VehicleType,
+} from "../shared-backend/shared-stuff";
+import { allVehicleTypes } from "../vehicles/VehicleConfigs";
 import { frontPagePath } from "./Routes";
 import { IStore } from "./store";
 

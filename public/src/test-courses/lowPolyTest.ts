@@ -3,12 +3,11 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
-import { defaultPreGameSettings, IPreGameSettings, TrackType } from "../classes/Game"
+import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
-import { defaultVehicleConfig, IVehicleConfig, VehicleType } from "../vehicles/VehicleConfigs";
+import { defaultVehicleConfig, IVehicleConfig } from "../vehicles/VehicleConfigs";
 import "../one-monitor-game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/RaceCourse"
-import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
 import { IGameScene } from "../one-monitor-game/IGameScene"
@@ -16,6 +15,7 @@ import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../one-monitor-game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
+import { VehicleControls, VehicleType, MobileControls, TrackType } from "../shared-backend/shared-stuff"
 
 const vechicleFov = 60
 

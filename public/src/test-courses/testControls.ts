@@ -1,8 +1,7 @@
 import { Socket } from "socket.io-client"
-import { IPlayerInfo } from "../classes/Game"
 import { IVehicle } from "../vehicles/IVehicle"
-import { MobileControls, VehicleControls } from "../utils/ControlsClasses"
 import { toast } from "react-toastify"
+import { MobileControls, VehicleControls } from "../shared-backend/shared-stuff"
 
 
 let speed = 40

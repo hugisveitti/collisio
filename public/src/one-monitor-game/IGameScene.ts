@@ -1,6 +1,5 @@
-import { TrackType } from "../classes/Game";
 import { IUserGameSettings } from "../classes/User";
-import { VehicleType } from "../vehicles/VehicleConfigs";
+import { VehicleType, TrackType } from "../shared-backend/shared-stuff";
 
 export interface IGameScene {
     togglePauseGame: () => void

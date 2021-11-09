@@ -12,7 +12,7 @@ import { v4 as uuid } from "uuid";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { IPlayerConnection, IPlayerInfo } from "../../classes/Game";
+import { IPlayerConnection } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
@@ -30,6 +30,7 @@ import {
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import BasicModal from "../modal/BasicModal";
+import { IPlayerInfo } from "../../shared-backend/shared-stuff";
 
 interface WaitParamType {
   roomId: string;

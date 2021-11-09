@@ -1,11 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import {
-  defaultPreGameSettings,
-  IPreGameSettings,
-  IPlayerInfo,
-} from "../classes/Game";
+import { defaultPreGameSettings } from "../classes/Game";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType } from "../utils/settings";
 import ControlsRoom from "../mobile/ControlsRoom";
@@ -23,6 +19,8 @@ import {
   setDBUserSettings,
 } from "../firebase/firebaseFunctions";
 import { defaultUserSettings } from "../classes/User";
+import { CircularProgress } from "@mui/material";
+import { IPlayerInfo } from "../shared-backend/shared-stuff";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -65,7 +63,7 @@ const Routes = () => {
   } as IStore;
 
   const user = useContext(UserContext);
-
+  console.log("routes!");
   useEffect(() => {
     if (user?.uid) {
       getDBUserSettings(user.uid, (dbUserSettings) => {
@@ -83,7 +81,7 @@ const Routes = () => {
     }
   }, [user]);
 
-  if (!socket) return null;
+  if (!socket) return <CircularProgress />;
   return (
     <Router basename="/">
       <Switch>

@@ -1,6 +1,6 @@
+import { VehicleType } from "../shared-backend/shared-stuff"
 import { SimpleVector } from "./IVehicle"
 
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck"
 
 export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "Normal", type: "normal" },

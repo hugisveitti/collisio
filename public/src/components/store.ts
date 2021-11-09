@@ -1,5 +1,6 @@
-import { IPreGameSettings, IPlayerInfo } from "../classes/Game";
+import { IPreGameSettings } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
+import { IPlayerInfo } from "../shared-backend/shared-stuff";
 
 
 export interface IStore {

@@ -1,7 +1,6 @@
 import { Socket } from "socket.io-client"
-import { IPlayerInfo } from "../classes/Game"
+import { MobileControls, VehicleControls } from "../shared-backend/shared-stuff"
 import { IVehicle } from "../vehicles/IVehicle"
-import { MobileControls, VehicleControls } from "./ControlsClasses"
 
 
 let speed = 40
@@ -58,7 +57,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
      */
 
     socket.on("get-controls", (data) => {
-        const { players } = data as { players: IPlayerInfo[] }
+        const { players } = data
         for (let i = 0; i < players.length; i++) {
             driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)
         }

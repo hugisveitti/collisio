@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import {
-  IPlayerInfo,
-  defaultPreGameSettings,
-  IPlayerConnection,
-} from "../classes/Game";
+import { defaultPreGameSettings } from "../classes/Game";
 import { defaultUserSettings } from "../classes/User";
 import GameRoom from "../components/GameRoom";
 // import GameRoom from "../components/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";
-import { createSocket, ISocketCallback } from "../utils/connectSocket";
-import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
+import {
+  IPlayerInfo,
+  MobileControls,
+  VehicleControls,
+  VehicleType,
+} from "../shared-backend/shared-stuff";
+import { createSocket } from "../utils/connectSocket";
 import { getDeviceType } from "../utils/settings";
-import { socketHandleStartGame } from "../utils/socketFunctions";
-import { VehicleType } from "../vehicles/VehicleConfigs";
 
 const TestContainer = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);

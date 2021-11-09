@@ -32,3 +32,9 @@ export const isIphone = () => {
 export const baseurl = "http://localhost:5000/"
 
 export const inTestMode = false
+
+export const outputDir = "dist"
+
+export const getStaticPath = (path: string) => {
+    return `${path}`
+}

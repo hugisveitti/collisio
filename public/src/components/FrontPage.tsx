@@ -233,9 +233,9 @@ need to be logged in."
           </Grid>
           <Grid item xs={12}>
             <Typography color="gray">
-              Create a room, you and 3 friends connect to that room with your
-              mobile phones. You can also play singleplayer and compete againt
-              highscores.
+              Create a room, you and upto 3 friends connect to that room with
+              your mobile phones. You can also play singleplayer and compete
+              againt highscores.
             </Typography>
           </Grid>
 

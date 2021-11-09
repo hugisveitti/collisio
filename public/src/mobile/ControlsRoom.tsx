@@ -8,10 +8,8 @@ import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { getDBUserSettings } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
-import {
-  MobileControls,
-  setHasAskedDeviceOrientation,
-} from "../utils/ControlsClasses";
+import { MobileControls } from "../shared-backend/shared-stuff";
+import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
 import { isIphone } from "../utils/settings";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";

@@ -1,4 +1,4 @@
-import { VehicleType } from "../vehicles/VehicleConfigs"
+import { VehicleType } from "../shared-backend/shared-stuff"
 import { defaultPreGameSettings, IPreGameSettings } from "./Game"
 
 export const minSteeringSensitivity = 0.1

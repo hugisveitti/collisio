@@ -1,11 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
-import { toast } from "react-toastify";
-import { IPlayerInfo } from "../../classes/Game";
-import { IUser } from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
-import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
-import { VehicleType } from "../../vehicles/VehicleConfigs";
+import { VehicleType } from "../../shared-backend/shared-stuff";
 
 interface IVehicleSelect {
   value: VehicleType;

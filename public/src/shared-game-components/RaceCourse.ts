@@ -3,10 +3,11 @@ import { CollisionEvent } from "@enable3d/common/dist/types";
 import { GLTF, GLTFLoader, LoadingManager, Group } from "@enable3d/three-wrapper/dist";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 
-import { TrackType } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
 import { IRaceCourse } from "./ICourse";
+import { getStaticPath } from '../utils/settings';
+import { TrackType } from '../shared-backend/shared-stuff';
 
 
 const loadDiv = document.createElement("div")
@@ -87,7 +88,7 @@ export class RaceCourse implements IRaceCourse {
 
         const loader = new GLTFLoader(manager)
 
-        loader.load(`models/${this.trackName}.gltf`, (gltf: GLTF) => {
+        loader.load(getStaticPath(`models/${this.trackName}.gltf`), (gltf: GLTF) => {
             this.scene.scene.add(gltf.scene)
             this.courseScene = gltf.scene
             console.log("gltf", gltf)

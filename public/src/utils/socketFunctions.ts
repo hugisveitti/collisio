@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { IPlayerInfo } from "../classes/Game";
+import { IPlayerInfo } from "../shared-backend/shared-stuff";
 import { ISocketCallback } from "./connectSocket";
 
 

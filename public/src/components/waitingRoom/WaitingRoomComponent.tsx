@@ -26,9 +26,9 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
-import { IPlayerInfo } from "../../classes/Game";
 import { IVehicleSettings } from "../../classes/User";
 import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
+import { IPlayerInfo, VehicleType } from "../../shared-backend/shared-stuff";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
@@ -36,7 +36,6 @@ import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
-import { VehicleType } from "../../vehicles/VehicleConfigs";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";

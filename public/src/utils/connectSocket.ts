@@ -15,6 +15,8 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
         window.location.href = "https://" + window.location.href.slice(7, window.location.href.length)
     }
 
+    // return
+
     const socket = io()
 
 
@@ -28,7 +30,7 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
     if (deviceType === "mobile") {
         if (!window.DeviceMotionEvent) {
-            alert("Device motion not supported in the browser, please use Google Chrome or add 'https://' instead of 'http://'")
+            toast("Device motion not supported in the browser, please use Google Chrome")
         } else {
             console.log("device motion supported")
         }

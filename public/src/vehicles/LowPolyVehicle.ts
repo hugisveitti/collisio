@@ -5,7 +5,9 @@ import { ExtendedMesh, Scene3D } from "enable3d";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { vehicleConfigs, VehicleType } from "./VehicleConfigs";
+import { vehicleConfigs } from "./VehicleConfigs";
+import { getStaticPath } from "../utils/settings";
+import { VehicleType } from "../shared-backend/shared-stuff";
 
 
 
@@ -708,7 +710,7 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
     const loader = new GLTFLoader()
 
-    loader.load(`models/${vehicleConfigs[vehicleType].path}`, (gltf: GLTF) => {
+    loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
         let tires = [] as ExtendedObject3D[]
         let chassises = [] as ExtendedObject3D[]
         for (let child of gltf.scene.children) {

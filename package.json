@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "nodemon"
+    "start": "node ts-server/server.js",
+    "dev": "nodemon ts-server/server.js"
   },
   "author": "Hugi Holm",
   "license": "ISC",
@@ -16,5 +16,8 @@
     "systeminformation": "^5.9.9",
     "uuid": "^8.3.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/uuid": "^8.3.1"
+  }
 }

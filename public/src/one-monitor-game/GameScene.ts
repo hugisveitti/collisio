@@ -4,24 +4,37 @@ import { Scene3D } from "enable3d";
 import { Howl } from "howler";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
-import { defaultPreGameSettings, IPlayerInfo, IPreGameSettings, TrackType } from "../classes/Game";
+import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
+import { IPlayerInfo, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../shared-game-components/ICourse";
-import { beepC4, beepE4 } from "../sound/soundPlayer";
 import { addControls } from "../utils/controls";
-import { VehicleControls } from "../utils/ControlsClasses";
+import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
 import { IGameScene } from "./IGameScene";
+
+
 
 
 const vechicleFov = 60
 const possibleColors = [0x9e4018, 0x0d2666, 0x1d8a47, 0x61f72a, "brown", "black", "white"]
 
 
+const beepC4 = new Howl({
+    src: [getStaticPath("sound/beepC4.mp3")],
+    html5: true,
+})
+
+const beepE4 = new Howl({
+    src: [getStaticPath("sound/beepE4.mp3")],
+    html5: true
+})
+
+
 
 const gameSong = new Howl({
-    src: ["/sound/song2.mp3"],
+    src: [getStaticPath("sound/song2.mp3")],
     html5: true,
     volume: .5,
 

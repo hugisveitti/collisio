@@ -2,13 +2,13 @@ import { Color } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
-import { IPreGameSettings, IPlayerInfo } from "../classes/Game";
+import { IPreGameSettings } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/SquaredCourse";
 import { addControls } from "../utils/controls";
-import { VehicleControls } from "../utils/ControlsClasses";
 import "./game-styles.css";
 import { NormalVehicle } from "../vehicles/NormalVehicle";
+import { IPlayerInfo, VehicleControls } from "../shared-backend/shared-stuff";
 
 
 const vechicleFov = 60

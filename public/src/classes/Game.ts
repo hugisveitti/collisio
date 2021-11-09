@@ -1,8 +1,5 @@
-import { VehicleType } from "../vehicles/VehicleConfigs";
-import { MobileControls, VehicleControls } from "../utils/ControlsClasses";
+import { TrackType, GameType, VehicleType } from "../shared-backend/shared-stuff";
 
-export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
-export type GameType = "ball" | "race"
 
 export const allTrackTypes: { name: string, type: TrackType }[] = [
     {
@@ -19,24 +16,6 @@ export interface IPlayerConnection {
     /** auth */
     isAuthenticated: boolean
 }
-
-export interface IPlayerInfo {
-    playerName: string
-    /** only for multiple monitor games */
-    bothConnected?: boolean
-    isLeader: boolean
-    teamName: string
-    playerNumber: number
-    mobileControls: MobileControls
-    vehicleControls: VehicleControls
-    /** only for ball game */
-    teamNumber?: number
-    id: string
-    isAuthenticated: boolean
-    vehicleType: VehicleType
-    photoURL?: string
-}
-
 
 
 export interface IPreGameSettings {

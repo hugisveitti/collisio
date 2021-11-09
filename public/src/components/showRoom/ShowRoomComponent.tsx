@@ -9,7 +9,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { VehicleType } from "../../vehicles/VehicleConfigs";
+import { VehicleType } from "../../shared-backend/shared-stuff";
 
 const possibleVehcileTypes: VehicleType[] = [
   "f1",

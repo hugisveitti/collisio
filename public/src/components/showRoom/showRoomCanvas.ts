@@ -2,7 +2,7 @@
 import * as THREE from "@enable3d/three-wrapper/dist/index"
 import { loadLowPolyVehicleModels, } from "../../vehicles/LowPolyVehicle"
 import { getDeviceType } from "../../utils/settings"
-import { VehicleType } from "../../vehicles/VehicleConfigs"
+import { VehicleType } from "../../shared-backend/shared-stuff"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: THREE.Scene) => {
     loadLowPolyVehicleModels(vehicleType, (tires, chassises) => {

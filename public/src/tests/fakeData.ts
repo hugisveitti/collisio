@@ -1,5 +1,6 @@
-import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo, TrackType } from "../classes/Game";
+import { IEndOfGameInfoGame, IEndOfGameInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { saveGameData } from "../firebase/firebaseFunctions";
+import { TrackType } from "../shared-backend/shared-stuff";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
 const id2 = "LEzfm3UQl7b6CKUupasInidva9W2"
