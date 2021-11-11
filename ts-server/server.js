@@ -44,6 +44,9 @@ app.get("/ammo.wasm.js", function (_, res) {
 app.get("/", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
+var sendIndexHTML = function (_, res) {
+    res.sendFile(path.join(__dirname, indexHTMLPath));
+};
 // There must be some better way to do this shit
 app.get("/wait", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
@@ -57,6 +60,7 @@ app.get("/game", function (_, res) {
 // app.get("/game/:id", (_: Request, res: Response) => {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
+app.get("/premium", sendIndexHTML);
 app.get("/controls", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });

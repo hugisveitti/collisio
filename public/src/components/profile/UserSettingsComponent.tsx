@@ -19,6 +19,7 @@ import {
 import { inputBackgroundColor } from "../../providers/theme";
 import { IUserSettings, IVehicleSettings } from "../../classes/User";
 import VehicleSelect from "../inputs/VehicleSelect";
+import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 
 interface IUserSettingsComponent {
   userId: string;
@@ -72,6 +73,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <VehicleSelect
+                  excludedVehicles={nonactiveVehcileTypes}
                   value={vehicleSettings.vehicleType}
                   onChange={(vt) => {
                     updateVehicleSettings("vehicleType", vt);

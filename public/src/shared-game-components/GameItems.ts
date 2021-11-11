@@ -1,4 +1,5 @@
 const structureBounciness = 0.2
+const treeBounciness = 0.1
 
 interface IGameItem {
     collisionFlags: number,
@@ -32,7 +33,7 @@ export const gameItems = {
         shape: "concave",
         // notAddPhysics: true,
         receiveShadow: true,
-        bounciness: .1
+        bounciness: .05
     },
     "checkered-flag": {
         collisionFlags: 1,
@@ -60,18 +61,19 @@ export const gameItems = {
         collisionFlags: 1,
         shape: "concave",
         castsShadow: false,
-
+        bounciness: treeBounciness,
     },
     "pine": {
         collisionFlags: 1,
         shape: "concave",
         castsShadow: false,
-
+        bounciness: treeBounciness
     },
     "leaf": {
         collisionFlags: 1,
         shape: "concave",
         castsShadow: false,
+        bounciness: treeBounciness
     },
     "checkpoint-spawn": {
         collisionFlags: -1,
@@ -140,6 +142,16 @@ export const gameItems = {
         mass: 2,
         notAddPhysics: false,
         gravityY: -50
+    },
+    "water": {
+        collisionFlags: 5,
+        shape: "concave",
+    },
+    "row-boat": {
+        collisionFlags: 1,
+        shape: "concave",
+        bounciness: structureBounciness,
+        castsShadow: false
     }
 
 } as { [key: string]: IGameItem }

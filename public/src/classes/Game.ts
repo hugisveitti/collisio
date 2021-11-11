@@ -7,6 +7,7 @@ export const allTrackTypes: { name: string, type: TrackType }[] = [
     },
     { name: "Farm track", type: "low-poly-farm-track" },
     { name: "F1 track", type: "low-poly-f1-track" },
+    { name: "Sea side", type: "sea-side-track" },
 ]
 
 export interface IPlayerConnection {

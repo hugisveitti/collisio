@@ -331,7 +331,7 @@ export class LowPolyVehicle implements IVehicle {
         if (!this.canDrive) return
 
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
-        if (this.getCurrentSpeedKmHour() > 300) {
+        if (this.getCurrentSpeedKmHour() > vehicleConfigs[this.vehicleType].maxSpeed) {
 
             eF = 0
         }
@@ -618,7 +618,7 @@ export class LowPolyVehicle implements IVehicle {
 
     setFont(font: Font) {
         this.font = font
-        this.createNameMesh()
+        // this.createNameMesh()
     }
 
     createNameMesh() {

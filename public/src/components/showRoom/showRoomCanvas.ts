@@ -39,7 +39,7 @@ const addLights = (scene: THREE.Scene) => {
 }
 
 
-let renderer, scene: THREE.Scene
+let renderer: THREE.WebGLRenderer | undefined, scene: THREE.Scene | undefined
 
 
 export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number) => {
@@ -58,7 +58,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     renderer.outputEncoding = THREE.sRGBEncoding;
-
+    console.log("width ", width)
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xbfe3dd);
@@ -98,7 +98,10 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
 
         controls.update();
-        renderer.render(scene, camera);
+        if (renderer) {
+
+            renderer.render(scene, camera);
+        }
 
     }
 
@@ -109,4 +112,11 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     // });
 
     return renderer
+}
+
+export const removeShowRoomCanvas = () => {
+    renderer.clear()
+    scene.clear()
+    scene = undefined
+    renderer = undefined
 }

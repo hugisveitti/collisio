@@ -17,7 +17,7 @@ import AppContainer from "../../containers/AppContainer";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { ISocketCallback } from "../../utils/connectSocket";
-import { getDeviceType, isIphone } from "../../utils/settings";
+import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import LoginComponent from "../LoginComponent";
 import { frontPagePath, controlsRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -258,7 +258,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   };
 
   /** usering loading be */
-  if (!onMobile && !props.store.roomId) {
+  if (!onMobile && !props.store.roomId && !inTestMode) {
     history.push(frontPagePath);
     return null;
   }

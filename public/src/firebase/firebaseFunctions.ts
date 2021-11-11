@@ -27,6 +27,7 @@ export interface IUser {
     email: string
     photoURL?: string
     uid: string
+    isPremium: boolean
 }
 
 export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) => {
@@ -62,6 +63,20 @@ export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
     }, err => {
         console.log("Error getting db user", err)
     }, { onlyOnce: true })
+}
+
+/** toDo this function
+ * I am thinking of creating a firebase list
+ * authenticated-users / ${uid} / authDetails
+ * authDetails:
+ * - date of buy
+ * - amount payed
+ *
+ * can only be written to from the server after user has payed,
+ * look into examples 
+ */
+export const getIsPremiumUser = (userId: string, callback: (isPremium: boolean) => void) => {
+    callback(false)
 }
 
 export interface IProfile {

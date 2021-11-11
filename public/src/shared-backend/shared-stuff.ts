@@ -5,8 +5,8 @@
  * So this limits the .js to one file.
  */
 
-export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course"
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck"
+export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course" | "sea-side-track"
+export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck" | "truck"
 
 export type GameType = "ball" | "race"
 

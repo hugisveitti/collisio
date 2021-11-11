@@ -1,4 +1,5 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
+import { stringInArray } from "../utils/utilFunctions"
 import { SimpleVector } from "./IVehicle"
 
 
@@ -7,8 +8,13 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "Tractor", type: "tractor" },
     { name: "F1", type: "f1" },
     { name: "Monster truck", type: "monsterTruck" },
-    { name: "test", type: "test" }
+    { name: "test", type: "test" },
+    { name: "Truck", type: "truck" }
 ]
+
+export const nonactiveVehcileTypes: VehicleType[] = ["monsterTruck", "test", "truck"]
+
+export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !stringInArray(vehicle.type, nonactiveVehcileTypes))
 
 export interface IVehicleConfig {
     wheelAxisBackPosition: number
@@ -38,6 +44,8 @@ export interface IVehicleConfig {
     rollInfluence: number
 
     inertia: SimpleVector
+
+    maxSpeed: number
 }
 
 export const defaultVehicleConfig: IVehicleConfig = {
@@ -66,7 +74,9 @@ export const defaultVehicleConfig: IVehicleConfig = {
     maxSuspensionForce: 50000,
     frictionSlip: 8.5,
     rollInfluence: .01,
-    inertia: { x: 12000, y: 2000, z: 12000 }
+    inertia: { x: 12000, y: 2000, z: 12000 },
+
+    maxSpeed: 300,
 }
 
 
@@ -156,11 +166,13 @@ export const vehicleConfigs = {
 
 
         mass: 1000,
-        engineForce: 10000,
-        breakingForce: 200,
+        engineForce: 15000,
+        breakingForce: 250,
         is4x4: false,
 
-        inertia: { x: 3000, y: 2000, z: 4000 }
+        inertia: { x: 3000, y: 2000, z: 4000 },
+
+        maxSpeed: 400
 
     },
     test: {

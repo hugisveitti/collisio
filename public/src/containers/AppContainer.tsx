@@ -1,35 +1,35 @@
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import HelpIcon from "@mui/icons-material/Help";
+import MenuIcon from "@mui/icons-material/Menu";
+import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import StarsIcon from "@mui/icons-material/Stars";
 import {
   AppBar,
   Box,
   Button,
   Drawer,
   IconButton,
-  Toolbar,
-  Typography,
   List,
-  ListItemText,
   ListItem,
   ListItemIcon,
+  ListItemText,
   Modal,
+  Toolbar,
+  Typography,
 } from "@mui/material";
 import React, { useContext, useState } from "react";
-import MenuIcon from "@mui/icons-material/Menu";
-import HelpIcon from "@mui/icons-material/Help";
-import SportsScoreIcon from "@mui/icons-material/SportsScore";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
 import { useHistory } from "react-router";
+import { ToastContainer } from "react-toastify";
+import LoginComponent from "../components/LoginComponent";
 import {
+  buyPremiumPagePath,
   frontPagePath,
   highscorePagePath,
   howToPlayPagePath,
   privateProfilePagePath,
   showRoomPagePath,
 } from "../components/Routes";
-import LoginComponent from "../components/LoginComponent";
-import { ToastContainer } from "react-toastify";
-import { IUser } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 
 interface IAppContainer {
@@ -116,6 +116,12 @@ const AppContainer = (props: IAppContainer) => {
                 <DirectionsCarIcon />
               </ListItemIcon>
               <ListItemText primary="Car room" />
+            </ListItem>
+            <ListItem button onClick={() => history.push(buyPremiumPagePath)}>
+              <ListItemIcon>
+                <StarsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Go Premium" />
             </ListItem>
           </List>
         </Box>

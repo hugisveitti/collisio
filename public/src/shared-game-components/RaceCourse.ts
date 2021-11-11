@@ -126,10 +126,40 @@ export class RaceCourse implements IRaceCourse {
                                 if (child.name.includes("hidden")) {
                                     child.visible = false
                                 }
+
                                 this.gamePhysicsObjects.push(eObject)
                             } else if (child.name.includes("ghost")) {
 
                             }
+                            if (child.name.includes("water")) {
+                                console.log("water", child)
+                                const waterObject = child
+                                const texturesPromise = Promise.all([
+                                    this.scene.load.texture('/textures/Water_1_M_Normal.jpg'),
+                                    this.scene.load.texture('/textures/Water_2_M_Normal.jpg')
+                                ])
+                                texturesPromise.then(textures => {
+                                    textures[0].needsUpdate = true
+                                    textures[1].needsUpdate = true
+
+                                    console.log("texutres", textures)
+
+                                    waterObject.visible = false
+                                    console.log("waterObject.scale", waterObject.scale)
+                                    this.scene.misc.water({
+                                        y: waterObject.position.y,
+                                        x: waterObject.position.x,
+                                        z: waterObject.position.z,
+
+                                        width: waterObject.scale.z * 2,
+                                        height: waterObject.scale.x * 2,
+                                        normalMap0: textures[0],
+                                        normalMap1: textures[1]
+                                    })
+                                })
+                            }
+
+
                             if (gameItems[key].isCourseObject) {
                                 // hacky ????
 

@@ -1,5 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
-import { createDBUser, IUser } from "../firebase/firebaseFunctions";
+import {
+  createDBUser,
+  getIsPremiumUser,
+  IUser,
+} from "../firebase/firebaseFunctions";
 import { auth } from "../firebase/firebaseInit";
 
 interface IUserProvider {
@@ -13,14 +17,17 @@ const UserProvider = (props: IUserProvider) => {
   useEffect(() => {
     const authListener = auth.onAuthStateChanged((userAuth) => {
       if (auth.currentUser && !user) {
-        const userInfo = {
-          displayName: auth.currentUser.displayName,
-          uid: auth.currentUser.uid,
-          photoURL: auth.currentUser.photoURL,
-          email: auth.currentUser.email,
-        };
-        setUser(userInfo);
-        createDBUser(userInfo);
+        getIsPremiumUser(auth.currentUser.uid, (isPremium) => {
+          const userInfo = {
+            displayName: auth.currentUser.displayName,
+            uid: auth.currentUser.uid,
+            photoURL: auth.currentUser.photoURL,
+            email: auth.currentUser.email,
+            isPremium: isPremium,
+          };
+          setUser(userInfo);
+          createDBUser(userInfo);
+        });
       } else {
         // change from null to undefined triggers useEffect in LoginComponent
         setUser(undefined);

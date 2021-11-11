@@ -1,0 +1,6 @@
+// from https://threejs.org/examples/webgl_lights_hemisphere
+// https://github.com/mrdoob/three.js/blob/master/examples/webgl_lights_hemisphere.html
+// see line document.getElementById( 'vertexShader' ).textContent
+export const skydomeVertexShader = '\n\n\t\t\tvarying vec3 vWorldPosition;\n\n\t\t\tvoid main() {\n\n\t\t\t\tvec4 worldPosition = modelMatrix * vec4( position, 1.0 );\n\t\t\t\tvWorldPosition = worldPosition.xyz;\n\n\t\t\t\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\n\t\t\t}\n\n\t\t'
+// document.getElementById( 'fragmentShader' ).textContent;
+export const skydomeFragmentShader = '\n\n\t\t\tuniform vec3 topColor;\n\t\t\tuniform vec3 bottomColor;\n\t\t\tuniform float offset;\n\t\t\tuniform float exponent;\n\n\t\t\tvarying vec3 vWorldPosition;\n\n\t\t\tvoid main() {\n\n\t\t\t\tfloat h = normalize( vWorldPosition + offset ).y;\n\t\t\t\tgl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );\n\n\t\t\t}\n\n\t\t'

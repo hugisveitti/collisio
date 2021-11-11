@@ -36,6 +36,7 @@ import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
+import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -290,6 +291,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               }
             }}
             value={props.store.player.vehicleType}
+            previewVehicle
+            excludedVehicles={nonactiveVehcileTypes}
           />
         </Grid>
       )}

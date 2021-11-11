@@ -64,6 +64,10 @@ app.get("/", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
+const sendIndexHTML = (_: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, indexHTMLPath));
+}
+
 
 // There must be some better way to do this shit
 app.get("/wait", (_: Request, res: Response) => {
@@ -81,6 +85,8 @@ app.get("/game", (_: Request, res: Response) => {
 // app.get("/game/:id", (_: Request, res: Response) => {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
+
+app.get("/premium", sendIndexHTML)
 
 app.get("/controls", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));

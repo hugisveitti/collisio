@@ -31,7 +31,11 @@ export const isIphone = () => {
 
 export const baseurl = "http://localhost:5000/"
 
-export const inTestMode = false
+/** test mode means:
+ * Not being redirected from pages
+ * can play the game with keyboard and no phone
+ */
+export const inTestMode = true
 
 
 export const getStaticPath = (path: string) => {

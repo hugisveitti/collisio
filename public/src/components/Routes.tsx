@@ -1,30 +1,31 @@
+import { CircularProgress } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { defaultPreGameSettings } from "../classes/Game";
-import { createSocket } from "../utils/connectSocket";
-import { getDeviceType, inTestMode } from "../utils/settings";
-import ControlsRoom from "../mobile/ControlsRoom";
-import GameRoom from "./gameRoom/GameRoom";
-import HighscorePage from "./HighscorePage";
-import HowToPlayPage from "./HowToPlayPage";
-import OneMonitorFrontPage from "./FrontPage";
-import PrivateProfilePage from "./profile/PrivateProfilePage";
-import { IStore } from "./store";
-import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
-import ShowRoomComponent from "./showRoom/ShowRoomComponent";
-import { UserContext } from "../providers/UserProvider";
+import { defaultUserSettings } from "../classes/User";
 import {
   getDBUserSettings,
   setDBUserSettings,
 } from "../firebase/firebaseFunctions";
-import { defaultUserSettings } from "../classes/User";
-import { CircularProgress } from "@mui/material";
+import ControlsRoom from "../mobile/ControlsRoom";
+import { UserContext } from "../providers/UserProvider";
 import {
   IPlayerInfo,
   MobileControls,
   VehicleControls,
 } from "../shared-backend/shared-stuff";
+import { createSocket } from "../utils/connectSocket";
+import { getDeviceType, inTestMode } from "../utils/settings";
+import BuyPremiumComponent from "./BuyPremiumComponent";
+import OneMonitorFrontPage from "./FrontPage";
+import GameRoom from "./gameRoom/GameRoom";
+import HighscorePage from "./HighscorePage";
+import HowToPlayPage from "./HowToPlayPage";
+import PrivateProfilePage from "./profile/PrivateProfilePage";
+import ShowRoomContainer from "./showRoom/ShowRoomContainer";
+import { IStore } from "./store";
+import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 
 export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
@@ -36,6 +37,7 @@ export const highscorePagePath = "/highscores";
 export const privateProfilePagePath = "/private-profile";
 export const publicProfilePagePath = "/public-profile/:id";
 export const showRoomPagePath = "/show-room";
+export const buyPremiumPagePath = "/premium";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -146,7 +148,11 @@ const Routes = () => {
         />
         <Route
           path={showRoomPagePath}
-          render={(props) => <ShowRoomComponent {...props} />}
+          render={(props) => <ShowRoomContainer {...props} />}
+        />
+        <Route
+          path={buyPremiumPagePath}
+          render={(props) => <BuyPremiumComponent {...props} />}
         />
       </Switch>
     </Router>

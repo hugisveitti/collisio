@@ -16,6 +16,8 @@ import { GameTime } from "../game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
 import { VehicleControls, VehicleType, MobileControls, TrackType } from "../shared-backend/shared-stuff"
+import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
+import { Console } from "console"
 
 const vechicleFov = 60
 
@@ -100,6 +102,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
         this.physics.setGravity(0, -20, 0)
+
     }
 
     async preload() {
@@ -107,7 +110,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         if (this.usingDebug) {
             this.physics.debug?.enable()
         }
-        await this.warpSpeed('-ground', "-light")
+        await this.warpSpeed('-ground', "-light", "-sky")
 
 
 
@@ -123,13 +126,42 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.scene.add(helper)
 
 
-        const hLight = new THREE.HemisphereLight(0xffffff, 1)
-        hLight.position.set(0, 1, 0)
+        // const hLight = new THREE.HemisphereLight(0xffffff, 1)
+        const hLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+        hLight.color.setHSL(0.6, 1, 0.6);
+        hLight.groundColor.setHSL(0.095, 1, 0.75);
+        hLight.position.set(0, 50, 0);
+        // hLight.position.set(0, 1, 0)
         this.scene.add(hLight)
 
         const aLight = new THREE.AmbientLight(0xffffff, 1)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
+
+        // skydome
+
+        const uniforms = {
+            "topColor": { value: new THREE.Color(0x0077ff) },
+            "bottomColor": { value: new THREE.Color(0xffffff) },
+            "offset": { value: 33 },
+            "exponent": { value: 0.6 }
+        };
+        uniforms["topColor"].value.copy(hLight.color);
+        this.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
+        this.scene.fog = new THREE.Fog(this.scene.background, 1, 5000);
+        this.scene.fog.color.copy(uniforms["bottomColor"].value);
+
+        const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
+        const skyMat = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: skydomeVertexShader,
+            fragmentShader: skydomeFragmentShader,
+            side: THREE.BackSide
+        });
+
+        const sky = new THREE.Mesh(skyGeo, skyMat);
+        this.scene.add(sky);
+
 
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -157,6 +189,12 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
                 this.vehicle.stop()
                 this.vehicle.start()
                 this.vehicle.setPosition(4, 15, 0)
+                this.vehicle.setRotation(0, 0, 0)
+            } else if (e.key === "u") {
+                this.vehicle.stop()
+                this.vehicle.start()
+                const p = this.vehicle.getPosition()
+                this.vehicle.setPosition(p.x, p.y + 5, p.z)
                 this.vehicle.setRotation(0, 0, 0)
             }
 
@@ -597,6 +635,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
         this.vehicle = new LowPolyTestVehicle(this, "blue", "test hugi", 0, this.vehicleType)
         this.createVehicle()
+
     }
 }
 
