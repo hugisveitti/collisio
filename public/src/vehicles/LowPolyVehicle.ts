@@ -84,6 +84,11 @@ export class LowPolyVehicle implements IVehicle {
 
     forwardTicks = 0
 
+    /** 
+     * if player is holding down forward then the vehicle gets to the maxspeed (300km/h)
+     * and then the maxSpeedTicks can help the vehicle gain more speed gradually
+     */
+    maxSpeedTicks: number
 
     constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
 
@@ -100,6 +105,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicleType = vehicleType
         this.isReady = false
 
+        this.maxSpeedTicks = 0
 
 
         this.mass = vehicleConfigs[this.vehicleType].mass
@@ -117,8 +123,11 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         this.chassisMesh = chassis.clone()
-        this.chassisMesh.receiveShadow = this.chassisMesh.castShadow = true
+        this.chassisMesh.receiveShadow = false
+        this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
+
+        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color)
 
 
 
@@ -174,7 +183,9 @@ export class LowPolyVehicle implements IVehicle {
 
         }
 
-        this.scene.add.existing(this.chassisMesh,)
+
+
+        this.scene.add.existing(this.chassisMesh)
 
         if (useBad) {
 
@@ -331,9 +342,14 @@ export class LowPolyVehicle implements IVehicle {
         if (!this.canDrive) return
 
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
-        if (this.getCurrentSpeedKmHour() > vehicleConfigs[this.vehicleType].maxSpeed) {
+        if (this.getCurrentSpeedKmHour() > vehicleConfigs[this.vehicleType].maxSpeed + (this.maxSpeedTicks / 10)) {
 
             eF = 0
+            this.maxSpeedTicks += 1
+        } else if (this.getCurrentSpeedKmHour() < vehicleConfigs[this.vehicleType].maxSpeed) {
+            this.maxSpeedTicks = 0
+        } else {
+            this.maxSpeedTicks -= 1
         }
         if (this.getCurrentSpeedKmHour() < 2) {
             this.break(true)
@@ -381,6 +397,19 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicle.applyEngineForce(slowBreakForce, BACK_LEFT)
         this.vehicle.applyEngineForce(slowBreakForce, BACK_RIGHT)
     };
+
+    zeroEngineForce() {
+        const ef = 0
+
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(ef, FRONT_LEFT)
+            this.vehicle.applyEngineForce(ef, FRONT_RIGHT)
+        }
+
+        this.vehicle.applyEngineForce(ef, BACK_LEFT)
+        this.vehicle.applyEngineForce(ef, BACK_RIGHT)
+    }
+
     turnLeft(angle: number) { };
     turnRight(angle: number) { };
     noTurn() {
@@ -403,7 +432,8 @@ export class LowPolyVehicle implements IVehicle {
 
     break(notBreak?: boolean) {
 
-        const breakForce = notBreak ? 0 : this.breakingForce
+        const breakForce = !!notBreak ? 0 : this.breakingForce
+        this.zeroEngineForce()
         this.vehicle.setBrake(breakForce, BACK_RIGHT)
         this.vehicle.setBrake(breakForce, BACK_LEFT)
         this.vehicle.setBrake(breakForce, FRONT_RIGHT)
@@ -713,17 +743,28 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
     loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
         let tires = [] as ExtendedObject3D[]
         let chassises = [] as ExtendedObject3D[]
+        let extraCarStuff: ExtendedObject3D
         for (let child of gltf.scene.children) {
             if (child.type === "Mesh" || child.type === "Group") {
 
                 if (child.name.includes("chassis")) {
                     let chassis = (child as ExtendedObject3D);
+                    // import to clone the material since the tires share material
+                    const material = (chassis.material as MeshStandardMaterial).clone();
+                    //  material.color = new THREE.Color("");
+                    (chassis.material as MeshStandardMaterial) = material
+                    console.log("chassis", chassis)
                     if (!onlyLoad) {
-                        chassis.geometry.center();
+                        // chassis.geometry.center();
                     }
                     chassises.push(chassis)
-                }
-                else if (child.name === "tire") {
+                } else if (child.name.includes("extra-car-stuff")) {
+                    extraCarStuff = (child as ExtendedObject3D)
+                    if (!onlyLoad) {
+                        // extraCarStuff.geometry.center()
+                    }
+
+                } else if (child.name === "tire") {
                     const tire = (child as ExtendedObject3D)
                     if (!onlyLoad) {
                         tire.geometry.center()
@@ -746,7 +787,21 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
         vehicleModels[vehicleType] = { tires, chassises }
 
+        console.log("extra car stuff", extraCarStuff)
+        console.log("chassies", chassises)
+        if (extraCarStuff) {
 
+            chassises[0].add(extraCarStuff)
+        }
+
+        console.log("chssises of 1", chassises[0])
+
+        if (!onlyLoad) {
+            for (let chassis of chassises) {
+                console.log("centering geomerty")
+                // chassis.geometry.center()
+            }
+        }
 
         callback(tires, chassises)
 

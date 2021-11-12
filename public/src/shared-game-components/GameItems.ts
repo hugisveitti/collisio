@@ -1,4 +1,4 @@
-const structureBounciness = 0.2
+const structureBounciness = 0.05
 const treeBounciness = 0.1
 
 interface IGameItem {
@@ -102,7 +102,7 @@ export const gameItems = {
     },
     "fence": {
         collisionFlags: 1,
-        shape: "convex",
+        shape: "concave",
         castsShadow: false,
         bounciness: structureBounciness,
     },

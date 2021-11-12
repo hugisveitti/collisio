@@ -3,16 +3,22 @@ import { stringInArray } from "../utils/utilFunctions"
 import { SimpleVector } from "./IVehicle"
 
 
+// #FF8000 is orange
+// #08B0000 is red
+//  0x1d8a47 is green
+export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", "black", "white"]
+
+
 export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "Normal", type: "normal" },
     { name: "Tractor", type: "tractor" },
     { name: "F1", type: "f1" },
-    { name: "Monster truck", type: "monsterTruck" },
+    // { name: "Monster truck", type: "monsterTruck" },
     { name: "test", type: "test" },
-    { name: "Truck", type: "truck" }
+    { name: "Off roader", type: "offRoader" }
 ]
 
-export const nonactiveVehcileTypes: VehicleType[] = ["monsterTruck", "test", "truck"]
+export const nonactiveVehcileTypes: VehicleType[] = ["test"]
 
 export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !stringInArray(vehicle.type, nonactiveVehcileTypes))
 
@@ -83,14 +89,14 @@ export const defaultVehicleConfig: IVehicleConfig = {
 export const vehicleConfigs = {
     normal: {
         ...defaultVehicleConfig,
-        wheelAxisBackPosition: -1.65,
-        wheelRadiusBack: 0.63 / 2,
-        wheelHalfTrackBack: .9,
+        wheelAxisBackPosition: -3.5,
+        wheelRadiusBack: 1 / 2,
+        wheelHalfTrackBack: 1.5,
         wheelAxisHeightBack: 0,
 
         wheelAxisFrontPosition: 1.35,
-        wheelRadiusFront: 0.63 / 2,
-        wheelHalfTrackFront: .9,
+        wheelRadiusFront: 1 / 2,
+        wheelHalfTrackFront: 1.5,
         wheelAxisHeightFront: 0,
 
         mass: 800,
@@ -98,7 +104,7 @@ export const vehicleConfigs = {
         breakingForce: 100,
         is4x4: false,
 
-        path: "simple-low-poly-car.gltf",
+        path: "simple-car.gltf",
 
 
     },
@@ -107,19 +113,20 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.8,
         wheelRadiusBack: 2.4 / 2,
         wheelHalfTrackBack: 1.6,
-        wheelAxisHeightBack: -.7,
+        wheelAxisHeightBack: -.2,
 
         wheelAxisFrontPosition: 2.1,
         wheelRadiusFront: 1.6 / 2,
         wheelHalfTrackFront: 1.36,
-        wheelAxisHeightFront: -1,
+        wheelAxisHeightFront: -.5,
 
+        suspensionRestLength: 1.6,
         mass: 1600,
         engineForce: 5000,
         breakingForce: 100,
         is4x4: true,
 
-        path: "low-poly-tractor.gltf"
+        path: "tractor.gltf"
     },
     monsterTruck: {
         ...defaultVehicleConfig,
@@ -148,31 +155,60 @@ export const vehicleConfigs = {
 
         path: "low-poly-monster-truck.gltf"
     },
+    offRoader: {
+        ...defaultVehicleConfig,
+        wheelAxisBackPosition: -1.85,
+        wheelRadiusBack: 1.8 / 2,
+        wheelHalfTrackBack: 1.25,
+        wheelAxisHeightBack: -.2,
+
+        wheelAxisFrontPosition: 1.95,
+        wheelRadiusFront: 1.8 / 2,
+        wheelHalfTrackFront: 1.25,
+        wheelAxisHeightFront: -0.2,
+
+
+        mass: 800,
+        engineForce: 4500,
+        breakingForce: 100,
+        is4x4: true,
+        inertia: { x: 3000, y: 2000, z: 3000 },
+        suspensionRestLength: 1.6,
+
+        maxSuspensionTravelCm: 100,
+        suspensionStiffness: 200,
+        suspensionDamping: 10,
+        suspensionCompression: 20,
+
+
+
+        path: "off-roader.gltf"
+    },
     f1: {
         ...defaultVehicleConfig,
-        path: "low-poly-f1-car.gltf",
+        path: "F1-car.gltf",
 
         wheelAxisBackPosition: -2.65,
         wheelRadiusBack: 0.95 / 2,
         wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: .5,
+        wheelAxisHeightBack: 0,
 
-        wheelAxisFrontPosition: 2.75,
+        wheelAxisFrontPosition: 2.85,
         wheelRadiusFront: 0.95 / 2,
         wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: .5,
+        wheelAxisHeightFront: 0,
 
-
+        suspensionRestLength: .4,
 
 
         mass: 1000,
-        engineForce: 15000,
-        breakingForce: 250,
+        engineForce: 10000,
+        breakingForce: 200,
         is4x4: false,
 
         inertia: { x: 3000, y: 2000, z: 4000 },
 
-        maxSpeed: 400
+
 
     },
     test: {
@@ -192,6 +228,7 @@ export const vehicleConfigs = {
         breakingForce: 100,
         is4x4: false,
     },
+
 } as { [key: string]: IVehicleConfig }
 
 // deep copy

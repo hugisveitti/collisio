@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var Player = /** @class */ (function () {
@@ -93,7 +93,7 @@ var Player = /** @class */ (function () {
             isAuthenticated: this.isAuthenticated,
             vehicleType: this.vehicleType,
             photoURL: this.photoURL,
-            isConnected: this.isConnected
+            isConnected: this.isConnected,
         };
     };
     Player.prototype.getPlayerControls = function () {

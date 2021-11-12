@@ -5,7 +5,7 @@ import Stats from "stats.js"
 import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
 import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
-import { defaultVehicleConfig, IVehicleConfig } from "../vehicles/VehicleConfigs";
+import { defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
 import "../game/game-styles.css"
 import { RaceCourse } from "../shared-game-components/RaceCourse"
 import "./lowPolyTest.css"
@@ -58,6 +58,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     isPaused = false
     trackType: TrackType
     usingDebug: boolean
+    vehicleColorNumber = 0
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -122,8 +123,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
-        const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
-        this.scene.add(helper)
+        // const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
+        // this.scene.add(helper)
 
 
         // const hLight = new THREE.HemisphereLight(0xffffff, 1)
@@ -208,7 +209,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             }
         })
 
-        this.vehicle = new LowPolyTestVehicle(this, "blue", "test hugi", 0, this.vehicleType)
+        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType)
     }
 
     async create() {
@@ -633,7 +634,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.vehicleType = vehicleType
         this.canStartUpdate = false
 
-        this.vehicle = new LowPolyTestVehicle(this, "blue", "test hugi", 0, this.vehicleType)
+        this.vehicleColorNumber += 1
+        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType)
         this.createVehicle()
 
     }

@@ -32,7 +32,7 @@ export default class TestRoom {
 
     setMobileSocket(mobileSocket: Socket) {
         this.mobileSocket = mobileSocket
-        this.mobileSocket.on("send-controls", this.handleGottenControls)
+        this.mobileSocket.on("send-controls", (mobileControls: MobileControls) => this.handleGottenControls(mobileControls))
         this.setupUserSettingsListener()
 
         if (this.desktopSocket) {
@@ -58,7 +58,7 @@ export default class TestRoom {
     }
 
     setupUserSettingsListener() {
-        this.mobileSocket!.on("settings-changed", this.handleSettingsChanged)
+        this.mobileSocket!.on("settings-changed", (data: any) => this.handleSettingsChanged(data))
     }
 
     userSettingsChanged(data: any) {

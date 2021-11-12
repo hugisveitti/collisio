@@ -6,7 +6,7 @@
  */
 
 export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course" | "sea-side-track"
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "monsterTruck" | "truck"
+export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader"
 
 export type GameType = "ball" | "race"
 
@@ -50,21 +50,21 @@ export class MobileControls {
 
 export class VehicleControls {
     left: boolean
-    forward: boolean
-    backward: boolean
+    f: boolean
+    b: boolean
     right: boolean
     steerValue: number
-    break: boolean
+
 
 
 
     constructor() {
         this.left = false
         this.right = false
-        this.forward = false
-        this.backward = false
+        this.f = false
+        this.b = false
         this.steerValue = 0
-        this.break = false
+
     }
 }
 

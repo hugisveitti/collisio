@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var TestRoom = /** @class */ (function () {
     function TestRoom() {
@@ -21,7 +21,7 @@ var TestRoom = /** @class */ (function () {
     TestRoom.prototype.setMobileSocket = function (mobileSocket) {
         var _this = this;
         this.mobileSocket = mobileSocket;
-        this.mobileSocket.on("send-controls", this.handleGottenControls);
+        this.mobileSocket.on("send-controls", function (mobileControls) { return _this.handleGottenControls(mobileControls); });
         this.setupUserSettingsListener();
         if (this.desktopSocket) {
             this.desktopSocket.emit("test-made-connection", {});
@@ -41,7 +41,8 @@ var TestRoom = /** @class */ (function () {
         this.userSettingsChanged({ userSettings: newUserSettings, playerNumber: 0 });
     };
     TestRoom.prototype.setupUserSettingsListener = function () {
-        this.mobileSocket.on("settings-changed", this.handleSettingsChanged);
+        var _this = this;
+        this.mobileSocket.on("settings-changed", function (data) { return _this.handleSettingsChanged(data); });
     };
     TestRoom.prototype.userSettingsChanged = function (data) {
         if (this.desktopSocket) {
@@ -50,4 +51,4 @@ var TestRoom = /** @class */ (function () {
     };
     return TestRoom;
 }());
-exports["default"] = TestRoom;
+exports.default = TestRoom;

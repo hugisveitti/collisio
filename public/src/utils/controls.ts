@@ -70,7 +70,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 
         switch (e.key) {
             case "w":
-                vehicleControls.forward = isDown
+                vehicleControls.f = isDown
                 break;
             case "d":
                 vehicleControls.right = isDown
@@ -79,10 +79,10 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
                 vehicleControls.left = isDown
                 break;
             case "s":
-                vehicleControls.backward = isDown
+                vehicleControls.b = isDown
                 break;
             case " ":
-                vehicleControls.break = isDown
+                vehicleControls.b = isDown
                 break
             default:
                 break;
@@ -99,19 +99,15 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
 
-    if (vehicleControls.forward) {
+    if (vehicleControls.f) {
         vehicle.goForward(true)
-    } else if (vehicleControls.backward) {
+    } else if (vehicleControls.b) {
         vehicle.goBackward(speed)
     } else {
         vehicle.noForce()
     }
 
-    if (vehicleControls.break) {
-        vehicle.break()
-    } else {
-        vehicle.break(true)
-    }
+
 
     if (vehicleControls.left) {
         vehicle.turn(angle)

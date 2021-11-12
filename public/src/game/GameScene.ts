@@ -12,13 +12,13 @@ import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
+import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { IGameScene } from "./IGameScene";
 
 
 
 
 const vechicleFov = 60
-const possibleColors = [0x9e4018, 0x0d2666, 0x1d8a47, 0x61f72a, "brown", "black", "white"]
 
 
 const beepC4 = new Howl({
@@ -178,7 +178,7 @@ export class GameScene extends Scene3D implements IGameScene {
         const recursiveCreate = (i: number) => {
 
 
-            const color = possibleColors[i]
+            const color = possibleVehicleColors[i]
 
             let newVehicle: IVehicle
             newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType)

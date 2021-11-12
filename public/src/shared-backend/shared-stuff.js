@@ -5,7 +5,7 @@
  * is useless to the front end.
  * So this limits the .js to one file.
  */
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehicleControls = exports.MobileControls = void 0;
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
@@ -32,10 +32,9 @@ var VehicleControls = /** @class */ (function () {
     function VehicleControls() {
         this.left = false;
         this.right = false;
-        this.forward = false;
-        this.backward = false;
+        this.f = false;
+        this.b = false;
         this.steerValue = 0;
-        this["break"] = false;
     }
     return VehicleControls;
 }());

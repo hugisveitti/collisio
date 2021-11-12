@@ -18,7 +18,7 @@ import betaGIF from "../images/beta.gif";
 import gammaGIF from "../images/gamma.gif";
 
 import AppContainer from "../containers/AppContainer";
-import { frontPagePath, highscorePagePath } from "./Routes";
+import { buyPremiumPagePath, frontPagePath, highscorePagePath } from "./Routes";
 import {
   CardContent,
   CardHeader,
@@ -32,6 +32,7 @@ import {
   List,
   ListItemText,
   ListItem,
+  Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -391,6 +392,26 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
                   The highscores are sorted in a way such that each 'track' &
                   'number-of-laps' pair has its own highscore list.
                 </Typography>
+              </Grid>
+            </Grid>
+          </HowToPlayItem>
+
+          <HowToPlayItem header="Maps, vehicles and game types">
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography>
+                  There are various race tracks, game modes and vehicles. For
+                  premium users everything is available, but basic users are
+                  limited to one vehicle and one race course.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  onClick={() => history.push(buyPremiumPagePath)}
+                >
+                  Go Premium
+                </Button>
               </Grid>
             </Grid>
           </HowToPlayItem>
