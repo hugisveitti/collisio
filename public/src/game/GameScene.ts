@@ -117,7 +117,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async preload() {
-        await this.warpSpeed("-ground", "-light")
+        await this.warpSpeed("-ground", "-light", "-sky")
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
         if (this.useShadows) {
