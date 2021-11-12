@@ -134,6 +134,13 @@ export class LowPolyVehicle implements IVehicle {
         this.createVehicle()
     }
 
+    changeColor(color: string | number) {
+        this.color = color;
+        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
+
+
+    }
+
     createBadChassis() {
         const chassisWidth = 1.8;
         const chassisHeight = .6;
@@ -648,21 +655,22 @@ export class LowPolyVehicle implements IVehicle {
 
     setFont(font: Font) {
         this.font = font
-        // this.createNameMesh()
+        this.createNameMesh()
     }
 
     createNameMesh() {
-        const textGeo = new THREE.TextGeometry(this.name, {
+        const textGeo = new THREE.TextGeometry(this.name.toUpperCase().slice(0, 3), {
             font: this.font!,
             size: 1,
             height: 0.5,
+
         })
 
         const textMesh = new THREE.Mesh(textGeo, new THREE.MeshLambertMaterial({ color: 0x667399, }))
         textMesh.rotateY(Math.PI)
         this.scene.add.existing(textMesh)
 
-        textMesh.position.set(3, 3, 0)
+        textMesh.position.set(1.2, 3, 0)
         this.chassisMesh.add(textMesh)
 
     }

@@ -10,7 +10,10 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { VehicleType } from "../../shared-backend/shared-stuff";
-import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
+import {
+  allVehicleTypes,
+  possibleVehicleColors,
+} from "../../vehicles/VehicleConfigs";
 import { stringInArray } from "../../utils/utilFunctions";
 import { useHistory } from "react-router";
 import { buyPremiumPagePath } from "../Routes";
@@ -50,6 +53,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
     };
   }, []);
 
+  possibleVehicleColors;
   useEffect(() => {
     const renderer = createShowRoomCanvas(
       possibleVehcileTypes[
@@ -89,34 +93,42 @@ const ShowRoomComponent = (props: IShowRoom) => {
           <div ref={canvasWrapperRef}></div>
         </Grid>
         <Grid item xs={12}>
-          <Typography component="h5">
+          <h4 style={{ textAlign: "center" }}>
             {
               possibleVehcileTypes[vehicleTypeNum % possibleVehcileTypes.length]
-                .name
+                ?.name
             }
-          </Typography>
+          </h4>
         </Grid>
-        <Collapse in={showBuyPremium}>
-          <Grid item xs={12} sm={9}>
-            <Typography color="InfoText">
-              This is a Premium vehicle available only to Premium users.
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Button
-              variant="contained"
-              onClick={() => history.push(buyPremiumPagePath)}
-            >
-              Go Premium
-            </Button>
-          </Grid>
-        </Collapse>
+        <Grid item xs={12}>
+          <Collapse in={showBuyPremium}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography color="InfoText" style={{ textAlign: "center" }}>
+                  This is a Premium vehicle available only to Premium users.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{ textAlign: "center" }}>
+                <Button
+                  variant="contained"
+                  onClick={() => history.push(buyPremiumPagePath)}
+                >
+                  Go Premium
+                </Button>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
 
         <Grid item xs={3} />
         <Grid item xs={3} className={classes.arrowContainer}>
           <IconButton
             onClick={() => {
-              setVehicleTypeNum(vehicleTypeNum - 1);
+              if (vehicleTypeNum === 0) {
+                setVehicleTypeNum(possibleVehcileTypes.length - 1);
+              } else {
+                setVehicleTypeNum(vehicleTypeNum - 1);
+              }
             }}
           >
             <ArrowBackIosNewIcon />
@@ -138,7 +150,11 @@ const ShowRoomComponent = (props: IShowRoom) => {
         <Grid item xs={3} className={classes.arrowContainer}>
           <IconButton
             onClick={() => {
-              setChassisNum(chassisNum - 1);
+              if (chassisNum === 0) {
+                setChassisNum(possibleVehicleColors.length - 1);
+              } else {
+                setChassisNum(chassisNum - 1);
+              }
             }}
           >
             <KeyboardArrowLeftIcon />

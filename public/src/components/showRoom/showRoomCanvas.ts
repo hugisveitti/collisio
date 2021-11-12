@@ -3,19 +3,23 @@ import * as THREE from "@enable3d/three-wrapper/dist/index"
 import { loadLowPolyVehicleModels, } from "../../vehicles/LowPolyVehicle"
 import { getDeviceType } from "../../utils/settings"
 import { VehicleType } from "../../shared-backend/shared-stuff"
+import { MeshStandardMaterial } from "three"
+import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: THREE.Scene) => {
     loadLowPolyVehicleModels(vehicleType, (tires, chassises) => {
-        const prePos = chassises[0].position
+        // const prePos = chassises[0].position;
 
-        const cI = Math.abs(chassisNum % chassises.length)
-        chassises[cI].position.set(prePos.x, prePos.y, prePos.z)
-        scene.add(chassises[cI])
+
+        //  chassises[0].position.set(prePos.x, prePos.y, prePos.z);
+
+        (chassises[0].material as THREE.MeshStandardMaterial).color = new THREE.Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
+        scene.add(chassises[0])
 
         for (let tire of tires) {
             const { x, y, z } = tire.position
 
-            // tire.position.set(x - prePos.x, y - prePos.y, z - prePos.z)
+            //  tire.position.set(x + prePos.x, y + prePos.y, z+  prePos.z)
             scene.add(tire)
 
             tire.castShadow = tire.receiveShadow = true

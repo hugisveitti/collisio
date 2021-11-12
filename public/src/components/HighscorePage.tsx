@@ -97,11 +97,6 @@ const HighscorePage = (props: IHighscorePage) => {
     });
   }, []);
 
-  // console.log(
-  //   "highscoreDict[trackKey][numberOfLapsKey]",
-  //   highscoreDict?[trackKey]?[numberOfLapsKey]
-  // );
-  console.log("more", highscoreDict, trackKey, numberOfLapsKey);
   /** use window.localStorage to remember what user was looking at */
 
   return (
