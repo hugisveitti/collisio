@@ -128,10 +128,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
 
         // const hLight = new THREE.HemisphereLight(0xffffff, 1)
-        const hLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
-        hLight.color.setHSL(0.6, 1, 0.6);
-        hLight.groundColor.setHSL(0.095, 1, 0.75);
-        hLight.position.set(0, 50, 0);
+        const hLight = new THREE.HemisphereLight(0xffffff, 1)
+        hLight.position.set(0, 1, 0);
+        hLight.color.setHSL(0.6, 1, 0.4);
+        //  hLight.groundColor.setHSL(0.095, 1, 0.75);
         // hLight.position.set(0, 1, 0)
         this.scene.add(hLight)
 

@@ -14,6 +14,7 @@ import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { IGameScene } from "./IGameScene";
+import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 
 
@@ -127,12 +128,38 @@ export class GameScene extends Scene3D implements IGameScene {
         this.scene.add(this.pLight)
 
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
-        hLight.position.set(0, 1, 0)
+        hLight.position.set(0, 1, 0);
+        hLight.color.setHSL(0.6, 1, 0.4);
         this.scene.add(hLight)
 
         const aLight = new THREE.AmbientLight(0xffffff, 1)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
+
+
+
+        const uniforms = {
+            "topColor": { value: new THREE.Color(0x0077ff) },
+            "bottomColor": { value: new THREE.Color(0xffffff) },
+            "offset": { value: 33 },
+            "exponent": { value: 0.6 }
+        };
+        uniforms["topColor"].value.copy(hLight.color);
+        this.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
+        this.scene.fog = new THREE.Fog(this.scene.background, 1, 5000);
+        this.scene.fog.color.copy(uniforms["bottomColor"].value);
+
+        const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
+        const skyMat = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: skydomeVertexShader,
+            fragmentShader: skydomeFragmentShader,
+            side: THREE.BackSide
+        });
+
+        const sky = new THREE.Mesh(skyGeo, skyMat);
+        this.scene.add(sky);
+
 
 
         document.addEventListener("keypress", (e) => {
