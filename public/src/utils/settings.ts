@@ -36,7 +36,7 @@ export const baseurl = "http://localhost:5000/"
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = false
+export const inTestMode = true
 
 
 export const getStaticPath = (path: string) => {

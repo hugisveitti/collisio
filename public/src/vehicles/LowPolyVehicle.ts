@@ -654,7 +654,7 @@ export class LowPolyVehicle implements IVehicle {
 
     setFont(font: Font) {
         this.font = font
-        this.createNameMesh()
+        // this.createNameMesh()
     }
 
     createNameMesh() {

@@ -337,8 +337,8 @@ export class GameScene extends Scene3D implements IGameScene {
 
             const nameInfo = document.createElement("span")
 
-            const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
-            nameInfo.innerHTML = `${pName}`
+
+            nameInfo.innerHTML = this.players[i].playerName
             viewDiv.appendChild(nameInfo)
 
             const kmInfo = document.createElement("span")
@@ -377,11 +377,15 @@ export class GameScene extends Scene3D implements IGameScene {
                 left:50%;
                 bottom:50%;
                 font-size:32px;
-                transform:translate(-50%,10px);
+                transform:translate(-50%,-25px);
                 text-align:center;
             `)
 
-            imporantViewInfo.innerHTML = "important info!!!"
+            // setTimeout(() => {
+            //     this.showViewsImportantInfo("some info")
+            // }, 7000)
+
+
 
             let nameRight = 50;
             let nameTop = 50;
@@ -391,24 +395,24 @@ export class GameScene extends Scene3D implements IGameScene {
             right:${nameRight}%;
             top:${nameTop}%;
             font-size:${nameFontSize}px;
-            transform:translate(-${nameRight}%, -${nameTop}%);
+            transform:translate(${nameRight}%, -${nameTop}%);
             `)
-
+            const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
 
             const callNameAnimate = () => {
-
+                nameInfo.innerHTML = pName
 
                 setTimeout(() => {
                     if (nameRight > 0) {
-                        nameTop -= 1;
-                        nameRight -= 1;
-                        nameFontSize -= 2
+                        nameTop -= 2;
+                        nameRight -= 2;
+                        nameFontSize -= 4;
                         nameInfo.setAttribute("style", `
                         position:absolute;
                         right:${nameRight}%;
                         top:${nameTop}%;
                         font-size:${nameFontSize}px;
-                        transform:translate(-${nameRight}%, -${nameTop}%);
+                        transform:translate(${nameRight}%, -${nameTop}%);
                         `)
 
                         callNameAnimate()
@@ -419,7 +423,7 @@ export class GameScene extends Scene3D implements IGameScene {
             setTimeout(() => {
 
                 callNameAnimate()
-            }, 1000)
+            }, 1500)
 
 
             playerInfosContainer.appendChild(viewDiv)
