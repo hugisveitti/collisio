@@ -95,6 +95,10 @@ export class GameScene extends Scene3D implements IGameScene {
 
     gameRoomActions: IGameRoomActions
 
+    viewsKmhInfo: HTMLSpanElement[]
+    viewsImpornantInfo: HTMLSpanElement[]
+    viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
+
 
     constructor() {
         super()
@@ -114,6 +118,10 @@ export class GameScene extends Scene3D implements IGameScene {
         this.importantInfoDiv.setAttribute("id", "important-info")
         document.body.appendChild(this.importantInfoDiv)
         this.gameRoomActions = {}
+
+        this.viewsKmhInfo = []
+        this.viewsImpornantInfo = []
+        this.viewsImpornantInfoClearTimeout = [] as NodeJS.Timeout[]
     }
 
     async preload() {
@@ -236,11 +244,52 @@ export class GameScene extends Scene3D implements IGameScene {
         recursiveCreate(0)
     }
 
+    /**
+     * 
+     * @param info text to be displayed
+     * @param i view indoex
+     * @param clear if the function should handle clearing the text using a time out
+     * 
+     */
+    setViewImportantInfo(info: string, i: number, clear?: boolean) {
+        this.viewsImpornantInfo[i].innerHTML = info
+
+        const fadeSecs = 2
+        if (clear) {
+            this.viewsImpornantInfoClearTimeout[i] = setTimeout(() => {
+                this.clearViewImportantInfo(i)
+            }, fadeSecs * 1000)
+        }
+        // this.viewsImpornantInfo[i].setAttribute("style", `
+        // opacity:1;
+        // `)
+        // setTimeout(() => {
+        //     this.viewsImpornantInfo[i].setAttribute("style", `
+        //     opacity:0;
+        //     `)
+        // }, fadeSecs * 1000)
+    }
+
+    clearViewImportantInfo(i: number) {
+
+        this.viewsImpornantInfo[i].innerHTML = ""
+
+    }
+
+    clearTimouts() {
+        for (let to of this.viewsImpornantInfoClearTimeout) {
+            window.clearTimeout(to)
+        }
+    }
+
+
     createViews() {
         this.views = []
         const lefts = [0, 0.5]
         const bottoms = [0, 0, 0.5, 0.5]
-
+        const playerInfosContainer = document.createElement("div")
+        playerInfosContainer.setAttribute("style", "position:relative;")
+        document.body.appendChild(playerInfosContainer)
         // only works for 2 players right now, need algorithm to make it dynamically calculate the size of each view
         for (let i = 0; i < this.players.length; i++) {
             const n = this.players.length
@@ -274,6 +323,128 @@ export class GameScene extends Scene3D implements IGameScene {
             this.vehicles[i].addCamera(view.camera)
             this.vehicles[i].isReady = true
             this.views.push(view)
+
+            const width = viewWidth * window.innerWidth
+
+            //  const left = (lefts[i % 2] * (window.innerWidth)) + (window.innerWidth / 4)
+            const left = lefts[i % 2] * (window.innerWidth)
+            const bottom = bottoms[i] * window.innerHeight
+            const viewDivWidth = viewWidth * window.innerWidth
+            const viewDivHeight = viewHeight * window.innerHeight
+
+            const viewDiv = document.createElement("div")
+
+            const nameInfo = document.createElement("span")
+
+            const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
+            nameInfo.innerHTML = `${pName}`
+            viewDiv.appendChild(nameInfo)
+
+            const kmInfo = document.createElement("span")
+            viewDiv.appendChild(kmInfo)
+            /** to be updated */
+            this.viewsKmhInfo.push(kmInfo)
+
+            const imporantViewInfo = document.createElement("span")
+            viewDiv.appendChild(imporantViewInfo)
+            this.viewsImpornantInfo.push(imporantViewInfo)
+            //this.viewsImpornantInfo.push(document.createElement("span"))
+
+
+            viewDiv.setAttribute("style", `
+                position:absolute;
+                font-family:monospace;
+                text-shadow:1px 1px white;
+             
+                left:${left}px;
+                bottom:${bottom}px;
+                font-size:32px;
+                width:${viewDivWidth}px;
+                height:${viewDivHeight}px;
+            `)
+
+
+            kmInfo.setAttribute("style", `
+                position:absolute;
+                left:50%;
+                bottom:0;
+                transform:translate(-50%,0px);
+            `)
+
+            imporantViewInfo.setAttribute("style", `
+                position:absolute;
+                left:50%;
+                bottom:50%;
+                font-size:32px;
+                transform:translate(-50%,10px);
+                text-align:center;
+            `)
+
+            imporantViewInfo.innerHTML = "important info!!!"
+
+            let nameRight = 50;
+            let nameTop = 50;
+            let nameFontSize = 132;
+            nameInfo.setAttribute("style", `
+            position:absolute;
+            right:${nameRight}%;
+            top:${nameTop}%;
+            font-size:${nameFontSize}px;
+            transform:translate(-${nameRight}%, -${nameTop}%);
+            `)
+
+
+            const callNameAnimate = () => {
+
+
+                setTimeout(() => {
+                    console.log("timeout over", nameRight)
+                    if (nameRight > 0) {
+                        console.log("change name style")
+                        nameTop -= 1;
+                        nameRight -= 1;
+                        nameFontSize -= 2
+                        nameInfo.setAttribute("style", `
+                        position:absolute;
+                        right:${nameRight}%;
+                        top:${nameTop}%;
+                        font-size:${nameFontSize}px;
+                        transform:translate(-${nameRight}%, -${nameTop}%);
+                        `)
+
+                        callNameAnimate()
+                    }
+                }, 5)
+            }
+
+            setTimeout(() => {
+
+                callNameAnimate()
+            }, 1000)
+
+
+            playerInfosContainer.appendChild(viewDiv)
+
+            window.addEventListener("resize", () => {
+                const left = lefts[i % 2] * (window.innerWidth)
+                const bottom = bottoms[i] * window.innerHeight
+                const viewDivWidth = viewWidth * window.innerWidth
+                const viewDivHeight = viewHeight * window.innerHeight
+
+                viewDiv.setAttribute("style", `
+                position:absolute;
+                font-family:monospace;
+                text-shadow:1px 1px white;
+             
+                left:${left}px;
+                bottom:${bottom}px;
+                font-size:32px;
+                width:${viewDivWidth}px;
+                height:${viewDivHeight}px;
+            `)
+            })
+
+
         }
     }
 
@@ -323,7 +494,21 @@ export class GameScene extends Scene3D implements IGameScene {
 
     }
 
+    /** show all view the same info */
+    showViewsImportantInfo(text: string) {
+        for (let i = 0; i < this.vehicles.length; i++) {
+            this.setViewImportantInfo(text, i)
+        }
+    }
+
+    clearViewsImportantInfo() {
+        for (let i = 0; i < this.vehicles.length; i++) {
+            this.clearViewImportantInfo(i)
+        }
+    }
+
     showImportantInfo(text: string) {
+
         this.importantInfoDiv.innerHTML = text
     }
 
@@ -466,7 +651,9 @@ export class GameScene extends Scene3D implements IGameScene {
         const p = this.course.startPosition
         const r = this.course.startRotation
 
-        const courseY = this.course.ground?.position?.y ?? 2
+        const courseY = this.course.startPosition?.y ?? 2
+        console.log("startPos", this.course.startPosition)
+        console.log("groundY", courseY)
         let possibleStartingPos = []
         let offset = 1
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -477,7 +664,7 @@ export class GameScene extends Scene3D implements IGameScene {
                 offset += (Math.sign(offset) * 5)
             }
 
-            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY + 3, z: p.z + offset - 5 })
+            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY, z: p.z + offset - 5 })
         }
 
 
@@ -523,6 +710,8 @@ export class GameScene extends Scene3D implements IGameScene {
             this.renderer.render(this.scene, this.views[i].camera);
 
             this.checkVehicleOutOfBounds(i)
+
+            this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour().toFixed(0)} km/h`
         }
     }
 

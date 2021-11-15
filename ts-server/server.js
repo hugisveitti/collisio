@@ -108,7 +108,7 @@ var server = app.listen(port, function () {
 });
 var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
-var gameMaster = new ServerGame_1.default(io);
+var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
-    gameMaster.addSocket(socket);
+    roomMaster.addSocket(socket);
 });

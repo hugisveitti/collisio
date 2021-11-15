@@ -15,6 +15,12 @@ import {
   MobileControls,
   VehicleControls,
 } from "../shared-backend/shared-stuff";
+import {
+  fakePlayer1,
+  fakePlayer2,
+  fakePlayer3,
+  fakePlayer4,
+} from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode } from "../utils/settings";
 import BuyPremiumComponent from "./BuyPremiumComponent";
@@ -55,21 +61,8 @@ const Routes = () => {
     setSocket(newSocket);
 
     if (inTestMode) {
-      const _player: IPlayerInfo = {
-        playerName: "test",
-        isLeader: true,
-        teamName: "test",
-        playerNumber: 0,
-        mobileControls: new MobileControls(),
-        vehicleControls: new VehicleControls(),
-        teamNumber: 0,
-        id: "0",
-        isAuthenticated: false,
-        vehicleType: "f1",
-        isConnected: true,
-      };
-      setPlayers([_player]);
-      setPlayer(_player);
+      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      setPlayer(fakePlayer1);
     }
   }, []);
 

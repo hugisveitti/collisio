@@ -30,7 +30,13 @@ import {
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import BasicModal from "../modal/BasicModal";
-import { IPlayerInfo } from "../../shared-backend/shared-stuff";
+import {
+  IPlayerInfo,
+  mdts_players_in_room,
+  mts_player_connected,
+  stmd_players_in_room_callback,
+  stm_player_connected_callback,
+} from "../../shared-backend/shared-stuff";
 
 interface WaitParamType {
   roomId: string;
@@ -59,9 +65,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const roomId = params?.roomId;
 
   const getPlayersInRoom = () => {
-    props.socket.emit("get-players-in-room", { roomId });
+    props.socket.emit(mdts_players_in_room, { roomId });
     props.socket.once(
-      "get-players-in-room-callback",
+      stmd_players_in_room_callback,
       (response: ISocketCallback) => {
         if (response.status === "error") {
           toast.error(response.message);
@@ -74,7 +80,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   const connectToRoom = (_displayName: string) => {
     setConnectingGuest(true);
-    props.socket.emit("player-connected", {
+    props.socket.emit(mts_player_connected, {
       roomId,
       playerName: _displayName,
       playerId: user?.uid ?? uuid(),
@@ -82,7 +88,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       photoURL: user?.photoURL,
     } as IPlayerConnection);
     props.socket.once(
-      "player-connected-callback",
+      stm_player_connected_callback,
       (response: ISocketCallback) => {
         if (response.status === "success") {
           props.store.setPlayer(response.data.player);
@@ -151,8 +157,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.socket.off("game-settings-changed");
       props.socket.off("waiting-room-alert");
       props.socket.off("player-disconnected");
-      props.socket.off("get-players-in-room-callback");
-      props.socket.off("player-connected-callback");
+      props.socket.off(stmd_players_in_room_callback);
+      props.socket.off(stm_player_connected_callback);
     };
   }, []);
 

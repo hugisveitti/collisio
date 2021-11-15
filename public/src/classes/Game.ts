@@ -29,7 +29,7 @@ export interface IPreGameSettings {
 export const defaultPreGameSettings: IPreGameSettings = {
     ballRadius: 1,
     gameType: "race",
-    numberOfLaps: 3,
+    numberOfLaps: 2,
     trackName: "low-poly-farm-track",
 }
 

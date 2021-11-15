@@ -13,58 +13,91 @@ import { inputBackgroundColor } from "../../providers/theme";
 
 interface IRaceTimeTable {
   raceTimeInfo: IRaceTimeInfo[];
-  dense?: boolean;
   isEndOfGame?: boolean;
 }
 
 const RaceTimeTable = (props: IRaceTimeTable) => {
   if (props.raceTimeInfo.length === 0) return null;
+
+  const cellStyle = !props.isEndOfGame ? { width: 50 } : {};
+  const containerStyle = !props.isEndOfGame ? { width: 250 } : {};
   return (
     <TableContainer
       component={Paper}
-      style={{ backgroundColor: inputBackgroundColor, boxShadow: "none" }}
+      style={{
+        ...containerStyle,
+        backgroundColor: inputBackgroundColor,
+        boxShadow: "none",
+      }}
     >
-      <Table size={props.dense ? "small" : "medium"}>
+      <Table
+        size={!props.isEndOfGame ? "small" : "medium"}
+        style={{ fontSize: 8 }}
+      >
         <TableHead>
           <TableRow>
-            <TableCell size={props.dense ? "small" : "medium"}>
+            <TableCell
+              size={!props.isEndOfGame ? "small" : "medium"}
+              style={cellStyle}
+            >
               Player
             </TableCell>
-            <TableCell size={props.dense ? "small" : "medium"}>Lap</TableCell>
-            <TableCell size={props.dense ? "small" : "medium"} align="right">
+            <TableCell style={cellStyle}>Lap / TL</TableCell>
+            <TableCell
+              size={!props.isEndOfGame ? "small" : "medium"}
+              align="right"
+              style={cellStyle}
+            >
               {props.isEndOfGame ? "Best lap time" : "Curr LT"}
             </TableCell>
-            <TableCell size={props.dense ? "small" : "medium"} align="right">
-              Total Time
-            </TableCell>
+            {!!props.isEndOfGame && (
+              <>
+                <TableCell
+                  size={!props.isEndOfGame ? "small" : "medium"}
+                  align="right"
+                  style={cellStyle}
+                >
+                  Total Time
+                </TableCell>
+              </>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
           {props.raceTimeInfo.map((timeInfo) => {
             return (
               <TableRow key={timeInfo.playerName}>
-                <TableCell size={props.dense ? "small" : "medium"}>
+                <TableCell
+                  size={!props.isEndOfGame ? "small" : "medium"}
+                  style={cellStyle}
+                >
                   {props.isEndOfGame
                     ? timeInfo.playerName
                     : timeInfo.playerName.toUpperCase().slice(0, 3)}
                 </TableCell>
-                <TableCell size={props.dense ? "small" : "medium"}>
+                <TableCell style={cellStyle}>
                   {timeInfo.lapNumber} / {timeInfo.numberOfLaps}
                 </TableCell>
                 <TableCell
-                  size={props.dense ? "small" : "medium"}
+                  size={!props.isEndOfGame ? "small" : "medium"}
                   align="right"
+                  style={cellStyle}
                 >
                   {props.isEndOfGame
                     ? timeInfo.bestLapTime.toFixed(2)
                     : timeInfo.currentLapTime.toFixed(2)}
                 </TableCell>
-                <TableCell
-                  size={props.dense ? "small" : "medium"}
-                  align="right"
-                >
-                  {timeInfo.totalTime.toFixed(2)}
-                </TableCell>
+                {!!props.isEndOfGame && (
+                  <>
+                    <TableCell
+                      size={!props.isEndOfGame ? "small" : "medium"}
+                      align="right"
+                      style={cellStyle}
+                    >
+                      {timeInfo.totalTime.toFixed(2)}
+                    </TableCell>
+                  </>
+                )}
               </TableRow>
             );
           })}

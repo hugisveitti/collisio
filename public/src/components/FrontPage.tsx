@@ -15,6 +15,12 @@ import AppContainer from "../containers/AppContainer";
 import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
+import {
+  dts_create_room,
+  mts_player_connected,
+  std_room_created_callback,
+  stm_player_connected_callback,
+} from "../shared-backend/shared-stuff";
 import "../styles/main.css";
 import { ISocketCallback } from "../utils/connectSocket";
 import { IDeviceOrientationEvent } from "../utils/ControlsClasses";
@@ -84,7 +90,7 @@ const FrontPage = (props: FrontPageProps) => {
 
   const createPlayerConnectedCallback = () => {
     props.socket.once(
-      "player-connected-callback",
+      stm_player_connected_callback,
       (response: ISocketCallback) => {
         console.log("player conn res", response);
         if (response.status === "error") {
@@ -100,7 +106,8 @@ const FrontPage = (props: FrontPageProps) => {
   };
 
   const connectToRoomMobile = (roomId: string, playerName: string) => {
-    props.socket.emit("player-connected", {
+    console.log("connect to room mobile");
+    props.socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
       playerId: user?.uid ?? uuid(),
@@ -112,19 +119,22 @@ const FrontPage = (props: FrontPageProps) => {
   };
 
   const createRoomDesktopCallback = () => {
-    props.socket.once("create-room-callback", (response: ISocketCallback) => {
-      if (response.status === "success") {
-        const { roomId } = response.data;
-        props.store.setRoomId(roomId);
-        goToWaitingRoom(roomId);
-      } else {
-        toast.error(response.message);
+    props.socket.once(
+      std_room_created_callback,
+      (response: ISocketCallback) => {
+        if (response.status === "success") {
+          const { roomId } = response.data;
+          props.store.setRoomId(roomId);
+          goToWaitingRoom(roomId);
+        } else {
+          toast.error(response.message);
+        }
       }
-    });
+    );
   };
 
   const createRoomDesktop = (roomId: string) => {
-    props.socket.emit("create-room", { roomId });
+    props.socket.emit(dts_create_room, { roomId });
     createRoomDesktopCallback();
   };
 
@@ -158,7 +168,7 @@ const FrontPage = (props: FrontPageProps) => {
     }
 
     return () => {
-      props.socket.off("player-connected-callback");
+      props.socket.off(stm_player_connected_callback);
     };
   }, []);
 

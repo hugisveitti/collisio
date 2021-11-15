@@ -22,6 +22,8 @@ import { Link } from "react-router-dom";
 import {
   getAllHighscore,
   getUniqueHighscore,
+  HighscoreDict,
+  UniqueHighscoreDict,
 } from "../firebase/firebaseFunctions";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 import { frontPagePath } from "./Routes";
@@ -59,13 +61,12 @@ const HighscorePage = (props: IHighscorePage) => {
   const [numberOfLapsKey, setNumberOfLapsKey] = useState("");
   const [trackKey, setTrackKey] = useState("");
 
-  const [highscoreDict, setHighscoreDict] = useState(undefined);
+  const [highscoreDict, setHighscoreDict] = useState({} as UniqueHighscoreDict);
   const [highscoreHasLoaded, setHighscoreHasLoaded] = useState(false);
 
   useEffect(() => {
     getUniqueHighscore((_highscoreDict) => {
       const _trackKeys = Object.keys(_highscoreDict);
-      console.log("track keys", _trackKeys);
       const storageTrackKey = window.localStorage.getItem("highscoreTrackKey");
       let cTrackKey =
         storageTrackKey && storageTrackKey in _highscoreDict
@@ -97,6 +98,20 @@ const HighscorePage = (props: IHighscorePage) => {
     });
   }, []);
 
+  const getOrderedArrayFromDict = (): IEndOfRaceInfoPlayer[] => {
+    if (highscoreDict === undefined) return [];
+    const d: { [userId: string]: IEndOfRaceInfoPlayer } =
+      highscoreDict[trackKey][numberOfLapsKey];
+    const arr: IEndOfRaceInfoPlayer[] = [];
+    const userIds = Object.keys(d);
+    for (let id of userIds) {
+      arr.push(d[id]);
+    }
+
+    arr.sort((a, b) => a.totalTime - b.totalTime);
+    return arr;
+  };
+
   /** use window.localStorage to remember what user was looking at */
 
   return (
@@ -122,11 +137,49 @@ const HighscorePage = (props: IHighscorePage) => {
             </Grid>
           ) : (
             <>
-              <Grid item xs={5} sm={3}>
+              <Grid item xs={12} sm={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Track name</InputLabel>
+                  <Select
+                    label="    Track name"
+                    onChange={(e) => {
+                      const newTrackKey = e.target.value;
+                      setTrackKey(newTrackKey);
+
+                      const newNumberOfLapKeys = Object.keys(
+                        highscoreDict[newTrackKey]
+                      );
+
+                      if (!(numberOfLapsKey in highscoreDict[newTrackKey])) {
+                        setNumberOfLapsKey(newNumberOfLapKeys[0]);
+                      }
+                      setNumberOfLapsKeys(newNumberOfLapKeys);
+                      window.localStorage.setItem(
+                        "highscoreTrackKey",
+                        newTrackKey
+                      );
+                    }}
+                    style={{
+                      minWidth: 100,
+
+                      backgroundColor: "wheat",
+                    }}
+                    value={trackKey}
+                  >
+                    {trackKeys.map((key) => (
+                      <MenuItem key={key} value={key}>
+                        {key}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={9} sm={3}>
                 <FormControl fullWidth>
                   <InputLabel>No. laps</InputLabel>
                   <Select
-                    label="Number of laps"
+                    label="No. laps"
                     style={{
                       minWidth: 100,
                       backgroundColor: "wheat",
@@ -148,44 +201,7 @@ const HighscorePage = (props: IHighscorePage) => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={5} sm={3}>
-                <FormControl fullWidth>
-                  <InputLabel>Track name</InputLabel>
-                  <Select
-                    label="Track name"
-                    onChange={(e) => {
-                      const newTrackKey = e.target.value;
-                      setTrackKey(newTrackKey);
-
-                      const newNumberOfLapKeys = Object.keys(
-                        highscoreDict[newTrackKey]
-                      );
-
-                      if (!(numberOfLapsKey in highscoreDict[newTrackKey])) {
-                        setNumberOfLapsKey(newNumberOfLapKeys[0]);
-                      }
-                      setNumberOfLapsKeys(newNumberOfLapKeys);
-                      window.localStorage.setItem(
-                        "highscoreTrackKey",
-                        newTrackKey
-                      );
-                    }}
-                    style={{
-                      minWidth: 100,
-                      marginLeft: 15,
-                      backgroundColor: "wheat",
-                    }}
-                    value={trackKey}
-                  >
-                    {trackKeys.map((key) => (
-                      <MenuItem key={key} value={key}>
-                        {key}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={2} sm={2}>
+              <Grid item xs={3} sm={1}>
                 <Tooltip title="Each track and number of laps combination has its own highscore table.">
                   <IconButton>
                     <HelpOutlineIcon />
@@ -219,11 +235,12 @@ const HighscorePage = (props: IHighscorePage) => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        Object.keys(
-                          highscoreDict[trackKey][numberOfLapsKey]
-                        ).map((userId: string, i) => {
-                          const playerData =
-                            highscoreDict[trackKey][numberOfLapsKey][userId];
+                        getOrderedArrayFromDict().map((playerData, i) => {
+                          // Object.keys(
+                          //   highscoreDict[trackKey][numberOfLapsKey]
+                          // ).map((userId: string, i) => {
+                          // const playerData =
+                          //   highscoreDict[trackKey][numberOfLapsKey][userId];
                           return (
                             <HighscorePageTableRow
                               key={`${playerData.gameId}-${playerData.playerName}-${i}`}

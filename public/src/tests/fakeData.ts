@@ -1,6 +1,6 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { saveGameData } from "../firebase/firebaseFunctions";
-import { TrackType } from "../shared-backend/shared-stuff";
+import { IPlayerInfo, MobileControls, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
 const id2 = "LEzfm3UQl7b6CKUupasInidva9W2"
@@ -104,3 +104,59 @@ export const createFakeHighscoreData = () => {
         })
     }
 }
+
+export const fakePlayer1: IPlayerInfo = {
+    playerName: "1test",
+    isLeader: true,
+    teamName: "test",
+    playerNumber: 0,
+    mobileControls: new MobileControls(),
+    vehicleControls: new VehicleControls(),
+    teamNumber: 0,
+    id: "0",
+    isAuthenticated: false,
+    vehicleType: "f1",
+    isConnected: true,
+};
+
+export const fakePlayer2: IPlayerInfo = {
+    playerName: "2test2",
+    isLeader: true,
+    teamName: "test",
+    playerNumber: 1,
+    mobileControls: new MobileControls(),
+    vehicleControls: new VehicleControls(),
+    teamNumber: 0,
+    id: "1",
+    isAuthenticated: false,
+    vehicleType: "normal",
+    isConnected: true,
+};
+
+export const fakePlayer3: IPlayerInfo = {
+    playerName: "3test3",
+    isLeader: true,
+    teamName: "test",
+    playerNumber: 2,
+    mobileControls: new MobileControls(),
+    vehicleControls: new VehicleControls(),
+    teamNumber: 0,
+    id: "2",
+    isAuthenticated: false,
+    vehicleType: "tractor",
+    isConnected: true,
+};
+
+export const fakePlayer4: IPlayerInfo = {
+    playerName: "4test3",
+    isLeader: true,
+    teamName: "test",
+    playerNumber: 3,
+    mobileControls: new MobileControls(),
+    vehicleControls: new VehicleControls(),
+    teamNumber: 0,
+    id: "3",
+    isAuthenticated: false,
+    vehicleType: "offRoader",
+    isConnected: true,
+};

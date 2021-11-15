@@ -126,7 +126,7 @@ import RoomMaster from "./one-monitor-game/ServerGame"
 
 
 const io = require("socket.io")(server,) // { cors: { origin: "*" } })
-const gameMaster = new RoomMaster(io)
+const roomMaster = new RoomMaster(io)
 io.on("connection", (socket: Socket) => {
-    gameMaster.addSocket(socket)
+    roomMaster.addSocket(socket)
 })

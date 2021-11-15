@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
 var uuid_1 = require("uuid");
+var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var ServerPlayer_1 = require("./ServerPlayer");
 var TestRoom_1 = __importDefault(require("./TestRoom"));
 var successStatus = "success";
@@ -28,10 +29,11 @@ var RoomMaster = /** @class */ (function () {
     }
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
-        mobileSocket.on("player-connected", function (_a) {
+        mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL;
+            console.log("connecting player", roomId, playerName);
             if (!_this.roomExists(roomId)) {
-                mobileSocket.emit("player-connected-callback", { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
+                mobileSocket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
             else {
                 var player = new ServerPlayer_1.Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL);
@@ -46,7 +48,7 @@ var RoomMaster = /** @class */ (function () {
             delete _this.rooms[roomId];
         });
         socket.join(roomId);
-        socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId: roomId } });
+        socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };
     RoomMaster.prototype.addSocket = function (socket) {
         var _this = this;
@@ -54,7 +56,7 @@ var RoomMaster = /** @class */ (function () {
         var isTestMode = false;
         var onMobile;
         console.log("adding socket, games", Object.keys(this.rooms));
-        socket.once("device-type", function (_a) {
+        socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode;
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
@@ -70,7 +72,7 @@ var RoomMaster = /** @class */ (function () {
             else {
                 console.log("Connection from", deviceType);
                 if (deviceType === "desktop") {
-                    socket.on("create-room", function () {
+                    socket.on(shared_stuff_1.dts_create_room, function () {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = (0, uuid_1.v4)().slice(0, 4);
@@ -87,7 +89,7 @@ var RoomMaster = /** @class */ (function () {
                 else {
                     _this.setupPlayerConnectedListener(socket);
                 }
-                socket.on("get-players-in-room", function (_a) {
+                socket.on(shared_stuff_1.mdts_players_in_room, function (_a) {
                     var roomId = _a.roomId;
                     var message, status, players;
                     if (_this.rooms[roomId]) {
@@ -100,7 +102,7 @@ var RoomMaster = /** @class */ (function () {
                         message = "Room with given id does not exist";
                         status = errorStatus;
                     }
-                    socket.emit("get-players-in-room-callback", { message: message, status: status, data: { players: players } });
+                    socket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: message, status: status, data: { players: players } });
                 });
             }
         });
@@ -148,13 +150,14 @@ var Room = /** @class */ (function () {
                 playerExists = true;
             }
         }
+        console.log("connecting player");
         if (this.gameStarted) {
             if (!playerExists) {
-                player.socket.emit("player-connected-callback", { status: errorStatus, message: "The game you are trying to connect to has already started." });
+                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
                 return;
             }
             else {
-                player.socket.emit("player-connected-callback", { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
+                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
                 player.socket.emit("handle-game-starting");
                 return;
             }
@@ -165,7 +168,7 @@ var Room = /** @class */ (function () {
         if (this.players.length === 1) {
             player.setLeader();
         }
-        player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
+        player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
         player.socket.join(this.roomId);
         player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader });
         this.alertWaitingRoom();

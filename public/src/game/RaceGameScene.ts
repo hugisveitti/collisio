@@ -91,6 +91,9 @@ export class RaceGameScene extends GameScene {
          */
         setTimeout(() => {
             for (let vehcile of this.vehicles) {
+                const r = vehcile.getRotation()
+                const gR = this.course.startRotation
+                vehcile.setRotation(0, gR.y, 0)
                 vehcile.stop()
 
             }
@@ -98,21 +101,21 @@ export class RaceGameScene extends GameScene {
 
         const timer = () => {
             this.playCountdownBeep()
-            this.showImportantInfo(countdown + "")
+            // this.showImportantInfo(countdown + "")
+            this.showViewsImportantInfo(countdown + "")
             countdown -= 1
             this.countDownTimeout = setTimeout(() => {
                 if (countdown > 0) {
-
                     timer()
-
                 } else {
                     this.playStartBeep()
-                    this.showImportantInfo("GO!!!!")
+                    this.showViewsImportantInfo("GO!!!!")
+                    // this.showImportantInfo("GO!!!!")
                     this.startAllVehicles()
                     this.gameStarted = true
 
                     setTimeout(() => {
-                        this.clearImportantInfo()
+                        this.clearViewsImportantInfo()
                     }, 2000)
                 }
             }, 1000)
@@ -156,13 +159,17 @@ export class RaceGameScene extends GameScene {
 
         window.clearTimeout(this.countDownTimeout)
         window.clearTimeout(this.gameStartingTimeOut)
+        this.clearTimouts()
 
         this.gameStarted = false
         this.winner = ""
         this.winTime = -1
 
         const sec = 2
-        this.showImportantInfo("Race starting in " + sec + " seconds")
+
+        this.showViewsImportantInfo("Race countdown starting in " + sec + " seconds")
+        //this.showImportantInfo("Race starting in " + sec + " seconds")
+        // this.showImportantInfo("Race starting in " + sec + " seconds")
         this.gameStartingTimeOut = setTimeout(() => {
             this.startRaceCountdown()
         }, sec * 1000)
@@ -173,14 +180,14 @@ export class RaceGameScene extends GameScene {
 
         const vehicleNumber = vehicle.body.name.slice(8, 9)
         if (this.gameTimers[vehicleNumber].isCheckpointCrossed) {
+            const cLapTime = this.gameTimers[vehicleNumber].getCurrentLapTime()
             this.gameTimers[vehicleNumber].lapDone()
 
 
-            const cLapTime = this.gameTimers[vehicleNumber].getCurrentLapTime()
 
             const p = this.course.goalSpawn.position
             const r = this.course.goalSpawn.rotation
-            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
 
             if (this.gameTimers[vehicleNumber].finished() && this.gameStarted) {
                 const totalTime = this.gameTimers[vehicleNumber].getTotalTime()
@@ -188,8 +195,12 @@ export class RaceGameScene extends GameScene {
                 if (this.winner === "") {
                     this.winner = this.players[vehicleNumber].playerName
                     this.winTime = totalTime
+
                 }
+                this.setViewImportantInfo(`Race finished, total time: ${totalTime}`, +vehicleNumber)
                 this.checkRaceOver()
+            } else {
+                this.setViewImportantInfo(`Lap time: ${cLapTime.toFixed(2)}`, +vehicleNumber, true)
             }
         }
     }
@@ -214,21 +225,19 @@ export class RaceGameScene extends GameScene {
 
         const p = this.course.checkpointSpawn.position
         const r = this.course.checkpointSpawn.rotation
-        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: 4, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
+        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
     }
 
 
     updateScoreTable() {
         const timeInfos: IRaceTimeInfo[] = []
-        let s = "<table><th>Player |</th><th>Best LT |</th><th>Curr LT |</th><th>TT |</th><th>Ln</th>"
         for (let i = 0; i < this.vehicles.length; i++) {
-            let cLapTime = this.gameTimers[i].getCurrentLapTime() //.toFixed(2)
-            const bLT = this.gameTimers[i].getBestLapTime() // === Infinity ? "-" : this.gameTimers[i].getBestLapTime()
+            let cLapTime = this.gameTimers[i].getCurrentLapTime()
+            const bLT = this.gameTimers[i].getBestLapTime()
             let totalTime = this.gameTimers[i].getTotalTime()
             if (this.gameTimers[i].finished()) {
                 cLapTime = -1
             }
-            s += `<tr><td>${this.players[i].playerName}</td><td>${bLT}</td><td>${cLapTime}</td><td>${totalTime.toFixed(2)}</td><td>${this.gameTimers[i].lapNumber} / ${this.preGameSettings.numberOfLaps}</td></tr>`
             const timeInfoObject: IRaceTimeInfo = {
                 playerName: this.players[i].playerName,
                 bestLapTime: bLT,
@@ -239,8 +248,7 @@ export class RaceGameScene extends GameScene {
             }
             timeInfos.push(timeInfoObject)
         }
-        s += "</table>"
-        // scoreTable.innerHTML = s
+
         if (this.gameRoomActions.updateScoreTable) {
             this.gameRoomActions.updateScoreTable(timeInfos)
         }

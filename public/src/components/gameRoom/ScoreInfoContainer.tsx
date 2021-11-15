@@ -20,7 +20,7 @@ const ScoreInfoContainer = (props: IScoreInfoContainer) => {
         opacity: 0.5,
       }}
     >
-      <RaceTimeTable raceTimeInfo={props.raceTimeInfo} dense />
+      <RaceTimeTable raceTimeInfo={props.raceTimeInfo} isEndOfGame={false} />
     </div>
   );
 };

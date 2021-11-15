@@ -1,13 +1,12 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Font, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
-import { GLTF, GLTFLoader, LoadingManager } from "@enable3d/three-wrapper/dist";
+import { Font, GLTF, GLTFLoader, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
+import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh, Scene3D } from "enable3d";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
-import { IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
-import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { vehicleConfigs } from "./VehicleConfigs";
-import { getStaticPath } from "../utils/settings";
 import { VehicleType } from "../shared-backend/shared-stuff";
+import { getStaticPath } from "../utils/settings";
+import { IPositionRotation, IVehicle } from "./IVehicle";
+import { vehicleConfigs } from "./VehicleConfigs";
 
 
 
@@ -681,7 +680,8 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-        this.setPosition(position.x, position.y + 4, position.z)
+        const y = Math.max(vehicleConfigs[this.vehicleType].wheelAxisBackPosition, vehicleConfigs[this.vehicleType].wheelAxisFrontPosition) + vehicleConfigs[this.vehicleType].suspensionRestLength
+        this.setPosition(position.x, position.y + y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
     };
 

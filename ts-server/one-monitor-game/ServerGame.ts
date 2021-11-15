@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { IPlayerInfo } from "../../public/src/shared-backend/shared-stuff";
+import { dts_create_room, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_room_created_callback, stmd_players_in_room_callback, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer"
 import TestRoom from "./TestRoom"
 
@@ -41,9 +41,10 @@ export default class RoomMaster {
             photoURL: string
         }
 
-        mobileSocket.on("player-connected", ({ roomId, playerName, playerId, isAuthenticated, photoURL }: IPlayerConnectedData) => {
+        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL }: IPlayerConnectedData) => {
+            console.log("connecting player", roomId, playerName)
             if (!this.roomExists(roomId)) {
-                mobileSocket.emit("player-connected-callback", { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
+                mobileSocket.emit(stmd_players_in_room_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
                 this.rooms[roomId].addPlayer(player)
@@ -59,7 +60,7 @@ export default class RoomMaster {
             delete this.rooms[roomId]
         })
         socket.join(roomId)
-        socket.emit("create-room-callback", { status: successStatus, message: "Successfully connected to the game.", data: { roomId } })
+        socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
     }
 
 
@@ -69,7 +70,7 @@ export default class RoomMaster {
         let onMobile: boolean
         console.log("adding socket, games", Object.keys(this.rooms))
 
-        socket.once("device-type", ({ deviceType, mode }) => {
+        socket.once(mdts_device_type, ({ deviceType, mode }) => {
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
             if (isTestMode) {
@@ -82,7 +83,7 @@ export default class RoomMaster {
             } else {
                 console.log("Connection from", deviceType)
                 if (deviceType === "desktop") {
-                    socket.on("create-room", () => {
+                    socket.on(dts_create_room, () => {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = uuid().slice(0, 4)
@@ -102,7 +103,7 @@ export default class RoomMaster {
 
                 }
 
-                socket.on("get-players-in-room", ({ roomId }) => {
+                socket.on(mdts_players_in_room, ({ roomId }) => {
                     let message, status, players: IPlayerInfo[]
                     if (this.rooms[roomId]) {
                         players = this.rooms[roomId].getPlayersInfo()
@@ -113,7 +114,7 @@ export default class RoomMaster {
                         message = "Room with given id does not exist"
                         status = errorStatus
                     }
-                    socket.emit("get-players-in-room-callback", { message, status, data: { players } })
+                    socket.emit(stmd_players_in_room_callback, { message, status, data: { players } })
                 })
 
             }
@@ -180,13 +181,14 @@ export class Room {
                 playerExists = true
             }
         }
+        console.log("connecting player")
 
         if (this.gameStarted) {
             if (!playerExists) {
-                player.socket.emit("player-connected-callback", { status: errorStatus, message: "The game you are trying to connect to has already started." })
+                player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
                 return
             } else {
-                player.socket.emit("player-connected-callback", { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
+                player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
                 player.socket.emit("handle-game-starting")
                 return
             }
@@ -201,7 +203,7 @@ export class Room {
         }
 
 
-        player.socket.emit("player-connected-callback", { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
+        player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
         player.socket.join(this.roomId)
         player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()

@@ -86,3 +86,31 @@ export interface IPlayerInfo {
     photoURL?: string
     isConnected?: boolean
 }
+
+
+/**
+ * Socket names
+ * 
+ * 
+ * dts is desktop to server
+ * stm is server to mobile
+ * mts is mobile to server
+ * 
+ * mdts is mobile or desktop to server
+ * stmd is server to mobile or desktop
+ * 
+ */
+
+
+export const dts_game_highscore = "dts_game_highscore";
+export const std_room_created_callback = "std_room_created_callback";
+export const dts_create_room = "dts_create_room"
+
+export const mdts_device_type = "mdts_device_type"
+export const mdts_players_in_room = "mdts_players_in_room"
+export const stmd_players_in_room_callback = "stmd_players_in_room_callback"
+
+export const mts_player_connected = "mts_player_connected"
+export const stm_player_connected_callback = "stm_player_connected_callback"
+
+

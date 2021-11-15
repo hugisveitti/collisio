@@ -1,5 +1,6 @@
 import { toast } from "react-toastify"
 import { io } from "socket.io-client"
+import { mdts_device_type } from "../shared-backend/shared-stuff"
 
 
 export interface ISocketCallback {
@@ -21,11 +22,9 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
 
     socket.on("connect", () => {
-        if (deviceType === "desktop") {
-            socket.emit("device-type", { deviceType: "desktop", mode })
-        } else {
-            socket.emit("device-type", { deviceType: "mobile", mode })
-        }
+
+        socket.emit(mdts_device_type, { deviceType: deviceType, mode })
+
     })
 
     if (deviceType === "mobile") {
