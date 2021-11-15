@@ -15,6 +15,7 @@ import { UserContext } from "../providers/UserProvider";
 import {
   MobileControls,
   mts_game_data_info,
+  mts_user_settings_changed,
   stm_game_finished,
   stm_player_finished,
 } from "../shared-backend/shared-stuff";
@@ -53,6 +54,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [isPortrait, setIsPortrait] = useState(false);
   /** used to see if device orientation isnt working */
   const [deviceOrientationAsked, setDeviceOrientationAsked] = useState(false);
+  const [sendControlsInterval, setSendControlsInterval] = useState(
+    undefined as undefined | NodeJS.Timer
+  );
 
   const handleUserLoggedIn = () => {};
 
@@ -101,6 +105,16 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     }, 100);
   };
 
+  const createSendControlsInterval = () => {
+    const _sendControlsInterval = setInterval(() => {
+      props.socket.emit("send-controls", controller);
+
+      // set fps
+    }, 1000 / 60);
+
+    setSendControlsInterval(_sendControlsInterval);
+  };
+
   useEffect(() => {
     handleDeviceOrientChange();
     // for portait mode
@@ -108,11 +122,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     // for gamma, beta, alpha
     window.addEventListener("deviceorientation", deviceOrientationHandler);
 
-    const sendControlsInterval = setInterval(() => {
-      props.socket.emit("send-controls", controller);
-
-      // set fps
-    }, 1000 / 60);
+    // createSendControlsInterval();
 
     return () => {
       window.clearInterval(sendControlsInterval);
@@ -122,27 +132,35 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   }, []);
 
   useEffect(() => {
+    // clearInterval(sendControlsInterval);
+    if (!settingsModalOpen) {
+      createSendControlsInterval();
+    } else {
+      clearInterval(sendControlsInterval);
+    }
+  }, [settingsModalOpen]);
+
+  useEffect(() => {
     setTimeout(() => {
       // hacky way
       // should have some emit from the game to the devices telling them to send info such as userSettings
       // 5000 ms then send it is hackkkky
-      props.socket.emit("settings-changed", props.store.userSettings);
+      props.socket.emit(mts_user_settings_changed, props.store.userSettings);
     }, 3000);
 
     props.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
-      console.log("player finished", data);
       if (data.isAuthenticated) {
         saveRaceDataPlayer(data, (gameDataInfo) => {
-          console.log("game data info", gameDataInfo);
           props.socket.emit(mts_game_data_info, gameDataInfo);
         });
       } else {
-        toast.warning("Your game won't be saved since you are not logged in.");
+        toast.warning(
+          "Your highscore won't be saved since you are not logged in."
+        );
       }
     });
 
     props.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
-      console.log("race finieshed", data);
       if (user?.uid) {
         saveRaceDataGame(user.uid, data);
       } else {

@@ -149,3 +149,7 @@ export const stm_game_finished = "stm_game_finished"
 export const mts_game_data_info = "mts_game_data_info"
 export const std_game_data_info = "std_game_data_info"
 /** end save highscore */
+
+
+export const std_user_settings_changed = "std_user_settings_changed"
+export const mts_user_settings_changed = "mts_user_settings_changed"

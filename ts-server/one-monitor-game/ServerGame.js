@@ -252,7 +252,7 @@ var Room = /** @class */ (function () {
         this.alertWaitingRoom();
     };
     Room.prototype.userSettingsChanged = function (data) {
-        this.socket.emit("user-settings-changed", data);
+        this.socket.emit(shared_stuff_1.std_user_settings_changed, data);
     };
     Room.prototype.setupPlayerFinishedListener = function () {
         var _this = this;

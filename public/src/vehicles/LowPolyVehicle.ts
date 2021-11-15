@@ -680,7 +680,8 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-        const y = Math.max(vehicleConfigs[this.vehicleType].wheelAxisBackPosition, vehicleConfigs[this.vehicleType].wheelAxisFrontPosition) + vehicleConfigs[this.vehicleType].suspensionRestLength
+        const y = (Math.max(vehicleConfigs[this.vehicleType].wheelAxisBackPosition, vehicleConfigs[this.vehicleType].wheelAxisFrontPosition) + vehicleConfigs[this.vehicleType].suspensionRestLength) ?? 2
+
         this.setPosition(position.x, position.y + y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
     };

@@ -6,7 +6,7 @@
  * So this limits the .js to one file.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
+exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
         this.beta = 0;
@@ -82,4 +82,6 @@ exports.dts_game_finished = "dts_game_finished";
 exports.stm_game_finished = "stm_game_finished";
 exports.mts_game_data_info = "mts_game_data_info";
 exports.std_game_data_info = "std_game_data_info";
-/** end save highscore */ 
+/** end save highscore */
+exports.std_user_settings_changed = "std_user_settings_changed";
+exports.mts_user_settings_changed = "mts_user_settings_changed";

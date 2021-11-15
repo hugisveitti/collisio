@@ -27,7 +27,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     }
 
     getLocalStorage(key: keyof IVehicleConfig) {
-        return window.localStorage.getItem(`${key}-${this.vehicleType}`)
+        return +window.localStorage.getItem(`${key}-${this.vehicleType}`)
     }
 
     setVehicleConfigKey(key: keyof IVehicleConfig, value: number | SimpleVector | string | boolean) {

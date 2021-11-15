@@ -4,7 +4,7 @@ import React from "react";
 import { IRaceTimeInfo } from "../../classes/Game";
 import { IEndOfGameData } from "../../game/GameScene";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
-import { frontPagePath } from "../Routes";
+import { frontPagePath, highscorePagePath } from "../Routes";
 import RaceTimeTable from "./RaceTimeTable";
 
 /**
@@ -43,12 +43,15 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
           <RaceTimeTable isEndOfGame raceTimeInfo={props.raceTimeInfo} />
         </Grid>
         <Grid item xs={6} xl={2}>
-          <a href={frontPagePath}>Back to front page</a>
-        </Grid>
-        <Grid item xs={6} xl={2}>
           <Button variant="contained" onClick={props.restartGame}>
             Restart
           </Button>
+        </Grid>
+        <Grid item xs={6} xl={2}>
+          <a href={frontPagePath}>Back to front page</a>
+        </Grid>
+        <Grid item xs={6} xl={2}>
+          <a href={highscorePagePath}>See highscores</a>
         </Grid>
       </Grid>
     </BasicDesktopModal>

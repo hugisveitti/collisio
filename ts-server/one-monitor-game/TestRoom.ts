@@ -1,6 +1,6 @@
 import { Socket } from "socket.io"
 
-import { MobileControls } from "../../public/src/shared-backend/shared-stuff"
+import { MobileControls, mts_user_settings_changed, std_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
 
 export default class TestRoom {
 
@@ -40,7 +40,7 @@ export default class TestRoom {
         }
 
         this.mobileSocket.once("disconnected", () => {
-            this.mobileSocket!.off("settings-changed", this.handleSettingsChanged)
+            this.mobileSocket!.off(mts_user_settings_changed, this.handleSettingsChanged)
         })
     }
 
@@ -58,12 +58,12 @@ export default class TestRoom {
     }
 
     setupUserSettingsListener() {
-        this.mobileSocket!.on("settings-changed", (data: any) => this.handleSettingsChanged(data))
+        this.mobileSocket!.on(mts_user_settings_changed, (data: any) => this.handleSettingsChanged(data))
     }
 
     userSettingsChanged(data: any) {
         if (this.desktopSocket) {
-            this.desktopSocket.emit("user-settings-changed", data)
+            this.desktopSocket.emit(std_user_settings_changed, data)
         }
     }
 }

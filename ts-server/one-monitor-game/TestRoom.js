@@ -27,7 +27,7 @@ var TestRoom = /** @class */ (function () {
             this.desktopSocket.emit("test-made-connection", {});
         }
         this.mobileSocket.once("disconnected", function () {
-            _this.mobileSocket.off("settings-changed", _this.handleSettingsChanged);
+            _this.mobileSocket.off(shared_stuff_1.mts_user_settings_changed, _this.handleSettingsChanged);
         });
     };
     TestRoom.prototype.setupControlsListener = function () {
@@ -42,11 +42,11 @@ var TestRoom = /** @class */ (function () {
     };
     TestRoom.prototype.setupUserSettingsListener = function () {
         var _this = this;
-        this.mobileSocket.on("settings-changed", function (data) { return _this.handleSettingsChanged(data); });
+        this.mobileSocket.on(shared_stuff_1.mts_user_settings_changed, function (data) { return _this.handleSettingsChanged(data); });
     };
     TestRoom.prototype.userSettingsChanged = function (data) {
         if (this.desktopSocket) {
-            this.desktopSocket.emit("user-settings-changed", data);
+            this.desktopSocket.emit(shared_stuff_1.std_user_settings_changed, data);
         }
     };
     return TestRoom;

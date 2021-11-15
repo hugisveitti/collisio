@@ -7,7 +7,7 @@ import {
   IconButton,
   Slider,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { IUserSettings, IVehicleSettings } from "../classes/User";
@@ -15,6 +15,7 @@ import NotLoggedInModal from "../components/NotLoggedInModal";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import { IUser, setDBUserSettings } from "../firebase/firebaseFunctions";
+import { mts_user_settings_changed } from "../shared-backend/shared-stuff";
 
 interface IControllerSettingsComponent {
   setSettingsModalOpen: any;
@@ -30,10 +31,18 @@ interface IControllerSettingsComponent {
 const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   const user = props.user;
 
+  const [chaseSpeedDefaultVal, setChaseSpeedDefaultVal] = useState(
+    props.store.userSettings.vehicleSettings.chaseCameraSpeed
+  );
+
+  const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(
+    props.store.userSettings.vehicleSettings.steeringSensitivity
+  );
+
   const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
     if (user) {
       setDBUserSettings(user.uid, newUserSettings);
-      props.socket.emit("settings-changed", newUserSettings);
+      props.socket.emit(mts_user_settings_changed, newUserSettings);
       props.store.setUserSettings(newUserSettings);
     }
   };
@@ -100,8 +109,9 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           max={1}
           valueLabelDisplay="auto"
           step={0.01}
-          value={props.store.userSettings.vehicleSettings.chaseCameraSpeed}
-          onChange={(e, value) => {
+          defaultValue={chaseSpeedDefaultVal}
+          onChange={(e, value) => {}}
+          onChangeCommitted={(e, value) => {
             const newVehicleSettings = {
               ...props.store.userSettings.vehicleSettings,
               chaseCameraSpeed: value,
@@ -111,9 +121,8 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               vehicleSettings: newVehicleSettings,
             };
             props.store.setUserSettings(newUserSettings);
-          }}
-          onChangeCommitted={() => {
-            saveUserSettingsToBD(props.store.userSettings);
+
+            saveUserSettingsToBD(newUserSettings);
           }}
         />
       </Grid>
@@ -124,20 +133,19 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           max={2}
           valueLabelDisplay="auto"
           step={0.01}
-          value={props.store.userSettings.vehicleSettings.steeringSensitivity}
-          onChange={(e, value) => {
-            const newVehicleSettings = {
+          defaultValue={steerSenceDefaultVal}
+          onChange={(e, value) => {}}
+          onChangeCommitted={(e, value) => {
+            const newVehicleSettings: IVehicleSettings = {
               ...props.store.userSettings.vehicleSettings,
-              steeringSensitivity: value,
-            } as IVehicleSettings;
+              steeringSensitivity: value as number,
+            };
             const newUserSettings = {
               ...props.store.userSettings,
               vehicleSettings: newVehicleSettings,
             };
             props.store.setUserSettings(newUserSettings);
-          }}
-          onChangeCommitted={() => {
-            saveUserSettingsToBD(props.store.userSettings);
+            saveUserSettingsToBD(newUserSettings);
           }}
         />
       </Grid>

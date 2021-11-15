@@ -15,7 +15,7 @@ import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
-import { VehicleControls, VehicleType, MobileControls, TrackType } from "../shared-backend/shared-stuff"
+import { VehicleControls, VehicleType, MobileControls, TrackType, std_user_settings_changed } from "../shared-backend/shared-stuff"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { Console } from "console"
 
@@ -528,6 +528,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
     setSocket(socket: Socket) {
         this.socket = socket
+        this.userSettingsListener()
     }
 
     createController() {
@@ -624,6 +625,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     restartGame() {
+        console.log("restart game!")
         this.vehicle.resetPosition()
         this.gameTime.restart()
     }
@@ -639,6 +641,13 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.createVehicle()
 
     }
+
+    userSettingsListener() {
+        this.socket.on(std_user_settings_changed, (data: any) => {
+            this.vehicle.updateVehicleSettings(data.userSettings.vehicleSettings)
+        })
+    }
+
 }
 
 

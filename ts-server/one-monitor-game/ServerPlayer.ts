@@ -2,7 +2,7 @@ import { Socket } from "socket.io"
 import { Room } from "./ServerGame"
 
 
-import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info } from "../../public/src/shared-backend/shared-stuff"
+import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info, mts_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
 
@@ -138,7 +138,7 @@ export class Player {
     }
 
     setupUserSettingsListener() {
-        this.socket.on("settings-changed", (newUserSettings) => {
+        this.socket.on(mts_user_settings_changed, (newUserSettings) => {
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (this.game) {
                 this.game.userSettingsChanged({ userSettings: newUserSettings, playerNumber: this.playerNumber })

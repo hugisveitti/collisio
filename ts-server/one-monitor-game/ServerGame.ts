@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { dts_create_room, dts_game_finished, dts_player_finished, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_game_data_info, std_room_created_callback, stmd_players_in_room_callback, stmd_socket_ready, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
+import { dts_create_room, dts_game_finished, dts_player_finished, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_game_data_info, std_room_created_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer"
 import TestRoom from "./TestRoom"
 
@@ -300,7 +300,7 @@ export class Room {
     }
 
     userSettingsChanged(data: any) {
-        this.socket.emit("user-settings-changed", data)
+        this.socket.emit(std_user_settings_changed, data)
     }
 
     setupPlayerFinishedListener() {

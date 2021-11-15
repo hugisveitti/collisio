@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { IPlayerInfo, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
+import { IPlayerInfo, std_user_settings_changed, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../shared-game-components/ICourse";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -620,7 +620,8 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     userSettingsListener() {
-        this.socket.on("user-settings-changed", (data: IUserSettingsMessage) => {
+        this.socket.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
+            console.log("setting user settings", data)
             this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
         })
     }
