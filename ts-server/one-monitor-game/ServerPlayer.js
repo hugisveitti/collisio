@@ -4,7 +4,6 @@ exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var Player = /** @class */ (function () {
     function Player(socket, playerName, id, isAuthenticated, photoURL) {
-        this.socket = socket;
         this.playerName = playerName;
         this.teamNumber = 1;
         this.vehicleType = "normal";
@@ -15,16 +14,17 @@ var Player = /** @class */ (function () {
         this.VehicleControls = new shared_stuff_1.VehicleControls();
         this.isConnected = true;
         this.photoURL = photoURL;
+        this.setSocket(socket);
+    }
+    Player.prototype.setSocket = function (newSocket) {
+        this.socket = newSocket;
         this.setupControler();
+        this.setupGameDataInfoListener();
         this.setupPlayerInfoListener();
         this.setupQuitGameListener();
         this.setupUserSettingsListener();
         this.setupReconnectListener();
         this.setupWaitingRoomListener;
-    }
-    Player.prototype.setSocket = function (newSocket) {
-        this.socket = newSocket;
-        this.setupControler();
     };
     Player.prototype.setupWaitingRoomListener = function () {
         var _this = this;
@@ -127,6 +127,21 @@ var Player = /** @class */ (function () {
             }
             if (_this.game) {
                 _this.game.alertWaitingRoom();
+            }
+        });
+    };
+    Player.prototype.playerFinished = function (data) {
+        console.log("##player finished");
+        this.socket.emit(shared_stuff_1.stm_player_finished, data);
+    };
+    Player.prototype.gameFinished = function (data) {
+        this.socket.emit(shared_stuff_1.stm_game_finished, data);
+    };
+    Player.prototype.setupGameDataInfoListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mts_game_data_info, function (data) {
+            if (_this.game) {
+                _this.game.sendGameDataInfo(data);
             }
         });
     };

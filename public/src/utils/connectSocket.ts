@@ -1,6 +1,6 @@
 import { toast } from "react-toastify"
-import { io } from "socket.io-client"
-import { mdts_device_type } from "../shared-backend/shared-stuff"
+import { io, Socket } from "socket.io-client"
+import { mdts_device_type, stmd_socket_ready } from "../shared-backend/shared-stuff"
 
 
 export interface ISocketCallback {
@@ -9,7 +9,7 @@ export interface ISocketCallback {
     data: any
 }
 
-export const createSocket = (deviceType: string, mode: string = "not-test") => {
+export const createSocket = (deviceType: string, callback: (socket: Socket) => void, mode: string = "not-test") => {
 
     // not secure, device orientation wont work
     if (window.location.href.includes("http://") && !window.location.href.includes("localhost")) {
@@ -24,6 +24,9 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
     socket.on("connect", () => {
 
         socket.emit(mdts_device_type, { deviceType: deviceType, mode })
+        socket.on(stmd_socket_ready, () => {
+            callback(socket)
+        })
 
     })
 
@@ -41,9 +44,8 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
     })
 
+    /** if user leaves the website */
     window.onbeforeunload = () => {
         socket.emit("quit-room")
     }
-
-    return socket
 }

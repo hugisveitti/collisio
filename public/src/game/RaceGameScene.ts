@@ -16,7 +16,7 @@ import { GameTime } from "./GameTimeClass";
 
 
 const stats = new Stats()
-const scoreTable = document.createElement("div")
+const totalTimeDiv = document.createElement("div")
 
 
 export class RaceGameScene extends GameScene {
@@ -39,8 +39,16 @@ export class RaceGameScene extends GameScene {
     constructor() {
         super()
 
-        scoreTable.setAttribute("id", "score-info")
-        document.body.appendChild(scoreTable)
+        document.body.appendChild(totalTimeDiv)
+        totalTimeDiv.setAttribute("style", `
+        position:absolute;
+        top:25px;
+        left:50%;
+        transform:translate(-50%, 0);
+        font-family:monospace;
+        font-size:64px;
+        text-shadow:1px 1px white;
+        `)
 
         this.winner = ""
         this.winTime = -1
@@ -198,6 +206,7 @@ export class RaceGameScene extends GameScene {
 
                 }
                 this.setViewImportantInfo(`Race finished, total time: ${totalTime}`, +vehicleNumber)
+                this.prepareEndOfRacePlayer(+vehicleNumber)
                 this.checkRaceOver()
             } else {
                 this.setViewImportantInfo(`Lap time: ${cLapTime.toFixed(2)}`, +vehicleNumber, true)
@@ -213,7 +222,7 @@ export class RaceGameScene extends GameScene {
             }
         }
         if (isRaceOver) {
-            this.showImportantInfo(`Race over <br /> ${this.winner} won with total time ${this.winTime} <br /> Press 'r' to reset game`)
+
             this.gameStarted = false
             this.prepareEndOfGameData()
         }
@@ -231,10 +240,13 @@ export class RaceGameScene extends GameScene {
 
     updateScoreTable() {
         const timeInfos: IRaceTimeInfo[] = []
+        let maxTotalTime = 0
+
         for (let i = 0; i < this.vehicles.length; i++) {
             let cLapTime = this.gameTimers[i].getCurrentLapTime()
             const bLT = this.gameTimers[i].getBestLapTime()
             let totalTime = this.gameTimers[i].getTotalTime()
+            maxTotalTime = Math.max(totalTime, maxTotalTime)
             if (this.gameTimers[i].finished()) {
                 cLapTime = -1
             }
@@ -252,6 +264,8 @@ export class RaceGameScene extends GameScene {
         if (this.gameRoomActions.updateScoreTable) {
             this.gameRoomActions.updateScoreTable(timeInfos)
         }
+
+        totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
     }
 
 
@@ -273,37 +287,52 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+
+    /**
+     * Prepare and send data when player finished to save to highscore
+     * @i player number
+     */
+    prepareEndOfRacePlayer(i: number) {
+        const playerData: IEndOfRaceInfoPlayer = {
+            totalTime: this.gameTimers[i].getTotalTime(),
+            numberOfLaps: this.preGameSettings.numberOfLaps,
+            playerName: this.players[i].playerName,
+            playerId: this.players[i].id,
+            bestLapTime: this.gameTimers[i].getBestLapTime(),
+            trackType: this.preGameSettings.trackName,
+            lapTimes: this.gameTimers[i].getLapTimes(),
+            gameId: this.gameId,
+            date: new Date(),
+            private: false,
+            isAuthenticated: this.players[i].isAuthenticated,
+            vehicleType: this.players[i].vehicleType,
+            engineForce: this.vehicles[i].engineForce,
+            breakingForce: this.vehicles[i].breakingForce,
+            steeringSensitivity: this.vehicles[i].steeringSensitivity
+        }
+
+        console.log("end of race player prepare ", playerData)
+        if (this.gameRoomActions.playerFinished) {
+            this.gameRoomActions.playerFinished(playerData)
+        }
+    }
+
+
     prepareEndOfGameData() {
         const playerGameInfos: IPlayerGameInfo[] = []
-        const playersData: IEndOfRaceInfoPlayer[] = []
+
         for (let i = 0; i < this.vehicles.length; i++) {
-            const playerData: IEndOfRaceInfoPlayer = {
-                totalTime: this.gameTimers[i].getTotalTime(),
-                numberOfLaps: this.preGameSettings.numberOfLaps,
-                playerName: this.players[i].playerName,
-                playerId: this.players[i].id,
-                bestLapTime: this.gameTimers[i].getBestLapTime(), //  this.bestLapTime[i],
-                trackType: this.preGameSettings.trackName,
-                lapTimes: this.gameTimers[i].getLapTimes(),
-                gameId: this.gameId,
-                date: new Date(),
-                private: false,
-                isAuthenticated: this.players[i].isAuthenticated,
-                vehicleType: this.players[i].vehicleType,
-                engineForce: this.vehicles[i].engineForce,
-                breakingForce: this.vehicles[i].breakingForce,
-                steeringSensitivity: this.vehicles[i].steeringSensitivity
-            }
-            playersData.push(playerData)
+
             playerGameInfos.push({
-                id: this.players[i].id ?? "undefined",
+                id: this.players[i].id,
                 name: this.players[i].playerName,
                 totalTime: this.gameTimers[i].getTotalTime(),
                 lapTimes: this.gameTimers[i].getLapTimes(),
                 vehicleType: this.players[i].vehicleType,
                 engineForce: this.vehicles[i].engineForce,
                 breakingForce: this.vehicles[i].breakingForce,
-                steeringSensitivity: this.vehicles[i].steeringSensitivity
+                steeringSensitivity: this.vehicles[i].steeringSensitivity,
+                isAuthenticated: this.players[i].isAuthenticated
             })
         }
 
@@ -315,8 +344,9 @@ export class RaceGameScene extends GameScene {
             roomId: this.roomId,
             date: new Date()
         }
+        console.log("prepare endo of race data")
         if (this.gameRoomActions.gameFinished) {
-            this.gameRoomActions.gameFinished({ playersData, endOfRaceInfo })
+            this.gameRoomActions.gameFinished({ endOfRaceInfo })
         }
         // wa
         // if save then update gameId

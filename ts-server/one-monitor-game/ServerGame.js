@@ -33,7 +33,7 @@ var RoomMaster = /** @class */ (function () {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL;
             console.log("connecting player", roomId, playerName);
             if (!_this.roomExists(roomId)) {
-                mobileSocket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
+                mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
             else {
                 var player = new ServerPlayer_1.Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL);
@@ -105,6 +105,7 @@ var RoomMaster = /** @class */ (function () {
                     socket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: message, status: status, data: { players: players } });
                 });
             }
+            socket.emit(shared_stuff_1.stmd_socket_ready, {});
         });
     };
     return RoomMaster;
@@ -116,13 +117,10 @@ var Room = /** @class */ (function () {
         this.gameSettings = {};
         this.roomId = roomId;
         this.io = io;
-        this.socket = socket;
         this.gameStarted = false;
         this.isConnected = true;
         this.deleteRoomCallback = deleteRoomCallback;
-        this.setupStartGameListener();
-        this.setupGameSettingsListener();
-        this.setupLeftWaitingRoomListener();
+        this.setSocket(socket);
     }
     Room.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;
@@ -141,6 +139,9 @@ var Room = /** @class */ (function () {
         this.socket = socket;
         this.setupStartGameListener();
         this.setupGameSettingsListener();
+        this.setupLeftWaitingRoomListener();
+        this.setupPlayerFinishedListener();
+        this.setupGameFinishedListener();
     };
     Room.prototype.addPlayer = function (player) {
         var playerExists = false;
@@ -150,17 +151,16 @@ var Room = /** @class */ (function () {
                 playerExists = true;
             }
         }
-        console.log("connecting player");
+        console.log("adding player");
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
-                return;
             }
             else {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
                 player.socket.emit("handle-game-starting");
-                return;
             }
+            return;
         }
         this.players.push(player);
         player.setGame(this);
@@ -253,6 +253,31 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.userSettingsChanged = function (data) {
         this.socket.emit("user-settings-changed", data);
+    };
+    Room.prototype.setupPlayerFinishedListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.dts_player_finished, function (data) {
+            console.log("player finehsd", data.playerId);
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                if (player.id === data.playerId) {
+                    console.log("player found!");
+                    player.playerFinished(data);
+                }
+            }
+        });
+    };
+    Room.prototype.setupGameFinishedListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.dts_game_finished, function (data) {
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var players = _a[_i];
+                players.gameFinished(data);
+            }
+        });
+    };
+    Room.prototype.sendGameDataInfo = function (data) {
+        this.socket.emit(shared_stuff_1.std_game_data_info, data);
     };
     Room.prototype.toString = function () {
         var playersString = "";

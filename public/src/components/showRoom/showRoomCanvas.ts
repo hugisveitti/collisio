@@ -62,7 +62,6 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     renderer.outputEncoding = THREE.sRGBEncoding;
-    console.log("width ", width)
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xbfe3dd);

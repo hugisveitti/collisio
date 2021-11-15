@@ -113,6 +113,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       setDisplayNameModalOpen(true);
     } else {
       if (!props.store.player) {
+        /** if gotten here through url */
+
         connectToRoom(user.displayName);
       }
       setDisplayNameModalOpen(false);

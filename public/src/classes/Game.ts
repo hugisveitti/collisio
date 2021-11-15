@@ -1,4 +1,4 @@
-import { TrackType, GameType, VehicleType } from "../shared-backend/shared-stuff";
+import { TrackType, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 
 
 export const allTrackTypes: { name: string, type: TrackType }[] = [
@@ -37,7 +37,7 @@ export const defaultPreGameSettings: IPreGameSettings = {
 export interface IEndOfRaceInfoPlayer {
     totalTime: number
     numberOfLaps: number
-    playerId?: string
+    playerId: string
     playerName: string
     lapTimes: number[]
     bestLapTime: number
@@ -61,11 +61,11 @@ export interface IPlayerGameInfo {
     engineForce: number
     breakingForce: number
     steeringSensitivity: number
+    isAuthenticated: boolean
 }
 
 // info about the game
 export interface IEndOfRaceInfoGame {
-
     numberOfLaps: number
     playersInfo: IPlayerGameInfo[]
     trackType: TrackType
@@ -82,6 +82,15 @@ export interface IRaceTimeInfo {
     currentLapTime: number
     lapNumber: number /**  show "current lap / totalNumberOfLaps" */
     numberOfLaps: number
+
 }
 
 
+export interface IRoomInfo {
+    roomId: string
+    players: IPreGamePlayerInfo[]
+    preGameSettings: IPreGameSettings
+    desktopId: string
+    desktopAuthenticated: boolean
+    date: Date
+}

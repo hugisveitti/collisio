@@ -3,12 +3,21 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
-import { getDBUserSettings } from "../firebase/firebaseFunctions";
+import {
+  saveRaceDataGame,
+  saveRaceDataPlayer,
+} from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
-import { MobileControls } from "../shared-backend/shared-stuff";
+import {
+  MobileControls,
+  mts_game_data_info,
+  stm_game_finished,
+  stm_player_finished,
+} from "../shared-backend/shared-stuff";
 import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
 import { isIphone } from "../utils/settings";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
@@ -29,7 +38,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const [forward, setForward] = useState(false);
   const [backward, setBackward] = useState(false);
-  const [breaks, setBreaks] = useState(false);
   const [reset, setReset] = useState(false);
   const [moreSpeed, setMoreSpeed] = useState(false);
 
@@ -120,6 +128,32 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       // 5000 ms then send it is hackkkky
       props.socket.emit("settings-changed", props.store.userSettings);
     }, 3000);
+
+    props.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
+      console.log("player finished", data);
+      if (data.isAuthenticated) {
+        saveRaceDataPlayer(data, (gameDataInfo) => {
+          console.log("game data info", gameDataInfo);
+          props.socket.emit(mts_game_data_info, gameDataInfo);
+        });
+      } else {
+        toast.warning("Your game won't be saved since you are not logged in.");
+      }
+    });
+
+    props.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
+      console.log("race finieshed", data);
+      if (user?.uid) {
+        saveRaceDataGame(user.uid, data);
+      } else {
+        console.warn("Player not logged in, cannot save game");
+      }
+    });
+
+    return () => {
+      props.socket.off(stm_game_finished);
+      props.socket.off(stm_player_finished);
+    };
   }, []);
 
   // how to set key
@@ -299,3 +333,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 };
 
 export default ControlsRoom;
+function stm_game_finisehd(stm_game_finisehd: any, arg1: (data: any) => any) {
+  throw new Error("Function not implemented.");
+}

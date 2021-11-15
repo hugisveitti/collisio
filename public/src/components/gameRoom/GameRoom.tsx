@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../../game/ball-game";
 import { IGameScene } from "../../game/IGameScene";
-import { RaceGameScene, startRaceGame } from "../../game/RaceGameScene";
+import { startRaceGame } from "../../game/RaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import GameSettingsModal from "./GameSettingsModal";
@@ -12,10 +12,19 @@ import { frontPagePath } from "../Routes";
 import { IStore } from "../store";
 import EndOfGameModal from "./EndOfGameModal";
 import { IEndOfGameData } from "../../game/GameScene";
-import { saveGameData } from "../../firebase/firebaseFunctions";
 import { inTestMode } from "../../utils/settings";
-import { IRaceTimeInfo } from "../../classes/Game";
+import {
+  IEndOfRaceInfoGame,
+  IEndOfRaceInfoPlayer,
+  IRaceTimeInfo,
+} from "../../classes/Game";
 import ScoreInfoContainer from "./ScoreInfoContainer";
+import {
+  dts_game_finished,
+  dts_player_finished,
+  std_game_data_info,
+} from "../../shared-backend/shared-stuff";
+import { saveGameFinished } from "../../firebase/firebaseFunctions";
 
 interface IGameRoom {
   socket: Socket;
@@ -47,16 +56,23 @@ const GameRoom = (props: IGameRoom) => {
   const handelGameFinished = (data: IEndOfGameData) => {
     setEndOfGameModalOpen(true);
     setEndOfGameData(data);
-    if (data?.endOfRaceInfo && data.playersData && !inTestMode) {
-      saveGameData(data.playersData, data.endOfRaceInfo, (_gameDataInfo) => {
-        console.log("game data info", _gameDataInfo);
-        setGameDataInfo(_gameDataInfo);
-      });
+    if (!inTestMode) {
+      saveGameFinished(data.endOfRaceInfo);
+      props.socket.emit(dts_game_finished, data);
+      // saveRaceData(data.playersData, data.endOfRaceInfo, (_gameDataInfo) => {
+      // console.log("game data info", _gameDataInfo);
+      // setGameDataInfo(_gameDataInfo);
+      // });
     }
   };
 
   const handleUpdateScoreTable = (data: IRaceTimeInfo[]) => {
     setRaceTimeInfo(data);
+  };
+
+  const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
+    props.socket.emit(dts_player_finished, data);
+    console.log("send to server player finished");
   };
 
   useEffect(() => {
@@ -99,6 +115,7 @@ const GameRoom = (props: IGameRoom) => {
           escPressed: handleEscPressed,
           gameFinished: handelGameFinished,
           updateScoreTable: handleUpdateScoreTable,
+          playerFinished: handlePlayerFinished,
         },
         (_gameObject) => {
           setGameObject(_gameObject);
@@ -106,9 +123,14 @@ const GameRoom = (props: IGameRoom) => {
       );
     }
 
+    props.socket.on(std_game_data_info, (data: string[]) => {
+      setGameDataInfo(gameDataInfo.concat(data));
+    });
+
     return () => {
       props.socket.emit("quit-room");
       props.socket.off("player-disconnected");
+      props.socket.off(std_game_data_info);
     };
   }, []);
 
@@ -136,6 +158,7 @@ const GameRoom = (props: IGameRoom) => {
             gameObject.restartGame();
             setEndOfGameModalOpen(false);
           }
+          setGameDataInfo([]);
         }}
         raceTimeInfo={raceTimeInfo}
         gameDataInfo={gameDataInfo}

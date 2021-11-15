@@ -1,5 +1,4 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { saveGameData } from "../firebase/firebaseFunctions";
 import { IPlayerInfo, MobileControls, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
@@ -84,7 +83,8 @@ export const createFakeHighscoreData = () => {
                 engineForce: 100,
                 steeringSensitivity: -1,
                 breakingForce: -1,
-                vehicleType: "test"
+                vehicleType: "test",
+                isAuthenticated: false
             })
         }
         const gameData: IEndOfRaceInfoGame = {
@@ -99,9 +99,9 @@ export const createFakeHighscoreData = () => {
         console.log("###saving data")
         console.log("GAMEDATA", gameData)
         console.log("PlayerDATA", playerData)
-        saveGameData(playerData, gameData, (gameDataInfo) => {
-            console.log("interesting game data in fake data", gameDataInfo)
-        })
+        // saveRaceData(playerData, gameData, (gameDataInfo) => {
+        //     console.log("interesting game data in fake data", gameDataInfo)
+        // })
     }
 }
 

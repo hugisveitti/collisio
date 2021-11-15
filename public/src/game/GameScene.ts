@@ -42,7 +42,6 @@ const gameSong = new Howl({
 })
 
 export interface IEndOfGameData {
-    playersData?: IEndOfRaceInfoPlayer[]
     endOfRaceInfo?: IEndOfRaceInfoGame
 }
 
@@ -64,8 +63,10 @@ interface IView {
 
 export interface IGameRoomActions {
     escPressed?: () => void
+    /** have the possibity to expand this interface to include other game types */
     gameFinished?: (data: IEndOfGameData) => void
     updateScoreTable?: (data: IRaceTimeInfo[]) => void
+    playerFinished?: (data: IEndOfRaceInfoPlayer) => void
 }
 
 
@@ -398,9 +399,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
                 setTimeout(() => {
-                    console.log("timeout over", nameRight)
                     if (nameRight > 0) {
-                        console.log("change name style")
                         nameTop -= 1;
                         nameRight -= 1;
                         nameFontSize -= 2
@@ -652,8 +651,6 @@ export class GameScene extends Scene3D implements IGameScene {
         const r = this.course.startRotation
 
         const courseY = this.course.startPosition?.y ?? 2
-        console.log("startPos", this.course.startPosition)
-        console.log("groundY", courseY)
         let possibleStartingPos = []
         let offset = 1
         for (let i = 0; i < this.vehicles.length; i++) {

@@ -21,6 +21,7 @@ import {
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
+import CookiePrompt from "../components/CookiePrompt";
 import LoginComponent from "../components/LoginComponent";
 import {
   buyPremiumPagePath,
@@ -144,6 +145,7 @@ const AppContainer = (props: IAppContainer) => {
 
       {props.children}
       <ToastContainer />
+      <CookiePrompt />
     </React.Fragment>
   );
 };

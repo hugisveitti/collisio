@@ -1,6 +1,6 @@
 import { child, get, push, ref, set, update, onValue, remove, orderByValue, query, orderByChild, limitToLast, Query } from "firebase/database";
 import { toast } from "react-toastify";
-import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { TrackType } from "../shared-backend/shared-stuff";
 import { database, } from "./firebaseInit";
@@ -14,6 +14,7 @@ export const uniqueHighscoresRefPath = "unique-highscores"
 
 export const playerGameDataRefPath = "player-game-data"
 export const gameDataRefPath = "game-data"
+export const roomDataRefPath = "room-data"
 export const userGamesRefPath = "games"
 
 const availableRoomsRefPath = "available-rooms"
@@ -100,71 +101,93 @@ export const getDBUserProfile = (userId: string, callback: (data: IProfile | und
     }), { onlyOnce: true })
 }
 
-export const saveGameData = (playerGameInfo: IEndOfRaceInfoPlayer[], gameInfo: IEndOfRaceInfoGame, callback: (gameDataInfo: string[]) => void) => {
-    // const newGameKey = push(child(ref(database), gameDataRefPath)).key;
-    const newGameKey = gameInfo.gameId
+export const saveRaceDataPlayer = (playerGameInfo: IEndOfRaceInfoPlayer, callback: (gameDataInfo: string[]) => void) => {
+    const newGameKey = playerGameInfo.gameId
+
     const updates = {}
-    updates[gameDataRefPath + "/" + newGameKey] = gameInfo
+    const gameDataInfo: string[] = []
+    const { trackType, numberOfLaps } = playerGameInfo
 
-    // Facts, like if a user got her personal best
-    // If user got top 10 all time
-    let gameDataInfo: string[] = []
+    getPlayerBestScoreOnTrackAndLap(playerGameInfo.playerId, trackType, numberOfLaps, (oldPersonalBest) => {
+        getAllTimeBestScoresOnTrackAndLap(trackType, numberOfLaps, 5, (bestScores) => {
 
-
-
-    const userIds = playerGameInfo.map(p => p.playerId)
-    getPlayersBestScoreOnTrackAndLap(userIds, gameInfo.trackType, gameInfo.numberOfLaps, (oldPersonalBests) => {
-        getAllTimeBestScoresOnTrackAndLap(gameInfo.trackType, gameInfo.numberOfLaps, 5, (bestScores) => {
-
-            for (let i = 0; i < playerGameInfo.length; i++) {
-                if (playerGameInfo[i].isAuthenticated) {
-                    const pData = playerGameInfo[i]
-                    updates[usersRefPath + "/" + pData.playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = pData
-                    updates[usersRefPath + "/" + pData.playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGameGameInfoPath] = gameInfo
-                    updates[allHighscoresRefPath + "/" + gameInfo.trackType + "/" + gameInfo.numberOfLaps + "/" + playerGameInfo[i].playerId + "/" + newGameKey] = pData
-
-
-                    if (oldPersonalBests[pData.playerId].totalTime !== undefined && oldPersonalBests[pData.playerId].totalTime > pData.totalTime) {
+            if (playerGameInfo.isAuthenticated) {
+                const pData = playerGameInfo
+                updates[usersRefPath + "/" + pData.playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = pData
+                updates[allHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId + "/" + newGameKey] = pData
+                if (oldPersonalBest.totalTime !== undefined && oldPersonalBest.totalTime > pData.totalTime) {
+                    gameDataInfo.push(
+                        `${pData.playerName} set a personal best time.`
+                    )
+                    updates[uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
+                } else if (oldPersonalBest.totalTime !== undefined) {
+                    gameDataInfo.push(`${pData.playerName} was ${(pData.totalTime - oldPersonalBest.totalTime).toFixed(2)} sec from setting a PB.`)
+                } else {
+                    gameDataInfo.push(`${pData.playerName} raced this track and number-of-laps combination for the first time.`)
+                    updates[uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
+                }
+                const totalTime = pData.totalTime
+                let place = 1
+                let gottenPlace = false
+                for (let bScores of bestScores) {
+                    if (totalTime < bScores.totalTime && !gottenPlace) {
+                        gottenPlace = true
                         gameDataInfo.push(
-                            `${pData.playerName} set a personal best time.`
-                        )
-                        updates[uniqueHighscoresRefPath + "/" + gameInfo.trackType + "/" + gameInfo.numberOfLaps + "/" + playerGameInfo[i].playerId] = playerGameInfo[i]
-                    } else if (oldPersonalBests[pData.playerId].totalTime !== undefined) {
-                        gameDataInfo.push(`${pData.playerName} was ${(pData.totalTime - oldPersonalBests[pData.playerId].totalTime).toFixed(2)} sec from setting a PB.`)
-                    } else {
-                        gameDataInfo.push(`${pData.playerName} raced this track and number-of-laps combination for the first time.`)
-                        updates[uniqueHighscoresRefPath + "/" + gameInfo.trackType + "/" + gameInfo.numberOfLaps + "/" + playerGameInfo[i].playerId] = playerGameInfo[i]
-                    }
-                    const totalTime = pData.totalTime
-                    let place = 1
-                    let gottenPlace = false
-                    for (let bScores of bestScores) {
-                        if (totalTime < bScores.totalTime && !gottenPlace) {
-                            gottenPlace = true
-                            gameDataInfo.push(
-                                `${pData.playerName}'s time was number ${place} of all time.`
-                            )
-                        }
-                        place += 1
-                    }
-                    if (bestScores.length > 0) {
-                        gameDataInfo.push(
-                            `${pData.playerName}'s time was ${(pData.totalTime - bestScores[0].totalTime).toFixed(2)} sec from the all time best record.`
+                            `${pData.playerName}'s time was number ${place} of all time.`
                         )
                     }
-
+                    place += 1
+                }
+                if (bestScores.length > 0) {
+                    gameDataInfo.push(
+                        `${pData.playerName}'s time was ${(pData.totalTime - bestScores[0].totalTime).toFixed(2)} sec from the all time best record.`
+                    )
                 }
             }
             update(ref(database), updates).catch((err) => {
-                console.log("error saving race", err)
-                toast("Error saving race")
+                console.log("error saving player data", err)
+                toast.error("Error saving player data")
             })
 
             callback(gameDataInfo)
         })
     })
+}
 
 
+export const saveRaceDataGame = (playerId: string, gameInfo: IEndOfRaceInfoGame,) => {
+    const updates = {}
+    updates[usersRefPath + "/" + playerId + "/" + userGamesRefPath + "/" + gameInfo.gameId + "/" + userGameGameInfoPath] = gameInfo
+    update(ref(database), updates).catch((err) => {
+        console.log("error saving game data", err)
+        toast.error("Error saving game data")
+    })
+}
+
+/**
+ * Save data about game that is started
+ * So we can keep track of games started and not finished
+ * @param gameInfo 
+ */
+export const saveRoom = (roomId: string, roomInfo: IRoomInfo) => {
+
+    const updates = {}
+    updates[roomDataRefPath + "/" + roomId] = roomInfo
+    update(ref(database), updates).catch((err) => {
+        console.log("error saving room data", err)
+
+    })
+}
+
+export const saveGameFinished = (gameInfo: IEndOfRaceInfoGame) => {
+
+    const newGameKey = gameInfo.gameId
+    const updates = {}
+    updates[gameDataRefPath + "/" + newGameKey] = gameInfo
+    update(ref(database), updates).catch((err) => {
+        console.log("error saving game data", err)
+        toast.error("Error saving game data")
+    })
 }
 
 /**

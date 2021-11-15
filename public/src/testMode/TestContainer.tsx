@@ -32,8 +32,7 @@ const TestContainer = () => {
   const onMobile = deviceType === "mobile";
 
   useEffect(() => {
-    const newSocket = createSocket(deviceType, "test");
-    setSocket(newSocket);
+    createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
   }, []);
 
   useEffect(() => {

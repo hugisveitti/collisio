@@ -69,28 +69,53 @@ export class VehicleControls {
 }
 
 
-
-export interface IPlayerInfo {
+export interface IPreGamePlayerInfo {
     playerName: string
-
-    isLeader: boolean
     teamName: string
-    playerNumber: number
-    mobileControls: MobileControls
-    vehicleControls?: VehicleControls
-    /** only for ball game */
     teamNumber?: number
+    playerNumber: number
     id: string
     isAuthenticated: boolean
     vehicleType: VehicleType
     photoURL?: string
-    isConnected?: boolean
+
+}
+
+
+export interface IPlayerInfo extends IPreGamePlayerInfo {
+    mobileControls: MobileControls
+    vehicleControls?: VehicleControls
+    isConnected: true,
+    isLeader: boolean
+}
+
+export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGamePlayerInfo => {
+    const { playerName,
+        teamName,
+        teamNumber,
+        playerNumber,
+        id,
+        isAuthenticated,
+        vehicleType,
+        photoURL, } = playerInfo
+
+    return {
+        playerName,
+        teamName: teamName ?? "undefined",
+        teamNumber,
+        playerNumber,
+        id,
+        isAuthenticated,
+        vehicleType,
+        photoURL,
+    }
 }
 
 
 /**
- * Socket names
- * 
+ * ****************
+ *  Socket names  *
+ * *************** *
  * 
  * dts is desktop to server
  * stm is server to mobile
@@ -101,6 +126,7 @@ export interface IPlayerInfo {
  * 
  */
 
+export const stmd_socket_ready = "stmd_socket_ready"
 
 export const dts_game_highscore = "dts_game_highscore";
 export const std_room_created_callback = "std_room_created_callback";
@@ -113,4 +139,13 @@ export const stmd_players_in_room_callback = "stmd_players_in_room_callback"
 export const mts_player_connected = "mts_player_connected"
 export const stm_player_connected_callback = "stm_player_connected_callback"
 
+/** save highscore */
+export const dts_player_finished = "dts_player_finished"
+export const stm_player_finished = "stm_player_finished"
 
+export const dts_game_finished = "dts_game_finished"
+export const stm_game_finished = "stm_game_finished"
+
+export const mts_game_data_info = "mts_game_data_info"
+export const std_game_data_info = "std_game_data_info"
+/** end save highscore */

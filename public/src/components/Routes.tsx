@@ -57,8 +57,7 @@ const Routes = () => {
   const deviceType = getDeviceType();
 
   useEffect(() => {
-    const newSocket = createSocket(deviceType);
-    setSocket(newSocket);
+    createSocket(deviceType, (_socket) => setSocket(_socket));
 
     if (inTestMode) {
       setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);

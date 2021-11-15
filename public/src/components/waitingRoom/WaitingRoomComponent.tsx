@@ -26,9 +26,18 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
+import { IRoomInfo } from "../../classes/Game";
 import { IVehicleSettings } from "../../classes/User";
-import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
-import { IPlayerInfo, VehicleType } from "../../shared-backend/shared-stuff";
+import {
+  IUser,
+  saveRoom,
+  setDBUserSettings,
+} from "../../firebase/firebaseFunctions";
+import {
+  IPlayerInfo,
+  playerInfoToPreGamePlayerInfo,
+  VehicleType,
+} from "../../shared-backend/shared-stuff";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
@@ -36,7 +45,10 @@ import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
-import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import {
+  getVehicleNameFromType,
+  nonactiveVehcileTypes,
+} from "../../vehicles/VehicleConfigs";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -63,6 +75,16 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const handleStartGame = () => {
     socketHandleStartGame(props.socket, (response: ISocketCallback) => {
       if (response.status === "success") {
+        const roomInfo: IRoomInfo = {
+          desktopId: user?.uid,
+          desktopAuthenticated: !!user,
+          roomId: props.roomId,
+          preGameSettings: props.store.preGameSettings,
+          players: props.store.players.map(playerInfoToPreGamePlayerInfo),
+          date: new Date(),
+        };
+        saveRoom(props.roomId, roomInfo);
+
         history.push(gameRoomPath);
       } else {
         toast.error(response.message);
@@ -190,8 +212,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
       <Grid item xs={12}>
         <Typography color="textSecondary">
-          You can press 'r' to reset the game and 'p' to pause and unpause the
-          game.
+          You can press 'esc' to pause the game and open the settings.
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -218,7 +239,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                             src={player.photoURL}
                           />
                         ) : (
-                          <FaceIcon />
+                          <FaceIcon fontSize="large" />
                         )}
                       </ListItemAvatar>
                       <ListItemText
@@ -231,7 +252,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                           )
                         }
                       />
-                      <ListItemText primary={player.vehicleType} />
+                      <ListItemText
+                        primary={getVehicleNameFromType(player.vehicleType)}
+                      />
 
                       {renderTeamSelect(player, i)}
                     </ListItem>

@@ -18,6 +18,8 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "Off roader", type: "offRoader" }
 ]
 
+export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
+
 export const nonactiveVehcileTypes: VehicleType[] = ["test"]
 
 export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !stringInArray(vehicle.type, nonactiveVehcileTypes))

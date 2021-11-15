@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { dts_create_room, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_room_created_callback, stmd_players_in_room_callback, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
+import { dts_create_room, dts_game_finished, dts_player_finished, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_game_data_info, std_room_created_callback, stmd_players_in_room_callback, stmd_socket_ready, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer"
 import TestRoom from "./TestRoom"
 
@@ -44,7 +44,7 @@ export default class RoomMaster {
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL }: IPlayerConnectedData) => {
             console.log("connecting player", roomId, playerName)
             if (!this.roomExists(roomId)) {
-                mobileSocket.emit(stmd_players_in_room_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
+                mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
                 this.rooms[roomId].addPlayer(player)
@@ -118,6 +118,8 @@ export default class RoomMaster {
                 })
 
             }
+
+            socket.emit(stmd_socket_ready, {})
         })
     }
 }
@@ -129,7 +131,7 @@ export class Room {
     players: Player[]
     roomId
     io
-    socket
+    socket!: Socket
     gameStarted
 
 
@@ -142,15 +144,13 @@ export class Room {
         this.gameSettings = {}
         this.roomId = roomId
         this.io = io
-        this.socket = socket
         this.gameStarted = false
 
         this.isConnected = true
         this.deleteRoomCallback = deleteRoomCallback
 
-        this.setupStartGameListener()
-        this.setupGameSettingsListener()
-        this.setupLeftWaitingRoomListener()
+        this.setSocket(socket)
+
     }
 
     setupLeftWaitingRoomListener() {
@@ -169,6 +169,9 @@ export class Room {
         this.socket = socket
         this.setupStartGameListener()
         this.setupGameSettingsListener()
+        this.setupLeftWaitingRoomListener()
+        this.setupPlayerFinishedListener()
+        this.setupGameFinishedListener()
     }
 
     addPlayer(player: Player) {
@@ -181,17 +184,17 @@ export class Room {
                 playerExists = true
             }
         }
-        console.log("connecting player")
+        console.log("adding player")
 
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
-                return
+
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
                 player.socket.emit("handle-game-starting")
-                return
             }
+            return
         }
 
 
@@ -298,6 +301,31 @@ export class Room {
 
     userSettingsChanged(data: any) {
         this.socket.emit("user-settings-changed", data)
+    }
+
+    setupPlayerFinishedListener() {
+        this.socket.on(dts_player_finished, (data: any) => {
+            console.log("player finehsd", data.playerId)
+            for (let player of this.players) {
+
+                if (player.id === data.playerId) {
+                    console.log("player found!")
+                    player.playerFinished(data)
+                }
+            }
+        })
+    }
+
+    setupGameFinishedListener() {
+        this.socket.on(dts_game_finished, (data: any) => {
+            for (let players of this.players) {
+                players.gameFinished(data)
+            }
+        })
+    }
+
+    sendGameDataInfo(data: any) {
+        this.socket.emit(std_game_data_info, data)
     }
 
     toString() {

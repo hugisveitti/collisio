@@ -6,7 +6,7 @@
  * So this limits the .js to one file.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.VehicleControls = exports.MobileControls = void 0;
+exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
         this.beta = 0;
@@ -39,9 +39,24 @@ var VehicleControls = /** @class */ (function () {
     return VehicleControls;
 }());
 exports.VehicleControls = VehicleControls;
+var playerInfoToPreGamePlayerInfo = function (playerInfo) {
+    var playerName = playerInfo.playerName, teamName = playerInfo.teamName, teamNumber = playerInfo.teamNumber, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL;
+    return {
+        playerName: playerName,
+        teamName: teamName !== null && teamName !== void 0 ? teamName : "undefined",
+        teamNumber: teamNumber,
+        playerNumber: playerNumber,
+        id: id,
+        isAuthenticated: isAuthenticated,
+        vehicleType: vehicleType,
+        photoURL: photoURL,
+    };
+};
+exports.playerInfoToPreGamePlayerInfo = playerInfoToPreGamePlayerInfo;
 /**
- * Socket names
- *
+ * ****************
+ *  Socket names  *
+ * *************** *
  *
  * dts is desktop to server
  * stm is server to mobile
@@ -51,6 +66,7 @@ exports.VehicleControls = VehicleControls;
  * stmd is server to mobile or desktop
  *
  */
+exports.stmd_socket_ready = "stmd_socket_ready";
 exports.dts_game_highscore = "dts_game_highscore";
 exports.std_room_created_callback = "std_room_created_callback";
 exports.dts_create_room = "dts_create_room";
@@ -59,3 +75,11 @@ exports.mdts_players_in_room = "mdts_players_in_room";
 exports.stmd_players_in_room_callback = "stmd_players_in_room_callback";
 exports.mts_player_connected = "mts_player_connected";
 exports.stm_player_connected_callback = "stm_player_connected_callback";
+/** save highscore */
+exports.dts_player_finished = "dts_player_finished";
+exports.stm_player_finished = "stm_player_finished";
+exports.dts_game_finished = "dts_game_finished";
+exports.stm_game_finished = "stm_game_finished";
+exports.mts_game_data_info = "mts_game_data_info";
+exports.std_game_data_info = "std_game_data_info";
+/** end save highscore */ 

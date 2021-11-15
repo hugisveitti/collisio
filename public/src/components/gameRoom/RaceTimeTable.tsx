@@ -11,6 +11,10 @@ import React from "react";
 import { IRaceTimeInfo } from "../../classes/Game";
 import { inputBackgroundColor } from "../../providers/theme";
 
+const sortRaceTimeInfo = (raceTimeInfo: IRaceTimeInfo[]) => {
+  return raceTimeInfo.sort((a, b) => a.totalTime - b.totalTime);
+};
+
 interface IRaceTimeTable {
   raceTimeInfo: IRaceTimeInfo[];
   isEndOfGame?: boolean;
@@ -21,6 +25,10 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
 
   const cellStyle = !props.isEndOfGame ? { width: 50 } : {};
   const containerStyle = !props.isEndOfGame ? { width: 250 } : {};
+
+  const raceTimeInfo = props.isEndOfGame
+    ? sortRaceTimeInfo(props.raceTimeInfo)
+    : props.raceTimeInfo;
   return (
     <TableContainer
       component={Paper}
@@ -64,7 +72,7 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.raceTimeInfo.map((timeInfo) => {
+          {raceTimeInfo.map((timeInfo) => {
             return (
               <TableRow key={timeInfo.playerName}>
                 <TableCell

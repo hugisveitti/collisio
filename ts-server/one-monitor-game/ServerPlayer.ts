@@ -2,7 +2,7 @@ import { Socket } from "socket.io"
 import { Room } from "./ServerGame"
 
 
-import { MobileControls, VehicleControls, IPlayerInfo } from "../../public/src/shared-backend/shared-stuff"
+import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info } from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
 
@@ -12,7 +12,7 @@ export class Player {
     teamNumber
     teamName?: string
     /** socket is a mobile socket */
-    socket: Socket
+    socket!: Socket
     game?: Room
     mobileControls
     VehicleControls
@@ -24,7 +24,7 @@ export class Player {
     photoURL
 
     constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string) {
-        this.socket = socket
+
         this.playerName = playerName
         this.teamNumber = 1
         this.vehicleType = "normal"
@@ -37,14 +37,8 @@ export class Player {
         this.isConnected = true
         this.photoURL = photoURL
 
-        this.setupControler()
+        this.setSocket(socket)
 
-        this.setupPlayerInfoListener()
-
-        this.setupQuitGameListener()
-        this.setupUserSettingsListener()
-        this.setupReconnectListener()
-        this.setupWaitingRoomListener
 
     }
 
@@ -52,6 +46,13 @@ export class Player {
     setSocket(newSocket: Socket) {
         this.socket = newSocket
         this.setupControler()
+        this.setupGameDataInfoListener()
+        this.setupPlayerInfoListener()
+
+        this.setupQuitGameListener()
+        this.setupUserSettingsListener()
+        this.setupReconnectListener()
+        this.setupWaitingRoomListener
     }
 
     setupWaitingRoomListener() {
@@ -169,6 +170,22 @@ export class Player {
         })
     }
 
+    playerFinished(data: any) {
+        console.log("##player finished")
+        this.socket.emit(stm_player_finished, data)
+    }
+
+    gameFinished(data: any) {
+        this.socket.emit(stm_game_finished, data)
+    }
+
+    setupGameDataInfoListener() {
+        this.socket.on(mts_game_data_info, (data: any) => {
+            if (this.game) {
+                this.game.sendGameDataInfo(data)
+            }
+        })
+    }
 
 
     toString() {
