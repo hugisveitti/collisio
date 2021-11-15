@@ -477,7 +477,7 @@ export class GameScene extends Scene3D implements IGameScene {
         } else {
             gameSong.pause()
             this.songIsPlaying = false
-            this.showImportantInfo("GAME PAUSED <br /> Press 'p' to unpause.")
+            //     this.showImportantInfo("GAME PAUSED <br /> Press 'p' to unpause.")
         }
 
         for (let i = 0; i < this.vehicles.length; i++) {
