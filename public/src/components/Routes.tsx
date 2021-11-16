@@ -60,7 +60,8 @@ const Routes = () => {
     createSocket(deviceType, (_socket) => setSocket(_socket));
 
     if (inTestMode) {
-      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      // setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      setPlayers([fakePlayer1, fakePlayer2]);
       setPlayer(fakePlayer1);
     }
   }, []);
@@ -96,7 +97,14 @@ const Routes = () => {
     }
   }, [user]);
 
-  if (!socket) return <CircularProgress />;
+  // possibly load the socket in the appContainer since not everything needs a socket
+  if (!socket)
+    return (
+      <div style={{ margin: "auto", marginTop: 50, textAlign: "center" }}>
+        <CircularProgress />
+      </div>
+    );
+
   return (
     <Router>
       <Switch>

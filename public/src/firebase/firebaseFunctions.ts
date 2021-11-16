@@ -367,6 +367,10 @@ export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerG
     onValue(playerDataRef, snap => {
         if (snap.exists()) {
             const data = snap.val()
+            /** TODO there is some fail here
+             * I think it has to do with how I save the data
+             */
+            console.log("data", data)
             const gamesData = [] as IPlayerGameData[]
             const keys = Object.keys(data)
             for (let key of keys) {

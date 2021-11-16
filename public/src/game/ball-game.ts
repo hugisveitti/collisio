@@ -4,11 +4,11 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IPreGameSettings } from "../classes/Game";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
-import { SimpleCourt, SimpleCourtSettings } from "../shared-game-components/SquaredCourse";
+import { SimpleCourt, SimpleCourtSettings } from "../course/SquaredCourse";
 import { addControls } from "../utils/controls";
 import "./game-styles.css";
-import { NormalVehicle } from "../vehicles/NormalVehicle";
 import { IPlayerInfo, VehicleControls } from "../shared-backend/shared-stuff";
+import { LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 
 
 const vechicleFov = 60
@@ -332,7 +332,7 @@ export class PhysicsTest extends Scene3D {
         for (let i = 0; i < this.players.length; i++) {
             const color = this.players[i].teamNumber === 1 ? team1Color : team0Color
 
-            this.vehicles.push(new NormalVehicle(this, color, this.players[i].playerName))
+            this.vehicles.push(new LowPolyVehicle(this, color, this.players[i].playerName, this.players[i].playerNumber, this.players[i].vehicleType))
             this.resetPlayers()
         }
     }

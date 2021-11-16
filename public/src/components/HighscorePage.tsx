@@ -29,7 +29,11 @@ import HighscorePageTableRow from "./HighscorePageTableRow";
 import { frontPagePath } from "./Routes";
 import AppContainer from "../containers/AppContainer";
 import "../styles/main.css";
-import { IEndOfRaceInfoPlayer } from "../classes/Game";
+import {
+  allTrackTypes,
+  getTrackNameFromType,
+  IEndOfRaceInfoPlayer,
+} from "../classes/Game";
 
 const stringInList = (s: string, sList: string[]) => {
   for (let i = 0; i < sList.length; i++) {
@@ -168,7 +172,7 @@ const HighscorePage = (props: IHighscorePage) => {
                   >
                     {trackKeys.map((key) => (
                       <MenuItem key={key} value={key}>
-                        {key}
+                        {getTrackNameFromType(key)}
                       </MenuItem>
                     ))}
                   </Select>

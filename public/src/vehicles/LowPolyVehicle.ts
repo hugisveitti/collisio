@@ -9,7 +9,13 @@ import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
 
-
+export const getVehicleNumber = (vehicleName: string) => {
+    const num = +vehicleName.slice(8, 9)
+    if (isNaN(num)) {
+        console.warn("No vehicle number for", vehicleName)
+    }
+    return num
+}
 
 const cameraOffset = 20
 
@@ -23,7 +29,7 @@ const degToRad = 0.017453
 
 
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
-let targetPos = new THREE.Vector3(0, 0, 0)
+
 
 const ACTIVE_TAG = 1;
 const ISLAND_SLEEPING = 2;
@@ -69,6 +75,9 @@ export class LowPolyVehicle implements IVehicle {
 
 
     cameraDir = new THREE.Vector3()
+    cameraLookAtPos = new THREE.Vector3()
+    cameraDiff = new THREE.Vector3()
+    cameraTarget = new THREE.Vector3()
 
     chaseCameraSpeed: number
     useChaseCamera: boolean
@@ -125,8 +134,10 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.receiveShadow = false
         this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
+        const material = (this.chassisMesh.material as MeshStandardMaterial).clone();
+        this.chassisMesh.material = material;
 
-        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color)
+        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
 
 
 
@@ -136,8 +147,6 @@ export class LowPolyVehicle implements IVehicle {
     changeColor(color: string | number) {
         this.color = color;
         (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
-
-
     }
 
     createBadChassis() {
@@ -484,37 +493,35 @@ export class LowPolyVehicle implements IVehicle {
             const p = this.getPosition()
 
             // this is for the follow camera effect
-            targetPos = new THREE.Vector3(
-
+            this.cameraTarget.set(
                 p.x - ((Math.sin(r.y) * cameraOffset)),
                 p.y + 10,
                 p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
             )
 
 
-            let a = new THREE.Vector3()
-            a.subVectors(targetPos, camera.position)
 
-            this.cameraDir.x = (camera.position.x + ((targetPos.x - camera.position.x) * this.chaseCameraSpeed))
-            this.cameraDir.z = (camera.position.z + ((targetPos.z - camera.position.z) * this.chaseCameraSpeed))
-            this.cameraDir.y = (camera.position.y + ((targetPos.y - camera.position.y) * 0.005)) // have the y dir change slower?
+            this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
-            const cameraLookAtPos = new THREE.Vector3(0, 0, 0)
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseCameraSpeed))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseCameraSpeed))
+            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * 0.005)) // have the y dir change slower?
+
+            this.cameraLookAtPos.set(0, 0, 0)
             const cs = 0.5
 
-            cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((p.x - this.prevCahseCameraPos.x) * cs))
-            cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((p.z - this.prevCahseCameraPos.z) * cs))
-            cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((p.y - this.prevCahseCameraPos.y) * cs))
+            this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((p.x - this.prevCahseCameraPos.x) * cs))
+            this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((p.z - this.prevCahseCameraPos.z) * cs))
+            this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((p.y - this.prevCahseCameraPos.y) * cs))
 
-            this.prevCahseCameraPos = cameraLookAtPos.clone()
+            this.prevCahseCameraPos = this.cameraLookAtPos.clone()
 
 
-            if (a.length() > 0.1) {
+            if (this.cameraDiff.length() > 0.1) {
                 camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
                 camera.updateProjectionMatrix()
-                camera.lookAt(cameraLookAtPos)
-                //camera.lookAt(this.chassisMesh.position.clone())
-                //  console.log("camera.lookAt(this.chassisMesh.position.clone())", camera.lookAt(this.chassisMesh.position.clone()))
+                camera.lookAt(this.cameraLookAtPos)
+
 
             } else {
 
@@ -717,6 +724,15 @@ export class LowPolyVehicle implements IVehicle {
         this.chaseCameraSpeed = chaseCameraSpeed
     }
 
+    destroy() {
+        this.scene.destroy(this.chassisMesh)
+        for (let tire of this.tires) {
+            // this.scene.
+            this.scene.scene.remove(tire)
+        }
+
+    }
+
 }
 
 const tiresConfig = [
@@ -762,7 +778,6 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
                     const material = (chassis.material as MeshStandardMaterial).clone();
                     //  material.color = new THREE.Color("");
                     (chassis.material as MeshStandardMaterial) = material
-                    console.log("chassis", chassis)
                     if (!onlyLoad) {
                         // chassis.geometry.center();
                     }
@@ -796,18 +811,14 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
 
         vehicleModels[vehicleType] = { tires, chassises }
 
-        console.log("extra car stuff", extraCarStuff)
-        console.log("chassies", chassises)
         if (extraCarStuff) {
 
             chassises[0].add(extraCarStuff)
         }
 
-        console.log("chssises of 1", chassises[0])
 
         if (!onlyLoad) {
             for (let chassis of chassises) {
-                console.log("centering geomerty")
                 // chassis.geometry.center()
             }
         }

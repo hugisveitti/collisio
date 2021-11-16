@@ -6,6 +6,7 @@ import {
   CardContent,
   Collapse,
   CardActions,
+  Slider,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
@@ -33,12 +34,15 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
   );
   const [vehicleOpen, setVehicleOpen] = useState(false);
 
+  const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(0.3);
+
   useEffect(() => {
     getDBUserSettings(props.userId, (settings) => {
       console.log("settings", settings);
       setUserSettings(settings);
 
       setVehicleSettings(settings.vehicleSettings);
+      setSteerSenceDefaultVal(settings.vehicleSettings.steeringSensitivity);
     });
   }, []);
 
@@ -77,6 +81,25 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
                   value={vehicleSettings.vehicleType}
                   onChange={(vt) => {
                     updateVehicleSettings("vehicleType", vt);
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <span>Steering sensitivity</span>
+                <Slider
+                  min={0.01}
+                  max={2}
+                  valueLabelDisplay="auto"
+                  step={0.01}
+                  value={steerSenceDefaultVal}
+                  onChange={(e, value) => {
+                    setSteerSenceDefaultVal(value as number);
+                  }}
+                  onChangeCommitted={(e, value) => {
+                    updateVehicleSettings(
+                      "steeringSensitivity",
+                      steerSenceDefaultVal
+                    );
                   }}
                 />
               </Grid>

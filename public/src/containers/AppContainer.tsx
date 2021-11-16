@@ -18,7 +18,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
 import CookiePrompt from "../components/CookiePrompt";
@@ -40,8 +40,14 @@ interface IAppContainer {
 const AppContainer = (props: IAppContainer) => {
   const history = useHistory();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const user = useContext(UserContext);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setLoginModalOpen(false);
+    }
+  }, [user]);
 
   const renderLoginLogoutButton = () => {
     if (user) {

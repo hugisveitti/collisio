@@ -1,13 +1,13 @@
 
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { Scene3D } from "enable3d";
+import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Howl } from "howler";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
 import { IPlayerInfo, std_user_settings_changed, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
-import { ICourse } from "../shared-game-components/ICourse";
+import { ICourse } from "../course/ICourse";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
@@ -717,4 +717,25 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
+}
+
+export const startGame = (SceneClass: typeof GameScene, socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: GameScene) => void) => {
+    const config = { scenes: [SceneClass], antialias: true }
+    PhysicsLoader("/ammo", () => {
+        const project = new Project(config)
+
+        const key = project.scenes.keys().next().value;
+
+        // hacky way to get the project's scene
+        const gameObject = (project.scenes.get(key) as GameScene);
+        gameObject.setSocket(socket);
+        gameObject.setPlayers(players);
+        gameObject.setGameRoomActions(gameRoomActions)
+        gameObject.setPreGameSettings(gameSettings, roomId);
+        gameObject.setUserGameSettings(userGameSettings);
+        //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
+        callback(gameObject)
+
+        return project
+    })
 }

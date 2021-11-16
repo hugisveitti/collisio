@@ -4,14 +4,14 @@ import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { startBallGameOneMonitor } from "../../game/ball-game";
 import { IGameScene } from "../../game/IGameScene";
-import { startRaceGame } from "../../game/RaceGameScene";
+// import { startRaceGame } from "../../game/RaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import GameSettingsModal from "./GameSettingsModal";
 import { frontPagePath } from "../Routes";
 import { IStore } from "../store";
 import EndOfGameModal from "./EndOfGameModal";
-import { IEndOfGameData } from "../../game/GameScene";
+import { IEndOfGameData, startGame } from "../../game/GameScene";
 import { inTestMode } from "../../utils/settings";
 import {
   IEndOfRaceInfoGame,
@@ -25,6 +25,7 @@ import {
   std_game_data_info,
 } from "../../shared-backend/shared-stuff";
 import { saveGameFinished } from "../../firebase/firebaseFunctions";
+import { RaceGameScene } from "../../game/RaceGameScene";
 
 interface IGameRoom {
   socket: Socket;
@@ -72,7 +73,6 @@ const GameRoom = (props: IGameRoom) => {
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
     props.socket.emit(dts_player_finished, data);
-    console.log("send to server player finished");
   };
 
   useEffect(() => {
@@ -105,7 +105,8 @@ const GameRoom = (props: IGameRoom) => {
         props.store.preGameSettings
       );
     } else if (props.store?.preGameSettings?.gameType === "race") {
-      startRaceGame(
+      startGame(
+        RaceGameScene,
         props.socket,
         props.store.players,
         props.store.preGameSettings,

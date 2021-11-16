@@ -4,11 +4,11 @@
  * is useless to the front end.
  * So this limits the .js to one file.
  */
-
-export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course" | "sea-side-track"
+/** trackType.gltf */
+export type TrackType = "low-poly-farm-track" | "low-poly-f1-track" | "test-course" | "sea-side-track" | "simple-tag-course"
 export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader"
 
-export type GameType = "ball" | "race"
+export type GameType = "ball" | "race" | "tag"
 
 
 export class MobileControls {

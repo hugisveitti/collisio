@@ -100,7 +100,7 @@ const GameDataComponent = (props: IGameDataComponent) => {
                 {(gamesData as IPlayerGameData[])
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((p, i) => {
-                    const key = `${p.gameInfo.gameId}-${i}`;
+                    const key = `gamedata-${p.gameInfo?.gameId}-${i}`;
                     return (
                       <GameDataTableRow
                         key={key}

@@ -6,8 +6,8 @@ import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings } from "../classes/User";
 import { IPlayerInfo, VehicleControls } from '../shared-backend/shared-stuff';
-import { IRaceCourse } from "../shared-game-components/ICourse";
-import { RaceCourse } from "../shared-game-components/RaceCourse";
+import { IRaceCourse } from "../course/ICourse";
+import { RaceCourse } from "../course/RaceCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import "./game-styles.css";
@@ -91,7 +91,6 @@ export class RaceGameScene extends GameScene {
         // makes vehicle fall
         for (let vehcile of this.vehicles) {
             vehcile.start()
-
         }
 
         /** hacky way to make vehicles stopp
@@ -355,25 +354,23 @@ export class RaceGameScene extends GameScene {
 }
 
 
-export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: RaceGameScene) => void) => {
-    const config = { scenes: [RaceGameScene], antialias: true }
-    PhysicsLoader("/ammo", () => {
-        const project = new Project(config)
+// export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: RaceGameScene) => void) => {
+//     const config = { scenes: [RaceGameScene], antialias: true }
+//     PhysicsLoader("/ammo", () => {
+//         const project = new Project(config)
 
-        const key = project.scenes.keys().next().value;
+//         const key = project.scenes.keys().next().value;
 
-        // hacky way to get the project's scene
-        const gameObject = (project.scenes.get(key) as RaceGameScene);
-        gameObject.setSocket(socket);
-        gameObject.setPlayers(players);
-        gameObject.setGameRoomActions(gameRoomActions)
-        gameObject.setPreGameSettings(gameSettings, roomId);
-        gameObject.setUserGameSettings(userGameSettings);
-        //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
-        console.log("starting game, players", players)
-        callback(gameObject)
+//         // hacky way to get the project's scene
+//         const gameObject = (project.scenes.get(key) as RaceGameScene);
+//         gameObject.setSocket(socket);
+//         gameObject.setPlayers(players);
+//         gameObject.setGameRoomActions(gameRoomActions)
+//         gameObject.setPreGameSettings(gameSettings, roomId);
+//         gameObject.setUserGameSettings(userGameSettings);
+//         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
+//         callback(gameObject)
 
-        return project
-    })
-
-}
+//         return project
+//     })
+// }

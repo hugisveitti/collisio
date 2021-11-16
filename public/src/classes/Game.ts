@@ -1,13 +1,32 @@
 import { TrackType, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 
 
-export const allTrackTypes: { name: string, type: TrackType }[] = [
+interface ITrackType {
+    name: string
+    type: TrackType
+    gameType: GameType
+}
+
+export const getTrackNameFromType = (trackType: TrackType) => {
+    return allTrackTypes.find(track => track.type === trackType)?.name ?? "-"
+}
+
+export const allTrackTypes: ITrackType[] = [
     {
-        name: "Test", type: "test-course"
+        name: "Test", type: "test-course", gameType: "race"
     },
-    { name: "Farm track", type: "low-poly-farm-track" },
-    { name: "F1 track", type: "low-poly-f1-track" },
-    { name: "Beach track", type: "sea-side-track" },
+    {
+        name: "Farm track", type: "low-poly-farm-track", gameType: "race"
+    },
+    {
+        name: "F1 track", type: "low-poly-f1-track", gameType: "race"
+    },
+    {
+        name: "Beach track", type: "sea-side-track", gameType: "race"
+    },
+    {
+        name: "Simple Tag", type: "simple-tag-course", gameType: "tag"
+    }
 ]
 
 export interface IPlayerConnection {

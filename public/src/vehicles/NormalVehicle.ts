@@ -26,8 +26,8 @@ const turnDivder = 150
 
 
 const radiantMultiplier = 0.0174532925
-
-export class NormalVehicle implements IVehicle {
+/** delete this class??? */
+export class NormalVehicle {
 
     vehicle: Ammo.btRaycastVehicle
     scene: Scene3D

@@ -2,12 +2,11 @@ import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
 import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
-import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
-import { defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
+import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
+import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
 import "../game/game-styles.css"
-import { RaceCourse } from "../shared-game-components/RaceCourse"
+import { RaceCourse } from "../course/RaceCourse"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
 import { IGameScene } from "../game/IGameScene"
@@ -15,9 +14,12 @@ import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
-import { VehicleControls, VehicleType, MobileControls, TrackType, std_user_settings_changed } from "../shared-backend/shared-stuff"
+import { VehicleControls, VehicleType, MobileControls, TrackType, std_user_settings_changed, GameType } from "../shared-backend/shared-stuff"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { Console } from "console"
+import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
+import { CollisionEvent } from "@enable3d/common/dist/types"
+import { TagGameScene } from "../game/TagGameScene"
 
 const vechicleFov = 60
 
@@ -29,6 +31,7 @@ const stats = new Stats()
 
 const vehicleInputsContainer = document.createElement("div")
 document.body.appendChild(vehicleInputsContainer)
+
 
 
 export class LowPolyTestScene extends Scene3D implements IGameScene {
@@ -48,7 +51,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     timeStarted: number
     bestLapTime: number
     canStartUpdate: boolean
-    course: RaceCourse
+
+    course: RaceCourse | TagCourse
+    gameType: GameType
+
     pLight: THREE.PointLight
     useShadows: boolean
     vehicleType: VehicleType
@@ -59,6 +65,11 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     trackType: TrackType
     usingDebug: boolean
     vehicleColorNumber = 0
+
+    otherVehicles: LowPolyTestVehicle[]
+    numberOfOtherVehicles = 2
+
+    isIt: number
 
     constructor() {
         super({ key: "OneMonitorRaceGameScene" })
@@ -84,6 +95,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.currentLaptime = 0
         this.timeStarted = 0
 
+
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
@@ -95,6 +107,14 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.gameTime = new GameTime(3)
         this.trackType = window.localStorage.getItem("trackType") as TrackType ?? "test-course"
         this.usingDebug = eval(window.localStorage.getItem("usingDebug")) ?? true
+
+        this.gameType = "tag"
+
+
+        this.otherVehicles = []
+
+        // in tag game
+        this.isIt = 0
     }
 
     async init() {
@@ -209,16 +229,69 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             }
         })
 
-        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType)
+        this.initVehicles()
+    }
+
+    initVehicles() {
+        this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType)
+        for (let i = 0; i < this.numberOfOtherVehicles; i++) {
+            this.otherVehicles.push(
+                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type)
+            )
+        }
     }
 
     async create() {
         // test-course.gltf
         // low-poly-farm-track
-        this.course = new RaceCourse(this, this.trackType, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        if (this.gameType === "race") {
+
+            this.course = new RaceCourse(this, this.trackType, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        } else if (this.gameType === "tag") {
+            this.course = new TagCourse(this, this.trackType, (name, coin) => this.handleCoinCollided(name, coin))
+        }
         this.course.createCourse(this.useShadows, () => {
-            this.createVehicle()
+            this.createOtherVehicles(() => {
+                this.createVehicle().then(() => {
+
+                })
+            })
         })
+    }
+
+    getGameType() {
+        return this.gameType
+    }
+
+    handleCoinCollided(vehicleName: string, coin: Coin) {
+        console.log("vehcile", vehicleName, "collided")
+        const vehicleNumber = getVehicleNumber(vehicleName)
+        console.log("vehicle number", vehicleNumber)
+        console.log("is it", this.isIt)
+        if (vehicleNumber !== this.isIt) {
+            coin.removeFromScene(this)
+        } else {
+            console.log("players that are it cannot collect coins")
+        }
+    }
+
+    createOtherVehicles(callback: () => void) {
+        const p = this.course.ground.scale
+        const helper = (i: number) => {
+            loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, (tires, chassises) => {
+                this.otherVehicles[i].addModels(tires, chassises[0])
+                //  this.otherVehicles[i].setPosition((Math.random() * 50) - 50, p.y + 2, (Math.random() * 50) - 50)
+
+                if (i < this.otherVehicles.length - 1) {
+                    helper(i + 1)
+                } else {
+                    callback()
+                }
+            })
+        }
+        if (this.otherVehicles.length > 0) {
+            helper(0)
+        }
     }
 
     changeTrack(trackType: TrackType) {
@@ -226,6 +299,15 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         window.localStorage.setItem("trackType", trackType)
         this.canStartUpdate = false
         this.course.clearCourse()
+
+        /** TODO Cannot destroy vehicles */
+        // this.vehicle.destroy()
+        // for (let ovehicle of this.otherVehicles) {
+        //     ovehicle.destroy()
+        // }
+        // this.vehicle = undefined
+        // this.otherVehicles = []
+        // this.initVehicles()
         this.create()
 
     }
@@ -340,8 +422,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             const useChaseCamera = window.localStorage.getItem("useChaseCamera")
             this.vehicle.useChaseCamera = eval(useChaseCamera)
             this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
-            const p = this.course.goalSpawn.position
-            const r = this.course.goalSpawn.rotation
+            const p = this.course.startPosition
+            const r = this.course.startRotation
             this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
             this.vehicle.resetPosition()
             // this.dirLight.target = this.vehicle.chassisMesh
@@ -462,21 +544,42 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             }
             createVehicleInputButtons()
 
-            const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 0, y: 4, z: 0 })
-            ball.body.setBounciness(1)
+            // const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 10, y: 4, z: 40 })
+            // ball.body.setBounciness(1)
 
             this.vehicle.useBadRotationTicks = false
 
+            const allVehicles = this.otherVehicles.concat(this.vehicle)
+            if (this.getGameType() === "tag") {
+
+                (this.course as TagCourse).setSpawns(allVehicles)
+            }
+
+            this.vehicle.setPosition(0, 2, 0)
+
             this.canStartUpdate = true
             this.createController()
+            const isVehicle = (object: ExtendedObject3D) => {
+                return object.name.slice(0, 7) === "vehicle"
+            }
+
+            this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
+                if (isVehicle(otherObject)) {
+                    console.log("collide with vehicle", otherObject)
+                    const vehicleNumber = getVehicleNumber(otherObject.name)
+                    this.vehicle.changeColor(notItColor)
+                    this.otherVehicles[vehicleNumber - 1].changeColor(itColor)
+                    this.isIt = vehicleNumber
+                }
+            })
 
         })
     }
 
     handleGoalCrossed(o: ExtendedObject3D) {
         if (!this.goalCrossed) {
-            const p = this.course.goalSpawn.position
-            const r = this.course.goalSpawn.rotation
+            const p = (this.course as RaceCourse).goalSpawn.position
+            const r = (this.course as RaceCourse).goalSpawn.rotation
             this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
             this.checkpointCrossed = false
 
@@ -493,8 +596,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     handleCheckpointCrossed(o: ExtendedObject3D) {
         if (!this.checkpointCrossed) {
             this.goalCrossed = false
-            const p = this.course.checkpointSpawn.position
-            const r = this.course.checkpointSpawn.rotation
+            const p = (this.course as RaceCourse).checkpointSpawn.position
+            const r = (this.course as RaceCourse).checkpointSpawn.rotation
 
             this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
         }
@@ -520,7 +623,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         if (this.camera.type === "PerspectiveCamera") {
-            (this.camera as unknown as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
+            (this.camera as THREE.PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
         }
         this.camera.updateProjectionMatrix();
     }
@@ -558,6 +661,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
             stats.begin()
             if (this.vehicle) {
+                this.vehicle.intelligentDrive(true)
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
@@ -565,6 +669,12 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
                 <br />
                 km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
                 `
+            }
+            this.course.updateCourse()
+            for (let oVehicle of this.otherVehicles) {
+                oVehicle.randomDrive()
+                // oVehicle.intelligentDrive(false)
+                oVehicle.update()
             }
             stats.end()
 

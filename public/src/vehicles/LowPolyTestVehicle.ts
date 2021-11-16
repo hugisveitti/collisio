@@ -1,8 +1,35 @@
+import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { Scene3D } from "enable3d";
+import { ClosestRaycaster } from "enable3d/node_modules/@enable3d/ammo-physics";
+import { VehicleType } from "../shared-backend/shared-stuff";
 import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
 import { defaultVehicleConfig, initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
+
+const intelligentDriveLine = false
+
 export class LowPolyTestVehicle extends LowPolyVehicle {
+
+    closestRaycaster: ClosestRaycaster
+    line: THREE.Line
+
+    constructor(scene: Scene3D, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType) {
+        super(scene, color, name, vehicleNumber, vehicleType)
+        this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
+
+        if (intelligentDriveLine) {
+
+            const material = new THREE.LineBasicMaterial({ color: 0x0000ff })
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(2, -10, 0)
+            ])
+            this.line = new THREE.Line(geometry, material)
+            this.scene.add.existing(this.line)
+        }
+
+    }
 
     setLocalStorageVec(key: keyof IVehicleConfig, vec: SimpleVector) {
         window.localStorage.setItem(`${key}-${this.vehicleType}-x`, vec.x + "")
@@ -158,4 +185,68 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
         this.breakingForce = breakingForce
     }
 
+    randomDrive() {
+        if (Math.random() < .1) {
+            this.goForward(false)
+        } else if (Math.random() < .1) {
+            this.goBackward()
+        }
+
+        if (Math.random() < .1) {
+            this.turn((Math.random() * 80) - 40)
+        }
+    }
+
+    intelligentDrive(log: boolean) {
+        /** wait with this */
+
+        //  const p = this.getPosition()
+        const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
+        const po = tm.getOrigin()
+        const q = tm.getRotation()
+        const r = this.chassisMesh.rotation
+        const p = this.getPosition()
+        let px = po.x()
+        let py = po.y()
+        let pz = po.z()
+
+        px = p.x
+        py = p.y
+        pz = p.z
+
+        const tm1 = this.vehicle.getWheelInfo(3).get_m_worldTransform();
+        const po1 = tm.getOrigin()
+
+        const w = this.vehicle.getWheelInfo(2).get_m_wheelDirectionCS()
+
+        const d = this.chassisMesh.getWorldDirection(new THREE.Vector3(px, py, pz))
+        const offset = 1
+
+        const rx = ((Math.sin(r.y) * offset)) + Math.PI / 2
+        const ry = r.y// 0// Math.PI / 2 // p.y
+        const rz = ((Math.cos(r.y) * offset) * Math.sign(Math.cos(r.z))) - Math.PI
+
+
+        this.closestRaycaster.setRayFromWorld(rx, ry, rz)
+        this.closestRaycaster.setRayToWorld(px, py, pz)
+        if (intelligentDriveLine) {
+
+            this.line.position.set(px, py, pz)
+            this.line.rotation.set(rx, ry, rz)
+        }
+
+
+        this.closestRaycaster.rayTest()
+        if (this.closestRaycaster.hasHit()) {
+            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
+            const obj = this.closestRaycaster.getCollisionObject()
+            if (log) {
+
+                // console.log("closest", x, y, z)
+                // console.log("hit object", obj)
+            }
+
+
+        }
+    }
 }
