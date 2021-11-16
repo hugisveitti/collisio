@@ -107,8 +107,10 @@ var server = app.listen(port, function () {
     console.log("listening on port " + port);
 });
 var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
+var Worker = require('worker_threads').Worker;
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
 var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
+    //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket);
 });

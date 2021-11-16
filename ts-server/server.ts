@@ -122,11 +122,12 @@ const server = app.listen(port, () => {
 
 import RoomMaster from "./one-monitor-game/ServerGame"
 
-
+const { Worker } = require('worker_threads')
 
 
 const io = require("socket.io")(server,) // { cors: { origin: "*" } })
 const roomMaster = new RoomMaster(io)
 io.on("connection", (socket: Socket) => {
+    //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket)
 })

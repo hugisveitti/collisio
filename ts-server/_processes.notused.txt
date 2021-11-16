@@ -1,0 +1,97 @@
+
+const port = process.env.PORT || 5000
+const http = require("http")
+const { setupMaster, setupWorker } = require("@socket.io/sticky");
+const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
+
+if (cluster.isMaster) {
+
+
+    console.log(`Primary ${process.pid} is running`);
+
+
+    // const httpServer = http.createServer()
+
+    // const server =  app.listen(port, () => {
+    //     console.log(`listening on port ${port}`)
+    // })
+    const server = http.createServer(app)
+
+    setupMaster(server, {
+        loadBalancingMethod: "least-connection",
+    })
+
+
+    setupPrimary()
+
+    cluster.setupMaster(server, {
+        serialization: "advanced",
+    })
+
+    server.listen(port, () => {
+        console.log(`listening on port ${port}`)
+    })
+
+    // const io = new Server(server)
+    // // // const roomMaster = new RoomMaster(io)
+
+
+    // io.on("connection", (socket: Socket) => {
+    //     //roomMaster.addSocket(socket)
+    //     console.log("connection on primary")
+    //     const key = Object.keys(workers)[0]
+    //     // workers[key].send({ msg: "hi from primary", data: socket.id })
+    // })
+
+
+
+
+
+    const workers: { [key: string]: any } = {}
+    for (let i = 0; i < 2; i++) {
+        const worker = cluster.fork()
+        workers[worker.process.pid] = (worker)
+    }
+
+    cluster.on('exit', (worker: any, code: any, signal: any) => {
+        console.log(`worker ${worker.process.pid} died`);
+        delete workers[worker.process.pid]
+        // const newWorker = cluster.fork()
+        // workers[worker.process.pid] = newWorker
+    });
+} else {
+
+
+    console.log(`Worker ${process.pid} started`);
+    // process.on("message", ({ msg, data }) => {
+    //     console.log(`message sent to ${process.pid}: ${msg}`)
+    //     console.log("getting data", data)
+
+    // })
+
+    // const server = app.listen(port, () => {
+    //     console.log(`listening on port ${port}`)
+    // })
+
+    const httpServer = http.createServer(app)
+
+
+
+    const io = new Server(httpServer) // require("socket.io")(httpServer)
+
+    io.adapter(createAdapter())
+    setupWorker(io)
+
+    console.log("waiting for connections")
+    const roomMaster = new RoomMaster(io)
+    io.on("connection", (socket: Socket) => {
+        console.log(`worker: ${process.pid}, socket:${socket.id}`)
+        roomMaster.addSocket(socket)
+        socket.on("disconnect", () => console.log(`disconnected, socket ${socket.id} `))
+        // socket.disconnect()
+    })
+
+
+
+}
+

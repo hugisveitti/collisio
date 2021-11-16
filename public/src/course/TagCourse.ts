@@ -70,7 +70,6 @@ export class Coin {
 
     setPositionOfObject(object: THREE.Object3D) {
         const p = object.position
-        console.log("p", p)
         this.setPosition(p.x, p.y, p.z)
     }
 
@@ -113,7 +112,6 @@ export class TagCourse extends Course implements ITagCourse {
 
         //this.scene.scene.remove(this.coin)
 
-        console.log("coin points", this.coinPoints)
         let i = 0;
         for (let cp of this.coinPoints) {
 
