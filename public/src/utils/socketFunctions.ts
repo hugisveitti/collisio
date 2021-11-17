@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { IPlayerInfo } from "../shared-backend/shared-stuff";
+import { dts_start_game, IPlayerInfo, std_start_game_callback } from "../shared-backend/shared-stuff";
 import { ISocketCallback } from "./connectSocket";
 
 
@@ -8,8 +8,8 @@ export const sendPlayerInfoChanged = (socket: Socket, newPlayerInfo: IPlayerInfo
 }
 
 export const socketHandleStartGame = (socket: Socket, callback: (res: ISocketCallback) => void) => {
-    socket.emit("handle-start-game");
-    socket.once("handle-start-game-callback", (response: ISocketCallback) => {
+    socket.emit(dts_start_game);
+    socket.once(std_start_game_callback, (response: ISocketCallback) => {
         callback(response)
     });
 }

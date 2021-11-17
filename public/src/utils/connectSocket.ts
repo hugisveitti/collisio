@@ -22,7 +22,6 @@ export const createSocket = (deviceType: string, callback: (socket: Socket) => v
 
 
     socket.on("connect", () => {
-        console.log("socket", socket.id)
 
         socket.emit(mdts_device_type, { deviceType: deviceType, mode })
         socket.on(stmd_socket_ready, () => {

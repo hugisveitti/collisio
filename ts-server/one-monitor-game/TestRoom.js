@@ -21,7 +21,7 @@ var TestRoom = /** @class */ (function () {
     TestRoom.prototype.setMobileSocket = function (mobileSocket) {
         var _this = this;
         this.mobileSocket = mobileSocket;
-        this.mobileSocket.on("send-controls", function (mobileControls) { return _this.handleGottenControls(mobileControls); });
+        this.mobileSocket.on(shared_stuff_1.mts_controls, function (mobileControls) { return _this.handleGottenControls(mobileControls); });
         this.setupUserSettingsListener();
         if (this.desktopSocket) {
             this.desktopSocket.emit("test-made-connection", {});
@@ -33,7 +33,7 @@ var TestRoom = /** @class */ (function () {
     TestRoom.prototype.setupControlsListener = function () {
         var _this = this;
         setInterval(function () {
-            _this.desktopSocket.emit("get-controls", { mobileControls: _this.mobileControls });
+            _this.desktopSocket.emit(shared_stuff_1.std_controls, { mobileControls: _this.mobileControls });
             // set fps
         }, 1000 / 90);
     };

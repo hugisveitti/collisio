@@ -1,6 +1,6 @@
 import { Socket } from "socket.io"
 
-import { MobileControls, mts_user_settings_changed, std_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
+import { MobileControls, mts_controls, mts_user_settings_changed, std_controls, std_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
 
 export default class TestRoom {
 
@@ -32,7 +32,7 @@ export default class TestRoom {
 
     setMobileSocket(mobileSocket: Socket) {
         this.mobileSocket = mobileSocket
-        this.mobileSocket.on("send-controls", (mobileControls: MobileControls) => this.handleGottenControls(mobileControls))
+        this.mobileSocket.on(mts_controls, (mobileControls: MobileControls) => this.handleGottenControls(mobileControls))
         this.setupUserSettingsListener()
 
         if (this.desktopSocket) {
@@ -48,7 +48,7 @@ export default class TestRoom {
 
     setupControlsListener() {
         setInterval(() => {
-            this.desktopSocket!.emit("get-controls", { mobileControls: this.mobileControls })
+            this.desktopSocket!.emit(std_controls, { mobileControls: this.mobileControls })
             // set fps
         }, 1000 / 90)
     }

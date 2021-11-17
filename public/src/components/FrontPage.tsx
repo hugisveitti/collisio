@@ -132,14 +132,15 @@ const FrontPage = (props: FrontPageProps) => {
     );
   };
 
-  const createRoomDesktop = (roomId: string) => {
-    props.socket.emit(dts_create_room, { roomId });
+  const createRoomDesktop = () => {
+    props.socket.emit(dts_create_room, {});
     createRoomDesktopCallback();
   };
 
+  // need the roomId for the mobile
   const connectButtonClicked = (roomId: string) => {
     if (deviceType === "desktop") {
-      createRoomDesktop(roomId);
+      createRoomDesktop();
     } else {
       if (user) {
         connectToRoomMobile(roomId, playerName);

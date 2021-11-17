@@ -29,9 +29,10 @@
     "@types/filesystem": "0.0.32",
     "@types/howler": "2.2.4",
     "css-loader": "6.2.0",
+    "d3": "^7.1.1",
     "enable3d": "0.21.0",
     "firebase": "9.1.2",
-    "howler": "^.2.3",
+    "howler": "^2.2.3",
     "qrcode": "1.4.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -44,6 +45,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "@types/d3": "^7.1.0",
     "@types/node": "^16.9.1",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",

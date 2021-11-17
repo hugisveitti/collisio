@@ -35,6 +35,7 @@ import {
   mdts_players_in_room,
   mts_player_connected,
   stmd_players_in_room_callback,
+  stm_game_starting,
   stm_player_connected_callback,
 } from "../../shared-backend/shared-stuff";
 
@@ -133,7 +134,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
     props.socket.emit("in-waiting-room");
     if (onMobile) {
-      props.socket.once("handle-game-starting", () => {
+      props.socket.once(stm_game_starting, () => {
         history.push(controlsRoomPath);
       });
 

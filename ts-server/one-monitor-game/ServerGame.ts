@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { dts_create_room, dts_game_finished, dts_player_finished, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_game_data_info, std_room_created_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
+import { dts_create_room, dts_game_finished, dts_ping_test, dts_player_finished, dts_start_game, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_controls, std_game_data_info, std_ping_test_callback, std_room_created_callback, std_start_game_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_game_starting, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer"
 import TestRoom from "./TestRoom"
 
@@ -12,6 +12,7 @@ export default class RoomMaster {
     rooms: { [roomId: string]: Room }
     io
     testRoom
+    allSocketIds: string[]
 
 
     constructor(io: Socket) {
@@ -19,6 +20,8 @@ export default class RoomMaster {
         this.rooms = {}
         /** only one test room */
         this.testRoom = new TestRoom()
+
+        this.allSocketIds = []
     }
 
     roomExists = (roomId: string) => {
@@ -42,7 +45,7 @@ export default class RoomMaster {
         }
 
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL }: IPlayerConnectedData) => {
-            console.log("connecting player", roomId, playerName)
+            // console.log("connecting player", roomId, playerName)
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else {
@@ -56,9 +59,9 @@ export default class RoomMaster {
     createRoom(socket: Socket, roomId: string) {
         this.rooms[roomId] = new Room(roomId, this.io, socket, () => {
             /** delete room callback */
-
             delete this.rooms[roomId]
         })
+        // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
     }
@@ -68,7 +71,8 @@ export default class RoomMaster {
         let roomId: string
         let isTestMode = false
         let onMobile: boolean
-        console.log("adding socket, games", Object.keys(this.rooms))
+        // console.log("adding socket", socket.id.slice(0, 4))
+        this.allSocketIds.push(socket.id)
 
         socket.once(mdts_device_type, ({ deviceType, mode }) => {
             isTestMode = mode === "test"
@@ -81,7 +85,7 @@ export default class RoomMaster {
                     this.testRoom.setDesktopSocket(socket)
                 }
             } else {
-                console.log("Connection from", deviceType)
+                // console.log("Connection from", deviceType)
                 if (deviceType === "desktop") {
                     socket.on(dts_create_room, () => {
                         // increadably unlikly two games get same uuid
@@ -91,11 +95,12 @@ export default class RoomMaster {
                     })
 
                     socket.on("disconnect", () => {
-                        console.log("disconnected from desktop", roomId)
+                        // console.log("disconnected from desktop", roomId)
                         if (roomId) {
                             this.rooms[roomId].isConnected = false
                             delete this.rooms[roomId]
                         }
+
                     })
                 } else {
 
@@ -120,6 +125,11 @@ export default class RoomMaster {
             }
 
             socket.emit(stmd_socket_ready, {})
+            socket.on("disconnect", () => {
+                const idx = this.allSocketIds.indexOf(socket.id)
+                this.allSocketIds.splice(idx, 1)
+                // console.log("all connected sockets", this.allSocketIds)
+            })
         })
     }
 }
@@ -172,6 +182,14 @@ export class Room {
         this.setupLeftWaitingRoomListener()
         this.setupPlayerFinishedListener()
         this.setupGameFinishedListener()
+        this.setupPingListener()
+    }
+
+
+    setupPingListener() {
+        this.socket.on(dts_ping_test, () => {
+            this.socket.emit(std_ping_test_callback, { ping: "ping" })
+        })
     }
 
     addPlayer(player: Player) {
@@ -184,7 +202,6 @@ export class Room {
                 playerExists = true
             }
         }
-        console.log("adding player")
 
         if (this.gameStarted) {
             if (!playerExists) {
@@ -192,7 +209,7 @@ export class Room {
 
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
-                player.socket.emit("handle-game-starting")
+                player.socket.emit(stm_game_starting)
             }
             return
         }
@@ -231,7 +248,7 @@ export class Room {
 
     setupControlsListener() {
         setInterval(() => {
-            this.socket.emit("get-controls", { players: this.getPlayersControls() })
+            this.socket.emit(std_controls, { players: this.getPlayersControls() })
             // set fps
         }, 1000 / 120)
     }
@@ -253,9 +270,9 @@ export class Room {
     }
 
     setupStartGameListener() {
-        this.socket.once("handle-start-game", () => {
+        this.socket.once(dts_start_game, () => {
             if (this.players.length === 0) {
-                this.socket.emit("handle-start-game-callback", {
+                this.socket.emit(std_start_game_callback, {
                     message: "No players connected, cannot start game",
                     status: errorStatus
                 })
@@ -264,7 +281,7 @@ export class Room {
                     this.setupStartGameListener()
                 }, 50)
             } else {
-                this.socket.emit("handle-start-game-callback", {
+                this.socket.emit(std_start_game_callback, {
                     message: "Game starting",
                     status: successStatus
                 })

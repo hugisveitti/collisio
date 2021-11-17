@@ -52,3 +52,10 @@
   top: 50px;
   text-align: center;
 }
+
+.game-text {
+  color: black;
+  text-shadow: 1px 1px white;
+  font-size: 16px;
+  font-family: monospace;
+}

@@ -11,7 +11,7 @@ const app = express()
 si.cpu()
     .then(data => {
         console.log("####CPU Info#####")
-        console.log(data)
+        console.log("cores", data.cores)
         console.log("#####END CPU INFO#####")
     })
     .catch(error => console.error(error));
@@ -23,8 +23,8 @@ const byteToGig = (byte: number) => {
 si.mem()
     .then(data => {
         console.log("####Memory Info#####")
-        console.log("Total", byteToGig(data.total))
-        console.log("Free", byteToGig(data.free))
+        console.log("Total", byteToGig(data.total).toFixed(2))
+        console.log("Free", byteToGig(data.free).toFixed(2))
         console.log("#####END Memory INFO#####")
     })
     .catch(error => console.error(error));
@@ -87,6 +87,8 @@ app.get("/game", (_: Request, res: Response) => {
 // });
 
 app.get("/premium", sendIndexHTML)
+
+app.get("/stress-test", sendIndexHTML)
 
 app.get("/controls", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));

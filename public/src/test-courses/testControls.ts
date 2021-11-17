@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client"
 import { IVehicle } from "../vehicles/IVehicle"
 import { toast } from "react-toastify"
-import { MobileControls, VehicleControls } from "../shared-backend/shared-stuff"
+import { MobileControls, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
 
 
 let speed = 40
@@ -76,7 +76,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
     setInterval(() => {
         if (!driveWithKeyboard) {
-            socket.once("get-controls", (data) => {
+            socket.once(std_controls, (data) => {
                 const { mobileControls } = data as { mobileControls: MobileControls }
                 if (mobileControls?.f !== undefined) {
                     driveVehicle(mobileControls, vehicle)

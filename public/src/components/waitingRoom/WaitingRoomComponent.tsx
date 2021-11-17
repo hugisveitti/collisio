@@ -36,6 +36,7 @@ import {
 import {
   IPlayerInfo,
   playerInfoToPreGamePlayerInfo,
+  std_start_game_callback,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import { ISocketCallback } from "../../utils/connectSocket";
@@ -103,7 +104,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       });
 
     return () => {
-      props.socket.off("handle-start-game-callback");
+      props.socket.off(std_start_game_callback);
     };
   }, []);
 

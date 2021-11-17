@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client"
-import { MobileControls, VehicleControls } from "../shared-backend/shared-stuff"
+import { MobileControls, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
 import { IVehicle } from "../vehicles/IVehicle"
 
 
@@ -56,7 +56,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
      * In ServerGame.js to send from server, I need the one in the Server since if we have multiple players the data needs to be collected from all players and sent
      */
 
-    socket.on("get-controls", (data) => {
+    socket.on(std_controls, (data) => {
         const { players } = data
         for (let i = 0; i < players.length; i++) {
             driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)

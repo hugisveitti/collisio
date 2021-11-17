@@ -31,7 +31,7 @@ var app = express();
 si.cpu()
     .then(function (data) {
     console.log("####CPU Info#####");
-    console.log(data);
+    console.log("cores", data.cores);
     console.log("#####END CPU INFO#####");
 })
     .catch(function (error) { return console.error(error); });
@@ -41,8 +41,8 @@ var byteToGig = function (byte) {
 si.mem()
     .then(function (data) {
     console.log("####Memory Info#####");
-    console.log("Total", byteToGig(data.total));
-    console.log("Free", byteToGig(data.free));
+    console.log("Total", byteToGig(data.total).toFixed(2));
+    console.log("Free", byteToGig(data.free).toFixed(2));
     console.log("#####END Memory INFO#####");
 })
     .catch(function (error) { return console.error(error); });
@@ -85,6 +85,7 @@ app.get("/game", function (_, res) {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
 app.get("/premium", sendIndexHTML);
+app.get("/stress-test", sendIndexHTML);
 app.get("/controls", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });

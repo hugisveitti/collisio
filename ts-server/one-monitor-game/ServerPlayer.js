@@ -24,7 +24,14 @@ var Player = /** @class */ (function () {
         this.setupQuitGameListener();
         this.setupUserSettingsListener();
         this.setupReconnectListener();
-        this.setupWaitingRoomListener;
+        this.setupWaitingRoomListener();
+        this.setupPingListener();
+    };
+    Player.prototype.setupPingListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mts_ping_test, function () {
+            _this.socket.emit(shared_stuff_1.stm_ping_test_callback, {});
+        });
     };
     Player.prototype.setupWaitingRoomListener = function () {
         var _this = this;
@@ -77,7 +84,7 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.setupControler = function () {
         var _this = this;
-        this.socket.on("send-controls", function (mobileControls) {
+        this.socket.on(shared_stuff_1.mts_controls, function (mobileControls) {
             _this.mobileControls = mobileControls;
         });
     };
@@ -111,7 +118,7 @@ var Player = /** @class */ (function () {
     Player.prototype.startGame = function () {
         this.setupControler();
         if (this.game) {
-            this.socket.emit("handle-game-starting", { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber });
+            this.socket.emit(shared_stuff_1.stm_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber });
         }
     };
     Player.prototype.setupPlayerInfoListener = function () {
@@ -131,7 +138,6 @@ var Player = /** @class */ (function () {
         });
     };
     Player.prototype.playerFinished = function (data) {
-        console.log("##player finished");
         this.socket.emit(shared_stuff_1.stm_player_finished, data);
     };
     Player.prototype.gameFinished = function (data) {

@@ -26,12 +26,13 @@ var RoomMaster = /** @class */ (function () {
         this.rooms = {};
         /** only one test room */
         this.testRoom = new TestRoom_1.default();
+        this.allSocketIds = [];
     }
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL;
-            console.log("connecting player", roomId, playerName);
+            // console.log("connecting player", roomId, playerName)
             if (!_this.roomExists(roomId)) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
@@ -47,6 +48,7 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
+        // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };
@@ -55,7 +57,8 @@ var RoomMaster = /** @class */ (function () {
         var roomId;
         var isTestMode = false;
         var onMobile;
-        console.log("adding socket, games", Object.keys(this.rooms));
+        // console.log("adding socket", socket.id.slice(0, 4))
+        this.allSocketIds.push(socket.id);
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode;
             isTestMode = mode === "test";
@@ -70,7 +73,7 @@ var RoomMaster = /** @class */ (function () {
                 }
             }
             else {
-                console.log("Connection from", deviceType);
+                // console.log("Connection from", deviceType)
                 if (deviceType === "desktop") {
                     socket.on(shared_stuff_1.dts_create_room, function () {
                         // increadably unlikly two games get same uuid
@@ -79,7 +82,7 @@ var RoomMaster = /** @class */ (function () {
                         _this.createRoom(socket, roomId);
                     });
                     socket.on("disconnect", function () {
-                        console.log("disconnected from desktop", roomId);
+                        // console.log("disconnected from desktop", roomId)
                         if (roomId) {
                             _this.rooms[roomId].isConnected = false;
                             delete _this.rooms[roomId];
@@ -106,6 +109,11 @@ var RoomMaster = /** @class */ (function () {
                 });
             }
             socket.emit(shared_stuff_1.stmd_socket_ready, {});
+            socket.on("disconnect", function () {
+                var idx = _this.allSocketIds.indexOf(socket.id);
+                _this.allSocketIds.splice(idx, 1);
+                // console.log("all connected sockets", this.allSocketIds)
+            });
         });
     };
     return RoomMaster;
@@ -142,6 +150,13 @@ var Room = /** @class */ (function () {
         this.setupLeftWaitingRoomListener();
         this.setupPlayerFinishedListener();
         this.setupGameFinishedListener();
+        this.setupPingListener();
+    };
+    Room.prototype.setupPingListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.dts_ping_test, function () {
+            _this.socket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
+        });
     };
     Room.prototype.addPlayer = function (player) {
         var playerExists = false;
@@ -151,14 +166,13 @@ var Room = /** @class */ (function () {
                 playerExists = true;
             }
         }
-        console.log("adding player");
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
             }
             else {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
-                player.socket.emit("handle-game-starting");
+                player.socket.emit(shared_stuff_1.stm_game_starting);
             }
             return;
         }
@@ -192,7 +206,7 @@ var Room = /** @class */ (function () {
     Room.prototype.setupControlsListener = function () {
         var _this = this;
         setInterval(function () {
-            _this.socket.emit("get-controls", { players: _this.getPlayersControls() });
+            _this.socket.emit(shared_stuff_1.std_controls, { players: _this.getPlayersControls() });
             // set fps
         }, 1000 / 120);
     };
@@ -212,9 +226,9 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupStartGameListener = function () {
         var _this = this;
-        this.socket.once("handle-start-game", function () {
+        this.socket.once(shared_stuff_1.dts_start_game, function () {
             if (_this.players.length === 0) {
-                _this.socket.emit("handle-start-game-callback", {
+                _this.socket.emit(shared_stuff_1.std_start_game_callback, {
                     message: "No players connected, cannot start game",
                     status: errorStatus
                 });
@@ -223,7 +237,7 @@ var Room = /** @class */ (function () {
                 }, 50);
             }
             else {
-                _this.socket.emit("handle-start-game-callback", {
+                _this.socket.emit(shared_stuff_1.std_start_game_callback, {
                     message: "Game starting",
                     status: successStatus
                 });

@@ -10,17 +10,9 @@ import {
 } from "../firebase/firebaseFunctions";
 import ControlsRoom from "../mobile/ControlsRoom";
 import { UserContext } from "../providers/UserProvider";
-import {
-  IPlayerInfo,
-  MobileControls,
-  VehicleControls,
-} from "../shared-backend/shared-stuff";
-import {
-  fakePlayer1,
-  fakePlayer2,
-  fakePlayer3,
-  fakePlayer4,
-} from "../tests/fakeData";
+import { IPlayerInfo } from "../shared-backend/shared-stuff";
+import { StressTestComponent } from "../testMode/StressTestComponent";
+import { fakePlayer1, fakePlayer2 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode } from "../utils/settings";
 import BuyPremiumComponent from "./BuyPremiumComponent";
@@ -44,6 +36,7 @@ export const privateProfilePagePath = "/private-profile";
 export const publicProfilePagePath = "/public-profile/:id";
 export const showRoomPagePath = "/show-room";
 export const buyPremiumPagePath = "/premium";
+export const stressTestPagePath = "/stress-test";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -153,6 +146,10 @@ const Routes = () => {
         <Route
           path={buyPremiumPagePath}
           render={(props) => <BuyPremiumComponent {...props} />}
+        />
+        <Route
+          path={stressTestPagePath}
+          render={(props) => <StressTestComponent socket={socket} {...props} />}
         />
       </Switch>
     </Router>

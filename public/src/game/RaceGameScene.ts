@@ -10,7 +10,7 @@ import { IRaceCourse } from "../course/ICourse";
 import { RaceCourse } from "../course/RaceCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
-import "./game-styles.css";
+
 import { GameScene, IEndOfGameData, IGameRoomActions } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
@@ -34,6 +34,8 @@ export class RaceGameScene extends GameScene {
     countDownTimeout: NodeJS.Timeout
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
+
+    ticks: number = 0
 
 
     constructor() {
@@ -269,7 +271,8 @@ export class RaceGameScene extends GameScene {
 
 
 
-    update() {
+    update(time: number) {
+        this.ticks += 1
         if (this.everythingReady()) {
             stats.begin()
             if (inTestMode) {
@@ -281,7 +284,11 @@ export class RaceGameScene extends GameScene {
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()
             }
+            // console.log("time", time, this.ticks)
+            if (this.ticks % 60 === 0) {
 
+                this.updatePing()
+            }
             stats.end()
         }
     }

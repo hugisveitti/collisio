@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { IPlayerInfo, std_user_settings_changed, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_ping_test, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../course/ICourse";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -15,7 +15,7 @@ import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../ve
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { IGameScene } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
-
+import "./game-styles.css";
 
 
 
@@ -99,6 +99,7 @@ export class GameScene extends Scene3D implements IGameScene {
     viewsKmhInfo: HTMLSpanElement[]
     viewsImpornantInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
+    pingInfo: HTMLSpanElement
 
 
     constructor() {
@@ -123,6 +124,16 @@ export class GameScene extends Scene3D implements IGameScene {
         this.viewsKmhInfo = []
         this.viewsImpornantInfo = []
         this.viewsImpornantInfoClearTimeout = [] as NodeJS.Timeout[]
+
+
+        this.pingInfo = document.createElement("span")
+        this.pingInfo.setAttribute("class", "game-text")
+        this.pingInfo.setAttribute("style", `
+            position:absolute;
+            top:50px;
+            left:5px;
+        `)
+        document.body.appendChild(this.pingInfo)
     }
 
     async preload() {
@@ -200,7 +211,6 @@ export class GameScene extends Scene3D implements IGameScene {
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
-
     }
 
     async createVehicles(callback: () => void) {
@@ -649,8 +659,17 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
+    updatePing() {
+        const start = Date.now()
+        this.socket.emit(dts_ping_test)
+        this.socket.once(std_ping_test_callback, () => {
+            const ping = Date.now() - start
+            this.pingInfo.innerHTML = `ping ${ping}ms`
+        })
+    }
+
     resetVehicles() {
-        // delete?
+
 
         const p = this.course.startPosition
         const r = this.course.startRotation

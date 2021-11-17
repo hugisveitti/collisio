@@ -14,6 +14,7 @@ import {
 import { UserContext } from "../providers/UserProvider";
 import {
   MobileControls,
+  mts_controls,
   mts_game_data_info,
   mts_user_settings_changed,
   stm_game_finished,
@@ -107,7 +108,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const createSendControlsInterval = () => {
     const _sendControlsInterval = setInterval(() => {
-      props.socket.emit("send-controls", controller);
+      props.socket.emit(mts_controls, controller);
 
       // set fps
     }, 1000 / 60);

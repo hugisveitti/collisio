@@ -139,6 +139,13 @@ export const stmd_players_in_room_callback = "stmd_players_in_room_callback"
 export const mts_player_connected = "mts_player_connected"
 export const stm_player_connected_callback = "stm_player_connected_callback"
 
+export const dts_start_game = "dts_start_game"
+export const std_start_game_callback = "std_start_game_callback"
+export const stm_game_starting = "stm_game_starting"
+
+export const std_controls = "std_controls"
+export const mts_controls = "mts_controls"
+
 /** save highscore */
 export const dts_player_finished = "dts_player_finished"
 export const stm_player_finished = "stm_player_finished"
@@ -153,3 +160,10 @@ export const std_game_data_info = "std_game_data_info"
 
 export const std_user_settings_changed = "std_user_settings_changed"
 export const mts_user_settings_changed = "mts_user_settings_changed"
+
+
+export const mts_ping_test = "mts_ping_test"
+export const stm_ping_test_callback = "stm_ping_test_callback"
+
+export const dts_ping_test = "dts_ping_test"
+export const std_ping_test_callback = "std_ping_test_callback"

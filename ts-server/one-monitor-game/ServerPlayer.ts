@@ -2,7 +2,7 @@ import { Socket } from "socket.io"
 import { Room } from "./ServerGame"
 
 
-import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info, mts_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
+import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info, mts_user_settings_changed, stm_game_starting, mts_controls, mts_ping_test, stm_ping_test_callback } from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
 
@@ -52,7 +52,15 @@ export class Player {
         this.setupQuitGameListener()
         this.setupUserSettingsListener()
         this.setupReconnectListener()
-        this.setupWaitingRoomListener
+        this.setupWaitingRoomListener()
+
+        this.setupPingListener()
+    }
+
+    setupPingListener() {
+        this.socket.on(mts_ping_test, () => {
+            this.socket.emit(stm_ping_test_callback, {})
+        })
     }
 
     setupWaitingRoomListener() {
@@ -111,7 +119,7 @@ export class Player {
     }
 
     setupControler() {
-        this.socket.on("send-controls", (mobileControls) => {
+        this.socket.on(mts_controls, (mobileControls) => {
             this.mobileControls = mobileControls
         })
     }
@@ -149,7 +157,7 @@ export class Player {
     startGame() {
         this.setupControler()
         if (this.game) {
-            this.socket.emit("handle-game-starting", { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
+            this.socket.emit(stm_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
         }
     }
 
@@ -171,7 +179,6 @@ export class Player {
     }
 
     playerFinished(data: any) {
-        console.log("##player finished")
         this.socket.emit(stm_player_finished, data)
     }
 
