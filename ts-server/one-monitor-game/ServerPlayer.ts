@@ -22,6 +22,7 @@ export class Player {
     isAuthenticated
     vehicleType
     photoURL
+    userSettings: any
 
     constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string) {
 
@@ -36,10 +37,9 @@ export class Player {
         this.VehicleControls = new VehicleControls()
         this.isConnected = true
         this.photoURL = photoURL
+        this.userSettings = undefined
 
         this.setSocket(socket)
-
-
     }
 
 
@@ -147,6 +147,9 @@ export class Player {
 
     setupUserSettingsListener() {
         this.socket.on(mts_user_settings_changed, (newUserSettings) => {
+            if (newUserSettings) {
+                this.userSettings = newUserSettings
+            }
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (this.game) {
                 this.game.userSettingsChanged({ userSettings: newUserSettings, playerNumber: this.playerNumber })

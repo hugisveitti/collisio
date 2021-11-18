@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { dts_create_room, dts_game_finished, dts_ping_test, dts_player_finished, dts_start_game, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_controls, std_game_data_info, std_ping_test_callback, std_room_created_callback, std_start_game_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_game_starting, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
+import { dts_create_room, dts_game_finished, dts_ping_test, dts_player_finished, dts_start_game, dts_vehicles_ready, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_controls, std_game_data_info, std_ping_test_callback, std_room_created_callback, std_start_game_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_game_starting, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer"
 import TestRoom from "./TestRoom"
 
@@ -61,6 +61,7 @@ export default class RoomMaster {
             /** delete room callback */
             delete this.rooms[roomId]
         })
+        console.log("creating room, all rooms", Object.keys(this.rooms))
         // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
@@ -183,6 +184,17 @@ export class Room {
         this.setupPlayerFinishedListener()
         this.setupGameFinishedListener()
         this.setupPingListener()
+        this.setupVechilesReadyListener()
+    }
+
+    setupVechilesReadyListener() {
+        this.socket.on(dts_vehicles_ready, () => {
+            for (let player of this.players) {
+                if (player.userSettings) {
+                    this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber })
+                }
+            }
+        })
     }
 
 

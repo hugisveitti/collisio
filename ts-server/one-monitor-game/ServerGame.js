@@ -48,6 +48,7 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
+        console.log("creating room, all rooms", Object.keys(this.rooms));
         // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
@@ -151,6 +152,18 @@ var Room = /** @class */ (function () {
         this.setupPlayerFinishedListener();
         this.setupGameFinishedListener();
         this.setupPingListener();
+        this.setupVechilesReadyListener();
+    };
+    Room.prototype.setupVechilesReadyListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.dts_vehicles_ready, function () {
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                if (player.userSettings) {
+                    _this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber });
+                }
+            }
+        });
     };
     Room.prototype.setupPingListener = function () {
         var _this = this;

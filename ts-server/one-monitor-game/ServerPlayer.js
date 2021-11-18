@@ -14,6 +14,7 @@ var Player = /** @class */ (function () {
         this.VehicleControls = new shared_stuff_1.VehicleControls();
         this.isConnected = true;
         this.photoURL = photoURL;
+        this.userSettings = undefined;
         this.setSocket(socket);
     }
     Player.prototype.setSocket = function (newSocket) {
@@ -109,6 +110,9 @@ var Player = /** @class */ (function () {
     Player.prototype.setupUserSettingsListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mts_user_settings_changed, function (newUserSettings) {
+            if (newUserSettings) {
+                _this.userSettings = newUserSettings;
+            }
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (_this.game) {
                 _this.game.userSettingsChanged({ userSettings: newUserSettings, playerNumber: _this.playerNumber });
