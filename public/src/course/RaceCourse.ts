@@ -72,9 +72,13 @@ export class RaceCourse extends Course implements IRaceCourse {
 
     setStartPositions(vehicles: IVehicle[]) {
 
-        const usableSpawns = this.spawns.filter(s => s.name !== "checkpoint-spawn" && s.name !== "goal-spawn")
+        let usableSpawns = this.spawns.filter(s => s.name !== "checkpoint-spawn" && s.name !== "goal-spawn")
         if (usableSpawns.length >= vehicles.length) {
-
+            /**
+             * Make the spawns be in order (spawn1, spawn2, etc.)
+             * and remove unwanted spawns
+             * since if there are 2 players, they could start one in front of the other instead of side by side
+             */
             shuffleArray(usableSpawns)
 
             // use predefined spawns

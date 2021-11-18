@@ -93,16 +93,19 @@ export class RaceGameScene extends GameScene {
         let countdown = 4
         this.startGameSong()
         // makes vehicle fall
-
+        for (let vehicle of this.vehicles) {
+            vehicle.start()
+            vehicle.canDrive = false
+        }
         /** hacky way to make vehicles stopp
          * TODO: not this, find a way to make vechicles reliably start on the ground paused..
          */
         setTimeout(() => {
-            for (let vehcile of this.vehicles) {
-                const r = vehcile.getRotation()
-                const gR = this.course.startRotation
-                vehcile.setRotation(0, gR.y, 0)
-
+            for (let vehicle of this.vehicles) {
+                const r = vehicle.getRotation()
+                // const gR = this.course.startRotation
+                // vehcile.setRotation(0, gR.y, 0)
+                vehicle.stop()
 
             }
         }, (2) * 1000)

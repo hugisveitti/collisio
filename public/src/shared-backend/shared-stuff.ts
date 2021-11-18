@@ -5,7 +5,7 @@
  * So this limits the .js to one file.
  */
 /** trackName.gltf */
-export type TrackName = "low-poly-farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course"
+export type TrackName = "low-poly-farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track"
 export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader"
 
 export type GameType = "ball" | "race" | "tag"
@@ -167,3 +167,7 @@ export const stm_ping_test_callback = "stm_ping_test_callback"
 
 export const dts_ping_test = "dts_ping_test"
 export const std_ping_test_callback = "std_ping_test_callback"
+
+
+/** when vehicles are ready, stuff like settings can be sent */
+export const dts_vehicles_ready = "dts_vehicles_ready"

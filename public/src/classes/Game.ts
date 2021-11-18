@@ -26,6 +26,9 @@ export const allTrackNames: ITrackName[] = [
     },
     {
         name: "Simple Tag", type: "simple-tag-course", gameType: "tag"
+    },
+    {
+        name: "Town track", type: "town-track", gameType: "race"
     }
 ]
 
@@ -49,7 +52,7 @@ export const defaultPreGameSettings: IPreGameSettings = {
     ballRadius: 1,
     gameType: "race",
     numberOfLaps: 2,
-    trackName: "low-poly-farm-track",
+    trackName: "f1-track",
 }
 
 // info about individual players

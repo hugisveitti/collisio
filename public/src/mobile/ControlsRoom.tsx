@@ -143,11 +143,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   useEffect(() => {
     setTimeout(() => {
+      // still need to send the stuff to the server
       // hacky way
       // should have some emit from the game to the devices telling them to send info such as userSettings
       // 5000 ms then send it is hackkkky
       props.socket.emit(mts_user_settings_changed, props.store.userSettings);
-    }, 3000);
+    }, 1000);
 
     props.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       if (data.isAuthenticated) {

@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { dts_ping_test, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../course/ICourse";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -251,6 +251,7 @@ export class GameScene extends Scene3D implements IGameScene {
             loadPromise.then((msg) => {
                 if (i === this.players.length - 1) {
                     callback()
+                    this.emitVehiclesReady()
                 } else {
                     recursiveCreate(i + 1)
                 }
@@ -635,10 +636,20 @@ export class GameScene extends Scene3D implements IGameScene {
         addControls(this.vehicleControls, this.socket, this.vehicles)
     }
 
+    emitVehiclesReady() {
+        /** send info about vehiclesTypes and have the server check if 
+         * non premium accounts have premium vehicles
+         */
+        this.socket.emit(dts_vehicles_ready, { numberOfVehicles: this.vehicles.length })
+    }
+
     userSettingsListener() {
         this.socket.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             console.log("setting user settings", data)
-            this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
+            if (this.vehicles) {
+
+                this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
+            }
         })
     }
 
