@@ -35,7 +35,7 @@ export class RaceGameScene extends GameScene {
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
 
-    ticks: number = 0
+    ticks: number
 
 
     constructor() {
@@ -58,6 +58,8 @@ export class RaceGameScene extends GameScene {
 
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
+
+        this.ticks = 0
     }
 
     async create() {

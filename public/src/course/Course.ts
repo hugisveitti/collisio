@@ -5,7 +5,7 @@ import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { Scene3D } from "enable3d";
 import { TrackType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { SimpleVector } from "../vehicles/IVehicle";
+import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
 import { ICourse } from "./ICourse";
 
@@ -192,6 +192,8 @@ export class Course implements ICourse {
             this.scene.physics.destroy(obj)
         }
     }
+
+    setStartPositions(vehicles: IVehicle[]) { }
 
     updateCourse() { }
 }

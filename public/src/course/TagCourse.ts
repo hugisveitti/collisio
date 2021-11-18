@@ -130,15 +130,15 @@ export class TagCourse extends Course implements ITagCourse {
         }
     }
 
-    setSpawns(vehciles: IVehicle[]) {
+    setStartPositions(vehicles: IVehicle[]) {
         // shuffle the spawns?
 
-        for (let i = 0; i < vehciles.length; i++) {
+        for (let i = 0; i < vehicles.length; i++) {
             const p = this.spawns[i % this.spawns.length].position
             const r = this.spawns[i % this.spawns.length].rotation
 
-            vehciles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
-            vehciles[i].resetPosition()
+            vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
+            vehicles[i].resetPosition()
         }
     }
 }

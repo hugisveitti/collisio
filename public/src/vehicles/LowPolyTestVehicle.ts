@@ -186,9 +186,9 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     }
 
     randomDrive() {
-        if (Math.random() < .1) {
+        if (Math.random() < .3) {
             this.goForward(false)
-        } else if (Math.random() < .1) {
+        } else if (Math.random() < .05) {
             this.goBackward()
         }
 

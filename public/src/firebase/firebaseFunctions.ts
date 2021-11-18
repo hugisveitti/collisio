@@ -279,53 +279,8 @@ const getPlayersBestScoreOnTrackAndLap = (userIds: string[], trackType: TrackTyp
 // then it is possible to view the highscore of each track - numberOfLaps combo
 // and possibly just the bestLapTime of each track..
 // I AM not sure what the best way to store the highscores is
-type HighscoreStoreDict = { [trackKey: string]: { [numberOfLapsKey: number]: { [playerKeys: string]: { [gameKey: string]: IEndOfRaceInfoPlayer } } } }
 export type HighscoreDict = { [trackKey: string]: { [numberOfLapsKey: number]: IEndOfRaceInfoPlayer[] } }
-export const getAllHighscore = (callback: (playerGameInfo: HighscoreDict, trackKeys: string[], numberOfLapsKeys: string[]) => void) => {
-    const allHighscoreRef = ref(database, allHighscoresRefPath)
 
-    onValue(allHighscoreRef, (snap) => {
-        if (snap.exists()) {
-            const scores = snap.val() as HighscoreStoreDict
-            const trackKeys = Object.keys(scores)
-            const trackDict = {}
-
-            let numberOfLapsKeys: string[] = []
-
-            for (let trackKey of trackKeys) {
-                trackDict[trackKey] = {}
-                const currNumberOfLapsKeys = Object.keys(scores[trackKey])
-                numberOfLapsKeys = numberOfLapsKeys.concat(currNumberOfLapsKeys)
-                for (let numberOfLapsKey of currNumberOfLapsKeys) {
-                    // const trackNumberScores = scores[trackKey][numberOfLapsKey]
-                    const gamesData: IEndOfRaceInfoPlayer[] = []
-                    const playerKeys = Object.keys(scores[trackKey][numberOfLapsKey])
-                    for (let playerKey of playerKeys) {
-                        const gameKeys = Object.keys(scores[trackKey][numberOfLapsKey][playerKey])
-                        for (let gameKey of gameKeys) {
-                            const gameData = scores[trackKey][numberOfLapsKey][playerKey][gameKey]
-                            gamesData.push(gameData)
-                        }
-                    }
-                    gamesData.sort((a: IEndOfRaceInfoPlayer, b: IEndOfRaceInfoPlayer) => {
-                        return a.totalTime - b.totalTime
-                    })
-                    trackDict[trackKey][numberOfLapsKey] = gamesData
-                }
-            }
-            numberOfLapsKeys.sort()
-            numberOfLapsKeys = [...new Set(numberOfLapsKeys)]
-
-
-            callback(trackDict, trackKeys, numberOfLapsKeys)
-
-        } else {
-            callback({}, [], [])
-        }
-    }, (err) => {
-        console.log("Error getting highscores", err)
-    }, { onlyOnce: true })
-}
 
 
 export type UniqueHighscoreDict = { [trackType: string]: { [numberOfLaps: number]: { [userId: string]: IEndOfRaceInfoPlayer } } }

@@ -110,6 +110,8 @@ const StressTestRow = (props: IStressTestRow) => {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open}>
             <LinePlotComponent
+              yMin={0}
+              yMax={150}
               values={pings}
               width={400}
               height={200}

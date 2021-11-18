@@ -136,8 +136,7 @@ export class GameScene extends Scene3D implements IGameScene {
         document.body.appendChild(this.pingInfo)
     }
 
-    async preload() {
-        await this.warpSpeed("-ground", "-light", "-sky")
+    async addLights() {
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
         if (this.useShadows) {
@@ -179,6 +178,13 @@ export class GameScene extends Scene3D implements IGameScene {
 
         const sky = new THREE.Mesh(skyGeo, skyMat);
         this.scene.add(sky);
+
+    }
+
+    async preload() {
+        await this.warpSpeed("-ground", "-light", "-sky")
+
+        this.addLights()
 
 
 
@@ -671,36 +677,37 @@ export class GameScene extends Scene3D implements IGameScene {
     resetVehicles() {
 
 
-        const p = this.course.startPosition
-        const r = this.course.startRotation
+        // const p = this.course.startPosition
+        // const r = this.course.startRotation
 
-        const courseY = this.course.startPosition?.y ?? 2
-        let possibleStartingPos = []
-        let offset = 1
-        for (let i = 0; i < this.vehicles.length; i++) {
+        // const courseY = this.course.startPosition?.y ?? 2
+        // let possibleStartingPos = []
+        // let offset = 1
+        // for (let i = 0; i < this.vehicles.length; i++) {
 
-            offset *= -1
+        //     offset *= -1
 
-            if (i % 2 !== 0) {
-                offset += (Math.sign(offset) * 5)
-            }
+        //     if (i % 2 !== 0) {
+        //         offset += (Math.sign(offset) * 5)
+        //     }
 
-            possibleStartingPos.push({ x: p.x + offset - 5, y: courseY, z: p.z + offset - 5 })
-        }
+        //     possibleStartingPos.push({ x: p.x + offset - 5, y: courseY, z: p.z + offset - 5 })
+        // }
 
 
-        for (let i = 0; i < this.players.length; i++) {
+        // for (let i = 0; i < this.players.length; i++) {
 
-            this.vehicles[i].canDrive = false
+        //     this.vehicles[i].canDrive = false
 
-            const sI = Math.floor(Math.random() * possibleStartingPos.length)
-            const sPos = possibleStartingPos[sI]
-            possibleStartingPos.splice(sI, 1)
+        //     const sI = Math.floor(Math.random() * possibleStartingPos.length)
+        //     const sPos = possibleStartingPos[sI]
+        //     possibleStartingPos.splice(sI, 1)
 
-            this.vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
-            this.vehicles[i].resetPosition()
-            this.vehicles[i].pause()
-        }
+        //     this.vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
+        //     this.vehicles[i].resetPosition()
+        //     this.vehicles[i].pause()
+        // }
+        this.course.setStartPositions(this.vehicles)
         this._resetVehicles()
     }
 
@@ -752,7 +759,6 @@ export const startGame = (SceneClass: typeof GameScene, socket: Socket, players:
         gameObject.setGameRoomActions(gameRoomActions)
         gameObject.setPreGameSettings(gameSettings, roomId);
         gameObject.setUserGameSettings(userGameSettings);
-        //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
         callback(gameObject)
 
         return project

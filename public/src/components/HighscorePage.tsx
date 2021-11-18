@@ -1,6 +1,6 @@
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
   CircularProgress,
-  Collapse,
   FormControl,
   Grid,
   IconButton,
@@ -17,23 +17,16 @@ import {
   Tooltip,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { Link } from "react-router-dom";
+import { getTrackNameFromType, IEndOfRaceInfoPlayer } from "../classes/Game";
+import AppContainer from "../containers/AppContainer";
 import {
-  getAllHighscore,
   getUniqueHighscore,
-  HighscoreDict,
   UniqueHighscoreDict,
 } from "../firebase/firebaseFunctions";
+import "../styles/main.css";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 import { frontPagePath } from "./Routes";
-import AppContainer from "../containers/AppContainer";
-import "../styles/main.css";
-import {
-  allTrackTypes,
-  getTrackNameFromType,
-  IEndOfRaceInfoPlayer,
-} from "../classes/Game";
 
 const stringInList = (s: string, sList: string[]) => {
   for (let i = 0; i < sList.length; i++) {

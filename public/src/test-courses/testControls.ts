@@ -5,12 +5,14 @@ import { MobileControls, std_controls, VehicleControls } from "../shared-backend
 
 
 let speed = 40
-let maxAngle = 0.4
-let angle = 30
+let maxAngle = 40
+let angle = 0
+let dAngle = 4
 
 
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
+
     let btnDown = false
     if (mobileControls.f) {
         vehicle.goForward(false)
@@ -53,7 +55,6 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
     })
 
     const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
-
         if (vehicleControls.f) {
             vehicle.goForward(false)
         } else if (vehicleControls.b) {
@@ -64,11 +65,20 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
         if (vehicleControls.left) {
+            angle += dAngle
+            angle = Math.min(angle, maxAngle)
             vehicle.turn(angle)
         } else if (vehicleControls.right) {
-            vehicle.turn(-angle)
+            angle -= dAngle
+            angle = Math.max(angle, -maxAngle)
+            vehicle.turn(angle)
         } else {
-            vehicle.turn(0)
+            if (angle > 0) {
+                angle -= dAngle
+            } else if (angle < 0) {
+                angle += dAngle
+            }
+            vehicle.turn(angle)
         }
     }
 
@@ -85,7 +95,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
         } else {
             testDriveVehicleWithKeyboard(vehicle, vehicleControls)
         }
-    }, 1000 / 120)
+    }, 1000 / 60)
 
 
 

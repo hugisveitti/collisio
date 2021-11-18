@@ -6,6 +6,8 @@ interface ILinePlotComponent {
   height: number;
   values: number[];
   id: string;
+  yMax: number;
+  yMin: number;
 }
 
 const LinePlotComponent = (props: ILinePlotComponent) => {
@@ -31,7 +33,10 @@ const LinePlotComponent = (props: ILinePlotComponent) => {
   }, []);
 
   useEffect(() => {
-    const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    const y = d3
+      .scaleLinear()
+      .domain([props.yMin, props.yMax])
+      .range([height, 0]);
     const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
     if (!svg) return;
 

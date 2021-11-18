@@ -1,6 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { SimpleVector } from "../vehicles/IVehicle";
+import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 
 export interface ICourse {
     checkIfObjectOutOfBounds: (object: SimpleVector) => boolean
@@ -8,6 +8,7 @@ export interface ICourse {
     createCourse: (useShadows: boolean, callback: () => void) => void
     clearCourse: () => void
     updateCourse: () => void
+    setStartPositions: (vehicle: IVehicle[]) => void
     ground: ExtendedObject3D
     startPosition: THREE.Vector3
     startRotation: THREE.Euler

@@ -2,7 +2,7 @@ import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
-import { defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
+import { allTrackTypes, defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
 import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
 import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
 import "../game/game-styles.css"
@@ -72,7 +72,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     isIt: number
 
     constructor() {
-        super({ key: "OneMonitorRaceGameScene" })
+        super({ key: "LowPolyTestScene" })
 
         scoreTable.setAttribute("id", "score-info")
         lapTimeDiv.setAttribute("id", "lap-time")
@@ -108,7 +108,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.trackType = window.localStorage.getItem("trackType") as TrackType ?? "test-course"
         this.usingDebug = eval(window.localStorage.getItem("usingDebug")) ?? true
 
-        this.gameType = "tag"
+        this.gameType = this.getGameType()
 
 
         this.otherVehicles = []
@@ -126,14 +126,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
     }
 
-    async preload() {
-
-        if (this.usingDebug) {
-            this.physics.debug?.enable()
-        }
-        await this.warpSpeed('-ground', "-light", "-sky")
-
-
+    async addLights() {
 
         this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
@@ -183,7 +176,18 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         const sky = new THREE.Mesh(skyGeo, skyMat);
         this.scene.add(sky);
 
+    }
 
+    async preload() {
+
+        if (this.usingDebug) {
+            this.physics.debug?.enable()
+        }
+        await this.warpSpeed('-ground', "-light", "-sky")
+
+
+
+        this.addLights()
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         window.addEventListener("resize", () => this.onWindowResize())
@@ -244,10 +248,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     async create() {
         // test-course.gltf
         // low-poly-farm-track
-        if (this.gameType === "race") {
+        if (this.getGameType() === "race") {
 
             this.course = new RaceCourse(this, this.trackType, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
-        } else if (this.gameType === "tag") {
+        } else if (this.getGameType() === "tag") {
             this.course = new TagCourse(this, this.trackType, (name, coin) => this.handleCoinCollided(name, coin))
         }
         this.course.createCourse(this.useShadows, () => {
@@ -260,6 +264,13 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     getGameType() {
+        for (let i = 0; i < allTrackTypes.length; i++) {
+            if (allTrackTypes[i].type === this.trackType) {
+                this.gameType = allTrackTypes[i].gameType
+                return allTrackTypes[i].gameType
+            }
+        }
+        console.warn("Game type not known")
         return this.gameType
     }
 
@@ -298,7 +309,9 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.trackType = trackType
         window.localStorage.setItem("trackType", trackType)
         this.canStartUpdate = false
-        this.course.clearCourse()
+        //  this.course.clearCourse()
+        this.scene.clear()
+        this.addLights()
 
         /** TODO Cannot destroy vehicles */
         // this.vehicle.destroy()
@@ -550,19 +563,24 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             this.vehicle.useBadRotationTicks = false
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
+            console.log("game type", this.getGameType());
+            this.course.setStartPositions(allVehicles)
+            for (let v of allVehicles) {
+                v.unpause()
+                v.canDrive = true
+            }
             if (this.getGameType() === "tag") {
 
-                (this.course as TagCourse).setSpawns(allVehicles)
+                this.vehicle.setPosition(0, 2, 0)
             }
 
-            this.vehicle.setPosition(0, 2, 0)
 
-            this.canStartUpdate = true
             this.createController()
             const isVehicle = (object: ExtendedObject3D) => {
                 return object.name.slice(0, 7) === "vehicle"
             }
 
+            this.canStartUpdate = true
             this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
                 if (isVehicle(otherObject)) {
                     console.log("collide with vehicle", otherObject)
@@ -635,11 +653,8 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     createController() {
-
-
         if (this.vehicle) {
             this.vehicleControls = new VehicleControls()
-
 
             addTestControls(this.vehicleControls, this.socket, this.vehicle,)
 
@@ -656,12 +671,11 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     update() {
-
         if (this.canStartUpdate) {
 
             stats.begin()
             if (this.vehicle) {
-                this.vehicle.intelligentDrive(true)
+                //     this.vehicle.intelligentDrive(true)
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()

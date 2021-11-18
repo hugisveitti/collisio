@@ -19,7 +19,7 @@ export const allTrackTypes: ITrackType[] = [
         name: "Farm track", type: "low-poly-farm-track", gameType: "race"
     },
     {
-        name: "F1 track", type: "low-poly-f1-track", gameType: "race"
+        name: "F1 track", type: "f1-track", gameType: "race"
     },
     {
         name: "Beach track", type: "sea-side-track", gameType: "race"
