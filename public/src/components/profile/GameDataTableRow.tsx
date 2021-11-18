@@ -33,7 +33,7 @@ export default (props: IProps) => {
           </IconButton>
         </TableCell>
         <TableCell>{playerData.date}</TableCell>
-        <TableCell>{playerData.trackType}</TableCell>
+        <TableCell>{playerData.trackName}</TableCell>
         <TableCell>{playerData.numberOfLaps}</TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
         <TableCell>{playerData.bestLapTime}</TableCell>
@@ -43,7 +43,7 @@ export default (props: IProps) => {
               deletePlayerGameData(
                 props.userId,
                 playerData.gameId,
-                playerData.trackType,
+                playerData.trackName,
                 playerData.numberOfLaps
               );
             }}

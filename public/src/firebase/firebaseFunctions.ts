@@ -2,7 +2,7 @@ import { child, get, push, ref, set, update, onValue, remove, orderByValue, quer
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
-import { TrackType } from "../shared-backend/shared-stuff";
+import { TrackName } from "../shared-backend/shared-stuff";
 import { database, } from "./firebaseInit";
 
 export const usersRefPath = "users"
@@ -106,25 +106,25 @@ export const saveRaceDataPlayer = (playerGameInfo: IEndOfRaceInfoPlayer, callbac
 
     const updates = {}
     const gameDataInfo: string[] = []
-    const { trackType, numberOfLaps } = playerGameInfo
+    const { trackName, numberOfLaps } = playerGameInfo
 
-    getPlayerBestScoreOnTrackAndLap(playerGameInfo.playerId, trackType, numberOfLaps, (oldPersonalBest) => {
-        getAllTimeBestScoresOnTrackAndLap(trackType, numberOfLaps, 5, (bestScores) => {
+    getPlayerBestScoreOnTrackAndLap(playerGameInfo.playerId, trackName, numberOfLaps, (oldPersonalBest) => {
+        getAllTimeBestScoresOnTrackAndLap(trackName, numberOfLaps, 5, (bestScores) => {
 
             if (playerGameInfo.isAuthenticated) {
                 const pData = playerGameInfo
                 updates[usersRefPath + "/" + pData.playerId + "/" + userGamesRefPath + "/" + newGameKey + "/" + userGamePlayerInfoPath] = pData
-                updates[allHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId + "/" + newGameKey] = pData
+                updates[allHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + playerGameInfo.playerId + "/" + newGameKey] = pData
                 if (oldPersonalBest.totalTime !== undefined && oldPersonalBest.totalTime > pData.totalTime) {
                     gameDataInfo.push(
                         `${pData.playerName} set a personal best time.`
                     )
-                    updates[uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
+                    updates[uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
                 } else if (oldPersonalBest.totalTime !== undefined) {
                     gameDataInfo.push(`${pData.playerName} was ${(pData.totalTime - oldPersonalBest.totalTime).toFixed(2)} sec from setting a PB.`)
                 } else {
                     gameDataInfo.push(`${pData.playerName} raced this track and number-of-laps combination for the first time.`)
-                    updates[uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
+                    updates[uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + playerGameInfo.playerId] = playerGameInfo
                 }
                 const totalTime = pData.totalTime
                 let place = 1
@@ -192,18 +192,18 @@ export const saveGameFinished = (gameInfo: IEndOfRaceInfoGame) => {
 
 /**
  * 
- * @param trackType :TrackType
+ * @param trackName :TrackName
  * @param numberOfLaps key
  * @param nFastest : top n fastest, if n < 1 then will get all 
  * @param callback : to return the thing
  */
-const getAllTimeBestScoresOnTrackAndLap = (trackType: TrackType, numberOfLaps: number, nFastest: number, callback: (scores: IEndOfRaceInfoPlayer[]) => void) => {
+const getAllTimeBestScoresOnTrackAndLap = (trackName: TrackName, numberOfLaps: number, nFastest: number, callback: (scores: IEndOfRaceInfoPlayer[]) => void) => {
 
     let bestScoreRef: Query
     if (nFastest > 1) {
-        bestScoreRef = query(ref(database, uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps), orderByChild("totalTime"), limitToLast(nFastest))
+        bestScoreRef = query(ref(database, uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps), orderByChild("totalTime"), limitToLast(nFastest))
     } else {
-        bestScoreRef = query(ref(database, uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps), orderByChild("totalTime"))
+        bestScoreRef = query(ref(database, uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps), orderByChild("totalTime"))
     }
 
 
@@ -236,8 +236,8 @@ interface IBestTime {
 
 type IBestTimeD = { [userId: string]: IBestTime }
 
-const getPlayerBestScoreOnTrackAndLap = (userId: string, trackType: TrackType, numberOfLaps: number, callback: (oldPersonalBest: IBestTime) => void) => {
-    const playerBestScoreRef = ref(database, uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + userId)
+const getPlayerBestScoreOnTrackAndLap = (userId: string, trackName: TrackName, numberOfLaps: number, callback: (oldPersonalBest: IBestTime) => void) => {
+    const playerBestScoreRef = ref(database, uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId)
 
     onValue(playerBestScoreRef, (snap) => {
         if (snap.exists()) {
@@ -249,14 +249,14 @@ const getPlayerBestScoreOnTrackAndLap = (userId: string, trackType: TrackType, n
     }, { onlyOnce: true })
 }
 
-const getPlayersBestScoreOnTrackAndLap = (userIds: string[], trackType: TrackType, numberOfLaps: number, callback: (oldPersonalBests: IBestTimeD) => void) => {
+const getPlayersBestScoreOnTrackAndLap = (userIds: string[], trackName: TrackName, numberOfLaps: number, callback: (oldPersonalBests: IBestTimeD) => void) => {
 
     let personalBests: { [userId: string]: IBestTime } = {}
     // index is to index the userId
     // Using this recursion to do it async
     const getItem = (index: number) => {
-        // const playerBestScoreRef = ref(database, uniqueHighscoresRefPath + "/" + trackType + "/" + numberOfLaps + "/" + userIds[index])
-        getPlayerBestScoreOnTrackAndLap(userIds[index], trackType, numberOfLaps, (oldPersonalBest) => {
+        // const playerBestScoreRef = ref(database, uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userIds[index])
+        getPlayerBestScoreOnTrackAndLap(userIds[index], trackName, numberOfLaps, (oldPersonalBest) => {
             personalBests[userIds[index]] = oldPersonalBest
             if (index === userIds.length - 1) {
                 callback(personalBests)
@@ -283,7 +283,7 @@ export type HighscoreDict = { [trackKey: string]: { [numberOfLapsKey: number]: I
 
 
 
-export type UniqueHighscoreDict = { [trackType: string]: { [numberOfLaps: number]: { [userId: string]: IEndOfRaceInfoPlayer } } }
+export type UniqueHighscoreDict = { [trackName: string]: { [numberOfLaps: number]: { [userId: string]: IEndOfRaceInfoPlayer } } }
 export const getUniqueHighscore = (callback: (highscoreDict: UniqueHighscoreDict) => void) => {
 
     /** limit to last first? */

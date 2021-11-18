@@ -1,17 +1,17 @@
-import { TrackType, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
+import { TrackName, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 
 
-interface ITrackType {
+interface ITrackName {
     name: string
-    type: TrackType
+    type: TrackName
     gameType: GameType
 }
 
-export const getTrackNameFromType = (trackType: TrackType) => {
-    return allTrackTypes.find(track => track.type === trackType)?.name ?? "-"
+export const getTrackNameFromType = (trackName: TrackName) => {
+    return allTrackNames.find(track => track.type === trackName)?.name ?? "-"
 }
 
-export const allTrackTypes: ITrackType[] = [
+export const allTrackNames: ITrackName[] = [
     {
         name: "Test", type: "test-course", gameType: "race"
     },
@@ -42,7 +42,7 @@ export interface IPreGameSettings {
     ballRadius: number
     gameType: GameType
     numberOfLaps: number
-    trackName: TrackType
+    trackName: TrackName
 }
 
 export const defaultPreGameSettings: IPreGameSettings = {
@@ -60,7 +60,7 @@ export interface IEndOfRaceInfoPlayer {
     playerName: string
     lapTimes: number[]
     bestLapTime: number
-    trackType: TrackType
+    trackName: TrackName
     gameId: string
     date: Date
     private: boolean
@@ -87,7 +87,7 @@ export interface IPlayerGameInfo {
 export interface IEndOfRaceInfoGame {
     numberOfLaps: number
     playersInfo: IPlayerGameInfo[]
-    trackType: TrackType
+    trackName: TrackName
     gameId: string
     roomId: string
     date: Date

@@ -1,5 +1,5 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { IPlayerInfo, MobileControls, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
+import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
 const id2 = "LEzfm3UQl7b6CKUupasInidva9W2"
@@ -26,13 +26,13 @@ const players = [
 ]
 
 const numberOfFakeGames = 30
-const possibleTracks: TrackType[] = ["f1-track", "low-poly-farm-track"]
+const possibleTracks: TrackName[] = ["f1-track", "low-poly-farm-track"]
 
 export const createFakeHighscoreData = () => {
     console.log("Creating fake data")
     for (let i = 0; i < numberOfFakeGames; i++) {
-        const trackType: TrackType = possibleTracks[Math.floor(Math.random() * possibleTracks.length)]
-        const gameId = `test-fakeGameId-${trackType}-${i}`
+        const trackName: TrackName = possibleTracks[Math.floor(Math.random() * possibleTracks.length)]
+        const gameId = `test-fakeGameId-${trackName}-${i}`
         const numberOfLaps = Math.floor((Math.random() * 6) + 2)
         const roomId = "test"
         const playerNames = []
@@ -64,7 +64,7 @@ export const createFakeHighscoreData = () => {
                 lapTimes,
                 bestLapTime,
                 gameId,
-                trackType,
+                trackName,
                 totalTime: tt,
                 numberOfLaps,
                 date: new Date(),
@@ -92,7 +92,7 @@ export const createFakeHighscoreData = () => {
             numberOfLaps,
             gameId,
             roomId,
-            trackType,
+            trackName,
             date: new Date()
         }
 

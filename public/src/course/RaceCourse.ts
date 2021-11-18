@@ -3,7 +3,7 @@ import { CollisionEvent } from "@enable3d/common/dist/types";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle } from "../vehicles/IVehicle";
 import { IRaceCourse } from "./ICourse";
-import { TrackType } from '../shared-backend/shared-stuff';
+import { TrackName } from '../shared-backend/shared-stuff';
 import { Course } from './Course';
 import { shuffleArray } from "../utils/utilFunctions";
 
@@ -23,7 +23,7 @@ export class RaceCourse extends Course implements IRaceCourse {
 
 
 
-    constructor(scene: Scene3D, trackName: TrackType, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
+    constructor(scene: Scene3D, trackName: TrackName, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
 
         super(scene, trackName)
 
@@ -76,8 +76,7 @@ export class RaceCourse extends Course implements IRaceCourse {
         if (usableSpawns.length >= vehicles.length) {
 
             shuffleArray(usableSpawns)
-            console.log("spawns", this.spawns)
-            console.log("usable", usableSpawns)
+
             // use predefined spawns
 
             for (let i = 0; i < vehicles.length; i++) {
@@ -86,7 +85,7 @@ export class RaceCourse extends Course implements IRaceCourse {
 
                 vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
                 vehicles[i].resetPosition()
-                vehicles[i].pause()
+                vehicles[i].stop()
             }
         } else {
 
@@ -119,7 +118,7 @@ export class RaceCourse extends Course implements IRaceCourse {
 
                 vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
                 vehicles[i].resetPosition()
-                vehicles[i].pause()
+                vehicles[i].stop()
             }
         }
     }

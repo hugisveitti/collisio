@@ -6,7 +6,7 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { dts_ping_test, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackType, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_ping_test, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../course/ICourse";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -616,7 +616,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     _restartGame() { }
 
-    changeTrack(trackType: TrackType) {
+    changeTrack(trackName: TrackName) {
         console.log("change track not implemented")
     }
 
@@ -676,37 +676,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
     resetVehicles() {
 
-
-        // const p = this.course.startPosition
-        // const r = this.course.startRotation
-
-        // const courseY = this.course.startPosition?.y ?? 2
-        // let possibleStartingPos = []
-        // let offset = 1
-        // for (let i = 0; i < this.vehicles.length; i++) {
-
-        //     offset *= -1
-
-        //     if (i % 2 !== 0) {
-        //         offset += (Math.sign(offset) * 5)
-        //     }
-
-        //     possibleStartingPos.push({ x: p.x + offset - 5, y: courseY, z: p.z + offset - 5 })
-        // }
-
-
-        // for (let i = 0; i < this.players.length; i++) {
-
-        //     this.vehicles[i].canDrive = false
-
-        //     const sI = Math.floor(Math.random() * possibleStartingPos.length)
-        //     const sPos = possibleStartingPos[sI]
-        //     possibleStartingPos.splice(sI, 1)
-
-        //     this.vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
-        //     this.vehicles[i].resetPosition()
-        //     this.vehicles[i].pause()
-        // }
         this.course.setStartPositions(this.vehicles)
         this._resetVehicles()
     }

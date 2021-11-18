@@ -3,7 +3,7 @@ import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { GLTF, GLTFLoader, Group, LoadingManager } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { Scene3D } from "enable3d";
-import { TrackType } from "../shared-backend/shared-stuff";
+import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
@@ -36,7 +36,7 @@ const keyNameMatch = (key: string, name: string) => {
 
 export class Course implements ICourse {
     scene: Scene3D
-    trackName: TrackType
+    trackName: TrackName
     ground: ExtendedObject3D
 
 
@@ -51,7 +51,7 @@ export class Course implements ICourse {
 
     spawns: THREE.Object3D[]
 
-    constructor(scene: Scene3D, trackName: TrackType,) {
+    constructor(scene: Scene3D, trackName: TrackName,) {
         this.scene = scene
         this.trackName = trackName
         this.gamePhysicsObjects = []

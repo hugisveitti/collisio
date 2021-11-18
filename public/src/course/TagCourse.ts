@@ -1,6 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, Scene3D } from "enable3d";
-import { TrackType } from "../shared-backend/shared-stuff";
+import { TrackName } from "../shared-backend/shared-stuff";
 import { IVehicle } from '../vehicles/IVehicle';
 import { LowPolyVehicle } from '../vehicles/LowPolyVehicle';
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
@@ -88,7 +88,7 @@ export class TagCourse extends Course implements ITagCourse {
     coins: Coin[]
     coinPoints: THREE.Object3D[]
     coinCollidedCallback: (name: string, coin: Coin) => void
-    constructor(scene: Scene3D, trackName: TrackType, coinCollidedCallback: (name: string, coin: Coin) => void) {
+    constructor(scene: Scene3D, trackName: TrackName, coinCollidedCallback: (name: string, coin: Coin) => void) {
         super(scene, trackName)
         this.coinCollidedCallback = coinCollidedCallback
         this.startPosition = new THREE.Vector3(2, 2, 3)

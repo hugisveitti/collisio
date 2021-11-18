@@ -2,7 +2,7 @@ import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
-import { allTrackTypes, defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
+import { allTrackNames, defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
 import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
 import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
 import "../game/game-styles.css"
@@ -14,7 +14,7 @@ import { IUserGameSettings } from "../classes/User"
 import { GameTime } from "../game/GameTimeClass"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
-import { VehicleControls, VehicleType, MobileControls, TrackType, std_user_settings_changed, GameType } from "../shared-backend/shared-stuff"
+import { VehicleControls, VehicleType, MobileControls, TrackName, std_user_settings_changed, GameType } from "../shared-backend/shared-stuff"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { Console } from "console"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
@@ -62,7 +62,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     gameTime: GameTime
     escPress: () => void
     isPaused = false
-    trackType: TrackType
+    trackName: TrackName
     usingDebug: boolean
     vehicleColorNumber = 0
 
@@ -105,7 +105,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.mobileControls = new MobileControls()
 
         this.gameTime = new GameTime(3)
-        this.trackType = window.localStorage.getItem("trackType") as TrackType ?? "test-course"
+        this.trackName = window.localStorage.getItem("trackName") as TrackName ?? "test-course"
         this.usingDebug = eval(window.localStorage.getItem("usingDebug")) ?? true
 
         this.gameType = this.getGameType()
@@ -250,9 +250,9 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         // low-poly-farm-track
         if (this.getGameType() === "race") {
 
-            this.course = new RaceCourse(this, this.trackType, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+            this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         } else if (this.getGameType() === "tag") {
-            this.course = new TagCourse(this, this.trackType, (name, coin) => this.handleCoinCollided(name, coin))
+            this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
         }
         this.course.createCourse(this.useShadows, () => {
             this.createOtherVehicles(() => {
@@ -264,10 +264,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     getGameType() {
-        for (let i = 0; i < allTrackTypes.length; i++) {
-            if (allTrackTypes[i].type === this.trackType) {
-                this.gameType = allTrackTypes[i].gameType
-                return allTrackTypes[i].gameType
+        for (let i = 0; i < allTrackNames.length; i++) {
+            if (allTrackNames[i].type === this.trackName) {
+                this.gameType = allTrackNames[i].gameType
+                return allTrackNames[i].gameType
             }
         }
         console.warn("Game type not known")
@@ -305,9 +305,9 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         }
     }
 
-    changeTrack(trackType: TrackType) {
-        this.trackType = trackType
-        window.localStorage.setItem("trackType", trackType)
+    changeTrack(trackName: TrackName) {
+        this.trackName = trackName
+        window.localStorage.setItem("trackName", trackName)
         this.canStartUpdate = false
         //  this.course.clearCourse()
         this.scene.clear()

@@ -11,13 +11,13 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { allTrackTypes, IPreGameSettings } from "../../classes/Game";
+import { allTrackNames, IPreGameSettings } from "../../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../../classes/User";
 import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import { IGameScene } from "../../game/IGameScene";
 import {
   IPlayerInfo,
-  TrackType,
+  TrackName,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
@@ -187,7 +187,7 @@ const GameSettingsModal = (props: IPreGameSettingsModal) => {
                     onChange={(e) => {
                       const newPreGameSettings: IPreGameSettings = {
                         ...props.store.userSettings.preGameSettings,
-                        trackName: e.target.value as TrackType,
+                        trackName: e.target.value as TrackName,
                       };
 
                       const newUserSettings: IUserSettings = {
@@ -198,13 +198,13 @@ const GameSettingsModal = (props: IPreGameSettingsModal) => {
 
                       if (props.gameObject.changeTrack) {
                         props.gameObject.changeTrack(
-                          e.target.value as TrackType
+                          e.target.value as TrackName
                         );
                       }
                     }}
                     value={props.store.userSettings.preGameSettings.trackName}
                   >
-                    {allTrackTypes.map((t) => (
+                    {allTrackNames.map((t) => (
                       <MenuItem key={t.name} value={t.type}>
                         {t.name}
                       </MenuItem>

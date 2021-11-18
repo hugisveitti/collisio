@@ -93,9 +93,6 @@ export class RaceGameScene extends GameScene {
         let countdown = 4
         this.startGameSong()
         // makes vehicle fall
-        for (let vehcile of this.vehicles) {
-            vehcile.start()
-        }
 
         /** hacky way to make vehicles stopp
          * TODO: not this, find a way to make vechicles reliably start on the ground paused..
@@ -105,7 +102,7 @@ export class RaceGameScene extends GameScene {
                 const r = vehcile.getRotation()
                 const gR = this.course.startRotation
                 vehcile.setRotation(0, gR.y, 0)
-                vehcile.stop()
+
 
             }
         }, (2) * 1000)
@@ -121,7 +118,6 @@ export class RaceGameScene extends GameScene {
                 } else {
                     this.playStartBeep()
                     this.showViewsImportantInfo("GO!!!!")
-                    // this.showImportantInfo("GO!!!!")
                     this.startAllVehicles()
                     this.gameStarted = true
 
@@ -307,7 +303,7 @@ export class RaceGameScene extends GameScene {
             playerName: this.players[i].playerName,
             playerId: this.players[i].id,
             bestLapTime: this.gameTimers[i].getBestLapTime(),
-            trackType: this.preGameSettings.trackName,
+            trackName: this.preGameSettings.trackName,
             lapTimes: this.gameTimers[i].getLapTimes(),
             gameId: this.gameId,
             date: new Date(),
@@ -347,7 +343,7 @@ export class RaceGameScene extends GameScene {
         const endOfRaceInfo: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
             numberOfLaps: this.preGameSettings.numberOfLaps,
-            trackType: this.preGameSettings.trackName,
+            trackName: this.preGameSettings.trackName,
             gameId: this.gameId,
             roomId: this.roomId,
             date: new Date()
