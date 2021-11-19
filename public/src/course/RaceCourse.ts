@@ -74,18 +74,23 @@ export class RaceCourse extends Course implements IRaceCourse {
 
         let usableSpawns = this.spawns.filter(s => s.name !== "checkpoint-spawn" && s.name !== "goal-spawn")
         if (usableSpawns.length >= vehicles.length) {
+            const sortedSpawns = new Array(usableSpawns.length)
+            for (let spawn of usableSpawns) {
+                const idx = +spawn.name.slice(5, 6)
+                sortedSpawns[idx - 1] = spawn
+            }
             /**
              * Make the spawns be in order (spawn1, spawn2, etc.)
              * and remove unwanted spawns
              * since if there are 2 players, they could start one in front of the other instead of side by side
              */
-            shuffleArray(usableSpawns)
+            //  shuffleArray(sortedSpawns)
 
             // use predefined spawns
 
             for (let i = 0; i < vehicles.length; i++) {
-                const p = usableSpawns[i].position
-                const r = usableSpawns[i].rotation
+                const p = sortedSpawns[i].position
+                const r = sortedSpawns[i].rotation
 
                 vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
                 vehicles[i].resetPosition()

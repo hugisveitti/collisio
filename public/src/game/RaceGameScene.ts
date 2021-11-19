@@ -105,7 +105,7 @@ export class RaceGameScene extends GameScene {
                 const r = vehicle.getRotation()
                 // const gR = this.course.startRotation
                 // vehcile.setRotation(0, gR.y, 0)
-                vehicle.stop()
+                //     vehicle.stop()
 
             }
         }, (2) * 1000)
