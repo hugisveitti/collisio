@@ -2,7 +2,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import {
   Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   Grid,
   IconButton,
   Slider,
@@ -16,6 +18,8 @@ import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import { IUser, setDBUserSettings } from "../firebase/firebaseFunctions";
 import { mts_user_settings_changed } from "../shared-backend/shared-stuff";
+
+export const invertedControllerKey = "invertedController";
 
 interface IControllerSettingsComponent {
   setSettingsModalOpen: any;

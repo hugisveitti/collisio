@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import {
   defaultRaceTrack,
@@ -102,7 +103,10 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                     value="tag"
                     control={
                       <Radio
-                        onChange={() => updateGameSettings("gameType", "tag")}
+                        onChange={() => {
+                          //updateGameSettings("gameType", "tag")}
+                          toast("Tag game not available yet");
+                        }}
                         checked={props.store.preGameSettings.gameType === "tag"}
                       />
                     }

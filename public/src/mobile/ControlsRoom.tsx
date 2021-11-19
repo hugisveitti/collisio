@@ -22,7 +22,9 @@ import {
 } from "../shared-backend/shared-stuff";
 import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
 import { isIphone } from "../utils/settings";
-import ControllerSettingsComponent from "./ControllerSettingsComponent";
+import ControllerSettingsComponent, {
+  invertedControllerKey,
+} from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";
 
 interface IControlsRoomProps {
@@ -58,6 +60,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [sendControlsInterval, setSendControlsInterval] = useState(
     undefined as undefined | NodeJS.Timer
   );
+  const [invertedController, setInvertedController] = useState(1);
 
   const handleUserLoggedIn = () => {};
 
@@ -70,6 +73,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
+    // -1 if inverted
+
     const gamma = e.gamma ?? 0;
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
@@ -83,7 +88,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
-    controller.beta = Math.round(beta);
+    controller.beta = Math.round(beta) * invertedController;
 
     setOrientation({
       gamma,
@@ -124,6 +129,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     window.addEventListener("deviceorientation", deviceOrientationHandler);
 
     // createSendControlsInterval();
+    const _invertedController = window.localStorage.getItem(
+      invertedControllerKey
+    );
+    if (_invertedController) {
+      setInvertedController(+_invertedController);
+    }
 
     return () => {
       window.clearInterval(sendControlsInterval);
