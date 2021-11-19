@@ -5,7 +5,7 @@
  * So this limits the .js to one file.
  */
 /** trackName.gltf */
-export type TrackName = "low-poly-farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track"
+export type TrackName = "farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track"
 export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader"
 
 export type GameType = "ball" | "race" | "tag"

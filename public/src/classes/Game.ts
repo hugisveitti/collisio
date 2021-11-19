@@ -16,7 +16,7 @@ export const allTrackNames: ITrackName[] = [
         name: "Test", type: "test-course", gameType: "race"
     },
     {
-        name: "Farm track", type: "low-poly-farm-track", gameType: "race"
+        name: "Farm track", type: "farm-track", gameType: "race"
     },
     {
         name: "F1 track", type: "f1-track", gameType: "race"

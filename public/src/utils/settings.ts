@@ -30,7 +30,7 @@ export const isIphone = () => {
     return navigator.userAgent.toLowerCase().includes("iphone")
 }
 
-export const baseurl = "http://localhost:5000/"
+export const inDevelopment = window.location.href.includes("localhost")
 
 /** test mode means:
  * Not being redirected from pages

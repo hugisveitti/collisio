@@ -74,7 +74,7 @@ export class PhysicsTest extends Scene3D {
             ballRadius: 1,
             numberOfLaps: 0,
             gameType: "ball",
-            trackName: "low-poly-farm-track"
+            trackName: "farm-track"
         }
     }
 

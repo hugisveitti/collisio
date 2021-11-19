@@ -247,7 +247,6 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
     async create() {
         // test-course.gltf
-        // low-poly-farm-track
         if (this.getGameType() === "race") {
 
             this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))

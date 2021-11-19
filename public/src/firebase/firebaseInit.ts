@@ -1,11 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, getRedirectResult, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth"
-import _analytics, { getAnalytics } from "firebase/analytics";
-import { firebaseConfig } from "./firebaseConfig";
+import { createUserWithEmailAndPassword, FacebookAuthProvider, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 import { toast } from "react-toastify";
-import { getDatabase } from "firebase/database"
-import { createDBUser } from "./firebaseFunctions";
+import { getFirebaseConfig } from "./firebaseConfig";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -13,7 +11,7 @@ import { createDBUser } from "./firebaseFunctions";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(getFirebaseConfig());
 
 // const analytics = getAnalytics(app);
 

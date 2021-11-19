@@ -1,0 +1,57 @@
+{
+  "rules": {
+    "users":{
+      ".read":true,
+      "$uid":{
+      	".write": "newData.val() != null || $uid == auth.uid"
+      }
+    },
+    "profiles": {
+      ".read":true,
+      "$uid": {
+        ".write":"auth.uid == $uid"
+      }
+    },
+    "all-highscores":{
+      ".read":true,
+        "$trackName":{
+          "$numberOfLaps":{
+            "$uid":{
+              ".write":"auth.uid == $uid"
+              // allowed to add always but only remove your data
+            
+              
+            }
+          }
+        }
+    },
+    "unique-highscores":{
+      ".read":true,
+        ".indexOn":"totalTime",
+        "$trackName":{
+          "$numberOfLaps":{
+            ".indexOn":"totalTime",
+            "$uid":{
+              // allowed to add always but only remove your data
+          
+               ".write":"auth.uid == $uid"
+          }
+        }
+      }
+    },
+    "game-data":{
+      ".read":true,
+      ".write":"newData.val() != null || !data.exists()"
+    },
+    "room-data":{
+      ".read":true,
+      ".write":"newData.val() != null || !data.exists()"
+    },
+    "available-rooms":{      
+      "$uid":{
+        ".read": "true",
+      	".write": "$uid == auth.uid"
+      }
+    }
+  }
+}

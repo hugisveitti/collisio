@@ -147,9 +147,7 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                       }}
                       value={props.store.preGameSettings.trackName}
                     >
-                      <MenuItem value="low-poly-farm-track">
-                        Farm track
-                      </MenuItem>
+                      <MenuItem value="farm-track">Farm track</MenuItem>
                       <MenuItem value="f1-track">F1 track</MenuItem>
                       <MenuItem value="sea-side-track">Beach track</MenuItem>
                       {/* <MenuItem value="track">Simple track</MenuItem>

@@ -291,7 +291,6 @@ export const getUniqueHighscore = (callback: (highscoreDict: UniqueHighscoreDict
     const allHighscoreRef = ref(database, uniqueHighscoresRefPath)
     // const allHighscoreRef = ref(database, uniqueHighscoresRefPath)
 
-    //getAllTimeBestScoresOnTrackAndLap("low-poly-farm-track", 1, -1, () => console.log("done getting alltime best"))
 
     onValue(allHighscoreRef, (snap) => {
         let uniqueHighscores: UniqueHighscoreDict = {}
