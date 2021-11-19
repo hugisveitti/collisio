@@ -12,7 +12,12 @@ import ControlsRoom from "../mobile/ControlsRoom";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
 import { StressTestComponent } from "../testMode/StressTestComponent";
-import { fakePlayer1, fakePlayer2 } from "../tests/fakeData";
+import {
+  fakePlayer1,
+  fakePlayer2,
+  fakePlayer3,
+  fakePlayer4,
+} from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode } from "../utils/settings";
 import BuyPremiumComponent from "./BuyPremiumComponent";
@@ -54,7 +59,7 @@ const Routes = () => {
 
     if (inTestMode) {
       // setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
-      setPlayers([fakePlayer1, fakePlayer2]);
+      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
       setPlayer(fakePlayer1);
     }
   }, []);

@@ -26,7 +26,7 @@ interface IGameDataComponent {
 }
 
 const GameDataComponent = (props: IGameDataComponent) => {
-  const [gamesData, setGamesData] = useState(undefined);
+  const [gamesData, setGamesData] = useState([]);
 
   const [gamesLoaded, setGamesLoaded] = useState(false);
   const [page, setPage] = useState(0);

@@ -54,6 +54,7 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import PreGameSettingsComponent from "./PreGameSettingsComponent";
+import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -128,37 +129,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
     }
   };
 
-  const renderTeamSelect = (player: IPlayerInfo, i: number) => {
-    if (props.store.preGameSettings.gameType !== "ball") return null;
-    if (onMobile && props.store.player?.playerNumber === player.playerNumber) {
-      return (
-        <ListItemText>
-          <FormControl>
-            <FormLabel component="legend">Team</FormLabel>
-            <RadioGroup
-              defaultValue={1}
-              onChange={(e, val) => {
-                const newPlayerInfo: IPlayerInfo = {
-                  ...props.store.player,
-                  teamNumber: +val,
-                  teamName: val,
-                };
-
-                props.store.setPlayer(newPlayerInfo);
-
-                sendPlayerInfoChanged(props.socket, newPlayerInfo);
-              }}
-            >
-              <FormControlLabel label="0" value={0} control={<Radio />} />
-              <FormControlLabel label="1" value={1} control={<Radio />} />
-            </RadioGroup>
-          </FormControl>
-        </ListItemText>
-      );
-    }
-    return <ListItemText primary={`Team ${player.teamNumber}`} />;
-  };
-
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -220,64 +190,15 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <h3 className="center">Players in room {props.store.roomId}</h3>
       </Grid>
 
-      <React.Fragment>
-        <Grid item xs={1} sm={2} />
-        {props.store.players.length > 0 ? (
-          <Grid item xs={10} sm={8}>
-            <List
-              style={{
-                backgroundColor: "wheat",
-              }}
-            >
-              {props.store.players.map((player: IPlayerInfo, i: number) => {
-                return (
-                  <React.Fragment key={player.playerName}>
-                    <ListItem>
-                      <ListItemAvatar>
-                        {player.photoURL ? (
-                          <Avatar
-                            alt={player.playerName}
-                            src={player.photoURL}
-                          />
-                        ) : (
-                          <FaceIcon fontSize="large" />
-                        )}
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          player.playerNumber ===
-                          props.store.player?.playerNumber ? (
-                            <strong>{player.playerName}</strong>
-                          ) : (
-                            player.playerName
-                          )
-                        }
-                      />
-                      <ListItemText
-                        primary={getVehicleNameFromType(player.vehicleType)}
-                      />
-
-                      {renderTeamSelect(player, i)}
-                    </ListItem>
-                    {i !== props.store.players.length - 1 && <Divider />}
-                  </React.Fragment>
-                );
-              })}
-            </List>
-          </Grid>
-        ) : (
-          <Grid item xs={10} sm={8}>
-            <Typography
-              style={{
-                backgroundColor: "wheat",
-              }}
-            >
-              No players connected
-            </Typography>
-          </Grid>
-        )}
-        <Grid item xs={1} sm={2} />
-      </React.Fragment>
+      <Grid item xs={12}>
+        <WaitingRoomPlayerList
+          players={props.store.players}
+          playerId={props.store.player?.id}
+          trackName={props.store.preGameSettings.trackName}
+          numberOfLaps={props.store.preGameSettings.numberOfLaps}
+          gameType={props.store.preGameSettings.gameType}
+        />
+      </Grid>
 
       {!onMobile && (
         <React.Fragment>

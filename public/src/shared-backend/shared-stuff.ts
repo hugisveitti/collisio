@@ -72,12 +72,12 @@ export class VehicleControls {
 export interface IPreGamePlayerInfo {
     playerName: string
     teamName: string
-    teamNumber?: number
+    teamNumber: number
     playerNumber: number
     id: string
     isAuthenticated: boolean
     vehicleType: VehicleType
-    photoURL?: string
+    photoURL: string
 
 }
 

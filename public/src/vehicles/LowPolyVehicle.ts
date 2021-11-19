@@ -712,6 +712,7 @@ export class LowPolyVehicle implements IVehicle {
         // this.mass = vehicleSettings.mass
         // this.useChaseCamera = vehicleSettings.useChaseCamera
 
+
         this.chassisMesh.remove(this.camera)
         if (!this.useChaseCamera) {
             const { x, y, z } = staticCameraPos

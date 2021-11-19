@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ts-server/server.js",
-    "dev": "nodemon ts-server/server.js"
+    "dev": "nodemon ts-server/server.js && firebase emulators:start"
   },
   "author": "Hugi Holm",
   "license": "ISC",

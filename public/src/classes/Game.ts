@@ -1,7 +1,9 @@
 import { TrackName, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 
-
-interface ITrackName {
+/** change name to map
+ * since a racetrack is a map and the tag courses are also maps but not tracks....
+ */
+export interface ITrackInfo {
     name: string
     type: TrackName
     gameType: GameType
@@ -11,7 +13,7 @@ export const getTrackNameFromType = (trackName: TrackName) => {
     return allTrackNames.find(track => track.type === trackName)?.name ?? "-"
 }
 
-export const allTrackNames: ITrackName[] = [
+export const allTrackNames: ITrackInfo[] = [
     {
         name: "Test", type: "test-course", gameType: "race"
     },
@@ -32,6 +34,9 @@ export const allTrackNames: ITrackName[] = [
     }
 ]
 
+export const defaultRaceTrack: TrackName = "farm-track"
+export const defaultTagTrack: TrackName = "simple-tag-course"
+
 export interface IPlayerConnection {
     playerName: string
     playerId: string
@@ -46,6 +51,7 @@ export interface IPreGameSettings {
     gameType: GameType
     numberOfLaps: number
     trackName: TrackName
+    tagGameLength: number
 }
 
 export const defaultPreGameSettings: IPreGameSettings = {
@@ -53,6 +59,7 @@ export const defaultPreGameSettings: IPreGameSettings = {
     gameType: "race",
     numberOfLaps: 2,
     trackName: "f1-track",
+    tagGameLength: 2
 }
 
 // info about individual players

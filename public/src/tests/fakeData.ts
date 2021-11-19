@@ -117,6 +117,7 @@ export const fakePlayer1: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "f1",
     isConnected: true,
+    photoURL: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Bart_-_Good_Night.png/200px-Bart_-_Good_Night.png"
 };
 
 export const fakePlayer2: IPlayerInfo = {
@@ -131,6 +132,8 @@ export const fakePlayer2: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "normal",
     isConnected: true,
+    photoURL: ""
+
 };
 
 export const fakePlayer3: IPlayerInfo = {
@@ -145,10 +148,12 @@ export const fakePlayer3: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "tractor",
     isConnected: true,
+
+    photoURL: ""
 };
 
 export const fakePlayer4: IPlayerInfo = {
-    playerName: "4test3",
+    playerName: "4test4",
     isLeader: true,
     teamName: "test",
     playerNumber: 3,
@@ -159,4 +164,5 @@ export const fakePlayer4: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "offRoader",
     isConnected: true,
+    photoURL: "https://static3.srcdn.com/wordpress/wp-content/uploads/2016/12/The-Simpsons-Roasting-On-An-Open-Fire-Christmas.jpg?q=50&fit=crop&w=960&h=500&dpr=1.5"
 };

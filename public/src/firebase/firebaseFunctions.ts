@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { TrackName } from "../shared-backend/shared-stuff";
+import { removeUndefinedFromObject } from "../utils/utilFunctions";
 import { database, } from "./firebaseInit";
 
 export const usersRefPath = "users"
@@ -37,7 +38,7 @@ export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) 
 
     onValue(dbUserRef, snapshot => {
         if (!snapshot.exists()) {
-            set(ref(database, usersRefPath + "/" + userData.uid), userData).catch((err) => {
+            set(ref(database, usersRefPath + "/" + userData.uid), removeUndefinedFromObject(userData)).catch((err) => {
                 console.log("Error setting db user", err);
             });
             if (callback) {
@@ -173,7 +174,7 @@ export const saveRoom = (roomId: string, roomInfo: IRoomInfo) => {
 
     const updates = {}
     updates[roomDataRefPath + "/" + roomId] = roomInfo
-    update(ref(database), updates).catch((err) => {
+    update(ref(database), removeUndefinedFromObject(updates)).catch((err) => {
         console.log("error saving room data", err)
 
     })
@@ -236,7 +237,7 @@ interface IBestTime {
 
 type IBestTimeD = { [userId: string]: IBestTime }
 
-const getPlayerBestScoreOnTrackAndLap = (userId: string, trackName: TrackName, numberOfLaps: number, callback: (oldPersonalBest: IBestTime) => void) => {
+export const getPlayerBestScoreOnTrackAndLap = (userId: string, trackName: TrackName, numberOfLaps: number, callback: (oldPersonalBest: IBestTime) => void) => {
     const playerBestScoreRef = ref(database, uniqueHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId)
 
     onValue(playerBestScoreRef, (snap) => {

@@ -17,7 +17,10 @@ import { IGameScene } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 import "./game-styles.css";
 
-
+// placement of views on the screen,
+// left = viewLefts[playerIndex % 2]
+export const viewLefts = [0, 0.5]
+export const viewBottoms = [0, 0, 0.5, 0.5]
 
 const vechicleFov = 60
 
@@ -303,14 +306,13 @@ export class GameScene extends Scene3D implements IGameScene {
 
     createViews() {
         this.views = []
-        const lefts = [0, 0.5]
-        const bottoms = [0, 0, 0.5, 0.5]
+
         const playerInfosContainer = document.createElement("div")
         playerInfosContainer.setAttribute("style", "position:relative;")
         document.body.appendChild(playerInfosContainer)
         // only works for 2 players right now, need algorithm to make it dynamically calculate the size of each view
+        const n = this.players.length
         for (let i = 0; i < this.players.length; i++) {
-            const n = this.players.length
             const viewHeight = n > 2 ? .5 : 1.0
             let viewWidth: number
             if (n === 3 || n === 1) {
@@ -324,8 +326,8 @@ export class GameScene extends Scene3D implements IGameScene {
             const camera = i === n - 1 ? this.camera as THREE.PerspectiveCamera : new THREE.PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, 10000)
 
             const view = {
-                left: lefts[i % 2],
-                bottom: bottoms[i],
+                left: viewLefts[i % 2],
+                bottom: viewBottoms[i],
                 width: viewWidth,
                 height: viewHeight,
                 up: [0, 1, 0],
@@ -345,8 +347,8 @@ export class GameScene extends Scene3D implements IGameScene {
             const width = viewWidth * window.innerWidth
 
             //  const left = (lefts[i % 2] * (window.innerWidth)) + (window.innerWidth / 4)
-            const left = lefts[i % 2] * (window.innerWidth)
-            const bottom = bottoms[i] * window.innerHeight
+            const left = viewLefts[i % 2] * (window.innerWidth)
+            const bottom = viewBottoms[i] * window.innerHeight
             const viewDivWidth = viewWidth * window.innerWidth
             const viewDivHeight = viewHeight * window.innerHeight
 
@@ -446,8 +448,8 @@ export class GameScene extends Scene3D implements IGameScene {
             playerInfosContainer.appendChild(viewDiv)
 
             window.addEventListener("resize", () => {
-                const left = lefts[i % 2] * (window.innerWidth)
-                const bottom = bottoms[i] * window.innerHeight
+                const left = viewLefts[i % 2] * (window.innerWidth)
+                const bottom = viewBottoms[i] * window.innerHeight
                 const viewDivWidth = viewWidth * window.innerWidth
                 const viewDivHeight = viewHeight * window.innerHeight
 
@@ -646,7 +648,7 @@ export class GameScene extends Scene3D implements IGameScene {
     userSettingsListener() {
         this.socket.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             console.log("setting user settings", data)
-            if (this.vehicles) {
+            if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
 
                 this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
             }

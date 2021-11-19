@@ -18,3 +18,18 @@ export const shuffleArray = (arr: any[]) => {
         j += 1
     }
 }
+
+export const removeUndefinedFromObject = (object: Object) => {
+    const keys = Object.keys(object)
+    const newObject = {}
+    for (let key of keys) {
+        if (object[key] !== undefined) {
+            if (typeof object[key] === "object") {
+                newObject[key] = removeUndefinedFromObject(object[key])
+            } else {
+                newObject[key] = object[key]
+            }
+        }
+    }
+    return newObject
+}

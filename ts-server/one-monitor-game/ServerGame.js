@@ -36,6 +36,9 @@ var RoomMaster = /** @class */ (function () {
             if (!_this.roomExists(roomId)) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
+            else if (_this.rooms[roomId].isFull()) {
+                mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room is full.", status: errorStatus });
+            }
             else {
                 var player = new ServerPlayer_1.Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL);
                 _this.rooms[roomId].addPlayer(player);
@@ -305,6 +308,10 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.sendGameDataInfo = function (data) {
         this.socket.emit(shared_stuff_1.std_game_data_info, data);
+    };
+    Room.prototype.isFull = function () {
+        // max number of players
+        return this.players.length >= 4;
     };
     Room.prototype.toString = function () {
         var playersString = "";

@@ -16,10 +16,15 @@ import {
 import React from "react";
 import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";
-import { IPreGameSettings } from "../../classes/Game";
+import {
+  defaultRaceTrack,
+  defaultTagTrack,
+  IPreGameSettings,
+} from "../../classes/Game";
 import { IUserSettings } from "../../classes/User";
 import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
+import TrackSelect from "../inputs/TrackSelect";
 import { IStore } from "../store";
 
 interface IPreGameSettingsComponent {
@@ -35,6 +40,15 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
     const newPreGameSettings = { ...props.store.preGameSettings };
     // @ts-ignore
     newPreGameSettings[key] = value;
+
+    if (key === "gameType") {
+      if (value === "tag") {
+        newPreGameSettings.trackName = defaultTagTrack;
+      } else if (value === "race") {
+        newPreGameSettings.trackName = defaultRaceTrack;
+      }
+    }
+
     const newUserSettings: IUserSettings = {
       ...props.store.userSettings,
       preGameSettings: newPreGameSettings,
@@ -85,32 +99,30 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                     label="Race"
                   />
                   <FormControlLabel
-                    value="ball"
+                    value="tag"
                     control={
                       <Radio
-                        onChange={() => updateGameSettings("gameType", "ball")}
-                        checked={
-                          props.store.preGameSettings.gameType === "ball"
-                        }
+                        onChange={() => updateGameSettings("gameType", "tag")}
+                        checked={props.store.preGameSettings.gameType === "tag"}
                       />
                     }
-                    label="Ball"
+                    label="Tag"
                   />
                 </RadioGroup>
               </FormControl>
             </Grid>
-            {props.store.preGameSettings.gameType === "ball" ? (
+            {props.store.preGameSettings.gameType === "tag" ? (
               <React.Fragment>
                 <Grid item xs={false} sm={4} xl={5} />
                 <Grid item xs={12} sm={4} xl={2}>
                   <TextField
                     fullWidth
                     type="number"
-                    label="Ball radius"
+                    label="Tag game length in minutes"
                     value={props.store.preGameSettings.ballRadius}
                     style={{ backgroundColor: inputBackgroundColor }}
                     onChange={(ev) => {
-                      updateGameSettings("ballRadius", +ev.target.value);
+                      updateGameSettings("tagGameLength", +ev.target.value);
                     }}
                   />
                 </Grid>
@@ -118,10 +130,9 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Grid item xs={false} sm={3} xl={4} />
+                <Grid item xs={false} sm={4} xl={5} />
                 <Grid item xs={12} sm={3} xl={2}>
                   <TextField
-                    fullWidth
                     label="No. of laps"
                     type="number"
                     value={props.store.preGameSettings.numberOfLaps}
@@ -133,31 +144,19 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={3} xl={2}>
-                  <FormControl fullWidth>
-                    <InputLabel id="track-select">Track selection</InputLabel>
-                    <Select
-                      style={{
-                        backgroundColor: inputBackgroundColor,
-                      }}
-                      label="Track selection"
-                      name="race-track"
-                      onChange={(e) => {
-                        updateGameSettings("trackName", e.target.value);
-                      }}
-                      value={props.store.preGameSettings.trackName}
-                    >
-                      <MenuItem value="farm-track">Farm track</MenuItem>
-                      <MenuItem value="f1-track">F1 track</MenuItem>
-                      <MenuItem value="sea-side-track">Beach track</MenuItem>
-                      {/* <MenuItem value="track">Simple track</MenuItem>
-                      <MenuItem value="town-track">Town track</MenuItem> */}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={false} sm={3} xl={4} />
+                <Grid item xs={false} sm={4} xl={5} />
               </React.Fragment>
             )}
+            <Grid item xs={12}>
+              <TrackSelect
+                gameType={props.store.preGameSettings.gameType}
+                excludedTracks={["town-track", "test-course"]}
+                value={props.store.preGameSettings.trackName}
+                onChange={(newTrackName) => {
+                  updateGameSettings("trackName", newTrackName);
+                }}
+              />
+            </Grid>
           </Grid>
         </CardContent>
       </Card>

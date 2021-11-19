@@ -48,6 +48,8 @@ export default class RoomMaster {
             // console.log("connecting player", roomId, playerName)
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
+            } else if (this.rooms[roomId].isFull()) {
+                mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
                 this.rooms[roomId].addPlayer(player)
@@ -219,6 +221,7 @@ export class Room {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
 
+
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
                 player.socket.emit(stm_game_starting)
@@ -355,6 +358,11 @@ export class Room {
 
     sendGameDataInfo(data: any) {
         this.socket.emit(std_game_data_info, data)
+    }
+
+    isFull() {
+        // max number of players
+        return this.players.length >= 4
     }
 
     toString() {
