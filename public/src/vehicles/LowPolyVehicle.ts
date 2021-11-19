@@ -458,6 +458,7 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     stop() {
+        this.zeroEngineForce()
         this.chassisMesh.body.setCollisionFlags(1)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
