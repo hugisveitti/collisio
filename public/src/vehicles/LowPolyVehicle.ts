@@ -229,7 +229,6 @@ export class LowPolyVehicle implements IVehicle {
         this.scene.add.existing(this.chassisMesh)
 
         if (useBad) {
-
             this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass })
         } else {
             this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass, shape: "convex", autoCenter: false, })
@@ -239,7 +238,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
 
-        this.chassisMesh.body.setBounciness(.05)
+        this.chassisMesh.body.setBounciness(.0)
 
         // how to lower center of mass
 

@@ -133,6 +133,7 @@ export class TagGameScene extends GameScene {
         this.gameStarted = false
         this.gameOver = false
         this.gameClock.stop()
+        this.gameClock = new Clock(false)
         this.course.setupGameObjects()
         this.resetTagObjects()
         this.stopAllVehicles()
@@ -187,7 +188,7 @@ export class TagGameScene extends GameScene {
 
     updateClock() {
         if (this.gameOver) return
-        const time = this.preGameSettings.tagGameLength * 60 - this.clock.getElapsedTime()
+        const time = this.preGameSettings.tagGameLength * 60 - this.gameClock.getElapsedTime()
         this.showImportantInfo(time.toFixed(0))
         if (time.toFixed(0) === "0") {
             this.gameClock.stop()
@@ -212,8 +213,11 @@ export class TagGameScene extends GameScene {
         if (!this.gameStarted) return
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.tagObjects[i].isIt) {
-                this.vehicles[i].setColor(notItColor)
-                this.tagObjects[i].setIsIt(false)
+                if (this.tagObjects[i].resetPressed()) {
+
+                    this.vehicles[i].setColor(notItColor)
+                    this.tagObjects[i].setIsIt(false)
+                }
             }
         }
         this.handleVehicleTagged(vehicleNumber)

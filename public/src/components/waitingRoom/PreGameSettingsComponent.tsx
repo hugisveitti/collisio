@@ -123,7 +123,7 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                     fullWidth
                     type="number"
                     label="Tag game length in minutes"
-                    value={props.store.preGameSettings.ballRadius}
+                    value={props.store.preGameSettings.tagGameLength}
                     style={{ backgroundColor: inputBackgroundColor }}
                     onChange={(ev) => {
                       updateGameSettings("tagGameLength", +ev.target.value);
