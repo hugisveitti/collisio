@@ -1,7 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Grid, IconButton, Typography } from "@mui/material";
 import React from "react";
-import { IRaceTimeInfo } from "../../classes/Game";
+import { IRaceTimeInfo, IScoreInfo } from "../../classes/Game";
 import { IEndOfGameData } from "../../game/GameScene";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { frontPagePath, highscorePagePath } from "../Routes";
@@ -16,7 +16,7 @@ interface IEndOfGameModal {
   onClose: () => void;
   data: IEndOfGameData;
   restartGame: () => void;
-  raceTimeInfo: IRaceTimeInfo[];
+  scoreInfo: IScoreInfo;
   gameDataInfo: string[];
 }
 
@@ -40,7 +40,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
           );
         })}
         <Grid item xs={12}>
-          <RaceTimeTable isEndOfGame raceTimeInfo={props.raceTimeInfo} />
+          <RaceTimeTable isEndOfGame raceTimeInfo={props.scoreInfo.timeInfos} />
         </Grid>
         <Grid item xs={6} xl={2}>
           <Button variant="contained" onClick={props.restartGame}>

@@ -22,5 +22,5 @@ export interface IRaceCourse extends ICourse {
 }
 
 export interface ITagCourse extends ICourse {
-
+    setupGameObjects: () => void
 }

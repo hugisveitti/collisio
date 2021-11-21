@@ -1,12 +1,18 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Font, GLTF, GLTFLoader, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { ExtendedMesh, Scene3D } from "enable3d";
+import { ExtendedMesh } from "enable3d";
+import { Howl } from "howler";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
+import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
+
+export const isVehicle = (object: ExtendedObject3D) => {
+    return object.name.slice(0, 7) === "vehicle"
+}
 
 
 export const getVehicleNumber = (vehicleName: string) => {
@@ -16,6 +22,13 @@ export const getVehicleNumber = (vehicleName: string) => {
     }
     return num
 }
+
+const engineSound = new Howl({
+    src: [getStaticPath("sound/engine.mp3")],
+    html5: true,
+    volume: .5,
+    loop: true
+})
 
 const cameraOffset = 20
 
@@ -51,7 +64,7 @@ export class LowPolyVehicle implements IVehicle {
     chassisMesh!: ExtendedObject3D
 
 
-    scene: Scene3D
+    scene: IGameScene
     color: string | number | undefined
     name: string
     vehicle: Ammo.btRaycastVehicle
@@ -98,7 +111,14 @@ export class LowPolyVehicle implements IVehicle {
      */
     maxSpeedTicks: number
 
-    constructor(scene: Scene3D, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType) {
+    useEngineSound: boolean
+    engineSound: Howl
+
+    engineRate: number
+
+
+
+    constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
 
         this.scene = scene
         this.color = color
@@ -120,6 +140,11 @@ export class LowPolyVehicle implements IVehicle {
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
+
+        this.useEngineSound = useEngineSound
+        this.engineSound = engineSound
+        this.engineRate = 1
+
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -144,10 +169,11 @@ export class LowPolyVehicle implements IVehicle {
         this.createVehicle()
     }
 
-    changeColor(color: string | number) {
+    setColor(color: string | number) {
         this.color = color;
         (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
     }
+
 
     createBadChassis() {
         const chassisWidth = 1.8;
@@ -304,8 +330,27 @@ export class LowPolyVehicle implements IVehicle {
         this.isReady = true
         /** don't start the vehicle until race */
         this.stop()
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "s") {
+                this.toggleEngineSound()
 
+            }
+        })
     }
+
+    toggleEngineSound() {
+        if (!this.useEngineSound) return
+        if (!this.engineSound.playing()) {
+            console.log("starting engine sound")
+            this.engineSound.play()
+
+        } else {
+            console.log("stopping engine sound")
+
+            this.engineSound.stop()
+        }
+    }
+
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
 
@@ -371,6 +416,8 @@ export class LowPolyVehicle implements IVehicle {
         if (this.getCurrentSpeedKmHour() < 2) {
             this.break(true)
         }
+
+        this.engineSound.rate(2)
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -693,6 +740,8 @@ export class LowPolyVehicle implements IVehicle {
         const y = (Math.max(vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength, vehicleConfigs[this.vehicleType].wheelAxisHeightFront) + vehicleConfigs[this.vehicleType].suspensionRestLength) ?? 2
         this.setPosition(position.x, position.y + y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
+
+        this.scene.resetVehicleCallback(this.vehicleNumber)
     };
 
     setCheckpointPositionRotation(positionRotation: IPositionRotation) {

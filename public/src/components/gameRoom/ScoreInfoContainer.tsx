@@ -2,11 +2,12 @@
  * But will include other game modes
  */
 import React from "react";
-import { IRaceTimeInfo } from "../../classes/Game";
+import { IRaceTimeInfo, IScoreInfo } from "../../classes/Game";
 import RaceTimeTable from "./RaceTimeTable";
+import TagScoreTable from "./TagScoreTable";
 
 interface IScoreInfoContainer {
-  raceTimeInfo: IRaceTimeInfo[];
+  scoreInfo: IScoreInfo;
 }
 
 const ScoreInfoContainer = (props: IScoreInfoContainer) => {
@@ -20,7 +21,18 @@ const ScoreInfoContainer = (props: IScoreInfoContainer) => {
         opacity: 0.5,
       }}
     >
-      <RaceTimeTable raceTimeInfo={props.raceTimeInfo} isEndOfGame={false} />
+      {props.scoreInfo.timeInfos && (
+        <RaceTimeTable
+          raceTimeInfo={props.scoreInfo.timeInfos}
+          isEndOfGame={false}
+        />
+      )}
+      {props.scoreInfo.tagInfos && (
+        <TagScoreTable
+          tagInfos={props.scoreInfo.tagInfos}
+          isEndOfGame={false}
+        />
+      )}
     </div>
   );
 };

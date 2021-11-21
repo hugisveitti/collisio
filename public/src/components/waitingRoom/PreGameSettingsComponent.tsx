@@ -104,8 +104,8 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                     control={
                       <Radio
                         onChange={() => {
-                          //updateGameSettings("gameType", "tag")}
-                          toast("Tag game not available yet");
+                          updateGameSettings("gameType", "tag");
+                          //  toast("Tag game not available yet");
                         }}
                         checked={props.store.preGameSettings.gameType === "tag"}
                       />

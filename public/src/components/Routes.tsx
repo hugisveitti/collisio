@@ -19,7 +19,11 @@ import {
   fakePlayer4,
 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
-import { getDeviceType, inTestMode } from "../utils/settings";
+import {
+  getDeviceType,
+  inTestMode,
+  testPreGameSettings,
+} from "../utils/settings";
 import BuyPremiumComponent from "./BuyPremiumComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
@@ -50,7 +54,7 @@ const Routes = () => {
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [preGameSettings, setPreGameSettings] = useState(
-    defaultPreGameSettings
+    inTestMode ? testPreGameSettings : defaultPreGameSettings
   );
   const deviceType = getDeviceType();
 

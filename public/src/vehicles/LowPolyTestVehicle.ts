@@ -1,6 +1,8 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { Scene3D } from "enable3d";
 import { ClosestRaycaster } from "enable3d/node_modules/@enable3d/ammo-physics";
+import { GameScene } from '../game/GameScene';
+import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
@@ -14,8 +16,8 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     closestRaycaster: ClosestRaycaster
     line: THREE.Line
 
-    constructor(scene: Scene3D, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType) {
-        super(scene, color, name, vehicleNumber, vehicleType)
+    constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
+        super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
 
         if (intelligentDriveLine) {

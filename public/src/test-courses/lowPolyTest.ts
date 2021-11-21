@@ -1,25 +1,23 @@
+import { CollisionEvent } from "@enable3d/common/dist/types"
 import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
 import { allTrackNames, defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
-import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle"
-import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs";
-import "../game/game-styles.css"
+import { IUserGameSettings } from "../classes/User"
 import { RaceCourse } from "../course/RaceCourse"
+import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
+import "../game/game-styles.css"
+import { GameTime } from "../game/GameTimeClass"
+import { IGameScene } from "../game/IGameScene"
+import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
+import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
+import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
+import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
+import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
-import { IGameScene } from "../game/IGameScene"
-import { IUserGameSettings } from "../classes/User"
-import { GameTime } from "../game/GameTimeClass"
-import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
-import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
-import { VehicleControls, VehicleType, MobileControls, TrackName, std_user_settings_changed, GameType } from "../shared-backend/shared-stuff"
-import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
-import { Console } from "console"
-import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
-import { CollisionEvent } from "@enable3d/common/dist/types"
-import { TagGameScene } from "../game/TagGameScene"
 
 const vechicleFov = 60
 
@@ -237,10 +235,10 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     }
 
     initVehicles() {
-        this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType)
+        this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
-                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type)
+                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type, false)
             )
         }
     }
@@ -567,6 +565,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
             for (let v of allVehicles) {
                 v.unpause()
                 v.canDrive = true
+                v.start()
             }
             if (this.getGameType() === "tag") {
 
@@ -575,23 +574,24 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
 
 
             this.createController()
-            const isVehicle = (object: ExtendedObject3D) => {
-                return object.name.slice(0, 7) === "vehicle"
-            }
 
             this.canStartUpdate = true
             this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
                 if (isVehicle(otherObject)) {
                     console.log("collide with vehicle", otherObject)
                     const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.vehicle.changeColor(notItColor)
-                    this.otherVehicles[vehicleNumber - 1].changeColor(itColor)
+                    this.vehicle.setColor(notItColor)
+                    this.otherVehicles[vehicleNumber - 1].setColor(itColor)
                     this.isIt = vehicleNumber
                 }
             })
-
         })
     }
+
+    resetVehicleCallback(vehicleNumber: number) {
+        console.log("vehicle reset", vehicleNumber)
+    }
+
 
     handleGoalCrossed(o: ExtendedObject3D) {
         if (!this.goalCrossed) {
@@ -760,7 +760,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
         this.canStartUpdate = false
 
         this.vehicleColorNumber += 1
-        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType)
+        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType, true)
         this.createVehicle()
 
     }

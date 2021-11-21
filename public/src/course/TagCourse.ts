@@ -2,13 +2,13 @@ import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { IVehicle } from '../vehicles/IVehicle';
-import { LowPolyVehicle } from '../vehicles/LowPolyVehicle';
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { Course } from "./Course";
 import { ITagCourse } from "./ICourse";
 
 export const itColor = possibleVehicleColors[2]
 export const notItColor = possibleVehicleColors[1]
+export const freezeColor = possibleVehicleColors[0]
 
 export class Coin {
 
@@ -26,6 +26,8 @@ export class Coin {
     /** for naming */
     number: number
 
+
+
     coinCollidedCallback: (name: string, coin: Coin) => void
 
     deleteCallback: (coin: Coin) => void
@@ -40,6 +42,8 @@ export class Coin {
         this.model.castShadow = true
         this.model.receiveShadow = false
         this.model.name = `coin-${this.number}`
+
+
 
         this.ry = 0;
         this.dry = .02; //Math.random() / 35 + .005 //
@@ -108,10 +112,15 @@ export class TagCourse extends Course implements ITagCourse {
         return this.coins.length === 0
     }
 
-    _createCourse() {
+    setupGameObjects() {
 
-        //this.scene.scene.remove(this.coin)
 
+        /** remove existing coins */
+        for (let coin of this.coins) {
+            coin.removeFromScene(this.scene)
+        }
+
+        /** setup coins */
         let i = 0;
         for (let cp of this.coinPoints) {
 
@@ -121,6 +130,11 @@ export class TagCourse extends Course implements ITagCourse {
             this.coins.push(coin)
             i += 1
         }
+    }
+
+    _createCourse() {
+
+        this.setupGameObjects()
 
     }
 
@@ -130,15 +144,4 @@ export class TagCourse extends Course implements ITagCourse {
         }
     }
 
-    setStartPositions(vehicles: IVehicle[]) {
-        // shuffle the spawns?
-
-        for (let i = 0; i < vehicles.length; i++) {
-            const p = this.spawns[i % this.spawns.length].position
-            const r = this.spawns[i % this.spawns.length].rotation
-
-            vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
-            vehicles[i].resetPosition()
-        }
-    }
 }

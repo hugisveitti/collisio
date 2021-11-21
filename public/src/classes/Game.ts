@@ -111,8 +111,18 @@ export interface IRaceTimeInfo {
     currentLapTime: number
     lapNumber: number /**  show "current lap / totalNumberOfLaps" */
     numberOfLaps: number
-
 }
+
+export interface ITagScoreInfo {
+    playerName: string
+    score: number
+}
+
+export interface IScoreInfo {
+    timeInfos?: IRaceTimeInfo[],
+    tagInfos?: ITagScoreInfo[]
+}
+
 
 
 export interface IRoomInfo {

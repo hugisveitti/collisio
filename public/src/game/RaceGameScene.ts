@@ -1,18 +1,15 @@
-import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
-import { Socket } from "socket.io-client";
+import { ExtendedObject3D } from "enable3d";
 import Stats from "stats.js";
 import { v4 as uuid } from "uuid";
-import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
-import { IUserGameSettings } from "../classes/User";
-import { IPlayerInfo, VehicleControls } from '../shared-backend/shared-stuff';
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInfo } from "../classes/Game";
 import { IRaceCourse } from "../course/ICourse";
 import { RaceCourse } from "../course/RaceCourse";
+import { VehicleControls } from '../shared-backend/shared-stuff';
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
-
-import { GameScene, IEndOfGameData, IGameRoomActions } from "./GameScene";
+import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
+
 
 
 const stats = new Stats()
@@ -26,7 +23,6 @@ export class RaceGameScene extends GameScene {
     winner: string
     winTime: number
 
-    pLight: THREE.PointLight
 
     gameTimers: GameTime[]
 
@@ -42,15 +38,16 @@ export class RaceGameScene extends GameScene {
         super()
 
         document.body.appendChild(totalTimeDiv)
-        totalTimeDiv.setAttribute("style", `
-        position:absolute;
-        top:25px;
-        left:50%;
-        transform:translate(-50%, 0);
-        font-family:monospace;
-        font-size:64px;
-        text-shadow:1px 1px white;
-        `)
+        totalTimeDiv.setAttribute("id", "totalTime")
+        // totalTimeDiv.setAttribute("style", `
+        // position:absolute;
+        // top:25px;
+        // left:50%;
+        // transform:translate(-50%, 0);
+        // font-family:monospace;
+        // font-size:64px;
+        // text-shadow:1px 1px white;
+        // `)
 
         this.winner = ""
         this.winTime = -1
@@ -143,7 +140,6 @@ export class RaceGameScene extends GameScene {
                 this.gameTimers[i].start()
             } else {
                 this.gameTimers[i].stop()
-
             }
         }
     }
@@ -265,7 +261,7 @@ export class RaceGameScene extends GameScene {
         }
 
         if (this.gameRoomActions.updateScoreTable) {
-            this.gameRoomActions.updateScoreTable(timeInfos)
+            this.gameRoomActions.updateScoreTable({ timeInfos })
         }
 
         totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)

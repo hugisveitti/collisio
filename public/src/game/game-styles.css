@@ -31,7 +31,7 @@
 }
 
 #important-info {
-  color: rgb(155, 41, 41);
+  color: black;
   text-shadow: 1px 1px white;
   font-size: 64px;
   position: absolute;
@@ -58,4 +58,14 @@
   text-shadow: 1px 1px white;
   font-size: 16px;
   font-family: monospace;
+}
+
+#totalTime {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  font-family: monospace;
+  font-size: 64px;
+  text-shadow: 1px 1px white;
 }

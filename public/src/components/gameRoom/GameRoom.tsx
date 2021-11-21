@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { startBallGameOneMonitor } from "../../game/ball-game";
 import { IGameScene } from "../../game/IGameScene";
 // import { startRaceGame } from "../../game/RaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
@@ -17,6 +16,7 @@ import {
   IEndOfRaceInfoGame,
   IEndOfRaceInfoPlayer,
   IRaceTimeInfo,
+  IScoreInfo,
 } from "../../classes/Game";
 import ScoreInfoContainer from "./ScoreInfoContainer";
 import {
@@ -26,6 +26,7 @@ import {
 } from "../../shared-backend/shared-stuff";
 import { saveGameFinished } from "../../firebase/firebaseFunctions";
 import { RaceGameScene } from "../../game/RaceGameScene";
+import { TagGameScene } from "../../game/TagGameScene";
 
 interface IGameRoom {
   socket: Socket;
@@ -43,7 +44,7 @@ const GameRoom = (props: IGameRoom) => {
   const [gameObject, setGameObject] = useState({} as IGameScene);
   const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
   const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
-  const [raceTimeInfo, setRaceTimeInfo] = useState([] as IRaceTimeInfo[]);
+  const [scoreInfo, setScoreInfo] = useState({} as IScoreInfo);
   /** interesting information about the game that can be retrieved when saving the data */
   const [gameDataInfo, setGameDataInfo] = useState([] as string[]);
 
@@ -67,8 +68,10 @@ const GameRoom = (props: IGameRoom) => {
     }
   };
 
-  const handleUpdateScoreTable = (data: IRaceTimeInfo[]) => {
-    setRaceTimeInfo(data);
+  const handleUpdateScoreTable = (data: IScoreInfo) => {
+    if (data) {
+      setScoreInfo(data);
+    }
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
@@ -98,31 +101,32 @@ const GameRoom = (props: IGameRoom) => {
       toast.warn("No room connection, redirecting to frontpage");
       return null;
     }
-    if (props.store?.preGameSettings?.gameType === "ball") {
-      startBallGameOneMonitor(
-        props.socket,
-        props.store.players,
-        props.store.preGameSettings
-      );
-    } else if (props.store?.preGameSettings?.gameType === "race") {
-      startGame(
-        RaceGameScene,
-        props.socket,
-        props.store.players,
-        props.store.preGameSettings,
-        props.store.userSettings.userGameSettings,
-        props.store.roomId,
-        {
-          escPressed: handleEscPressed,
-          gameFinished: handelGameFinished,
-          updateScoreTable: handleUpdateScoreTable,
-          playerFinished: handlePlayerFinished,
-        },
-        (_gameObject) => {
-          setGameObject(_gameObject);
-        }
-      );
+    if (props.store.preGameSettings.gameType === "ball") {
+      console.warn("ball game not supported");
     }
+
+    const CurrGameScene =
+      props.store.preGameSettings.gameType === "race"
+        ? RaceGameScene
+        : TagGameScene;
+
+    startGame(
+      CurrGameScene,
+      props.socket,
+      props.store.players,
+      props.store.preGameSettings,
+      props.store.userSettings.userGameSettings,
+      props.store.roomId,
+      {
+        escPressed: handleEscPressed,
+        gameFinished: handelGameFinished,
+        updateScoreTable: handleUpdateScoreTable,
+        playerFinished: handlePlayerFinished,
+      },
+      (_gameObject) => {
+        setGameObject(_gameObject);
+      }
+    );
 
     props.socket.on(std_game_data_info, (data: string[]) => {
       setGameDataInfo(gameDataInfo.concat(data));
@@ -161,10 +165,10 @@ const GameRoom = (props: IGameRoom) => {
           }
           setGameDataInfo([]);
         }}
-        raceTimeInfo={raceTimeInfo}
+        scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}
       />
-      <ScoreInfoContainer raceTimeInfo={raceTimeInfo} />
+      <ScoreInfoContainer scoreInfo={scoreInfo} />
       <ToastContainer />
     </React.Fragment>
   );

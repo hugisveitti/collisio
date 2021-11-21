@@ -1,3 +1,4 @@
+import { IPreGameSettings } from "../classes/Game";
 
 type DeviceType = "desktop" | "mobile"
 
@@ -38,6 +39,13 @@ export const inDevelopment = window.location.href.includes("localhost")
  */
 export const inTestMode = false
 
+export const testPreGameSettings: IPreGameSettings = {
+    ballRadius: 1,
+    gameType: "tag",
+    numberOfLaps: 2,
+    trackName: "simple-tag-course",
+    tagGameLength: 2
+}
 
 export const getStaticPath = (path: string) => {
     return `/${path}`

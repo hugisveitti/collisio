@@ -1,5 +1,7 @@
+import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { IVehicleSettings } from '../classes/User';
+import { GameScene } from '../game/GameScene';
 import { GameTime } from '../game/GameTimeClass';
 
 export interface SimpleVector {
@@ -18,17 +20,29 @@ export interface IPositionRotation {
 }
 
 export interface IVehicle {
+
+    /** could try and have a function getCollisionBody
+     * But I couldn't import the definition of PhysicsBody
+     */
+    chassisMesh: ExtendedObject3D
+
     canDrive: boolean
     isPaused: boolean
-    mass: number
+
+    engineForce: number
 
     vehicleSettings: IVehicleSettings
-    engineForce: number
     steeringSensitivity: number
     breakingForce: number
 
     /* Has model loaded */
     isReady: boolean
+
+    /** same as playerNumber */
+    vehicleNumber: number
+
+    useBadRotationTicks: boolean
+
 
     goForward: (moreSpeed?: boolean) => void
     goBackward: (speed?: number) => void
@@ -58,5 +72,6 @@ export interface IVehicle {
     resetPosition: () => void
     setCheckpointPositionRotation: (positionRotation: IPositionRotation) => void
     updateVehicleSettings: (vehicleSettings: IVehicleSettings) => void
+    setColor: (color: string | number) => void
 
 }

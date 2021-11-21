@@ -15,16 +15,48 @@ document.body.appendChild(loadDiv)
 
 const manager = new LoadingManager()
 
-manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
-    loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
+let dotTimeout: NodeJS.Timeout
+
+let numDots = 1
+
+
+
+const setLoadingDivText = (text: string) => {
+    window.clearTimeout(dotTimeout)
+
+    const createText = () => {
+
+        let dotText = text
+        for (let i = 0; i < numDots; i++) {
+            dotText += ""
+        }
+        loadDiv.innerHTML = dotText
+        dotTimeout = setTimeout(() => {
+            numDots += 1
+            if (numDots === 4) {
+                numDots = 1
+            }
+        }, 200)
+    }
+    createText()
 }
 
+const clearLoadingDivText = () => {
+    loadDiv.innerHTML = ""
+    window.clearTimeout(dotTimeout)
+}
+
+manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
+    setLoadingDivText("Loading files " + loaded + " / " + itemsTotal)
+}
+
+
 manager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
-    loadDiv.innerHTML = "Loading files " + loaded + " / " + itemsTotal
+    setLoadingDivText("Loading files " + loaded + " / " + itemsTotal)
 }
 
 manager.onLoad = () => {
-    loadDiv.innerHTML = ""
+    clearLoadingDivText()
 }
 
 const keyNameMatch = (key: string, name: string) => {
@@ -124,7 +156,6 @@ export class Course implements ICourse {
 
                             }
                             if (child.name.includes("water")) {
-                                console.log("water", child)
                                 const waterObject = child
                                 const texturesPromise = Promise.all([
                                     this.scene.load.texture('/textures/Water_1_M_Normal.jpg'),
@@ -134,10 +165,8 @@ export class Course implements ICourse {
                                     textures[0].needsUpdate = true
                                     textures[1].needsUpdate = true
 
-                                    console.log("texutres", textures)
 
                                     waterObject.visible = false
-                                    console.log("waterObject.scale", waterObject.scale)
                                     this.scene.misc.water({
                                         y: waterObject.position.y,
                                         x: waterObject.position.x,
@@ -157,7 +186,6 @@ export class Course implements ICourse {
                                 if (!gameItems[key].objectName) {
                                     console.warn(`Object with key '${key}' is course object but doesn't have an object name`)
                                 }
-
                                 if (gameItems[key].isCourseObjectArray) {
                                     const code = `this.${gameItems[key].objectName}.push(child)`
                                     eval(code)
@@ -193,7 +221,67 @@ export class Course implements ICourse {
         }
     }
 
-    setStartPositions(vehicles: IVehicle[]) { }
+    setStartPositions(vehicles: IVehicle[]) {
+
+        let usableSpawns = this.spawns.filter(s => s.name !== "checkpoint-spawn" && s.name !== "goal-spawn")
+        if (usableSpawns.length >= vehicles.length) {
+            const sortedSpawns = new Array(usableSpawns.length)
+            for (let spawn of usableSpawns) {
+                const idx = +spawn.name.slice(5, 6)
+                sortedSpawns[idx - 1] = spawn
+            }
+            /**
+             * Make the spawns be in order (spawn1, spawn2, etc.)
+             * and remove unwanted spawns
+             * since if there are 2 players, they could start one in front of the other instead of side by side
+             */
+            //  shuffleArray(sortedSpawns)
+
+            // use predefined spawns
+
+            for (let i = 0; i < vehicles.length; i++) {
+                const p = sortedSpawns[i].position
+                const r = sortedSpawns[i].rotation
+
+                vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
+                vehicles[i].resetPosition()
+                vehicles[i].stop()
+            }
+        } else {
+
+
+            const p = this.startPosition
+            const r = this.startRotation
+
+            const courseY = this.startPosition?.y ?? 2
+            let possibleStartingPos = []
+            let offset = 1
+            for (let i = 0; i < vehicles.length; i++) {
+
+                offset *= -1
+
+                if (i % 2 !== 0) {
+                    offset += (Math.sign(offset) * 5)
+                }
+
+                possibleStartingPos.push({ x: p.x + offset - 5, y: courseY, z: p.z + offset - 5 })
+            }
+
+
+            for (let i = 0; i < vehicles.length; i++) {
+
+                vehicles[i].canDrive = false
+
+                const sI = Math.floor(Math.random() * possibleStartingPos.length)
+                const sPos = possibleStartingPos[sI]
+                possibleStartingPos.splice(sI, 1)
+
+                vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
+                vehicles[i].resetPosition()
+                vehicles[i].stop()
+            }
+        }
+    }
 
     updateCourse() { }
 }

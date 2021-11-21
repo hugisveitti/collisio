@@ -4,18 +4,18 @@ import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Howl } from "howler";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
-import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IRaceTimeInfo } from "../classes/Game";
+import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IScoreInfo } from "../classes/Game";
 import { IUserGameSettings, IUserSettings } from "../classes/User";
-import { dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { ICourse } from "../course/ICourse";
+import { dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
+import "./game-styles.css";
 import { IGameScene } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
-import "./game-styles.css";
 
 // placement of views on the screen,
 // left = viewLefts[playerIndex % 2]
@@ -30,6 +30,7 @@ const beepC4 = new Howl({
     html5: true,
 })
 
+
 const beepE4 = new Howl({
     src: [getStaticPath("sound/beepE4.mp3")],
     html5: true
@@ -41,7 +42,6 @@ const gameSong = new Howl({
     src: [getStaticPath("sound/song2.mp3")],
     html5: true,
     volume: .5,
-
 })
 
 export interface IEndOfGameData {
@@ -64,11 +64,12 @@ interface IView {
     camera: THREE.PerspectiveCamera
 }
 
+
 export interface IGameRoomActions {
     escPressed?: () => void
     /** have the possibity to expand this interface to include other game types */
     gameFinished?: (data: IEndOfGameData) => void
-    updateScoreTable?: (data: IRaceTimeInfo[]) => void
+    updateScoreTable?: (data: IScoreInfo) => void
     playerFinished?: (data: IEndOfRaceInfoPlayer) => void
 }
 
@@ -517,9 +518,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     /** show all view the same info */
-    showViewsImportantInfo(text: string) {
+    showViewsImportantInfo(text: string, clear?: boolean) {
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.setViewImportantInfo(text, i)
+            this.setViewImportantInfo(text, i, clear)
         }
     }
 
@@ -610,6 +611,13 @@ export class GameScene extends Scene3D implements IGameScene {
 
     _startAllVehicles() { }
 
+    stopAllVehicles() {
+        for (let i = 0; i < this.vehicles.length; i++) {
+            this.vehicles[i].canDrive = false
+            this.vehicles[i].stop()
+        }
+    }
+
 
     restartGame() {
         this.resetVehicles()
@@ -680,6 +688,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     updatePing() {
         const start = Date.now()
+
         this.socket.emit(dts_ping_test)
         this.socket.once(std_ping_test_callback, () => {
             const ping = Date.now() - start
@@ -688,13 +697,17 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     resetVehicles() {
-
         this.course.setStartPositions(this.vehicles)
         this._resetVehicles()
     }
 
     // to be overwritten
     _resetVehicles() {
+
+    }
+
+    /** function called if vehicle position is reset */
+    resetVehicleCallback(vehicleNumber: number) {
 
     }
 

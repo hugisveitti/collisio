@@ -24,10 +24,7 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, 
         // vehicle.break(false)
     }
 
-
     vehicle.turn(mobileControls.beta)
-
-
 
     if (mobileControls.resetVehicle) {
         vehicle.resetPosition()
