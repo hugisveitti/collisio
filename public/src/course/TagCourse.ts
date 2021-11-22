@@ -1,5 +1,6 @@
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, Scene3D } from "enable3d";
+import { GameScene } from '../game/GameScene';
 import { TrackName } from "../shared-backend/shared-stuff";
 import { IVehicle } from '../vehicles/IVehicle';
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
@@ -28,7 +29,12 @@ export class Coin {
     /** for naming */
     number: number
 
-
+    /**
+     * TODO:fix this
+     * I am having a bad time removing the coins from the physics and world 
+     * and the collision functions
+     */
+    destroyed: boolean
 
     coinCollidedCallback: (name: string, coin: Coin) => void
 
@@ -45,7 +51,7 @@ export class Coin {
         this.model.receiveShadow = false
         this.model.name = `coin-${this.number}`
 
-
+        this.destroyed
 
         this.ry = 0;
         this.dry = .02; //Math.random() / 35 + .005 //
@@ -58,15 +64,27 @@ export class Coin {
 
         this.model.body.needUpdate = true
         this.model.body.on.collision((otherObject, ev) => {
-            if (otherObject.name.slice(0, 7) === "vehicle") {
+
+            if (!this.destroyed && otherObject.name.slice(0, 7) === "vehicle") {
+
                 this.coinCollidedCallback(otherObject.name, this)
             }
         })
     }
 
-    removeFromScene(scene: Scene3D) {
-        scene.scene.remove(this.model)
-        scene.physics.destroy(this.model)
+    removeFromScene(gameScene: GameScene) {
+        this.destroyed = true
+        const obj = gameScene.scene.getObjectByName(this.model.name)
+        if (!this.model?.body) return
+        /**
+         *  this does not work I think
+         */
+        this.model.body.checkCollisions = false
+        this.model.clear()
+
+
+        gameScene.destroy(this.model)
+
         this.deleteCallback(this)
     }
 
@@ -93,9 +111,10 @@ export class TagCourse extends Course implements ITagCourse {
     coinModel: ExtendedObject3D
     coins: Coin[]
     coinPoints: THREE.Object3D[]
+
     coinCollidedCallback: (name: string, coin: Coin) => void
-    constructor(scene: Scene3D, trackName: TrackName, coinCollidedCallback: (name: string, coin: Coin) => void) {
-        super(scene, trackName)
+    constructor(gameScene: GameScene, trackName: TrackName, coinCollidedCallback: (name: string, coin: Coin) => void) {
+        super(gameScene, trackName)
         this.coinCollidedCallback = coinCollidedCallback
         this.startPosition = new THREE.Vector3(2, 2, 3)
         this.startRotation = new THREE.Euler(0, Math.PI, 0)
@@ -116,22 +135,27 @@ export class TagCourse extends Course implements ITagCourse {
 
     setupGameObjects() {
 
-
         /** remove existing coins */
-        for (let coin of this.coins) {
-            coin.removeFromScene(this.scene)
+        const nCoins = this.coins.length
+        let i = 0
+        while (i < nCoins) {
+            this.coins[0].removeFromScene(this.gameScene)
+            i += 1
+            // delete this.coins[0]
         }
 
+        this.coins = []
         /** setup coins */
-        let i = 0;
+        i = 0;
         for (let cp of this.coinPoints) {
-
             const coin = new Coin(this.coinModel, i, this.coinCollidedCallback, (coin) => this.deleteCoin(coin))
             coin.setPositionOfObject(cp)
-            coin.addToScene(this.scene)
+            coin.addToScene(this.gameScene)
             this.coins.push(coin)
             i += 1
         }
+
+
     }
 
     _createCourse() {

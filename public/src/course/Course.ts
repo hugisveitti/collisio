@@ -3,6 +3,7 @@ import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { GLTF, GLTFLoader, Group, LoadingManager } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { Scene3D } from "enable3d";
+import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
@@ -67,7 +68,7 @@ const keyNameMatch = (key: string, name: string) => {
 }
 
 export class Course implements ICourse {
-    scene: Scene3D
+    gameScene: GameScene
     trackName: TrackName
     ground: ExtendedObject3D
 
@@ -83,8 +84,8 @@ export class Course implements ICourse {
 
     spawns: THREE.Object3D[]
 
-    constructor(scene: Scene3D, trackName: TrackName,) {
-        this.scene = scene
+    constructor(gameScene: GameScene, trackName: TrackName,) {
+        this.gameScene = gameScene
         this.trackName = trackName
         this.gamePhysicsObjects = []
         this.spawns = []
@@ -113,7 +114,7 @@ export class Course implements ICourse {
         const loader = new GLTFLoader(manager)
 
         loader.load(getStaticPath(`models/${this.trackName}.gltf`), (gltf: GLTF) => {
-            this.scene.scene.add(gltf.scene)
+            this.gameScene.scene.add(gltf.scene)
             this.courseScene = gltf.scene
             console.log("gltf", gltf)
             const itemKeys = Object.keys(gameItems)
@@ -133,7 +134,7 @@ export class Course implements ICourse {
                             child.visible = !Boolean(gameItems[key].notVisible);
                             if (!child.name.includes("ghost") && !Boolean(gameItems[key].notAddPhysics)) {
                                 const eObject = (child as ExtendedObject3D)
-                                this.scene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
+                                this.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
                                 eObject.castShadow = useShadows && Boolean(gameItems[key].castsShadow);
                                 eObject.receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
                                 //  eObject.visible = !Boolean(gameItems[key].notVisible);
@@ -158,8 +159,8 @@ export class Course implements ICourse {
                             if (child.name.includes("water")) {
                                 const waterObject = child
                                 const texturesPromise = Promise.all([
-                                    this.scene.load.texture('/textures/Water_1_M_Normal.jpg'),
-                                    this.scene.load.texture('/textures/Water_2_M_Normal.jpg')
+                                    this.gameScene.load.texture('/textures/Water_1_M_Normal.jpg'),
+                                    this.gameScene.load.texture('/textures/Water_2_M_Normal.jpg')
                                 ])
                                 texturesPromise.then(textures => {
                                     textures[0].needsUpdate = true
@@ -167,7 +168,7 @@ export class Course implements ICourse {
 
 
                                     waterObject.visible = false
-                                    this.scene.misc.water({
+                                    this.gameScene.misc.water({
                                         y: waterObject.position.y,
                                         x: waterObject.position.x,
                                         z: waterObject.position.z,
@@ -215,9 +216,9 @@ export class Course implements ICourse {
     }
 
     clearCourse() {
-        this.scene.scene.remove(this.courseScene)
+        this.gameScene.scene.remove(this.courseScene)
         for (let obj of this.gamePhysicsObjects) {
-            this.scene.physics.destroy(obj)
+            this.gameScene.physics.destroy(obj)
         }
     }
 

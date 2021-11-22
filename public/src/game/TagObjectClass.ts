@@ -2,9 +2,9 @@
  * as each vehicle will be asciated with one tagobjectclass
  */
 
-import { Scene3D } from "enable3d"
 import { chocolateColor, Coin, itColor, notItColor } from "../course/TagCourse"
 import { IVehicle } from "../vehicles/IVehicle"
+import { GameScene } from "./GameScene"
 
 export class TagObject {
 
@@ -32,7 +32,7 @@ export class TagObject {
         this.chocolateTime = 6
     }
 
-    coinCollision(coin: Coin, scene: Scene3D) {
+    coinCollision(coin: Coin, scene: GameScene) {
         if (!this.isIt) {
             this.coinCount += 1
             coin.removeFromScene(scene)

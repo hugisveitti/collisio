@@ -6,6 +6,7 @@ import { IRaceCourse } from "./ICourse";
 import { TrackName } from '../shared-backend/shared-stuff';
 import { Course } from './Course';
 import { shuffleArray } from "../utils/utilFunctions";
+import { GameScene } from "../game/GameScene";
 
 
 export class RaceCourse extends Course implements IRaceCourse {
@@ -23,9 +24,9 @@ export class RaceCourse extends Course implements IRaceCourse {
 
 
 
-    constructor(scene: Scene3D, trackName: TrackName, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
+    constructor(gameScene: GameScene, trackName: TrackName, goalCrossedCallback: (vehicle: ExtendedObject3D) => void, checkpointCrossedCallback: (vehicle: ExtendedObject3D) => void) {
 
-        super(scene, trackName)
+        super(gameScene, trackName)
 
         this.goalCrossedCallback = goalCrossedCallback
         this.checkpointCrossedCallback = checkpointCrossedCallback
@@ -67,10 +68,4 @@ export class RaceCourse extends Course implements IRaceCourse {
 
         }
     }
-
-
-
-
-
-
 }

@@ -8,6 +8,7 @@ import { IUserGameSettings } from "../classes/User"
 import { RaceCourse } from "../course/RaceCourse"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
+import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
 import { IGameScene } from "../game/IGameScene"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
@@ -32,11 +33,11 @@ document.body.appendChild(vehicleInputsContainer)
 
 
 
-export class LowPolyTestScene extends Scene3D implements IGameScene {
+export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScene {
 
     vehicle?: LowPolyTestVehicle
 
-    font?: THREE.Font
+    font: THREE.Font
     textMesh?: any
     socket!: Socket
     vehicleControls!: VehicleControls
@@ -70,7 +71,7 @@ export class LowPolyTestScene extends Scene3D implements IGameScene {
     isIt: number
 
     constructor() {
-        super({ key: "LowPolyTestScene" })
+        super()
 
         scoreTable.setAttribute("id", "score-info")
         lapTimeDiv.setAttribute("id", "lap-time")

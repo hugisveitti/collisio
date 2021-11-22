@@ -1,12 +1,14 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Font, GLTF, GLTFLoader, MeshStandardMaterial } from "@enable3d/three-wrapper/dist";
+import { Font, GLTF, GLTFLoader, MeshStandardMaterial, Audio, AudioListener } from "@enable3d/three-wrapper/dist";
 import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedMesh } from "enable3d";
 import { Howl } from "howler";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
+import { setEngineSound } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
+import { numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -23,12 +25,10 @@ export const getVehicleNumber = (vehicleName: string) => {
     return num
 }
 
-const engineSound = new Howl({
-    src: [getStaticPath("sound/engine.mp3")],
-    html5: true,
-    volume: .5,
-    loop: true
-})
+
+
+
+const soundScaler = numberScaler(1, 5, 0, 330)
 
 const cameraOffset = 20
 
@@ -44,11 +44,7 @@ const degToRad = 0.017453
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 
 
-const ACTIVE_TAG = 1;
-const ISLAND_SLEEPING = 2;
-const WANTS_DEACTIVATION = 3;
 const DISABLE_DEACTIVATION = 4;
-const DISABLE_SIMULATION = 5;
 
 export const staticCameraPos = { x: 0, y: 10, z: -25 }
 
@@ -112,9 +108,11 @@ export class LowPolyVehicle implements IVehicle {
     maxSpeedTicks: number
 
     useEngineSound: boolean
-    engineSound: Howl
+    engineSound: Audio | undefined
 
-    engineRate: number
+    /** only for the engine sound */
+    currentEngineForce: number
+
 
 
 
@@ -141,9 +139,9 @@ export class LowPolyVehicle implements IVehicle {
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
 
-        this.useEngineSound = useEngineSound
-        this.engineSound = engineSound
-        this.engineRate = 1
+        this.useEngineSound = true// useEngineSound
+
+        this.currentEngineForce = 0
 
     }
 
@@ -330,7 +328,7 @@ export class LowPolyVehicle implements IVehicle {
         /** don't start the vehicle until race */
         this.stop()
         window.addEventListener("keydown", (e) => {
-            if (e.key === "s") {
+            if (e.key === "z") {
                 this.toggleEngineSound()
 
             }
@@ -339,7 +337,11 @@ export class LowPolyVehicle implements IVehicle {
 
     toggleEngineSound() {
         if (!this.useEngineSound) return
-        if (!this.engineSound.playing()) {
+        if (!this.engineSound) {
+            console.warn("Engine sound not loaded")
+            return
+        }
+        if (!this.engineSound.isPlaying) {
             console.log("starting engine sound")
             this.engineSound.play()
 
@@ -416,7 +418,7 @@ export class LowPolyVehicle implements IVehicle {
             this.break(true)
         }
 
-        this.engineSound.rate(2)
+
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -447,7 +449,7 @@ export class LowPolyVehicle implements IVehicle {
 
     noForce() {
         this.break(true)
-        let slowBreakForce = 1000
+        let slowBreakForce = 2000
         slowBreakForce *= -Math.sign(this.getCurrentSpeedKmHour())
         if (Math.abs(this.getCurrentSpeedKmHour()) < 10) slowBreakForce = 0
 
@@ -529,8 +531,18 @@ export class LowPolyVehicle implements IVehicle {
             this.chassisMesh.add(camera)
         }
         this.camera = camera
-
+        this.createCarSounds()
     };
+
+    createCarSounds() {
+        const listener = new AudioListener()
+        this.camera.add(listener)
+
+        this.engineSound = new Audio(listener)
+        setEngineSound(this.engineSound, .3)
+
+    }
+
     cameraLookAt(camera: THREE.PerspectiveCamera) {
 
         if (this.useChaseCamera) {
@@ -629,7 +641,9 @@ export class LowPolyVehicle implements IVehicle {
     };
     update() {
 
-
+        if (this.engineSound && this.useEngineSound) {
+            this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
+        }
 
         // this.vehicle.updateWheelTransform(4, true)
         tm = this.vehicle.getChassisWorldTransform()

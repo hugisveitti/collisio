@@ -33,3 +33,20 @@ export const removeUndefinedFromObject = (object: Object) => {
     }
     return newObject
 }
+
+
+/**
+ * scale number 
+ * @param a
+ * @param b
+ * @param min
+ * @param max 
+ * @returns a number scaler, a function that scales changes the range of a number
+ * https://en.wikipedia.org/wiki/Feature_scaling
+ * goes from  range min - max to range [a-b]
+ */
+export const numberScaler = (a: number, b: number, min: number, max: number) => {
+    return (num: number) => {
+        return a + (((num - min) * (b - a)) / (max - min))
+    }
+}
