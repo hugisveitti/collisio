@@ -9,6 +9,8 @@ import { ITagCourse } from "./ICourse";
 export const itColor = possibleVehicleColors[2]
 export const notItColor = possibleVehicleColors[1]
 export const freezeColor = possibleVehicleColors[0]
+/** a chocolate cannot be it */
+export const chocolateColor = possibleVehicleColors[3]
 
 export class Coin {
 

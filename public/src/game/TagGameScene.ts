@@ -1,16 +1,22 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import Stats from "stats.js";
 import { CollisionEvent } from "@enable3d/common/dist/types";
+import { Clock } from "@enable3d/three-wrapper/dist";
+import Stats from "stats.js";
 import { ITagScoreInfo } from "../classes/Game";
 import { ITagCourse } from "../course/ICourse";
 import { Coin, freezeColor, itColor, notItColor, TagCourse } from "../course/TagCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
+import { stringInArray } from "../utils/utilFunctions";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { TagObject } from "./TagObjectClass";
-import { Clock } from "@enable3d/three-wrapper/dist";
 
+
+/** times to show on the players view
+       * e.g. 60 seconds left
+       */
+let importantTimes = ["60", "30", "10", "5", "4", "3", "2", "1"]
 
 
 
@@ -35,6 +41,10 @@ export class TagGameScene extends GameScene {
     isItTimeout: boolean
 
     gameOver: boolean
+
+    isItTimeoutObject: NodeJS.Timeout
+
+
 
     constructor() {
         super()
@@ -86,23 +96,24 @@ export class TagGameScene extends GameScene {
 
 
 
-    handleVehicleTagged(vehicleNumber: number) {
-        console.log("tagged vehicle", vehicleNumber)
-        this.vehicles[vehicleNumber].setColor(freezeColor)
-        this.tagObjects[vehicleNumber].setIsIt(true)
-        this.setIsItTimeout(vehicleNumber)
-        this.setViewImportantInfo("You are it!", vehicleNumber, true)
+    handleVehicleTagged(newIt: number, oldIt: number) {
+
+        if (!this.tagObjects[newIt].isChocolate) {
+
+            this.tagObjects[newIt].setIsIt(true)
+            this.tagObjects[oldIt].setIsIt(false, false)
+
+            this.setViewImportantInfo("You are it!", newIt, true)
+            const playerName = this.players[newIt].playerName
+            for (let i = 0; i < this.vehicles.length; i++) {
+                if (i !== newIt) {
+                    this.setViewImportantInfo(`${playerName} is it!`, i, true)
+                }
+            }
+        }
     }
 
-    setIsItTimeout(vehicleNumber: number) {
-        console.log("setting is it timeout")
-        this.isItTimeout = true
-        setTimeout(() => {
-            console.log("stopping is it timeout")
-            this.vehicles[vehicleNumber].setColor(itColor)
-            this.isItTimeout = false
-        }, 1500)
-    }
+
 
     createColliderListeners() {
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -112,10 +123,8 @@ export class TagGameScene extends GameScene {
 
                 if (!this.isItTimeout && !this.gameOver && this.tagObjects[i].isIt && isVehicle(otherObject)) {
                     /** change colors */
-                    this.vehicles[i].setColor(notItColor)
-                    this.tagObjects[i].setIsIt(false)
                     const vn = getVehicleNumber(otherObject.name)
-                    this.handleVehicleTagged(vn)
+                    this.handleVehicleTagged(vn, i)
 
                 }
             })
@@ -125,7 +134,7 @@ export class TagGameScene extends GameScene {
     resetTagObjects() {
         this.tagObjects = []
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.tagObjects.push(new TagObject())
+            this.tagObjects.push(new TagObject(this.vehicles[i]))
         }
     }
 
@@ -188,12 +197,18 @@ export class TagGameScene extends GameScene {
 
     updateClock() {
         if (this.gameOver) return
-        const time = this.preGameSettings.tagGameLength * 60 - this.gameClock.getElapsedTime()
-        this.showImportantInfo(time.toFixed(0))
-        if (time.toFixed(0) === "0") {
+        let time = (this.preGameSettings.tagGameLength * 60 - this.gameClock.getElapsedTime()).toFixed(0)
+
+        this.showImportantInfo(time)
+        if (time === "0") {
             this.gameClock.stop()
             this.handleGameOver()
         }
+
+        if (stringInArray(time, importantTimes)) {
+            this.showViewsImportantInfo(`${time} sec left`, true)
+        }
+
     }
 
     handleGameOver() {
@@ -211,16 +226,25 @@ export class TagGameScene extends GameScene {
 
     resetVehicleCallback(vehicleNumber: number) {
         if (!this.gameStarted) return
-        for (let i = 0; i < this.vehicles.length; i++) {
-            if (this.tagObjects[i].isIt) {
-                if (this.tagObjects[i].resetPressed()) {
+        const changeTags = this.tagObjects[vehicleNumber].resetPressed()
+        console.log("change tags", changeTags)
 
-                    this.vehicles[i].setColor(notItColor)
-                    this.tagObjects[i].setIsIt(false)
+        if (changeTags) {
+            let oldIt = -1
+            for (let i = 0; i < this.vehicles.length; i++) {
+                if (this.tagObjects[i].isIt) {
+                    // if (this.tagObjects[vehicleNumber].resetPressed()) {
+                    oldIt = i
+                    this.tagObjects[i].setIsIt(false, true)
+                    // }
                 }
             }
+            if (oldIt !== -1) {
+                this.handleVehicleTagged(vehicleNumber, oldIt)
+            }
+        } else {
+            this.setViewImportantInfo(`${this.tagObjects[vehicleNumber].getRemainingResets()} resets left`, vehicleNumber, true)
         }
-        this.handleVehicleTagged(vehicleNumber)
     }
 
     updateScoreTable() {

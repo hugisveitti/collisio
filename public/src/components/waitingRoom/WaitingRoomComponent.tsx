@@ -1,21 +1,10 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import FaceIcon from "@mui/icons-material/Face";
 import HelpIcon from "@mui/icons-material/Help";
 import {
-  Avatar,
   Button,
   Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Radio,
-  RadioGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -24,7 +13,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Socket } from "socket.io-client";
 import { IRoomInfo } from "../../classes/Game";
 import { IVehicleSettings } from "../../classes/User";
@@ -46,16 +34,12 @@ import {
   sendPlayerInfoChanged,
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
-import {
-  getVehicleNameFromType,
-  nonactiveVehcileTypes,
-} from "../../vehicles/VehicleConfigs";
+import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import PreGameSettingsComponent from "./PreGameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
-
 interface IWaitingRoomProps {
   socket: Socket;
   store: IStore;

@@ -37,7 +37,8 @@ export const inDevelopment = window.location.href.includes("localhost")
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = false
+export const inTestMode = true
+
 
 export const testPreGameSettings: IPreGameSettings = {
     ballRadius: 1,
