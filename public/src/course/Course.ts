@@ -218,7 +218,8 @@ export class Course implements ICourse {
     clearCourse() {
         this.gameScene.scene.remove(this.courseScene)
         for (let obj of this.gamePhysicsObjects) {
-            this.gameScene.physics.destroy(obj)
+            this.gameScene.destroy(obj)
+
         }
     }
 

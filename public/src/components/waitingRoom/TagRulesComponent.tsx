@@ -20,6 +20,7 @@ const TagRulesComponent = () => {
         backgroundColor: cardBackgroundColor,
         textAlign: "left",
         maxWidth: 500,
+        margin: "auto",
       }}
     >
       <CardHeader

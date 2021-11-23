@@ -99,7 +99,7 @@ export default class RoomMaster {
 
                     socket.on("disconnect", () => {
                         // console.log("disconnected from desktop", roomId)
-                        if (roomId) {
+                        if (roomId && this.rooms[roomId]) {
                             this.rooms[roomId].isConnected = false
                             delete this.rooms[roomId]
                         }

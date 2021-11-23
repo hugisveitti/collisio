@@ -87,7 +87,7 @@ var RoomMaster = /** @class */ (function () {
                     });
                     socket.on("disconnect", function () {
                         // console.log("disconnected from desktop", roomId)
-                        if (roomId) {
+                        if (roomId && _this.rooms[roomId]) {
                             _this.rooms[roomId].isConnected = false;
                             delete _this.rooms[roomId];
                         }

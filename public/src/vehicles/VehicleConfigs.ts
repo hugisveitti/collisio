@@ -15,7 +15,8 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "F1", type: "f1" },
     // { name: "Monster truck", type: "monsterTruck" },
     { name: "test", type: "test" },
-    { name: "Off roader", type: "offRoader" }
+    { name: "Off roader", type: "offRoader" },
+    { name: "Sports car", type: "sportsCar" }
 ]
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
@@ -186,6 +187,30 @@ export const vehicleConfigs = {
 
         path: "off-roader.gltf"
     },
+    sportsCar: {
+        ...defaultVehicleConfig,
+        wheelAxisBackPosition: -2.55,
+        wheelRadiusBack: 1.2 / 2,
+        wheelHalfTrackBack: 1.3,
+        wheelAxisHeightBack: 0.5,
+
+        wheelAxisFrontPosition: 2.85,
+        wheelRadiusFront: 1.2 / 2,
+        wheelHalfTrackFront: 1.3,
+        wheelAxisHeightFront: 0.5,
+
+        suspensionRestLength: 1.4,
+
+
+        mass: 1000,
+        engineForce: 10000,
+        breakingForce: 200,
+        is4x4: false,
+
+        inertia: { x: 3000, y: 2000, z: 4000 },
+
+        path: "sports-car.gltf"
+    },
     f1: {
         ...defaultVehicleConfig,
         path: "F1-car.gltf",
@@ -207,10 +232,6 @@ export const vehicleConfigs = {
         engineForce: 10000,
         breakingForce: 200,
         is4x4: false,
-
-        inertia: { x: 3000, y: 2000, z: 4000 },
-
-
 
     },
     test: {

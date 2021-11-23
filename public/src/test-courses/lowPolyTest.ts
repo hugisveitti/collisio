@@ -307,7 +307,8 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.trackName = trackName
         window.localStorage.setItem("trackName", trackName)
         this.canStartUpdate = false
-        //  this.course.clearCourse()
+        this.course.clearCourse()
+
         this.scene.clear()
         this.addLights()
 
