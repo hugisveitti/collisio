@@ -1,3 +1,6 @@
+import { updateProfile } from "@firebase/auth";
+import EditIcon from "@mui/icons-material/Edit";
+import EditOffIcon from "@mui/icons-material/EditOff";
 import {
   Button,
   Card,
@@ -10,30 +13,27 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import EditOffIcon from "@mui/icons-material/EditOff";
-import { UserContext } from "../../providers/UserProvider";
 import { makeStyles } from "@mui/styles";
-import { frontPagePath } from "../Routes";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { updateProfile } from "@firebase/auth";
-import { auth, signOut } from "../../firebase/firebaseInit";
-import GameDataComponent from "./GameDataComponent";
 import AppContainer from "../../containers/AppContainer";
-import { inputBackgroundColor, themeOptions } from "../../providers/theme";
 import { setDBUserProfile } from "../../firebase/firebaseFunctions";
+import { auth, signOut } from "../../firebase/firebaseInit";
+import {
+  cardBackgroundColor,
+  inputBackgroundColor,
+} from "../../providers/theme";
+import { UserContext } from "../../providers/UserProvider";
+import { frontPagePath } from "../Routes";
+import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 
 const useStyles = makeStyles({
   container: {
     padding: 25,
     marginTop: 0,
-    backgroundColor: themeOptions.palette.secondary.dark,
   },
-  input: {
-    backgroundColor: themeOptions.palette.secondary.light,
-  },
+  input: {},
 });
 
 interface IPrivateProfilePage {}
@@ -157,9 +157,9 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
         <Grid item xs={12} sm={12} md={3}>
           <Grid spacing={3} container>
             <Grid item xs={12}>
-              <div style={{ margin: 15 }}>
+              {/* <div style={{ margin: 15 }}>
                 <Link to={frontPagePath}>Back to front page</Link>
-              </div>
+              </div> */}
 
               {!user ? (
                 <div
@@ -168,10 +168,10 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                     textAlign: "center",
                   }}
                 >
-                  <span>Loading your profile...</span>
+                  <Typography>Loading your profile...</Typography>
                   <br />
                   <br />
-                  <span>You might not be logged in...</span>
+                  <Typography>You might not be logged in...</Typography>
                   <br />
                   <br />
                   <CircularProgress />
@@ -180,7 +180,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 <>
                   <Card
                     style={{
-                      backgroundColor: inputBackgroundColor,
+                      backgroundColor: cardBackgroundColor,
                     }}
                   >
                     {inEditMode ? renderEditInfo() : renderStaticInfo()}
@@ -208,8 +208,13 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
             >
               <GameDataComponent userId={user.uid} />
             </Grid>
-            <Grid item xs={2}>
-              <Button color="inherit" onClick={signOut} variant="contained">
+            <Grid item xs={3} style={{ textAlign: "left" }}>
+              <Button
+                color="inherit"
+                onClick={signOut}
+                variant="contained"
+                disableElevation
+              >
                 Logout
               </Button>
             </Grid>

@@ -10,18 +10,17 @@ const ShowRoomContainer = (props: IShowRoomContainer) => {
   const user = useContext(UserContext);
 
   return (
-    <AppContainer>
-      <div
-        style={{
-          backgroundColor: containerBackgroundColor,
-          paddingTop: 1,
-        }}
-      >
-        <ShowRoomComponent
-          isPremiumUser={user?.isPremium}
-          excludedVehicles={["test"]}
-        />
-      </div>
+    <AppContainer
+      containerStyles={{
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0.1,
+      }}
+    >
+      <ShowRoomComponent
+        isPremiumUser={user?.isPremium}
+        excludedVehicles={["test"]}
+      />
     </AppContainer>
   );
 };

@@ -1,5 +1,6 @@
 import { Modal } from "@mui/material";
 import React from "react";
+import { modalBackgroundColor } from "../../providers/theme";
 
 interface IBasicModal {
   open: boolean;
@@ -16,10 +17,12 @@ const BasicModal = (props: IBasicModal) => {
           position: "absolute",
           top: "25%",
           left: "8%",
-          backgroundColor: "#eeebdf",
-          border: "2px solid #000",
+          backgroundColor: modalBackgroundColor,
+          // border: "2px solid #000",
           padding: 10,
           outline: 0,
+          maxHeight: "80%",
+          overflowY: "auto",
         }}
       >
         {props.children}

@@ -8,6 +8,7 @@ import {
   Grid,
   IconButton,
   Slider,
+  Typography,
 } from "@mui/material";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -22,7 +23,6 @@ import { mts_user_settings_changed } from "../shared-backend/shared-stuff";
 export const invertedControllerKey = "invertedController";
 
 interface IControllerSettingsComponent {
-  setSettingsModalOpen: any;
   onClose: () => void;
 
   userLoggedIn: () => void;
@@ -51,18 +51,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
     }
   };
 
-  if (!user) {
-    return (
-      <NotLoggedInModal
-        onClose={props.onClose}
-        infoText="To set user settings, you need to be logged in."
-        onContinoueAsGuest={props.onClose}
-        open
-        signInWithPopup
-      />
-    );
-  }
-
   if (!props.store.userSettings) {
     return (
       <div style={{ margin: "auto", marginTop: 15, textAlign: "center" }}>
@@ -74,7 +62,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} style={{ textAlign: "right" }}>
-        <IconButton onClick={() => props.setSettingsModalOpen(false)}>
+        <IconButton onClick={() => props.onClose()}>
           <CloseIcon />
         </IconButton>
       </Grid>
@@ -107,7 +95,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
         </Button>
       </Grid>
       <Grid item xs={12}>
-        <span>Chase camera speed</span>
+        <Typography>Chase camera speed</Typography>
         <Slider
           min={0.01}
           max={1}
@@ -131,7 +119,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
         />
       </Grid>
       <Grid item xs={12}>
-        <span>Steering sensitivity</span>
+        <Typography>Steering sensitivity</Typography>
         <Slider
           min={0.01}
           max={2}

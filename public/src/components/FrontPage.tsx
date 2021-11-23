@@ -40,13 +40,8 @@ interface FrontPageProps {
 }
 
 const useStyles = makeStyles({
-  container: {
-    padding: 25,
-    marginTop: 0,
-    backgroundColor: themeOptions.palette.secondary.dark,
-  },
   input: {
-    backgroundColor: themeOptions.palette.secondary.light,
+    //  backgroundColor: themeOptions.palette.secondary.light,
   },
 });
 
@@ -141,6 +136,10 @@ const FrontPage = (props: FrontPageProps) => {
     if (deviceType === "desktop") {
       createRoomDesktop();
     } else {
+      if (playerName.length === 0) {
+        toast.error("Player name cannot be empty");
+        return;
+      }
       if (user) {
         connectToRoomMobile(roomId, playerName);
         handleRequestDeviceOrientation();
@@ -183,111 +182,118 @@ need to be logged in."
           handleRequestDeviceOrientation();
         }}
       />
-      <div className="container">
-        <Grid container spacing={5}>
-          <Grid item xs={12}>
-            <h2 className="center">
-              Welcome to <i>Collisio</i>
-            </h2>
-          </Grid>
-          <Grid item xs={12}>
-            <img src={logo} className="image-logo" alt="" />
-          </Grid>
+      <Grid container spacing={5}>
+        <Grid item xs={12}>
+          <Typography variant="h3" component="div" gutterBottom>
+            Welcome to <i>Collisio</i>
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <img src={logo} className="image-logo" alt="" />
+        </Grid>
 
-          {deviceType === "mobile" && (
-            <>
-              {user && (
-                <Grid item xs={12} sm={12}>
-                  <AvailableRoomsComponent
-                    store={props.store}
-                    connectButtonClicked={connectButtonClicked}
-                    userId={user.uid}
-                  />
-                </Grid>
-              )}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Player Name"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  disabled={!!user}
-                  fullWidth
-                  className={classes.input}
+        {deviceType === "mobile" && (
+          <>
+            {user && (
+              <Grid item xs={12} sm={12}>
+                <AvailableRoomsComponent
+                  store={props.store}
+                  connectButtonClicked={connectButtonClicked}
+                  userId={user.uid}
                 />
               </Grid>
+            )}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                style={{
+                  backgroundColor: inputBackgroundColor,
+                }}
+                label="Player Name"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                disabled={!!user}
+                fullWidth
+              />
+            </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  style={{
-                    backgroundColor: inputBackgroundColor,
-                  }}
-                  fullWidth
-                  label="Room id"
-                  value={props.store.roomId}
-                  onChange={(e) => props.store.setRoomId(e.target.value)}
-                />
-              </Grid>
-            </>
-          )}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                style={{
+                  backgroundColor: inputBackgroundColor,
+                }}
+                fullWidth
+                label="Room id"
+                value={props.store.roomId}
+                onChange={(e) => props.store.setRoomId(e.target.value)}
+              />
+            </Grid>
+          </>
+        )}
 
-          <Grid item xs={12}>
+        <Grid item xs={12}>
+          <Button
+            disableElevation
+            onClick={() => connectButtonClicked(props.store.roomId)}
+            variant="contained"
+            size="large"
+            startIcon={<VideogameAssetIcon />}
+          >
+            {deviceType === "desktop" ? "Create a Game" : "Join a Game"}
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography color="gray">
+            Create a room, you and upto 3 friends connect to that room with your
+            mobile phones. You can also play singleplayer and compete againt
+            highscores.
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Typography>
+            A car game where your phone is the controller. No installations, no
+            fuss, just a desktop browser and a smartphone browser.
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={false} sm={1} lg={4} xl={4} />
+        <Grid item xs={12} sm={5} lg={2} xl={2}>
+          <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
             <Button
-              onClick={() => connectButtonClicked(props.store.roomId)}
+              disableElevation
               variant="contained"
-              size="large"
-              startIcon={<VideogameAssetIcon />}
+              size="small"
+              startIcon={<HelpIcon />}
             >
-              {deviceType === "desktop" ? "Create a Game" : "Join a Game"}
+              How to play game
             </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography color="gray">
-              Create a room, you and upto 3 friends connect to that room with
-              your mobile phones. You can also play singleplayer and compete
-              againt highscores.
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <p>
-              A car game where your phone is the controller. No installations,
-              no fuss, just a desktop browser and a smartphone browser.
-            </p>
-          </Grid>
+          </Link>
         </Grid>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Divider variant="middle" />
-          </Grid>
-          <Grid item xs={false} sm={1} lg={4} xl={4} />
-          <Grid item xs={12} sm={5} lg={2} xl={2}>
-            <Link style={{ textDecoration: "none" }} to={howToPlayPagePath}>
-              <Button variant="contained" size="small" startIcon={<HelpIcon />}>
-                How to play game
-              </Button>
-            </Link>
-          </Grid>
-          <Grid item xs={12} sm={5} lg={2} xl={2}>
-            <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
-              <Button
-                variant="contained"
-                startIcon={<SportsScoreIcon />}
-                size="small"
-              >
-                Highscores
-              </Button>
-            </Link>
-          </Grid>
-          <Grid item xs={false} sm={1} lg={4} xl={4} />
-          <Grid item xs={12}>
-            <p>
-              This game is in development. If you have suggestions please email
-              hugiholm1 [a] [t] gmail.com
-            </p>
-          </Grid>
+        <Grid item xs={12} sm={5} lg={2} xl={2}>
+          <Link to={highscorePagePath} style={{ textDecoration: "none" }}>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<SportsScoreIcon />}
+              size="small"
+            >
+              Highscores
+            </Button>
+          </Link>
         </Grid>
-      </div>
+        <Grid item xs={false} sm={1} lg={4} xl={4} />
+        <Grid item xs={12}>
+          <Typography>
+            This game is in development. If you have suggestions please email
+            hugiholm1 [a] [t] gmail.com
+          </Typography>
+        </Grid>
+      </Grid>
     </AppContainer>
   );
 };

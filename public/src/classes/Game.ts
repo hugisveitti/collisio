@@ -1,4 +1,4 @@
-import { TrackName, GameType, VehicleType, IPlayerInfo, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
+import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
@@ -11,6 +11,19 @@ export interface ITrackInfo {
 
 export const getTrackNameFromType = (trackName: TrackName) => {
     return allTrackNames.find(track => track.type === trackName)?.name ?? "-"
+}
+
+export const getGameTypeNameFromType = (gameType: GameType) => {
+    switch (gameType) {
+        case "race":
+            return "Race"
+        case "tag":
+            return "Tag"
+        case "ball":
+            return "Ball"
+        default:
+            return "Unknown game type"
+    }
 }
 
 export const allTrackNames: ITrackInfo[] = [
@@ -27,12 +40,15 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Beach track", type: "sea-side-track", gameType: "race"
     },
     {
-        name: "Simple Tag", type: "simple-tag-course", gameType: "tag"
+        name: "Tag course", type: "simple-tag-course", gameType: "tag"
     },
     {
         name: "Town track", type: "town-track", gameType: "race"
     }
 ]
+
+export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track"]
+export const activeGameTypes: GameType[] = ["race", "tag"]
 
 export const defaultRaceTrack: TrackName = "farm-track"
 export const defaultTagTrack: TrackName = "simple-tag-course"

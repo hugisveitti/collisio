@@ -43,7 +43,11 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
           <RaceTimeTable isEndOfGame raceTimeInfo={props.scoreInfo.timeInfos} />
         </Grid>
         <Grid item xs={6} xl={2}>
-          <Button variant="contained" onClick={props.restartGame}>
+          <Button
+            variant="contained"
+            onClick={props.restartGame}
+            disableElevation
+          >
             Restart
           </Button>
         </Grid>

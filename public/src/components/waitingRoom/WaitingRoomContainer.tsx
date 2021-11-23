@@ -236,6 +236,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </Grid>
           <Grid item xs={6}>
             <LoadingButton
+              disableElevation
               loading={connectingGuest}
               variant="outlined"
               onClick={() => {
@@ -247,11 +248,15 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </Grid>
           {showLoginInComponent ? (
             <Grid item xs={12}>
-              <LoginComponent signInWithPopup={false} />
+              <LoginComponent
+                onClose={() => setShowLoginInComponent(false)}
+                signInWithPopup={false}
+              />
             </Grid>
           ) : (
             <Grid item xs={6}>
               <Button
+                disableElevation
                 variant="contained"
                 onClick={() => {
                   setShowLoginInComponent(true);
@@ -274,7 +279,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   return (
     <AppContainer>
-      <div className="container">
+      <React.Fragment>
         {renderDisplayNameModal()}
         {onMobile && !props.store.player ? (
           <div
@@ -293,7 +298,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
             />
           </React.Fragment>
         )}
-      </div>
+      </React.Fragment>
       <DeviceOrientationPermissionComponent
         onMobile={onMobile}
         onIphone={isIphone()}

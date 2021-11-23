@@ -21,6 +21,7 @@ import {
   saveRoom,
   setDBUserSettings,
 } from "../../firebase/firebaseFunctions";
+import { basicColor } from "../../providers/theme";
 import {
   IPlayerInfo,
   playerInfoToPreGamePlayerInfo,
@@ -116,13 +117,21 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <h1 className="center">Waiting room</h1>
+        <Typography variant="h3" className="center">
+          Waiting room
+        </Typography>
       </Grid>
       <Grid item xs={12}>
-        <h2>{roomId}</h2>
+        <Typography variant="h4">{roomId}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Link to={frontPagePath}>Back to front page</Link>
+        <Button
+          variant="contained"
+          disableElevation
+          style={{ backgroundColor: basicColor }}
+        >
+          <Link to={frontPagePath}>Back to front page</Link>
+        </Button>
       </Grid>
       <Grid item xs={12}>
         <Typography component="span">
@@ -171,7 +180,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        <h3 className="center">Players in room {props.store.roomId}</h3>
+        <Typography variant="h6" component="div">
+          Players in room {props.store.roomId}
+        </Typography>
       </Grid>
 
       <Grid item xs={12}>
@@ -187,7 +198,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       {!onMobile && (
         <React.Fragment>
           <Grid item xs={12}>
-            <Button variant="contained" onClick={handleStartGame}>
+            <Button
+              variant="contained"
+              onClick={handleStartGame}
+              disableElevation
+            >
               Start game
             </Button>
           </Grid>

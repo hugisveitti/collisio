@@ -21,11 +21,12 @@ import {
   stm_player_finished,
 } from "../shared-backend/shared-stuff";
 import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
-import { isIphone } from "../utils/settings";
+import { inTestMode, isIphone } from "../utils/settings";
 import ControllerSettingsComponent, {
   invertedControllerKey,
 } from "./ControllerSettingsComponent";
 import "./ControlsRoom.css";
+import ControllerSettingsModal from "./ControllerSettingsModal";
 
 interface IControlsRoomProps {
   socket: Socket;
@@ -52,14 +53,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   });
 
   // change these colors!
-  const downColor = "#005c46"; // "green";
-  const upColor = "#fcba03"; // "red";
+  const downColor = "#005c46";
+  const upColor = "#fcba03";
   const [isPortrait, setIsPortrait] = useState(false);
   /** used to see if device orientation isnt working */
   const [deviceOrientationAsked, setDeviceOrientationAsked] = useState(false);
   const [sendControlsInterval, setSendControlsInterval] = useState(
     undefined as undefined | NodeJS.Timer
   );
+  /** -1 if inverted */
   const [invertedController, setInvertedController] = useState(1);
 
   const handleUserLoggedIn = () => {};
@@ -97,7 +99,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
   };
 
-  if (!props.store?.roomId) {
+  if (!props.store?.roomId && !inTestMode) {
     history.push(frontPagePath);
     toast.warn("No room connection, redirecting to frontpage");
     return null;
@@ -245,35 +247,18 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   return (
     <React.Fragment>
-      <Modal
+      <ControllerSettingsModal
+        userLoggedIn={handleUserLoggedIn}
+        resetOrientation={resetDeviceOrientationListener}
         open={settingsModalOpen}
         onClose={() => {
           setSettingsModalOpen(false);
+          handleButtonAction(false, "pause", setSettingsModalOpen);
         }}
-        style={{ border: 0 }}
-      >
-        <div
-          style={{
-            marginTop: 50,
-            backgroundColor: "#eeebdf",
-            border: "2px solid #000",
-            padding: 10,
-            outline: 0,
-          }}
-        >
-          <ControllerSettingsComponent
-            onClose={() => {
-              handleButtonAction(false, "pause", setSettingsModalOpen);
-            }}
-            setSettingsModalOpen={setSettingsModalOpen}
-            userLoggedIn={handleUserLoggedIn}
-            socket={props.socket}
-            resetOrientation={resetDeviceOrientationListener}
-            user={user}
-            store={props.store}
-          />
-        </div>
-      </Modal>
+        user={user}
+        store={props.store}
+        socket={props.socket}
+      />
 
       <div
         className="controller-btn"

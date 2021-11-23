@@ -18,7 +18,10 @@ import {
   getPlayerGameData,
   IPlayerGameData,
 } from "../../firebase/firebaseFunctions";
-import { inputBackgroundColor } from "../../providers/theme";
+import {
+  cardBackgroundColor,
+  inputBackgroundColor,
+} from "../../providers/theme";
 import GameDataTableRow from "./GameDataTableRow";
 
 interface IGameDataComponent {
@@ -70,7 +73,7 @@ const GameDataComponent = (props: IGameDataComponent) => {
 
   return (
     <React.Fragment>
-      <div style={{ backgroundColor: inputBackgroundColor }}>
+      <div style={{ backgroundColor: cardBackgroundColor }}>
         <TablePagination
           page={page}
           count={gamesData.length}

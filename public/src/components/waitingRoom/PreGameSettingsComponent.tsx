@@ -27,6 +27,7 @@ import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
 import TrackSelect from "../inputs/TrackSelect";
 import { IStore } from "../store";
+import TagRulesComponent from "./TagRulesComponent";
 
 interface IPreGameSettingsComponent {
   socket: Socket;
@@ -71,6 +72,7 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
   return (
     <Grid item xs={12}>
       <Card
+        variant="outlined"
         style={{
           backgroundColor: "inherit",
           width: "100%",
@@ -160,6 +162,11 @@ const GameSettingsComponent = (props: IPreGameSettingsComponent) => {
                   updateGameSettings("trackName", newTrackName);
                 }}
               />
+            </Grid>
+            <Grid item xs={12}>
+              {props.store.preGameSettings.gameType === "tag" && (
+                <TagRulesComponent />
+              )}
             </Grid>
           </Grid>
         </CardContent>

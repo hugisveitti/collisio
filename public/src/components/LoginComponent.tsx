@@ -16,6 +16,7 @@ import {
   Input,
   Typography,
   Grid,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -32,23 +33,18 @@ import {
 } from "../firebase/firebaseInit";
 import { UserContext } from "../providers/UserProvider";
 import { toast } from "react-toastify";
-import { privateProfilePagePath } from "./Routes";
-import { Link } from "react-router-dom";
 
-const useStyles = makeStyles({
-  container: {
-    backgroundColor: "#da5e58",
-    minWidth: 300,
-  },
-});
+import { Close } from "@mui/icons-material";
+import { basicColor } from "../providers/theme";
 
 interface ILoginComponent {
   setPlayerName?: Dispatch<SetStateAction<string>>;
   signInWithPopup?: boolean;
+  onClose: () => void;
+  backgroundColor?: string;
 }
 
 const LoginComponent = (props: ILoginComponent) => {
-  const classes = useStyles();
   const user = useContext(UserContext);
 
   const [creatingAccountWithEmail, setCreatingAccountWithEmail] =
@@ -59,6 +55,8 @@ const LoginComponent = (props: ILoginComponent) => {
 
   const [isSigningIn, setIsSigningIn] = useState(true);
 
+  const buttonWidth = 250;
+
   useEffect(() => {
     if (user !== null) {
       setIsSigningIn(false);
@@ -67,136 +65,151 @@ const LoginComponent = (props: ILoginComponent) => {
 
   if (isSigningIn) {
     return (
-      <div className={classes.container}>
-        <Card>
-          <CardContent style={{ textAlign: "center" }}>
-            <CircularProgress />
-          </CardContent>
-        </Card>
-      </div>
+      <Card
+        variant="outlined"
+        style={{
+          backgroundColor: props.backgroundColor,
+        }}
+      >
+        <CardContent style={{ textAlign: "center" }}>
+          <CircularProgress />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={classes.container}>
-      <Card variant="outlined">
-        <CardHeader
-          title="Login"
-          subheader="Login or signup with one of the methods below."
-        />
+    <Card
+      variant="outlined"
+      style={{
+        backgroundColor: props.backgroundColor,
+      }}
+    >
+      <CardHeader
+        title="Login"
+        subheader="Login or signup with one of the methods below."
+        action={
+          <IconButton onClick={() => props.onClose()}>
+            <Close />
+          </IconButton>
+        }
+      />
 
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  signInWithGoogle(props.signInWithPopup);
-                  setIsSigningIn(true);
-                }}
-                variant="contained"
-                style={{ backgroundColor: "#de5246", marginTop: 15 }}
-                startIcon={<GoogleIcon />}
-              >
-                Sign in with Google
-              </Button>
-            </Grid>
+      <CardContent>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                signInWithGoogle(props.signInWithPopup);
+                setIsSigningIn(true);
+              }}
+              disableElevation
+              variant="contained"
+              style={{
+                backgroundColor: "#de5246",
+                textAlign: "left",
+                width: buttonWidth,
+              }}
+              startIcon={<GoogleIcon />}
+            >
+              Sign in with Google
+            </Button>
+          </Grid>
 
-            {creatingAccountWithEmail ? (
-              <React.Fragment>
-                <Grid item xs={12} sm={12}>
-                  <Input
-                    style={{ marginTop: 25 }}
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Input
-                    style={{ marginTop: 15 }}
-                    placeholder="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    error={password.length < 6}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Input
-                    style={{ marginTop: 15 }}
-                    placeholder="Displayname"
-                    value={displayName}
-                    onChange={(e) => {
-                      setDisplayName(e.target.value);
-                      if (props.setPlayerName) {
-                        props.setPlayerName(e.target.value);
-                      }
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={6} sm={4}>
-                  <Button
-                    style={{ marginRight: 5 }}
-                    variant="contained"
-                    startIcon={<LoginIcon />}
-                    onClick={() => {
-                      if (password.length < 6) {
-                        toast.error(
-                          "The password must be atleast 6 characters."
-                        );
-                        return;
-                      }
-                      setIsSigningIn(true);
-                      signInWithEmail(email, password);
-                    }}
-                  >
-                    Login
-                  </Button>
-                </Grid>
-                <Grid item xs={6} sm={8}>
-                  <Button
-                    onClick={() => {
-                      if (password.length < 6) {
-                        toast.error(
-                          "The password must be atleast 6 characters."
-                        );
-                        return;
-                      }
-                      if (displayName === "") {
-                        toast.error("The display name cannot be empty.");
-                        return;
-                      }
-                      setIsSigningIn(true);
-                      createAccountWithEmail(email, password, displayName);
-                    }}
-                    variant="outlined"
-                    startIcon={<ControlPointIcon />}
-                  >
-                    Sign up
-                  </Button>
-                </Grid>
-              </React.Fragment>
-            ) : (
-              <Grid item xs={12}>
+          {creatingAccountWithEmail ? (
+            <React.Fragment>
+              <Grid item xs={12} sm={12}>
+                <Input
+                  style={{ marginTop: 25 }}
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Input
+                  style={{ marginTop: 15 }}
+                  placeholder="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={password.length < 6}
+                />
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Input
+                  style={{ marginTop: 15 }}
+                  placeholder="Displayname"
+                  value={displayName}
+                  onChange={(e) => {
+                    setDisplayName(e.target.value);
+                    if (props.setPlayerName) {
+                      props.setPlayerName(e.target.value);
+                    }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12}>
                 <Button
-                  onClick={() => setCreatingAccountWithEmail(true)}
+                  disableElevation
                   variant="contained"
-                  startIcon={<EmailIcon />}
-                  style={{
-                    backgroundColor: "#abdbe3",
-                    marginTop: 15,
-                    color: "black",
+                  startIcon={<LoginIcon />}
+                  onClick={() => {
+                    if (password.length < 6) {
+                      toast.error("The password must be atleast 6 characters.");
+                      return;
+                    }
+                    setIsSigningIn(true);
+                    signInWithEmail(email, password);
                   }}
                 >
-                  Sign up or sign in with email
+                  Login
                 </Button>
               </Grid>
-            )}
-          </Grid>
-        </CardContent>
-      </Card>
-    </div>
+              <Grid item xs={12} sm={12}>
+                <Button
+                  onClick={() => {
+                    if (password.length < 6) {
+                      toast.error("The password must be atleast 6 characters.");
+                      return;
+                    }
+                    if (displayName === "") {
+                      toast.error("The display name cannot be empty.");
+                      return;
+                    }
+                    setIsSigningIn(true);
+                    createAccountWithEmail(email, password, displayName);
+                  }}
+                  variant="outlined"
+                  disableElevation
+                  startIcon={<ControlPointIcon />}
+                >
+                  Sign up
+                </Button>
+              </Grid>
+            </React.Fragment>
+          ) : (
+            <Grid item xs={12}>
+              <Button
+                onClick={() => setCreatingAccountWithEmail(true)}
+                variant="contained"
+                disableElevation
+                startIcon={<EmailIcon />}
+                style={{
+                  backgroundColor: basicColor,
+                  color: "black",
+                  textAlign: "left",
+                  width: buttonWidth,
+                }}
+              >
+                Sign up/in with email
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -31,10 +31,12 @@ import {
   privateProfilePagePath,
   showRoomPagePath,
 } from "../components/Routes";
+import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
+  containerStyles?: React.CSSProperties;
 }
 
 const AppContainer = (props: IAppContainer) => {
@@ -140,16 +142,24 @@ const AppContainer = (props: IAppContainer) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-
-            backgroundColor: "#eeebdf",
-            border: "2px solid #000",
           }}
         >
-          <LoginComponent />
+          <LoginComponent onClose={() => setLoginModalOpen(false)} />
         </div>
       </Modal>
-
-      {props.children}
+      <div
+        style={{
+          backgroundColor: containerBackgroundColor,
+          paddingTop: 25,
+          paddingLeft: 10,
+          paddingRight: 10,
+          paddingBottom: 10,
+          textAlign: "center",
+          ...props.containerStyles,
+        }}
+      >
+        {props.children}
+      </div>
       <ToastContainer />
       <CookiePrompt />
     </React.Fragment>

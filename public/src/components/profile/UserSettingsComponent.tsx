@@ -1,26 +1,23 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  Grid,
-  CardHeader,
-  IconButton,
   Card,
-  CardContent,
-  Collapse,
   CardActions,
+  CardContent,
+  CardHeader,
+  Collapse,
+  Grid,
+  IconButton,
   Slider,
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import EditOffIcon from "@mui/icons-material/EditOff";
+import { IUserSettings, IVehicleSettings } from "../../classes/User";
 import {
   getDBUserSettings,
   setDBUserSettings,
 } from "../../firebase/firebaseFunctions";
-import { inputBackgroundColor } from "../../providers/theme";
-import { IUserSettings, IVehicleSettings } from "../../classes/User";
-import VehicleSelect from "../inputs/VehicleSelect";
-import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import { cardBackgroundColor } from "../../providers/theme";
 
 interface IUserSettingsComponent {
   userId: string;
@@ -76,16 +73,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
           <CardContent>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <VehicleSelect
-                  excludedVehicles={nonactiveVehcileTypes}
-                  value={vehicleSettings.vehicleType}
-                  onChange={(vt) => {
-                    updateVehicleSettings("vehicleType", vt);
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <span>Steering sensitivity</span>
+                <Typography>Steering sensitivity</Typography>
                 <Slider
                   min={0.01}
                   max={2}
@@ -115,7 +103,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
   return (
     <Card
       style={{
-        backgroundColor: inputBackgroundColor,
+        backgroundColor: cardBackgroundColor,
       }}
     >
       {renderStaticInfo()}

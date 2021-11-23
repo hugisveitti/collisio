@@ -1,22 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Collapse, Grid, IconButton, Typography } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import AppContainer from "../../containers/AppContainer";
-import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
-import "../../styles/main.css";
-import { containerBackgroundColor } from "../../providers/theme";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Button, Collapse, Grid, IconButton, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router";
 import { VehicleType } from "../../shared-backend/shared-stuff";
+import "../../styles/main.css";
+import { stringInArray } from "../../utils/utilFunctions";
 import {
   allVehicleTypes,
   possibleVehicleColors,
 } from "../../vehicles/VehicleConfigs";
-import { stringInArray } from "../../utils/utilFunctions";
-import { useHistory } from "react-router";
 import { buyPremiumPagePath } from "../Routes";
+import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
 
 // const allPossibleVehcileTypes: VehicleType[] = ["f1", "tractor", "normal", "truck", ];
 
@@ -93,12 +91,12 @@ const ShowRoomComponent = (props: IShowRoom) => {
           <div ref={canvasWrapperRef}></div>
         </Grid>
         <Grid item xs={12}>
-          <h4 style={{ textAlign: "center" }}>
+          <Typography variant="h6" component="div">
             {
               possibleVehcileTypes[vehicleTypeNum % possibleVehcileTypes.length]
                 ?.name
             }
-          </h4>
+          </Typography>
         </Grid>
         <Grid item xs={12}>
           <Collapse in={showBuyPremium}>

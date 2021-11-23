@@ -26,7 +26,7 @@ const players = [
 ]
 
 const numberOfFakeGames = 30
-const possibleTracks: TrackName[] = ["f1-track", "farm-track"]
+const possibleTracks: TrackName[] = ["f1-track", "farm-track", "sea-side-track"]
 
 export const createFakeHighscoreData = () => {
     console.log("Creating fake data")
