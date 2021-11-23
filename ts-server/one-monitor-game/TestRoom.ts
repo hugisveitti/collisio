@@ -1,6 +1,12 @@
 import { Socket } from "socket.io"
 
-import { MobileControls, mts_controls, mts_user_settings_changed, std_controls, std_user_settings_changed } from "../../public/src/shared-backend/shared-stuff"
+import {
+    MobileControls,
+    mts_controls,
+    mts_user_settings_changed,
+    std_controls,
+    std_user_settings_changed
+} from "../../public/src/shared-backend/shared-stuff"
 
 export default class TestRoom {
 

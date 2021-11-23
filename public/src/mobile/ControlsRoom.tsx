@@ -16,6 +16,7 @@ import {
   mts_controls,
   mts_game_data_info,
   mts_user_settings_changed,
+  stm_desktop_disconnected,
   stm_game_finished,
   stm_player_finished,
 } from "../shared-backend/shared-stuff";
@@ -135,7 +136,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setInvertedController(+_invertedController);
     }
 
+    props.socket.on(stm_desktop_disconnected, () => {
+      toast.error("Game disconnected");
+      history.push(frontPagePath);
+      /** go to front page? */
+    });
+
     return () => {
+      props.socket.off(stm_desktop_disconnected);
       window.clearInterval(sendControlsInterval);
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
       window.removeEventListener("orientationchange", handleDeviceOrientChange);

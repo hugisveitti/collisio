@@ -3,7 +3,7 @@
  */
 
 import { io, Socket } from "socket.io-client"
-import { dts_create_room, dts_start_game, IPlayerInfo, mdts_device_type, MobileControls, mts_controls, mts_player_connected, std_controls, std_room_created_callback, stmd_socket_ready } from "../shared-backend/shared-stuff"
+import { dts_create_room, mdts_start_game, IPlayerInfo, mdts_device_type, MobileControls, mts_controls, mts_player_connected, std_controls, std_room_created_callback, stmd_socket_ready } from "../shared-backend/shared-stuff"
 import { ISocketCallback } from "../utils/connectSocket"
 
 export const removeSockets = (desktopSocket: Socket, mobileSockets: Socket[]) => {
@@ -25,7 +25,7 @@ export const createSocketTest = (numberOfMobiles: number, callback: (roomId: str
             })
         }
 
-        desktopSocket.emit(dts_start_game)
+        desktopSocket.emit(mdts_start_game)
     })
 }
 

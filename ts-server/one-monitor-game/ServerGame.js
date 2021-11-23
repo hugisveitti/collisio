@@ -134,19 +134,6 @@ var Room = /** @class */ (function () {
         this.deleteRoomCallback = deleteRoomCallback;
         this.setSocket(socket);
     }
-    Room.prototype.setupLeftWaitingRoomListener = function () {
-        var _this = this;
-        this.socket.on("left-waiting-room", function () {
-            /** if game hasnt started delete game */
-            if (!_this.gameStarted) {
-                for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
-                    var player = _a[_i];
-                    player.gameDisconnected();
-                }
-                _this.deleteRoomCallback();
-            }
-        });
-    };
     Room.prototype.setSocket = function (socket) {
         this.socket = socket;
         this.setupStartGameListener();
@@ -156,6 +143,30 @@ var Room = /** @class */ (function () {
         this.setupGameFinishedListener();
         this.setupPingListener();
         this.setupVechilesReadyListener();
+        this.setupLeftWebsiteListener();
+    };
+    Room.prototype.setupLeftWaitingRoomListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.dts_left_waiting_room, function () {
+            /** if game hasnt started delete game */
+            if (!_this.gameStarted) {
+                for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                    var player = _a[_i];
+                    player.desktopDisconnected();
+                }
+                _this.deleteRoomCallback();
+            }
+        });
+    };
+    Room.prototype.setupLeftWebsiteListener = function () {
+        var _this = this;
+        this.socket.on("disconnect", function () {
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                player.desktopDisconnected();
+            }
+            _this.deleteRoomCallback();
+        });
     };
     Room.prototype.setupVechilesReadyListener = function () {
         var _this = this;
@@ -188,7 +199,7 @@ var Room = /** @class */ (function () {
             }
             else {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
-                player.socket.emit(shared_stuff_1.stm_game_starting);
+                player.socket.emit(shared_stuff_1.stmd_game_starting);
             }
             return;
         }
@@ -200,24 +211,37 @@ var Room = /** @class */ (function () {
         }
         player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
         player.socket.join(this.roomId);
-        player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader });
         this.alertWaitingRoom();
         if (this.gameStarted) {
             player.startGame();
         }
     };
     Room.prototype.alertWaitingRoom = function () {
-        this.io.to(this.roomId).emit("waiting-room-alert", { players: this.getPlayersInfo() });
+        this.io.to(this.roomId).emit(shared_stuff_1.stmd_waiting_room_alert, { players: this.getPlayersInfo() });
     };
     Room.prototype.setupGameSettingsListener = function () {
         var _this = this;
-        this.socket.on("game-settings-changed", function (data) {
+        this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (data) {
             _this.gameSettings = data.gameSettings;
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 player.sendGameSettings(_this.gameSettings);
             }
         });
+    };
+    Room.prototype.startGameFromLeader = function () {
+        this.startGame();
+        this.socket.emit(shared_stuff_1.stmd_game_starting);
+    };
+    Room.prototype.sendGameSettings = function (gameSettings) {
+        this.gameSettings = gameSettings;
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var player = _a[_i];
+            if (!player.isLeader) {
+                player.sendGameSettings(this.gameSettings);
+            }
+        }
+        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings });
     };
     Room.prototype.setupControlsListener = function () {
         var _this = this;
@@ -242,7 +266,7 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupStartGameListener = function () {
         var _this = this;
-        this.socket.once(shared_stuff_1.dts_start_game, function () {
+        this.socket.once(shared_stuff_1.mdts_start_game, function () {
             if (_this.players.length === 0) {
                 _this.socket.emit(shared_stuff_1.std_start_game_callback, {
                     message: "No players connected, cannot start game",
@@ -270,7 +294,7 @@ var Room = /** @class */ (function () {
     };
     // if game hasn't started, remove player from game
     Room.prototype.playerDisconnected = function (playerName, playerId) {
-        this.socket.emit("player-disconnected", { playerName: playerName });
+        this.socket.emit(shared_stuff_1.std_player_disconnected, { playerName: playerName });
         if (!this.gameStarted) {
             for (var i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's

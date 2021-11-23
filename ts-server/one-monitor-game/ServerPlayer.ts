@@ -2,7 +2,24 @@ import { Socket } from "socket.io"
 import { Room } from "./ServerGame"
 
 
-import { MobileControls, VehicleControls, IPlayerInfo, stm_player_finished, stm_game_finished, mts_game_data_info, mts_user_settings_changed, stm_game_starting, mts_controls, mts_ping_test, stm_ping_test_callback } from "../../public/src/shared-backend/shared-stuff"
+import {
+    MobileControls,
+    VehicleControls,
+    IPlayerInfo,
+    stm_player_finished,
+    stm_game_finished,
+    mts_game_data_info,
+    mts_user_settings_changed,
+    stmd_game_starting,
+    mts_controls,
+    mts_ping_test,
+    stm_ping_test_callback,
+    stm_desktop_disconnected,
+    stmd_game_settings_changed,
+    mts_connected_to_waiting_room,
+    mdts_game_settings_changed,
+    mdts_start_game
+} from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
 
@@ -42,7 +59,11 @@ export class Player {
         this.setSocket(socket)
     }
 
-
+    /**
+     * idea: turn off some of these listeners when the game has started TODO
+     * 
+     * @param newSocket Socket 
+     */
     setSocket(newSocket: Socket) {
         this.socket = newSocket
         this.setupControler()
@@ -53,8 +74,11 @@ export class Player {
         this.setupUserSettingsListener()
         this.setupReconnectListener()
         this.setupWaitingRoomListener()
+        this.setupGameSettingsListener()
+        this.setupGameStartedListener()
 
         this.setupPingListener()
+
     }
 
     setupPingListener() {
@@ -64,15 +88,38 @@ export class Player {
     }
 
     setupWaitingRoomListener() {
-        this.socket.on("in-waiting-room", () => {
+        this.socket.on(mts_connected_to_waiting_room, () => {
             if (this.game) {
                 this.game.alertWaitingRoom()
             }
         })
     }
 
+    setupGameStartedListener() {
+        this.socket.on(mdts_start_game, () => {
+            if (this.game && this.isLeader) {
+                this.game.startGameFromLeader()
+            } else if (!this.isLeader) {
+                console.log("NOT LEADER trying to start game")
+            }
+        })
+    }
+
+    setupGameSettingsListener() {
+        this.socket.on(mdts_game_settings_changed, (data: any) => {
+            if (!this.isLeader) {
+                console.log("not leader cannot change game settings")
+            } else {
+
+                if (this.game) {
+                    this.game.sendGameSettings(data.gameSettings)
+                }
+            }
+        })
+    }
+
     sendGameSettings(gameSettings: any) {
-        this.socket.emit("game-settings-changed", { gameSettings })
+        this.socket.emit(stmd_game_settings_changed, { gameSettings })
     }
 
     setupQuitGameListener() {
@@ -83,14 +130,14 @@ export class Player {
         })
     }
 
-    leaderStartsGame() {
-        if (this.game) {
-            this.game.startGame()
-        }
-    }
+
 
     setupLeaderStartGameListener() {
-        this.socket.once("leader-start-game", () => this.leaderStartsGame())
+        this.socket.once("leader-start-game", () => {
+            if (this.game) {
+                this.game.startGame()
+            }
+        })
     }
 
     setLeader() {
@@ -98,8 +145,8 @@ export class Player {
         this.setupLeaderStartGameListener()
     }
 
-    gameDisconnected() {
-
+    desktopDisconnected() {
+        this.socket.emit(stm_desktop_disconnected, {})
     }
 
     setGame(game: Room) {
@@ -160,7 +207,7 @@ export class Player {
     startGame() {
         this.setupControler()
         if (this.game) {
-            this.socket.emit(stm_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
+            this.socket.emit(stmd_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber })
         }
     }
 

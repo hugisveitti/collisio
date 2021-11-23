@@ -20,12 +20,18 @@ import {
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
+  dts_left_waiting_room,
   IPlayerInfo,
   mdts_players_in_room,
+  mts_connected_to_waiting_room,
   mts_player_connected,
+  std_player_disconnected,
   stmd_players_in_room_callback,
-  stm_game_starting,
+  stmd_waiting_room_alert,
+  stm_desktop_disconnected,
+  stmd_game_settings_changed,
   stm_player_connected_callback,
+  stmd_game_starting,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { ISocketCallback } from "../../utils/connectSocket";
@@ -33,7 +39,7 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import LoginComponent from "../LoginComponent";
 import BasicModal from "../modal/BasicModal";
-import { controlsRoomPath, frontPagePath } from "../Routes";
+import { controlsRoomPath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
@@ -127,38 +133,46 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       setUserLoading(false);
     }, 1000);
 
-    props.socket.on("waiting-room-alert", ({ players: _players }) => {
+    props.socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
       props.store.setPlayers(_players);
     });
 
-    props.socket.emit("in-waiting-room");
-    if (onMobile) {
-      props.socket.once(stm_game_starting, () => {
+    props.socket.on(stmd_game_starting, () => {
+      console.log("starting game");
+      if (onMobile) {
         history.push(controlsRoomPath);
-      });
+      } else {
+        history.push(gameRoomPath);
+      }
+    });
+
+    if (onMobile) {
+      props.socket.emit(mts_connected_to_waiting_room);
 
       getPlayersInRoom();
-      props.socket.on("game-settings-changed", (data) => {
+      props.socket.on(stmd_game_settings_changed, (data) => {
         props.store.setGameSettings(data.gameSettings);
       });
 
-      props.socket.on("game-disconnected", () => {
-        console.log("game disconnected was called");
+      props.socket.on(stm_desktop_disconnected, () => {
         toast.error("Game disconnected");
+        history.push(frontPagePath);
         /** go to front page? */
       });
     } else {
-      props.socket.on("player-disconnected", ({ playerName }) => {
+      props.socket.on(std_player_disconnected, ({ playerName }) => {
         toast.warn(`${playerName} disconnected from waiting room`);
       });
     }
 
     return () => {
       window.clearTimeout(userLoadingTimout);
-      props.socket.emit("left-waiting-room", {});
-      props.socket.off("game-settings-changed");
-      props.socket.off("waiting-room-alert");
-      props.socket.off("player-disconnected");
+      props.socket.emit(dts_left_waiting_room, {});
+      props.socket.off(stmd_game_starting);
+      props.socket.off(stm_desktop_disconnected);
+      props.socket.off(stmd_game_settings_changed);
+      props.socket.off(stmd_waiting_room_alert);
+      props.socket.off(std_player_disconnected);
       props.socket.off(stmd_players_in_room_callback);
       props.socket.off(stm_player_connected_callback);
     };

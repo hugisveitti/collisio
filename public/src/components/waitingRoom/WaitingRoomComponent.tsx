@@ -188,7 +188,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         />
       </Grid>
 
-      {!onMobile && (
+      {(!onMobile || props.store.player?.isLeader) && (
         <React.Fragment>
           <Grid item xs={12}>
             <Button

@@ -44,8 +44,5 @@ export const createSocket = (deviceType: string, callback: (socket: Socket) => v
 
     })
 
-    /** if user leaves the website */
-    window.onbeforeunload = () => {
-        socket.emit("quit-room")
-    }
+
 }

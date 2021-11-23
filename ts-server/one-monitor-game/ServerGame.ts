@@ -1,8 +1,34 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
-import { dts_create_room, dts_game_finished, dts_ping_test, dts_player_finished, dts_start_game, dts_vehicles_ready, IPlayerInfo, mdts_device_type, mdts_players_in_room, mts_player_connected, std_controls, std_game_data_info, std_ping_test_callback, std_room_created_callback, std_start_game_callback, std_user_settings_changed, stmd_players_in_room_callback, stmd_socket_ready, stm_game_starting, stm_player_connected_callback } from "../../public/src/shared-backend/shared-stuff";
-import { Player } from "./ServerPlayer"
-import TestRoom from "./TestRoom"
+import {
+    dts_create_room,
+    dts_game_finished,
+    mdts_game_settings_changed,
+    dts_left_waiting_room,
+    dts_ping_test,
+    dts_player_finished,
+    dts_vehicles_ready,
+    IPlayerInfo,
+    mdts_device_type,
+    mdts_players_in_room,
+    mts_player_connected,
+    std_controls,
+    std_game_data_info,
+    std_ping_test_callback,
+    std_player_disconnected,
+    std_room_created_callback,
+    std_start_game_callback,
+    std_user_settings_changed,
+    stmd_players_in_room_callback,
+    stmd_socket_ready,
+    stmd_waiting_room_alert,
+    stmd_game_starting,
+    stm_player_connected_callback,
+    stmd_game_settings_changed,
+    mdts_start_game
+} from "../../public/src/shared-backend/shared-stuff";
+import { Player } from "./ServerPlayer";
+import TestRoom from "./TestRoom";
 
 const successStatus = "success"
 const errorStatus = "error"
@@ -166,17 +192,6 @@ export class Room {
 
     }
 
-    setupLeftWaitingRoomListener() {
-        this.socket.on("left-waiting-room", () => {
-            /** if game hasnt started delete game */
-            if (!this.gameStarted) {
-                for (let player of this.players) {
-                    player.gameDisconnected()
-                }
-                this.deleteRoomCallback()
-            }
-        })
-    }
 
     setSocket(socket: Socket) {
         this.socket = socket
@@ -187,6 +202,30 @@ export class Room {
         this.setupGameFinishedListener()
         this.setupPingListener()
         this.setupVechilesReadyListener()
+        this.setupLeftWebsiteListener()
+    }
+
+
+    setupLeftWaitingRoomListener() {
+        this.socket.on(dts_left_waiting_room, () => {
+            /** if game hasnt started delete game */
+            if (!this.gameStarted) {
+                for (let player of this.players) {
+                    player.desktopDisconnected()
+                }
+                this.deleteRoomCallback()
+            }
+        })
+    }
+
+    setupLeftWebsiteListener() {
+
+        this.socket.on("disconnect", () => {
+            for (let player of this.players) {
+                player.desktopDisconnected()
+            }
+            this.deleteRoomCallback()
+        })
     }
 
     setupVechilesReadyListener() {
@@ -224,7 +263,7 @@ export class Room {
 
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
-                player.socket.emit(stm_game_starting)
+                player.socket.emit(stmd_game_starting)
             }
             return
         }
@@ -240,25 +279,38 @@ export class Room {
 
         player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
         player.socket.join(this.roomId)
-        player.socket.emit("room-connected", { roomId: this.roomId, isLeader: player.isLeader })
         this.alertWaitingRoom()
         if (this.gameStarted) {
             player.startGame()
         }
-
     }
 
     alertWaitingRoom() {
-        this.io.to(this.roomId).emit("waiting-room-alert", { players: this.getPlayersInfo() })
+        this.io.to(this.roomId).emit(stmd_waiting_room_alert, { players: this.getPlayersInfo() })
     }
 
     setupGameSettingsListener() {
-        this.socket.on("game-settings-changed", (data) => {
+        this.socket.on(mdts_game_settings_changed, (data: any) => {
             this.gameSettings = data.gameSettings
             for (let player of this.players) {
                 player.sendGameSettings(this.gameSettings)
             }
         })
+    }
+
+    startGameFromLeader() {
+        this.startGame()
+        this.socket.emit(stmd_game_starting)
+    }
+
+    sendGameSettings(gameSettings: any) {
+        this.gameSettings = gameSettings
+        for (let player of this.players) {
+            if (!player.isLeader) {
+                player.sendGameSettings(this.gameSettings)
+            }
+        }
+        this.socket.emit(stmd_game_settings_changed, { gameSettings })
     }
 
     setupControlsListener() {
@@ -285,7 +337,7 @@ export class Room {
     }
 
     setupStartGameListener() {
-        this.socket.once(dts_start_game, () => {
+        this.socket.once(mdts_start_game, () => {
             if (this.players.length === 0) {
                 this.socket.emit(std_start_game_callback, {
                     message: "No players connected, cannot start game",
@@ -316,7 +368,7 @@ export class Room {
 
     // if game hasn't started, remove player from game
     playerDisconnected(playerName: string, playerId: string) {
-        this.socket.emit("player-disconnected", { playerName })
+        this.socket.emit(std_player_disconnected, { playerName })
 
         if (!this.gameStarted) {
             for (let i = 0; i < this.players.length; i++) {

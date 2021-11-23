@@ -17,6 +17,11 @@ var Player = /** @class */ (function () {
         this.userSettings = undefined;
         this.setSocket(socket);
     }
+    /**
+     * idea: turn off some of these listeners when the game has started TODO
+     *
+     * @param newSocket Socket
+     */
     Player.prototype.setSocket = function (newSocket) {
         this.socket = newSocket;
         this.setupControler();
@@ -26,6 +31,8 @@ var Player = /** @class */ (function () {
         this.setupUserSettingsListener();
         this.setupReconnectListener();
         this.setupWaitingRoomListener();
+        this.setupGameSettingsListener();
+        this.setupGameStartedListener();
         this.setupPingListener();
     };
     Player.prototype.setupPingListener = function () {
@@ -36,14 +43,38 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.setupWaitingRoomListener = function () {
         var _this = this;
-        this.socket.on("in-waiting-room", function () {
+        this.socket.on(shared_stuff_1.mts_connected_to_waiting_room, function () {
             if (_this.game) {
                 _this.game.alertWaitingRoom();
             }
         });
     };
+    Player.prototype.setupGameStartedListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mdts_start_game, function () {
+            if (_this.game && _this.isLeader) {
+                _this.game.startGameFromLeader();
+            }
+            else if (!_this.isLeader) {
+                console.log("NOT LEADER trying to start game");
+            }
+        });
+    };
+    Player.prototype.setupGameSettingsListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (data) {
+            if (!_this.isLeader) {
+                console.log("not leader cannot change game settings");
+            }
+            else {
+                if (_this.game) {
+                    _this.game.sendGameSettings(data.gameSettings);
+                }
+            }
+        });
+    };
     Player.prototype.sendGameSettings = function (gameSettings) {
-        this.socket.emit("game-settings-changed", { gameSettings: gameSettings });
+        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings });
     };
     Player.prototype.setupQuitGameListener = function () {
         var _this = this;
@@ -53,20 +84,20 @@ var Player = /** @class */ (function () {
             }
         });
     };
-    Player.prototype.leaderStartsGame = function () {
-        if (this.game) {
-            this.game.startGame();
-        }
-    };
     Player.prototype.setupLeaderStartGameListener = function () {
         var _this = this;
-        this.socket.once("leader-start-game", function () { return _this.leaderStartsGame(); });
+        this.socket.once("leader-start-game", function () {
+            if (_this.game) {
+                _this.game.startGame();
+            }
+        });
     };
     Player.prototype.setLeader = function () {
         this.isLeader = true;
         this.setupLeaderStartGameListener();
     };
-    Player.prototype.gameDisconnected = function () {
+    Player.prototype.desktopDisconnected = function () {
+        this.socket.emit(shared_stuff_1.stm_desktop_disconnected, {});
     };
     Player.prototype.setGame = function (game) {
         var _this = this;
@@ -122,7 +153,7 @@ var Player = /** @class */ (function () {
     Player.prototype.startGame = function () {
         this.setupControler();
         if (this.game) {
-            this.socket.emit(shared_stuff_1.stm_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber });
+            this.socket.emit(shared_stuff_1.stmd_game_starting, { players: this.game.getPlayersInfo(), playerNumber: this.playerNumber });
         }
     };
     Player.prototype.setupPlayerInfoListener = function () {

@@ -139,9 +139,9 @@ export const stmd_players_in_room_callback = "stmd_players_in_room_callback"
 export const mts_player_connected = "mts_player_connected"
 export const stm_player_connected_callback = "stm_player_connected_callback"
 
-export const dts_start_game = "dts_start_game"
-export const std_start_game_callback = "std_start_game_callback"
-export const stm_game_starting = "stm_game_starting"
+export const mdts_start_game = "mdts_start_game"
+export const std_start_game_callback = "stmd_start_game_callback"
+export const stmd_game_starting = "stmd_game_starting"
 
 export const std_controls = "std_controls"
 export const mts_controls = "mts_controls"
@@ -171,3 +171,16 @@ export const std_ping_test_callback = "std_ping_test_callback"
 
 /** when vehicles are ready, stuff like settings can be sent */
 export const dts_vehicles_ready = "dts_vehicles_ready"
+
+
+
+/** connection stuff */
+export const dts_left_waiting_room = "dts_left_waiting_room"
+export const stm_desktop_disconnected = "stm_desktop_disconnected"
+export const std_player_disconnected = "std_player_disconnected"
+export const mts_connected_to_waiting_room = "mts_connected_to_waiting_room"
+export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
+
+
+export const mdts_game_settings_changed = "mdts_game_settings_changed"
+export const stmd_game_settings_changed = "stmd_game_settings_changed"

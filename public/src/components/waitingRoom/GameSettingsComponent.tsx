@@ -10,7 +10,7 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";
 import { defaultRaceTrack, defaultTagTrack } from "../../classes/Game";
@@ -18,9 +18,11 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
-import { IUserSettings } from "../../classes/User";
-import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
+import {
+  mdts_game_settings_changed,
+  stmd_game_settings_changed,
+} from "../../shared-backend/shared-stuff";
 import TrackSelect from "../inputs/TrackSelect";
 import { IStore } from "../store";
 import TagRulesComponent from "./TagRulesComponent";
@@ -33,6 +35,16 @@ interface IGameSettingsComponent {
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const history = useHistory();
+
+  useEffect(() => {
+    props.socket.on(stmd_game_settings_changed, (data) => {
+      console.log("game settings changed", data);
+      props.store.setGameSettings(data.gameSettings);
+    });
+    return () => {
+      props.socket.off(stmd_game_settings_changed);
+    };
+  }, []);
 
   const updateGameSettings = (key: keyof IGameSettings, value: any) => {
     const newGameSettings = { ...props.store.gameSettings };
@@ -51,7 +63,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
     props.store.setGameSettings(newGameSettings);
 
-    props.socket.emit("game-settings-changed", {
+    props.socket.emit(mdts_game_settings_changed, {
       gameSettings: newGameSettings,
     });
   };
@@ -121,8 +133,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Grid item xs={false} sm={4} xl={5} />
-                <Grid item xs={12} sm={3} xl={2}>
+                <Grid item xs={12}>
                   <TextField
                     label="No. of laps"
                     type="number"
@@ -135,7 +146,6 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={false} sm={4} xl={5} />
               </React.Fragment>
             )}
             <Grid item xs={12}>
