@@ -11,7 +11,6 @@ import {
 import QRCode from "qrcode";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IRoomInfo } from "../../classes/Game";
@@ -21,7 +20,6 @@ import {
   saveRoom,
   setDBUserSettings,
 } from "../../firebase/firebaseFunctions";
-import { basicColor } from "../../providers/theme";
 import {
   IPlayerInfo,
   playerInfoToPreGamePlayerInfo,
@@ -36,10 +34,11 @@ import {
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
-import { frontPagePath, gameRoomPath } from "../Routes";
+import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import PreGameSettingsComponent from "./PreGameSettingsComponent";
+import GameSettingsComponent from "./GameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 interface IWaitingRoomProps {
   socket: Socket;
@@ -66,7 +65,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           desktopId: user?.uid,
           desktopAuthenticated: !!user,
           roomId: props.roomId,
-          preGameSettings: props.store.preGameSettings,
+          gameSettings: props.store.gameSettings,
           players: props.store.players.map(playerInfoToPreGamePlayerInfo),
           date: new Date(),
         };
@@ -125,13 +124,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <Typography variant="h4">{roomId}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Button
-          variant="contained"
-          disableElevation
-          style={{ backgroundColor: basicColor }}
-        >
-          <Link to={frontPagePath}>Back to front page</Link>
-        </Button>
+        <ToFrontPageButton />
       </Grid>
       <Grid item xs={12}>
         <Typography component="span">
@@ -189,9 +182,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <WaitingRoomPlayerList
           players={props.store.players}
           playerId={props.store.player?.id}
-          trackName={props.store.preGameSettings.trackName}
-          numberOfLaps={props.store.preGameSettings.numberOfLaps}
-          gameType={props.store.preGameSettings.gameType}
+          trackName={props.store.gameSettings.trackName}
+          numberOfLaps={props.store.gameSettings.numberOfLaps}
+          gameType={props.store.gameSettings.gameType}
         />
       </Grid>
 
@@ -207,7 +200,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </Button>
           </Grid>
           <Divider variant="middle" style={{ margin: 15 }} />
-          <PreGameSettingsComponent
+          <GameSettingsComponent
             socket={props.socket}
             store={props.store}
             userId={user?.uid}

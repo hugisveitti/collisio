@@ -329,25 +329,33 @@ export class LowPolyVehicle implements IVehicle {
         this.stop()
         window.addEventListener("keydown", (e) => {
             if (e.key === "z") {
-                this.toggleEngineSound()
+                this.useEngineSound = !this.useEngineSound
+                this.toggleSound(this.useEngineSound)
 
             }
         })
     }
 
-    toggleEngineSound() {
-        if (!this.useEngineSound) return
+
+
+    toggleSound(useSound: boolean) {
+
         if (!this.engineSound) {
             console.warn("Engine sound not loaded")
             return
         }
+
+        if (useSound === this.engineSound.isPlaying) {
+            /** already doing what we want */
+            return
+        }
+
         if (!this.engineSound.isPlaying) {
             console.log("starting engine sound")
             this.engineSound.play()
 
         } else {
             console.log("stopping engine sound")
-
             this.engineSound.stop()
         }
     }

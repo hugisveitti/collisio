@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { defaultPreGameSettings } from "../classes/Game";
+import { defaultGameSettings } from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
 import GameRoom from "../components/gameRoom/GameRoom";
 // import GameRoom from "../components/GameRoom";
@@ -22,9 +22,7 @@ const TestContainer = () => {
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
-  const [preGameSettings, setPreGameSettings] = useState(
-    defaultPreGameSettings
-  );
+  const [gameSettings, setGameSettings] = useState(defaultGameSettings);
 
   const [canStartGame, setCanStartGame] = useState(true);
 
@@ -68,8 +66,8 @@ const TestContainer = () => {
     setPlayers,
     player,
     setPlayer,
-    preGameSettings,
-    setPreGameSettings,
+    gameSettings,
+    setGameSettings,
     userSettings,
     setUserSettings,
   } as IStore;

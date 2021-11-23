@@ -95,7 +95,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/base64-arraybuffer/lib/base64-arraybuffer.js":
 /*!*******************************************************************!*\
@@ -165,7 +165,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/clsx/dist/clsx.m.js":
 /*!******************************************!*\
@@ -178,7 +178,7 @@
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function () { return /* export default binding */ __WEBPACK_DEFAULT_EXPORT__; }
           /* harmony export */
-});
+        });
         function toVal(mix) {
           var k, y, str = '';
 
@@ -222,7 +222,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/component-emitter/index.js":
 /*!*************************************************!*\
@@ -408,7 +408,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/globalThis.browser.js":
 /*!*****************************************************************!*\
@@ -428,7 +428,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/index.js":
 /*!****************************************************!*\
@@ -453,7 +453,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/socket.js":
 /*!*****************************************************!*\
@@ -1147,7 +1147,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transport.js":
 /*!********************************************************!*\
@@ -1277,7 +1277,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/index.js":
 /*!***************************************************************!*\
@@ -1333,7 +1333,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling-jsonp.js":
 /*!***********************************************************************!*\
@@ -1539,7 +1539,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling-xhr.js":
 /*!*********************************************************************!*\
@@ -1882,7 +1882,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling.js":
 /*!*****************************************************************!*\
@@ -2098,7 +2098,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js":
 /*!***************************************************************************************!*\
@@ -2126,7 +2126,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/transports/websocket.js":
 /*!*******************************************************************!*\
@@ -2393,7 +2393,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/util.js":
 /*!***************************************************!*\
@@ -2412,7 +2412,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/lib/xmlhttprequest.js":
 /*!*************************************************************!*\
@@ -2463,7 +2463,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/node_modules/debug/src/browser.js":
 /*!*************************************************************************!*\
@@ -2743,7 +2743,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/node_modules/debug/src/common.js":
 /*!************************************************************************!*\
@@ -3028,7 +3028,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-client/node_modules/ms/index.js":
 /*!****************************************************************!*\
@@ -3201,7 +3201,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-parser/lib/commons.js":
 /*!******************************************************!*\
@@ -3233,7 +3233,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-parser/lib/decodePacket.browser.js":
 /*!*******************************************************************!*\
@@ -3301,7 +3301,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-parser/lib/encodePacket.browser.js":
 /*!*******************************************************************!*\
@@ -3358,7 +3358,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/engine.io-parser/lib/index.js":
 /*!****************************************************!*\
@@ -3411,7 +3411,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/has-cors/index.js":
 /*!****************************************!*\
@@ -3439,7 +3439,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/history/esm/history.js":
 /*!*********************************************!*\
@@ -3458,7 +3458,7 @@
 /* harmony export */   "parsePath": function () { return /* binding */ parsePath; },
 /* harmony export */   "createPath": function () { return /* binding */ createPath; }
           /* harmony export */
-});
+        });
 /* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
 /* harmony import */ var resolve_pathname__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! resolve-pathname */ "./node_modules/resolve-pathname/esm/resolve-pathname.js");
 /* harmony import */ var value_equal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! value-equal */ "./node_modules/value-equal/esm/value-equal.js");
@@ -4386,7 +4386,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js":
 /*!**********************************************************************************!*\
@@ -4501,7 +4501,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/mini-create-react-context/dist/esm/index.js":
 /*!******************************************************************!*\
@@ -4695,7 +4695,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/object-assign/index.js":
 /*!*********************************************!*\
@@ -4797,7 +4797,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/parseqs/index.js":
 /*!***************************************!*\
@@ -4845,7 +4845,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/parseuri/index.js":
 /*!****************************************!*\
@@ -4924,7 +4924,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/path-to-regexp/index.js":
 /*!**********************************************!*\
@@ -5361,7 +5361,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/path-to-regexp/node_modules/isarray/index.js":
 /*!*******************************************************************!*\
@@ -5375,7 +5375,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/prop-types/checkPropTypes.js":
 /*!***************************************************!*\
@@ -5489,7 +5489,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/prop-types/factoryWithTypeCheckers.js":
 /*!************************************************************!*\
@@ -6092,7 +6092,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/prop-types/index.js":
 /*!******************************************!*\
@@ -6118,7 +6118,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/prop-types/lib/ReactPropTypesSecret.js":
 /*!*************************************************************!*\
@@ -6142,7 +6142,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-dom/cjs/react-dom.development.js":
 /*!*************************************************************!*\
@@ -32411,7 +32411,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-dom/index.js":
 /*!*****************************************!*\
@@ -32456,7 +32456,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-is/cjs/react-is.development.js":
 /*!***********************************************************!*\
@@ -32649,7 +32649,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-is/index.js":
 /*!****************************************!*\
@@ -32666,7 +32666,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-router-dom/esm/react-router-dom.js":
 /*!***************************************************************!*\
@@ -32696,7 +32696,7 @@
 /* harmony export */   "Link": function () { return /* binding */ Link; },
 /* harmony export */   "NavLink": function () { return /* binding */ NavLink; }
           /* harmony export */
-});
+        });
 /* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
@@ -33029,7 +33029,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-router/esm/react-router.js":
 /*!*******************************************************!*\
@@ -33057,7 +33057,7 @@
 /* harmony export */   "useRouteMatch": function () { return /* binding */ useRouteMatch; },
 /* harmony export */   "withRouter": function () { return /* binding */ withRouter; }
           /* harmony export */
-});
+        });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
@@ -33826,7 +33826,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react-toastify/dist/react-toastify.esm.js":
 /*!****************************************************************!*\
@@ -33849,7 +33849,7 @@
 /* harmony export */   "useToast": function () { return /* binding */ useToast; },
 /* harmony export */   "useToastContainer": function () { return /* binding */ useToastContainer; }
           /* harmony export */
-});
+        });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
@@ -35296,7 +35296,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react/cjs/react.development.js":
 /*!*****************************************************!*\
@@ -37641,7 +37641,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/react/index.js":
 /*!*************************************!*\
@@ -37658,7 +37658,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/resolve-pathname/esm/resolve-pathname.js":
 /*!***************************************************************!*\
@@ -37746,7 +37746,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/scheduler/cjs/scheduler-tracing.development.js":
 /*!*********************************************************************!*\
@@ -38105,7 +38105,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/scheduler/cjs/scheduler.development.js":
 /*!*************************************************************!*\
@@ -38763,7 +38763,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/scheduler/index.js":
 /*!*****************************************!*\
@@ -38780,7 +38780,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/scheduler/tracing.js":
 /*!*******************************************!*\
@@ -38797,7 +38797,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/node_modules/debug/src/browser.js":
 /*!*************************************************************************!*\
@@ -39077,7 +39077,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/node_modules/debug/src/common.js":
 /*!************************************************************************!*\
@@ -39362,7 +39362,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/node_modules/ms/index.js":
 /*!****************************************************************!*\
@@ -39535,7 +39535,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/dist/binary.js":
 /*!******************************************************!*\
@@ -39627,7 +39627,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/dist/index.js":
 /*!*****************************************************!*\
@@ -39919,7 +39919,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/dist/is-binary.js":
 /*!*********************************************************!*\
@@ -39986,7 +39986,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/node_modules/debug/src/browser.js":
 /*!*************************************************************************!*\
@@ -40266,7 +40266,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/node_modules/debug/src/common.js":
 /*!************************************************************************!*\
@@ -40551,7 +40551,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-parser/node_modules/ms/index.js":
 /*!****************************************************************!*\
@@ -40724,7 +40724,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/tiny-invariant/dist/tiny-invariant.esm.js":
 /*!****************************************************************!*\
@@ -40750,7 +40750,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/tiny-warning/dist/tiny-warning.esm.js":
 /*!************************************************************!*\
@@ -40783,7 +40783,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/classes/Game.ts":
 /*!*****************************!*\
@@ -40794,8 +40794,8 @@
         "use strict";
 
         Object.defineProperty(exports, "__esModule", ({ value: true }));
-        exports.defaultPreGameSettings = void 0;
-        exports.defaultPreGameSettings = {
+        exports.defaultGameSettings = void 0;
+        exports.defaultGameSettings = {
           ballRadius: 1,
           typeOfGame: "race",
           numberOfLaps: 3,
@@ -40804,7 +40804,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/classes/User.ts":
 /*!*****************************!*\
@@ -40837,7 +40837,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/test.tsx":
 /*!**********************!*\
@@ -40866,7 +40866,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/testMode/TestContainer.tsx":
 /*!****************************************!*\
@@ -40908,7 +40908,7 @@
           const [players, setPlayers] = react_1.useState([]);
           const [player, setPlayer] = react_1.useState(undefined);
           const [userSettings, setUserSettings] = react_1.useState(User_1.defaultUserSettings);
-          const [gameSettings, setGameSettings] = react_1.useState(Game_1.defaultPreGameSettings);
+          const [gameSettings, setGameSettings] = react_1.useState(Game_1.defaultGameSettings);
           const deviceType = settings_1.getDeviceType();
           react_1.useEffect(() => {
             const newSocket = connectSocket_1.createSocket(deviceType);
@@ -40948,7 +40948,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/utils/ControlsClasses.ts":
 /*!**************************************!*\
@@ -41024,7 +41024,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/utils/connectSocket.ts":
 /*!************************************!*\
@@ -41066,7 +41066,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./src/utils/settings.ts":
 /*!*******************************!*\
@@ -41116,7 +41116,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/value-equal/esm/value-equal.js":
 /*!*****************************************************!*\
@@ -41165,7 +41165,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/yeast/index.js":
 /*!*************************************!*\
@@ -41245,7 +41245,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/index.js":
 /*!******************************************************!*\
@@ -41328,7 +41328,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/manager.js":
 /*!********************************************************!*\
@@ -41715,7 +41715,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/on.js":
 /*!***************************************************!*\
@@ -41737,7 +41737,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/socket.js":
 /*!*******************************************************!*\
@@ -42209,7 +42209,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/typed-events.js":
 /*!*************************************************************!*\
@@ -42293,7 +42293,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/socket.io-client/build/url.js":
 /*!****************************************************!*\
@@ -42371,7 +42371,7 @@
 
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/@babel/runtime/helpers/esm/extends.js":
 /*!************************************************************!*\
@@ -42384,7 +42384,7 @@
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function () { return /* binding */ _extends; }
           /* harmony export */
-});
+        });
         function _extends() {
           _extends = Object.assign || function (target) {
             for (var i = 1; i < arguments.length; i++) {
@@ -42404,7 +42404,7 @@
         }
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":
 /*!******************************************************************!*\
@@ -42417,7 +42417,7 @@
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function () { return /* binding */ _inheritsLoose; }
           /* harmony export */
-});
+        });
 /* harmony import */ var _setPrototypeOf_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./setPrototypeOf.js */ "./node_modules/@babel/runtime/helpers/esm/setPrototypeOf.js");
 
         function _inheritsLoose(subClass, superClass) {
@@ -42427,7 +42427,7 @@
         }
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js":
 /*!*********************************************************************************!*\
@@ -42440,7 +42440,7 @@
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function () { return /* binding */ _objectWithoutPropertiesLoose; }
           /* harmony export */
-});
+        });
         function _objectWithoutPropertiesLoose(source, excluded) {
           if (source == null) return {};
           var target = {};
@@ -42457,7 +42457,7 @@
         }
 
         /***/
-}),
+      }),
 
 /***/ "./node_modules/@babel/runtime/helpers/esm/setPrototypeOf.js":
 /*!*******************************************************************!*\
@@ -42470,7 +42470,7 @@
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function () { return /* binding */ _setPrototypeOf; }
           /* harmony export */
-});
+        });
         function _setPrototypeOf(o, p) {
           _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
             o.__proto__ = p;
@@ -42481,10 +42481,10 @@
         }
 
         /***/
-})
+      })
 
     /******/
-});
+  });
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -42496,14 +42496,14 @@
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
       /******/
-}
+    }
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			// no module.id needed
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
       /******/
-};
+    };
 /******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
@@ -42511,7 +42511,7 @@
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
     /******/
-}
+  }
 /******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
@@ -42524,9 +42524,9 @@
 /******/ 			__webpack_require__.d(getter, { a: getter });
 /******/ 			return getter;
       /******/
-};
+    };
     /******/
-}();
+  }();
 /******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	!function () {
@@ -42536,13 +42536,13 @@
 /******/ 				if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
           /******/
-}
+        }
         /******/
-}
+      }
       /******/
-};
+    };
     /******/
-}();
+  }();
 /******/
 /******/ 	/* webpack/runtime/global */
 /******/ 	!function () {
@@ -42551,20 +42551,20 @@
 /******/ 			try {
 /******/ 				return this || new Function('return this')();
         /******/
-} catch (e) {
+      } catch (e) {
 /******/ 				if (typeof window === 'object') return window;
         /******/
-}
+      }
       /******/
-})();
+    })();
     /******/
-}();
+  }();
 /******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	!function () {
 /******/ 		__webpack_require__.o = function (obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
     /******/
-}();
+  }();
 /******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	!function () {
@@ -42573,12 +42573,12 @@
 /******/ 			if (typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
         /******/
-}
+      }
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
       /******/
-};
+    };
     /******/
-}();
+  }();
 /******/
 /************************************************************************/
 /******/

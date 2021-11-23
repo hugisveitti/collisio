@@ -1,4 +1,5 @@
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
+import { IGameSettings } from "./localGameSettings";
 
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
@@ -62,21 +63,7 @@ export interface IPlayerConnection {
 }
 
 
-export interface IPreGameSettings {
-    ballRadius: number
-    gameType: GameType
-    numberOfLaps: number
-    trackName: TrackName
-    tagGameLength: number
-}
 
-export const defaultPreGameSettings: IPreGameSettings = {
-    ballRadius: 1,
-    gameType: "race",
-    numberOfLaps: 2,
-    trackName: "f1-track",
-    tagGameLength: 2
-}
 
 // info about individual players
 export interface IEndOfRaceInfoPlayer {
@@ -144,7 +131,7 @@ export interface IScoreInfo {
 export interface IRoomInfo {
     roomId: string
     players: IPreGamePlayerInfo[]
-    preGameSettings: IPreGameSettings
+    gameSettings: IGameSettings
     desktopId: string
     desktopAuthenticated: boolean
     date: Date

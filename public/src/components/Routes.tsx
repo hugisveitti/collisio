@@ -2,7 +2,10 @@ import { CircularProgress } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { defaultPreGameSettings } from "../classes/Game";
+import {
+  defaultGameSettings,
+  getAllLocalGameSettings,
+} from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
 import {
   getDBUserSettings,
@@ -19,11 +22,7 @@ import {
   fakePlayer4,
 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
-import {
-  getDeviceType,
-  inTestMode,
-  testPreGameSettings,
-} from "../utils/settings";
+import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import BuyPremiumComponent from "./BuyPremiumComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
@@ -53,8 +52,8 @@ const Routes = () => {
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
-  const [preGameSettings, setPreGameSettings] = useState(
-    inTestMode ? testPreGameSettings : defaultPreGameSettings
+  const [gameSettings, setGameSettings] = useState(
+    inTestMode ? testGameSettings : defaultGameSettings
   );
   const deviceType = getDeviceType();
 
@@ -68,18 +67,18 @@ const Routes = () => {
     }
   }, []);
 
-  const store = {
+  const store: IStore = {
     roomId,
     setRoomId,
     players,
     setPlayers,
     player,
     setPlayer,
-    preGameSettings,
-    setPreGameSettings,
     userSettings,
     setUserSettings,
-  } as IStore;
+    gameSettings,
+    setGameSettings,
+  };
 
   const user = useContext(UserContext);
   useEffect(() => {
@@ -98,6 +97,11 @@ const Routes = () => {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    const _gameSettings = getAllLocalGameSettings();
+    store.setGameSettings(_gameSettings);
+  }, []);
 
   // possibly load the socket in the appContainer since not everything needs a socket
   if (!socket)

@@ -1,4 +1,5 @@
-import { IPreGameSettings } from "../classes/Game";
+
+import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
 
@@ -10,8 +11,8 @@ export interface IStore {
     setPlayers: React.Dispatch<React.SetStateAction<IPlayerInfo[]>>
     player: IPlayerInfo
     setPlayer: React.Dispatch<React.SetStateAction<IPlayerInfo>>
-    preGameSettings: IPreGameSettings
-    setPreGameSettings: React.Dispatch<React.SetStateAction<IPreGameSettings>>
+    gameSettings: IGameSettings
+    setGameSettings: React.Dispatch<React.SetStateAction<IGameSettings>>
     userSettings: IUserSettings
     setUserSettings: React.Dispatch<React.SetStateAction<IUserSettings>>
 }

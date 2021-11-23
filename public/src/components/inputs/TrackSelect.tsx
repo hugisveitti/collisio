@@ -42,6 +42,7 @@ interface ITrackSelect {
   excludedTracks: TrackName[];
   onChange: (trackName: TrackName) => void;
   value: TrackName;
+  showMapPreview: boolean;
 }
 
 const TrackSelect = (props: ITrackSelect) => {
@@ -81,23 +82,27 @@ const TrackSelect = (props: ITrackSelect) => {
           ))}
         </Select>
       </FormControl>
-      <br />
-      <Button
-        style={{ marginTop: 10 }}
-        variant="outlined"
-        onClick={() => setShowPreview(!showPreview)}
-        startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
-      >
-        Map preview
-      </Button>
+      {props.showMapPreview && (
+        <>
+          <br />
+          <Button
+            style={{ marginTop: 10 }}
+            variant="outlined"
+            onClick={() => setShowPreview(!showPreview)}
+            startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
+          >
+            Map preview
+          </Button>
 
-      <Collapse in={showPreview} style={{ marginTop: 10 }}>
-        {trackImage ? (
-          <img style={{ maxWidth: "100%" }} src={trackImage} />
-        ) : (
-          <Typography>No preview available</Typography>
-        )}
-      </Collapse>
+          <Collapse in={showPreview} style={{ marginTop: 10 }}>
+            {trackImage ? (
+              <img style={{ maxWidth: "100%" }} src={trackImage} />
+            ) : (
+              <Typography>No preview available</Typography>
+            )}
+          </Collapse>
+        </>
+      )}
     </React.Fragment>
   );
 };

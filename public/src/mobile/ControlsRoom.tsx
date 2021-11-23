@@ -1,4 +1,3 @@
-import { Modal } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
@@ -22,11 +21,9 @@ import {
 } from "../shared-backend/shared-stuff";
 import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
 import { inTestMode, isIphone } from "../utils/settings";
-import ControllerSettingsComponent, {
-  invertedControllerKey,
-} from "./ControllerSettingsComponent";
-import "./ControlsRoom.css";
+import { invertedControllerKey } from "./ControllerSettingsComponent";
 import ControllerSettingsModal from "./ControllerSettingsModal";
+import "./ControlsRoom.css";
 
 interface IControlsRoomProps {
   socket: Socket;
@@ -201,8 +198,25 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     controller[key] = b;
   };
 
-  const btnSize = screen.availWidth < 350 ? 120 : 150;
-  const utilBtnSize = screen.availWidth < 350 ? 60 : 90;
+  const screenHeight = screen.availHeight;
+  const screenWidth = screen.availWidth;
+  console.log("screen height", screenHeight);
+  console.log("screen width", screenWidth);
+  console.log("screen2 height", screen.height);
+  console.log("screen2 width", screen.width);
+
+  const btnSize = screenWidth < 350 ? 120 : 150;
+  const utilBtnSize = screenWidth < 350 ? 60 : 90;
+
+  const getSteeringDirection = () => {
+    if (controller.beta < 0) {
+      return "Right";
+    }
+    if (controller.beta > 0) {
+      return "Left";
+    }
+    return "Straight";
+  };
 
   const btnSizeStyle: React.CSSProperties = {
     width: btnSize,
@@ -230,12 +244,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     ? {
         ...rotateText,
         left: btnSize + 45,
-        top: screen.availHeight / 2 - btnSize / 2,
+        top: screenHeight / 2 - btnSize / 2,
       }
-    : { left: screen.availWidth / 2 - btnSize / 2, top: 145 };
+    : { left: screenWidth / 2 - btnSize / 2, top: 145 };
   const resetStyles = isPortrait
-    ? { ...rotateText, left: 35, top: screen.availHeight / 2 - btnSize / 2 }
-    : { left: screen.availWidth / 2 - btnSize / 2, top: 35 };
+    ? { ...rotateText, left: 35, top: screenHeight / 2 - btnSize / 2 }
+    : { left: screenWidth / 2 - btnSize / 2, top: 35 };
 
   const infoStyles = isPortrait
     ? {
@@ -327,6 +341,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         Gamma:{orientation.gamma.toFixed(0)}
         <br />
         Alpha:{orientation.alpha.toFixed(0)}
+        <br />
+        {getSteeringDirection()}
       </div>
 
       <div

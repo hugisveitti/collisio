@@ -1,16 +1,15 @@
 import { CollisionEvent } from "@enable3d/common/dist/types"
 import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D, THREE } from "enable3d"
+import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
-import { allTrackNames, defaultPreGameSettings, IPreGameSettings } from "../classes/Game"
-import { IUserGameSettings } from "../classes/User"
+import { allTrackNames } from "../classes/Game"
+import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { IGameScene } from "../game/IGameScene"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
@@ -42,7 +41,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     socket!: Socket
     vehicleControls!: VehicleControls
     // course!: RaceCourse
-    gameSettings: IPreGameSettings
+    gameSettings: IGameSettings
     raceStarted: boolean
     checkpointCrossed: boolean
     goalCrossed: boolean
@@ -89,7 +88,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.bestLapTime = 10000
         this.canStartUpdate = false
 
-        this.gameSettings = defaultPreGameSettings
+        this.gameSettings = defaultGameSettings
 
         this.currentLaptime = 0
         this.timeStarted = 0
@@ -625,7 +624,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 
 
 
-    setGameSettings(newGameSettings: IPreGameSettings, escPress: () => void) {
+    setTestGameSettings(newGameSettings: IGameSettings, escPress: () => void) {
         this.gameSettings = newGameSettings
         this.escPress = escPress
     }
@@ -735,7 +734,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         }
     }
 
-    setUserGameSettings(userGameSettings: IUserGameSettings) {
+    setGameSettings(userGameSettings: IGameSettings) {
         for (let key of Object.keys(userGameSettings)) {
             if (userGameSettings[key] !== undefined) {
                 this[key] = userGameSettings[key]
@@ -755,7 +754,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.gameTime.restart()
     }
 
-    changeVehicle(vehicleType: VehicleType) {
+    changeVehicle(vehicleNumber: number, vehicleType: VehicleType) {
 
         window.localStorage.setItem("vehicleType", vehicleType)
         this.vehicleType = vehicleType
@@ -776,7 +775,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 }
 
 
-export const startLowPolyTest = (socket: Socket, gameSettings: IPreGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
+export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
     const config = { scenes: [LowPolyTestScene], antialias: true, randomStuff: "hello" }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
@@ -787,7 +786,7 @@ export const startLowPolyTest = (socket: Socket, gameSettings: IPreGameSettings,
         // hacky way to get the project's scene
         gameObject.setSocket(socket);
         // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
-        gameObject.setGameSettings(gameSettings, escPress);
+        gameObject.setTestGameSettings(gameSettings, escPress);
         callback(gameObject)
 
         return project

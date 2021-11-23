@@ -1,5 +1,6 @@
 import { Modal } from "@mui/material";
 import React from "react";
+import { modalBackgroundColor } from "../../providers/theme";
 
 interface IBasicDesktopModal {
   open: boolean;
@@ -17,8 +18,8 @@ const BasicDesktopModal = (props: IBasicDesktopModal) => {
           top: "25%",
           left: "50%",
           width: "75%",
-          backgroundColor: "#eeebdf",
-          border: "2px solid #000",
+          backgroundColor: modalBackgroundColor, //"#eeebdf",
+          border: 0, //"2px solid #000",
           padding: 10,
           outline: 0,
         }}

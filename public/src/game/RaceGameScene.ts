@@ -60,7 +60,7 @@ export class RaceGameScene extends GameScene {
     }
 
     async create() {
-        this.course = new RaceCourse(this, this.preGameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             this.courseLoaded = true
             const createVehiclePromise = new Promise((resolve, reject) => {
@@ -73,7 +73,7 @@ export class RaceGameScene extends GameScene {
 
                 // adds font to vehicles, which displays names
                 for (let i = 0; i < this.players.length; i++) {
-                    this.gameTimers.push(new GameTime(this.preGameSettings.numberOfLaps))
+                    this.gameTimers.push(new GameTime(this.gameSettings.numberOfLaps))
                 }
                 this.loadFont()
                 this.createViews()
@@ -152,7 +152,7 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
 
         for (let i = 0; i < this.players.length; i++) {
-            this.gameTimers.push(new GameTime(this.preGameSettings.numberOfLaps))
+            this.gameTimers.push(new GameTime(this.gameSettings.numberOfLaps))
         }
     }
 
@@ -255,7 +255,7 @@ export class RaceGameScene extends GameScene {
                 currentLapTime: cLapTime,
                 totalTime,
                 lapNumber: this.gameTimers[i].lapNumber,
-                numberOfLaps: this.preGameSettings.numberOfLaps
+                numberOfLaps: this.gameSettings.numberOfLaps
             }
             timeInfos.push(timeInfoObject)
         }
@@ -299,11 +299,11 @@ export class RaceGameScene extends GameScene {
     prepareEndOfRacePlayer(i: number) {
         const playerData: IEndOfRaceInfoPlayer = {
             totalTime: this.gameTimers[i].getTotalTime(),
-            numberOfLaps: this.preGameSettings.numberOfLaps,
+            numberOfLaps: this.gameSettings.numberOfLaps,
             playerName: this.players[i].playerName,
             playerId: this.players[i].id,
             bestLapTime: this.gameTimers[i].getBestLapTime(),
-            trackName: this.preGameSettings.trackName,
+            trackName: this.gameSettings.trackName,
             lapTimes: this.gameTimers[i].getLapTimes(),
             gameId: this.gameId,
             date: new Date(),
@@ -342,8 +342,8 @@ export class RaceGameScene extends GameScene {
 
         const endOfRaceInfo: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
-            numberOfLaps: this.preGameSettings.numberOfLaps,
-            trackName: this.preGameSettings.trackName,
+            numberOfLaps: this.gameSettings.numberOfLaps,
+            trackName: this.gameSettings.trackName,
             gameId: this.gameId,
             roomId: this.roomId,
             date: new Date()
@@ -359,7 +359,7 @@ export class RaceGameScene extends GameScene {
 }
 
 
-// export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: RaceGameScene) => void) => {
+// export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: RaceGameScene) => void) => {
 //     const config = { scenes: [RaceGameScene], antialias: true }
 //     PhysicsLoader("/ammo", () => {
 //         const project = new Project(config)
@@ -371,7 +371,7 @@ export class RaceGameScene extends GameScene {
 //         gameObject.setSocket(socket);
 //         gameObject.setPlayers(players);
 //         gameObject.setGameRoomActions(gameRoomActions)
-//         gameObject.setPreGameSettings(gameSettings, roomId);
+//         gameObject.setGameSettings(gameSettings, roomId);
 //         gameObject.setUserGameSettings(userGameSettings);
 //         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
 //         callback(gameObject)

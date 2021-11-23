@@ -3,33 +3,22 @@ import {
   Button,
   CircularProgress,
   Grid,
-  Modal,
   TextField,
   Typography,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-import { v4 as uuid } from "uuid";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
+import { v4 as uuid } from "uuid";
 import { IPlayerConnection } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
-import { inputBackgroundColor } from "../../providers/theme";
-import { UserContext } from "../../providers/UserProvider";
-import { ISocketCallback } from "../../utils/connectSocket";
-import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
-import LoginComponent from "../LoginComponent";
-import { frontPagePath, controlsRoomPath } from "../Routes";
-import { IStore } from "../store";
-import WaitingRoomComponent from "./WaitingRoomComponent";
-import "../../styles/main.css";
 import {
   addToAvailableRooms,
   removeFromAvailableRooms,
 } from "../../firebase/firebaseFunctions";
-import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
-import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
-import BasicModal from "../modal/BasicModal";
+import { inputBackgroundColor } from "../../providers/theme";
+import { UserContext } from "../../providers/UserProvider";
 import {
   IPlayerInfo,
   mdts_players_in_room,
@@ -38,6 +27,16 @@ import {
   stm_game_starting,
   stm_player_connected_callback,
 } from "../../shared-backend/shared-stuff";
+import "../../styles/main.css";
+import { ISocketCallback } from "../../utils/connectSocket";
+import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
+import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
+import LoginComponent from "../LoginComponent";
+import BasicModal from "../modal/BasicModal";
+import { controlsRoomPath, frontPagePath } from "../Routes";
+import { IStore } from "../store";
+import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
+import WaitingRoomComponent from "./WaitingRoomComponent";
 
 interface WaitParamType {
   roomId: string;
@@ -140,7 +139,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       getPlayersInRoom();
       props.socket.on("game-settings-changed", (data) => {
-        props.store.setPreGameSettings(data.gameSettings);
+        props.store.setGameSettings(data.gameSettings);
       });
 
       props.socket.on("game-disconnected", () => {
@@ -176,11 +175,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.store.setPlayer(newPlayer);
       sendPlayerInfoChanged(props.socket, newPlayer);
     }
-
-    if (props.store.userSettings.preGameSettings && !onMobile) {
-      props.store.setPreGameSettings(props.store.userSettings.preGameSettings);
-    }
   }, [props.store.userSettings]);
+
+  useEffect(() => {
+    if (props.store.gameSettings && !onMobile) {
+      props.store.setGameSettings(props.store.gameSettings);
+    }
+  }, [props.store.gameSettings]);
 
   useEffect(() => {
     if (!onMobile && user && props.store.roomId) {

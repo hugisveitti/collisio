@@ -1,5 +1,5 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
-import { defaultPreGameSettings, IPreGameSettings } from "./Game"
+import { defaultGameSettings, IGameSettings } from "./localGameSettings"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3
@@ -35,26 +35,14 @@ export const defaultVehicleSettings = {
     vehicleType: "normal"
 } as IVehicleSettings
 
-export interface IUserGameSettings {
-    useSound: boolean
-    useShadows: boolean
-}
 
-const defaultUserGameSettings: IUserGameSettings = {
-    useShadows: false,
-    useSound: true,
-}
 
 export interface IUserSettings {
     vehicleSettings: IVehicleSettings,
-    userGameSettings: IUserGameSettings
-    preGameSettings: IPreGameSettings
 }
 
 
 
 export const defaultUserSettings = {
     vehicleSettings: defaultVehicleSettings,
-    userGameSettings: defaultUserGameSettings,
-    preGameSettings: defaultPreGameSettings
 } as IUserSettings

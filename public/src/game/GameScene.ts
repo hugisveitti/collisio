@@ -4,8 +4,9 @@ import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Howl } from "howler";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
-import { defaultPreGameSettings, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPreGameSettings, IScoreInfo } from "../classes/Game";
-import { IUserGameSettings, IUserSettings } from "../classes/User";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
+import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
+import { IUserSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { addControls } from "../utils/controls";
@@ -79,7 +80,7 @@ export class GameScene extends Scene3D implements IGameScene {
     players: IPlayerInfo[]
     vehicles: IVehicle[]
     font: THREE.Font
-    preGameSettings: IPreGameSettings
+    gameSettings: IGameSettings
     useSound: boolean
     useShadows: boolean
     pLight: THREE.PointLight
@@ -118,7 +119,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this._everythingReady = false
         this.gameStarted = false
         this.gameId = uuid()
-        this.preGameSettings = defaultPreGameSettings
+        this.gameSettings = defaultGameSettings
         this.importantInfoDiv = document.createElement("div")
 
         this.importantInfoDiv.setAttribute("id", "important-info")
@@ -553,31 +554,34 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
 
-
-    setPreGameSettings(preGameSettings: IPreGameSettings, roomId: string) {
-        this.preGameSettings = preGameSettings
-        this.roomId = roomId
-    }
-
     setGameRoomActions(gameRoomActions: IGameRoomActions) {
         this.gameRoomActions = gameRoomActions
     }
 
-    setUserGameSettings(userGameSettings: IUserGameSettings) {
-        for (let key of Object.keys(userGameSettings)) {
-            if (userGameSettings[key] !== undefined) {
-                this[key] = userGameSettings[key]
+    setGameSettings(gameSettings: IGameSettings) {
+        this.gameSettings = gameSettings
+        for (let key of Object.keys(gameSettings)) {
+            if (gameSettings[key] !== undefined) {
+                this[key] = gameSettings[key]
             }
         }
         if (this.pLight && this.course) {
             this.pLight.castShadow = this.useShadows
-            this.pLight.shadow.bias = 0.01
+            this.pLight.shadow.bias = 0.1
             this.course.toggleShadows(this.useShadows)
         }
 
+        this.toggleUseSound()
+
+    }
+
+    toggleUseSound() {
         if (!this.useSound) {
             gameSong.stop()
             this.songIsPlaying = false
+            for (let vehicle of this.vehicles) {
+                vehicle.toggleSound(this.useSound)
+            }
         } else {
             this.startGameSong()
         }
@@ -740,7 +744,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 }
 
-export const startGame = (SceneClass: typeof GameScene, socket: Socket, players: IPlayerInfo[], gameSettings: IPreGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: GameScene) => void) => {
+export const startGame = (SceneClass: typeof GameScene, socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: GameScene) => void) => {
     const config = { scenes: [SceneClass], antialias: true }
     PhysicsLoader("/ammo", () => {
         const project = new Project(config)
@@ -752,8 +756,8 @@ export const startGame = (SceneClass: typeof GameScene, socket: Socket, players:
         gameObject.setSocket(socket);
         gameObject.setPlayers(players);
         gameObject.setGameRoomActions(gameRoomActions)
-        gameObject.setPreGameSettings(gameSettings, roomId);
-        gameObject.setUserGameSettings(userGameSettings);
+        gameObject.roomId = roomId
+        gameObject.setGameSettings(gameSettings);
         callback(gameObject)
 
         return project

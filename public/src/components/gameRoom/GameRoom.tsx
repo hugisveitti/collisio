@@ -88,7 +88,7 @@ const GameRoom = (props: IGameRoom) => {
     if (props.useTestCourse) {
       return startLowPolyTest(
         props.socket,
-        props.store.preGameSettings,
+        props.store.gameSettings,
         handleEscPressed,
         (gameObject) => {
           setGameObject(gameObject);
@@ -101,12 +101,12 @@ const GameRoom = (props: IGameRoom) => {
       toast.warn("No room connection, redirecting to frontpage");
       return null;
     }
-    if (props.store.preGameSettings.gameType === "ball") {
+    if (props.store.gameSettings.gameType === "ball") {
       console.warn("ball game not supported");
     }
 
     const CurrGameScene =
-      props.store.preGameSettings.gameType === "race"
+      props.store.gameSettings.gameType === "race"
         ? RaceGameScene
         : TagGameScene;
 
@@ -114,8 +114,7 @@ const GameRoom = (props: IGameRoom) => {
       CurrGameScene,
       props.socket,
       props.store.players,
-      props.store.preGameSettings,
-      props.store.userSettings.userGameSettings,
+      props.store.gameSettings,
       props.store.roomId,
       {
         escPressed: handleEscPressed,

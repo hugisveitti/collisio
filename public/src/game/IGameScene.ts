@@ -1,12 +1,12 @@
 import { Scene3D } from "enable3d";
-import { IUserGameSettings } from "../classes/User";
+import { IGameSettings } from "../classes/localGameSettings";
 import { VehicleType, TrackName } from "../shared-backend/shared-stuff";
 
 export interface IGameScene extends Scene3D {
     togglePauseGame: () => void
-    setUserGameSettings: (userGameSettings: IUserGameSettings) => void
+    setGameSettings: (gameSettings: IGameSettings) => void
     restartGame: () => void
-    changeVehicle?: (vehicleType: VehicleType) => void
+    changeVehicle?: (vehicleNumber: number, vehicleType: VehicleType) => void
     changeTrack?: (trackName: TrackName) => void
     resetVehicleCallback: (vehicleNumber: number) => void
 }

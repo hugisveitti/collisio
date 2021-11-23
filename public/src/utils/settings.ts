@@ -1,4 +1,4 @@
-import { IPreGameSettings } from "../classes/Game";
+import { IGameSettings } from "../classes/localGameSettings";
 
 type DeviceType = "desktop" | "mobile"
 
@@ -37,15 +37,16 @@ export const inDevelopment = window.location.href.includes("localhost")
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = false
+export const inTestMode = true
 
 
-export const testPreGameSettings: IPreGameSettings = {
-    ballRadius: 1,
+export const testGameSettings: IGameSettings = {
     gameType: "tag",
     numberOfLaps: 2,
     trackName: "simple-tag-course",
-    tagGameLength: 2
+    tagGameLength: 2,
+    useShadows: true,
+    useSound: true
 }
 
 export const getStaticPath = (path: string) => {

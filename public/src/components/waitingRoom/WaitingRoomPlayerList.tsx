@@ -13,6 +13,7 @@ import {
   playerGameDataRefPath,
 } from "../../firebase/firebaseFunctions";
 import { viewBottoms, viewLefts } from "../../game/GameScene";
+import { cardBackgroundColor } from "../../providers/theme";
 import {
   GameType,
   IPlayerInfo,
@@ -79,7 +80,10 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
   };
 
   return (
-    <Card style={{ height: "100%", backgroundColor: "wheat" }}>
+    <Card
+      style={{ height: "100%", backgroundColor: cardBackgroundColor }}
+      variant="outlined"
+    >
       <CardHeader
         header={props.player.playerName}
         title={

@@ -68,7 +68,7 @@ export class TagGameScene extends GameScene {
 
 
     async create() {
-        this.course = new TagCourse(this, this.preGameSettings.trackName, (name, coin) => this.handleCoinCollidedCallback(name, coin))
+        this.course = new TagCourse(this, this.gameSettings.trackName, (name, coin) => this.handleCoinCollidedCallback(name, coin))
         this.course.createCourse(this.useShadows, () => {
             console.log("create course")
             this.courseLoaded = true
@@ -197,7 +197,7 @@ export class TagGameScene extends GameScene {
 
     updateClock() {
         if (this.gameOver) return
-        let time = (this.preGameSettings.tagGameLength * 60 - this.gameClock.getElapsedTime()).toFixed(0)
+        let time = (this.gameSettings.tagGameLength * 60 - this.gameClock.getElapsedTime()).toFixed(0)
 
         this.showImportantInfo(time)
         if (time === "0") {
