@@ -12,7 +12,6 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection } from "../classes/Game";
 import AppContainer from "../containers/AppContainer";
-import logo from "../images/caroutline.png";
 import { inputBackgroundColor, themeOptions } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import {
@@ -33,6 +32,7 @@ import {
   waitingRoomPath,
 } from "./Routes";
 import { IStore } from "./store";
+import logo from "../images/collisio-logo.png";
 
 interface FrontPageProps {
   socket: Socket;
@@ -40,9 +40,7 @@ interface FrontPageProps {
 }
 
 const useStyles = makeStyles({
-  input: {
-    //  backgroundColor: themeOptions.palette.secondary.light,
-  },
+  input: {},
 });
 
 const FrontPage = (props: FrontPageProps) => {
@@ -185,11 +183,11 @@ need to be logged in."
       <Grid container spacing={5}>
         <Grid item xs={12}>
           <Typography variant="h3" component="div" gutterBottom>
-            Welcome to <i>Collisio</i>
+            Welcome to
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <img src={logo} className="image-logo" alt="" />
+          <img src={logo} style={{ width: 400, maxWidth: "80%" }} alt="" />
         </Grid>
 
         {deviceType === "mobile" && (
