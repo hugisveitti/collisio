@@ -233,6 +233,9 @@ var Room = /** @class */ (function () {
         this.startGame();
         this.socket.emit(shared_stuff_1.stmd_game_starting);
     };
+    Room.prototype.sendGameActions = function (data) {
+        this.socket.emit(shared_stuff_1.std_send_game_actions, data);
+    };
     Room.prototype.sendGameSettings = function (gameSettings) {
         this.gameSettings = gameSettings;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
@@ -296,10 +299,17 @@ var Room = /** @class */ (function () {
     Room.prototype.playerDisconnected = function (playerName, playerId) {
         this.socket.emit(shared_stuff_1.std_player_disconnected, { playerName: playerName });
         if (!this.gameStarted) {
+            var wasLeader = false;
             for (var i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
                     this.players.splice(i, 1);
+                    wasLeader = this.players[i].isLeader;
+                }
+            }
+            if (wasLeader) {
+                if (this.players.length > 0) {
+                    this.players[0].setLeader();
                 }
             }
         }

@@ -27,13 +27,31 @@ var Player = /** @class */ (function () {
         this.setupControler();
         this.setupGameDataInfoListener();
         this.setupPlayerInfoListener();
-        this.setupQuitGameListener();
+        this.setupDisconnectListener();
         this.setupUserSettingsListener();
         this.setupReconnectListener();
         this.setupWaitingRoomListener();
         this.setupGameSettingsListener();
         this.setupGameStartedListener();
+        this.setupGameActionsListener();
         this.setupPingListener();
+    };
+    /**
+     * actions like reset game
+     * pause game
+     * send from mobile on to the server
+     */
+    Player.prototype.setupGameActionsListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mts_send_game_actions, function (gameActions) {
+            var _a;
+            if (_this.isLeader) {
+                (_a = _this.game) === null || _a === void 0 ? void 0 : _a.sendGameActions(gameActions);
+            }
+            else {
+                console.log("non leader cannot change gameActions");
+            }
+        });
     };
     Player.prototype.setupPingListener = function () {
         var _this = this;
@@ -76,38 +94,23 @@ var Player = /** @class */ (function () {
     Player.prototype.sendGameSettings = function (gameSettings) {
         this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings });
     };
-    Player.prototype.setupQuitGameListener = function () {
+    Player.prototype.setupDisconnectListener = function () {
         var _this = this;
-        this.socket.on("quit-game", function () {
-            if (_this.game) {
-                _this.game.playerDisconnected(_this.playerName, _this.id);
-            }
-        });
-    };
-    Player.prototype.setupLeaderStartGameListener = function () {
-        var _this = this;
-        this.socket.once("leader-start-game", function () {
-            if (_this.game) {
-                _this.game.startGame();
-            }
-        });
-    };
-    Player.prototype.setLeader = function () {
-        this.isLeader = true;
-        this.setupLeaderStartGameListener();
-    };
-    Player.prototype.desktopDisconnected = function () {
-        this.socket.emit(shared_stuff_1.stm_desktop_disconnected, {});
-    };
-    Player.prototype.setGame = function (game) {
-        var _this = this;
-        this.game = game;
         this.socket.on("disconnect", function () {
             if (_this.game) {
                 _this.game.playerDisconnected(_this.playerName, _this.id);
             }
             _this.isConnected = false;
         });
+    };
+    Player.prototype.setLeader = function () {
+        this.isLeader = true;
+    };
+    Player.prototype.desktopDisconnected = function () {
+        this.socket.emit(shared_stuff_1.stm_desktop_disconnected, {});
+    };
+    Player.prototype.setGame = function (game) {
+        this.game = game;
     };
     Player.prototype.setupReconnectListener = function () {
         this.socket.on("player-reconnect", function () {

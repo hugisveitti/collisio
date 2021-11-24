@@ -18,7 +18,8 @@ import {
     stmd_game_settings_changed,
     mts_connected_to_waiting_room,
     mdts_game_settings_changed,
-    mdts_start_game
+    mdts_start_game,
+    mts_send_game_actions
 } from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
@@ -70,15 +71,30 @@ export class Player {
         this.setupGameDataInfoListener()
         this.setupPlayerInfoListener()
 
-        this.setupQuitGameListener()
+        this.setupDisconnectListener()
         this.setupUserSettingsListener()
         this.setupReconnectListener()
         this.setupWaitingRoomListener()
         this.setupGameSettingsListener()
         this.setupGameStartedListener()
-
+        this.setupGameActionsListener()
         this.setupPingListener()
 
+    }
+
+    /**
+     * actions like reset game
+     * pause game
+     * send from mobile on to the server
+     */
+    setupGameActionsListener() {
+        this.socket.on(mts_send_game_actions, (gameActions: any) => {
+            if (this.isLeader) {
+                this.game?.sendGameActions(gameActions)
+            } else {
+                console.log("non leader cannot change gameActions")
+            }
+        })
     }
 
     setupPingListener() {
@@ -122,27 +138,17 @@ export class Player {
         this.socket.emit(stmd_game_settings_changed, { gameSettings })
     }
 
-    setupQuitGameListener() {
-        this.socket.on("quit-game", () => {
+    setupDisconnectListener() {
+        this.socket.on("disconnect", () => {
             if (this.game) {
                 this.game.playerDisconnected(this.playerName, this.id)
             }
-        })
-    }
-
-
-
-    setupLeaderStartGameListener() {
-        this.socket.once("leader-start-game", () => {
-            if (this.game) {
-                this.game.startGame()
-            }
+            this.isConnected = false
         })
     }
 
     setLeader() {
         this.isLeader = true
-        this.setupLeaderStartGameListener()
     }
 
     desktopDisconnected() {
@@ -151,12 +157,6 @@ export class Player {
 
     setGame(game: Room) {
         this.game = game
-        this.socket.on("disconnect", () => {
-            if (this.game) {
-                this.game.playerDisconnected(this.playerName, this.id)
-            }
-            this.isConnected = false
-        })
     }
 
     setupReconnectListener() {

@@ -25,7 +25,8 @@ import {
     stmd_game_starting,
     stm_player_connected_callback,
     stmd_game_settings_changed,
-    mdts_start_game
+    mdts_start_game,
+    std_send_game_actions
 } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
@@ -303,6 +304,10 @@ export class Room {
         this.socket.emit(stmd_game_starting)
     }
 
+    sendGameActions(data: any) {
+        this.socket.emit(std_send_game_actions, data)
+    }
+
     sendGameSettings(gameSettings: any) {
         this.gameSettings = gameSettings
         for (let player of this.players) {
@@ -371,11 +376,17 @@ export class Room {
         this.socket.emit(std_player_disconnected, { playerName })
 
         if (!this.gameStarted) {
+            let wasLeader = false
             for (let i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
                     this.players.splice(i, 1)
-
+                    wasLeader = this.players[i].isLeader
+                }
+            }
+            if (wasLeader) {
+                if (this.players.length > 0) {
+                    this.players[0].setLeader()
                 }
             }
         }
