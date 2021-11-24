@@ -165,6 +165,7 @@ const GameRoom = (props: IGameRoom) => {
       }
       if (gameActions.restart) {
         gameObject.restartGame();
+        setEndOfGameModalOpen(false);
         setSettingsModalOpen(false);
       }
       if (gameActions.toggleSound) {
