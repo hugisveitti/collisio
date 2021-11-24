@@ -12,9 +12,11 @@ import {
 } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
+  GameActions,
   MobileControls,
   mts_controls,
   mts_game_data_info,
+  mts_send_game_actions,
   mts_user_settings_changed,
   stm_desktop_disconnected,
   stm_game_finished,
@@ -32,6 +34,7 @@ interface IControlsRoomProps {
 }
 
 const controller = new MobileControls();
+const gameActions = new GameActions();
 
 const ControlsRoom = (props: IControlsRoomProps) => {
   const history = useHistory();
@@ -208,10 +211,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const screenHeight = screen.availHeight;
   const screenWidth = screen.availWidth;
-  console.log("screen height", screenHeight);
-  console.log("screen width", screenWidth);
-  console.log("screen2 height", screen.height);
-  console.log("screen2 width", screen.width);
 
   const btnSize = screenWidth < 350 ? 120 : 150;
   const utilBtnSize = screenWidth < 350 ? 60 : 90;
@@ -224,6 +223,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       return "Left";
     }
     return "Straight";
+  };
+
+  const sendGameActions = () => {
+    props.socket.emit(mts_send_game_actions, gameActions);
   };
 
   const btnSizeStyle: React.CSSProperties = {
@@ -275,11 +278,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         open={settingsModalOpen}
         onClose={() => {
           setSettingsModalOpen(false);
-          handleButtonAction(false, "pause", setSettingsModalOpen);
+          //  handleButtonAction(false, "pause", setSettingsModalOpen);
+          gameActions.pause = false;
+          sendGameActions();
         }}
         user={user}
         store={props.store}
         socket={props.socket}
+        gameActions={gameActions}
+        sendGameActions={sendGameActions}
       />
 
       <div
@@ -313,7 +320,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
       <div
         className="controller-btn"
-        onClick={() => handleButtonAction(true, "pause", setSettingsModalOpen)}
+        onClick={() => {
+          gameActions.pause = true;
+          sendGameActions();
+          setSettingsModalOpen(true);
+        }}
         style={{
           ...settingsStyles,
           ...utilbtnSizeStyle,

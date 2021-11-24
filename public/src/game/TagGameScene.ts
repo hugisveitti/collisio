@@ -1,10 +1,10 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { Clock } from "@enable3d/three-wrapper/dist";
 import Stats from "stats.js";
+import { Clock } from "three";
 import { ITagScoreInfo } from "../classes/Game";
 import { ITagCourse } from "../course/ICourse";
-import { Coin, freezeColor, itColor, notItColor, TagCourse } from "../course/TagCourse";
+import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { stringInArray } from "../utils/utilFunctions";

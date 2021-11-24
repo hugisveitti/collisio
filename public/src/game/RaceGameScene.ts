@@ -33,21 +33,19 @@ export class RaceGameScene extends GameScene {
 
     ticks: number
 
+    /**
+     * this is if players change number of laps in middle of game
+     */
+    currentNumberOfLaps: number
+
 
     constructor() {
         super()
 
+
         document.body.appendChild(totalTimeDiv)
         totalTimeDiv.setAttribute("id", "totalTime")
-        // totalTimeDiv.setAttribute("style", `
-        // position:absolute;
-        // top:25px;
-        // left:50%;
-        // transform:translate(-50%, 0);
-        // font-family:monospace;
-        // font-size:64px;
-        // text-shadow:1px 1px white;
-        // `)
+
 
         this.winner = ""
         this.winTime = -1
@@ -57,9 +55,11 @@ export class RaceGameScene extends GameScene {
         document.body.appendChild(stats.dom)
 
         this.ticks = 0
+        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
     }
 
     async create() {
+        this.gameTimers = []
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
         this.course.createCourse(this.useShadows, () => {
             this.courseLoaded = true
@@ -73,7 +73,7 @@ export class RaceGameScene extends GameScene {
 
                 // adds font to vehicles, which displays names
                 for (let i = 0; i < this.players.length; i++) {
-                    this.gameTimers.push(new GameTime(this.gameSettings.numberOfLaps))
+                    this.gameTimers.push(new GameTime(this.currentNumberOfLaps))
                 }
                 this.loadFont()
                 this.createViews()
@@ -81,12 +81,14 @@ export class RaceGameScene extends GameScene {
                 this.resetVehicles()
                 this.startRaceCountdown()
 
+
             })
 
         })
     }
 
     startRaceCountdown() {
+        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
         let countdown = 4
         this.startGameSong()
         // makes vehicle fall
@@ -132,11 +134,11 @@ export class RaceGameScene extends GameScene {
     }
 
 
+    _togglePauseGame(wasPaused: boolean) {
 
-
-    _togglePauseGame(isPaused: boolean) {
+        if (!this.gameStarted) return
         for (let i = 0; i < this.vehicles.length; i++) {
-            if (isPaused) {
+            if (wasPaused) {
                 this.gameTimers[i].start()
             } else {
                 this.gameTimers[i].stop()
@@ -152,7 +154,7 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
 
         for (let i = 0; i < this.players.length; i++) {
-            this.gameTimers.push(new GameTime(this.gameSettings.numberOfLaps))
+            this.gameTimers.push(new GameTime(this.currentNumberOfLaps))
         }
     }
 
@@ -162,7 +164,9 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+
     _restartGame() {
+        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
         window.clearTimeout(this.countDownTimeout)
         window.clearTimeout(this.gameStartingTimeOut)
@@ -173,6 +177,7 @@ export class RaceGameScene extends GameScene {
         this.winTime = -1
 
         const sec = 2
+
 
         this.showViewsImportantInfo("Race countdown starting in " + sec + " seconds")
         //this.showImportantInfo("Race starting in " + sec + " seconds")
@@ -240,8 +245,7 @@ export class RaceGameScene extends GameScene {
     updateScoreTable() {
         const timeInfos: IRaceTimeInfo[] = []
         let maxTotalTime = 0
-
-        for (let i = 0; i < this.vehicles.length; i++) {
+        for (let i = 0; i < this.gameTimers.length; i++) {
             let cLapTime = this.gameTimers[i].getCurrentLapTime()
             const bLT = this.gameTimers[i].getBestLapTime()
             let totalTime = this.gameTimers[i].getTotalTime()
@@ -255,7 +259,7 @@ export class RaceGameScene extends GameScene {
                 currentLapTime: cLapTime,
                 totalTime,
                 lapNumber: this.gameTimers[i].lapNumber,
-                numberOfLaps: this.gameSettings.numberOfLaps
+                numberOfLaps: this.currentNumberOfLaps
             }
             timeInfos.push(timeInfoObject)
         }
@@ -282,8 +286,7 @@ export class RaceGameScene extends GameScene {
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()
             }
-            // console.log("time", time, this.ticks)
-            if (this.ticks % 60 === 0) {
+            if (this.ticks % 90 === 0) {
 
                 this.updatePing()
             }
@@ -299,7 +302,7 @@ export class RaceGameScene extends GameScene {
     prepareEndOfRacePlayer(i: number) {
         const playerData: IEndOfRaceInfoPlayer = {
             totalTime: this.gameTimers[i].getTotalTime(),
-            numberOfLaps: this.gameSettings.numberOfLaps,
+            numberOfLaps: this.currentNumberOfLaps,
             playerName: this.players[i].playerName,
             playerId: this.players[i].id,
             bestLapTime: this.gameTimers[i].getBestLapTime(),
@@ -315,7 +318,6 @@ export class RaceGameScene extends GameScene {
             steeringSensitivity: this.vehicles[i].steeringSensitivity
         }
 
-        console.log("end of race player prepare ", playerData)
         if (this.gameRoomActions.playerFinished) {
             this.gameRoomActions.playerFinished(playerData)
         }
@@ -342,13 +344,12 @@ export class RaceGameScene extends GameScene {
 
         const endOfRaceInfo: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
-            numberOfLaps: this.gameSettings.numberOfLaps,
+            numberOfLaps: this.currentNumberOfLaps,
             trackName: this.gameSettings.trackName,
             gameId: this.gameId,
             roomId: this.roomId,
             date: new Date()
         }
-        console.log("prepare endo of race data")
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })
         }

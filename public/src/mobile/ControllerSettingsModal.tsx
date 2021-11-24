@@ -4,6 +4,7 @@ import BasicModal from "../components/modal/BasicModal";
 import NotLoggedInModal from "../components/NotLoggedInModal";
 import { IStore } from "../components/store";
 import { IUser } from "../firebase/firebaseFunctions";
+import { GameActions } from "../shared-backend/shared-stuff";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 
 interface IControllerSettingsModal {
@@ -14,6 +15,8 @@ interface IControllerSettingsModal {
   userLoggedIn: () => void;
   resetOrientation: () => void;
   socket: Socket;
+  gameActions: GameActions;
+  sendGameActions: () => void;
 }
 
 const ControllerSettingsModal = (props: IControllerSettingsModal) => {
@@ -38,6 +41,8 @@ const ControllerSettingsModal = (props: IControllerSettingsModal) => {
         socket={props.socket}
         user={props.user}
         store={props.store}
+        gameActions={props.gameActions}
+        sendGameActions={props.sendGameActions}
       />
     </BasicModal>
   );

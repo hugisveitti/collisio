@@ -1,8 +1,6 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
-import * as THREE from '@enable3d/three-wrapper/dist/index';
+import * as THREE from 'three';
 import { IVehicleSettings } from '../classes/User';
-import { GameScene } from '../game/GameScene';
-import { GameTime } from '../game/GameTimeClass';
 
 export interface SimpleVector {
     x: number

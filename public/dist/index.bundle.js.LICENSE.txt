@@ -33,23 +33,68 @@ object-assign
  * @license  MIT
  */
 
+/*!
+ * matter-js 0.17.1 by @liabru
+ * http://brm.io/matter-js/
+ * License MIT
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Liam Brummitt and contributors.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+/*!
+fflate - fast JavaScript compression/decompression
+<https://101arrowz.github.io/fflate>
+Licensed under MIT. https://github.com/101arrowz/fflate/blob/master/LICENSE
+version 0.6.9
+*/
+
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /**
- * @author       Kevin Lee (https://github.com/InfiniteLee)
- * @copyright    Copyright (c) 2019 Kevin Lee; Project Url: https://github.com/InfiniteLee/ammo-debug-drawer
- * @license      {@link https://github.com/InfiniteLee/ammo-debug-drawer/blob/master/LICENSE|MPL-2.0}
- */
-
-/**
- * @author       Kevin Lee (https://github.com/InfiniteLee)
- * @copyright    Copyright (c) 2020 Kevin Lee; Project Url: https://github.com/InfiniteLee/three-to-ammo
- * @license      {@link https://github.com/InfiniteLee/three-to-ammo/blob/master/LICENSE|MPL-2.0}
+ * @author       Evan Wallace (http://madebyevan.com/))
+ * @copyright    Copyright (c) 2011 Evan Wallace
+ * @license      MIT license
+ *
+ * @author       manthrax (https://github.com/manthrax)
+ *
+ * @author       Jiro-Digital (https://github.com/Jiro-Digital)
+ * @copyright    Copyright (c) 2020 Jiro Digital Ltd
+ * @license      {@link https://github.com/Jiro-Digital/three-csg-ts/blob/master/LICENSE|MIT}
+ *
+ * @author       Yannick Deubel (https://github.com/yandeu)
+ * @copyright    Copyright (c) 2021 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
+ * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE|GNU GPLv3}
  */
 
 /**
  * @author       Yannick Deubel (https://github.com/yandeu)
  * @copyright    Copyright (c) 2020 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
+ * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE|GNU GPLv3}
+ */
+
+/**
+ * @author       Yannick Deubel (https://github.com/yandeu)
+ * @copyright    Copyright (c) 2021 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
  * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE|GNU GPLv3}
  */
 
@@ -58,11 +103,17 @@ object-assign
  *
  * @author       swift502 <blaha.j502@gmail.com> (http://jblaha.art/)
  * @copyright    Copyright (c) 2018 swift502; Project Url: https://github.com/swift502/Sketchbook
- * @license      {@link https://github.com/swift502/Sketchbook/blob/master/LICENSE|GPL-3.0}
+ * @license      {@link https://github.com/swift502/Sketchbook/blob/master/LICENSE GPL-3.0}
  *
  * @author       Yannick Deubel (https://github.com/yandeu)
- * @copyright    Copyright (c) 2020 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
- * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE|GNU GPLv3}
+ * @copyright    Copyright (c) 2021 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
+ * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE GNU GPLv3}
+ */
+
+/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
  */
 
 /**
@@ -151,6 +202,27 @@ object-assign
  */
 
 /**
+ * @package      npmjs.com/package/@yandeu/events (events.min.js)
+ *
+ * @author       Arnout Kazemier (https://github.com/3rd-Eden)
+ * @copyright    Copyright (c) 2014 Arnout Kazemier
+ * @license      {@link https://github.com/primus/eventemitter3/blob/master/LICENSE|MIT}
+ *
+ * @author       Yannick Deubel (https://github.com/yandeu)
+ * @copyright    Copyright (c) 2021 Yannick Deubel; Project Url: https://github.com/yandeu/events
+ * @license      {@link https://github.com/yandeu/events/blob/master/LICENSE|MIT}
+ */
+
+/**
+ * @package      npmjs.com/package/@yandeu/tap (tap.min.js)
+ *
+ * @author       Yannick Deubel (https://github.com/yandeu)
+ * @copyright    Copyright (c) 2021 Yannick Deubel; Project Url: https://github.com/yandeu/tap
+ * @license      {@link https://github.com/yandeu/tap/blob/master/LICENSE|MIT}
+ * @description  Inspired by tapjs (https://www.npmjs.com/package/tapjs)
+ */
+
+/**
  * A better abstraction over CSS.
  *
  * @copyright Oleg Isonen (Slobodskoi) / Isonen 2014-present
@@ -208,5 +280,3 @@ object-assign
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
-/** @license zlib.js 2012 - imaya [ https://github.com/imaya/zlib.js ] The MIT License */

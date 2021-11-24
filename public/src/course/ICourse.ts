@@ -1,4 +1,4 @@
-import * as THREE from '@enable3d/three-wrapper/dist/index';
+import * as THREE from 'three';
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 

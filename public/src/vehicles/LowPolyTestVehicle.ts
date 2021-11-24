@@ -1,24 +1,21 @@
-import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { Scene3D } from "enable3d";
-import { ClosestRaycaster } from "enable3d/node_modules/@enable3d/ammo-physics";
-import { GameScene } from '../game/GameScene';
+import * as THREE from "three";
 import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
-import { defaultVehicleConfig, initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
+import { initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 
 const intelligentDriveLine = false
 
 export class LowPolyTestVehicle extends LowPolyVehicle {
 
-    closestRaycaster: ClosestRaycaster
+    //    closestRaycaster: ClosestRaycaster
     line: THREE.Line
 
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
-        this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
+        // this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
 
         if (intelligentDriveLine) {
 
@@ -201,54 +198,55 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
     intelligentDrive(log: boolean) {
         /** wait with this */
+        console.warn("no intelligent drive")
 
         //  const p = this.getPosition()
-        const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
-        const po = tm.getOrigin()
-        const q = tm.getRotation()
-        const r = this.chassisMesh.rotation
-        const p = this.getPosition()
-        let px = po.x()
-        let py = po.y()
-        let pz = po.z()
+        // const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
+        // const po = tm.getOrigin()
+        // const q = tm.getRotation()
+        // const r = this.chassisMesh.rotation
+        // const p = this.getPosition()
+        // let px = po.x()
+        // let py = po.y()
+        // let pz = po.z()
 
-        px = p.x
-        py = p.y
-        pz = p.z
+        // px = p.x
+        // py = p.y
+        // pz = p.z
 
-        const tm1 = this.vehicle.getWheelInfo(3).get_m_worldTransform();
-        const po1 = tm.getOrigin()
+        // const tm1 = this.vehicle.getWheelInfo(3).get_m_worldTransform();
+        // const po1 = tm.getOrigin()
 
-        const w = this.vehicle.getWheelInfo(2).get_m_wheelDirectionCS()
+        // const w = this.vehicle.getWheelInfo(2).get_m_wheelDirectionCS()
 
-        const d = this.chassisMesh.getWorldDirection(new THREE.Vector3(px, py, pz))
-        const offset = 1
+        // const d = this.chassisMesh.getWorldDirection(new THREE.Vector3(px, py, pz))
+        // const offset = 1
 
-        const rx = ((Math.sin(r.y) * offset)) + Math.PI / 2
-        const ry = r.y// 0// Math.PI / 2 // p.y
-        const rz = ((Math.cos(r.y) * offset) * Math.sign(Math.cos(r.z))) - Math.PI
-
-
-        this.closestRaycaster.setRayFromWorld(rx, ry, rz)
-        this.closestRaycaster.setRayToWorld(px, py, pz)
-        if (intelligentDriveLine) {
-
-            this.line.position.set(px, py, pz)
-            this.line.rotation.set(rx, ry, rz)
-        }
+        // const rx = ((Math.sin(r.y) * offset)) + Math.PI / 2
+        // const ry = r.y// 0// Math.PI / 2 // p.y
+        // const rz = ((Math.cos(r.y) * offset) * Math.sign(Math.cos(r.z))) - Math.PI
 
 
-        this.closestRaycaster.rayTest()
-        if (this.closestRaycaster.hasHit()) {
-            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
-            const obj = this.closestRaycaster.getCollisionObject()
-            if (log) {
+        // this.closestRaycaster.setRayFromWorld(rx, ry, rz)
+        // this.closestRaycaster.setRayToWorld(px, py, pz)
+        // if (intelligentDriveLine) {
 
-                // console.log("closest", x, y, z)
-                // console.log("hit object", obj)
-            }
+        //     this.line.position.set(px, py, pz)
+        //     this.line.rotation.set(rx, ry, rz)
+        // }
 
 
-        }
+        // this.closestRaycaster.rayTest()
+        // if (this.closestRaycaster.hasHit()) {
+        //     //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
+        //     const obj = this.closestRaycaster.getCollisionObject()
+        //     if (log) {
+
+        //         // console.log("closest", x, y, z)
+        //         // console.log("hit object", obj)
+        //     }
+
+
+        // }
     }
 }

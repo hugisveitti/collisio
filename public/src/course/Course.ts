@@ -1,8 +1,8 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { GLTF, GLTFLoader, Group, LoadingManager } from "@enable3d/three-wrapper/dist";
-import * as THREE from '@enable3d/three-wrapper/dist/index';
-import { Scene3D } from "enable3d";
+import { Group, LoadingManager } from "three";
+import { GLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader"
+import * as THREE from 'three';
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -12,35 +12,49 @@ import { ICourse } from "./ICourse";
 
 const loadDiv = document.createElement("div")
 loadDiv.setAttribute("id", "load-screen")
+loadDiv.setAttribute("class", "game-text")
 document.body.appendChild(loadDiv)
 
 const manager = new LoadingManager()
 
 let dotTimeout: NodeJS.Timeout
 
-let numDots = 1
+let numDots = 0
 
 
 
-const setLoadingDivText = (text: string) => {
+const setLoadingDivText = async (text: string) => {
     window.clearTimeout(dotTimeout)
+
+
+
 
     const createText = () => {
 
-        let dotText = text
+        let dotText = text + "<br>"
+
         for (let i = 0; i < numDots; i++) {
-            dotText += ""
+            dotText += "."
+
         }
+
         loadDiv.innerHTML = dotText
-        dotTimeout = setTimeout(() => {
+
+        dotTimeout = setTimeout(async () => {
             numDots += 1
             if (numDots === 4) {
                 numDots = 1
             }
-        }, 200)
+            createText()
+        }, 350)
     }
     createText()
 }
+
+// setTimeout(() => {
+
+//     setLoadingDivText("hello")
+// }, 100)
 
 const clearLoadingDivText = () => {
     loadDiv.innerHTML = ""
@@ -48,7 +62,7 @@ const clearLoadingDivText = () => {
 }
 
 manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
-    setLoadingDivText("Loading files " + loaded + " / " + itemsTotal)
+    setLoadingDivText("Started loading files " + loaded + " / " + itemsTotal)
 }
 
 

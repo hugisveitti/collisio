@@ -2,31 +2,33 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
+import { IEndOfRaceInfoPlayer, IScoreInfo } from "../../classes/Game";
+import {
+  IGameSettings,
+  setLocalGameSetting,
+} from "../../classes/localGameSettings";
+import { saveGameFinished } from "../../firebase/firebaseFunctions";
+import { IEndOfGameData, startGame } from "../../game/GameScene";
 import { IGameScene } from "../../game/IGameScene";
+import { RaceGameScene } from "../../game/RaceGameScene";
+import { TagGameScene } from "../../game/TagGameScene";
 // import { startRaceGame } from "../../game/RaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
-import { startLowPolyTest } from "../../test-courses/lowPolyTest";
-import GameSettingsModal from "./GameSettingsModal";
-import { frontPagePath } from "../Routes";
-import { IStore } from "../store";
-import EndOfGameModal from "./EndOfGameModal";
-import { IEndOfGameData, startGame } from "../../game/GameScene";
-import { inTestMode } from "../../utils/settings";
-import {
-  IEndOfRaceInfoGame,
-  IEndOfRaceInfoPlayer,
-  IRaceTimeInfo,
-  IScoreInfo,
-} from "../../classes/Game";
-import ScoreInfoContainer from "./ScoreInfoContainer";
 import {
   dts_game_finished,
   dts_player_finished,
+  GameActions,
   std_game_data_info,
+  std_player_disconnected,
+  std_send_game_actions,
 } from "../../shared-backend/shared-stuff";
-import { saveGameFinished } from "../../firebase/firebaseFunctions";
-import { RaceGameScene } from "../../game/RaceGameScene";
-import { TagGameScene } from "../../game/TagGameScene";
+import { startLowPolyTest } from "../../test-courses/lowPolyTest";
+import { inTestMode } from "../../utils/settings";
+import { frontPagePath } from "../Routes";
+import { IStore } from "../store";
+import EndOfGameModal from "./EndOfGameModal";
+import GameSettingsModal from "./GameSettingsModal";
+import ScoreInfoContainer from "./ScoreInfoContainer";
 
 interface IGameRoom {
   socket: Socket;
@@ -41,12 +43,13 @@ const GameRoom = (props: IGameRoom) => {
   //   window.location.href = frontPagePath;
   // }
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [gameObject, setGameObject] = useState({} as IGameScene);
+  const [gameObject, setGameObject] = useState(undefined as IGameScene);
   const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
   const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
   const [scoreInfo, setScoreInfo] = useState({} as IScoreInfo);
   /** interesting information about the game that can be retrieved when saving the data */
   const [gameDataInfo, setGameDataInfo] = useState([] as string[]);
+  const [gameActions, setGameActions] = useState(new GameActions());
 
   const user = useContext(UserContext);
   const history = useHistory();
@@ -78,8 +81,18 @@ const GameRoom = (props: IGameRoom) => {
     props.socket.emit(dts_player_finished, data);
   };
 
+  const updateSettings = (key: keyof IGameSettings, value: any) => {
+    const newGameSettings = props.store.gameSettings;
+
+    // @ts-ignore
+    newGameSettings[key] = value;
+    setLocalGameSetting(key, value);
+
+    gameObject.setGameSettings(newGameSettings);
+  };
+
   useEffect(() => {
-    props.socket.on("player-disconnected", ({ playerName }) => {
+    props.socket.on(std_player_disconnected, ({ playerName }) => {
       toast.warn(
         `${playerName} disconnected from game, logged in players can reconnect!`
       );
@@ -131,12 +144,47 @@ const GameRoom = (props: IGameRoom) => {
       setGameDataInfo(gameDataInfo.concat(data));
     });
 
+    props.socket.on(std_send_game_actions, (_gameActions: GameActions) => {
+      setGameActions(_gameActions);
+    });
+
     return () => {
-      props.socket.emit("quit-room");
-      props.socket.off("player-disconnected");
+      props.socket.off(std_player_disconnected);
       props.socket.off(std_game_data_info);
     };
   }, []);
+
+  useEffect(() => {
+    if (gameObject) {
+      if (gameActions.pause) {
+        setSettingsModalOpen(true);
+        gameObject.pauseGame();
+      } else {
+        setSettingsModalOpen(false);
+        gameObject.unpauseGame();
+      }
+      if (gameActions.restart) {
+        gameObject.restartGame();
+        setSettingsModalOpen(false);
+      }
+      if (gameActions.toggleSound) {
+        updateSettings("useSound", !props.store.gameSettings.useSound);
+      }
+
+      if (gameActions.toggleShadows) {
+        updateSettings("useShadows", !props.store.gameSettings.useShadows);
+      }
+
+      if (gameActions.numberOfLaps) {
+        updateSettings("numberOfLaps", gameActions.numberOfLaps);
+      }
+
+      if (gameActions.changeTrack) {
+        gameObject.changeTrack(gameActions.changeTrack);
+        updateSettings("trackName", gameActions.changeTrack);
+      }
+    }
+  }, [gameActions]);
 
   return (
     <React.Fragment>
@@ -146,12 +194,13 @@ const GameRoom = (props: IGameRoom) => {
         onClose={() => {
           setSettingsModalOpen(false);
           if (gameObject) {
-            gameObject.togglePauseGame();
+            gameObject.unpauseGame();
           }
         }}
         store={props.store}
         userId={user?.uid}
         isTestMode={props.isTestMode}
+        updateSettings={updateSettings}
       />
       <EndOfGameModal
         open={endOfGameModalOpen}

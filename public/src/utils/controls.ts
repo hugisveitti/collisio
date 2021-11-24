@@ -29,18 +29,6 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, 
     if (mobileControls.resetVehicle) {
         vehicle.resetPosition()
     }
-
-    if (callback && mobileControls.pause) {
-        if (!gameIsPaused) {
-            callback(true)
-        }
-        gameIsPaused = mobileControls.pause
-    } else if (callback && !mobileControls.pause) {
-        if (gameIsPaused) {
-            callback(false)
-        }
-        gameIsPaused = false
-    }
 }
 
 
@@ -52,8 +40,8 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
      * In the ControlsRoom to send from device
      * In ServerGame.js to send from server, I need the one in the Server since if we have multiple players the data needs to be collected from all players and sent
      */
-
     socket.on(std_controls, (data) => {
+
         const { players } = data
         for (let i = 0; i < players.length; i++) {
             driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber], callback)

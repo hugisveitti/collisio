@@ -2,12 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button, Grid, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
-import {
-  IGameSettings,
-  setLocalGameSetting,
-} from "../../classes/localGameSettings";
-import { IUserSettings } from "../../classes/User";
-import { setDBUserSettings } from "../../firebase/firebaseFunctions";
+import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import TrackSelect from "../inputs/TrackSelect";
@@ -18,24 +13,15 @@ import { IStore } from "../store";
 interface IGameSettingsModal {
   open: boolean;
   onClose: () => void;
-  gameObject: IGameScene;
+  gameObject: IGameScene | undefined;
   store: IStore;
   userId: string | undefined;
   isTestMode?: boolean;
+  updateSettings: (key: keyof IGameSettings, value: any) => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
   const history = useHistory();
-
-  const updateSettings = (key: keyof IGameSettings, value: any) => {
-    const newGameSettings = props.store.gameSettings;
-
-    // @ts-ignore
-    newGameSettings[key] = value;
-    setLocalGameSetting(key, value);
-
-    props.gameObject.setGameSettings(newGameSettings);
-  };
 
   if (!props.gameObject) return null;
   return (
@@ -58,7 +44,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             disableElevation
             variant="contained"
             onClick={() => {
-              updateSettings(
+              props.updateSettings(
                 "useShadows",
                 !props.store.gameSettings.useShadows
               );
@@ -72,7 +58,10 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             disableElevation
             variant="contained"
             onClick={() => {
-              updateSettings("useSound", !props.store.gameSettings.useSound);
+              props.updateSettings(
+                "useSound",
+                !props.store.gameSettings.useSound
+              );
             }}
           >
             Sound {props.store.gameSettings.useSound ? "On" : "Off"}
@@ -97,7 +86,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <React.Fragment>
             <Grid item xs={4}>
               <VehicleSelect
-                value={props.store.player.vehicleType}
+                value={props.store.userSettings.vehicleSettings.vehicleType}
                 onChange={(vehicleType) => {
                   const newVehicleSettings =
                     props.store.userSettings.vehicleSettings;
@@ -116,7 +105,17 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               <TrackSelect
                 value={props.store.gameSettings.trackName}
                 onChange={(trackName) => {
-                  updateSettings("trackName", trackName);
+                  props.updateSettings("trackName", trackName);
+                  const newGameSettings = {
+                    ...props.store.gameSettings,
+                    trackName,
+                  };
+                  props.store.setGameSettings(newGameSettings);
+                  props.gameObject.physics.debug.disable();
+                  props.gameObject.setGameSettings(newGameSettings);
+                  props.gameObject.setNeedsReload(true);
+
+                  props.gameObject.restartGame();
                 }}
                 excludedTracks={[]}
                 gameType={props.store.gameSettings.gameType}

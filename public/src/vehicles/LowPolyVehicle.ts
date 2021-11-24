@@ -1,8 +1,5 @@
-import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Font, GLTF, GLTFLoader, MeshStandardMaterial, Audio, AudioListener } from "@enable3d/three-wrapper/dist";
-import * as THREE from '@enable3d/three-wrapper/dist/index';
+import { ExtendedObject3D } from "@enable3d/ammo-physics"
 import { ExtendedMesh } from "enable3d";
-import { Howl } from "howler";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -11,6 +8,12 @@ import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
+
+
+
+import * as THREE from "three"
+import { GLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader"
+
 
 export const isVehicle = (object: ExtendedObject3D) => {
     return object.name.slice(0, 7) === "vehicle"
@@ -40,7 +43,7 @@ const BACK_RIGHT = 3
 
 const degToRad = 0.017453
 
-
+/** Ammo folder needs to be in src folder */
 let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 
 
@@ -108,7 +111,7 @@ export class LowPolyVehicle implements IVehicle {
     maxSpeedTicks: number
 
     useEngineSound: boolean
-    engineSound: Audio | undefined
+    engineSound: THREE.Audio | undefined
 
     /** only for the engine sound */
     currentEngineForce: number
@@ -139,7 +142,7 @@ export class LowPolyVehicle implements IVehicle {
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
 
-        this.useEngineSound = true// useEngineSound
+        this.useEngineSound = useEngineSound
 
         this.currentEngineForce = 0
 
@@ -157,10 +160,10 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.receiveShadow = false
         this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
-        const material = (this.chassisMesh.material as MeshStandardMaterial).clone();
+        const material = (this.chassisMesh.material as THREE.MeshStandardMaterial).clone();
         this.chassisMesh.material = material;
 
-        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
+        (this.chassisMesh.material as THREE.MeshStandardMaterial).color = new THREE.Color(this.color);
 
 
 
@@ -169,7 +172,7 @@ export class LowPolyVehicle implements IVehicle {
 
     setColor(color: string | number) {
         this.color = color;
-        (this.chassisMesh.material as MeshStandardMaterial).color = new THREE.Color(this.color);
+        (this.chassisMesh.material as THREE.MeshStandardMaterial).color = new THREE.Color(this.color);
     }
 
 
@@ -268,7 +271,6 @@ export class LowPolyVehicle implements IVehicle {
 
 
         this.scene.physics.physicsWorld.addAction(this.vehicle)
-        console.log("vehilce config", vehicleConfigs[this.vehicleType])
 
         this.wheelMeshes = []
 
@@ -331,7 +333,6 @@ export class LowPolyVehicle implements IVehicle {
             if (e.key === "z") {
                 this.useEngineSound = !this.useEngineSound
                 this.toggleSound(this.useEngineSound)
-
             }
         })
     }
@@ -339,7 +340,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
     toggleSound(useSound: boolean) {
-
+        this.useEngineSound = useSound
         if (!this.engineSound) {
             console.warn("Engine sound not loaded")
             return
@@ -351,11 +352,9 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         if (!this.engineSound.isPlaying) {
-            console.log("starting engine sound")
             this.engineSound.play()
 
         } else {
-            console.log("stopping engine sound")
             this.engineSound.stop()
         }
     }
@@ -514,6 +513,8 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     stop() {
+        // this.vehicle.setBrake(100, BACK_RIGHT)
+        // this.vehicle.setBrake(100, BACK_LEFT)
         this.zeroEngineForce()
         this.chassisMesh.body.setCollisionFlags(1)
         this.chassisMesh.body.setVelocity(0, 0, 0)
@@ -521,12 +522,15 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     start() {
+        // this.vehicle.setBrake(0, BACK_RIGHT)
+        // this.vehicle.setBrake(0, BACK_LEFT)
         this.chassisMesh.body.setCollisionFlags(0)
     };
 
     pause() {
         this.isPaused = true
         this.chassisMesh.body.setCollisionFlags(1)
+
     };
 
     unpause() {
@@ -543,12 +547,11 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     createCarSounds() {
-        const listener = new AudioListener()
+        const listener = new THREE.AudioListener()
         this.camera.add(listener)
 
-        this.engineSound = new Audio(listener)
-        setEngineSound(this.engineSound, .3)
-
+        this.engineSound = new THREE.Audio(listener)
+        setEngineSound(this.engineSound, .3, this.useEngineSound)
     }
 
     cameraLookAt(camera: THREE.PerspectiveCamera) {
@@ -730,7 +733,7 @@ export class LowPolyVehicle implements IVehicle {
         return this.vehicle.getCurrentSpeedKmHour()
     };
 
-    setFont(font: Font) {
+    setFont(font: THREE.Font) {
         this.font = font
         // this.createNameMesh()
     }
@@ -758,7 +761,10 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setAngularVelocity(0, 0, 0)
         this.chassisMesh.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-        const y = (Math.max(vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength, vehicleConfigs[this.vehicleType].wheelAxisHeightFront) + vehicleConfigs[this.vehicleType].suspensionRestLength) ?? 2
+
+        const frontHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightFront + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusFront
+        const backHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusBack
+        const y = Math.max(backHeight, frontHeight) ?? 2
         this.setPosition(position.x, position.y + y, position.z)
         this.setRotation(rotation.x, rotation.y, rotation.z)
 
@@ -773,6 +779,12 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicleSettings = vehicleSettings
         // this.engineForce = vehicleSettings.engineForce
         // this.steeringSensitivity = vehicleSettings.steeringSensitivity
+
+
+        if (this.vehicleSettings.vehicleType !== this.vehicleType) {
+            this.scene.setNeedsReload(true)
+        }
+
         const keys = Object.keys(vehicleSettings)
         for (let key of keys) {
             if (vehicleSettings[key] !== undefined) {
@@ -791,6 +803,8 @@ export class LowPolyVehicle implements IVehicle {
             this.camera.position.set(x, y, z)
             this.chassisMesh.add(this.camera)
         }
+
+
     };
 
     setchaseCameraSpeed(chaseCameraSpeed: number) {
@@ -848,9 +862,9 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
                 if (child.name.includes("chassis")) {
                     let chassis = (child as ExtendedObject3D);
                     // import to clone the material since the tires share material
-                    const material = (chassis.material as MeshStandardMaterial).clone();
+                    const material = (chassis.material as THREE.MeshStandardMaterial).clone();
                     //  material.color = new THREE.Color("");
-                    (chassis.material as MeshStandardMaterial) = material
+                    (chassis.material as THREE.MeshStandardMaterial) = material
                     if (!onlyLoad) {
                         // chassis.geometry.center();
                     }

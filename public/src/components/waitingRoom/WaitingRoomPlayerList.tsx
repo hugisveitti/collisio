@@ -74,6 +74,11 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
               Only logged in players can record their personal best time.
             </Typography>
           )}
+          {props.player.isLeader && (
+            <Typography>
+              <i>Leader</i>
+            </Typography>
+          )}
         </>
       </CardContent>
     );

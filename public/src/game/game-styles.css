@@ -43,13 +43,13 @@
 }
 
 #load-screen {
-  color: rgb(155, 41, 41);
+  color: black;
   text-shadow: 1px 1px white;
   font-size: 32px;
   position: absolute;
-  left: 1%;
-  right: 1%;
-  top: 50px;
+  left: 50%;
+  top: 150px;
+  transform: translate(-50%, 5px);
   text-align: center;
 }
 

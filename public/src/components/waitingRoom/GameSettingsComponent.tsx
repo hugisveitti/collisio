@@ -38,7 +38,6 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
   useEffect(() => {
     props.socket.on(stmd_game_settings_changed, (data) => {
-      console.log("game settings changed", data);
       props.store.setGameSettings(data.gameSettings);
     });
     return () => {
@@ -137,7 +136,11 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                   <TextField
                     label="No. of laps"
                     type="number"
-                    value={props.store.gameSettings.numberOfLaps}
+                    value={
+                      props.store.gameSettings.numberOfLaps
+                        ? props.store.gameSettings.numberOfLaps
+                        : ""
+                    }
                     onChange={(ev) => {
                       updateGameSettings("numberOfLaps", +ev.target.value);
                     }}

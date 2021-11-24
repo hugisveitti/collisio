@@ -11,6 +11,7 @@ export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "
 export type GameType = "ball" | "race" | "tag"
 
 
+
 export class MobileControls {
 
     beta: number
@@ -25,7 +26,7 @@ export class MobileControls {
 
     resetVehicle: boolean
 
-    pause: boolean
+
 
     constructor(data?: Object) {
         this.beta = 0
@@ -35,7 +36,7 @@ export class MobileControls {
         this.b = false
 
         this.resetVehicle = false
-        this.pause = false
+
 
         if (data) {
             const keys = Object.keys(data)
@@ -111,6 +112,36 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
     }
 }
 
+/**
+ * these actions are sent from mobile to server to desktop
+ * to e.g. pause the game from mobile or restart the game
+ */
+interface IGameActions {
+    pause: boolean
+    restart: boolean
+    changeTrack: TrackName | undefined
+    toggleSound: boolean
+    toggleShadows: boolean
+    numberOfLaps: number | undefined
+}
+
+export class GameActions implements IGameActions {
+    pause: boolean
+    restart: boolean
+    changeTrack: TrackName | undefined
+    toggleSound: boolean
+    toggleShadows: boolean
+    numberOfLaps: number | undefined
+
+    constructor() {
+        this.pause = false
+        this.restart = false
+        this.changeTrack = undefined
+        this.toggleShadows = false
+        this.toggleSound = false
+        this.numberOfLaps = undefined
+    }
+}
 
 /**
  * ****************
@@ -184,3 +215,6 @@ export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
 
 export const mdts_game_settings_changed = "mdts_game_settings_changed"
 export const stmd_game_settings_changed = "stmd_game_settings_changed"
+
+export const mts_send_game_actions = "mts_send_game_actions"
+export const std_send_game_actions = "std_send_game_actions"

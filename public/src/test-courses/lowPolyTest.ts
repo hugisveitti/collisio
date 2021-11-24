@@ -1,5 +1,5 @@
 import { CollisionEvent } from "@enable3d/common/dist/types"
-import { OrbitControls } from "@enable3d/three-wrapper/dist/index"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
@@ -235,6 +235,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     initVehicles() {
+        this.otherVehicles = []
         this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
@@ -252,6 +253,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
             this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
         }
         this.course.createCourse(this.useShadows, () => {
+            this.courseLoaded = true
             this.createOtherVehicles(() => {
                 this.createVehicle().then(() => {
 
@@ -577,15 +579,15 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
             this.createController()
 
             this.canStartUpdate = true
-            this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
-                if (isVehicle(otherObject)) {
-                    console.log("collide with vehicle", otherObject)
-                    const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.vehicle.setColor(notItColor)
-                    this.otherVehicles[vehicleNumber - 1].setColor(itColor)
-                    this.isIt = vehicleNumber
-                }
-            })
+            // this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
+            //     if (isVehicle(otherObject)) {
+            //         console.log("collide with vehicle", otherObject)
+            //         const vehicleNumber = getVehicleNumber(otherObject.name)
+            //         this.vehicle.setColor(notItColor)
+            //         this.otherVehicles[vehicleNumber - 1].setColor(itColor)
+            //         this.isIt = vehicleNumber
+            //     }
+            // })
         })
     }
 
@@ -663,15 +665,12 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 
 
     updateVehicles() {
-
-
         this.vehicle.update()
         this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
-
     }
 
     update() {
-        if (this.canStartUpdate) {
+        if (this.canStartUpdate && this.everythingReady()) {
 
             stats.begin()
             if (this.vehicle) {
@@ -734,6 +733,16 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         }
     }
 
+    unpauseGame() {
+        this.vehicle.unpause()
+        this.isPaused = false
+    }
+
+    pauseGame() {
+        this.vehicle.pause()
+        this.isPaused = true
+    }
+
     setGameSettings(userGameSettings: IGameSettings) {
         for (let key of Object.keys(userGameSettings)) {
             if (userGameSettings[key] !== undefined) {
@@ -748,11 +757,6 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         }
     }
 
-    restartGame() {
-        console.log("restart game!")
-        this.vehicle.resetPosition()
-        this.gameTime.restart()
-    }
 
     changeVehicle(vehicleNumber: number, vehicleType: VehicleType) {
 

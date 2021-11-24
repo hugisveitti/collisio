@@ -93,12 +93,12 @@ export const vehicleConfigs = {
     normal: {
         ...defaultVehicleConfig,
         wheelAxisBackPosition: -3.5,
-        wheelRadiusBack: 1.5 / 2,
+        wheelRadiusBack: 1 / 2,
         wheelHalfTrackBack: 1.5,
         wheelAxisHeightBack: 0,
 
         wheelAxisFrontPosition: 1.15,
-        wheelRadiusFront: 1.5 / 2,
+        wheelRadiusFront: 1 / 2,
         wheelHalfTrackFront: 1.5,
         wheelAxisHeightFront: 0,
 

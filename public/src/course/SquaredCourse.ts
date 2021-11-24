@@ -1,5 +1,5 @@
 import { ExtendedObject3D, Scene3D } from "enable3d";
-import { Texture } from "enable3d/node_modules/@enable3d/three-graphics";
+import { Texture } from "three";
 import { SimpleVector } from "../vehicles/IVehicle";
 
 

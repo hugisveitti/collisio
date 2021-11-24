@@ -1,8 +1,7 @@
-import * as THREE from '@enable3d/three-wrapper/dist/index';
 import { ExtendedObject3D, Scene3D } from "enable3d";
+import * as THREE from 'three';
 import { GameScene } from '../game/GameScene';
 import { TrackName } from "../shared-backend/shared-stuff";
-import { IVehicle } from '../vehicles/IVehicle';
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { Course } from "./Course";
 import { ITagCourse } from "./ICourse";
@@ -39,6 +38,8 @@ export class Coin {
     coinCollidedCallback: (name: string, coin: Coin) => void
 
     deleteCallback: (coin: Coin) => void
+
+
 
     constructor(model: ExtendedObject3D, number: number, coinCollidedCallback: (otherObjectName: string, coin: Coin) => void, deleteCallback: (coin: Coin) => void) {
         this.number = number
@@ -78,6 +79,8 @@ export class Coin {
         if (!this.model?.body) return
         /**
          *  this does not work I think
+         * 
+         * mabey gameScene.physics.removeAllListeners( event )
          */
         this.model.body.checkCollisions = false
         this.model.clear()

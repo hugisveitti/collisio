@@ -1,4 +1,4 @@
-import * as THREE from "@enable3d/three-wrapper/node_modules/three"
+import * as THREE from "three"
 
 const around = (num: number) => {
     return Math.floor(num * 100) / 100

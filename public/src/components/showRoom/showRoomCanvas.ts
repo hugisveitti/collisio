@@ -1,5 +1,6 @@
 
-import * as THREE from "@enable3d/three-wrapper/dist/index"
+import * as THREE from "three"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { loadLowPolyVehicleModels, } from "../../vehicles/LowPolyVehicle"
 import { getDeviceType } from "../../utils/settings"
 import { VehicleType } from "../../shared-backend/shared-stuff"
@@ -73,7 +74,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     camera.aspect = width / height
 
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0.5, 0);
     controls.update();
     controls.enablePan = false;

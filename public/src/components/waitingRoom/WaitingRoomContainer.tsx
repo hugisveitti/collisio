@@ -128,6 +128,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
+    /**
+     * if desktop goes in and out and in of waitingRoom
+     */
+    props.store.setPlayers([]);
+
     const userLoadingTimout = setTimeout(() => {
       /** TODO: do this */
       setUserLoading(false);
