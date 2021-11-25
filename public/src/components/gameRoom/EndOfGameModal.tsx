@@ -1,7 +1,10 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, Grid, IconButton, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import React from "react";
-import { IRaceTimeInfo, IScoreInfo } from "../../classes/Game";
+import { IScoreInfo } from "../../classes/Game";
 import { IEndOfGameData } from "../../game/GameScene";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { frontPagePath, highscorePagePath } from "../Routes";

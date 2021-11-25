@@ -2,8 +2,11 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { Button, Collapse, Grid, IconButton, Typography } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Collapse from "@mui/material/Collapse";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { VehicleType } from "../../shared-backend/shared-stuff";
@@ -18,12 +21,6 @@ import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
 
 // const allPossibleVehcileTypes: VehicleType[] = ["f1", "tractor", "normal", "truck", ];
 
-const useStyles = makeStyles({
-  arrowContainer: {
-    textAlign: "center",
-  },
-});
-
 interface IShowRoom {
   excludedVehicles?: VehicleType[];
   isPremiumUser: boolean;
@@ -35,8 +32,6 @@ const ShowRoomComponent = (props: IShowRoom) => {
   const [chassisNum, setChassisNum] = useState(0);
   const [vehicleTypeNum, setVehicleTypeNum] = useState(0);
   const [showBuyPremium, setShowBuyPremium] = useState(false);
-
-  const classes = useStyles();
 
   const possibleVehcileTypes = props.excludedVehicles
     ? allVehicleTypes.filter(
@@ -119,7 +114,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
         </Grid>
 
         <Grid item xs={3} />
-        <Grid item xs={3} className={classes.arrowContainer}>
+        <Grid item xs={3} style={{ textAlign: "center" }}>
           <IconButton
             onClick={() => {
               if (vehicleTypeNum === 0) {
@@ -132,7 +127,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
             <ArrowBackIosNewIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={3} className={classes.arrowContainer}>
+        <Grid item xs={3} style={{ textAlign: "center" }}>
           <IconButton
             onClick={() => {
               setVehicleTypeNum(vehicleTypeNum + 1);
@@ -145,7 +140,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
 
         <Grid item xs={3} />
 
-        <Grid item xs={3} className={classes.arrowContainer}>
+        <Grid item xs={3} style={{ textAlign: "center" }}>
           <IconButton
             onClick={() => {
               if (chassisNum === 0) {
@@ -158,7 +153,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
             <KeyboardArrowLeftIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={3} className={classes.arrowContainer}>
+        <Grid item xs={3} style={{ textAlign: "center" }}>
           <IconButton
             onClick={() => {
               setChassisNum(chassisNum + 1);

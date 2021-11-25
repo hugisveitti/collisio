@@ -88,7 +88,7 @@ app.get("/game", (_: Request, res: Response) => {
 
 app.get("/premium", sendIndexHTML)
 
-app.get("/stress-test", sendIndexHTML)
+
 
 app.get("/controls", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
@@ -114,7 +114,12 @@ app.get("/show-room", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
+app.get("/stress-test", sendIndexHTML)
 
+const adminHTMLPath = `../public/${buildFolder}/admin.html`
+app.get("/admin", (_: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, adminHTMLPath));
+})
 
 
 const server = app.listen(port, () => {

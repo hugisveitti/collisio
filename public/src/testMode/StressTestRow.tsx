@@ -1,4 +1,6 @@
-import { DeleteForever, ExpandLess, ExpandMore } from "@mui/icons-material";
+import DeleteForever from "@mui/icons-material/DeleteForever";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import {
   Button,
   Collapse,
@@ -110,12 +112,12 @@ const StressTestRow = (props: IStressTestRow) => {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open}>
             <LinePlotComponent
-              yMin={0}
-              yMax={150}
-              values={pings}
-              width={400}
-              height={200}
-              id={`${props.connection.roomId}_ping_plot`}
+            // yMin={0}
+            // yMax={150}
+            // values={pings}
+            // width={400}
+            // height={200}
+            // id={`${props.connection.roomId}_ping_plot`}
             />
           </Collapse>
         </TableCell>

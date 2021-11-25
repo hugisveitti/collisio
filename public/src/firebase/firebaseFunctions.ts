@@ -1,10 +1,10 @@
-import { child, get, push, ref, set, update, onValue, remove, orderByValue, query, orderByChild, limitToLast, Query } from "firebase/database";
+import { limitToLast, onValue, orderByChild, query, Query, ref, remove, set, update } from "firebase/database";
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { removeUndefinedFromObject } from "../utils/utilFunctions";
-import { database, } from "./firebaseInit";
+import { database } from "./firebaseInit";
 
 export const usersRefPath = "users"
 

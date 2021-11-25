@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { IEndOfRaceInfoPlayer } from "../classes/Game";
+import { getVehicleNameFromType } from "../vehicles/VehicleConfigs";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
@@ -53,7 +54,10 @@ export default (props: IProps) => {
                 );
               })}
               <div>Date of race: {playerData.date}</div>
-              <div>Type of vehicle: {playerData.vehicleType ?? "-"}</div>
+              <div>
+                Type of vehicle:{" "}
+                {getVehicleNameFromType(playerData.vehicleType) ?? "-"}
+              </div>
             </div>
           </Collapse>
         </TableCell>

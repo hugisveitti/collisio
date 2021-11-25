@@ -1,4 +1,5 @@
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
 import {
   Button,
   Collapse,

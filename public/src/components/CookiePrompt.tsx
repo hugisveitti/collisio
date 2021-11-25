@@ -1,4 +1,7 @@
-import { Button, Slide, Grid, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
+import Slide from "@mui/material/Slide";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 
 /**

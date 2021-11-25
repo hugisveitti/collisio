@@ -1,8 +1,13 @@
 import HelpIcon from "@mui/icons-material/Help";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
-import { Button, Divider, Grid, TextField, Typography } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
@@ -12,7 +17,7 @@ import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection } from "../classes/Game";
 import AppContainer from "../containers/AppContainer";
-import { inputBackgroundColor, themeOptions } from "../providers/theme";
+import { inputBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import {
   dts_create_room,
@@ -39,13 +44,9 @@ interface FrontPageProps {
   store: IStore;
 }
 
-const useStyles = makeStyles({
-  input: {},
-});
-
 const FrontPage = (props: FrontPageProps) => {
   const deviceType = getDeviceType();
-  const classes = useStyles();
+
   const [playerName, setPlayerName] = useState("");
   const [needToAskOrientPermission, setNeedToAskOrientPermission] =
     useState(true);

@@ -1,10 +1,17 @@
 const path = require('path')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const TerserPlugin = require('terser-webpack-plugin');
+
+
+
 
 // if issue with images go to "import-png.d.ts"
 module.exports = {
   mode: 'development',
   entry: {
     index: './src/index.tsx',
+    admin: "./src/admin/admin.tsx",
+    //test: "./src/test.tsx"
   },
   devtool: 'inline-source-map',
   devServer: {
@@ -35,6 +42,17 @@ module.exports = {
         options: {
           name: '[path][name].[ext]'
         }
+      }, {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: ['@babel/plugin-proposal-object-rest-spread'],
+            cacheDirectory: true
+          }
+        }
       }
     ]
   },
@@ -43,18 +61,16 @@ module.exports = {
   },
   output: {
     filename: '[name].bundle.js',
+    //  filename: PROD ? '[name].bundle.min.js' : '[name].bundle.js',
     path: path.resolve(__dirname, 'dist')
   },
   // optimization: {
-  //   runtimeChunk: "single",
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       vendor: {
-  //         test: /[\\/]node_modules[\\/]/,
-  //         name: 'vendors',
-  //         chunks: 'all'
-  //       }
-  //     }
-  //   }
-  // }
+  //   minimize: true,
+  //   minimizer: [new TerserPlugin()],
+  // },
+  // plugins: [
+  //   new BundleAnalyzerPlugin()
+  // ]
+
+
 }

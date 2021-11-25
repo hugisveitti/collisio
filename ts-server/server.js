@@ -85,7 +85,6 @@ app.get("/game", function (_, res) {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
 app.get("/premium", sendIndexHTML);
-app.get("/stress-test", sendIndexHTML);
 app.get("/controls", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
@@ -103,6 +102,11 @@ app.get("/public-profile/:id", function (_, res) {
 });
 app.get("/show-room", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
+});
+app.get("/stress-test", sendIndexHTML);
+var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
+app.get("/admin", function (_, res) {
+    res.sendFile(path.join(__dirname, adminHTMLPath));
 });
 var server = app.listen(port, function () {
     console.log("listening on port " + port);

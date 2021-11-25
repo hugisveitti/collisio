@@ -1,5 +1,6 @@
-import { ExtendedObject3D } from "@enable3d/ammo-physics"
-import { ExtendedMesh } from "enable3d";
+import { ExtendedObject3D } from "@enable3d/ammo-physics";
+import { Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -8,11 +9,6 @@ import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
-
-
-
-import * as THREE from "three"
-import { GLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 
 
 export const isVehicle = (object: ExtendedObject3D) => {
@@ -80,23 +76,23 @@ export class LowPolyVehicle implements IVehicle {
     tuning: Ammo.btVehicleTuning
     raycaster: Ammo.btDefaultVehicleRaycaster
     vehicleNumber: number
-    font: THREE.Font
+    font: Font
     badRotationTicks = 0
     useBadRotationTicks = true
     modelsLoaded = false
 
 
-    cameraDir = new THREE.Vector3()
-    cameraLookAtPos = new THREE.Vector3()
-    cameraDiff = new THREE.Vector3()
-    cameraTarget = new THREE.Vector3()
+    cameraDir = new Vector3()
+    cameraLookAtPos = new Vector3()
+    cameraDiff = new Vector3()
+    cameraTarget = new Vector3()
 
     chaseCameraSpeed: number
     useChaseCamera: boolean
     chaseCameraTicks: number
-    prevCahseCameraPos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
+    prevCahseCameraPos: Vector3 = new Vector3(0, 0, 0)
     vehicleSettings: IVehicleSettings
-    camera: THREE.PerspectiveCamera
+    camera: PerspectiveCamera
     vehicleType: VehicleType
     is4x4: boolean
     isReady: boolean
@@ -111,7 +107,7 @@ export class LowPolyVehicle implements IVehicle {
     maxSpeedTicks: number
 
     useEngineSound: boolean
-    engineSound: THREE.Audio | undefined
+    engineSound: Audio | undefined
 
     /** only for the engine sound */
     currentEngineForce: number
@@ -160,10 +156,10 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.receiveShadow = false
         this.chassisMesh.castShadow = true
         this.modelsLoaded = true;
-        const material = (this.chassisMesh.material as THREE.MeshStandardMaterial).clone();
+        const material = (this.chassisMesh.material as MeshStandardMaterial).clone();
         this.chassisMesh.material = material;
 
-        (this.chassisMesh.material as THREE.MeshStandardMaterial).color = new THREE.Color(this.color);
+        (this.chassisMesh.material as MeshStandardMaterial).color = new Color(this.color);
 
 
 
@@ -172,59 +168,12 @@ export class LowPolyVehicle implements IVehicle {
 
     setColor(color: string | number) {
         this.color = color;
-        (this.chassisMesh.material as THREE.MeshStandardMaterial).color = new THREE.Color(this.color);
+        (this.chassisMesh.material as MeshStandardMaterial).color = new Color(this.color);
     }
 
 
-    createBadChassis() {
-        const chassisWidth = 1.8;
-        const chassisHeight = .6;
-        const chassisLength = 3;
-        //this.scene.add.existing(this.chassisMesh, {})
-        let chassisMesh = new ExtendedObject3D()
-
-
-        const geometry = new THREE.BoxGeometry(chassisWidth, .4, chassisLength);
-        const material = new THREE.MeshLambertMaterial({ color: this.color });
-        const cubeA = new ExtendedMesh(geometry, material);
-        cubeA.position.set(0, 0.1, 0)
-        chassisMesh.add(cubeA)
-
-        const geometry2 = new THREE.BoxGeometry(chassisWidth, 1, chassisLength);
-
-        const cubeB = new ExtendedMesh(geometry2, material);
-        cubeB.position.set(0, .5, 0)
-        chassisMesh.add(cubeB)
-
-        const geometry3 = new THREE.BoxGeometry(1, 1, 1);
-
-        const cubeC = new ExtendedMesh(geometry3, material);
-        cubeC.position.set(0, 1.5, 0)
-        chassisMesh.add(cubeC)
-
-        const antG = new THREE.BoxGeometry(.05, 1, .05)
-        const antM = new THREE.MeshLambertMaterial({ color: "black" })
-        const antenna = new ExtendedMesh(antG, antM)
-        antenna.position.set(.6, 1.5, .85)
-        chassisMesh.add(antenna)
-
-        const exhG = new THREE.CylinderGeometry(.15, .15, .5, 12, 1., false)
-        const exhM = new THREE.MeshLambertMaterial({ color: "gray" })
-        const exhaust = new ExtendedMesh(exhG, exhM)
-        exhaust.rotateX(Math.PI / 2)
-        exhaust.position.set(-chassisWidth + 1.3, .1, -chassisLength / 2)
-        chassisMesh.add(exhaust)
-        return chassisMesh
-    }
 
     createVehicle() {
-
-
-        if (useBad) {
-            this.chassisMesh = this.createBadChassis()
-
-        }
-
 
 
         this.scene.add.existing(this.chassisMesh)
@@ -538,7 +487,7 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.body.setCollisionFlags(0)
     };
 
-    addCamera(camera: THREE.PerspectiveCamera) {
+    addCamera(camera: PerspectiveCamera) {
         if (!this.useChaseCamera) {
             this.chassisMesh.add(camera)
         }
@@ -547,14 +496,14 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     createCarSounds() {
-        const listener = new THREE.AudioListener()
+        const listener = new AudioListener()
         this.camera.add(listener)
 
-        this.engineSound = new THREE.Audio(listener)
+        this.engineSound = new Audio(listener)
         setEngineSound(this.engineSound, .3, this.useEngineSound)
     }
 
-    cameraLookAt(camera: THREE.PerspectiveCamera) {
+    cameraLookAt(camera: PerspectiveCamera) {
 
         if (this.useChaseCamera) {
 
@@ -733,20 +682,20 @@ export class LowPolyVehicle implements IVehicle {
         return this.vehicle.getCurrentSpeedKmHour()
     };
 
-    setFont(font: THREE.Font) {
+    setFont(font: Font) {
         this.font = font
         // this.createNameMesh()
     }
 
     createNameMesh() {
-        const textGeo = new THREE.TextGeometry(this.name.toUpperCase().slice(0, 3), {
+        const textGeo = new TextGeometry(this.name.toUpperCase().slice(0, 3), {
             font: this.font!,
             size: 1,
             height: 0.5,
 
         })
 
-        const textMesh = new THREE.Mesh(textGeo, new THREE.MeshLambertMaterial({ color: 0x667399, }))
+        const textMesh = new Mesh(textGeo, new MeshLambertMaterial({ color: 0x667399, }))
         textMesh.rotateY(Math.PI)
         this.scene.add.existing(textMesh)
 
@@ -862,9 +811,9 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callbac
                 if (child.name.includes("chassis")) {
                     let chassis = (child as ExtendedObject3D);
                     // import to clone the material since the tires share material
-                    const material = (chassis.material as THREE.MeshStandardMaterial).clone();
-                    //  material.color = new THREE.Color("");
-                    (chassis.material as THREE.MeshStandardMaterial) = material
+                    const material = (chassis.material as MeshStandardMaterial).clone();
+                    //  material.color = new Color("");
+                    (chassis.material as MeshStandardMaterial) = material
                     if (!onlyLoad) {
                         // chassis.geometry.center();
                     }

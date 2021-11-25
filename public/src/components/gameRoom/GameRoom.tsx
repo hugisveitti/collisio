@@ -12,7 +12,6 @@ import { IEndOfGameData, startGame } from "../../game/GameScene";
 import { IGameScene } from "../../game/IGameScene";
 import { RaceGameScene } from "../../game/RaceGameScene";
 import { TagGameScene } from "../../game/TagGameScene";
-// import { startRaceGame } from "../../game/RaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_game_finished,
@@ -64,10 +63,6 @@ const GameRoom = (props: IGameRoom) => {
     if (!inTestMode) {
       saveGameFinished(data.endOfRaceInfo);
       props.socket.emit(dts_game_finished, data);
-      // saveRaceData(data.playersData, data.endOfRaceInfo, (_gameDataInfo) => {
-      // console.log("game data info", _gameDataInfo);
-      // setGameDataInfo(_gameDataInfo);
-      // });
     }
   };
 

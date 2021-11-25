@@ -1,5 +1,5 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
-import * as THREE from 'three';
+import { Font } from "three"
 import { IVehicleSettings } from '../classes/User';
 
 export interface SimpleVector {
@@ -63,7 +63,7 @@ export interface IVehicle {
     getRotation: () => SimpleVector
     setRotation: (x: number, y: number, z: number) => void
     getCurrentSpeedKmHour: () => number
-    setFont: (font: THREE.Font) => void
+    setFont: (font: Font) => void
 
     lookForwardsBackwards: (lookBackwards: boolean) => void
 

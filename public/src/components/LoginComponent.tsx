@@ -1,3 +1,17 @@
+import CloseIcon from "@mui/icons-material/Close";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import EmailIcon from "@mui/icons-material/Email";
+import GoogleIcon from "@mui/icons-material/Google";
+import LoginIcon from "@mui/icons-material/Login";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Input from "@mui/material/Input";
+
 import React, {
   Dispatch,
   SetStateAction,
@@ -5,37 +19,14 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  CircularProgress,
-  Input,
-  Typography,
-  Grid,
-  IconButton,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import GoogleIcon from "@mui/icons-material/Google";
-import EmailIcon from "@mui/icons-material/Email";
-import LoginIcon from "@mui/icons-material/Login";
-import LogoutIcon from "@mui/icons-material/Logout";
-import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import PersonIcon from "@mui/icons-material/Person";
+import { toast } from "react-toastify";
 import {
   createAccountWithEmail,
   signInWithEmail,
   signInWithGoogle,
-  signOut,
 } from "../firebase/firebaseInit";
-import { UserContext } from "../providers/UserProvider";
-import { toast } from "react-toastify";
-
-import { Close } from "@mui/icons-material";
 import { basicColor } from "../providers/theme";
+import { UserContext } from "../providers/UserProvider";
 
 interface ILoginComponent {
   setPlayerName?: Dispatch<SetStateAction<string>>;
@@ -90,7 +81,7 @@ const LoginComponent = (props: ILoginComponent) => {
         subheader="Login or signup with one of the methods below."
         action={
           <IconButton onClick={() => props.onClose()}>
-            <Close />
+            <CloseIcon />
           </IconButton>
         }
       />

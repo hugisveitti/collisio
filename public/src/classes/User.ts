@@ -1,5 +1,4 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
-import { defaultGameSettings, IGameSettings } from "./localGameSettings"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3

@@ -4,20 +4,18 @@ import HelpIcon from "@mui/icons-material/Help";
 import MenuIcon from "@mui/icons-material/Menu";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import StarsIcon from "@mui/icons-material/Stars";
-import {
-  AppBar,
-  Box,
-  Button,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Modal,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Modal from "@mui/material/Modal";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
@@ -45,42 +43,42 @@ const AppContainer = (props: IAppContainer) => {
   const user = useContext(UserContext);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setLoginModalOpen(false);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setLoginModalOpen(false);
+  //   }
+  // }, [user]);
 
-  const renderLoginLogoutButton = () => {
-    if (user) {
-      return (
-        <React.Fragment>
-          <Button
-            color="inherit"
-            startIcon={<AccountCircleIcon />}
-            onClick={() => history.push(privateProfilePagePath)}
-          >
-            <Typography
-              variant="subtitle1"
-              component="span"
-              sx={{ flexGrow: 1 }}
-            >
-              {user.displayName}
-            </Typography>
-          </Button>
-        </React.Fragment>
-      );
-    }
-    return (
-      <Button color="inherit" onClick={() => setLoginModalOpen(true)}>
-        Login
-      </Button>
-    );
-  };
+  // const renderLoginLogoutButton = () => {
+  //   if (user) {
+  //     return (
+  //       <React.Fragment>
+  //         <Button
+  //           color="inherit"
+  //           startIcon={<AccountCircleIcon />}
+  //           onClick={() => history.push(privateProfilePagePath)}
+  //         >
+  //           <Typography
+  //             variant="subtitle1"
+  //             component="span"
+  //             sx={{ flexGrow: 1 }}
+  //           >
+  //             {user.displayName}
+  //           </Typography>
+  //         </Button>
+  //       </React.Fragment>
+  //     );
+  //   }
+  //   return (
+  //     <Button color="inherit" onClick={() => setLoginModalOpen(true)}>
+  //       Login
+  //     </Button>
+  //   );
+  // };
 
   return (
     <React.Fragment>
-      <Box sx={{ flexGrow: 1 }}>
+      {/* <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
             <IconButton
@@ -134,8 +132,9 @@ const AppContainer = (props: IAppContainer) => {
             </ListItem>
           </List>
         </Box>
-      </Drawer>
-      <Modal open={loginModalOpen} onClose={() => setLoginModalOpen(false)}>
+      </Drawer> */}
+      {/* <Modal open={loginModalOpen} onClose={() => setLoginModalOpen(false)}> */}
+      <Modal open={loginModalOpen} onClose={() => false}>
         <div
           style={{
             position: "absolute",
@@ -144,7 +143,8 @@ const AppContainer = (props: IAppContainer) => {
             transform: "translate(-50%, -50%)",
           }}
         >
-          <LoginComponent onClose={() => setLoginModalOpen(false)} />
+          <LoginComponent onClose={() => false} />
+          {/* <LoginComponent onClose={() => setLoginModalOpen(false)} /> */}
         </div>
       </Modal>
       <div

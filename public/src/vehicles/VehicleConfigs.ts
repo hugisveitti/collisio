@@ -10,13 +10,13 @@ export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, 
 
 
 export const allVehicleTypes: { name: string, type: VehicleType }[] = [
-    { name: "Normal", type: "normal" },
-    { name: "Tractor", type: "tractor" },
-    { name: "F1", type: "f1" },
+    { name: "MacNormie", type: "normal" },
+    { name: "Trakkie Tractor", type: "tractor" },
+    { name: "Phil the Phast", type: "f1" },
     // { name: "Monster truck", type: "monsterTruck" },
     { name: "test", type: "test" },
-    { name: "Off roader", type: "offRoader" },
-    { name: "Sports car", type: "sportsCar" }
+    { name: "Big girl Sally", type: "offRoader" },
+    { name: "Thunderparrot", type: "sportsCar" }
 ]
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"

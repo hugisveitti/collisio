@@ -1,5 +1,8 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, Grid, IconButton, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { IGameSettings } from "../../classes/localGameSettings";
