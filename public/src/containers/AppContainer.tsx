@@ -43,42 +43,42 @@ const AppContainer = (props: IAppContainer) => {
   const user = useContext(UserContext);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setLoginModalOpen(false);
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    if (user) {
+      setLoginModalOpen(false);
+    }
+  }, [user]);
 
-  // const renderLoginLogoutButton = () => {
-  //   if (user) {
-  //     return (
-  //       <React.Fragment>
-  //         <Button
-  //           color="inherit"
-  //           startIcon={<AccountCircleIcon />}
-  //           onClick={() => history.push(privateProfilePagePath)}
-  //         >
-  //           <Typography
-  //             variant="subtitle1"
-  //             component="span"
-  //             sx={{ flexGrow: 1 }}
-  //           >
-  //             {user.displayName}
-  //           </Typography>
-  //         </Button>
-  //       </React.Fragment>
-  //     );
-  //   }
-  //   return (
-  //     <Button color="inherit" onClick={() => setLoginModalOpen(true)}>
-  //       Login
-  //     </Button>
-  //   );
-  // };
+  const renderLoginLogoutButton = () => {
+    if (user) {
+      return (
+        <React.Fragment>
+          <Button
+            color="inherit"
+            startIcon={<AccountCircleIcon />}
+            onClick={() => history.push(privateProfilePagePath)}
+          >
+            <Typography
+              variant="subtitle1"
+              component="span"
+              sx={{ flexGrow: 1 }}
+            >
+              {user.displayName}
+            </Typography>
+          </Button>
+        </React.Fragment>
+      );
+    }
+    return (
+      <Button color="inherit" onClick={() => setLoginModalOpen(true)}>
+        Login
+      </Button>
+    );
+  };
 
   return (
     <React.Fragment>
-      {/* <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
             <IconButton
@@ -132,9 +132,8 @@ const AppContainer = (props: IAppContainer) => {
             </ListItem>
           </List>
         </Box>
-      </Drawer> */}
-      {/* <Modal open={loginModalOpen} onClose={() => setLoginModalOpen(false)}> */}
-      <Modal open={loginModalOpen} onClose={() => false}>
+      </Drawer>
+      <Modal open={loginModalOpen} onClose={() => setLoginModalOpen(false)}>
         <div
           style={{
             position: "absolute",
@@ -143,8 +142,7 @@ const AppContainer = (props: IAppContainer) => {
             transform: "translate(-50%, -50%)",
           }}
         >
-          <LoginComponent onClose={() => false} />
-          {/* <LoginComponent onClose={() => setLoginModalOpen(false)} /> */}
+          <LoginComponent onClose={() => setLoginModalOpen(false)} />
         </div>
       </Modal>
       <div

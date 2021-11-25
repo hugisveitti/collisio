@@ -1,5 +1,5 @@
 import { ExtendedObject3D, Scene3D } from "enable3d";
-import * as THREE from 'three';
+import { Euler, Object3D, Vector3 } from "three";
 import { GameScene } from '../game/GameScene';
 import { TrackName } from "../shared-backend/shared-stuff";
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
@@ -95,7 +95,7 @@ export class Coin {
         this.model.position.set(x, y, z)
     }
 
-    setPositionOfObject(object: THREE.Object3D) {
+    setPositionOfObject(object: Object3D) {
         const p = object.position
         this.setPosition(p.x, p.y, p.z)
     }
@@ -113,14 +113,14 @@ export class TagCourse extends Course implements ITagCourse {
 
     coinModel: ExtendedObject3D
     coins: Coin[]
-    coinPoints: THREE.Object3D[]
+    coinPoints: Object3D[]
 
     coinCollidedCallback: (name: string, coin: Coin) => void
     constructor(gameScene: GameScene, trackName: TrackName, coinCollidedCallback: (name: string, coin: Coin) => void) {
         super(gameScene, trackName)
         this.coinCollidedCallback = coinCollidedCallback
-        this.startPosition = new THREE.Vector3(2, 2, 3)
-        this.startRotation = new THREE.Euler(0, Math.PI, 0)
+        this.startPosition = new Vector3(2, 2, 3)
+        this.startRotation = new Euler(0, Math.PI, 0)
         this.coins = []
         this.coinPoints = []
     }

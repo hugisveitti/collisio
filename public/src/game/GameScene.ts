@@ -1,8 +1,7 @@
-
-import * as THREE from "three"
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
+import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Howl } from "howler";
 import { Socket } from "socket.io-client";
+import { Color, Font, Mesh, PerspectiveCamera, HemisphereLight, PointLight, AmbientLight, Fog, SphereGeometry, ShaderMaterial, BackSide, FontLoader } from "three";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
@@ -17,6 +16,7 @@ import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import "./game-styles.css";
 import { IGameScene } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
+
 
 
 // placement of views on the screen,
@@ -63,7 +63,7 @@ interface IView {
     height: number
     up: number[],
     fov: number,
-    camera: THREE.PerspectiveCamera
+    camera: PerspectiveCamera
 }
 
 
@@ -80,11 +80,11 @@ export class GameScene extends Scene3D implements IGameScene {
 
     players: IPlayerInfo[]
     vehicles: IVehicle[]
-    font: THREE.Font
+    font: Font
     gameSettings: IGameSettings
     useSound: boolean
     useShadows: boolean
-    pLight: THREE.PointLight
+    pLight: PointLight
     course: ICourse
     roomId: string
     gameId: string
@@ -157,7 +157,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async addLights() {
-        this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+        this.pLight = new PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
         if (this.useShadows) {
             this.pLight.castShadow = true
@@ -166,37 +166,37 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.scene.add(this.pLight)
 
-        const hLight = new THREE.HemisphereLight(0xffffff, 1)
+        const hLight = new HemisphereLight(0xffffff, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
         this.scene.add(hLight)
 
-        const aLight = new THREE.AmbientLight(0xffffff, 1)
+        const aLight = new AmbientLight(0xffffff, 1)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
 
 
 
         const uniforms = {
-            "topColor": { value: new THREE.Color(0x0077ff) },
-            "bottomColor": { value: new THREE.Color(0xffffff) },
+            "topColor": { value: new Color(0x0077ff) },
+            "bottomColor": { value: new Color(0xffffff) },
             "offset": { value: 33 },
             "exponent": { value: 0.6 }
         };
         uniforms["topColor"].value.copy(hLight.color);
-        this.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
-        this.scene.fog = new THREE.Fog(this.scene.background, 1, 5000);
+        this.scene.background = new Color().setHSL(0.6, 0, 1);
+        this.scene.fog = new Fog(this.scene.background, 1, 5000);
         this.scene.fog.color.copy(uniforms["bottomColor"].value);
 
-        const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
-        const skyMat = new THREE.ShaderMaterial({
+        const skyGeo = new SphereGeometry(4000, 32, 15);
+        const skyMat = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: skydomeVertexShader,
             fragmentShader: skydomeFragmentShader,
-            side: THREE.BackSide
+            side: BackSide
         });
 
-        const sky = new THREE.Mesh(skyGeo, skyMat);
+        const sky = new Mesh(skyGeo, skyMat);
         this.scene.add(sky);
 
     }
@@ -231,7 +231,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async init() {
-        this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
+        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
@@ -347,7 +347,7 @@ export class GameScene extends Scene3D implements IGameScene {
             const fov = vechicleFov
             // for some reason the last view needs to use the Scene's camera
             // maybe remove camera from warpSpeed ("-camera")
-            const camera = i === n - 1 ? this.camera as THREE.PerspectiveCamera : new THREE.PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, 10000)
+            const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, 10000)
 
             const view = {
                 left: viewLefts[i % 2],
@@ -725,7 +725,7 @@ export class GameScene extends Scene3D implements IGameScene {
     loadFont() {
         const fontName = "helvetiker"
         const fontWeight = "regular"
-        const loader = new THREE.FontLoader();
+        const loader = new FontLoader();
         loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
             this.font = response;
             for (let vehicle of this.vehicles) {
@@ -787,7 +787,7 @@ export class GameScene extends Scene3D implements IGameScene {
             this.renderer.setViewport(left, bottom, width, height);
             this.renderer.setScissor(left, bottom, width, height);
             this.renderer.setScissorTest(true);
-            this.renderer.setClearColor(new THREE.Color(255, 255, 255))
+            this.renderer.setClearColor(new Color(255, 255, 255))
 
 
             this.views[i].camera.aspect = width / height;

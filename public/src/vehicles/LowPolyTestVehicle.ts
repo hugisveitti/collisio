@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { LineBasicMaterial, Line, BufferGeometry, Vector3 } from "three"
 import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
@@ -11,7 +11,7 @@ const intelligentDriveLine = false
 export class LowPolyTestVehicle extends LowPolyVehicle {
 
     //    closestRaycaster: ClosestRaycaster
-    line: THREE.Line
+    line: Line
 
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
@@ -19,12 +19,12 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
         if (intelligentDriveLine) {
 
-            const material = new THREE.LineBasicMaterial({ color: 0x0000ff })
-            const geometry = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(2, -10, 0)
+            const material = new LineBasicMaterial({ color: 0x0000ff })
+            const geometry = new BufferGeometry().setFromPoints([
+                new Vector3(0, 0, 0),
+                new Vector3(2, -10, 0)
             ])
-            this.line = new THREE.Line(geometry, material)
+            this.line = new Line(geometry, material)
             this.scene.add.existing(this.line)
         }
 
@@ -219,7 +219,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
         // const w = this.vehicle.getWheelInfo(2).get_m_wheelDirectionCS()
 
-        // const d = this.chassisMesh.getWorldDirection(new THREE.Vector3(px, py, pz))
+        // const d = this.chassisMesh.getWorldDirection(new Vector3(px, py, pz))
         // const offset = 1
 
         // const rx = ((Math.sin(r.y) * offset)) + Math.PI / 2

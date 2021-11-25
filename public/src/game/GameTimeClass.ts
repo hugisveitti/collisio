@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import { Clock } from "three"
 
 const around = (num: number) => {
     return Math.floor(num * 100) / 100
@@ -11,8 +11,8 @@ export class GameTime {
     currentLapStart: number
     isPaused: boolean
     currentLapTime: number
-    clock: THREE.Clock
-    pauseClock: THREE.Clock
+    clock: Clock
+    pauseClock: Clock
     isCheckpointCrossed: boolean
     totalNumberOfLaps: number
     lapTimes: number[]
@@ -22,7 +22,7 @@ export class GameTime {
         this.totalNumberOfLaps = totalNumberOfLaps
         this.lapNumber = 1
         this.bestLapTime = Infinity
-        this.clock = new THREE.Clock(false)
+        this.clock = new Clock(false)
         this.isPaused = true
         this.currentLapTime = 0
         this.isCheckpointCrossed = false

@@ -1,8 +1,7 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Group, LoadingManager } from "three";
-import { GLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader"
-import * as THREE from 'three';
+import { Group, LoadingManager, Object3D, Vector3, Euler } from "three";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -87,8 +86,8 @@ export class Course implements ICourse {
     ground: ExtendedObject3D
 
 
-    startRotation: THREE.Euler
-    startPosition: THREE.Vector3
+    startRotation: Euler
+    startPosition: Vector3
 
     /** all of the objects with physics */
     gamePhysicsObjects: ExtendedObject3D[]
@@ -96,7 +95,7 @@ export class Course implements ICourse {
 
     courseScene: Group
 
-    spawns: THREE.Object3D[]
+    spawns: Object3D[]
 
     constructor(gameScene: GameScene, trackName: TrackName,) {
         this.gameScene = gameScene
