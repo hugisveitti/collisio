@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.Room = void 0;
 var uuid_1 = require("uuid");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var ServerPlayer_1 = require("./ServerPlayer");
-var TestRoom_1 = __importDefault(require("./TestRoom"));
+var TestRoom_1 = require("./TestRoom");
 var successStatus = "success";
 var errorStatus = "error";
 var RoomMaster = /** @class */ (function () {
@@ -25,7 +22,7 @@ var RoomMaster = /** @class */ (function () {
         this.io = io;
         this.rooms = {};
         /** only one test room */
-        this.testRoom = new TestRoom_1.default();
+        this.testRoom = new TestRoom_1["default"]();
         this.allSocketIds = [];
     }
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
@@ -122,7 +119,7 @@ var RoomMaster = /** @class */ (function () {
     };
     return RoomMaster;
 }());
-exports.default = RoomMaster;
+exports["default"] = RoomMaster;
 var Room = /** @class */ (function () {
     function Room(roomId, io, socket, deleteRoomCallback) {
         this.players = [];

@@ -109,7 +109,7 @@ export const vehicleConfigs = {
 
         path: "simple-car.gltf",
 
-
+        // path: "123456.js"
     },
     tractor: {
         ...defaultVehicleConfig,

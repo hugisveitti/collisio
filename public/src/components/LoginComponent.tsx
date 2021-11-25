@@ -152,7 +152,12 @@ const LoginComponent = (props: ILoginComponent) => {
                       return;
                     }
                     setIsSigningIn(true);
-                    signInWithEmail(email, password);
+                    signInWithEmail(email, password, (status, message) => {
+                      if (status === "error") {
+                        setIsSigningIn(false);
+                        toast.error(message);
+                      }
+                    });
                   }}
                 >
                   Login

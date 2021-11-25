@@ -104,10 +104,8 @@ app.get("/show-room", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 app.get("/stress-test", sendIndexHTML);
-var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
-app.get("/admin", function (_, res) {
-    res.sendFile(path.join(__dirname, adminHTMLPath));
-});
+var adminTools_1 = require("./adminTools");
+(0, adminTools_1.adminFunctions)(app);
 var server = app.listen(port, function () {
     console.log("listening on port " + port);
 });

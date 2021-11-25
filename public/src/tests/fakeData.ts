@@ -1,5 +1,6 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { getDateNow } from "../utils/utilFunctions";
 
 const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
 const id2 = "LEzfm3UQl7b6CKUupasInidva9W2"
@@ -67,7 +68,7 @@ export const createFakeHighscoreData = () => {
                 trackName,
                 totalTime: tt,
                 numberOfLaps,
-                date: new Date(),
+                date: getDateNow(),
                 private: false,
                 isAuthenticated: true,
                 engineForce: 100,
@@ -93,7 +94,7 @@ export const createFakeHighscoreData = () => {
             gameId,
             roomId,
             trackName,
-            date: new Date()
+            date: getDateNow()
         }
 
         console.log("###saving data")

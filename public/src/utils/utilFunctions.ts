@@ -24,11 +24,18 @@ export const removeUndefinedFromObject = (object: Object) => {
     const newObject = {}
     for (let key of keys) {
         if (object[key] !== undefined) {
-            if (typeof object[key] === "object") {
-                newObject[key] = removeUndefinedFromObject(object[key])
+            if (object[key] !== null && object[key] !== undefined) {
+                if (typeof object[key] === "object") {
+                    newObject[key] = removeUndefinedFromObject(object[key])
+                } else {
+                    newObject[key] = object[key]
+                }
             } else {
-                newObject[key] = object[key]
+
+                console.log("not includeing", key, object[key])
             }
+        } else {
+            console.log("not includeing", key, object[key])
         }
     }
     return newObject
@@ -49,4 +56,9 @@ export const numberScaler = (a: number, b: number, min: number, max: number) => 
     return (num: number) => {
         return a + (((num - min) * (b - a)) / (max - min))
     }
+}
+
+
+export const getDateNow = () => {
+    return new Date().toISOString()
 }

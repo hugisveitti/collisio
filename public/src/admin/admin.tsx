@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import UserProvider from "../providers/UserProvider";
-import AdminComponent from "./AdminComponent";
+import AdminContainer from "./AdminContainer";
 
 const AdminApp = () => {
   return (
-    // <UserProvider>
-    <AdminComponent />
-    // </UserProvider>
+    <UserProvider>
+      <AdminContainer />
+    </UserProvider>
   );
 };
 

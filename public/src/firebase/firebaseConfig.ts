@@ -3,8 +3,8 @@ import { inDevelopment } from "../utils/settings";
 
 
 export const getFirebaseConfig = () => {
-    const databaseURL = inDevelopment ? "http://localhost:9000?ns=emulatorui" : "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
-    // const databaseURL = "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
+    // const databaseURL = inDevelopment ? "http://localhost:9000?ns=emulatorui" : "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
+    const databaseURL = "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
 
     let config = {
         apiKey: "AIzaSyA3kmeXdI7yRSig8rGsD9G4io7KuYiOweY",

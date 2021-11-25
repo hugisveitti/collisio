@@ -116,11 +116,10 @@ app.get("/show-room", (_: Request, res: Response) => {
 
 app.get("/stress-test", sendIndexHTML)
 
-const adminHTMLPath = `../public/${buildFolder}/admin.html`
-app.get("/admin", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, adminHTMLPath));
-})
 
+
+import { adminFunctions } from "./adminTools";
+adminFunctions(app)
 
 const server = app.listen(port, () => {
     console.log(`listening on port ${port}`)

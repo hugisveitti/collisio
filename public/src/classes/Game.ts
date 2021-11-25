@@ -79,7 +79,7 @@ export interface IEndOfRaceInfoPlayer {
     bestLapTime: number
     trackName: TrackName
     gameId: string
-    date: Date
+    date: string
     private: boolean
     isAuthenticated: boolean
     vehicleType: VehicleType
@@ -107,7 +107,7 @@ export interface IEndOfRaceInfoGame {
     trackName: TrackName
     gameId: string
     roomId: string
-    date: Date
+    date: string
 }
 
 /** while race is going on */
@@ -138,5 +138,6 @@ export interface IRoomInfo {
     gameSettings: IGameSettings
     desktopId: string
     desktopAuthenticated: boolean
-    date: Date
+    date: string,
+    canceledGame: boolean
 }

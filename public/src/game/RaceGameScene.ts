@@ -7,6 +7,7 @@ import { RaceCourse } from "../course/RaceCourse";
 import { VehicleControls } from '../shared-backend/shared-stuff';
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
+import { getDateNow } from "../utils/utilFunctions";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
@@ -309,7 +310,7 @@ export class RaceGameScene extends GameScene {
             trackName: this.gameSettings.trackName,
             lapTimes: this.gameTimers[i].getLapTimes(),
             gameId: this.gameId,
-            date: new Date(),
+            date: getDateNow(),
             private: false,
             isAuthenticated: this.players[i].isAuthenticated,
             vehicleType: this.players[i].vehicleType,
@@ -348,7 +349,7 @@ export class RaceGameScene extends GameScene {
             trackName: this.gameSettings.trackName,
             gameId: this.gameId,
             roomId: this.roomId,
-            date: new Date()
+            date: getDateNow()
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })

@@ -1,5 +1,6 @@
 import { limitToLast, onValue, orderByChild, query, Query, ref, remove, set, update } from "firebase/database";
 import { toast } from "react-toastify";
+import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { TrackName } from "../shared-backend/shared-stuff";
@@ -29,7 +30,7 @@ export interface IUser {
     email: string
     photoURL?: string
     uid: string
-    isPremium: boolean
+    isPremium: boolean,
 }
 
 export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) => {
@@ -171,12 +172,12 @@ export const saveRaceDataGame = (playerId: string, gameInfo: IEndOfRaceInfoGame,
  * @param gameInfo 
  */
 export const saveRoom = (roomId: string, roomInfo: IRoomInfo) => {
-
     const updates = {}
-    updates[roomDataRefPath + "/" + roomId] = roomInfo
+    const roomKey = uuid()
+    updates[roomDataRefPath + "/" + roomKey] = roomInfo
+    console.log("room info", roomInfo)
     update(ref(database), removeUndefinedFromObject(updates)).catch((err) => {
         console.log("error saving room data", err)
-
     })
 }
 

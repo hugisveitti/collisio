@@ -11,11 +11,12 @@ import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
-import { IPlayerConnection } from "../../classes/Game";
+import { IPlayerConnection, IRoomInfo } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
   removeFromAvailableRooms,
+  saveRoom,
 } from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
@@ -32,11 +33,13 @@ import {
   stmd_game_settings_changed,
   stm_player_connected_callback,
   stmd_game_starting,
+  playerInfoToPreGamePlayerInfo,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
+import { getDateNow } from "../../utils/utilFunctions";
 import LoginComponent from "../LoginComponent";
 import BasicModal from "../modal/BasicModal";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "../Routes";
@@ -171,6 +174,18 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
+      if (!onMobile) {
+        const roomInfo: IRoomInfo = {
+          desktopId: user?.uid,
+          desktopAuthenticated: !!user,
+          roomId: props.store.roomId,
+          gameSettings: props.store.gameSettings,
+          players: props.store.players.map(playerInfoToPreGamePlayerInfo),
+          date: getDateNow(),
+          canceledGame: history.location?.pathname !== gameRoomPath,
+        };
+        saveRoom(props.store.roomId, roomInfo);
+      }
       window.clearTimeout(userLoadingTimout);
       props.socket.emit(dts_left_waiting_room, {});
       props.socket.off(stmd_game_starting);

@@ -6,7 +6,6 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Table,
   TableBody,
@@ -18,7 +17,6 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getTrackNameFromType, IEndOfRaceInfoPlayer } from "../classes/Game";
 import AppContainer from "../containers/AppContainer";
 import {
@@ -28,7 +26,6 @@ import {
 import { cardBackgroundColor, inputBackgroundColor } from "../providers/theme";
 import "../styles/main.css";
 import HighscorePageTableRow from "./HighscorePageTableRow";
-import { frontPagePath } from "./Routes";
 
 const stringInList = (s: string, sList: string[]) => {
   for (let i = 0; i < sList.length; i++) {

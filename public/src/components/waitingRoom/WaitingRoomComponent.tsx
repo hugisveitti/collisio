@@ -13,16 +13,10 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { IRoomInfo } from "../../classes/Game";
 import { IVehicleSettings } from "../../classes/User";
-import {
-  IUser,
-  saveRoom,
-  setDBUserSettings,
-} from "../../firebase/firebaseFunctions";
+import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
 import {
   IPlayerInfo,
-  playerInfoToPreGamePlayerInfo,
   std_start_game_callback,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
@@ -61,16 +55,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const handleStartGame = () => {
     socketHandleStartGame(props.socket, (response: ISocketCallback) => {
       if (response.status === "success") {
-        const roomInfo: IRoomInfo = {
-          desktopId: user?.uid,
-          desktopAuthenticated: !!user,
-          roomId: props.roomId,
-          gameSettings: props.store.gameSettings,
-          players: props.store.players.map(playerInfoToPreGamePlayerInfo),
-          date: new Date(),
-        };
-        saveRoom(props.roomId, roomInfo);
-
         history.push(gameRoomPath);
       } else {
         toast.error(response.message);

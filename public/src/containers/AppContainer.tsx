@@ -31,6 +31,7 @@ import {
 } from "../components/Routes";
 import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
+import "react-toastify/dist/ReactToastify.css";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];

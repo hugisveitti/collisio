@@ -19,7 +19,8 @@ import {
     mts_connected_to_waiting_room,
     mdts_game_settings_changed,
     mdts_start_game,
-    mts_send_game_actions
+    mts_send_game_actions,
+    std_start_game_callback
 } from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
@@ -115,8 +116,10 @@ export class Player {
         this.socket.on(mdts_start_game, () => {
             if (this.game && this.isLeader) {
                 this.game.startGameFromLeader()
+
             } else if (!this.isLeader) {
                 console.log("NOT LEADER trying to start game")
+
             }
         })
     }

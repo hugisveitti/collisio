@@ -24,6 +24,8 @@ getRedirectResult(auth).then(res => {
     console.log("error getting redirect res", err)
 })
 
+type SignInStatus = "success" | "error"
+
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
@@ -37,14 +39,16 @@ export const signInWithGoogle = (usePopup?: boolean) => {
             toast.error("Error logging in with Google.")
             console.log("error logging in", err)
         })
-    }
+    } else {
 
-    signInWithRedirect(auth, googleProvider).then(user => {
-        console.log("new user", user)
-    }).catch((err) => {
-        toast.error("Error logging in with Google.")
-        console.log("error logging in", err)
-    })
+
+        signInWithRedirect(auth, googleProvider).then(user => {
+            console.log("new user", user)
+        }).catch((err) => {
+            toast.error("Error logging in with Google.")
+            console.log("error logging in", err)
+        })
+    }
 }
 
 export const signInWithFacebook = () => {
@@ -69,17 +73,18 @@ export const createAccountWithEmail = (email: string, password: string, displayN
     })
 }
 
-export const signInWithEmail = (email: string, password: string) => {
+export const signInWithEmail = (email: string, password: string, callback: (status: SignInStatus, message: string) => void) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
             const user = userCredential.user;
             // ...
+            callback("success", "Successfully signed in.")
         })
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            toast.error("Error signing in with email. " + errorMessage)
+            callback("error", errorMessage)
             console.log("error signing in with email", error)
         });
 }
