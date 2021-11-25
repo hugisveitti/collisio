@@ -10,7 +10,7 @@ module.exports = {
   entry: {
     index: './src/index.tsx',
     admin: "./src/admin/admin.tsx",
-    test: "./src/test.tsx"
+    test: "./src/experiment.tsx"
   },
   module: {
     rules: [

@@ -101,14 +101,14 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
         photoURL, } = playerInfo
 
     return {
-        playerName,
+        playerName: playerName ?? "undefined",
         teamName: teamName ?? "undefined",
-        teamNumber,
-        playerNumber,
-        id,
-        isAuthenticated,
-        vehicleType,
-        photoURL,
+        teamNumber: teamNumber ?? -1,
+        playerNumber: playerNumber ?? -1,
+        id: id ?? "undefined",
+        isAuthenticated: isAuthenticated ?? false,
+        vehicleType: vehicleType ?? "test",
+        photoURL: photoURL ?? "",
     }
 }
 
@@ -206,7 +206,7 @@ export const dts_vehicles_ready = "dts_vehicles_ready"
 
 
 /** connection stuff */
-export const dts_left_waiting_room = "dts_left_waiting_room"
+export const mdts_left_waiting_room = "mdts_left_waiting_room"
 export const stm_desktop_disconnected = "stm_desktop_disconnected"
 export const std_player_disconnected = "std_player_disconnected"
 export const mts_connected_to_waiting_room = "mts_connected_to_waiting_room"

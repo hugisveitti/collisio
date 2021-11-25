@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
 import { IUserSettings } from "../classes/User";
 import { TrackName } from "../shared-backend/shared-stuff";
-import { removeUndefinedFromObject } from "../utils/utilFunctions";
+import { getDateNow } from "../utils/utilFunctions";
 import { database } from "./firebaseInit";
 
 export const usersRefPath = "users"
@@ -28,7 +28,7 @@ const userGameGameInfoPath = "game-info"
 export interface IUser {
     displayName: string
     email: string
-    photoURL?: string
+    photoURL: string
     uid: string
     isPremium: boolean,
 }
@@ -39,9 +39,10 @@ export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) 
 
     onValue(dbUserRef, snapshot => {
         if (!snapshot.exists()) {
-            set(ref(database, usersRefPath + "/" + userData.uid), removeUndefinedFromObject(userData)).catch((err) => {
-                console.log("Error setting db user", err);
-            });
+            userData["creationDate"] = getDateNow()
+            set(ref(database, usersRefPath + "/" + userData.uid), userData).catch((err) => {
+                console.warn("Error setting db user", err);
+            })
             if (callback) {
                 callback(userData)
             }
@@ -49,9 +50,15 @@ export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) 
             if (callback) {
                 callback(snapshot.val())
             }
+            const updates = {}
+            updates[usersRefPath + "/" + userData.uid + "/" + "latestLogin"] = getDateNow()
+            update(ref(database), updates).catch((err) => {
+                console.warn("error updating user data", err)
+            })
+
         }
     }, err => {
-        console.log("Error getting DBUser in create", err)
+        console.warn("Error getting DBUser in create", err)
     }, { onlyOnce: true })
 }
 
@@ -64,7 +71,7 @@ export const getDBUser = (userId: string, callback: (user: IUser) => void) => {
             callback(user)
         }
     }, err => {
-        console.log("Error getting db user", err)
+        console.warn("Error getting db user", err)
     }, { onlyOnce: true })
 }
 
@@ -147,7 +154,7 @@ export const saveRaceDataPlayer = (playerGameInfo: IEndOfRaceInfoPlayer, callbac
                 }
             }
             update(ref(database), updates).catch((err) => {
-                console.log("error saving player data", err)
+                console.warn("error saving player data", err)
                 toast.error("Error saving player data")
             })
 
@@ -161,7 +168,7 @@ export const saveRaceDataGame = (playerId: string, gameInfo: IEndOfRaceInfoGame,
     const updates = {}
     updates[usersRefPath + "/" + playerId + "/" + userGamesRefPath + "/" + gameInfo.gameId + "/" + userGameGameInfoPath] = gameInfo
     update(ref(database), updates).catch((err) => {
-        console.log("error saving game data", err)
+        console.warn("error saving game data", err)
         toast.error("Error saving game data")
     })
 }
@@ -175,8 +182,7 @@ export const saveRoom = (roomId: string, roomInfo: IRoomInfo) => {
     const updates = {}
     const roomKey = uuid()
     updates[roomDataRefPath + "/" + roomKey] = roomInfo
-    console.log("room info", roomInfo)
-    update(ref(database), removeUndefinedFromObject(updates)).catch((err) => {
+    update(ref(database), updates).catch((err) => {
         console.log("error saving room data", err)
     })
 }

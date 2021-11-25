@@ -19,6 +19,11 @@ export const shuffleArray = (arr: any[]) => {
     }
 }
 
+/**
+ * 
+ * @param object, 
+ * @returns a version of the object where undefined valeus are removed
+ */
 export const removeUndefinedFromObject = (object: Object) => {
     const keys = Object.keys(object)
     const newObject = {}

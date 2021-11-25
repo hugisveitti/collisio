@@ -5,6 +5,7 @@ import {
   IUser,
 } from "../firebase/firebaseFunctions";
 import { auth } from "../firebase/firebaseInit";
+import { getDateNow } from "../utils/utilFunctions";
 
 interface IUserProvider {
   children: any;
@@ -21,9 +22,10 @@ const UserProvider = (props: IUserProvider) => {
           const userInfo = {
             displayName: auth.currentUser.displayName,
             uid: auth.currentUser.uid,
-            photoURL: auth.currentUser.photoURL,
+            photoURL: auth.currentUser.photoURL ?? "",
             email: auth.currentUser.email,
             isPremium: isPremium,
+            latestLogin: getDateNow(),
           };
           setUser(userInfo);
           createDBUser(userInfo);

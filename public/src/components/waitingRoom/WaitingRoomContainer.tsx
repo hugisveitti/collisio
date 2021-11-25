@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection, IRoomInfo } from "../../classes/Game";
+import { IGameSettings } from "../../classes/localGameSettings";
 import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
@@ -21,19 +22,19 @@ import {
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
-  dts_left_waiting_room,
   IPlayerInfo,
+  mdts_left_waiting_room,
   mdts_players_in_room,
   mts_connected_to_waiting_room,
   mts_player_connected,
+  playerInfoToPreGamePlayerInfo,
   std_player_disconnected,
+  stmd_game_settings_changed,
+  stmd_game_starting,
   stmd_players_in_room_callback,
   stmd_waiting_room_alert,
   stm_desktop_disconnected,
-  stmd_game_settings_changed,
   stm_player_connected_callback,
-  stmd_game_starting,
-  playerInfoToPreGamePlayerInfo,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { ISocketCallback } from "../../utils/connectSocket";
@@ -59,6 +60,14 @@ interface WaitParamType {
   roomId: string;
 }
 
+/**
+ * a small hack
+ * since variables created with useState behave weird with useEffect
+ */
+let toSavePlayers = [];
+let toSaveRoomId = "";
+let toSaveGameSettings = {};
+
 const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const [userLoading, setUserLoading] = useState(true);
   const [displayNameModalOpen, setDisplayNameModalOpen] = useState(false);
@@ -72,6 +81,21 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
+
+  const handleSaveRoomInfo = () => {
+    if (toSaveRoomId) {
+      const roomInfo: IRoomInfo = {
+        desktopId: user?.uid,
+        desktopAuthenticated: !!user,
+        roomId: toSaveRoomId,
+        gameSettings: toSaveGameSettings as IGameSettings,
+        players: toSavePlayers.map(playerInfoToPreGamePlayerInfo),
+        date: getDateNow(),
+        canceledGame: history.location?.pathname !== gameRoomPath,
+      };
+      saveRoom(toSaveRoomId, roomInfo);
+    }
+  };
 
   const getPlayersInRoom = () => {
     props.socket.emit(mdts_players_in_room, { roomId });
@@ -131,9 +155,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
+    toSaveGameSettings = props.store.gameSettings;
     /**
      * if desktop goes in and out and in of waitingRoom
      */
+
     props.store.setPlayers([]);
 
     const userLoadingTimout = setTimeout(() => {
@@ -143,10 +169,10 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
     props.socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
       props.store.setPlayers(_players);
+      toSavePlayers = _players;
     });
 
     props.socket.on(stmd_game_starting, () => {
-      console.log("starting game");
       if (onMobile) {
         history.push(controlsRoomPath);
       } else {
@@ -159,6 +185,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       getPlayersInRoom();
       props.socket.on(stmd_game_settings_changed, (data) => {
+        toSaveGameSettings = data.gameSettings;
         props.store.setGameSettings(data.gameSettings);
       });
 
@@ -175,19 +202,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
     return () => {
       if (!onMobile) {
-        const roomInfo: IRoomInfo = {
-          desktopId: user?.uid,
-          desktopAuthenticated: !!user,
-          roomId: props.store.roomId,
-          gameSettings: props.store.gameSettings,
-          players: props.store.players.map(playerInfoToPreGamePlayerInfo),
-          date: getDateNow(),
-          canceledGame: history.location?.pathname !== gameRoomPath,
-        };
-        saveRoom(props.store.roomId, roomInfo);
+        /** save on unmount only if no gameRoom */
+        handleSaveRoomInfo();
       }
       window.clearTimeout(userLoadingTimout);
-      props.socket.emit(dts_left_waiting_room, {});
+      props.socket.emit(mdts_left_waiting_room, {});
       props.socket.off(stmd_game_starting);
       props.socket.off(stm_desktop_disconnected);
       props.socket.off(stmd_game_settings_changed);
@@ -219,6 +238,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     if (!onMobile && user && props.store.roomId) {
+      toSaveRoomId = props.store.roomId;
       addToAvailableRooms(user.uid, {
         roomId: props.store.roomId,
         displayName: user.displayName,

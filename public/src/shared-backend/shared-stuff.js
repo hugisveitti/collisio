@@ -1,6 +1,6 @@
 "use strict";
-exports.__esModule = true;
-exports.std_send_game_actions = exports.mts_send_game_actions = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.dts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.std_send_game_actions = exports.mts_send_game_actions = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
         this.beta = 0;
@@ -35,14 +35,14 @@ exports.VehicleControls = VehicleControls;
 var playerInfoToPreGamePlayerInfo = function (playerInfo) {
     var playerName = playerInfo.playerName, teamName = playerInfo.teamName, teamNumber = playerInfo.teamNumber, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL;
     return {
-        playerName: playerName,
+        playerName: playerName !== null && playerName !== void 0 ? playerName : "undefined",
         teamName: teamName !== null && teamName !== void 0 ? teamName : "undefined",
-        teamNumber: teamNumber,
-        playerNumber: playerNumber,
-        id: id,
-        isAuthenticated: isAuthenticated,
-        vehicleType: vehicleType,
-        photoURL: photoURL
+        teamNumber: teamNumber !== null && teamNumber !== void 0 ? teamNumber : -1,
+        playerNumber: playerNumber !== null && playerNumber !== void 0 ? playerNumber : -1,
+        id: id !== null && id !== void 0 ? id : "undefined",
+        isAuthenticated: isAuthenticated !== null && isAuthenticated !== void 0 ? isAuthenticated : false,
+        vehicleType: vehicleType !== null && vehicleType !== void 0 ? vehicleType : "test",
+        photoURL: photoURL !== null && photoURL !== void 0 ? photoURL : "",
     };
 };
 exports.playerInfoToPreGamePlayerInfo = playerInfoToPreGamePlayerInfo;
@@ -102,7 +102,7 @@ exports.std_ping_test_callback = "std_ping_test_callback";
 /** when vehicles are ready, stuff like settings can be sent */
 exports.dts_vehicles_ready = "dts_vehicles_ready";
 /** connection stuff */
-exports.dts_left_waiting_room = "dts_left_waiting_room";
+exports.mdts_left_waiting_room = "mdts_left_waiting_room";
 exports.stm_desktop_disconnected = "stm_desktop_disconnected";
 exports.std_player_disconnected = "std_player_disconnected";
 exports.mts_connected_to_waiting_room = "mts_connected_to_waiting_room";
