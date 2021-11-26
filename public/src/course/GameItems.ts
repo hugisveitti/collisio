@@ -46,10 +46,11 @@ export const gameItems = {
         collisionFlags: 5,
         shape: "convex",
         isCourseObject: true,
-        exactMatch: true,
+        // exactMatch: true,
         castsShadow: false,
         receiveShadow: true,
-        objectName: "checkpoint"
+        objectName: "checkpoints",
+        isCourseObjectArray: true
     },
     "goal": {
         collisionFlags: 5,
@@ -83,8 +84,9 @@ export const gameItems = {
         shape: "concave",
         notAddPhysics: true,
         isCourseObject: true,
-        exactMatch: true,
-        objectName: "checkpointSpawn"
+        // exactMatch: true,
+        objectName: "checkpointSpawns",
+        isCourseObjectArray: true
     },
     "goal-spawn": {
         collisionFlags: -1,

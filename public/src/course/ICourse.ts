@@ -17,9 +17,10 @@ export interface ICourse {
 
 export interface IRaceCourse extends ICourse {
     goalSpawn: ExtendedObject3D
-    checkpointSpawn: ExtendedObject3D
+    checkpointSpawns: ExtendedObject3D[]
     goal: ExtendedObject3D
-    checkpoint: ExtendedObject3D
+    checkpoints: ExtendedObject3D[]
+    getNumberOfCheckpoints: () => number
 }
 
 export interface ITagCourse extends ICourse {

@@ -25,6 +25,8 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
           : "No leader"}
       </TableCell>
       <TableCell>{props.roomInfo.canceledGame ? "Yes" : "No"}</TableCell>
+      <TableCell>{props.roomInfo.gameSettings.trackName}</TableCell>
+      <TableCell>{props.roomInfo.gameSettings.numberOfLaps}</TableCell>
     </TableRow>
   );
 };
@@ -50,6 +52,8 @@ const RoomDataTable = (props: IRoomDataTable) => {
             <TableCell>Number of players</TableCell>
             <TableCell>Leader</TableCell>
             <TableCell>Game cancelled</TableCell>
+            <TableCell>Trackname</TableCell>
+            <TableCell>Number of laps</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

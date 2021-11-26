@@ -202,6 +202,9 @@ export class Course implements ICourse {
                                 }
                                 if (gameItems[key].isCourseObjectArray) {
                                     const code = `this.${gameItems[key].objectName}.push(child)`
+                                    console.log("key", key)
+                                    console.log("${gameItems[key].objectName}", `${gameItems[key].objectName}`)
+                                    console.log("code", code)
                                     eval(code)
                                 } else {
                                     const code = `this.${gameItems[key].objectName} = child`

@@ -13,21 +13,30 @@ export class GameTime {
     currentLapTime: number
     clock: Clock
     pauseClock: Clock
-    isCheckpointCrossed: boolean
+    isCheckpointCrossed: boolean[]
     totalNumberOfLaps: number
     lapTimes: number[]
     totalTime: number
 
-    constructor(totalNumberOfLaps: number) {
+    constructor(totalNumberOfLaps: number, numberOfCheckpoints: number) {
         this.totalNumberOfLaps = totalNumberOfLaps
         this.lapNumber = 1
         this.bestLapTime = Infinity
         this.clock = new Clock(false)
         this.isPaused = true
         this.currentLapTime = 0
-        this.isCheckpointCrossed = false
+        this.isCheckpointCrossed = []
+        for (let i = 0; i < numberOfCheckpoints; i++) {
+            this.isCheckpointCrossed.push(false)
+        }
         this.lapTimes = []
         this.totalTime = 0
+    }
+
+    resetCheckpoints() {
+        for (let i = 0; i < this.isCheckpointCrossed.length; i++) {
+            this.isCheckpointCrossed[i] = false
+        }
     }
 
     start() {
@@ -55,7 +64,7 @@ export class GameTime {
         this.clock.stop()
         this.clock.start()
         this.currentLapTime = 0
-        this.isCheckpointCrossed = false
+        this.resetCheckpoints()
         if (this.finished()) {
             this.stop()
         } else {
@@ -63,13 +72,28 @@ export class GameTime {
         }
     }
 
+    allCheckpointsCrossed() {
+
+        for (let p of this.isCheckpointCrossed) {
+            if (!p) return false
+        }
+        return true
+    }
+
     getTotalTime() {
         if (this.finished()) return around(this.totalTime)
         return this.totalTime + this.getCurrentLapTime()
     }
 
-    checkpointCrossed() {
-        this.isCheckpointCrossed = true
+    checkpointCrossed(checkpointNumber: number) {
+        /**
+         * checkpoints indexed at 1 in blender
+         */
+        this.isCheckpointCrossed[checkpointNumber - 1] = true
+    }
+
+    crossedCheckpoint(checkpointNumber: number) {
+        return this.isCheckpointCrossed[checkpointNumber - 1]
     }
 
     getBestLapTime() {

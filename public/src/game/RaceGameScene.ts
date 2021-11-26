@@ -8,6 +8,7 @@ import { VehicleControls } from '../shared-backend/shared-stuff';
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
+import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
@@ -61,7 +62,7 @@ export class RaceGameScene extends GameScene {
 
     async create() {
         this.gameTimers = []
-        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
         this.course.createCourse(this.useShadows, () => {
             this.courseLoaded = true
             const createVehiclePromise = new Promise((resolve, reject) => {
@@ -71,10 +72,10 @@ export class RaceGameScene extends GameScene {
             })
 
             createVehiclePromise.then(() => {
-
+                this.currentNumberOfLaps = this.gameSettings.numberOfLaps
                 // adds font to vehicles, which displays names
                 for (let i = 0; i < this.players.length; i++) {
-                    this.gameTimers.push(new GameTime(this.currentNumberOfLaps))
+                    this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
                 }
                 this.loadFont()
                 this.createViews()
@@ -121,7 +122,7 @@ export class RaceGameScene extends GameScene {
                     timer()
                 } else {
                     this.playStartBeep()
-                    this.showViewsImportantInfo("GO!!!!")
+                    this.showViewsImportantInfo("GO!")
                     this.startAllVehicles()
                     this.gameStarted = true
 
@@ -155,7 +156,7 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
 
         for (let i = 0; i < this.players.length; i++) {
-            this.gameTimers.push(new GameTime(this.currentNumberOfLaps))
+            this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
     }
 
@@ -191,8 +192,8 @@ export class RaceGameScene extends GameScene {
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
 
-        const vehicleNumber = vehicle.body.name.slice(8, 9)
-        if (this.gameTimers[vehicleNumber].isCheckpointCrossed) {
+        const vehicleNumber = getVehicleNumber(vehicle.body.name)
+        if (this.gameTimers[vehicleNumber].allCheckpointsCrossed()) {
             const cLapTime = this.gameTimers[vehicleNumber].getCurrentLapTime()
             this.gameTimers[vehicleNumber].lapDone()
 
@@ -233,12 +234,17 @@ export class RaceGameScene extends GameScene {
         }
     }
 
-    handleCheckpointCrossed(vehicle: ExtendedObject3D) {
-        const vehicleNumber = vehicle.body.name.slice(8, 9)
-        this.gameTimers[vehicleNumber].checkpointCrossed()
+    handleCheckpointCrossed(vehicle: ExtendedObject3D, checkpointNumber: number) {
+        const vehicleNumber = getVehicleNumber(vehicle.body.name)
+        if (!this.gameTimers[vehicleNumber].crossedCheckpoint(checkpointNumber)) {
+            this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
 
-        const p = this.course.checkpointSpawn.position
-        const r = this.course.checkpointSpawn.rotation
+        }
+        this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
+
+        const p = this.course.checkpointSpawns[checkpointNumber - 1].position
+        const r = this.course.checkpointSpawns[checkpointNumber - 1].rotation
+
         this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
     }
 

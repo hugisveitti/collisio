@@ -60,9 +60,16 @@ const Routes = () => {
   useEffect(() => {
     createSocket(deviceType, (_socket) => setSocket(_socket));
 
+    if (!inTestMode) {
+      const _gameSettings = getAllLocalGameSettings();
+      store.setGameSettings(_gameSettings);
+    }
+
     if (inTestMode) {
+      store.setGameSettings(testGameSettings);
+
       // setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
-      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
     }
   }, []);
@@ -97,11 +104,6 @@ const Routes = () => {
       });
     }
   }, [user]);
-
-  useEffect(() => {
-    const _gameSettings = getAllLocalGameSettings();
-    store.setGameSettings(_gameSettings);
-  }, []);
 
   // possibly load the socket in the appContainer since not everything needs a socket
   if (!socket)

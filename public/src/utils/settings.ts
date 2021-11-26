@@ -41,13 +41,15 @@ export const inTestMode = false
 
 
 export const testGameSettings: IGameSettings = {
-    gameType: "tag",
+    gameType: "race",
     numberOfLaps: 2,
-    trackName: "simple-tag-course",
+    trackName: "f1-track",
     tagGameLength: 2,
     useShadows: true,
     useSound: true
 }
+
+
 
 export const getStaticPath = (path: string) => {
     return `/${path}`

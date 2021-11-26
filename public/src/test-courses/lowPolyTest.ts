@@ -102,7 +102,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.vehicleType = window.localStorage.getItem("vehicleType") as VehicleType ?? "normal"
         this.mobileControls = new MobileControls()
 
-        this.gameTime = new GameTime(3)
+        this.gameTime = new GameTime(3, 1)
         this.trackName = window.localStorage.getItem("trackName") as TrackName ?? "test-course"
         this.usingDebug = eval(window.localStorage.getItem("usingDebug")) ?? true
 
@@ -248,11 +248,14 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         // test-course.gltf
         if (this.getGameType() === "race") {
 
-            this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D) => this.handleCheckpointCrossed(o))
+            this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
         } else if (this.getGameType() === "tag") {
             this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
         }
         this.course.createCourse(this.useShadows, () => {
+            if (this.getGameType() === "race") {
+                this.gameTime = new GameTime(3, (this.course as RaceCourse).getNumberOfCheckpoints())
+            }
             this.courseLoaded = true
             this.createOtherVehicles(() => {
                 this.createVehicle().then(() => {
@@ -613,11 +616,11 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.goalCrossed = true
     }
 
-    handleCheckpointCrossed(o: ExtendedObject3D) {
+    handleCheckpointCrossed(o: ExtendedObject3D, checkpointNumber: number) {
         if (!this.checkpointCrossed) {
             this.goalCrossed = false
-            const p = (this.course as RaceCourse).checkpointSpawn.position
-            const r = (this.course as RaceCourse).checkpointSpawn.rotation
+            const p = (this.course as RaceCourse).checkpointSpawns[checkpointNumber].position
+            const r = (this.course as RaceCourse).checkpointSpawns[checkpointNumber].rotation
 
             this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
         }

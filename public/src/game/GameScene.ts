@@ -216,6 +216,8 @@ export class GameScene extends Scene3D implements IGameScene {
                 this.restartGame()
             } else if (e.key === "p") {
                 this.togglePauseGame()
+            } else if (e.key === "t") {
+                this.resetPlayer(0)
             }
         })
 
