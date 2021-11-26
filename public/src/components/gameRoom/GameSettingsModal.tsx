@@ -7,6 +7,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
+import { green1, red1 } from "../../providers/theme";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
@@ -51,6 +52,11 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                 "useShadows",
                 !props.store.gameSettings.useShadows
               );
+              const newGameSettings = {
+                ...props.store.gameSettings,
+                useShadows: !props.store.gameSettings.useSound,
+              };
+              props.store.setGameSettings(newGameSettings);
             }}
           >
             Shadows {props.store.gameSettings.useShadows ? "On" : "Off"}
@@ -65,6 +71,15 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                 "useSound",
                 !props.store.gameSettings.useSound
               );
+              console.log(
+                "props.store.gameSettings.useSound",
+                props.store.gameSettings
+              );
+              // const newGameSettings = {
+              //   ...props.store.gameSettings,
+              //   useSound: !props.store.gameSettings.useSound,
+              // };
+              // props.store.setGameSettings(newGameSettings);
             }}
           >
             Sound {props.store.gameSettings.useSound ? "On" : "Off"}

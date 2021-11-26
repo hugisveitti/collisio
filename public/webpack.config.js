@@ -42,7 +42,8 @@ module.exports = {
         options: {
           name: '[path][name].[ext]'
         }
-      }, {
+      },
+      {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
         use: {

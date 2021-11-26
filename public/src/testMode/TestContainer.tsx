@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { defaultGameSettings } from "../classes/localGameSettings";
+import {
+  defaultGameSettings,
+  getAllLocalGameSettings,
+} from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
 import GameRoom from "../components/gameRoom/GameRoom";
 // import GameRoom from "../components/GameRoom";
@@ -31,6 +34,8 @@ const TestContainer = () => {
 
   useEffect(() => {
     createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
+    const _gameSettings = getAllLocalGameSettings();
+    store.setGameSettings(_gameSettings);
   }, []);
 
   useEffect(() => {

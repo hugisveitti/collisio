@@ -83,6 +83,8 @@ const GameRoom = (props: IGameRoom) => {
     newGameSettings[key] = value;
     setLocalGameSetting(key, value);
 
+    /** hacky way to make react update component */
+    props.store.setGameSettings({ ...newGameSettings });
     gameObject.setGameSettings(newGameSettings);
   };
 

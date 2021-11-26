@@ -51,10 +51,10 @@ export const allTrackNames: ITrackInfo[] = [
     }
 ]
 
-export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track"]
+export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2"]
 export const activeGameTypes: GameType[] = ["race", "tag"]
 
-export const nonActiveTrackNames: TrackName[] = ["test-course", "town-track", "f1-track-2"]
+export const nonActiveTrackNames: TrackName[] = ["test-course", "town-track"]
 export const defaultRaceTrack: TrackName = "farm-track"
 export const defaultTagTrack: TrackName = "simple-tag-course"
 

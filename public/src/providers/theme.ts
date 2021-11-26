@@ -14,7 +14,7 @@ const blue2 = "#8ec6e2"
 const blue3 = "#4b93b8"
 const blue4 = "#185676"
 
-const green1 = "#d3e9a6"
+export const green1 = "#d3e9a6"
 const green2 = "#9cbc62"
 const green3 = "#669132"
 const green4 = "#365b13"
@@ -33,6 +33,11 @@ const gray1 = "#c4d9e1"
 const gray2 = "#97b0ba"
 const gray3 = "#65787f"
 const gray4 = "#374274"
+
+export const red1 = "#fb4a1"
+const red2 = "#dc5a3a"
+const red3 = "#ab3a1d"
+const red4 = "#7e1a09"
 
 export const containerBackgroundColor = yellow1 // "#dbb165"
 

@@ -599,7 +599,28 @@ export class LowPolyVehicle implements IVehicle {
         // }
         // camera.lookAt(this.chassisMesh.position.clone())
     };
+
+    checkIfSpinning() {
+        const vel = this.vehicle.getRigidBody().getAngularVelocity()
+        if (Math.abs(vel.x()) > 3) {
+            console.log("danger X", vel.x())
+            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x() / 2, vel.y(), vel.z()))
+
+        }
+        if (Math.abs(vel.y()) > 5) {
+            console.log("danger Y", vel.y())
+            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x(), vel.y() / 2, vel.z()))
+        }
+        if (Math.abs(vel.z()) > 6) {
+            console.log("danger Z", vel.z())
+            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x(), vel.y(), vel.z() / 2))
+
+        }
+    }
+
+
     update() {
+        this.checkIfSpinning()
 
         if (this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))

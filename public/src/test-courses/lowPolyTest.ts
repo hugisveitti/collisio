@@ -120,7 +120,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
-        this.physics.setGravity(0, -20, 0)
+        this.physics.setGravity(0, -50, 0)
 
     }
 
@@ -743,19 +743,19 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.isPaused = true
     }
 
-    setGameSettings(userGameSettings: IGameSettings) {
-        for (let key of Object.keys(userGameSettings)) {
-            if (userGameSettings[key] !== undefined) {
-                this[key] = userGameSettings[key]
-            }
-        }
+    // setGameSettings(userGameSettings: IGameSettings) {
+    //     for (let key of Object.keys(userGameSettings)) {
+    //         if (userGameSettings[key] !== undefined) {
+    //             this[key] = userGameSettings[key]
+    //         }
+    //     }
 
-        if (this.pLight && this.course) {
-            this.pLight.castShadow = this.useShadows
-            this.pLight.shadow.bias = 0.01
-            this.course.toggleShadows(this.useShadows)
-        }
-    }
+    //     if (this.pLight && this.course) {
+    //         this.pLight.castShadow = this.useShadows
+    //         this.pLight.shadow.bias = 0.01
+    //         this.course.toggleShadows(this.useShadows)
+    //     }
+    // }
 
 
     changeVehicle(vehicleNumber: number, vehicleType: VehicleType) {
