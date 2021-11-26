@@ -1,10 +1,13 @@
 "use strict";
-exports.__esModule = true;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
 var uuid_1 = require("uuid");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var ServerPlayer_1 = require("./ServerPlayer");
-var TestRoom_1 = require("./TestRoom");
+var TestRoom_1 = __importDefault(require("./TestRoom"));
 var successStatus = "success";
 var errorStatus = "error";
 var RoomMaster = /** @class */ (function () {
@@ -22,7 +25,7 @@ var RoomMaster = /** @class */ (function () {
         this.io = io;
         this.rooms = {};
         /** only one test room */
-        this.testRoom = new TestRoom_1["default"]();
+        this.testRoom = new TestRoom_1.default();
         this.allSocketIds = [];
     }
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
@@ -119,7 +122,7 @@ var RoomMaster = /** @class */ (function () {
     };
     return RoomMaster;
 }());
-exports["default"] = RoomMaster;
+exports.default = RoomMaster;
 var Room = /** @class */ (function () {
     function Room(roomId, io, socket, deleteRoomCallback) {
         this.players = [];
@@ -144,7 +147,7 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;
-        this.socket.on(shared_stuff_1.dts_left_waiting_room, function () {
+        this.socket.on(shared_stuff_1.mdts_left_waiting_room, function () {
             /** if game hasnt started delete game */
             if (!_this.gameStarted) {
                 for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
@@ -300,8 +303,8 @@ var Room = /** @class */ (function () {
             for (var i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
-                    this.players.splice(i, 1);
                     wasLeader = this.players[i].isLeader;
+                    this.players.splice(i, 1);
                 }
             }
             if (wasLeader) {

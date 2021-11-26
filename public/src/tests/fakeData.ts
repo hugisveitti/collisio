@@ -88,17 +88,17 @@ export const createFakeHighscoreData = () => {
                 isAuthenticated: false
             })
         }
-        const gameData: IEndOfRaceInfoGame = {
-            playersInfo: playerGameInfos,
-            numberOfLaps,
-            gameId,
-            roomId,
-            trackName,
-            date: getDateNow()
-        }
+        // const gameData: IEndOfRaceInfoGame = {
+        //     playersInfo: playerGameInfos,
+        //     numberOfLaps,
+        //     gameId,
+        //     roomId,
+        //     trackName,
+        //     date: getDateNow()
+        // }
 
         console.log("###saving data")
-        console.log("GAMEDATA", gameData)
+        // console.log("GAMEDATA", gameData)
         console.log("PlayerDATA", playerData)
         // saveRaceData(playerData, gameData, (gameDataInfo) => {
         //     console.log("interesting game data in fake data", gameDataInfo)

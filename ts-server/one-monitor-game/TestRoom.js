@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var TestRoom = /** @class */ (function () {
     function TestRoom() {
@@ -51,4 +51,4 @@ var TestRoom = /** @class */ (function () {
     };
     return TestRoom;
 }());
-exports["default"] = TestRoom;
+exports.default = TestRoom;

@@ -102,6 +102,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
 
   return (
     <Card
+      variant="outlined"
       style={{
         backgroundColor: cardBackgroundColor,
       }}

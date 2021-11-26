@@ -65,10 +65,13 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
           </Button>
 
           <Collapse in={showPreview} style={{ marginTop: 10 }}>
-            <ShowRoomComponent
-              excludedVehicles={props.excludedVehicles}
-              isPremiumUser={false}
-            />
+            {showPreview && (
+              <ShowRoomComponent
+                excludedVehicles={props.excludedVehicles}
+                isPremiumUser={false}
+                vehcileType={props.value}
+              />
+            )}
           </Collapse>
         </React.Fragment>
       )}

@@ -35,6 +35,7 @@ var Player = /** @class */ (function () {
         this.setupGameStartedListener();
         this.setupGameActionsListener();
         this.setupPingListener();
+        this.setupLeftWaitingRoomListener();
     };
     /**
      * actions like reset game
@@ -50,6 +51,15 @@ var Player = /** @class */ (function () {
             }
             else {
                 console.log("non leader cannot change gameActions");
+            }
+        });
+    };
+    Player.prototype.setupLeftWaitingRoomListener = function () {
+        var _this = this;
+        this.socket.on(shared_stuff_1.mdts_left_waiting_room, function () {
+            var _a, _b;
+            if (!((_a = _this.game) === null || _a === void 0 ? void 0 : _a.gameStarted)) {
+                (_b = _this.game) === null || _b === void 0 ? void 0 : _b.playerDisconnected(_this.playerName, _this.id);
             }
         });
     };

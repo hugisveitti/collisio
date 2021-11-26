@@ -24,6 +24,7 @@ import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
 interface IShowRoom {
   excludedVehicles?: VehicleType[];
   isPremiumUser: boolean;
+  vehcileType?: VehicleType;
 }
 
 const ShowRoomComponent = (props: IShowRoom) => {
@@ -49,9 +50,10 @@ const ShowRoomComponent = (props: IShowRoom) => {
   possibleVehicleColors;
   useEffect(() => {
     const renderer = createShowRoomCanvas(
-      possibleVehcileTypes[
-        Math.abs(vehicleTypeNum % possibleVehcileTypes.length)
-      ].type,
+      props.vehcileType ??
+        possibleVehcileTypes[
+          Math.abs(vehicleTypeNum % possibleVehcileTypes.length)
+        ].type,
       chassisNum
     );
     if (canvasWrapperRef.current && renderer) {
@@ -77,7 +79,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
     } else {
       setShowBuyPremium(true);
     }
-  }, [chassisNum, vehicleTypeNum]);
+  }, [chassisNum, vehicleTypeNum, props.vehcileType]);
 
   return (
     <React.Fragment>
@@ -85,84 +87,93 @@ const ShowRoomComponent = (props: IShowRoom) => {
         <Grid item xs={12}>
           <div ref={canvasWrapperRef}></div>
         </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h6" component="div">
-            {
-              possibleVehcileTypes[vehicleTypeNum % possibleVehcileTypes.length]
-                ?.name
-            }
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Collapse in={showBuyPremium}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography color="InfoText" style={{ textAlign: "center" }}>
-                  This is a Premium vehicle available only to Premium users.
-                </Typography>
-              </Grid>
-              <Grid item xs={12} style={{ textAlign: "center" }}>
-                <Button
-                  variant="contained"
-                  onClick={() => history.push(buyPremiumPagePath)}
-                >
-                  Go Premium
-                </Button>
-              </Grid>
+        {!props.vehcileType && (
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h6" component="div">
+                {
+                  possibleVehcileTypes[
+                    vehicleTypeNum % possibleVehcileTypes.length
+                  ]?.name
+                }
+              </Typography>
             </Grid>
-          </Collapse>
-        </Grid>
+            <Grid item xs={12}>
+              <Collapse in={showBuyPremium}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Typography
+                      color="InfoText"
+                      style={{ textAlign: "center" }}
+                    >
+                      This is a Premium vehicle available only to Premium users.
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} style={{ textAlign: "center" }}>
+                    <Button
+                      disableElevation
+                      variant="contained"
+                      onClick={() => history.push(buyPremiumPagePath)}
+                    >
+                      Go Premium
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
 
-        <Grid item xs={3} />
-        <Grid item xs={3} style={{ textAlign: "center" }}>
-          <IconButton
-            onClick={() => {
-              if (vehicleTypeNum === 0) {
-                setVehicleTypeNum(possibleVehcileTypes.length - 1);
-              } else {
-                setVehicleTypeNum(vehicleTypeNum - 1);
-              }
-            }}
-          >
-            <ArrowBackIosNewIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={3} style={{ textAlign: "center" }}>
-          <IconButton
-            onClick={() => {
-              setVehicleTypeNum(vehicleTypeNum + 1);
-            }}
-          >
-            <ArrowForwardIosIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={3} />
+            <Grid item xs={3} />
+            <Grid item xs={3} style={{ textAlign: "center" }}>
+              <IconButton
+                onClick={() => {
+                  if (vehicleTypeNum === 0) {
+                    setVehicleTypeNum(possibleVehcileTypes.length - 1);
+                  } else {
+                    setVehicleTypeNum(vehicleTypeNum - 1);
+                  }
+                }}
+              >
+                <ArrowBackIosNewIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={3} style={{ textAlign: "center" }}>
+              <IconButton
+                onClick={() => {
+                  setVehicleTypeNum(vehicleTypeNum + 1);
+                }}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={3} />
 
-        <Grid item xs={3} />
+            <Grid item xs={3} />
 
-        <Grid item xs={3} style={{ textAlign: "center" }}>
-          <IconButton
-            onClick={() => {
-              if (chassisNum === 0) {
-                setChassisNum(possibleVehicleColors.length - 1);
-              } else {
-                setChassisNum(chassisNum - 1);
-              }
-            }}
-          >
-            <KeyboardArrowLeftIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={3} style={{ textAlign: "center" }}>
-          <IconButton
-            onClick={() => {
-              setChassisNum(chassisNum + 1);
-            }}
-          >
-            <KeyboardArrowRightIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={3} />
+            <Grid item xs={3} style={{ textAlign: "center" }}>
+              <IconButton
+                onClick={() => {
+                  if (chassisNum === 0) {
+                    setChassisNum(possibleVehicleColors.length - 1);
+                  } else {
+                    setChassisNum(chassisNum - 1);
+                  }
+                }}
+              >
+                <KeyboardArrowLeftIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={3} style={{ textAlign: "center" }}>
+              <IconButton
+                onClick={() => {
+                  setChassisNum(chassisNum + 1);
+                }}
+              >
+                <KeyboardArrowRightIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={3} />
+          </>
+        )}
       </Grid>
     </React.Fragment>
   );

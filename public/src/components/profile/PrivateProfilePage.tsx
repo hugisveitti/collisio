@@ -179,6 +179,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
               ) : (
                 <>
                   <Card
+                    variant="outlined"
                     style={{
                       backgroundColor: cardBackgroundColor,
                     }}

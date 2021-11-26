@@ -345,11 +345,11 @@ export class RaceGameScene extends GameScene {
 
         const endOfRaceInfo: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
-            numberOfLaps: this.currentNumberOfLaps,
-            trackName: this.gameSettings.trackName,
+            gameSettings: this.gameSettings,
             gameId: this.gameId,
             roomId: this.roomId,
-            date: getDateNow()
+            date: getDateNow(),
+            ticks: this.ticks
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })

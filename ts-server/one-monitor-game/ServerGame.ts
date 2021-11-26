@@ -4,7 +4,7 @@ import {
     dts_create_room,
     dts_game_finished,
     mdts_game_settings_changed,
-    dts_left_waiting_room,
+    mdts_left_waiting_room,
     dts_ping_test,
     dts_player_finished,
     dts_vehicles_ready,
@@ -208,7 +208,7 @@ export class Room {
 
 
     setupLeftWaitingRoomListener() {
-        this.socket.on(dts_left_waiting_room, () => {
+        this.socket.on(mdts_left_waiting_room, () => {
             /** if game hasnt started delete game */
             if (!this.gameStarted) {
                 for (let player of this.players) {
@@ -380,8 +380,8 @@ export class Room {
             for (let i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
                 if (this.players[i].id === playerId) {
-                    this.players.splice(i, 1)
                     wasLeader = this.players[i].isLeader
+                    this.players.splice(i, 1)
                 }
             }
             if (wasLeader) {

@@ -102,12 +102,12 @@ export interface IPlayerGameInfo {
 
 // info about the game
 export interface IEndOfRaceInfoGame {
-    numberOfLaps: number
     playersInfo: IPlayerGameInfo[]
-    trackName: TrackName
     gameId: string
     roomId: string
     date: string
+    gameSettings: IGameSettings
+    ticks: number
 }
 
 /** while race is going on */

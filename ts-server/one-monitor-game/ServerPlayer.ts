@@ -1,27 +1,10 @@
 import { Socket } from "socket.io"
+import {
+    IPlayerInfo, mdts_game_settings_changed, mdts_left_waiting_room, mdts_start_game, MobileControls, mts_connected_to_waiting_room, mts_controls, mts_game_data_info, mts_ping_test, mts_send_game_actions, mts_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stm_desktop_disconnected, stm_game_finished, stm_ping_test_callback, stm_player_finished, VehicleControls
+} from "../../public/src/shared-backend/shared-stuff"
 import { Room } from "./ServerGame"
 
 
-import {
-    MobileControls,
-    VehicleControls,
-    IPlayerInfo,
-    stm_player_finished,
-    stm_game_finished,
-    mts_game_data_info,
-    mts_user_settings_changed,
-    stmd_game_starting,
-    mts_controls,
-    mts_ping_test,
-    stm_ping_test_callback,
-    stm_desktop_disconnected,
-    stmd_game_settings_changed,
-    mts_connected_to_waiting_room,
-    mdts_game_settings_changed,
-    mdts_start_game,
-    mts_send_game_actions,
-    std_start_game_callback
-} from "../../public/src/shared-backend/shared-stuff"
 
 export class Player {
 
@@ -80,7 +63,7 @@ export class Player {
         this.setupGameStartedListener()
         this.setupGameActionsListener()
         this.setupPingListener()
-
+        this.setupLeftWaitingRoomListener()
     }
 
     /**
@@ -94,6 +77,14 @@ export class Player {
                 this.game?.sendGameActions(gameActions)
             } else {
                 console.log("non leader cannot change gameActions")
+            }
+        })
+    }
+
+    setupLeftWaitingRoomListener() {
+        this.socket.on(mdts_left_waiting_room, () => {
+            if (!this.game?.gameStarted) {
+                this.game?.playerDisconnected(this.playerName, this.id)
             }
         })
     }

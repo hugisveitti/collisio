@@ -73,11 +73,13 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     camera.aspect = width / height
 
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0.5, 0);
-    controls.update();
-    controls.enablePan = false;
-    controls.enableDamping = true;
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // controls.target.set(0, 0.5, 0);
+    // controls.update();
+    // controls.enablePan = false;
+    // controls.enableDamping = true;
+
+    camera.lookAt(0, 0, 0)
 
 
     addVehicle(vehicleType, chassisNum, scene)
@@ -94,17 +96,24 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     };
 
+    let ry = 0
+    let offset = 15
+    camera.rotateY(ry)
     const animate = () => {
 
         requestAnimationFrame(animate);
 
 
-        controls.update();
+        // controls.update();
         if (renderer) {
 
             renderer.render(scene, camera);
         }
-
+        ry += .01
+        // camera.rotateY(ry)
+        camera.position.setX(Math.cos(ry) * offset)
+        camera.position.setZ(Math.sin(ry) * offset)
+        camera.lookAt(0, 0, 0)
     }
 
     animate()
