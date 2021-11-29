@@ -5,7 +5,7 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { setEngineSound } from "../sounds/gameSounds";
+import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
@@ -39,8 +39,6 @@ const BACK_RIGHT = 3
 
 const degToRad = 0.017453
 
-/** Ammo folder needs to be in src folder */
-let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 
 
 const DISABLE_DEACTIVATION = 4;
@@ -125,6 +123,12 @@ export class LowPolyVehicle implements IVehicle {
     vector2: Ammo.btVector3
 
     quaternion: Ammo.btQuaternion
+
+    /** Ammo folder needs to be in src folder */
+    tm: Ammo.btTransform
+    p: Ammo.btVector3
+    q: Ammo.btQuaternion
+
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
 
@@ -520,14 +524,16 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     addCamera(camera: PerspectiveCamera) {
-        if (!this.useChaseCamera) {
+        const c = this.chassisMesh.getObjectByName(camera.name)
+        if (!this.useChaseCamera && !c) {
             camera.position.set(staticCameraPos.x, staticCameraPos.y, staticCameraPos.z)
             this.chassisMesh.add(camera)
         }
-        const c = this.chassisMesh.getObjectByName(camera.name)
 
         this.camera = camera
-        this.createCarSounds()
+        if (!this.engineSound) {
+            this.createCarSounds()
+        }
     };
 
     removeCamera() {
@@ -541,9 +547,29 @@ export class LowPolyVehicle implements IVehicle {
     createCarSounds() {
         const listener = new AudioListener()
         this.camera.add(listener)
-
+        let volume = 0.3
         this.engineSound = new Audio(listener)
-        setEngineSound(this.engineSound, .3, this.useEngineSound)
+
+
+        loadEngineSoundBuffer((engineSoundBuffer: AudioBuffer) => {
+            this.engineSound.setBuffer(engineSoundBuffer)
+            this.engineSound.setLoop(true)
+            this.engineSound.setVolume(volume)
+
+
+            this.engineSound.setLoopEnd(2.5)
+            //  this.engineSound.stop()
+
+            /**
+             * some bug here
+             */
+            if (this.useEngineSound) {
+                setTimeout(() => {
+
+                    this.toggleSound(true)
+                }, 500)
+            }
+        })
     }
 
 
@@ -553,15 +579,17 @@ export class LowPolyVehicle implements IVehicle {
         if (this.spinCameraAroundVehicle) {
 
 
-            const r = this.chassisMesh.rotation
+            const rot = this.chassisMesh.rotation
+            this.vehicle.updateVehicle(0)
+            const pos = this.getPosition()
 
-            const p = this.getPosition()
 
             this.cameraTarget.set(
-                p.x - ((Math.sin(r.y) * cameraOffset)),
-                p.y + staticCameraPos.y,
-                p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
+                pos.x - ((Math.sin(rot.y) * cameraOffset)),
+                pos.y + staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * cameraOffset) * Math.sign(Math.cos(rot.z)))
             )
+
 
             this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * 0.03))
             this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * 0.03))
@@ -569,23 +597,26 @@ export class LowPolyVehicle implements IVehicle {
 
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+            camera.lookAt(this.chassisMesh.position.clone())
             camera.updateProjectionMatrix()
-            camera.lookAt(this.chassisMesh.position)
+            camera.updateMatrix()
+            camera.updateWorldMatrix(false, false)
+            camera.updateMatrixWorld()
 
         } else if (this.useChaseCamera) {
 
 
 
-            const r = this.chassisMesh.rotation
+            const rot = this.chassisMesh.rotation
 
-            const p = this.getPosition()
+            const pos = this.getPosition()
 
 
             // this is for the follow camera effect
             this.cameraTarget.set(
-                p.x - ((Math.sin(r.y) * cameraOffset)),
-                p.y + staticCameraPos.y,
-                p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
+                pos.x - ((Math.sin(rot.y) * cameraOffset)),
+                pos.y + staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * cameraOffset) * Math.sign(Math.cos(rot.z)))
             )
 
 
@@ -599,9 +630,9 @@ export class LowPolyVehicle implements IVehicle {
             //    this.cameraLookAtPos.set(0, 0, 0)
             const cs = 0.5
 
-            this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((p.x - this.prevCahseCameraPos.x) * cs))
-            this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((p.z - this.prevCahseCameraPos.z) * cs))
-            this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((p.y - this.prevCahseCameraPos.y) * cs))
+            this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((pos.x - this.prevCahseCameraPos.x) * cs))
+            this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
+            this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
 
             this.prevCahseCameraPos = this.cameraLookAtPos.clone()
 
@@ -617,6 +648,7 @@ export class LowPolyVehicle implements IVehicle {
             }
 
         } else {
+
             camera.lookAt(this.chassisMesh.position.clone())
         }
 
@@ -671,18 +703,18 @@ export class LowPolyVehicle implements IVehicle {
     checkIfSpinning() {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
         if (Math.abs(vel.x()) > 3) {
-            console.log("danger X", vel.x())
+
             this.vector.setValue(vel.x() / 2, vel.y(), vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
 
         }
         if (Math.abs(vel.y()) > 5) {
-            console.log("danger Y", vel.y())
+
             this.vector.setValue(vel.x(), vel.y() / 2, vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.z()) > 6) {
-            console.log("danger Z", vel.z())
+
             this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
 
@@ -693,19 +725,23 @@ export class LowPolyVehicle implements IVehicle {
     update() {
         this.checkIfSpinning()
 
-        if (this.engineSound && this.useEngineSound) {
+        if (!!this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
+
+            if (!this.engineSound.isPlaying) {
+                this.engineSound.play()
+            }
         }
 
 
 
-        tm = this.vehicle.getChassisWorldTransform()
-        p = tm.getOrigin()
-        q = tm.getRotation()
+        this.tm = this.vehicle.getChassisWorldTransform()
+        this.p = this.tm.getOrigin()
+        this.q = this.tm.getRotation()
 
-        this.chassisMesh.position.set(p.x(), p.y(), p.z())
-        this.chassisMesh.quaternion.set(q.x(), q.y(), q.z(), q.w())
-        if (Math.abs(q.z()) > 0.1 || Math.abs(q.x()) > 0.1) {
+        this.chassisMesh.position.set(this.p.x(), this.p.y(), this.p.z())
+        this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+        if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
             this.badRotationTicks += 1
         } else {
             this.badRotationTicks = 0
@@ -715,9 +751,9 @@ export class LowPolyVehicle implements IVehicle {
         for (let i = 0; i < 5; i++) {
 
             // this.vehicle.updateWheelTransform(i, true)
-            tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
-            p = tm.getOrigin()
-            q = tm.getRotation()
+            this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
+            this.p = this.tm.getOrigin()
+            this.q = this.tm.getRotation()
 
 
 
@@ -726,10 +762,10 @@ export class LowPolyVehicle implements IVehicle {
 
                 const fa = this.vehicle.getRightAxis()
 
-                this.wheelMeshes[i].position.set(p.x(), p.y(), p.z())
-                this.wheelMeshes[i].quaternion.set(q.x(), q.y(), q.z(), q.w())
+                this.wheelMeshes[i].position.set(this.p.x(), this.p.y(), this.p.z())
+                this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
                 this.vehicle.updateWheelTransform(i, false)
-                //  this.wheelMeshes[i].rotateZ(Math.PI / 2)
+
             } else {
 
             }

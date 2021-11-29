@@ -1,4 +1,5 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
+import { getLocalGameSetting } from "../classes/localGameSettings";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
 
@@ -131,7 +132,7 @@ export const fakePlayer2: IPlayerInfo = {
     teamNumber: 0,
     id: "1",
     isAuthenticated: false,
-    vehicleType: "normal",
+    vehicleType: "normal2",
     isConnected: true,
     photoURL: ""
 

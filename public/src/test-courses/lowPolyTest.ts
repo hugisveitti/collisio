@@ -15,7 +15,7 @@ import { GameType, MobileControls, std_user_settings_changed, TrackName, Vehicle
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
-import { allVehicleTypes, defaultVehicleConfig, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
+import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
 
@@ -99,7 +99,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.useShadows = true
         // monsterTruck, tractor
 
-        this.vehicleType = window.localStorage.getItem("vehicleType") as VehicleType ?? "normal"
+        this.vehicleType = window.localStorage.getItem("vehicleType") as VehicleType ?? defaultVehicleType
         this.mobileControls = new MobileControls()
 
         this.gameTime = new GameTime(3, 1)

@@ -23,7 +23,11 @@ import {
 } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import { basicColor, premiumColor, standardColor } from "../../providers/theme";
-import { activeVehicleTypes } from "../../vehicles/VehicleConfigs";
+import {
+  activeVehicleTypes,
+  defaultVehicleType,
+  getVehicleNameFromType,
+} from "../../vehicles/VehicleConfigs";
 import { frontPagePath } from "../Routes";
 
 interface IPremiumOptionListItem {
@@ -157,11 +161,11 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
               <List>
                 <PremiumOptionListItem
                   title="Access to one map"
-                  extraText={["Farm"]}
+                  extraText={[getTrackNameFromType("farm-track")]}
                 />
                 <PremiumOptionListItem
                   title="Access to one vehicle"
-                  extraText={["Normal"]}
+                  extraText={[getVehicleNameFromType(defaultVehicleType)]}
                 />
                 <PremiumOptionListItem
                   title="Access to one mode"

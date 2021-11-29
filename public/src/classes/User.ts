@@ -1,4 +1,5 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
+import { defaultVehicleType } from "../vehicles/VehicleConfigs"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3
@@ -31,7 +32,7 @@ export const defaultVehicleSettings = {
     steeringSensitivity: 0.3,
     chaseCameraSpeed: .3,
     useChaseCamera: false,
-    vehicleType: "normal"
+    vehicleType: defaultVehicleType
 } as IVehicleSettings
 
 

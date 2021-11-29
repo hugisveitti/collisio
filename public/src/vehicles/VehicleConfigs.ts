@@ -1,6 +1,6 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
 import { stringInArray } from "../utils/utilFunctions"
-import { SimpleVector } from "./IVehicle"
+import { IVehicle, SimpleVector } from "./IVehicle"
 
 
 // #FF8000 is orange
@@ -19,6 +19,8 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     { name: "Big girl Sally", type: "offRoader" },
     { name: "Thunderparrot", type: "sportsCar" }
 ]
+
+export const defaultVehicleType: VehicleType = "normal2"
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
 

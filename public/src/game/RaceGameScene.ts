@@ -60,7 +60,7 @@ export class RaceGameScene extends GameScene {
 
         this.ticks = 0
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
-        console.log("race game consturctor")
+
         this.hasShowStartAnimation = false
     }
 
@@ -184,25 +184,32 @@ export class RaceGameScene extends GameScene {
 
 
 
-        console.log("this.hasShowStartAnimation", this.hasShowStartAnimation)
+        this.hasShowStartAnimation = true
+        /**
+         * There is a bug here, I dont know what
+         * this works in inTestMode, but not otherwise
+         */
 
         if (!this.hasShowStartAnimation) {
             const sec = 3
             this.hasShowStartAnimation = true
-            console.log("doing animator")
+
             this.showViewsImportantInfo("Race countdown starting in " + sec + " seconds")
             for (let i = 0; i < this.vehicles.length; i++) {
                 // this.vehicles[i].chassisMesh.remove(this.views[i].camera)
                 this.vehicles[i].removeCamera()
                 this.vehicles[i].spinCameraAroundVehicle = true
 
-                const p = this.vehicles[i].getPosition()
-                const r = this.vehicles[i].getRotation()
+                const pos = this.vehicles[i].getPosition()
+
+                const rot = this.vehicles[i].getRotation()
                 this.views[i].camera.position.set(
-                    p.x + ((Math.sin(r.y) * 100)),
-                    p.y + 75,
-                    p.z - ((Math.cos(r.y) * 50) * Math.sign(Math.cos(r.z)))
+                    pos.x + ((Math.sin(rot.y) * 100)),
+                    pos.y + 75,
+                    pos.z - ((Math.cos(rot.y) * 50) * Math.sign(Math.cos(rot.z)))
                 )
+
+
 
             }
             this.gameStartingTimeOut = setTimeout(() => {
@@ -221,15 +228,6 @@ export class RaceGameScene extends GameScene {
             }, sec * 1000)
         }
         else {
-            for (let i = 0; i < this.vehicles.length; i++) {
-
-                //  if (!this.vehicles[i].useChaseCamera) {
-                //         this.vehicles[i].chassisMesh.remove(this.views[i].camera)
-                this.vehicles[i].removeCamera()
-                this.vehicles[i].addCamera(this.views[i].camera)
-                //     this.vehicles[i].addCamera(this.views[i].camera)
-                // }
-            }
 
             this.startRaceCountdown()
         }

@@ -14,6 +14,7 @@ import "../../styles/main.css";
 import { stringInArray } from "../../utils/utilFunctions";
 import {
   allVehicleTypes,
+  defaultVehicleType,
   possibleVehicleColors,
 } from "../../vehicles/VehicleConfigs";
 import { buyPremiumPagePath } from "../Routes";
@@ -73,7 +74,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
 
     if (
       possibleVehcileTypes[vehicleTypeNum % possibleVehcileTypes.length]
-        .type === "normal"
+        .type === defaultVehicleType
     ) {
       setShowBuyPremium(false);
     } else {

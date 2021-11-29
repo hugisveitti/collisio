@@ -4,14 +4,21 @@ import { Group, LoadingManager, Object3D, Vector3, Euler } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
-import { getStaticPath } from "../utils/settings";
+import { getDeviceType, getStaticPath } from "../utils/settings";
 import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
 import { ICourse } from "./ICourse";
 
+const loadImage = document.createElement("img")
+
+loadImage.src = "https://i.imgur.com/U2ckPYq.png"
+loadImage.setAttribute("style", "z-index:998; width:100%; height:auto;position:absolute;display:none;")
+document.body.appendChild(loadImage)
+
 const loadDiv = document.createElement("div")
 loadDiv.setAttribute("id", "load-screen")
 loadDiv.setAttribute("class", "game-text")
+loadDiv.setAttribute("style", "z-index:999;")
 document.body.appendChild(loadDiv)
 
 const manager = new LoadingManager()
@@ -25,7 +32,7 @@ let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
 const setLoadingDivText = async (text: string) => {
     window.clearTimeout(dotTimeout)
-
+    loadImage.setAttribute("style", "display:block;")
 
 
 
@@ -57,6 +64,7 @@ const setLoadingDivText = async (text: string) => {
 // }, 100)
 
 const clearLoadingDivText = () => {
+    loadImage.setAttribute("style", "display:none;")
     loadDiv.innerHTML = ""
     window.clearTimeout(dotTimeout)
 }

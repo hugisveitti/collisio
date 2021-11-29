@@ -14,7 +14,12 @@ import {
 import ControlsRoom from "../mobile/ControlsRoom";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
-import { fakePlayer1 } from "../tests/fakeData";
+import {
+  fakePlayer1,
+  fakePlayer2,
+  fakePlayer3,
+  fakePlayer4,
+} from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import OneMonitorFrontPage from "./FrontPage";
@@ -64,8 +69,8 @@ const Routes = () => {
       const _gameSettings = getAllLocalGameSettings();
       store.setGameSettings(_gameSettings ?? testGameSettings);
 
-      // setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
-      setPlayers([fakePlayer1]);
+      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      // setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
     }
   }, []);

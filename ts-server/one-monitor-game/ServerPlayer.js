@@ -6,7 +6,7 @@ var Player = /** @class */ (function () {
     function Player(socket, playerName, id, isAuthenticated, photoURL) {
         this.playerName = playerName;
         this.teamNumber = 1;
-        this.vehicleType = "normal";
+        this.vehicleType = "normal2";
         this.id = id;
         this.isAuthenticated = isAuthenticated;
         this.isLeader = false;
