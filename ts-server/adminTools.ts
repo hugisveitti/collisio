@@ -153,10 +153,7 @@ export const adminFunctions = (app: any) => {
         })
     }
 
-    const adminHTMLPath = `../public/${buildFolder}/admin.html`
-    app.get("/admin", (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, adminHTMLPath));
-    })
+
 
 
     const getQueryParams = (req: Request): IQueryParams => {

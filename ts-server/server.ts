@@ -115,11 +115,11 @@ app.get("/show-room", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("*", (_: Request, res: Response) => {
-    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
-});
 
-
+const adminHTMLPath = `../public/${buildFolder}/admin.html`
+app.get("/admin", (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, adminHTMLPath));
+})
 
 import { adminFunctions } from "./adminTools";
 adminFunctions(app)
@@ -140,3 +140,7 @@ io.on("connection", (socket: Socket) => {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket)
 })
+
+app.get("*", (_: Request, res: Response) => {
+    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+});

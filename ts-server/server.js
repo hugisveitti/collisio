@@ -105,8 +105,9 @@ app.get("/public-profile/:id", function (_, res) {
 app.get("/show-room", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
-app.get("*", function (_, res) {
-    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
+app.get("/admin", function (req, res) {
+    res.sendFile(path.join(__dirname, adminHTMLPath));
 });
 var adminTools_1 = require("./adminTools");
 (0, adminTools_1.adminFunctions)(app);
@@ -120,4 +121,7 @@ var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket);
+});
+app.get("*", function (_, res) {
+    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
 });
