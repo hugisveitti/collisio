@@ -31,12 +31,12 @@ var RoomMaster = /** @class */ (function () {
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
-            var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL;
+            var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest;
             // console.log("connecting player", roomId, playerName)
             if (!_this.roomExists(roomId)) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
-            else if (_this.rooms[roomId].isFull()) {
+            else if (!isStressTest && _this.rooms[roomId].isFull()) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room is full.", status: errorStatus });
             }
             else {

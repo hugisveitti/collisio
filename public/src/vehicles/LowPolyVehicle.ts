@@ -478,12 +478,16 @@ export class LowPolyVehicle implements IVehicle {
 
     pause() {
         this.isPaused = true
+        this.engineSound.stop()
         this.chassisMesh.body.setCollisionFlags(1)
 
     };
 
     unpause() {
         this.isPaused = false
+        if (this.useEngineSound) {
+            this.engineSound.play()
+        }
         this.chassisMesh.body.setCollisionFlags(0)
     };
 

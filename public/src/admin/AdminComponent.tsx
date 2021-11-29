@@ -15,6 +15,7 @@ import { IEndOfRaceInfoGame, IRoomInfo } from "../classes/Game";
 import { auth, signOut } from "../firebase/firebaseInit";
 import RoomDataTable from "./RoomDataTable";
 import GameDataTable from "./GameDataTable";
+import StressTestComponent from "../testMode/StressTestComponent";
 
 interface IAdminComponent {
   userTokenId: string;
@@ -28,6 +29,8 @@ const AdminComponent = (props: IAdminComponent) => {
   const [gamesData, setGamesData] = useState([]);
   const [nGameEntires, setNGameEntires] = useState(0);
   const [gameCardOpen, setGameCardOpen] = useState(false);
+
+  const [stressCardOpen, setStressCardOpen] = useState(false);
 
   const handleGetRoomData = () => {
     auth.currentUser.getIdToken().then((userTokenId) => {
@@ -197,6 +200,27 @@ const AdminComponent = (props: IAdminComponent) => {
                   <GameDataTable gamesData={gamesData} />
                 </Grid>
               </Grid>
+            </Collapse>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            header="Stress test"
+            title="Stress test"
+            subheader="Do a stress test"
+            action={
+              <IconButton onClick={() => setStressCardOpen(!gameCardOpen)}>
+                {stressCardOpen ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+            }
+          />
+
+          <CardContent>
+            <Collapse in={stressCardOpen}>
+              <StressTestComponent />
             </Collapse>
           </CardContent>
         </Card>

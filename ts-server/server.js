@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var path = __importStar(require("path"));
 var si = __importStar(require("systeminformation"));
+var socket_io_1 = require("socket.io");
 var app = express();
 // promises style - new since version 3
 si.cpu()
@@ -46,6 +47,7 @@ si.mem()
     console.log("#####END Memory INFO#####");
 })
     .catch(function (error) { return console.error(error); });
+console.log("Max event listeners", socket_io_1.Socket.EventEmitter.defaultMaxListeners);
 var port = process.env.PORT || 5000;
 // app.use(function (_:Request, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
@@ -103,7 +105,9 @@ app.get("/public-profile/:id", function (_, res) {
 app.get("/show-room", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
-app.get("/stress-test", sendIndexHTML);
+app.get("*", function (_, res) {
+    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+});
 var adminTools_1 = require("./adminTools");
 (0, adminTools_1.adminFunctions)(app);
 var server = app.listen(port, function () {

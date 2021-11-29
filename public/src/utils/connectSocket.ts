@@ -12,7 +12,7 @@ export interface ISocketCallback {
 export const createSocket = (deviceType: string, callback: (socket: Socket) => void, mode: string = "not-test") => {
 
     // not secure, device orientation wont work
-    if (window.location.href.includes("http://") && !window.location.href.includes("localhost")) {
+    if (window.location.href.includes("http://") && !window.location.href.includes("localhost") && !window.location.href.includes("192.168") && deviceType === "mobile") {
         window.location.href = "https://" + window.location.href.slice(7, window.location.href.length)
     }
 
@@ -41,7 +41,7 @@ export const createSocket = (deviceType: string, callback: (socket: Socket) => v
 
     socket.on("disconnect", () => {
         toast.error("Connection lost, you will probably have to refresh")
-
+        /** send to front page? */
     })
 
 

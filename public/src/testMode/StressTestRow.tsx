@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import LinePlotComponent from "../data/LinePlotComponent";
 import { startSocketTest } from "./socketTests";
+import { std_room_created_callback } from "../shared-backend/shared-stuff";
 
 export interface IRoomConnection {
   roomId: string;
@@ -60,6 +61,12 @@ const StressTestRow = (props: IStressTestRow) => {
     }
   }, [ping]);
 
+  useEffect(() => {
+    props.connection.desktopSocket.on("disconnect", () => {
+      console.log("socket disconencted", props.connection.roomId);
+    });
+  }, []);
+
   return (
     <>
       <TableRow key={props.connection.roomId}>
@@ -78,7 +85,7 @@ const StressTestRow = (props: IStressTestRow) => {
         <TableCell>
           <Button
             variant="outlined"
-            disabled={isPlaying}
+            // disabled={isPlaying}
             onClick={() => {
               if (!isPlaying) {
                 setIsPlaying(true);

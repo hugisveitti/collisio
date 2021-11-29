@@ -69,13 +69,14 @@ export default class RoomMaster {
             playerId: string
             isAuthenticated: boolean
             photoURL: string
+            isStressTest?: boolean
         }
 
-        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL }: IPlayerConnectedData) => {
+        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest }: IPlayerConnectedData) => {
             // console.log("connecting player", roomId, playerName)
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
-            } else if (this.rooms[roomId].isFull()) {
+            } else if (!isStressTest && this.rooms[roomId].isFull()) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)

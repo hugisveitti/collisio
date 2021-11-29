@@ -108,7 +108,7 @@ const GameRoom = (props: IGameRoom) => {
 
     if (!props.store.roomId && !inTestMode) {
       history.push(frontPagePath);
-      toast.warn("No room connection, redirecting to frontpage");
+      toast.warn("No room connection found.");
       return null;
     }
     if (props.store.gameSettings.gameType === "ball") {

@@ -3,7 +3,7 @@
  */
 
 import { io, Socket } from "socket.io-client"
-import { dts_create_room, mdts_start_game, IPlayerInfo, mdts_device_type, MobileControls, mts_controls, mts_player_connected, std_controls, std_room_created_callback, stmd_socket_ready } from "../shared-backend/shared-stuff"
+import { dts_create_room, IPlayerInfo, mdts_device_type, mdts_start_game, MobileControls, mts_controls, mts_player_connected, std_controls, std_room_created_callback, stmd_socket_ready, stm_player_connected_callback } from "../shared-backend/shared-stuff"
 import { ISocketCallback } from "../utils/connectSocket"
 
 export const removeSockets = (desktopSocket: Socket, mobileSockets: Socket[]) => {
@@ -84,13 +84,21 @@ const connectToRoom = (roomId: string, mobileSockets: Socket[], callback: () => 
             playerName: `tester-${roomId}-${i}`,
             playerId: `${roomId}-${i}`,
             isAthenticated: false,
-            photoURL: ""
+            photoURL: "",
+            isStressTest: true
         })
-        if (i === mobileSockets.length - 1) {
-            callback()
-        } else {
-            oneConnect(i + 1)
-        }
+        mobileSockets[i].on(stm_player_connected_callback, data => {
+            if (data.status === "success") {
+
+                if (i === mobileSockets.length - 1) {
+                    callback()
+                } else {
+                    oneConnect(i + 1)
+                }
+            } else {
+                console.log("Error connecting in stress test, roomId:", roomId)
+            }
+        })
     }
     oneConnect(0)
 }

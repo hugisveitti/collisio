@@ -29,6 +29,7 @@ si.mem()
     })
     .catch(error => console.error(error));
 
+console.log("Max event listeners", Socket.EventEmitter.defaultMaxListeners)
 
 const port = process.env.PORT || 5000
 
@@ -114,7 +115,9 @@ app.get("/show-room", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("/stress-test", sendIndexHTML)
+app.get("*", (_: Request, res: Response) => {
+    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+});
 
 
 

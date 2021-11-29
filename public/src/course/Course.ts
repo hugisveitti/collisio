@@ -20,7 +20,8 @@ let dotTimeout: NodeJS.Timeout
 
 let numDots = 0
 
-
+const loadingScreenTips = ["Lock the orientation of your mobile phone."]
+let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
 const setLoadingDivText = async (text: string) => {
     window.clearTimeout(dotTimeout)
@@ -30,7 +31,7 @@ const setLoadingDivText = async (text: string) => {
 
     const createText = () => {
 
-        let dotText = text + "<br>"
+        let dotText = text + "<br>" + `Pro tip: ${loadingScreenTips[tipIndex]}` + "<br>"
 
         for (let i = 0; i < numDots; i++) {
             dotText += "."
@@ -60,7 +61,9 @@ const clearLoadingDivText = () => {
     window.clearTimeout(dotTimeout)
 }
 
+
 manager.onStart = (url: string, loaded: number, itemsTotal: number) => {
+
     setLoadingDivText("Started loading files " + loaded + " / " + itemsTotal)
 }
 
