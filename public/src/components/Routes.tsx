@@ -61,7 +61,8 @@ const Routes = () => {
     }
 
     if (inTestMode) {
-      store.setGameSettings(testGameSettings);
+      const _gameSettings = getAllLocalGameSettings();
+      store.setGameSettings(_gameSettings ?? testGameSettings);
 
       // setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
       setPlayers([fakePlayer1]);
@@ -128,7 +129,12 @@ const Routes = () => {
         <Route
           path={gameRoomPath}
           render={(props) => (
-            <GameRoom {...props} socket={socket} store={store} />
+            <GameRoom
+              {...props}
+              socket={socket}
+              store={store}
+              isTestMode={inTestMode}
+            />
           )}
         />
         <Route

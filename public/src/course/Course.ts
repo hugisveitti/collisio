@@ -205,9 +205,7 @@ export class Course implements ICourse {
                                 }
                                 if (gameItems[key].isCourseObjectArray) {
                                     const code = `this.${gameItems[key].objectName}.push(child)`
-                                    console.log("key", key)
-                                    console.log("${gameItems[key].objectName}", `${gameItems[key].objectName}`)
-                                    console.log("code", code)
+
                                     eval(code)
                                 } else {
                                     const code = `this.${gameItems[key].objectName} = child`
@@ -245,7 +243,7 @@ export class Course implements ICourse {
     setStartPositions(vehicles: IVehicle[]) {
 
         let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
-        console.log("useable", usableSpawns)
+
         if (usableSpawns.length >= vehicles.length) {
             // const sortedSpawns = new Array(usableSpawns.length)
             // for (let spawn of usableSpawns) {
@@ -262,7 +260,7 @@ export class Course implements ICourse {
             //  shuffleArray(sortedSpawns)
 
             // use predefined spawns
-            console.log(" sortedSpawns", sortedSpawns)
+
             for (let i = 0; i < vehicles.length; i++) {
                 const p = sortedSpawns[i].position
                 const r = sortedSpawns[i].rotation

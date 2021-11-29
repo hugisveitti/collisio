@@ -364,8 +364,6 @@ export class GameScene extends Scene3D implements IGameScene {
             }
 
             view.camera.up.fromArray(view.up)
-            const { x, y, z } = staticCameraPos
-            view.camera.position.set(x, y, z)
 
 
             this.vehicles[i].addCamera(view.camera)
@@ -688,7 +686,6 @@ export class GameScene extends Scene3D implements IGameScene {
     _restartGame() { }
 
     changeTrack(trackName: TrackName) {
-        console.log("change track not implemented")
         this.setNeedsReload(true)
     }
 
@@ -727,15 +724,22 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     loadFont() {
-        const fontName = "helvetiker"
-        const fontWeight = "regular"
-        const loader = new FontLoader();
-        loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
-            this.font = response;
+        if (!this.font) {
+
+            const fontName = "helvetiker"
+            const fontWeight = "regular"
+            const loader = new FontLoader();
+            loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
+                this.font = response;
+                for (let vehicle of this.vehicles) {
+                    vehicle.setFont(this.font)
+                }
+            });
+        } else {
             for (let vehicle of this.vehicles) {
                 vehicle.setFont(this.font)
             }
-        });
+        }
     }
 
     resetPlayer(idx: number) {

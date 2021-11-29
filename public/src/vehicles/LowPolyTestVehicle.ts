@@ -13,6 +13,8 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     //    closestRaycaster: ClosestRaycaster
     line: Line
 
+
+
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
         // this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
@@ -128,7 +130,6 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
 
     resetConfigToDefault() {
-        console.log("initial vehicle configs", initialVehicleConfigs[this.vehicleType])
         for (let key in initialVehicleConfigs[this.vehicleType]) {
             if (instanceOfSimpleVector(initialVehicleConfigs[this.vehicleType][key])) {
                 // @ts-ignore

@@ -6,7 +6,7 @@
  */
 /** trackName.gltf */
 export type TrackName = "farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track" | "f1-track-2"
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar"
+export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar" | "normal2"
 
 export type GameType = "ball" | "race" | "tag"
 

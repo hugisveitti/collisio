@@ -10,7 +10,8 @@ export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, 
 
 
 export const allVehicleTypes: { name: string, type: VehicleType }[] = [
-    { name: "MacNormie", type: "normal" },
+    { name: "MacNormie", type: "normal2" },
+    { name: "Old Normie", type: "normal" },
     { name: "Trakkie Tractor", type: "tractor" },
     { name: "Phil the Phast", type: "f1" },
     // { name: "Monster truck", type: "monsterTruck" },
@@ -21,7 +22,7 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
 
-export const nonactiveVehcileTypes: VehicleType[] = ["test"]
+export const nonactiveVehcileTypes: VehicleType[] = ["test", "normal"]
 
 export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !stringInArray(vehicle.type, nonactiveVehcileTypes))
 
@@ -108,6 +109,27 @@ export const vehicleConfigs = {
         is4x4: false,
 
         path: "simple-car.gltf",
+
+        // path: "123456.js"
+    },
+    normal2: {
+        ...defaultVehicleConfig,
+        wheelAxisBackPosition: -3.30,
+        wheelRadiusBack: 1.45 / 2,
+        wheelHalfTrackBack: 1.35,
+        wheelAxisHeightBack: 0,
+
+        wheelAxisFrontPosition: 3.10,
+        wheelRadiusFront: 1.45 / 2,
+        wheelHalfTrackFront: 1.35,
+        wheelAxisHeightFront: 0,
+
+        mass: 800,
+        engineForce: 5000,
+        breakingForce: 100,
+        is4x4: false,
+
+        path: "normal-car-2.gltf",
 
         // path: "123456.js"
     },

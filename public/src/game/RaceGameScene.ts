@@ -8,7 +8,7 @@ import { VehicleControls } from '../shared-backend/shared-stuff';
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
-import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
+import { getVehicleNumber, staticCameraPos } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
@@ -40,6 +40,8 @@ export class RaceGameScene extends GameScene {
      */
     currentNumberOfLaps: number
 
+    hasShowStartAnimation: boolean
+
 
     constructor() {
         super()
@@ -58,6 +60,8 @@ export class RaceGameScene extends GameScene {
 
         this.ticks = 0
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        console.log("race game consturctor")
+        this.hasShowStartAnimation = false
     }
 
     async create() {
@@ -81,7 +85,7 @@ export class RaceGameScene extends GameScene {
                 this.createViews()
                 this.createController()
                 this.resetVehicles()
-                this.startRaceCountdown()
+                this.restartGame()
 
 
             })
@@ -91,7 +95,7 @@ export class RaceGameScene extends GameScene {
 
     startRaceCountdown() {
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
-        let countdown = 4
+        let countdown = 3
         this.startGameSong()
         // makes vehicle fall
         for (let vehicle of this.vehicles) {
@@ -178,15 +182,57 @@ export class RaceGameScene extends GameScene {
         this.winner = ""
         this.winTime = -1
 
-        const sec = 2
 
 
-        this.showViewsImportantInfo("Race countdown starting in " + sec + " seconds")
-        //this.showImportantInfo("Race starting in " + sec + " seconds")
-        // this.showImportantInfo("Race starting in " + sec + " seconds")
-        this.gameStartingTimeOut = setTimeout(() => {
+        console.log("this.hasShowStartAnimation", this.hasShowStartAnimation)
+
+        if (!this.hasShowStartAnimation) {
+            const sec = 3
+            this.hasShowStartAnimation = true
+            console.log("doing animator")
+            this.showViewsImportantInfo("Race countdown starting in " + sec + " seconds")
+            for (let i = 0; i < this.vehicles.length; i++) {
+                // this.vehicles[i].chassisMesh.remove(this.views[i].camera)
+                this.vehicles[i].removeCamera()
+                this.vehicles[i].spinCameraAroundVehicle = true
+
+                const p = this.vehicles[i].getPosition()
+                const r = this.vehicles[i].getRotation()
+                this.views[i].camera.position.set(
+                    p.x + ((Math.sin(r.y) * 100)),
+                    p.y + 75,
+                    p.z - ((Math.cos(r.y) * 50) * Math.sign(Math.cos(r.z)))
+                )
+
+            }
+            this.gameStartingTimeOut = setTimeout(() => {
+
+                for (let i = 0; i < this.vehicles.length; i++) {
+
+                    if (!this.vehicles[i].useChaseCamera) {
+                        const { x, y, z } = staticCameraPos
+                        this.camera.position.set(x, y, z)
+                        this.vehicles[i].addCamera(this.views[i].camera)
+                    }
+                    this.vehicles[i].spinCameraAroundVehicle = false
+                }
+                this.startRaceCountdown()
+
+            }, sec * 1000)
+        }
+        else {
+            for (let i = 0; i < this.vehicles.length; i++) {
+
+                //  if (!this.vehicles[i].useChaseCamera) {
+                //         this.vehicles[i].chassisMesh.remove(this.views[i].camera)
+                this.vehicles[i].removeCamera()
+                this.vehicles[i].addCamera(this.views[i].camera)
+                //     this.vehicles[i].addCamera(this.views[i].camera)
+                // }
+            }
+
             this.startRaceCountdown()
-        }, sec * 1000)
+        }
     }
 
 

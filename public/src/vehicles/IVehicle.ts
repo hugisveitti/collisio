@@ -1,5 +1,5 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
-import { Font } from "three"
+import { Font, Vector3 } from "three"
 import { IVehicleSettings } from '../classes/User';
 
 export interface SimpleVector {
@@ -41,6 +41,9 @@ export interface IVehicle {
 
     useBadRotationTicks: boolean
 
+    spinCameraAroundVehicle: boolean
+
+    useChaseCamera: boolean
 
     goForward: (moreSpeed?: boolean) => void
     goBackward: (speed?: number) => void
@@ -56,6 +59,7 @@ export interface IVehicle {
     unpause: () => void
 
     addCamera: (camera: any) => void
+    removeCamera: () => void
     cameraLookAt: (camera: any) => void
     update: () => void
     setPosition: (x: number, y: number, z: number) => void

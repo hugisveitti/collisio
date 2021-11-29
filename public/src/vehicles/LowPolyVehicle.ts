@@ -1,3 +1,4 @@
+import { throwStatement } from "@babel/types";
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -29,7 +30,6 @@ export const getVehicleNumber = (vehicleName: string) => {
 
 const soundScaler = numberScaler(1, 5, 0, 330)
 
-const cameraOffset = 20
 
 
 const FRONT_LEFT = 0
@@ -46,6 +46,7 @@ let tm: Ammo.btTransform, p: Ammo.btVector3, q: Ammo.btQuaternion
 const DISABLE_DEACTIVATION = 4;
 
 export const staticCameraPos = { x: 0, y: 10, z: -25 }
+const cameraOffset = -staticCameraPos.z
 
 
 let useBad = false
@@ -112,8 +113,18 @@ export class LowPolyVehicle implements IVehicle {
     /** only for the engine sound */
     currentEngineForce: number
 
+    /** for startup animation */
+    spinCameraAroundVehicle: boolean
 
 
+    /** 
+     * multi purpos vector
+     * Might have to delete them when vehicle is destroyed?
+     */
+    vector: Ammo.btVector3
+    vector2: Ammo.btVector3
+
+    quaternion: Ammo.btQuaternion
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
 
@@ -142,6 +153,10 @@ export class LowPolyVehicle implements IVehicle {
 
         this.currentEngineForce = 0
 
+        this.spinCameraAroundVehicle = false
+        this.vector = new Ammo.btVector3(0, 0, 0)
+        this.vector2 = new Ammo.btVector3(0, 0, 0)
+        this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -233,38 +248,43 @@ export class LowPolyVehicle implements IVehicle {
         const wheelHalfTrackFront = vehicleConfigs[this.vehicleType].wheelHalfTrackFront
         const wheelAxisHeightFront = vehicleConfigs[this.vehicleType].wheelAxisHeightFront
 
+        this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
 
         this.addWheel(
             true,
-            new Ammo.btVector3(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
+            this.vector,//   new Ammo.btVector3(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
             wheelRadiusFront,
             FRONT_LEFT
         )
 
+        this.vector.setValue(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
         this.addWheel(
             true,
-            new Ammo.btVector3(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
+            this.vector,//new Ammo.btVector3(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
             wheelRadiusFront,
             FRONT_RIGHT
         )
 
 
+        this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
         this.addWheel(
             false,
-            new Ammo.btVector3(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
+            this.vector,//  new Ammo.btVector3(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
             wheelRadiusBack,
             BACK_LEFT
         )
 
+        this.vector.setValue(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
         this.addWheel(
             false,
-            new Ammo.btVector3(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
+            this.vector,// new Ammo.btVector3(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
             wheelRadiusBack,
             BACK_RIGHT
         )
 
         // not sure what to have the gravity, the auto is -20
-        this.vehicle.getRigidBody().setGravity(new Ammo.btVector3(0, -30, 0))
+        this.vector.setValue(0, -30, 0)
+        this.vehicle.getRigidBody().setGravity(this.vector)
         this.vehicle.getRigidBody().setFriction(3.0)
 
         // I suspect that 0 means infinity, so 0 inertia is actually inf intertia, and the vehicle cannot move on that axis
@@ -272,8 +292,9 @@ export class LowPolyVehicle implements IVehicle {
 
         /** setting inertia */
         const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
-        this.vehicle.getRigidBody().setMassProps(this.mass, new Ammo.btVector3(x, y, z))
-        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, new Ammo.btVector3(x, y, z))
+        this.vector.setValue(x, y, z)
+        this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
+        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
 
         this.isReady = true
         /** don't start the vehicle until race */
@@ -303,7 +324,7 @@ export class LowPolyVehicle implements IVehicle {
         if (!this.engineSound.isPlaying) {
             this.engineSound.play()
 
-        } else {
+        } else if (this.engineSound) {
             this.engineSound.stop()
         }
     }
@@ -311,8 +332,11 @@ export class LowPolyVehicle implements IVehicle {
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
 
-
+        /**
+         * cannot use this.vector
+         */
         const wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0)
+
         const wheelAxelCS = new Ammo.btVector3(-1, 0, 0)
 
 
@@ -327,7 +351,7 @@ export class LowPolyVehicle implements IVehicle {
             isFront
         )
 
-        // wheelInfo.set_m_suspensionRestLength1(2)
+
         wheelInfo.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness)
 
         wheelInfo.set_m_wheelsDampingRelaxation(vehicleConfigs[this.vehicleType].suspensionDamping)
@@ -478,14 +502,18 @@ export class LowPolyVehicle implements IVehicle {
 
     pause() {
         this.isPaused = true
-        this.engineSound.stop()
+
+        if (this.engineSound && this.engineSound.isPlaying) {
+
+            this.engineSound.stop()
+        }
         this.chassisMesh.body.setCollisionFlags(1)
 
     };
 
     unpause() {
         this.isPaused = false
-        if (this.useEngineSound) {
+        if (this.useEngineSound && !this.engineSound.isPlaying) {
             this.engineSound.play()
         }
         this.chassisMesh.body.setCollisionFlags(0)
@@ -493,11 +521,22 @@ export class LowPolyVehicle implements IVehicle {
 
     addCamera(camera: PerspectiveCamera) {
         if (!this.useChaseCamera) {
+            camera.position.set(staticCameraPos.x, staticCameraPos.y, staticCameraPos.z)
             this.chassisMesh.add(camera)
         }
+        const c = this.chassisMesh.getObjectByName(camera.name)
+
         this.camera = camera
         this.createCarSounds()
     };
+
+    removeCamera() {
+        for (let i = 0; i < this.chassisMesh.children.length; i++) {
+            if (this.chassisMesh.children[i].type === "PerspectiveCamera") {
+                this.chassisMesh.remove(this.chassisMesh.children[i])
+            }
+        }
+    }
 
     createCarSounds() {
         const listener = new AudioListener()
@@ -507,20 +546,45 @@ export class LowPolyVehicle implements IVehicle {
         setEngineSound(this.engineSound, .3, this.useEngineSound)
     }
 
+
     cameraLookAt(camera: PerspectiveCamera) {
 
-        if (this.useChaseCamera) {
+
+        if (this.spinCameraAroundVehicle) {
+
+
+            const r = this.chassisMesh.rotation
+
+            const p = this.getPosition()
+
+            this.cameraTarget.set(
+                p.x - ((Math.sin(r.y) * cameraOffset)),
+                p.y + staticCameraPos.y,
+                p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
+            )
+
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * 0.03))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * 0.03))
+            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * 0.03))
+
+
+            camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+            camera.updateProjectionMatrix()
+            camera.lookAt(this.chassisMesh.position)
+
+        } else if (this.useChaseCamera) {
 
 
 
             const r = this.chassisMesh.rotation
-            // this.chassisMesh.position 
+
             const p = this.getPosition()
+
 
             // this is for the follow camera effect
             this.cameraTarget.set(
                 p.x - ((Math.sin(r.y) * cameraOffset)),
-                p.y + 10,
+                p.y + staticCameraPos.y,
                 p.z - ((Math.cos(r.y) * cameraOffset) * Math.sign(Math.cos(r.z)))
             )
 
@@ -532,7 +596,7 @@ export class LowPolyVehicle implements IVehicle {
             this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseCameraSpeed))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * 0.005)) // have the y dir change slower?
 
-            this.cameraLookAtPos.set(0, 0, 0)
+            //    this.cameraLookAtPos.set(0, 0, 0)
             const cs = 0.5
 
             this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((p.x - this.prevCahseCameraPos.x) * cs))
@@ -608,16 +672,19 @@ export class LowPolyVehicle implements IVehicle {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
         if (Math.abs(vel.x()) > 3) {
             console.log("danger X", vel.x())
-            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x() / 2, vel.y(), vel.z()))
+            this.vector.setValue(vel.x() / 2, vel.y(), vel.z())
+            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
 
         }
         if (Math.abs(vel.y()) > 5) {
             console.log("danger Y", vel.y())
-            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x(), vel.y() / 2, vel.z()))
+            this.vector.setValue(vel.x(), vel.y() / 2, vel.z())
+            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.z()) > 6) {
             console.log("danger Z", vel.z())
-            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(vel.x(), vel.y(), vel.z() / 2))
+            this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
+            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
 
         }
     }
@@ -630,7 +697,8 @@ export class LowPolyVehicle implements IVehicle {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
         }
 
-        // this.vehicle.updateWheelTransform(4, true)
+
+
         tm = this.vehicle.getChassisWorldTransform()
         p = tm.getOrigin()
         q = tm.getRotation()
@@ -683,7 +751,8 @@ export class LowPolyVehicle implements IVehicle {
     setPosition(x: number | undefined, y: number | undefined, z: number | undefined) {
         const tm = this.vehicle.getChassisWorldTransform()
         const p = tm.getOrigin()
-        tm.setOrigin(new Ammo.btVector3(x ?? p.x(), y ?? p.y(), z ?? p.z()))
+        this.vector.setValue(x ?? p.x(), y ?? p.y(), z ?? p.z())
+        tm.setOrigin(this.vector)
     };
 
     getPosition() {
@@ -700,7 +769,8 @@ export class LowPolyVehicle implements IVehicle {
 
     setRotation(x: number, y: number, z: number) {
         const tm = this.vehicle.getChassisWorldTransform()
-        tm.setRotation(new Ammo.btQuaternion(x, y, z, 1))
+        this.quaternion.setValue(x, y, z, 1)
+        tm.setRotation(this.quaternion)
     };
 
     getCurrentSpeedKmHour() {

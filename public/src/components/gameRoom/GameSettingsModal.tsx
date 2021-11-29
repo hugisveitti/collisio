@@ -1,4 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
+import VolumeOff from "@mui/icons-material/VolumeOff";
+import VolumeUp from "@mui/icons-material/VolumeUp";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -7,7 +9,6 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
-import { green1, red1 } from "../../providers/theme";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
@@ -43,7 +44,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         <Grid item xs={12}>
           <ToFrontPageButton />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} xl={2}>
           <Button
             disableElevation
             variant="contained"
@@ -62,31 +63,20 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             Shadows {props.store.gameSettings.useShadows ? "On" : "Off"}
           </Button>
         </Grid>
-        <Grid item xs={4}>
-          <Button
-            disableElevation
-            variant="contained"
+        <Grid item xs={4} xl={1}>
+          <IconButton
             onClick={() => {
               props.updateSettings(
                 "useSound",
                 !props.store.gameSettings.useSound
               );
-              console.log(
-                "props.store.gameSettings.useSound",
-                props.store.gameSettings
-              );
-              // const newGameSettings = {
-              //   ...props.store.gameSettings,
-              //   useSound: !props.store.gameSettings.useSound,
-              // };
-              // props.store.setGameSettings(newGameSettings);
             }}
           >
-            Sound {props.store.gameSettings.useSound ? "On" : "Off"}
-          </Button>
+            {props.store.gameSettings.useSound ? <VolumeUp /> : <VolumeOff />}
+          </IconButton>
         </Grid>
 
-        <Grid item xs={4} />
+        <Grid item xs={4} xl={9} />
         <Grid item xs={4}>
           <Button
             disableElevation
@@ -113,8 +103,18 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                   const newUserSettings = props.store.userSettings;
                   newUserSettings.vehicleSettings = newVehicleSettings;
 
+                  /**
+                   * ONLY FOR TESTING
+                   */
+
+                  // @ts-ignore
+                  props.gameObject.vehicles[0].updateVehicleSettings(
+                    newVehicleSettings
+                  );
+                  // @ts-ignore
+                  props.gameObject.players[0].vehicleType = vehicleType;
+                  props.gameObject.setNeedsReload(true);
                   props.store.setUserSettings(newUserSettings);
-                  props.gameObject.changeVehicle(0, vehicleType);
                 }}
                 previewVehicle={false}
               />
