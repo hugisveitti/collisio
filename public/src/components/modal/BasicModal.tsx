@@ -1,4 +1,4 @@
-import { Modal } from "@mui/material";
+import Modal from "@mui/material/Modal";
 import React from "react";
 import { modalBackgroundColor } from "../../providers/theme";
 

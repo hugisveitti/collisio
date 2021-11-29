@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -23,7 +23,7 @@ import {
 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
-import BuyPremiumComponent from "./BuyPremiumComponent";
+import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
 import HighscorePage from "./HighscorePage";

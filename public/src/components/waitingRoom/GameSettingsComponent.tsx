@@ -1,15 +1,13 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Grid,
-  Radio,
-  RadioGroup,
-  TextField,
-} from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import Radio from "@mui/material/Radio";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Grid from "@mui/material/Grid";
+import RadioGroup from "@mui/material/RadioGroup";
+import TextField from "@mui/material/TextField";
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";

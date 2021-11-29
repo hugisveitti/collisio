@@ -1,13 +1,11 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import HelpIcon from "@mui/icons-material/Help";
-import {
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import QRCode from "qrcode";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";

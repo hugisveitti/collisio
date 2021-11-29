@@ -1,22 +1,20 @@
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
-import {
-  Button,
-  Collapse,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { allTrackNames, ITrackInfo } from "../../classes/Game";
-import { inputBackgroundColor } from "../../providers/theme";
-import { GameType, TrackName } from "../../shared-backend/shared-stuff";
-import { stringInArray } from "../../utils/utilFunctions";
 import f1TrackImage from "../../images/tracks/f1-track.PNG";
 import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
+import { inputBackgroundColor } from "../../providers/theme";
+import { GameType, TrackName } from "../../shared-backend/shared-stuff";
+import { stringInArray } from "../../utils/utilFunctions";
 
 interface ITrackImagePair {
   image: any;

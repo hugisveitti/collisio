@@ -1,13 +1,11 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Collapse,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import Collapse from "@mui/material/Collapse";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { cardBackgroundColor } from "../../providers/theme";
 

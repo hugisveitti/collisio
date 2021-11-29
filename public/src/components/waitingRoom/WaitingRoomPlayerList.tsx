@@ -1,17 +1,11 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Grid,
-  Typography,
-} from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { getTrackNameFromType } from "../../classes/Game";
-import {
-  getPlayerBestScoreOnTrackAndLap,
-  playerGameDataRefPath,
-} from "../../firebase/firebaseFunctions";
+import { getPlayerBestScoreOnTrackAndLap } from "../../firebase/firebaseFunctions";
 import { viewBottoms, viewLefts } from "../../game/GameScene";
 import { cardBackgroundColor } from "../../providers/theme";
 import {

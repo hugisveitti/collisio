@@ -1,10 +1,13 @@
-import { Collapse, Icon, IconButton, TableCell, TableRow } from "@mui/material";
-import React, { useState } from "react";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { deletePlayerGameData, IUser } from "../../firebase/firebaseFunctions";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import React, { useState } from "react";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
+import { deletePlayerGameData } from "../../firebase/firebaseFunctions";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;

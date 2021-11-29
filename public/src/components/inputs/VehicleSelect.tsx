@@ -1,13 +1,12 @@
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import {
-  Button,
-  Collapse,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { inputBackgroundColor } from "../../providers/theme";
 import { VehicleType } from "../../shared-backend/shared-stuff";

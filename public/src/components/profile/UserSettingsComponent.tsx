@@ -1,16 +1,14 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  Grid,
-  IconButton,
-  Slider,
-  Typography,
-} from "@mui/material";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Collapse from "@mui/material/Collapse";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Slider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { IUserSettings, IVehicleSettings } from "../../classes/User";
 import {

@@ -38,6 +38,7 @@ import {
 } from "./Routes";
 import { IStore } from "./store";
 import logo from "../images/collisio-logo.png";
+import AdSense from "./monitary/AdSense";
 
 interface FrontPageProps {
   socket: Socket;
@@ -231,7 +232,6 @@ need to be logged in."
 
         <Grid item xs={12}>
           <Button
-            disableElevation
             onClick={() => connectButtonClicked(props.store.roomId)}
             variant="contained"
             size="large"
@@ -254,9 +254,11 @@ need to be logged in."
             fuss, just a desktop browser and a smartphone browser.
           </Typography>
         </Grid>
-      </Grid>
 
-      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <AdSense slotId="7059022973" />
+        </Grid>
+
         <Grid item xs={12}>
           <Divider variant="middle" />
         </Grid>

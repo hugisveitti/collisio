@@ -1,17 +1,13 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  Divider,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  Slider,
-  TextField,
-  Typography,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Slider from "@mui/material/Slider";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -23,7 +19,6 @@ import {
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import TrackSelect from "../components/inputs/TrackSelect";
 import VehicleSelect from "../components/inputs/VehicleSelect";
-import NotLoggedInModal from "../components/NotLoggedInModal";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import { IUser, setDBUserSettings } from "../firebase/firebaseFunctions";

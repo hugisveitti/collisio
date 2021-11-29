@@ -1,14 +1,12 @@
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import {
-  Button,
-  Collapse,
-  IconButton,
-  ListItemText,
-  TableCell,
-  TableRow,
-} from "@mui/material";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import ListItemText from "@mui/material/ListItemText";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
 import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import LinePlotComponent from "../data/LinePlotComponent";

@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ToastContainer } from "react-toastify";
-import CookiePrompt from "../components/CookiePrompt";
+import CookiePrompt from "../components/monitary/CookiePrompt";
 import LoginComponent from "../components/LoginComponent";
 import {
   buyPremiumPagePath,

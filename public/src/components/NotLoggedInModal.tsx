@@ -1,4 +1,7 @@
-import { Modal, Typography, Button, Grid } from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import {
   modalBackgroundColor,

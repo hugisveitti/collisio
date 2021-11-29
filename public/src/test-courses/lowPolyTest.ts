@@ -619,8 +619,8 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     handleCheckpointCrossed(o: ExtendedObject3D, checkpointNumber: number) {
         if (!this.checkpointCrossed) {
             this.goalCrossed = false
-            const p = (this.course as RaceCourse).checkpointSpawns[checkpointNumber].position
-            const r = (this.course as RaceCourse).checkpointSpawns[checkpointNumber].rotation
+            const p = (this.course as RaceCourse).checkpointSpawns[checkpointNumber - 1].position
+            const r = (this.course as RaceCourse).checkpointSpawns[checkpointNumber - 1].rotation
 
             this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
         }

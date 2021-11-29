@@ -1,30 +1,23 @@
 import { updateProfile } from "@firebase/auth";
 import EditIcon from "@mui/icons-material/Edit";
 import EditOffIcon from "@mui/icons-material/EditOff";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  CircularProgress,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import AppContainer from "../../containers/AppContainer";
 import { setDBUserProfile } from "../../firebase/firebaseFunctions";
 import { auth, signOut } from "../../firebase/firebaseInit";
-import {
-  cardBackgroundColor,
-  inputBackgroundColor,
-} from "../../providers/theme";
+import { cardBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
-import { frontPagePath } from "../Routes";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 
@@ -168,6 +161,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                     textAlign: "center",
                   }}
                 >
+                  {/** TODO fix this */}
                   <Typography>Loading your profile...</Typography>
                   <br />
                   <br />

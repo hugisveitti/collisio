@@ -1,27 +1,19 @@
 import { off } from "@firebase/database";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
   getPlayerGameData,
   IPlayerGameData,
 } from "../../firebase/firebaseFunctions";
-import {
-  cardBackgroundColor,
-  inputBackgroundColor,
-} from "../../providers/theme";
+import { cardBackgroundColor } from "../../providers/theme";
 import GameDataTableRow from "./GameDataTableRow";
 
 interface IGameDataComponent {

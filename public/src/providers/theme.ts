@@ -1,4 +1,5 @@
 import createTheme from "@mui/material/styles/createTheme"
+import { Shadows } from "@mui/material/styles/shadows"
 
 
 /** 
@@ -57,6 +58,7 @@ export const themeOptions = createTheme({
     typography: {
         "fontFamily": "monospace"
     },
+
     palette: {
         primary: {
             main: green3,// blue2 //'#2E604A',

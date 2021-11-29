@@ -102,6 +102,9 @@ export class RaceCourse extends Course implements IRaceCourse {
         if (this.goalSpawn) {
             this.startPosition = this.goalSpawn.position
             this.startRotation = this.goalSpawn.rotation
+        } else if (this.spawns.length > 0) {
+            this.startPosition = this.spawns[0].position
+            this.startRotation = this.spawns[0].rotation
         }
     }
 

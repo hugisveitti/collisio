@@ -241,13 +241,16 @@ export class Course implements ICourse {
 
     setStartPositions(vehicles: IVehicle[]) {
 
-        let usableSpawns = this.spawns.filter(s => s.name !== "checkpoint-spawn" && s.name !== "goal-spawn")
+        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
+        console.log("useable", usableSpawns)
         if (usableSpawns.length >= vehicles.length) {
-            const sortedSpawns = new Array(usableSpawns.length)
-            for (let spawn of usableSpawns) {
-                const idx = +spawn.name.slice(5, 6)
-                sortedSpawns[idx - 1] = spawn
-            }
+            // const sortedSpawns = new Array(usableSpawns.length)
+            // for (let spawn of usableSpawns) {
+            //     const idx = +spawn.name.slice(5, 6)
+            //     sortedSpawns[idx - 1] = spawn
+            // }
+            const sortedSpawns = usableSpawns
+            sortedSpawns.sort((a, b) => a.name > b.name ? -1 : 1)
             /**
              * Make the spawns be in order (spawn1, spawn2, etc.)
              * and remove unwanted spawns
@@ -256,7 +259,7 @@ export class Course implements ICourse {
             //  shuffleArray(sortedSpawns)
 
             // use predefined spawns
-
+            console.log(" sortedSpawns", sortedSpawns)
             for (let i = 0; i < vehicles.length; i++) {
                 const p = sortedSpawns[i].position
                 const r = sortedSpawns[i].rotation

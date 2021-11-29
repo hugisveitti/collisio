@@ -1,12 +1,10 @@
-import {
-  TableContainer,
-  Paper,
-  TableCell,
-  TableRow,
-  Table,
-  TableHead,
-  TableBody,
-} from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IRaceTimeInfo, ITagScoreInfo } from "../../classes/Game";
 import { inputBackgroundColor } from "../../providers/theme";

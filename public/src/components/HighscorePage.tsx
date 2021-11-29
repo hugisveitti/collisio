@@ -1,21 +1,20 @@
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import {
-  CircularProgress,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+
 import React, { useEffect, useState } from "react";
 import { getTrackNameFromType, IEndOfRaceInfoPlayer } from "../classes/Game";
 import AppContainer from "../containers/AppContainer";
@@ -26,6 +25,7 @@ import {
 import { cardBackgroundColor, inputBackgroundColor } from "../providers/theme";
 import "../styles/main.css";
 import HighscorePageTableRow from "./HighscorePageTableRow";
+import AdSense from "./monitary/AdSense";
 
 const stringInList = (s: string, sList: string[]) => {
   for (let i = 0; i < sList.length; i++) {
@@ -147,6 +147,10 @@ const HighscorePage = (props: IHighscorePage) => {
         ) : (
           <>
             <Grid item xs={12} sm={3}>
+              <Grid item xs={12}>
+                <AdSense slotId="7059022973" />
+              </Grid>
+
               <FormControl fullWidth>
                 <InputLabel>Track name</InputLabel>
                 <Select
