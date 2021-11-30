@@ -16,12 +16,12 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../classes/localGameSettings";
-import { IUserSettings, IVehicleSettings } from "../classes/User";
+import { IUser, IUserSettings, IVehicleSettings } from "../classes/User";
 import TrackSelect from "../components/inputs/TrackSelect";
 import VehicleSelect from "../components/inputs/VehicleSelect";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
-import { IUser, setDBUserSettings } from "../firebase/firebaseFunctions";
+import { setDBUserSettings } from "../firebase/firebaseFunctions";
 import {
   GameActions,
   mts_user_settings_changed,

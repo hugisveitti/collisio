@@ -11,8 +11,8 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { IVehicleSettings } from "../../classes/User";
-import { IUser, setDBUserSettings } from "../../firebase/firebaseFunctions";
+import { IUser, IVehicleSettings } from "../../classes/User";
+import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import {
   IPlayerInfo,
   std_start_game_callback,
@@ -32,6 +32,7 @@ import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import GameSettingsComponent from "./GameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
+
 interface IWaitingRoomProps {
   socket: Socket;
   store: IStore;
@@ -167,6 +168,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           trackName={props.store.gameSettings.trackName}
           numberOfLaps={props.store.gameSettings.numberOfLaps}
           gameType={props.store.gameSettings.gameType}
+          user={user}
         />
       </Grid>
 

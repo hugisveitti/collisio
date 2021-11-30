@@ -5,6 +5,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { getTrackNameFromType } from "../../classes/Game";
+import { IFollower, IUser } from "../../classes/User";
 import { getPlayerBestScoreOnTrackAndLap } from "../../firebase/firebaseFunctions";
 import { viewBottoms, viewLefts } from "../../game/GameScene";
 import { cardBackgroundColor } from "../../providers/theme";
@@ -15,10 +16,11 @@ import {
 } from "../../shared-backend/shared-stuff";
 import { getDeviceType } from "../../utils/settings";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
+import FollowButton from "../profile/FollowButton";
 
 interface IWaitingRoomPlayerItem {
   player: IPlayerInfo;
-  isUser: boolean;
+  user: IUser;
   trackName: TrackName;
   numberOfLaps: number;
   gameType: GameType;
@@ -28,9 +30,12 @@ const onDesktop = getDeviceType() !== "mobile";
 
 const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
   const [personalBest, setPersonalBest] = useState(-1);
+  const isUser = props.user?.uid === props.player.id;
+
+  const showPB = onDesktop || isUser;
 
   useEffect(() => {
-    if (props.gameType === "race" && onDesktop) {
+    if (props.gameType === "race" && showPB) {
       getPlayerBestScoreOnTrackAndLap(
         props.player.id,
         props.trackName,
@@ -78,6 +83,17 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
     );
   };
 
+  const userData: IFollower = {
+    displayName: props.user?.displayName,
+    uid: props.user?.uid,
+    photoURL: props.user?.photoURL,
+  };
+  const playerFollowingData: IFollower = {
+    displayName: props.player.playerName,
+    uid: props.player.id,
+    photoURL: props.player.photoURL,
+  };
+
   return (
     <Card
       style={{ height: "100%", backgroundColor: cardBackgroundColor }}
@@ -86,17 +102,22 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
       <CardHeader
         header={props.player.playerName}
         title={
-          props.isUser ? (
+          isUser ? (
             <strong>{props.player.playerName}</strong>
           ) : (
             props.player.playerName
           )
         }
         subheader={getVehicleNameFromType(props.player.vehicleType)}
+        action={
+          <FollowButton
+            userData={userData}
+            otherUserData={playerFollowingData}
+            onlyIcon
+          />
+        }
       />
-      {props.gameType === "race" &&
-        (onDesktop || props.isUser) &&
-        renderPersonalBest()}
+      {props.gameType === "race" && showPB && renderPersonalBest()}
       {props.player.photoURL ? (
         <CardMedia
           src={props.player.photoURL}
@@ -118,6 +139,7 @@ interface IWaitingRoomPlayerList {
   trackName: TrackName;
   numberOfLaps: number;
   gameType: GameType;
+  user: IUser;
 }
 
 const WaitingRoomPlayerList = (props: IWaitingRoomPlayerList) => {
@@ -169,7 +191,7 @@ const WaitingRoomPlayerList = (props: IWaitingRoomPlayerList) => {
           >
             <WaitingRoomPlayerItem
               player={player}
-              isUser={props.playerId === player.id}
+              user={props.user}
               trackName={props.trackName}
               numberOfLaps={props.numberOfLaps}
               gameType={props.gameType}

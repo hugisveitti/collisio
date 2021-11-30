@@ -363,7 +363,7 @@ export class RaceGameScene extends GameScene {
             date: getDateNow(),
             private: false,
             isAuthenticated: this.players[i].isAuthenticated,
-            vehicleType: this.players[i].vehicleType,
+            vehicleType: this.vehicles[i].vehicleType,
             engineForce: this.vehicles[i].engineForce,
             breakingForce: this.vehicles[i].breakingForce,
             steeringSensitivity: this.vehicles[i].steeringSensitivity

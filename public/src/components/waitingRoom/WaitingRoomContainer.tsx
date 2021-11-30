@@ -46,10 +46,6 @@ import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 
-interface WaitParamType {
-  roomId: string;
-}
-
 interface IWaitingRoomProps {
   socket: Socket;
   store: IStore;

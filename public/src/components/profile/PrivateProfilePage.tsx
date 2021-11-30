@@ -6,6 +6,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
+import CardActions from "@mui/material/CardActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -13,12 +14,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import makeStyles from "@mui/styles/makeStyles";
 import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { setDBUserProfile } from "../../firebase/firebaseFunctions";
 import { auth, signOut } from "../../firebase/firebaseInit";
 import { cardBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
-import { frontPagePath } from "../Routes";
+import { frontPagePath, getUserPagePath } from "../Routes";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 
@@ -34,6 +36,7 @@ interface IPrivateProfilePage {}
 
 const PrivateProfilePage = (props: IPrivateProfilePage) => {
   const classes = useStyles();
+  const history = useHistory();
   const user = useContext(UserContext);
   const [inEditMode, setInEditMode] = useState(false);
   const [editUser, setEditUser] = useState(undefined);
@@ -72,6 +75,15 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
             </Grid>
           </Grid>
         </CardContent>
+        <CardActions>
+          <Button
+            disableElevation
+            variant="contained"
+            onClick={() => history.push(getUserPagePath(user.uid))}
+          >
+            See public profile
+          </Button>
+        </CardActions>
       </>
     );
   };

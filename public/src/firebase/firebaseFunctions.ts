@@ -1,8 +1,10 @@
+import { doc } from "@firebase/firestore";
 import { limitToLast, onValue, orderByChild, query, Query, ref, remove, set, update } from "firebase/database";
+import { onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IRoomInfo } from "../classes/Game";
-import { IUserSettings } from "../classes/User";
+import { IUser, IUserSettings } from "../classes/User";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
 import { database } from "./firebaseInit";
@@ -25,13 +27,7 @@ const profilesRefPath = "profiles"
 const userGamePlayerInfoPath = "player-info"
 const userGameGameInfoPath = "game-info"
 
-export interface IUser {
-    displayName: string
-    email: string
-    photoURL: string
-    uid: string
-    isPremium: boolean,
-}
+
 
 export const createDBUser = (userData: IUser, callback?: (user: IUser) => void) => {
     // only create if not exists
@@ -438,3 +434,4 @@ export const createAvailableRoomsListeners = (userId: string, callback: (roomIds
 
     return availableRoomsRef
 }
+

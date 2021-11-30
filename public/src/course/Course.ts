@@ -27,7 +27,7 @@ let dotTimeout: NodeJS.Timeout
 
 let numDots = 0
 
-const loadingScreenTips = ["Lock the orientation of your mobile phone."]
+const loadingScreenTips = ["Lock the orientation of your mobile phone.", "The leader can change tracks, using the settings on the mobile.", "The leader can restart a game from the mobile."]
 let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
 const setLoadingDivText = async (text: string) => {

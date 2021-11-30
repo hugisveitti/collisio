@@ -1,9 +1,9 @@
 import React from "react";
 import { Socket } from "socket.io-client";
+import { IUser } from "../classes/User";
 import BasicModal from "../components/modal/BasicModal";
 import NotLoggedInModal from "../components/NotLoggedInModal";
 import { IStore } from "../components/store";
-import { IUser } from "../firebase/firebaseFunctions";
 import { GameActions } from "../shared-backend/shared-stuff";
 import ControllerSettingsComponent from "./ControllerSettingsComponent";
 

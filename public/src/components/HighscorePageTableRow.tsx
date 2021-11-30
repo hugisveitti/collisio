@@ -7,6 +7,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { IEndOfRaceInfoPlayer } from "../classes/Game";
 import { getVehicleNameFromType } from "../vehicles/VehicleConfigs";
+import { getUserPagePath } from "./Routes";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
@@ -30,7 +31,14 @@ export default (props: IProps) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>{playerData.playerName}</TableCell>
+        <TableCell>
+          <a
+            style={{ color: "inherit" }}
+            href={getUserPagePath(playerData.playerId)}
+          >
+            {playerData.playerName}
+          </a>
+        </TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
         <TableCell>{playerData.bestLapTime}</TableCell>
       </TableRow>

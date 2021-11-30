@@ -46,3 +46,43 @@ export interface IUserSettings {
 export const defaultUserSettings = {
     vehicleSettings: defaultVehicleSettings,
 } as IUserSettings
+
+
+export interface IUser {
+    displayName: string
+    email: string
+    photoURL: string
+    uid: string
+}
+
+type UserType = "premium" | "standard" | "basic"
+
+
+export interface IFollower {
+    uid: string
+    displayName: string
+    photoURL: string
+}
+
+export const getUserTypeName = (userType: UserType) => {
+    switch (userType) {
+        case "premium":
+            return "Premium"
+        case "standard":
+            return "Standard"
+        default:
+            return "Basic"
+    }
+}
+
+export interface IPublicUser {
+    displayName: string
+    photoURL: string
+    uid: string
+    latestLogin: string
+}
+
+export interface IPrivateUser {
+    email: string
+    uid: string
+}

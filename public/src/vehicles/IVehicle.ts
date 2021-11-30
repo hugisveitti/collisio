@@ -1,6 +1,7 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
 import { Font, Vector3 } from "three"
 import { IVehicleSettings } from '../classes/User';
+import { VehicleType } from '../shared-backend/shared-stuff';
 
 export interface SimpleVector {
     x: number
@@ -44,6 +45,7 @@ export interface IVehicle {
     spinCameraAroundVehicle: boolean
 
     useChaseCamera: boolean
+    vehicleType: VehicleType
 
     goForward: (moreSpeed?: boolean) => void
     goBackward: (speed?: number) => void

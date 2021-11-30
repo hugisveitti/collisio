@@ -30,6 +30,7 @@ import HowToPlayPage from "./HowToPlayPage";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
+import PublicProfilePageContainer from "./profile/PublicProfilePageContainer";
 import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
 import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
@@ -43,11 +44,15 @@ export const controlsRoomPath = "/controls";
 export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
 export const privateProfilePagePath = "/private-profile";
-export const publicProfilePagePath = "/user/:id";
+export const publicProfilePagePath = "/user/:profileId";
+export const publicProfilePath = "/user";
 export const showRoomPagePath = "/show-room";
 export const buyPremiumPagePath = "/premium";
 export const aboutPagePath = "/about";
 export const connectPagePath = "/connect";
+
+export const getUserPagePath = (userId: string) =>
+  `${publicProfilePath}/${userId}`;
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -174,6 +179,10 @@ const Routes = () => {
         <Route
           path={aboutPagePath}
           render={(props) => <AboutPageComponent {...props} />}
+        />
+        <Route
+          path={publicProfilePagePath}
+          render={(props) => <PublicProfilePageContainer {...props} />}
         />
         <Route
           path={connectPagePath}

@@ -17,10 +17,7 @@ const ShowRoomContainer = (props: IShowRoomContainer) => {
         paddingTop: 0.1,
       }}
     >
-      <ShowRoomComponent
-        isPremiumUser={user?.isPremium}
-        excludedVehicles={["test"]}
-      />
+      <ShowRoomComponent isPremiumUser={false} excludedVehicles={["test"]} />
     </AppContainer>
   );
 };
