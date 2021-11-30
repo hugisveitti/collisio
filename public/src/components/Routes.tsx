@@ -22,6 +22,7 @@ import {
 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
+import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
 import HighscorePage from "./HighscorePage";
@@ -31,6 +32,7 @@ import NotFoundPage from "./NotFoundPage";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
 import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
+import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 
 export const frontPagePath = "/";
@@ -41,10 +43,11 @@ export const controlsRoomPath = "/controls";
 export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
 export const privateProfilePagePath = "/private-profile";
-export const publicProfilePagePath = "/public-profile/:id";
+export const publicProfilePagePath = "/user/:id";
 export const showRoomPagePath = "/show-room";
 export const buyPremiumPagePath = "/premium";
-export const stressTestPagePath = "/stress-test";
+export const aboutPagePath = "/about";
+export const connectPagePath = "/connect";
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -167,6 +170,20 @@ const Routes = () => {
         <Route
           path={buyPremiumPagePath}
           render={(props) => <BuyPremiumComponent {...props} />}
+        />
+        <Route
+          path={aboutPagePath}
+          render={(props) => <AboutPageComponent {...props} />}
+        />
+        <Route
+          path={connectPagePath}
+          render={(props) => (
+            <ConnectToWaitingRoomContainer
+              {...props}
+              store={store}
+              socket={socket}
+            />
+          )}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

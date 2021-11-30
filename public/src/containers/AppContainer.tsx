@@ -1,7 +1,10 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
 import HelpIcon from "@mui/icons-material/Help";
 import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import StarsIcon from "@mui/icons-material/Stars";
 import AppBar from "@mui/material/AppBar";
@@ -22,7 +25,9 @@ import { ToastContainer } from "react-toastify";
 import CookiePrompt from "../components/monitary/CookiePrompt";
 import LoginComponent from "../components/LoginComponent";
 import {
+  aboutPagePath,
   buyPremiumPagePath,
+  connectPagePath,
   frontPagePath,
   highscorePagePath,
   howToPlayPagePath,
@@ -32,6 +37,7 @@ import {
 import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "react-toastify/dist/ReactToastify.css";
+import { getDeviceType } from "../utils/settings";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
@@ -43,6 +49,8 @@ const AppContainer = (props: IAppContainer) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const user = useContext(UserContext);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  const onMobile = getDeviceType() === "mobile";
 
   useEffect(() => {
     if (user) {
@@ -107,6 +115,21 @@ const AppContainer = (props: IAppContainer) => {
       <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 250 }} onClick={() => setDrawerOpen(false)}>
           <List>
+            <ListItem button onClick={() => history.push(frontPagePath)}>
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Frontpage"} />
+            </ListItem>
+
+            <ListItem button onClick={() => history.push(connectPagePath)}>
+              <ListItemIcon>
+                <VideogameAssetIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={!onMobile ? "Create a Game" : "Join a Game"}
+              />
+            </ListItem>
             <ListItem button onClick={() => history.push(howToPlayPagePath)}>
               <ListItemIcon>
                 <HelpIcon />
@@ -130,6 +153,12 @@ const AppContainer = (props: IAppContainer) => {
                 <StarsIcon />
               </ListItemIcon>
               <ListItemText primary="Go Premium" />
+            </ListItem>
+            <ListItem button onClick={() => history.push(aboutPagePath)}>
+              <ListItemIcon>
+                <EmojiPeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary="About" />
             </ListItem>
           </List>
         </Box>

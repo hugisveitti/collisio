@@ -18,6 +18,7 @@ import { setDBUserProfile } from "../../firebase/firebaseFunctions";
 import { auth, signOut } from "../../firebase/firebaseInit";
 import { cardBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
+import { frontPagePath } from "../Routes";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 
@@ -206,7 +207,11 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
             <Grid item xs={3} style={{ textAlign: "left" }}>
               <Button
                 color="inherit"
-                onClick={signOut}
+                onClick={() =>
+                  signOut(() => {
+                    window.location.href = frontPagePath;
+                  })
+                }
                 variant="contained"
                 disableElevation
               >

@@ -1,8 +1,6 @@
 const path = require('path')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const TerserPlugin = require('terser-webpack-plugin');
 
-
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 
 // if issue with images go to "import-png.d.ts"
@@ -64,14 +62,5 @@ module.exports = {
     filename: '[name].bundle.js',
     //  filename: PROD ? '[name].bundle.min.js' : '[name].bundle.js',
     path: path.resolve(__dirname, 'dist')
-  },
-  // optimization: {
-  //   minimize: true,
-  //   minimizer: [new TerserPlugin()],
-  // },
-  // plugins: [
-  //   new BundleAnalyzerPlugin()
-  // ]
-
-
+  }
 }

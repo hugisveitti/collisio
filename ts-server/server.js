@@ -87,6 +87,8 @@ app.get("/game", function (_, res) {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
 app.get("/premium", sendIndexHTML);
+app.get("/about", sendIndexHTML);
+app.get("/connect", sendIndexHTML);
 app.get("/controls", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
@@ -99,7 +101,7 @@ app.get("/highscores", function (_, res) {
 app.get("/private-profile", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
-app.get("/public-profile/:id", function (_, res) {
+app.get("/user/:id", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 app.get("/show-room", function (_, res) {

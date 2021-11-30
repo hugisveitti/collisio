@@ -89,6 +89,8 @@ export const signInWithEmail = (email: string, password: string, callback: (stat
         });
 }
 
-export const signOut = () => {
-    auth.signOut()
+export const signOut = (callback: () => void) => {
+    auth.signOut().then(() => {
+        callback()
+    })
 }

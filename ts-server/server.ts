@@ -88,6 +88,8 @@ app.get("/game", (_: Request, res: Response) => {
 // });
 
 app.get("/premium", sendIndexHTML)
+app.get("/about", sendIndexHTML)
+app.get("/connect", sendIndexHTML)
 
 
 
@@ -107,7 +109,7 @@ app.get("/private-profile", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 
-app.get("/public-profile/:id", (_: Request, res: Response) => {
+app.get("/user/:id", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 });
 

@@ -94,7 +94,15 @@ const AdminComponent = (props: IAdminComponent) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Button disableElevation variant="contained" onClick={() => signOut()}>
+        <Button
+          disableElevation
+          variant="contained"
+          onClick={() =>
+            signOut(() => {
+              window.location.href = "/";
+            })
+          }
+        >
           Logout
         </Button>
       </Grid>
