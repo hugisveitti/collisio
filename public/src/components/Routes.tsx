@@ -10,7 +10,8 @@ import { defaultUserSettings } from "../classes/User";
 import {
   getDBUserSettings,
   setDBUserSettings,
-} from "../firebase/firebaseFunctions";
+} from "../firebase/firestoreFunctions";
+
 import ControlsRoom from "../mobile/ControlsRoom";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";

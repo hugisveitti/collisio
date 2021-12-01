@@ -21,7 +21,7 @@ import TrackSelect from "../components/inputs/TrackSelect";
 import VehicleSelect from "../components/inputs/VehicleSelect";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
-import { setDBUserSettings } from "../firebase/firebaseFunctions";
+import { setDBUserSettings } from "../firebase/firestoreFunctions";
 import {
   GameActions,
   mts_user_settings_changed,

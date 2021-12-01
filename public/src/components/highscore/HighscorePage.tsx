@@ -15,32 +15,24 @@ import {
   IEndOfRaceInfoPlayer,
 } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
-import {
-  getUniqueHighscore,
-  UniqueHighscoreDict,
-} from "../../firebase/firebaseFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
 import AdSense from "../monitary/AdSense";
 import "../../styles/main.css";
 import HighscoreTable from "./HighscoreTable";
-import { stringInArray } from "../../utils/utilFunctions";
 import {
   BestTrackScore,
   getBestScoresOnTrack,
 } from "../../firebase/firestoreGameFunctions";
 import { TrackName } from "../../shared-backend/shared-stuff";
+import { stringInArray } from "../../utils/utilFunctions";
 
 interface IHighscorePage {}
 
 const HighscorePage = (props: IHighscorePage) => {
   const [numberOfLapsKeys, setNumberOfLapsKeys] = useState([]);
-  const [trackKeys, setTrackKeys] = useState(activeRaceTrackNames);
   const [numberOfLapsKey, setNumberOfLapsKey] = useState("");
-  const [trackKey, setTrackKey] = useState(activeRaceTrackNames[0]);
+  const [trackKey, setTrackKey] = useState("");
 
-  const [highscoreDict, setHighscoreDict] = useState(
-    undefined as UniqueHighscoreDict | undefined
-  );
   const [highscoreHasLoaded, setHighscoreHasLoaded] = useState(false);
 
   const [bestTrackScores, setBestTrackScores] = useState({} as BestTrackScore);
@@ -51,6 +43,8 @@ const HighscorePage = (props: IHighscorePage) => {
   useEffect(() => {
     if (bestTrackScores[numberOfLapsKey]) {
       setHighscoreList(bestTrackScores[numberOfLapsKey]);
+    } else {
+      setHighscoreList([]);
     }
   }, [numberOfLapsKey]);
 
@@ -73,6 +67,8 @@ const HighscorePage = (props: IHighscorePage) => {
 
       if (nolKeys.length > 0) {
         setNumberOfLapsKey(nolKeys[0]);
+      } else {
+        setNumberOfLapsKey("");
       }
     });
   }, [trackKey]);
@@ -118,7 +114,7 @@ const HighscorePage = (props: IHighscorePage) => {
                   }}
                   value={trackKey}
                 >
-                  {trackKeys.map((key) => (
+                  {activeRaceTrackNames.map((key) => (
                     <MenuItem key={key} value={key}>
                       {getTrackNameFromType(key)}
                     </MenuItem>
@@ -136,7 +132,11 @@ const HighscorePage = (props: IHighscorePage) => {
                     minWidth: 100,
                     backgroundColor: inputBackgroundColor,
                   }}
-                  value={numberOfLapsKey}
+                  value={
+                    stringInArray(numberOfLapsKey, numberOfLapsKeys)
+                      ? numberOfLapsKey
+                      : ""
+                  }
                   onChange={(e) => {
                     setNumberOfLapsKey(e.target.value);
                   }}

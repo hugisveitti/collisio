@@ -1,8 +1,10 @@
 import React, { createContext, useEffect, useState } from "react";
 import { IPublicUser, IUser } from "../classes/User";
-import { createDBUser, getIsPremiumUser } from "../firebase/firebaseFunctions";
 import { auth } from "../firebase/firebaseInit";
-import { setFirestorePublicUser } from "../firebase/firestoreFunctions";
+import {
+  setFirestorePrivateUser,
+  setFirestorePublicUser,
+} from "../firebase/firestoreFunctions";
 import { getDateNow } from "../utils/utilFunctions";
 
 interface IUserProvider {
@@ -21,15 +23,18 @@ const UserProvider = (props: IUserProvider) => {
           uid: auth.currentUser.uid,
           photoURL: auth.currentUser.photoURL ?? "",
           email: auth.currentUser.email,
+          creationDate: getDateNow(),
           latestLogin: getDateNow(),
         };
         setUser(userInfo);
-        createDBUser(userInfo);
+        //   createDBUser(userInfo);
+        setFirestorePrivateUser(userInfo);
         const publicUser: IPublicUser = {
           displayName: auth.currentUser.displayName,
           uid: auth.currentUser.uid,
           photoURL: auth.currentUser.photoURL ?? "",
           latestLogin: getDateNow(),
+          creationDate: getDateNow(),
         };
         setFirestorePublicUser(publicUser);
       } else {

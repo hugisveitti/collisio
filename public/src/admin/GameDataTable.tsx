@@ -8,6 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IEndOfRaceInfoGame } from "../classes/Game";
 import { inputBackgroundColor } from "../providers/theme";
+import { getDateFromNumber } from "../utils/utilFunctions";
 
 /**
  * Do something more interesting with this
@@ -20,7 +21,7 @@ const GameInfoRow = (props: IGameInfoRow) => {
   return (
     <TableRow>
       <TableCell>{props.gameData.roomId}</TableCell>
-      <TableCell>{props.gameData.date}</TableCell>
+      <TableCell>{getDateFromNumber(props.gameData.date)}</TableCell>
       <TableCell>{props.gameData.playersInfo?.length ?? "-"}</TableCell>
       <TableCell>{props.gameData.roomTicks ?? "-"}</TableCell>
       <TableCell>{props.gameData.gameTicks ?? "-"}</TableCell>

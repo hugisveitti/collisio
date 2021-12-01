@@ -60,10 +60,6 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
   }, []);
 
   useEffect(() => {
-    // createFakeHighscoreData();
-  }, []);
-
-  useEffect(() => {
     if (profile) {
       console.log("profile.uid", profile.uid);
       getUserSocials(

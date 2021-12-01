@@ -12,7 +12,6 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IUser, IVehicleSettings } from "../../classes/User";
-import { setDBUserSettings } from "../../firebase/firebaseFunctions";
 import {
   IPlayerInfo,
   std_start_game_callback,
@@ -32,6 +31,7 @@ import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import GameSettingsComponent from "./GameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
+import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 
 interface IWaitingRoomProps {
   socket: Socket;

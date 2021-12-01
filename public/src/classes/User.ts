@@ -79,10 +79,16 @@ export interface IPublicUser {
     displayName: string
     photoURL: string
     uid: string
-    latestLogin: number
+    latestLogin?: number
+    latestEdit?: number
+    creationDate?: number
 }
 
 export interface IPrivateUser {
     email: string
     uid: string
+    photoURL: string
+    latestLogin: number
+    displayName: string
+    creationDate?: number
 }

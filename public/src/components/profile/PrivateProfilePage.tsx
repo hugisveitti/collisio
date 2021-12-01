@@ -16,13 +16,14 @@ import makeStyles from "@mui/styles/makeStyles";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import AppContainer from "../../containers/AppContainer";
-import { setDBUserProfile } from "../../firebase/firebaseFunctions";
 import { auth, signOut } from "../../firebase/firebaseInit";
 import { cardBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { frontPagePath, getUserPagePath } from "../Routes";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
+import { getDateNow } from "../../utils/utilFunctions";
+import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
 
 const useStyles = makeStyles({
   container: {
@@ -104,10 +105,11 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 setInEditMode(false);
                 const { displayName, photoURL } = editUser;
                 updateProfile(auth.currentUser, { displayName, photoURL });
-                setDBUserProfile(user.uid, {
+                setFirestorePublicUser({
                   uid: user.uid,
                   displayName,
                   photoURL,
+                  latestEdit: getDateNow(),
                 });
                 if (user.displayName !== displayName) {
                   // TODO: fix this, so we don't need to reload when

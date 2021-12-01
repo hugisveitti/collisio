@@ -77,7 +77,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
       </Grid>
 
       <Grid item xs={12} lg={6}>
-        <Typography>Race info</Typography>
+        <Typography>Best races</Typography>
         <HighscoreTable
           data={props.bestRaces}
           noDataText="User hasn't completed any races"

@@ -10,7 +10,10 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection, IRoomInfo } from "../../classes/Game";
-import { IGameSettings } from "../../classes/localGameSettings";
+import {
+  IGameSettings,
+  setLocalGameSetting,
+} from "../../classes/localGameSettings";
 import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
@@ -180,6 +183,10 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       getPlayersInRoom();
       props.socket.on(stmd_game_settings_changed, (data) => {
         toSaveGameSettings = data.gameSettings;
+        for (let key of Object.keys(data.gameSettings)) {
+          // @ts-ignore
+          setLocalGameSetting(key, data.gameSettings[key]);
+        }
         props.store.setGameSettings(data.gameSettings);
       });
 

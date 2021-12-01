@@ -1,6 +1,6 @@
 import { addDoc, deleteDoc, doc, getDoc, getDocs, where } from "@firebase/firestore"
 import { collection, onSnapshot, query, setDoc } from "firebase/firestore"
-import { IFollower, IPrivateUser, IPublicUser, IUser } from "../classes/User"
+import { IFollower, IPrivateUser, IPublicUser, IUser, IUserSettings } from "../classes/User"
 import { v4 as uuid } from "uuid"
 
 import { firestore } from "./firebaseInit"
@@ -16,6 +16,9 @@ const followingsPath = "followings"
 const roomDataRefPath = "roomData"
 const availableRoomsRefPath = "availableRooms"
 
+const userSettingsRefPath = "settings"
+
+
 type CallbackStatus = "success" | "error"
 export interface IFirestoreCallback<T> {
     status: CallbackStatus
@@ -25,17 +28,18 @@ export interface IFirestoreCallback<T> {
 
 export const setFirestorePrivateUser = async (user: IPrivateUser) => {
     try {
-        await setDoc(doc(firestore, usersCollectionRefPath, user.uid), user)
+        await setDoc(doc(firestore, usersCollectionRefPath, user.uid), user, { merge: true })
     } catch (e) {
-        console.log("Error adding document:", e)
+        console.warn("Error adding document:", e)
     }
 }
 
 export const setFirestorePublicUser = async (user: IPublicUser) => {
+
     try {
-        await setDoc(doc(firestore, publicUserCollectionPath, user.uid), user)
+        await setDoc(doc(firestore, publicUserCollectionPath, user.uid), user, { merge: true, mergeFields: ["latestLogin"] })
     } catch (e) {
-        console.log("Error adding document:", e)
+        console.warn("Error adding document:", e)
     }
 }
 
@@ -66,13 +70,13 @@ export const addFollow = async (userId: string, userData: IFollower, followingId
     try {
         await setDoc(doc(firestore, socialsCollectionPath, userId, followingsPath, followingId), followingData)
     } catch (e) {
-        console.log("Error adding following:", e)
+        console.warn("Error adding following:", e)
     }
 
     try {
         await setDoc(doc(firestore, socialsCollectionPath, followingId, followersPath, userId), userData)
     } catch (e) {
-        console.log("Error adding follower:", e)
+        console.warn("Error adding follower:", e)
     }
 }
 /**
@@ -84,13 +88,13 @@ export const removeFollow = async (userId: string, followingId: string,) => {
     try {
         await deleteDoc(doc(firestore, socialsCollectionPath, userId, followingsPath, followingId))
     } catch (e) {
-        console.log("Error deleting following:", e)
+        console.warn("Error deleting following:", e)
     }
 
     try {
         await deleteDoc(doc(firestore, socialsCollectionPath, followingId, followersPath, userId),)
     } catch (e) {
-        console.log("Error deleting follower:", e)
+        console.warn("Error deleting follower:", e)
     }
 }
 
@@ -119,7 +123,7 @@ export const getUserFollowers = async (userId: string, followersCallback: (follo
         })
         followersCallback(arr as IFollower[])
     } catch (e) {
-        console.log("Error getting user followers:", e)
+        console.warn("Error getting user followers:", e)
     }
 }
 
@@ -134,7 +138,7 @@ export const getUserFollowings = async (userId: string, followingsCallback: (fol
         })
         followingsCallback(arr)
     } catch (e) {
-        console.log("Error getting user followings:", e)
+        console.warn("Error getting user followings:", e)
     }
     return arr
 }
@@ -199,3 +203,38 @@ export const createAvailableRoomsListeners = async (userId: string, callback: (r
 
     return (unsub)
 }
+
+/**
+ * 
+ * settings is a collection with documents such as 
+ * - IVehicleSettings
+ * 
+ * @param userId 
+ * @param settings 
+ */
+
+export const setDBUserSettings = async (userId: string, settings: IUserSettings) => {
+    const userSettingsRef = doc(firestore, usersCollectionRefPath, userId)
+
+    setDoc(userSettingsRef, { settings }, { merge: true })
+}
+
+
+
+export const getDBUserSettings = async (userId: string, callback: (settings: IUserSettings | undefined) => void) => {
+
+
+    const userSettingsRef = doc(firestore, usersCollectionRefPath, userId)
+
+    const data = await getDoc(userSettingsRef)
+    if (data.exists()) {
+
+        const settings = data.data()["settings"]
+
+        callback(settings as IUserSettings)
+    } else {
+        callback(undefined)
+    }
+}
+
+

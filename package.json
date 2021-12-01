@@ -11,6 +11,7 @@
   "author": "Hugi Holm",
   "license": "ISC",
   "dependencies": {
+    "@firebase/firestore": "^3.3.1",
     "@socket.io/cluster-adapter": "^0.1.0",
     "@socket.io/sticky": "^1.0.1",
     "cluster": "^0.7.7",

@@ -8,6 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IRoomInfo } from "../classes/Game";
 import { inputBackgroundColor } from "../providers/theme";
+import { getDateFromNumber } from "../utils/utilFunctions";
 
 interface IRoomInfoRow {
   roomInfo: IRoomInfo;
@@ -17,7 +18,7 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   return (
     <TableRow>
       <TableCell>{props.roomInfo.roomId}</TableCell>
-      <TableCell>{props.roomInfo.date}</TableCell>
+      <TableCell>{getDateFromNumber(props.roomInfo.date)}</TableCell>
       <TableCell>{props.roomInfo.players?.length ?? "-"}</TableCell>
       <TableCell>
         {props.roomInfo.players?.length > 0

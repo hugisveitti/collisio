@@ -1,6 +1,7 @@
 import { FirebaseOptions, initializeApp } from "firebase/app";
 import { initializeApp as adminApp, } from "firebase-admin/app"
 import { getDatabase } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
 
 
 export const admin = require("firebase-admin");
@@ -30,5 +31,5 @@ let config = {
 const firebaseApp = initializeApp(config);
 export const database = getDatabase(firebaseApp)
 
-
+export const firestore = getFirestore(firebaseApp)
 

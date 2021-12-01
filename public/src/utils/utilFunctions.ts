@@ -68,6 +68,9 @@ export const getDateNow = (): number => {
     return Date.now()
 }
 
-export const getDateFromNumber = (num: number): string => {
-    return new Date(num).toISOString()
+export const getDateFromNumber = (num: number | any): string => {
+    if (typeof num === "number") {
+        return new Date(num).toISOString()
+    }
+    return "-"
 }

@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { getTrackNameFromType } from "../../classes/Game";
 import { IFollower, IUser } from "../../classes/User";
-import { getPlayerBestScoreOnTrackAndLap } from "../../firebase/firebaseFunctions";
+import { getPlayerBestScoreOnTrackAndLap } from "../../firebase/firestoreGameFunctions";
 import { viewBottoms, viewLefts } from "../../game/GameScene";
 import { cardBackgroundColor } from "../../providers/theme";
 import {
@@ -41,7 +41,7 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
         props.trackName,
         props.numberOfLaps,
         (personalBest) => {
-          if (personalBest.totalTime) {
+          if (personalBest?.totalTime) {
             setPersonalBest(personalBest.totalTime);
           } else {
             setPersonalBest(-1);

@@ -14,7 +14,8 @@ import { IUserSettings, IVehicleSettings } from "../../classes/User";
 import {
   getDBUserSettings,
   setDBUserSettings,
-} from "../../firebase/firebaseFunctions";
+} from "../../firebase/firestoreFunctions";
+
 import { cardBackgroundColor } from "../../providers/theme";
 
 interface IUserSettingsComponent {

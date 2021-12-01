@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.database = exports.admin = void 0;
+exports.firestore = exports.database = exports.admin = void 0;
 var app_1 = require("firebase/app");
 var app_2 = require("firebase-admin/app");
 var database_1 = require("firebase/database");
+var firestore_1 = require("firebase/firestore");
 exports.admin = require("firebase-admin");
 var serviceAccount = require("./configs/race-game-a4327-firebase-adminsdk-jw2qt-30f56f1644.json");
 (0, app_2.initializeApp)({
@@ -24,3 +25,4 @@ var config = {
 };
 var firebaseApp = (0, app_1.initializeApp)(config);
 exports.database = (0, database_1.getDatabase)(firebaseApp);
+exports.firestore = (0, firestore_1.getFirestore)(firebaseApp);

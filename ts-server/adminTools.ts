@@ -1,10 +1,12 @@
-import { database, admin } from "./firebase-config";
+import { admin, firestore } from "./firebase-config";
 import { Request, Response } from "express";
 
 import * as path from "path";
-import { get, limitToLast, onValue, orderByChild, QueryConstraint, ref } from "@firebase/database";
-import { query } from "firebase/database";
+//import { get, limitToLast, onValue, orderByChild, QueryConstraint, ref } from "@firebase/database";
+//import { query } from "firebase/database";
 import { isAdmin } from "@firebase/util";
+import { doc, getDoc, getDocs, limit, orderBy, query } from "@firebase/firestore";
+import { collection } from "firebase/firestore";
 
 const buildFolder = "dist"
 
@@ -15,24 +17,24 @@ export const adminFunctions = (app: any) => {
 
 
     const adminsRefPath = "admins"
-    const roomDataPath = "room-data"
-    const gameDataPath = "game-data"
+    const roomDataPath = "roomData"
+    const gameDataPath = "allGames"
 
-    const getIsAdmin = (userId: string, callback: (isAdmin: boolean) => void) => {
-        const adminsRef = ref(database, adminsRefPath + "/" + userId)
-        onValue(adminsRef, (snap) => {
-            if (snap.exists()) {
-                /** is admin */
+    const getIsAdmin = async (userId: string, callback: (isAdmin: boolean) => void) => {
+        const adminsRef = doc(firestore, adminsRefPath, userId)
+        console.log("userId", userId)
+        try {
+
+            const data = await getDoc(adminsRef)
+            if (data.exists()) {
                 callback(true)
             } else {
                 callback(false)
             }
-        }, (err) => {
-            console.log("error getting admin data")
-            callback(false)
-        }, {
-            onlyOnce: true
-        })
+        } catch (e) {
+            console.warn("Error getting isAdmin", e)
+        }
+
     }
 
     app.get("/role/:userTokenId", (req: Request, res: Response) => {
@@ -59,7 +61,7 @@ export const adminFunctions = (app: any) => {
     })
 
     interface ICallbackData {
-        data?: any
+        data?: any | any[]
         status: CallbackStatus
         statusCode: StatusCode
         message?: string
@@ -69,43 +71,55 @@ export const adminFunctions = (app: any) => {
         n?: number
     }
 
-    const createFirebaseQueries = (queryParams: IQueryParams): QueryConstraint[] => {
-        const queries = []
+    // const createFirebaseQueries = (queryParams: IQueryParams): QueryConstraint[] => {
+    //     const queries = []
 
-        if (queryParams.n) {
-            queries.push(limitToLast(queryParams.n))
-        }
-        console.log("queries", queries)
-        return queries
-    }
+    //     if (queryParams.n) {
+    //         queries.push(limitToLast(queryParams.n))
+    //     }
+    //     console.log("queries", queries)
+    //     return queries
+    // }
 
 
     const getRoomData = (userId: string, queryParams: IQueryParams, callback: (callbackData: ICallbackData) => void) => {
         /** first check if user is admin */
-        getIsAdmin(userId, (isAdmin) => {
+        getIsAdmin(userId, async (isAdmin) => {
             if (isAdmin) {
-                const queries = createFirebaseQueries(queryParams)
-                queries.push(orderByChild("date"))
+                // const queries = createFirebaseQueries(queryParams)
+                // queries.push(orderByChild("date"))
+                const roomDataRef = collection(firestore, roomDataPath)
+                let q = query(roomDataRef, orderBy("date", "desc"))
+                if (queryParams.n) {
+                    q = query(q, limit(queryParams.n))
+                }
 
-                /** I believe limitToLast(n) will work but we will then also have to sort them on the front end */
-                const roomDataRef = query(ref(database, roomDataPath), ...queries)
+                try {
 
-                onValue(roomDataRef, (snap) => {
+
+                    const data = await getDocs(q)
+                    const rooms: any[] = []
+                    data.forEach(doc => {
+                        rooms.push(doc.data())
+                    })
+
                     callback({
                         status: "success",
                         statusCode: 200,
-                        data: snap.val(),
+                        data: rooms,
                         message: "Successfully gotten room data"
                     })
-                }, (err) => {
-                    console.log("error getting room data")
+                } catch (e) {
+                    console.warn("Error getting room data", e)
                     callback({
                         status: "error",
                         statusCode: 500,
 
-                        message: "Unknown error"
+                        message: "Error gotten room data"
                     })
-                }, { onlyOnce: true })
+                }
+
+
             } else {
                 callback({
                     status: "error",
@@ -119,29 +133,38 @@ export const adminFunctions = (app: any) => {
 
     const getGameData = (userId: string, queryParams: IQueryParams, callback: (gameData: ICallbackData) => void) => {
 
-        getIsAdmin(userId, (isAdmin) => {
+        getIsAdmin(userId, async (isAdmin) => {
             if (isAdmin) {
-                const queries = createFirebaseQueries(queryParams)
-                queries.push(orderByChild("date"))
 
-                /** I believe limitToLast(n) will work but we will then also have to sort them on the front end */
-                const gameDataRef = query(ref(database, gameDataPath), ...queries)
-                onValue(gameDataRef, (snap) => {
+                const gameDataRef = collection(firestore, gameDataPath)
+                let q = query(gameDataRef, orderBy("date", "desc"))
+                if (queryParams.n) {
+                    q = query(q, limit(queryParams.n))
+                }
+
+                try {
+
+                    const data = await getDocs(q)
+                    const games: any[] = []
+                    data.forEach(doc => {
+                        games.push(doc.data())
+                    })
+
                     callback({
                         status: "success",
                         statusCode: 200,
-                        data: snap.val(),
+                        data: games,
                         message: "Successfully gotten room data"
                     })
-                }, (err) => {
-                    console.log("error getting room data")
+                } catch (e) {
+                    console.warn("Error getting game data", e)
                     callback({
                         status: "error",
                         statusCode: 500,
-
-                        message: "Unknown error"
+                        message: "Error"
                     })
-                }, { onlyOnce: true })
+                }
+
             } else {
                 callback({
                     status: "error",
