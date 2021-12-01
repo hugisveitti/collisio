@@ -14,12 +14,12 @@ export const usersRefPath = "users"
 // all highscores is simply all of the highscores
 export const allHighscoresRefPath = "all-highscores"
 // unique is way to quickly retrieve a players fastest game
-export const uniqueHighscoresRefPath = "unique-highscores"
+const uniqueHighscoresRefPath = "unique-highscores"
 
-export const playerGameDataRefPath = "player-game-data"
-export const gameDataRefPath = "game-data"
-export const roomDataRefPath = "room-data"
-export const userGamesRefPath = "games"
+const playerGameDataRefPath = "player-game-data"
+const gameDataRefPath = "game-data"
+const roomDataRefPath = "room-data"
+const userGamesRefPath = "games"
 
 const availableRoomsRefPath = "available-rooms"
 const profilesRefPath = "profiles"
@@ -160,7 +160,7 @@ export const saveRaceDataPlayer = (playerGameInfo: IEndOfRaceInfoPlayer, callbac
 }
 
 
-export const saveRaceDataGame = (playerId: string, gameInfo: IEndOfRaceInfoGame,) => {
+export const saveRaceDataGame = (playerId: string, gameInfo: IEndOfRaceInfoGame) => {
     const updates = {}
     updates[usersRefPath + "/" + playerId + "/" + userGamesRefPath + "/" + gameInfo.gameId + "/" + userGameGameInfoPath] = gameInfo
     update(ref(database), updates).catch((err) => {
@@ -312,46 +312,46 @@ export const getUniqueHighscore = (callback: (highscoreDict: UniqueHighscoreDict
 
 }
 
-export interface IPlayerGameData {
-    playerInfo: IEndOfRaceInfoPlayer
-    gameInfo: IEndOfRaceInfoGame
-}
+// export interface IPlayerGameData {
+//     playerInfo: IEndOfRaceInfoPlayer
+//     gameInfo: IEndOfRaceInfoGame
+// }
 
 
-export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
-    const playerDataRef = ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)
+// export const getPlayerGameData = (userId: string, callback: (gamesData: IPlayerGameData[] | undefined) => void) => {
+//     const playerDataRef = ref(database, usersRefPath + "/" + userId + "/" + userGamesRefPath)
 
 
-    onValue(playerDataRef, snap => {
-        if (snap.exists()) {
-            const data = snap.val()
-            /** TODO there is some fail here
-             * I think it has to do with how I save the data
-             */
-            console.log("data", data)
-            const gamesData = [] as IPlayerGameData[]
-            const keys = Object.keys(data)
-            for (let key of keys) {
-                gamesData.unshift({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
-            }
+//     onValue(playerDataRef, snap => {
+//         if (snap.exists()) {
+//             const data = snap.val()
+//             /** TODO there is some fail here
+//              * I think it has to do with how I save the data
+//              */
+//             console.log("data", data)
+//             const gamesData = [] as IPlayerGameData[]
+//             const keys = Object.keys(data)
+//             for (let key of keys) {
+//                 gamesData.unshift({ playerInfo: data[key][userGamePlayerInfoPath], gameInfo: data[key][userGameGameInfoPath] })
+//             }
 
-            callback(gamesData)
+//             callback(gamesData)
 
-        } else {
-            callback(undefined)
-        }
-    }, err => {
-        console.warn("Error getting player data", err)
-    }, {})
+//         } else {
+//             callback(undefined)
+//         }
+//     }, err => {
+//         console.warn("Error getting player data", err)
+//     }, {})
 
-    return playerDataRef
-}
+//     return playerDataRef
+// }
 
 
 /**
  * Users will not be able to delete games form uniqueHighscores
  */
-
+/*
 export const deletePlayerGameData = (userId: string, gameId: string, trackName: string, numberOfLaps: number) => {
     const highscoreRef = ref(database, allHighscoresRefPath + "/" + trackName + "/" + numberOfLaps + "/" + userId + "/" + gameId)
 
@@ -374,7 +374,8 @@ export const deletePlayerGameData = (userId: string, gameId: string, trackName: 
     })
 
 
-}
+}*/
+
 
 const userSettingsRef = "settings"
 
@@ -400,38 +401,38 @@ export const getDBUserSettings = (userId: string, callback: (settings: IUserSett
 }
 
 
-export interface AvailableRoomsFirebaseObject {
-    roomId: string
-    displayName: string
-}
+// export interface AvailableRoomsFirebaseObject {
+//     roomId: string
+//     displayName: string
+// }
 
-export const addToAvailableRooms = (userId: string, object: AvailableRoomsFirebaseObject) => {
+// export const addToAvailableRooms = (userId: string, object: AvailableRoomsFirebaseObject) => {
 
-    set(ref(database, availableRoomsRefPath + "/" + userId), object).catch(err => {
-        console.warn("error adding room to available rooms", object.roomId, userId, err)
-    })
-}
+//     set(ref(database, availableRoomsRefPath + "/" + userId), object).catch(err => {
+//         console.warn("error adding room to available rooms", object.roomId, userId, err)
+//     })
+// }
 
-export const removeFromAvailableRooms = (userId: string) => {
-    set(ref(database, availableRoomsRefPath + "/" + userId), null).catch(err => {
-        console.error("error removing room to available rooms", userId, err)
-    })
-}
+// export const removeFromAvailableRooms = (userId: string) => {
+//     set(ref(database, availableRoomsRefPath + "/" + userId), null).catch(err => {
+//         console.error("error removing room to available rooms", userId, err)
+//     })
+// }
 
 
-export const createAvailableRoomsListeners = (userId: string, callback: (roomIds: AvailableRoomsFirebaseObject[]) => void) => {
-    const availableRoomsRef = ref(database, availableRoomsRefPath + "/" + userId)
+// export const createAvailableRoomsListeners = (userId: string, callback: (roomIds: AvailableRoomsFirebaseObject[]) => void) => {
+//     const availableRoomsRef = ref(database, availableRoomsRefPath + "/" + userId)
 
-    onValue(availableRoomsRef, (snap) => {
-        if (snap.exists()) {
-            // TODO: include friends 
-            const roomId = snap.val() as AvailableRoomsFirebaseObject
-            callback([roomId])
-        } else {
-            callback([])
-        }
-    })
+//     onValue(availableRoomsRef, (snap) => {
+//         if (snap.exists()) {
+//             // TODO: include friends 
+//             const roomId = snap.val() as AvailableRoomsFirebaseObject
+//             callback([roomId])
+//         } else {
+//             callback([])
+//         }
+//     })
 
-    return availableRoomsRef
-}
+//     return availableRoomsRef
+// }
 

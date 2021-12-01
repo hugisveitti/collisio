@@ -69,6 +69,12 @@ export const createAccountWithEmail = (email: string, password: string, displayN
         const userInfo = { displayName, uid: userCredential.user.uid, email }
         console.log("creating user", userInfo, auth.currentUser)
         updateProfile(auth.currentUser, { displayName })
+        setTimeout(() => {
+            /**
+             * This reload is because the display name wont show in the appcontainer and this is an easy fix
+             */
+            window.location.reload()
+        }, 200)
     }).catch((err) => {
         toast.error("Error creating account with email " + err.message)
         console.log("Error creating account with email", err)

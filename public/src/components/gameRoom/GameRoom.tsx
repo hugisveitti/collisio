@@ -7,7 +7,8 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
-import { saveGameFinished } from "../../firebase/firebaseFunctions";
+import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
+
 import { IEndOfGameData, startGame } from "../../game/GameScene";
 import { IGameScene } from "../../game/IGameScene";
 import { RaceGameScene } from "../../game/RaceGameScene";
@@ -59,11 +60,12 @@ const GameRoom = (props: IGameRoom) => {
 
   const handelGameFinished = (data: IEndOfGameData) => {
     setEndOfGameModalOpen(true);
+    saveRaceDataGame(data.endOfRaceInfo);
     setEndOfGameData(data);
-    if (!inTestMode) {
-      saveGameFinished(data.endOfRaceInfo);
-      props.socket.emit(dts_game_finished, data);
-    }
+    // if (!inTestMode) {
+    //   saveGameFinished(data.endOfRaceInfo);
+    //   props.socket.emit(dts_game_finished, data);
+    // }
   };
 
   const handleUpdateScoreTable = (data: IScoreInfo) => {

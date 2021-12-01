@@ -1,5 +1,6 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { getLocalGameSetting } from "../classes/localGameSettings";
+import { defaultGameSettings, getLocalGameSetting } from "../classes/localGameSettings";
+import { saveRaceData, saveRaceDataGame } from "../firebase/firestoreGameFunctions";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
 
@@ -27,7 +28,7 @@ const players = [
     }
 ]
 
-const numberOfFakeGames = 30
+const numberOfFakeGames = 20
 const possibleTracks: TrackName[] = ["f1-track", "farm-track", "sea-side-track"]
 
 export const createFakeHighscoreData = () => {
@@ -69,13 +70,16 @@ export const createFakeHighscoreData = () => {
                 trackName,
                 totalTime: tt,
                 numberOfLaps,
+                // @ts-ignore
                 date: getDateNow(),
                 private: false,
                 isAuthenticated: true,
                 engineForce: 100,
                 steeringSensitivity: -1,
                 breakingForce: -1,
-                vehicleType: "test"
+                vehicleType: "test",
+                roomTicks: 0,
+                gameTicks: 0
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",
@@ -89,21 +93,22 @@ export const createFakeHighscoreData = () => {
                 isAuthenticated: false
             })
         }
-        // const gameData: IEndOfRaceInfoGame = {
-        //     playersInfo: playerGameInfos,
-        //     numberOfLaps,
-        //     gameId,
-        //     roomId,
-        //     trackName,
-        //     date: getDateNow()
-        // }
+        const gameData: IEndOfRaceInfoGame = {
+            playersInfo: playerGameInfos,
+            gameSettings: defaultGameSettings,
+            gameId,
+            roomId,
 
-        console.log("###saving data")
-        // console.log("GAMEDATA", gameData)
-        console.log("PlayerDATA", playerData)
-        // saveRaceData(playerData, gameData, (gameDataInfo) => {
-        //     console.log("interesting game data in fake data", gameDataInfo)
-        // })
+            date: getDateNow(),
+            roomTicks: 10,
+            gameTicks: 10,
+        }
+
+
+        saveRaceDataGame(gameData)
+
+        //  saveRaceData(playerData[1].playerId, playerData[1])
+        saveRaceData(playerData[0].playerId, playerData[0], (info) => console.log("info about race", info))
     }
 }
 

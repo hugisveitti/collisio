@@ -33,7 +33,8 @@ export class RaceGameScene extends GameScene {
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
 
-    ticks: number
+    roomTicks: number
+    gameTicks: number
 
     /**
      * this is if players change number of laps in middle of game
@@ -58,7 +59,8 @@ export class RaceGameScene extends GameScene {
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
 
-        this.ticks = 0
+        this.roomTicks = 0
+        this.gameTicks = 0
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
         this.hasShowStartAnimation = false
@@ -165,6 +167,7 @@ export class RaceGameScene extends GameScene {
     }
 
     _startAllVehicles() {
+        this.gameTicks = 0
         for (let i = 0; i < this.vehicles.length; i++) {
             this.gameTimers[i].start()
         }
@@ -325,7 +328,8 @@ export class RaceGameScene extends GameScene {
 
 
     update(time: number) {
-        this.ticks += 1
+        this.gameTicks += 1
+        this.roomTicks += 1
         if (this.everythingReady()) {
             stats.begin()
             if (inTestMode) {
@@ -337,7 +341,7 @@ export class RaceGameScene extends GameScene {
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()
             }
-            if (this.ticks % 90 === 0) {
+            if (this.roomTicks % 90 === 0) {
 
                 this.updatePing()
             }
@@ -366,7 +370,9 @@ export class RaceGameScene extends GameScene {
             vehicleType: this.vehicles[i].vehicleType,
             engineForce: this.vehicles[i].engineForce,
             breakingForce: this.vehicles[i].breakingForce,
-            steeringSensitivity: this.vehicles[i].steeringSensitivity
+            steeringSensitivity: this.vehicles[i].steeringSensitivity,
+            roomTicks: this.roomTicks,
+            gameTicks: this.gameTicks
         }
 
         if (this.gameRoomActions.playerFinished) {
@@ -399,7 +405,8 @@ export class RaceGameScene extends GameScene {
             gameId: this.gameId,
             roomId: this.roomId,
             date: getDateNow(),
-            ticks: this.ticks
+            roomTicks: this.roomTicks,
+            gameTicks: this.gameTicks
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })
@@ -411,23 +418,3 @@ export class RaceGameScene extends GameScene {
 }
 
 
-// export const startRaceGame = (socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, userGameSettings: IUserGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: RaceGameScene) => void) => {
-//     const config = { scenes: [RaceGameScene], antialias: true }
-//     PhysicsLoader("/ammo", () => {
-//         const project = new Project(config)
-
-//         const key = project.scenes.keys().next().value;
-
-//         // hacky way to get the project's scene
-//         const gameObject = (project.scenes.get(key) as RaceGameScene);
-//         gameObject.setSocket(socket);
-//         gameObject.setPlayers(players);
-//         gameObject.setGameRoomActions(gameRoomActions)
-//         gameObject.setGameSettings(gameSettings, roomId);
-//         gameObject.setUserGameSettings(userGameSettings);
-//         //setUnpauseFunc((project.scenes.get(key) as OneMonitorRaceGameScene).unpauseGame)
-//         callback(gameObject)
-
-//         return project
-//     })
-// }

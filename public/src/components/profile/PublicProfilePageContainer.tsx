@@ -1,20 +1,25 @@
+import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { toast } from "react-toastify";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { IFollower, IPublicUser } from "../../classes/User";
 import AppContainer from "../../containers/AppContainer";
 import {
   getFirestorePublicUser,
   getUserSocials,
-  isUserFollower,
 } from "../../firebase/firestoreFunctions";
-import { toast } from "react-toastify";
+import {
+  getBestScoresOnTrackAndLap,
+  getPlayerBestScoreOnTrackAndLap,
+  getPlayerBestScores,
+} from "../../firebase/firestoreGameFunctions";
+import { UserContext } from "../../providers/UserProvider";
+import { createFakeHighscoreData } from "../../tests/fakeData";
 import { frontPagePath } from "../Routes";
 import PublicProfilePageComponent from "./PublicProfilePageComponent";
-import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
-import { UserContext } from "../../providers/UserProvider";
-import { Unsubscribe } from "@firebase/firestore";
 
 interface PublicProfileParamType {
   profileId: string;
@@ -31,6 +36,7 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
   const user = useContext(UserContext);
   const [followers, setFollowers] = useState([] as IFollower[]);
   const [followings, setFollowings] = useState([] as IFollower[]);
+  const [bestRaces, setBestRaces] = useState([] as IEndOfRaceInfoPlayer[]);
 
   useEffect(() => {
     if (profileId) {
@@ -45,7 +51,16 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
           }, 3000);
         }
       });
+      getPlayerBestScores(profileId, (data) => {
+        if (data) {
+          setBestRaces(data);
+        }
+      });
     }
+  }, []);
+
+  useEffect(() => {
+    // createFakeHighscoreData();
   }, []);
 
   useEffect(() => {
@@ -77,6 +92,7 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
             profile={profile}
             followers={followers}
             followings={followings}
+            bestRaces={bestRaces}
           />
         )}
       </Grid>

@@ -16,7 +16,7 @@ import {
   addToAvailableRooms,
   removeFromAvailableRooms,
   saveRoom,
-} from "../../firebase/firebaseFunctions";
+} from "../../firebase/firestoreFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
@@ -87,7 +87,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         date: getDateNow(),
         canceledGame: history.location?.pathname !== gameRoomPath,
       };
-      saveRoom(toSaveRoomId, roomInfo);
+      saveRoom(roomInfo);
     }
   };
 
@@ -236,6 +236,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       addToAvailableRooms(user.uid, {
         roomId: props.store.roomId,
         displayName: user.displayName,
+        userId: user.uid,
       });
     }
     window.onbeforeunload = () => {

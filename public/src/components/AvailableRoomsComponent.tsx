@@ -8,11 +8,13 @@ import Typography from "@mui/material/Typography";
 import { off } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import {
-  AvailableRoomsFirebaseObject,
-  createAvailableRoomsListeners,
-} from "../firebase/firebaseFunctions";
+
 import { IStore } from "./store";
+import {
+  createAvailableRoomsListeners,
+  AvailableRoomsFirebaseObject,
+} from "../firebase/firestoreFunctions";
+import { Unsubscribe } from "@firebase/firestore";
 
 interface IAvailableRoomsComponent {
   userId: string;
@@ -27,13 +29,17 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
   );
 
   useEffect(() => {
-    const availRoomListener = createAvailableRoomsListeners(
-      props.userId,
-      (_availRooms) => setAvailRoomIds(_availRooms)
-    );
+    let unsubRoomListener: Unsubscribe;
+    createAvailableRoomsListeners(props.userId, (_availRooms) =>
+      setAvailRoomIds(_availRooms)
+    ).then((sub) => {
+      unsubRoomListener = sub;
+    });
 
     return () => {
-      off(availRoomListener);
+      if (unsubRoomListener) {
+        unsubRoomListener();
+      }
     };
   }, [props.userId]);
 

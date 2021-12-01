@@ -64,6 +64,10 @@ export const numberScaler = (a: number, b: number, min: number, max: number) => 
 }
 
 
-export const getDateNow = () => {
-    return new Date().toISOString()
+export const getDateNow = (): number => {
+    return Date.now()
+}
+
+export const getDateFromNumber = (num: number): string => {
+    return new Date(num).toISOString()
 }

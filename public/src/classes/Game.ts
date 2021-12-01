@@ -52,6 +52,14 @@ export const allTrackNames: ITrackInfo[] = [
 ]
 
 export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2"]
+export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name => {
+    for (let i = 0; i < allTrackNames.length; i++) {
+        if (allTrackNames[i].type === name) {
+            return allTrackNames[i].gameType === "race"
+        }
+    }
+    return false
+})
 export const activeGameTypes: GameType[] = ["race", "tag"]
 
 export const nonActiveTrackNames: TrackName[] = ["test-course", "town-track"]
@@ -79,13 +87,15 @@ export interface IEndOfRaceInfoPlayer {
     bestLapTime: number
     trackName: TrackName
     gameId: string
-    date: string
+    date: number
     private: boolean
     isAuthenticated: boolean
     vehicleType: VehicleType
     engineForce: number
     breakingForce: number
     steeringSensitivity: number
+    roomTicks: number
+    gameTicks: number
 }
 
 export interface IPlayerGameInfo {
@@ -105,9 +115,10 @@ export interface IEndOfRaceInfoGame {
     playersInfo: IPlayerGameInfo[]
     gameId: string
     roomId: string
-    date: string
+    date: number
     gameSettings: IGameSettings
-    ticks: number
+    roomTicks: number
+    gameTicks: number
 }
 
 /** while race is going on */
@@ -138,6 +149,6 @@ export interface IRoomInfo {
     gameSettings: IGameSettings
     desktopId: string
     desktopAuthenticated: boolean
-    date: string,
+    date: number,
     canceledGame: boolean
 }

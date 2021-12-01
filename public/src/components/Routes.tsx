@@ -25,7 +25,7 @@ import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
-import HighscorePage from "./HighscorePage";
+import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";

@@ -79,7 +79,7 @@ export interface IPublicUser {
     displayName: string
     photoURL: string
     uid: string
-    latestLogin: string
+    latestLogin: number
 }
 
 export interface IPrivateUser {

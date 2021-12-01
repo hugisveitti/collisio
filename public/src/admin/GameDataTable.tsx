@@ -22,7 +22,8 @@ const GameInfoRow = (props: IGameInfoRow) => {
       <TableCell>{props.gameData.roomId}</TableCell>
       <TableCell>{props.gameData.date}</TableCell>
       <TableCell>{props.gameData.playersInfo?.length ?? "-"}</TableCell>
-      <TableCell>{props.gameData.ticks ?? "-"}</TableCell>
+      <TableCell>{props.gameData.roomTicks ?? "-"}</TableCell>
+      <TableCell>{props.gameData.gameTicks ?? "-"}</TableCell>
       <TableCell>{props.gameData.gameSettings?.trackName ?? "-"}</TableCell>
       <TableCell>{props.gameData.gameSettings?.numberOfLaps ?? "-"}</TableCell>
       <TableCell>
@@ -52,7 +53,8 @@ const GameDataTable = (props: IGameDataTable) => {
             <TableCell>RoomId</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Number of players</TableCell>
-            <TableCell>Ticks</TableCell>
+            <TableCell>Room Ticks</TableCell>
+            <TableCell>Game Ticks</TableCell>
             <TableCell>Track name</TableCell>
             <TableCell>Number of laps</TableCell>
             <TableCell>Leader</TableCell>

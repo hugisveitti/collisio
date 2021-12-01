@@ -1,8 +1,10 @@
-import { addDoc, deleteDoc, doc, getDoc, getDocs } from "@firebase/firestore"
-import { collection, onSnapshot, setDoc } from "firebase/firestore"
+import { addDoc, deleteDoc, doc, getDoc, getDocs, where } from "@firebase/firestore"
+import { collection, onSnapshot, query, setDoc } from "firebase/firestore"
 import { IFollower, IPrivateUser, IPublicUser, IUser } from "../classes/User"
+import { v4 as uuid } from "uuid"
 
 import { firestore } from "./firebaseInit"
+import { IRoomInfo } from "../classes/Game"
 
 const usersCollectionRefPath = "users"
 const publicUserCollectionPath = "profiles"
@@ -10,6 +12,9 @@ const publicUserCollectionPath = "profiles"
 const socialsCollectionPath = "socials"
 const followersPath = "followers"
 const followingsPath = "followings"
+
+const roomDataRefPath = "roomData"
+const availableRoomsRefPath = "availableRooms"
 
 type CallbackStatus = "success" | "error"
 export interface IFirestoreCallback<T> {
@@ -105,21 +110,33 @@ export const isUserFollower = (userId: string, followingId: string, callback: (i
 
 export const getUserFollowers = async (userId: string, followersCallback: (followers: IFollower[]) => void) => {
     const followersDocRef = collection(firestore, socialsCollectionPath, userId, followersPath)
-    const followersDocSnap = await getDocs(followersDocRef)
-    const arr = []
-    followersDocSnap.forEach((doc) => {
-        arr.push(doc)
-    })
-    followersCallback(arr as IFollower[])
+    try {
+
+        const followersDocSnap = await getDocs(followersDocRef)
+        const arr = []
+        followersDocSnap.forEach((doc) => {
+            arr.push(doc.data())
+        })
+        followersCallback(arr as IFollower[])
+    } catch (e) {
+        console.log("Error getting user followers:", e)
+    }
 }
 
 export const getUserFollowings = async (userId: string, followingsCallback: (followings: IFollower[]) => void) => {
     const followingsDocRef = collection(firestore, socialsCollectionPath, userId, followingsPath)
-    const followingsDocSnap = await getDocs(followingsDocRef)
-    const arr = []
-    followingsDocSnap.forEach((doc) => {
-        arr.push(doc)
-    })
+    const arr: IFollower[] = []
+    try {
+
+        const followingsDocSnap = await getDocs(followingsDocRef)
+        followingsDocSnap.forEach((doc) => {
+            arr.push(doc.data() as IFollower)
+        })
+        followingsCallback(arr)
+    } catch (e) {
+        console.log("Error getting user followings:", e)
+    }
+    return arr
 }
 
 
@@ -129,4 +146,56 @@ export const getUserFollowings = async (userId: string, followingsCallback: (fol
 export const getUserSocials = async (userId: string, followersCallback: (followers: IFollower[]) => void, followingsCallback: (followings: IFollower[]) => void) => {
     getUserFollowers(userId, (followers) => followersCallback(followers))
     getUserFollowings(userId, (followings) => followingsCallback(followings))
+}
+
+/**
+ * Save data about game that is started
+ * So we can keep track of games started and not finished
+ * @param gameInfo 
+ */
+export const saveRoom = (roomInfo: IRoomInfo) => {
+    const roomKey = uuid()
+    const roomRef = doc(firestore, roomDataRefPath, roomKey)
+    setDoc(roomRef, roomInfo)
+}
+
+
+export interface AvailableRoomsFirebaseObject {
+    roomId: string
+    displayName: string
+    userId: string
+}
+
+export const addToAvailableRooms = (userId: string, object: AvailableRoomsFirebaseObject) => {
+
+    const roomRef = doc(firestore, availableRoomsRefPath, userId)
+    setDoc(roomRef, object)
+
+}
+
+export const removeFromAvailableRooms = (userId: string) => {
+    const roomRef = doc(firestore, availableRoomsRefPath, userId)
+    deleteDoc(roomRef)
+}
+
+
+export const createAvailableRoomsListeners = async (userId: string, callback: (rooms: AvailableRoomsFirebaseObject[]) => void) => {
+
+    const followings = await getUserFollowings(userId, (followings) => { })
+    let fIds = followings.map(f => f.uid)
+    fIds = fIds.concat(userId)
+
+    const q = query(collection(firestore, availableRoomsRefPath), where("userId", "in", fIds))
+    const unsub = onSnapshot(
+        q,
+        (qSnap) => {
+
+            const rooms = []
+            qSnap.forEach(doc => {
+                rooms.push(doc.data() as AvailableRoomsFirebaseObject)
+            })
+            callback(rooms)
+        });
+
+    return (unsub)
 }

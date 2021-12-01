@@ -43,7 +43,10 @@ const HowToPlayItem = (props: IHowToPlayItem) => {
 
   return (
     <Grid item xs={12}>
-      <Card style={{ backgroundColor: inputBackgroundColor }}>
+      <Card
+        style={{ backgroundColor: inputBackgroundColor }}
+        variant="outlined"
+      >
         <CardHeader
           subheader={props.header}
           action={

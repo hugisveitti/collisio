@@ -1,15 +1,15 @@
-import React from "react";
-
+import { Timestamp } from "@firebase/firestore";
+import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import React from "react";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { IFollower, IPublicUser, IUser } from "../../classes/User";
 import { cardBackgroundColor } from "../../providers/theme";
-import Button from "@mui/material/Button";
-import { addFollow, removeFollow } from "../../firebase/firestoreFunctions";
+import HighscoreTable from "../highscore/HighscoreTable";
 import FollowButton from "./FollowButton";
 
 interface IPublicProfilePageComponent {
@@ -17,6 +17,7 @@ interface IPublicProfilePageComponent {
   user: IUser;
   followings: IFollower[];
   followers: IFollower[];
+  bestRaces: IEndOfRaceInfoPlayer[];
 }
 
 const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
@@ -30,6 +31,12 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
     uid: props.profile.uid,
     photoURL: props.profile.photoURL,
   };
+
+  console.log("props.profile.latestLogin", props.profile.latestLogin);
+  const lastLogin =
+    typeof props.profile.latestLogin === "number"
+      ? new Date(props.profile.latestLogin).toISOString()
+      : "-";
   return (
     <>
       <Grid item xs={12} lg={6}>
@@ -42,10 +49,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
           <CardHeader
             header={props.profile.displayName}
             title={props.profile.displayName}
-            subheader={`Last logged in ${props.profile.latestLogin.slice(
-              0,
-              10
-            )}`}
+            subheader={`Last logged in ${lastLogin ?? "-"}`}
             action={
               <FollowButton userData={userData} otherUserData={followingData} />
             }
@@ -74,6 +78,11 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
 
       <Grid item xs={12} lg={6}>
         <Typography>Race info</Typography>
+        <HighscoreTable
+          data={props.bestRaces}
+          noDataText="User hasn't completed any races"
+          includeTrackAndNumLaps
+        />
       </Grid>
     </>
   );

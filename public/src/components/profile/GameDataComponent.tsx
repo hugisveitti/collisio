@@ -9,10 +9,8 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import {
-  getPlayerGameData,
-  IPlayerGameData,
-} from "../../firebase/firebaseFunctions";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
+import { getPlayerGameDataListener } from "../../firebase/firestoreGameFunctions";
 import { cardBackgroundColor } from "../../providers/theme";
 import GameDataTableRow from "./GameDataTableRow";
 
@@ -21,7 +19,7 @@ interface IGameDataComponent {
 }
 
 const GameDataComponent = (props: IGameDataComponent) => {
-  const [gamesData, setGamesData] = useState([]);
+  const [gamesData, setGamesData] = useState([] as IEndOfRaceInfoPlayer[]);
 
   const [gamesLoaded, setGamesLoaded] = useState(false);
   const [page, setPage] = useState(0);
@@ -39,14 +37,16 @@ const GameDataComponent = (props: IGameDataComponent) => {
   };
 
   useEffect(() => {
-    const playerDataRef = getPlayerGameData(props.userId, (_gamesData) => {
+    const unsub = getPlayerGameDataListener(props.userId, (_gamesData) => {
       if (_gamesData) {
         setGamesData(_gamesData);
       }
       setGamesLoaded(true);
     });
     return () => {
-      off(playerDataRef);
+      if (unsub) {
+        unsub();
+      }
     };
   }, []);
 
@@ -92,14 +92,14 @@ const GameDataComponent = (props: IGameDataComponent) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(gamesData as IPlayerGameData[])
+                {gamesData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((p, i) => {
-                    const key = `gamedata-${p.gameInfo?.gameId}-${i}`;
+                    const key = `gamedata-${p.gameId}-${i}`;
                     return (
                       <GameDataTableRow
                         key={key}
-                        playerData={p.playerInfo}
+                        playerData={p}
                         userId={props.userId}
                       />
                     );

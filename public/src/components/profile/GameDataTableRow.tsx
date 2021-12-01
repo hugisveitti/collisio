@@ -7,7 +7,8 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import React, { useState } from "react";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
-import { deletePlayerGameData } from "../../firebase/firebaseFunctions";
+import { deletePlayerGameData } from "../../firebase/firestoreGameFunctions";
+import { getDateFromNumber } from "../../utils/utilFunctions";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
@@ -21,6 +22,10 @@ export default (props: IProps) => {
   // console.log("props in gamedata row", props);
   if (!props.playerData) return null;
 
+  const raceDate =
+    typeof playerData.date === "number"
+      ? getDateFromNumber(playerData.date)
+      : "-";
   return (
     <React.Fragment>
       <TableRow onClick={() => {}} sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -35,7 +40,7 @@ export default (props: IProps) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>{playerData.date}</TableCell>
+        <TableCell>{raceDate}</TableCell>
         <TableCell>{playerData.trackName}</TableCell>
         <TableCell>{playerData.numberOfLaps}</TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
@@ -43,12 +48,7 @@ export default (props: IProps) => {
         <TableCell>
           <IconButton
             onClick={() => {
-              deletePlayerGameData(
-                props.userId,
-                playerData.gameId,
-                playerData.trackName,
-                playerData.numberOfLaps
-              );
+              deletePlayerGameData(props.userId, playerData.gameId);
             }}
           >
             <DeleteForeverIcon />
@@ -77,7 +77,7 @@ export default (props: IProps) => {
                   </span>
                 );
               })}
-              <div>Date of race: {playerData.date}</div>
+              <div>Date of race: {raceDate}</div>
               <div>Type of vehicle: {playerData.vehicleType ?? "-"}</div>
             </div>
           </Collapse>

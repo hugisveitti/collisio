@@ -7,9 +7,12 @@ import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import {
+  saveRaceData,
   saveRaceDataGame,
-  saveRaceDataPlayer,
-} from "../firebase/firebaseFunctions";
+} from "../firebase/firestoreGameFunctions";
+// import {
+//   saveRaceDataGame,
+// } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
   GameActions,
@@ -173,7 +176,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
     props.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       if (data.isAuthenticated) {
-        saveRaceDataPlayer(data, (gameDataInfo) => {
+        saveRaceData(data.playerId, data, (gameDataInfo) => {
           props.socket.emit(mts_game_data_info, gameDataInfo);
         });
       } else {
@@ -185,7 +188,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
     props.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
       if (user?.uid) {
-        saveRaceDataGame(user.uid, data);
+        // saveRaceDataGame(data);
       } else {
         console.warn("Player not logged in, cannot save game");
       }
