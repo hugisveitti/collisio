@@ -61,7 +61,6 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
 
   useEffect(() => {
     if (profile) {
-      console.log("profile.uid", profile.uid);
       getUserSocials(
         profile.uid,
         (_followers) => setFollowers(_followers),

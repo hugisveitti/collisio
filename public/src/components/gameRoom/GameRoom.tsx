@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify/";
 import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoPlayer, IScoreInfo } from "../../classes/Game";
 import {
@@ -217,7 +217,6 @@ const GameRoom = (props: IGameRoom) => {
         gameDataInfo={gameDataInfo}
       />
       <ScoreInfoContainer scoreInfo={scoreInfo} />
-      <ToastContainer />
     </React.Fragment>
   );
 };

@@ -160,7 +160,7 @@ export class RaceGameScene extends GameScene {
         }
 
         this.gameTimers = []
-
+        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }

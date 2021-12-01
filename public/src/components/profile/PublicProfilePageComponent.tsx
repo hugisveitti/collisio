@@ -32,7 +32,6 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
     photoURL: props.profile.photoURL,
   };
 
-  console.log("props.profile.latestLogin", props.profile.latestLogin);
   const lastLogin =
     typeof props.profile.latestLogin === "number"
       ? new Date(props.profile.latestLogin).toISOString()

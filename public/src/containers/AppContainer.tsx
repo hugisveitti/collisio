@@ -1,6 +1,7 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import HelpIcon from "@mui/icons-material/Help";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -21,7 +22,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { ToastContainer } from "react-toastify";
 import CookiePrompt from "../components/monitary/CookiePrompt";
 import LoginComponent from "../components/LoginComponent";
 import {
@@ -33,6 +33,7 @@ import {
   howToPlayPagePath,
   privateProfilePagePath,
   showRoomPagePath,
+  tournamentPagePath,
 } from "../components/Routes";
 import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
@@ -130,6 +131,12 @@ const AppContainer = (props: IAppContainer) => {
                 primary={!onMobile ? "Create a Game" : "Join a Game"}
               />
             </ListItem>
+            <ListItem button onClick={() => history.push(tournamentPagePath)}>
+              <ListItemIcon>
+                <EmojiEventsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Tournaments" />
+            </ListItem>
             <ListItem button onClick={() => history.push(howToPlayPagePath)}>
               <ListItemIcon>
                 <HelpIcon />
@@ -188,7 +195,7 @@ const AppContainer = (props: IAppContainer) => {
       >
         {props.children}
       </div>
-      <ToastContainer />
+
       <CookiePrompt />
     </React.Fragment>
   );

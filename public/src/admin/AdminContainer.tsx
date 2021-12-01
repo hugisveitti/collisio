@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginComponent from "../components/LoginComponent";
 import { auth } from "../firebase/firebaseInit";
@@ -46,7 +46,6 @@ const AdminContainer = () => {
           <>{isAdmin && <AdminComponent userTokenId={userTokenId} />}</>
         )}
       </div>
-      <ToastContainer />
     </div>
   );
 };

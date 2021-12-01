@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
@@ -377,7 +377,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       >
         {moreSpeed && <span>MORE SPEED</span>}
       </div>
-      <ToastContainer />
       <DeviceOrientationPermissionComponent
         onMobile={true}
         onIphone={isIphone()}
