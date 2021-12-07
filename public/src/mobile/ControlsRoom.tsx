@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import PauseIcon from "@mui/icons-material/Pause";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
-import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
@@ -24,11 +25,12 @@ import {
   stm_game_settings_changed_ballback,
   stm_player_finished,
 } from "../shared-backend/shared-stuff";
-import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
 import { inTestMode, isIphone } from "../utils/settings";
 import { invertedControllerKey } from "./ControllerSettingsComponent";
 import ControllerSettingsModal from "./ControllerSettingsModal";
 import "./ControlsRoom.css";
+import { Button, IconButton } from "@mui/material";
+import { blue4, green1, orange2, yellow1, yellow3 } from "../providers/theme";
 
 interface IControlsRoomProps {
   store: IStore;
@@ -56,8 +58,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   });
 
   // change these colors!
-  const downColor = "#005c46";
-  const upColor = "#fcba03";
+  const downColor = blue4; // "#005c46";
+  const upColor = orange2; // "#fcba03";
   const [isPortrait, setIsPortrait] = useState(false);
 
   const [sendControlsInterval, setSendControlsInterval] = useState(
@@ -218,10 +220,18 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     controller[key] = b;
   };
 
-  const screenHeight = screen.availHeight;
-  const screenWidth = screen.availWidth;
+  const screenHeight =
+    document.fullscreenElement === null
+      ? screen.availHeight
+      : window.innerHeight;
+  const screenWidth =
+    document.fullscreenElement === null ? screen.availWidth : window.innerWidth;
 
-  const btnSize = screenWidth < 350 ? 120 : 150;
+  //const btnSize = screenWidth < 350 ? 120 : 150;
+
+  const btnW = isPortrait ? screenWidth : screenWidth / 3;
+  const btnH = isPortrait ? screenHeight / 3 : screenHeight;
+
   const utilBtnSize = screenWidth < 350 ? 60 : 90;
 
   const getSteeringDirection = () => {
@@ -239,10 +249,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const btnSizeStyle: React.CSSProperties = {
-    width: btnSize,
-    height: btnSize,
-    lineHeight: btnSize + "px",
-    fontSize: 32,
+    width: btnW,
+    height: btnH,
+    lineHeight: btnH + "px",
+    fontSize: 64,
   };
 
   const utilbtnSizeStyle: React.CSSProperties = {
@@ -252,24 +262,36 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     fontSize: 16,
   };
 
-  const rotateText = { transform: "rotate(-90deg)" };
-  const fButtonStyles = isPortrait
-    ? { ...rotateText, top: 35 }
-    : { bottom: 35 };
-  const bButtonStyles = isPortrait
-    ? { right: 35, ...rotateText }
-    : { left: 35 };
+  const rotateText: React.CSSProperties = isPortrait
+    ? {
+        transform: "rotate(-90deg)",
+        position: "absolute",
+      }
+    : {};
+  const fButtonStyles: React.CSSProperties = isPortrait
+    ? { top: 0 }
+    : { bottom: 0 };
+  const bButtonStyles: React.CSSProperties = isPortrait
+    ? { right: 0 }
+    : { left: 0 };
+
+  const utilBtnPos: React.CSSProperties = isPortrait
+    ? {
+        transform: `translate(0, -${utilBtnSize / 2}px)`,
+        top: btnH * 1.5,
+      }
+    : {
+        left: 1.5 * btnW,
+        transform: `translate(-${utilBtnSize / 2}px, 0)`,
+      };
 
   const settingsStyles = isPortrait
     ? {
-        ...rotateText,
-        left: btnSize + 45,
-        top: screenHeight / 2 - btnSize / 2,
+        left: 35 + utilBtnSize * 2,
       }
-    : { left: screenWidth / 2 - btnSize / 2, top: 145 };
-  const resetStyles = isPortrait
-    ? { ...rotateText, left: 35, top: screenHeight / 2 - btnSize / 2 }
-    : { left: screenWidth / 2 - btnSize / 2, top: 35 };
+    : { top: 35 + utilBtnSize * 2 };
+
+  const resetStyles = isPortrait ? { left: 35 } : { top: 35 };
 
   const infoStyles = isPortrait
     ? {
@@ -291,6 +313,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             gameSettings: props.store.gameSettings,
           });
           setGameSettingsLoading(true);
+          if (inTestMode) {
+            setSettingsModalOpen(false);
+            setGameSettingsLoading(false);
+          }
           props.store.socket.once(stm_game_settings_changed_ballback, () => {
             setSettingsModalOpen(false);
             setGameSettingsLoading(false);
@@ -313,12 +339,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         style={{
           ...btnSizeStyle,
           ...fButtonStyles,
-          right: 35,
+          right: 0,
           color: forward ? upColor : downColor,
           backgroundColor: forward ? downColor : upColor,
         }}
       >
-        F
+        <span style={rotateText}>F</span>
       </div>
       <div
         className="controller-btn"
@@ -327,12 +353,29 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         style={{
           ...btnSizeStyle,
           ...bButtonStyles,
-          bottom: 35,
+          bottom: 0,
           color: backward ? upColor : downColor,
           backgroundColor: backward ? downColor : upColor,
         }}
       >
-        B
+        <span style={rotateText}>B</span>
+      </div>
+
+      <div
+        className="controller-btn"
+        onTouchStart={() => handleButtonAction(true, "resetVehicle", setReset)}
+        onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
+        style={{
+          ...utilBtnPos,
+          ...resetStyles,
+          ...utilbtnSizeStyle,
+          color: reset ? upColor : downColor,
+          backgroundColor: reset ? downColor : upColor,
+        }}
+      >
+        <span style={rotateText}>
+          <RefreshIcon fontSize="large" />
+        </span>
       </div>
 
       <div
@@ -345,25 +388,16 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         style={{
           ...settingsStyles,
           ...utilbtnSizeStyle,
+          ...utilBtnPos,
           color: downColor,
           backgroundColor: upColor,
         }}
       >
-        Settings
+        <span style={rotateText}>
+          <PauseIcon fontSize="large" />
+        </span>
       </div>
-      <div
-        className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "resetVehicle", setReset)}
-        onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
-        style={{
-          ...resetStyles,
-          ...utilbtnSizeStyle,
-          color: reset ? upColor : downColor,
-          backgroundColor: reset ? downColor : upColor,
-        }}
-      >
-        Reset
-      </div>
+
       <div
         id="orientation-info"
         style={{

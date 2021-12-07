@@ -33,6 +33,7 @@ import GameSettingsComponent from "./GameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { green4 } from "../../providers/theme";
+import FullscreenButton from "../inputs/FullscreenButton";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -101,7 +102,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} lg={4}>
+      <Grid item xs={2} lg={2} style={{ textAlign: "left" }}>
+        <FullscreenButton />
+      </Grid>
+      <Grid item xs={10} lg={4}>
         <Typography variant="h3" className="center">
           Waiting room
         </Typography>
@@ -113,7 +117,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </span>
         </Typography>
       </Grid>
-      <Grid item xs={12} lg={4}>
+      <Grid item xs={12} lg={2}>
         <ToFrontPageButton />
       </Grid>
 

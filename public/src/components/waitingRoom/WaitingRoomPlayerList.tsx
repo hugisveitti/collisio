@@ -94,6 +94,10 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
     photoURL: props.player.photoURL,
   };
 
+  const playerName = onDesktop
+    ? props.player.playerName
+    : props.player.playerName.split(" ")[0].slice(0, 5);
+
   return (
     <Card
       style={{ height: "100%", backgroundColor: cardBackgroundColor }}
@@ -102,11 +106,9 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
       <CardHeader
         header={props.player.playerName}
         title={
-          isUser ? (
-            <strong>{props.player.playerName}</strong>
-          ) : (
-            props.player.playerName
-          )
+          <span style={{ overflowWrap: "anywhere" }}>
+            {isUser ? <strong>{playerName}</strong> : playerName}
+          </span>
         }
         subheader={getVehicleNameFromType(props.player.vehicleType)}
         action={
@@ -147,6 +149,7 @@ interface IWaitingRoomPlayerList {
 }
 
 const WaitingRoomPlayerList = (props: IWaitingRoomPlayerList) => {
+  console.log("props player list", props);
   const n = props.players.length;
   const containerWidth = Math.min(450, screen.availWidth) - 50;
   let containerHeight = onDesktop ? 600 : 400;

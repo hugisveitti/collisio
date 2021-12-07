@@ -6,7 +6,6 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { Link } from "react-router-dom";
-import { Socket } from "socket.io-client";
 import AppContainer from "../containers/AppContainer";
 import logo from "../images/collisio-logo.png";
 import "../styles/main.css";
@@ -80,12 +79,6 @@ const FrontPage = (props: FrontPageProps) => {
           </Link>
         </Grid>
         <Grid item xs={false} sm={1} lg={4} xl={4} />
-        <Grid item xs={12}>
-          <Typography>
-            This game is in development. If you have suggestions please email
-            hugiholm1 [a] [t] gmail.com
-          </Typography>
-        </Grid>
       </Grid>
     </AppContainer>
   );

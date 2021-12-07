@@ -6,23 +6,23 @@ import { Shadows } from "@mui/material/styles/shadows"
  * color1 is lightest and color4 is darkest
  */
 const orange1 = "#ffc64c"
-const orange2 = "#fda000"
+export const orange2 = "#fda000"
 const orange3 = "#f07900"
 const orange4 = "#c65600"
 
 const blue1 = "#c1eaff"
 const blue2 = "#8ec6e2"
 const blue3 = "#4b93b8"
-const blue4 = "#185676"
+export const blue4 = "#185676"
 
 export const green1 = "#d3e9a6"
 const green2 = "#9cbc62"
 const green3 = "#669132"
 export const green4 = "#365b13"
 
-const yellow1 = "#f9f3a6"
+export const yellow1 = "#f9f3a6"
 const yellow2 = "#f8e325"
-const yellow3 = "#dfb70a"
+export const yellow3 = "#dfb70a"
 const yellow4 = "#af9000"
 
 const beige1 = "#f8d5c9"

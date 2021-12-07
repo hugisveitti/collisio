@@ -113,7 +113,7 @@ export const createFakeHighscoreData = () => {
 }
 
 export const fakePlayer1: IPlayerInfo = {
-    playerName: "1test",
+    playerName: "1test tester testersen",
     isLeader: true,
     teamName: "test",
     playerNumber: 0,
@@ -128,7 +128,7 @@ export const fakePlayer1: IPlayerInfo = {
 };
 
 export const fakePlayer2: IPlayerInfo = {
-    playerName: "2test2",
+    playerName: "2test2 tester testersen",
     isLeader: true,
     teamName: "test",
     playerNumber: 1,
@@ -144,7 +144,7 @@ export const fakePlayer2: IPlayerInfo = {
 };
 
 export const fakePlayer3: IPlayerInfo = {
-    playerName: "3test3",
+    playerName: "3test3 tester testersen",
     isLeader: true,
     teamName: "test",
     playerNumber: 2,

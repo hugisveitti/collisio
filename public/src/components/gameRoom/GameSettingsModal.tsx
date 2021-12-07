@@ -9,6 +9,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
+import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
@@ -32,10 +33,13 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
   return (
     <BasicDesktopModal open={props.open} onClose={props.onClose}>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={3} style={{ textAlign: "left" }}>
+          <FullscreenButton />
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: "center" }}>
           <Typography variant="h6">Game is paused</Typography>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: "right" }}>
+        <Grid item xs={3} style={{ textAlign: "right" }}>
           <IconButton onClick={props.onClose}>
             <CloseIcon />
           </IconButton>

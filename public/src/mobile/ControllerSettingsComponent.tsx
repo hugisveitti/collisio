@@ -29,6 +29,7 @@ import {
   mts_user_settings_changed,
 } from "../shared-backend/shared-stuff";
 import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
+import FullscreenButton from "../components/inputs/FullscreenButton";
 
 export const invertedControllerKey = "invertedController";
 
@@ -100,7 +101,10 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   /** Add reset orientation device */
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} style={{ textAlign: "right" }}>
+      <Grid item xs={6} style={{ textAlign: "left" }}>
+        <FullscreenButton />
+      </Grid>
+      <Grid item xs={6} style={{ textAlign: "right" }}>
         <IconButton onClick={() => props.onClose()}>
           <CloseIcon />
         </IconButton>

@@ -69,9 +69,13 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
   const history = useHistory();
   return (
     <AppContainer>
-      <Grid container spacing={1} style={{ maxWidth: 600, margin: "auto" }}>
+      <Grid
+        container
+        spacing={1}
+        style={{ maxWidth: 600, width: "95%", margin: "auto" }}
+      >
         <Grid item xs={12}>
-          <Typography variant="h3" component="div">
+          <Typography variant="h4" component="div">
             How to play
           </Typography>
         </Grid>

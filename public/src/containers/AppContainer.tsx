@@ -1,16 +1,17 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import HelpIcon from "@mui/icons-material/Help";
-import MenuIcon from "@mui/icons-material/Menu";
-import HomeIcon from "@mui/icons-material/Home";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import HelpIcon from "@mui/icons-material/Help";
+import HomeIcon from "@mui/icons-material/Home";
+import MenuIcon from "@mui/icons-material/Menu";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import StarsIcon from "@mui/icons-material/Stars";
+import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
@@ -22,7 +23,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import CookiePrompt from "../components/monitary/CookiePrompt";
+import "react-toastify/dist/ReactToastify.css";
 import LoginComponent from "../components/LoginComponent";
 import {
   aboutPagePath,
@@ -37,9 +38,7 @@ import {
 } from "../components/Routes";
 import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
-import "react-toastify/dist/ReactToastify.css";
 import { getDeviceType } from "../utils/settings";
-import CircularProgress from "@mui/material/CircularProgress";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
@@ -208,8 +207,6 @@ const AppContainer = (props: IAppContainer) => {
           props.children
         )}
       </div>
-
-      <CookiePrompt />
     </React.Fragment>
   );
 };

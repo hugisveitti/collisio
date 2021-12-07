@@ -9,11 +9,13 @@ import "@fontsource/roboto/700.css";
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { themeOptions } from "./providers/theme";
 import { ToastContainer } from "react-toastify";
+import CookiePrompt from "./components/monitary/CookiePrompt";
 
 ReactDOM.render(
   <UserProvider>
     <ThemeProvider theme={themeOptions}>
       <Routes />
+      <CookiePrompt />
       <ToastContainer />
     </ThemeProvider>
   </UserProvider>,

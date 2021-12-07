@@ -7,8 +7,8 @@ import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
-  hasAskedDeviceOrientation,
   requestDeviceOrientation,
+  getHasAskedDeviceOrientation,
 } from "../../utils/ControlsClasses";
 import BasicModal from "../modal/BasicModal";
 
@@ -25,13 +25,8 @@ const DeviceOrientationPermissionComponent = (
   const [modalOpen, setModalOpen] = useState(true);
 
   // To my knowledge, I only need to ask on Iphones
-  if (!props.onMobile || !props.onIphone) return null;
-  console.log(
-    "hasAskedDeviceOrientation && !props.showModal",
-    hasAskedDeviceOrientation,
-    !props.showModal
-  );
-  if (hasAskedDeviceOrientation && !props.showModal) return null;
+
+  if (getHasAskedDeviceOrientation() && !props.showModal) return null;
 
   return (
     <BasicModal

@@ -155,11 +155,15 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
-    if (!props.store.socket && !onMobile) {
+    if (!props.store.socket && !onMobile && !inTestMode) {
       /** Desktops should always have a socket when connected to waiting room */
-      toast.error("No room connection");
+      // toast.error("No room connection");
       history.push(frontPagePath);
     }
+
+    // if (inTestMode && !onMobile) {
+    //   createSocket(getDeviceType(), (socket) => props.store.setSocket(socket));
+    // }
   }, []);
 
   useEffect(() => {
@@ -168,8 +172,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     /**
      * if desktop goes in and out and in of waitingRoom
      */
-
-    props.store.setPlayers([]);
+    if (!inTestMode) {
+      props.store.setPlayers([]);
+    }
 
     const userLoadingTimout = setTimeout(() => {
       /** TODO: do this */
@@ -231,7 +236,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [props.store.socket]);
 
   useEffect(() => {
-    if (props.store.userSettings && props.store.player) {
+    if (props.store.userSettings && props.store.player && !inTestMode) {
       /** maybe need some more efficient way to use save data */
       const newPlayer: IPlayerInfo = {
         ...props.store.player,

@@ -1,4 +1,3 @@
-import CircularProgress from "@mui/material/CircularProgress";
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -21,6 +20,7 @@ import {
   fakePlayer3,
   fakePlayer4,
 } from "../tests/fakeData";
+import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
@@ -81,6 +81,8 @@ const Routes = () => {
       setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
       // setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
+
+      createSocket(getDeviceType(), (_s) => setSocket(_s));
     }
   }, []);
 
@@ -116,6 +118,8 @@ const Routes = () => {
       });
     }
   }, [user]);
+
+  if (inTestMode && !store.socket) return null;
 
   return (
     <Router>
