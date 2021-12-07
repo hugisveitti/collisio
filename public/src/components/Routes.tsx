@@ -21,7 +21,6 @@ import {
   fakePlayer3,
   fakePlayer4,
 } from "../tests/fakeData";
-import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
@@ -66,11 +65,10 @@ const Routes = () => {
   const [gameSettings, setGameSettings] = useState(
     inTestMode ? testGameSettings : defaultGameSettings
   );
+
   const deviceType = getDeviceType();
 
   useEffect(() => {
-    createSocket(deviceType, (_socket) => setSocket(_socket));
-
     if (!inTestMode) {
       const _gameSettings = getAllLocalGameSettings();
       store.setGameSettings(_gameSettings);
@@ -97,6 +95,8 @@ const Routes = () => {
     setUserSettings,
     gameSettings,
     setGameSettings,
+    socket,
+    setSocket,
   };
 
   const user = useContext(UserContext);
@@ -117,47 +117,28 @@ const Routes = () => {
     }
   }, [user]);
 
-  // possibly load the socket in the appContainer since not everything needs a socket
-  if (!socket)
-    return (
-      <div style={{ margin: "auto", marginTop: 50, textAlign: "center" }}>
-        <CircularProgress />
-      </div>
-    );
-
   return (
     <Router>
       <Switch>
         <Route
           exact
           path={frontPagePath}
-          render={(props) => (
-            <OneMonitorFrontPage {...props} socket={socket} store={store} />
-          )}
+          render={(props) => <OneMonitorFrontPage {...props} store={store} />}
         />
         <Route
           // the order matters, the :Id must be first
           path={[waitingRoomGameIdPath, waitingRoomPath]}
-          render={(props) => (
-            <WaitingRoom {...props} socket={socket} store={store} />
-          )}
+          render={(props) => <WaitingRoom {...props} store={store} />}
         />
         <Route
           path={gameRoomPath}
           render={(props) => (
-            <GameRoom
-              {...props}
-              socket={socket}
-              store={store}
-              isTestMode={inTestMode}
-            />
+            <GameRoom {...props} store={store} isTestMode={inTestMode} />
           )}
         />
         <Route
           path={controlsRoomPath}
-          render={(props) => (
-            <ControlsRoom {...props} socket={socket} store={store} />
-          )}
+          render={(props) => <ControlsRoom {...props} store={store} />}
         />
         <Route
           path={howToPlayPagePath}
@@ -194,11 +175,7 @@ const Routes = () => {
         <Route
           path={connectPagePath}
           render={(props) => (
-            <ConnectToWaitingRoomContainer
-              {...props}
-              store={store}
-              socket={socket}
-            />
+            <ConnectToWaitingRoomContainer {...props} store={store} />
           )}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />

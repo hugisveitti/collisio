@@ -39,10 +39,12 @@ import { containerBackgroundColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import "react-toastify/dist/ReactToastify.css";
 import { getDeviceType } from "../utils/settings";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface IAppContainer {
   children: JSX.Element | JSX.Element[];
   containerStyles?: React.CSSProperties;
+  loading?: boolean;
 }
 
 const AppContainer = (props: IAppContainer) => {
@@ -193,7 +195,18 @@ const AppContainer = (props: IAppContainer) => {
           ...props.containerStyles,
         }}
       >
-        {props.children}
+        {props.loading ? (
+          <div
+            style={{
+              marginTop: 25,
+              textAlign: "center",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : (
+          props.children
+        )}
       </div>
 
       <CookiePrompt />

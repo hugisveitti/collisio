@@ -7,7 +7,6 @@ import { IStore } from "../store";
 import ConnectToWaitingRoomComponent from "./ConnectToWaitingRoomComponent";
 
 interface IConnectToWaitingRoomContainer {
-  socket: Socket;
   store: IStore;
 }
 
@@ -19,7 +18,6 @@ const ConnectToWaitingRoomContainer = (
       <Grid container spacing={3}>
         <ConnectToWaitingRoomComponent
           store={props.store}
-          socket={props.socket}
           quickConnection={getDeviceType() === "desktop"}
         />
       </Grid>

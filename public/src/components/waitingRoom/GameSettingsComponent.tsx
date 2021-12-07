@@ -26,7 +26,6 @@ import { IStore } from "../store";
 import TagRulesComponent from "./TagRulesComponent";
 
 interface IGameSettingsComponent {
-  socket: Socket;
   store: IStore;
   userId: string | undefined;
 }
@@ -35,11 +34,11 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const history = useHistory();
 
   useEffect(() => {
-    props.socket.on(stmd_game_settings_changed, (data) => {
+    props.store.socket.on(stmd_game_settings_changed, (data) => {
       props.store.setGameSettings(data.gameSettings);
     });
     return () => {
-      props.socket.off(stmd_game_settings_changed);
+      props.store.socket.off(stmd_game_settings_changed);
     };
   }, []);
 
@@ -60,7 +59,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
     props.store.setGameSettings(newGameSettings);
 
-    props.socket.emit(mdts_game_settings_changed, {
+    props.store.socket.emit(mdts_game_settings_changed, {
       gameSettings: newGameSettings,
     });
   };
@@ -77,7 +76,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         <CardHeader title="Game Settings" subheader="You can change settings" />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} lg={3}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">Type of game</FormLabel>
                 <RadioGroup
@@ -113,10 +112,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             </Grid>
             {props.store.gameSettings.gameType === "tag" ? (
               <React.Fragment>
-                <Grid item xs={false} sm={4} xl={5} />
-                <Grid item xs={12} sm={4} xl={2}>
+                <Grid item xs={12} sm={4} lg={4} xl={2}>
                   <TextField
-                    fullWidth
                     type="number"
                     label="Tag game length in minutes"
                     value={props.store.gameSettings.tagGameLength}
@@ -126,11 +123,10 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={false} sm={4} xl={5} />
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Grid item xs={12}>
+                <Grid item xs={12} lg={4}>
                   <TextField
                     label="No. of laps"
                     type="number"
@@ -149,7 +145,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 </Grid>
               </React.Fragment>
             )}
-            <Grid item xs={12}>
+            <Grid item xs={12} lg={4}>
               <TrackSelect
                 gameType={props.store.gameSettings.gameType}
                 excludedTracks={["town-track", "test-course"]}

@@ -18,7 +18,7 @@ import {
   std_room_created_callback,
   stm_player_connected_callback,
 } from "../../shared-backend/shared-stuff";
-import { ISocketCallback } from "../../utils/connectSocket";
+import { createSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import AvailableRoomsComponent from "../AvailableRoomsComponent";
 import NotLoggedInModal from "../NotLoggedInModal";
@@ -27,7 +27,6 @@ import { IStore } from "../store";
 
 interface IConnectToWaitingRoomComponent {
   store: IStore;
-  socket: Socket;
   /**
    * if true then on desktop it will create a room right away
    * used if button in side nav clicked
@@ -45,44 +44,55 @@ const ConnectToWaitingRoomComponent = (
   const [playerName, setPlayerName] = useState("");
   const onMobile = getDeviceType() === "mobile";
 
-  const [notLoggedInModalOpen, setNotLoggedInModelOpen] = useState(false);
   const [connectingToRoom, setConnectingToRoom] = useState(
     props.quickConnection
   );
 
-  const createRoomDesktop = () => {
+  const createRoomDesktop = (socket: Socket) => {
     setConnectingToRoom(true);
 
-    props.socket.emit(dts_create_room, {});
-    props.socket.once(
-      std_room_created_callback,
-      (response: ISocketCallback) => {
-        if (response.status === "success") {
-          const { roomId } = response.data;
-          props.store.setRoomId(roomId);
-          goToWaitingRoom(roomId);
-        } else {
-          setConnectingToRoom(false);
-          toast.error(response.message);
-        }
+    socket.emit(dts_create_room, {
+      data: {
+        gameSettings: props.store.gameSettings,
+      },
+    });
+    socket.once(std_room_created_callback, (response: ISocketCallback) => {
+      if (response.status === "success") {
+        const { roomId } = response.data;
+        props.store.setRoomId(roomId);
+        goToWaitingRoom(roomId);
+      } else {
+        setConnectingToRoom(false);
+        toast.error(response.message);
       }
-    );
+    });
   };
 
-  // need the roomId for the mobile
-  const connectButtonClicked = (roomId: string) => {
+  const handleConnection = (socket: Socket, roomId: string | undefined) => {
     if (!onMobile) {
-      createRoomDesktop();
+      createRoomDesktop(socket);
     } else {
       if (playerName.length === 0) {
         toast.error("Player name cannot be empty");
         return;
+      } else if (!roomId) {
+        toast.error("Room id cannot be undefined");
+        return;
       }
-      if (user) {
-        connectToRoomMobile(roomId, playerName);
-      } else {
-        setNotLoggedInModelOpen(true);
-      }
+
+      connectToRoomMobile(roomId, playerName, socket);
+    }
+  };
+
+  // need the roomId for the mobile
+  const connectButtonClicked = (roomId?: string) => {
+    if (!props.store.socket) {
+      createSocket(getDeviceType(), (socket) => {
+        props.store.setSocket(socket);
+        handleConnection(socket, roomId);
+      });
+    } else {
+      handleConnection(props.store.socket, roomId);
     }
   };
 
@@ -96,10 +106,14 @@ const ConnectToWaitingRoomComponent = (
     history.push(waitingRoomPath + "/" + roomId);
   };
 
-  const connectToRoomMobile = (roomId: string, playerName: string) => {
+  const connectToRoomMobile = (
+    roomId: string,
+    playerName: string,
+    socket: Socket
+  ) => {
     setConnectingToRoom(true);
 
-    props.socket.emit(mts_player_connected, {
+    socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
       playerId: user?.uid ?? uuid(),
@@ -107,31 +121,34 @@ const ConnectToWaitingRoomComponent = (
       photoURL: user?.photoURL,
     } as IPlayerConnection);
 
-    props.socket.once(
-      stm_player_connected_callback,
-      (response: ISocketCallback) => {
-        console.log("player conn res", response);
-        if (response.status === "error") {
-          const { message } = response;
-          toast.error(message);
-          setConnectingToRoom(false);
-        } else {
-          toast.success(response.message);
-          props.store.setPlayer(response.data.player);
-          goToWaitingRoom(response.data.roomId);
-        }
+    socket.once(stm_player_connected_callback, (response: ISocketCallback) => {
+      if (response.status === "error") {
+        const { message } = response;
+        toast.error(message);
+        setConnectingToRoom(false);
+      } else {
+        toast.success(response.message);
+        console.log("res", response);
+        props.store.setGameSettings(response.data.gameSettings);
+        props.store.setPlayer(response.data.player);
+        goToWaitingRoom(response.data.roomId);
       }
-    );
+    });
   };
 
   useEffect(() => {
     if (props.quickConnection && !onMobile) {
-      createRoomDesktop();
+      connectButtonClicked();
     }
-    return () => {
-      props.socket.off(stm_player_connected_callback);
-    };
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (props.store.socket) {
+        props.store.socket.off(stm_player_connected_callback);
+      }
+    };
+  }, [props.store.socket]);
 
   if (connectingToRoom) {
     return (
@@ -148,15 +165,6 @@ const ConnectToWaitingRoomComponent = (
 
   return (
     <React.Fragment>
-      <NotLoggedInModal
-        open={notLoggedInModalOpen}
-        onClose={() => setNotLoggedInModelOpen(false)}
-        infoText="You are not logged in. To use features such as saving highscore you
-need to be logged in."
-        onContinoueAsGuest={() => {
-          connectToRoomMobile(props.store.roomId, playerName);
-        }}
-      />
       {onMobile && (
         <>
           {user && (

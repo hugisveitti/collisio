@@ -32,6 +32,7 @@ import { IStore } from "../store";
 import GameSettingsComponent from "./GameSettingsComponent";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
+import { green4 } from "../../providers/theme";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -52,7 +53,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const roomId = props.roomId;
 
   const handleStartGame = () => {
-    socketHandleStartGame(props.socket, (response: ISocketCallback) => {
+    socketHandleStartGame(props.store.socket, (response: ISocketCallback) => {
       if (response.status === "success") {
         history.push(gameRoomPath);
       } else {
@@ -63,16 +64,18 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     // only generate qr code on desktop
-    QRCode.toDataURL(window.location.href)
-      .then((url) => {
-        setRoomQrCode(url);
-      })
-      .catch((err) => {
-        console.log("error generating qr code", err);
-      });
+    if (!onMobile) {
+      QRCode.toDataURL(window.location.href)
+        .then((url) => {
+          setRoomQrCode(url);
+        })
+        .catch((err) => {
+          console.log("error generating qr code", err);
+        });
+    }
 
     return () => {
-      props.socket.off(std_start_game_callback);
+      props.store.socket.off(std_start_game_callback);
     };
   }, []);
 
@@ -98,63 +101,81 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={4}>
         <Typography variant="h3" className="center">
           Waiting room
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Typography variant="h4">{roomId}</Typography>
+      <Grid item xs={12} lg={4}>
+        <Typography variant="h4">
+          <span style={{ backgroundColor: green4, color: "white" }}>
+            {roomId}
+          </span>
+        </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={4}>
         <ToFrontPageButton />
       </Grid>
+
       <Grid item xs={12}>
-        <Typography component="span">
-          Link to room: {window.location.href}
-        </Typography>{" "}
-        <Tooltip
-          title="Link copied!"
-          arrow
-          placement="top"
-          open={copyTooltipOpen}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          onClose={() => setCopyTooltipOpen(false)}
-        >
-          <IconButton
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              setCopyTooltipOpen(true);
-              setTimeout(() => {
-                setCopyTooltipOpen(false);
-              }, 2000);
-            }}
-          >
-            <ContentCopyIcon />
-          </IconButton>
-        </Tooltip>
+        <Divider variant="middle" />
       </Grid>
-      {roomQrCode && (
-        <Grid item xs={12}>
-          <img src={roomQrCode} alt="" />
-        </Grid>
+
+      {!onMobile && (
+        <>
+          <Grid item xs={12} lg={3}>
+            <Typography>
+              On your mobile, either scan the QR code, copy the link to room and
+              paste it in your phone or write the room id '{roomId}' in input on
+              the front page.
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} lg={3}>
+            <Typography color="textSecondary">
+              You can press 'esc' to pause the game and open the settings.
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} lg={3}>
+            <Typography component="span">
+              Link to room: {window.location.href}
+            </Typography>{" "}
+            <Tooltip
+              title="Link copied!"
+              arrow
+              placement="top"
+              open={copyTooltipOpen}
+              disableFocusListener
+              disableHoverListener
+              disableTouchListener
+              onClose={() => setCopyTooltipOpen(false)}
+            >
+              <IconButton
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopyTooltipOpen(true);
+                  setTimeout(() => {
+                    setCopyTooltipOpen(false);
+                  }, 2000);
+                }}
+              >
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+
+          {roomQrCode && (
+            <Grid item xs={12} lg={3}>
+              <img src={roomQrCode} alt="" />
+            </Grid>
+          )}
+          <Grid item xs={12}>
+            <Divider variant="middle" />
+          </Grid>
+        </>
       )}
 
-      <Grid item xs={12}>
-        <Typography>
-          On your mobile, either scan the QR code, copy the link to room and
-          paste it in your phone or write the room id '{roomId}' in input on the
-          front page.
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Typography color="textSecondary">
-          You can press 'esc' to pause the game and open the settings.
-        </Typography>
-      </Grid>
       <Grid item xs={12}>
         <Typography variant="h6" component="div">
           Players in room {props.store.roomId}
@@ -184,11 +205,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             </Button>
           </Grid>
           <Divider variant="middle" style={{ margin: 15 }} />
-          <GameSettingsComponent
-            socket={props.socket}
-            store={props.store}
-            userId={user?.uid}
-          />
+          <GameSettingsComponent store={props.store} userId={user?.uid} />
         </React.Fragment>
       )}
       {onMobile && (
@@ -203,7 +220,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                   vehicleType,
                 } as IPlayerInfo;
                 props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(props.socket, newPayerInfo);
+                sendPlayerInfoChanged(props.store.socket, newPayerInfo);
 
                 updateUserVehicleSettings(
                   "vehicleType",

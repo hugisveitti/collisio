@@ -5,6 +5,7 @@ import { getDatabase } from "firebase/database";
 import { toast } from "react-toastify";
 import { getFirestore } from "firebase/firestore";
 import { getFirebaseConfig } from "./firebaseConfig";
+import { inDevelopment } from "../utils/settings";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -17,7 +18,16 @@ const app = initializeApp(getFirebaseConfig());
 // const analytics = getAnalytics(app);
 
 export const database = getDatabase(app)
-export const firestore = getFirestore(app)
+
+const getMyFirestore = () => {
+    if (inDevelopment) {
+        return getFirestore()
+    }
+    return getFirestore(app)
+
+}
+
+export const firestore = getMyFirestore()
 
 export const auth = getAuth(app)
 getRedirectResult(auth).then(res => {

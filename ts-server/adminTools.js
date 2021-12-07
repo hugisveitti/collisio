@@ -157,7 +157,7 @@ var adminFunctions = function (app) {
     };
     var getGameData = function (userId, queryParams, callback) {
         getIsAdmin(userId, function (isAdmin) { return __awaiter(void 0, void 0, void 0, function () {
-            var gameDataRef, q, data, rooms_2, e_3;
+            var gameDataRef, q, data, games_1, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -173,14 +173,14 @@ var adminFunctions = function (app) {
                         return [4 /*yield*/, (0, firestore_1.getDocs)(q)];
                     case 2:
                         data = _a.sent();
-                        rooms_2 = [];
+                        games_1 = [];
                         data.forEach(function (doc) {
-                            rooms_2.push(doc.data());
+                            games_1.push(doc.data());
                         });
                         callback({
                             status: "success",
                             statusCode: 200,
-                            data: rooms_2,
+                            data: games_1,
                             message: "Successfully gotten room data"
                         });
                         return [3 /*break*/, 4];

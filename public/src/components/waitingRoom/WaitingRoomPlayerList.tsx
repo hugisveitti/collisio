@@ -110,11 +110,15 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
         }
         subheader={getVehicleNameFromType(props.player.vehicleType)}
         action={
-          <FollowButton
-            userData={userData}
-            otherUserData={playerFollowingData}
-            onlyIcon
-          />
+          <>
+            {props.user && (
+              <FollowButton
+                userData={userData}
+                otherUserData={playerFollowingData}
+                onlyIcon
+              />
+            )}
+          </>
         }
       />
       {props.gameType === "race" && showPB && renderPersonalBest()}

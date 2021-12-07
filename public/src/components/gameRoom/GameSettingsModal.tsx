@@ -108,11 +108,23 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                    */
 
                   // @ts-ignore
-                  props.gameObject.vehicles[0].updateVehicleSettings(
-                    newVehicleSettings
-                  );
+                  if (props.gameObject.vehicles.length > 0) {
+                    // @ts-ignore
+                    props.gameObject.vehicles[0].updateVehicleSettings(
+                      newVehicleSettings
+                    );
+                    // @ts-ignore
+                  } else if (props.gameObject.vehicle) {
+                    // @ts-ignore.
+                    props.gameObject.vehicle.updateVehicleSettings(
+                      newVehicleSettings
+                    );
+                  }
                   // @ts-ignore
-                  props.gameObject.players[0].vehicleType = vehicleType;
+                  if (props.gameObject.players.length > 0) {
+                    // @ts-ignore
+                    props.gameObject.players[0].vehicleType = vehicleType;
+                  }
                   props.gameObject.setNeedsReload(true);
                   props.store.setUserSettings(newUserSettings);
                 }}

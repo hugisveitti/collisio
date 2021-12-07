@@ -6,16 +6,14 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
-import {
-  saveRaceData,
-  saveRaceDataGame,
-} from "../firebase/firestoreGameFunctions";
+import { saveRaceData } from "../firebase/firestoreGameFunctions";
 // import {
 //   saveRaceDataGame,
 // } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
   GameActions,
+  mdts_game_settings_changed,
   MobileControls,
   mts_controls,
   mts_game_data_info,
@@ -23,6 +21,7 @@ import {
   mts_user_settings_changed,
   stm_desktop_disconnected,
   stm_game_finished,
+  stm_game_settings_changed_ballback,
   stm_player_finished,
 } from "../shared-backend/shared-stuff";
 import { setHasAskedDeviceOrientation } from "../utils/ControlsClasses";
@@ -32,7 +31,6 @@ import ControllerSettingsModal from "./ControllerSettingsModal";
 import "./ControlsRoom.css";
 
 interface IControlsRoomProps {
-  socket: Socket;
   store: IStore;
 }
 
@@ -48,7 +46,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [forward, setForward] = useState(false);
   const [backward, setBackward] = useState(false);
   const [reset, setReset] = useState(false);
-  const [moreSpeed, setMoreSpeed] = useState(false);
+  const [gameSettingsLoading, setGameSettingsLoading] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const [orientation, setOrientation] = useState({
     gamma: 0,
@@ -60,8 +59,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const downColor = "#005c46";
   const upColor = "#fcba03";
   const [isPortrait, setIsPortrait] = useState(false);
-  /** used to see if device orientation isnt working */
-  const [deviceOrientationAsked, setDeviceOrientationAsked] = useState(false);
+
   const [sendControlsInterval, setSendControlsInterval] = useState(
     undefined as undefined | NodeJS.Timer
   );
@@ -85,11 +83,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
     if (e.gamma === null && e.beta === 0 && e.alpha === null) {
-      if (!deviceOrientationAsked) {
-        // this is hacky, just so the prompt doesnt go crazy
-        setDeviceOrientationAsked(true);
-        setHasAskedDeviceOrientation(false);
-      }
+      toast.error(
+        "Your device orientation is not working. Please reset orientation in settings."
+      );
     }
 
     controller.alpha = Math.round(alpha);
@@ -111,15 +107,20 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");
-    window.removeEventListener("deviceorientation", deviceOrientationHandler);
+    setShowPermissionModal(true);
+    window.removeEventListener("deviceorientation", deviceOrientationHandler, {
+      capture: true,
+    });
     setTimeout(() => {
-      window.addEventListener("deviceorientation", deviceOrientationHandler);
+      window.addEventListener("deviceorientation", deviceOrientationHandler, {
+        capture: true,
+      });
     }, 100);
   };
 
   const createSendControlsInterval = () => {
     const _sendControlsInterval = setInterval(() => {
-      props.socket.emit(mts_controls, controller);
+      props.store.socket.emit(mts_controls, controller);
 
       // set fps
     }, 1000 / 60);
@@ -132,7 +133,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     // for portait mode
     window.addEventListener("orientationchange", handleDeviceOrientChange);
     // for gamma, beta, alpha
-    window.addEventListener("deviceorientation", deviceOrientationHandler);
+    window.addEventListener("deviceorientation", deviceOrientationHandler, {
+      capture: true,
+    });
 
     // createSendControlsInterval();
     const _invertedController = window.localStorage.getItem(
@@ -142,14 +145,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setInvertedController(+_invertedController);
     }
 
-    props.socket.on(stm_desktop_disconnected, () => {
+    props.store.socket.on(stm_desktop_disconnected, () => {
       toast.error("Game disconnected");
       history.push(frontPagePath);
       /** go to front page? */
     });
 
     return () => {
-      props.socket.off(stm_desktop_disconnected);
+      props.store.socket.off(stm_desktop_disconnected);
       window.clearInterval(sendControlsInterval);
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
       window.removeEventListener("orientationchange", handleDeviceOrientChange);
@@ -171,13 +174,16 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       // hacky way
       // should have some emit from the game to the devices telling them to send info such as userSettings
       // 5000 ms then send it is hackkkky
-      props.socket.emit(mts_user_settings_changed, props.store.userSettings);
+      props.store.socket.emit(
+        mts_user_settings_changed,
+        props.store.userSettings
+      );
     }, 1000);
 
-    props.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
+    props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       if (data.isAuthenticated) {
         saveRaceData(data.playerId, data, (gameDataInfo) => {
-          props.socket.emit(mts_game_data_info, gameDataInfo);
+          props.store.socket.emit(mts_game_data_info, gameDataInfo);
         });
       } else {
         toast.warning(
@@ -186,7 +192,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       }
     });
 
-    props.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
+    props.store.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
       if (user?.uid) {
         // saveRaceDataGame(data);
       } else {
@@ -195,8 +201,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
 
     return () => {
-      props.socket.off(stm_game_finished);
-      props.socket.off(stm_player_finished);
+      props.store.socket.off(stm_game_finished);
+      props.store.socket.off(stm_player_finished);
     };
   }, []);
 
@@ -229,7 +235,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const sendGameActions = () => {
-    props.socket.emit(mts_send_game_actions, gameActions);
+    props.store.socket.emit(mts_send_game_actions, gameActions);
   };
 
   const btnSizeStyle: React.CSSProperties = {
@@ -280,16 +286,24 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         resetOrientation={resetDeviceOrientationListener}
         open={settingsModalOpen}
         onClose={() => {
-          setSettingsModalOpen(false);
           //  handleButtonAction(false, "pause", setSettingsModalOpen);
-          gameActions.pause = false;
-          sendGameActions();
+          props.store.socket.emit(mdts_game_settings_changed, {
+            gameSettings: props.store.gameSettings,
+          });
+          setGameSettingsLoading(true);
+          props.store.socket.once(stm_game_settings_changed_ballback, () => {
+            setSettingsModalOpen(false);
+            setGameSettingsLoading(false);
+            gameActions.pause = false;
+            sendGameActions();
+          });
         }}
         user={user}
         store={props.store}
-        socket={props.socket}
+        socket={props.store.socket}
         gameActions={gameActions}
         sendGameActions={sendGameActions}
+        loading={gameSettingsLoading}
       />
 
       <div
@@ -366,26 +380,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         <br />
         {getSteeringDirection()}
       </div>
-
-      <div
-        id="more-speed-info"
-        style={{
-          ...infoStyles,
-          top: 0,
-          transform: isPortrait ? "rotate(-90deg)" : "",
-        }}
-      >
-        {moreSpeed && <span>MORE SPEED</span>}
-      </div>
       <DeviceOrientationPermissionComponent
         onMobile={true}
         onIphone={isIphone()}
+        showModal={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
       />
     </React.Fragment>
   );
 };
 
 export default ControlsRoom;
-function stm_game_finisehd(stm_game_finisehd: any, arg1: (data: any) => any) {
-  throw new Error("Function not implemented.");
-}

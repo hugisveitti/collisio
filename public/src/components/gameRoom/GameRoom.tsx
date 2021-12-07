@@ -1,3 +1,4 @@
+import { DocumentReference } from "@firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify/";
@@ -15,12 +16,12 @@ import { RaceGameScene } from "../../game/RaceGameScene";
 import { TagGameScene } from "../../game/TagGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
-  dts_game_finished,
   dts_player_finished,
   GameActions,
   std_game_data_info,
   std_player_disconnected,
   std_send_game_actions,
+  stmd_game_settings_changed,
 } from "../../shared-backend/shared-stuff";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import { inTestMode } from "../../utils/settings";
@@ -31,7 +32,6 @@ import GameSettingsModal from "./GameSettingsModal";
 import ScoreInfoContainer from "./ScoreInfoContainer";
 
 interface IGameRoom {
-  socket: Socket;
   store: IStore;
   useTestCourse?: boolean;
   isTestMode?: boolean;
@@ -64,7 +64,7 @@ const GameRoom = (props: IGameRoom) => {
     setEndOfGameData(data);
     // if (!inTestMode) {
     //   saveGameFinished(data.endOfRaceInfo);
-    //   props.socket.emit(dts_game_finished, data);
+    //   props.store.socket.emit(dts_game_finished, data);
     // }
   };
 
@@ -75,7 +75,7 @@ const GameRoom = (props: IGameRoom) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    props.socket.emit(dts_player_finished, data);
+    props.store.socket.emit(dts_player_finished, data);
   };
 
   const updateSettings = (key: keyof IGameSettings, value: any) => {
@@ -90,8 +90,14 @@ const GameRoom = (props: IGameRoom) => {
     gameObject.setGameSettings(newGameSettings);
   };
 
+  if (!props.store.socket && !inTestMode) {
+    toast.error("No room connected");
+    history.push(frontPagePath);
+    return null;
+  }
+
   useEffect(() => {
-    props.socket.on(std_player_disconnected, ({ playerName }) => {
+    props.store.socket.on(std_player_disconnected, ({ playerName }) => {
       toast.warn(
         `${playerName} disconnected from game, logged in players can reconnect!`
       );
@@ -99,7 +105,7 @@ const GameRoom = (props: IGameRoom) => {
 
     if (props.useTestCourse) {
       return startLowPolyTest(
-        props.socket,
+        props.store.socket,
         props.store.gameSettings,
         handleEscPressed,
         (gameObject) => {
@@ -124,7 +130,7 @@ const GameRoom = (props: IGameRoom) => {
 
     startGame(
       CurrGameScene,
-      props.socket,
+      props.store.socket,
       props.store.players,
       props.store.gameSettings,
       props.store.roomId,
@@ -139,19 +145,29 @@ const GameRoom = (props: IGameRoom) => {
       }
     );
 
-    props.socket.on(std_game_data_info, (data: string[]) => {
+    props.store.socket.on(std_game_data_info, (data: string[]) => {
       setGameDataInfo(gameDataInfo.concat(data));
     });
 
-    props.socket.on(std_send_game_actions, (_gameActions: GameActions) => {
-      setGameActions(_gameActions);
-    });
-
-    return () => {
-      props.socket.off(std_player_disconnected);
-      props.socket.off(std_game_data_info);
-    };
+    props.store.socket.on(
+      std_send_game_actions,
+      (_gameActions: GameActions) => {
+        setGameActions(_gameActions);
+      }
+    );
   }, []);
+
+  useEffect(() => {
+    props.store.socket.on(stmd_game_settings_changed, (data) => {
+      props.store.setGameSettings(data.gameSettings);
+      if (gameObject) {
+        gameObject.setGameSettings(data.gameSettings);
+      }
+    });
+    return () => {
+      props.store.socket.off(stmd_game_settings_changed);
+    };
+  }, [gameObject]);
 
   useEffect(() => {
     if (gameObject) {
@@ -167,22 +183,22 @@ const GameRoom = (props: IGameRoom) => {
         setEndOfGameModalOpen(false);
         setSettingsModalOpen(false);
       }
-      if (gameActions.toggleSound) {
-        updateSettings("useSound", !props.store.gameSettings.useSound);
-      }
+      // if (gameActions.toggleSound) {
+      //   updateSettings("useSound", !props.store.gameSettings.useSound);
+      // }
 
-      if (gameActions.toggleShadows) {
-        updateSettings("useShadows", !props.store.gameSettings.useShadows);
-      }
+      // if (gameActions.toggleShadows) {
+      //   updateSettings("useShadows", !props.store.gameSettings.useShadows);
+      // }
 
-      if (gameActions.numberOfLaps) {
-        updateSettings("numberOfLaps", gameActions.numberOfLaps);
-      }
+      // if (gameActions.numberOfLaps) {
+      //   updateSettings("numberOfLaps", gameActions.numberOfLaps);
+      // }
 
-      if (gameActions.changeTrack) {
-        gameObject.changeTrack(gameActions.changeTrack);
-        updateSettings("trackName", gameActions.changeTrack);
-      }
+      // if (gameActions.changeTrack) {
+      //   gameObject.changeTrack(gameActions.changeTrack);
+      //   updateSettings("trackName", gameActions.changeTrack);
+      // }
     }
   }, [gameActions]);
 

@@ -5,7 +5,7 @@
  * So this limits the .js to one file.
  */
 /** trackName.gltf */
-export type TrackName = "farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track" | "f1-track-2"
+export type TrackName = "farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track" | "f1-track-2" | "monaco-track"
 export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar" | "normal2"
 
 export type GameType = "ball" | "race" | "tag"
@@ -119,27 +119,27 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
 interface IGameActions {
     pause: boolean
     restart: boolean
-    changeTrack: TrackName | undefined
-    toggleSound: boolean
-    toggleShadows: boolean
-    numberOfLaps: number | undefined
+    // changeTrack: TrackName | undefined
+    // toggleSound: boolean
+    // toggleShadows: boolean
+    // numberOfLaps: number | undefined
 }
 
 export class GameActions implements IGameActions {
     pause: boolean
     restart: boolean
-    changeTrack: TrackName | undefined
-    toggleSound: boolean
-    toggleShadows: boolean
-    numberOfLaps: number | undefined
+    // changeTrack: TrackName | undefined
+    // toggleSound: boolean
+    // toggleShadows: boolean
+    // numberOfLaps: number | undefined
 
     constructor() {
         this.pause = false
         this.restart = false
-        this.changeTrack = undefined
-        this.toggleShadows = false
-        this.toggleSound = false
-        this.numberOfLaps = undefined
+        // this.changeTrack = undefined
+        // this.toggleShadows = false
+        // this.toggleSound = false
+        // this.numberOfLaps = undefined
     }
 }
 
@@ -215,6 +215,8 @@ export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
 
 export const mdts_game_settings_changed = "mdts_game_settings_changed"
 export const stmd_game_settings_changed = "stmd_game_settings_changed"
+export const dts_game_settings_changed_callback = "mdts_game_settings_changed_callback"
+export const stm_game_settings_changed_ballback = "stmd_game_settings_changed_ballback"
 
 export const mts_send_game_actions = "mts_send_game_actions"
 export const std_send_game_actions = "std_send_game_actions"

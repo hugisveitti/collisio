@@ -7,7 +7,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
@@ -25,6 +25,7 @@ export const viewLefts = [0, 0.5]
 export const viewBottoms = [0, 0, 0.5, 0.5]
 
 const vechicleFov = 60
+
 
 
 const beepC4 = new Howl({
@@ -594,7 +595,13 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setGameSettings(gameSettings: IGameSettings) {
+        if (this.gameSettings.trackName !== gameSettings.trackName) {
+            this.setNeedsReload(true)
+        }
+
         this.gameSettings = gameSettings
+
+
         for (let key of Object.keys(gameSettings)) {
             if (gameSettings[key] !== undefined) {
                 this[key] = gameSettings[key]
@@ -608,6 +615,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.toggleUseSound()
 
+        this.socket.emit(dts_game_settings_changed_callback, {})
     }
 
     toggleUseSound() {
@@ -717,8 +725,13 @@ export class GameScene extends Scene3D implements IGameScene {
     userSettingsListener() {
         this.socket.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
-                this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
                 this.players[data.playerNumber].vehicleType = data.userSettings.vehicleSettings.vehicleType
+                if (this.vehicles.length >= data.playerNumber - 1) {
+                    /* 
+                    * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
+                    */
+                    this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
+                }
             }
         })
     }
@@ -744,7 +757,10 @@ export class GameScene extends Scene3D implements IGameScene {
 
     resetPlayer(idx: number) {
         this.vehicles[idx].resetPosition()
+        this._resetPlayer(idx)
     }
+
+    _resetPlayer(idx: number) { }
 
     checkVehicleOutOfBounds(idx: number) {
         const pos = this.vehicles[idx].getPosition()

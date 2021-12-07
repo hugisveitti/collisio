@@ -325,8 +325,8 @@ export class LowPolyVehicle implements IVehicle {
             return
         }
 
-        if (!this.engineSound.isPlaying) {
-            this.engineSound.play()
+        if (useSound) {
+            this.startEngineSound()
 
         } else if (this.engineSound) {
             this.engineSound.stop()
@@ -506,7 +506,7 @@ export class LowPolyVehicle implements IVehicle {
 
     pause() {
         this.isPaused = true
-
+        this.zeroEngineForce()
         if (this.engineSound && this.engineSound.isPlaying) {
 
             this.engineSound.stop()
@@ -517,8 +517,8 @@ export class LowPolyVehicle implements IVehicle {
 
     unpause() {
         this.isPaused = false
-        if (this.useEngineSound && !this.engineSound.isPlaying) {
-            this.engineSound.play()
+        if (this.useEngineSound) {
+            this.startEngineSound()
         }
         this.chassisMesh.body.setCollisionFlags(0)
     };
@@ -721,6 +721,12 @@ export class LowPolyVehicle implements IVehicle {
         }
     }
 
+    startEngineSound() {
+
+        if (!this.engineSound?.isPlaying) {
+            // this.engineSound.play()
+        }
+    }
 
     update() {
         this.checkIfSpinning()
@@ -728,9 +734,8 @@ export class LowPolyVehicle implements IVehicle {
         if (!!this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
 
-            if (!this.engineSound.isPlaying) {
-                this.engineSound.play()
-            }
+            // if it has stopped
+            this.startEngineSound()
         }
 
 

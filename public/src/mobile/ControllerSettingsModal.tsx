@@ -1,3 +1,4 @@
+import CircularProgress from "@mui/material/CircularProgress";
 import React from "react";
 import { Socket } from "socket.io-client";
 import { IUser } from "../classes/User";
@@ -17,6 +18,7 @@ interface IControllerSettingsModal {
   socket: Socket;
   gameActions: GameActions;
   sendGameActions: () => void;
+  loading: boolean;
 }
 
 const ControllerSettingsModal = (props: IControllerSettingsModal) => {
@@ -34,16 +36,22 @@ const ControllerSettingsModal = (props: IControllerSettingsModal) => {
 
   return (
     <BasicModal open={props.open} onClose={props.onClose}>
-      <ControllerSettingsComponent
-        onClose={props.onClose}
-        resetOrientation={props.resetOrientation}
-        userLoggedIn={props.userLoggedIn}
-        socket={props.socket}
-        user={props.user}
-        store={props.store}
-        gameActions={props.gameActions}
-        sendGameActions={props.sendGameActions}
-      />
+      {props.loading ? (
+        <div style={{ marginTop: 25, textAlign: "center" }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <ControllerSettingsComponent
+          onClose={props.onClose}
+          resetOrientation={props.resetOrientation}
+          userLoggedIn={props.userLoggedIn}
+          socket={props.store.socket}
+          user={props.user}
+          store={props.store}
+          gameActions={props.gameActions}
+          sendGameActions={props.sendGameActions}
+        />
+      )}
     </BasicModal>
   );
 };

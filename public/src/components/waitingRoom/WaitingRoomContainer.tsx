@@ -38,7 +38,7 @@ import {
   stm_player_connected_callback,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
-import { ISocketCallback } from "../../utils/connectSocket";
+import { createSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
@@ -50,7 +50,6 @@ import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionC
 import WaitingRoomComponent from "./WaitingRoomComponent";
 
 interface IWaitingRoomProps {
-  socket: Socket;
   store: IStore;
 }
 interface WaitParamType {
@@ -95,8 +94,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   };
 
   const getPlayersInRoom = () => {
-    props.socket.emit(mdts_players_in_room, { roomId });
-    props.socket.once(
+    props.store.socket.emit(mdts_players_in_room, { roomId });
+    props.store.socket.once(
       stmd_players_in_room_callback,
       (response: ISocketCallback) => {
         if (response.status === "error") {
@@ -110,19 +109,20 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   const connectToRoom = (_displayName: string) => {
     setConnectingGuest(true);
-    props.socket.emit(mts_player_connected, {
+    props.store.socket.emit(mts_player_connected, {
       roomId,
       playerName: _displayName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
       photoURL: user?.photoURL,
     } as IPlayerConnection);
-    props.socket.once(
+    props.store.socket.once(
       stm_player_connected_callback,
       (response: ISocketCallback) => {
         if (response.status === "success") {
           props.store.setPlayer(response.data.player);
           props.store.setRoomId(roomId);
+          props.store.setGameSettings(response.data.gameSettings);
           props.store.setPlayers(response.data.players);
           setConnectingGuest(false);
           toast.success(response.message);
@@ -139,8 +139,11 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   useEffect(() => {
     if (!onMobile) return;
 
-    if (!user && !props.store.player) {
-      setDisplayNameModalOpen(true);
+    if (!user && !props.store.player && !props.store.socket) {
+      createSocket(getDeviceType(), (_socket) => {
+        props.store.setSocket(_socket);
+        setDisplayNameModalOpen(true);
+      });
     } else {
       if (!props.store.player) {
         /** if gotten here through url */
@@ -152,6 +155,15 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
+    if (!props.store.socket && !onMobile) {
+      /** Desktops should always have a socket when connected to waiting room */
+      toast.error("No room connection");
+      history.push(frontPagePath);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!props.store.socket) return;
     toSaveGameSettings = props.store.gameSettings;
     /**
      * if desktop goes in and out and in of waitingRoom
@@ -164,12 +176,12 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       setUserLoading(false);
     }, 1000);
 
-    props.socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
+    props.store.socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
       props.store.setPlayers(_players);
       toSavePlayers = _players;
     });
 
-    props.socket.on(stmd_game_starting, () => {
+    props.store.socket.on(stmd_game_starting, () => {
       if (onMobile) {
         history.push(controlsRoomPath);
       } else {
@@ -178,10 +190,10 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     });
 
     if (onMobile) {
-      props.socket.emit(mts_connected_to_waiting_room);
+      props.store.socket.emit(mts_connected_to_waiting_room);
 
       getPlayersInRoom();
-      props.socket.on(stmd_game_settings_changed, (data) => {
+      props.store.socket.on(stmd_game_settings_changed, (data) => {
         toSaveGameSettings = data.gameSettings;
         for (let key of Object.keys(data.gameSettings)) {
           // @ts-ignore
@@ -190,13 +202,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         props.store.setGameSettings(data.gameSettings);
       });
 
-      props.socket.on(stm_desktop_disconnected, () => {
+      props.store.socket.on(stm_desktop_disconnected, () => {
         toast.error("Game disconnected");
         history.push(frontPagePath);
         /** go to front page? */
       });
     } else {
-      props.socket.on(std_player_disconnected, ({ playerName }) => {
+      props.store.socket.on(std_player_disconnected, ({ playerName }) => {
         toast.warn(`${playerName} disconnected from waiting room`);
       });
     }
@@ -207,16 +219,16 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         handleSaveRoomInfo();
       }
       window.clearTimeout(userLoadingTimout);
-      props.socket.emit(mdts_left_waiting_room, {});
-      props.socket.off(stmd_game_starting);
-      props.socket.off(stm_desktop_disconnected);
-      props.socket.off(stmd_game_settings_changed);
-      props.socket.off(stmd_waiting_room_alert);
-      props.socket.off(std_player_disconnected);
-      props.socket.off(stmd_players_in_room_callback);
-      props.socket.off(stm_player_connected_callback);
+      props.store.socket.emit(mdts_left_waiting_room, {});
+      props.store.socket.off(stmd_game_starting);
+      props.store.socket.off(stm_desktop_disconnected);
+      props.store.socket.off(stmd_game_settings_changed);
+      props.store.socket.off(stmd_waiting_room_alert);
+      props.store.socket.off(std_player_disconnected);
+      props.store.socket.off(stmd_players_in_room_callback);
+      props.store.socket.off(stm_player_connected_callback);
     };
-  }, []);
+  }, [props.store.socket]);
 
   useEffect(() => {
     if (props.store.userSettings && props.store.player) {
@@ -227,7 +239,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       };
 
       props.store.setPlayer(newPlayer);
-      sendPlayerInfoChanged(props.socket, newPlayer);
+      sendPlayerInfoChanged(props.store.socket, newPlayer);
     }
   }, [props.store.userSettings]);
 
@@ -262,69 +274,62 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const renderDisplayNameModal = () => {
     if (userLoading) return null;
     return (
-      <BasicModal
-        open={displayNameModalOpen}
-        onClose={() => {
-          let _displayName = displayName;
-          if (displayName === "") {
-            _displayName = "Clown-" + (Math.random() * 1000).toFixed(0);
-            setDisplayName(_displayName);
-          }
-          setDisplayNameModalOpen(false);
-          connectToRoom(_displayName);
-          setShowLoginInComponent(false);
-        }}
-      >
-        <Grid container spacing={3}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Typography>
+            You are not logged in, please type in your name or log in.
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            style={{
+              backgroundColor: inputBackgroundColor,
+            }}
+            label="Enter your name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <LoadingButton
+            disableElevation
+            loading={connectingGuest}
+            variant="outlined"
+            onClick={() => {
+              let _displayName = displayName;
+              if (displayName === "") {
+                _displayName = "Clown-" + (Math.random() * 1000).toFixed(0);
+                setDisplayName(_displayName);
+              }
+              setShowLoginInComponent(false);
+              connectToRoom(_displayName);
+              setDisplayNameModalOpen(false);
+            }}
+          >
+            Submit
+          </LoadingButton>
+        </Grid>
+        {showLoginInComponent ? (
           <Grid item xs={12}>
-            <Typography>
-              You are not logged in, please type in your name or log in.
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              style={{
-                backgroundColor: inputBackgroundColor,
-              }}
-              label="Enter your name"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+            <LoginComponent
+              onClose={() => setShowLoginInComponent(false)}
+              signInWithPopup={false}
             />
           </Grid>
+        ) : (
           <Grid item xs={6}>
-            <LoadingButton
+            <Button
               disableElevation
-              loading={connectingGuest}
-              variant="outlined"
+              variant="contained"
               onClick={() => {
-                connectToRoom(displayName);
+                setShowLoginInComponent(true);
               }}
             >
-              Submit
-            </LoadingButton>
+              Login
+            </Button>
           </Grid>
-          {showLoginInComponent ? (
-            <Grid item xs={12}>
-              <LoginComponent
-                onClose={() => setShowLoginInComponent(false)}
-                signInWithPopup={false}
-              />
-            </Grid>
-          ) : (
-            <Grid item xs={6}>
-              <Button
-                disableElevation
-                variant="contained"
-                onClick={() => {
-                  setShowLoginInComponent(true);
-                }}
-              >
-                Login
-              </Button>
-            </Grid>
-          )}
-        </Grid>
-      </BasicModal>
+        )}
+      </Grid>
     );
   };
 
@@ -335,25 +340,30 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }
 
   return (
-    <AppContainer>
+    <AppContainer loading={!props.store.socket}>
       <React.Fragment>
-        {renderDisplayNameModal()}
-        {onMobile && !props.store.player ? (
-          <div
-            className="container"
-            style={{ marginTop: 75, textAlign: "center", margin: "auto" }}
-          >
-            <CircularProgress />
-          </div>
+        {displayNameModalOpen ? (
+          renderDisplayNameModal()
         ) : (
-          <React.Fragment>
-            <WaitingRoomComponent
-              socket={props.socket}
-              store={props.store}
-              user={user}
-              roomId={roomId}
-            />
-          </React.Fragment>
+          <>
+            {onMobile && !props.store.player ? (
+              <div
+                className="container"
+                style={{ marginTop: 75, textAlign: "center", margin: "auto" }}
+              >
+                <CircularProgress />
+              </div>
+            ) : (
+              <React.Fragment>
+                <WaitingRoomComponent
+                  socket={props.store.socket}
+                  store={props.store}
+                  user={user}
+                  roomId={roomId}
+                />
+              </React.Fragment>
+            )}
+          </>
         )}
       </React.Fragment>
       <DeviceOrientationPermissionComponent

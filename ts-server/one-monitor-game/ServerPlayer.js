@@ -54,6 +54,9 @@ var Player = /** @class */ (function () {
             }
         });
     };
+    Player.prototype.gameSettingsChangedCallback = function () {
+        this.socket.emit(shared_stuff_1.stm_game_settings_changed_ballback, {});
+    };
     Player.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mdts_left_waiting_room, function () {

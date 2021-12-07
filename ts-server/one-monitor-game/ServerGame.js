@@ -32,7 +32,6 @@ var RoomMaster = /** @class */ (function () {
         var _this = this;
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest;
-            // console.log("connecting player", roomId, playerName)
             if (!_this.roomExists(roomId)) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
@@ -45,9 +44,9 @@ var RoomMaster = /** @class */ (function () {
             }
         });
     };
-    RoomMaster.prototype.createRoom = function (socket, roomId) {
+    RoomMaster.prototype.createRoom = function (socket, roomId, data) {
         var _this = this;
-        this.rooms[roomId] = new Room(roomId, this.io, socket, function () {
+        this.rooms[roomId] = new Room(roomId, this.io, socket, data, function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
@@ -61,14 +60,12 @@ var RoomMaster = /** @class */ (function () {
         var roomId;
         var isTestMode = false;
         var onMobile;
-        // console.log("adding socket", socket.id.slice(0, 4))
         this.allSocketIds.push(socket.id);
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode;
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
             if (isTestMode) {
-                console.log("In testmode from", deviceType);
                 if (onMobile) {
                     _this.testRoom.setMobileSocket(socket);
                 }
@@ -77,16 +74,14 @@ var RoomMaster = /** @class */ (function () {
                 }
             }
             else {
-                // console.log("Connection from", deviceType)
                 if (deviceType === "desktop") {
-                    socket.on(shared_stuff_1.dts_create_room, function () {
+                    socket.on(shared_stuff_1.dts_create_room, function (req) {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = (0, uuid_1.v4)().slice(0, 4);
-                        _this.createRoom(socket, roomId);
+                        _this.createRoom(socket, roomId, req.data);
                     });
                     socket.on("disconnect", function () {
-                        // console.log("disconnected from desktop", roomId)
                         if (roomId && _this.rooms[roomId]) {
                             _this.rooms[roomId].isConnected = false;
                             delete _this.rooms[roomId];
@@ -116,7 +111,6 @@ var RoomMaster = /** @class */ (function () {
             socket.on("disconnect", function () {
                 var idx = _this.allSocketIds.indexOf(socket.id);
                 _this.allSocketIds.splice(idx, 1);
-                // console.log("all connected sockets", this.allSocketIds)
             });
         });
     };
@@ -124,7 +118,7 @@ var RoomMaster = /** @class */ (function () {
 }());
 exports.default = RoomMaster;
 var Room = /** @class */ (function () {
-    function Room(roomId, io, socket, deleteRoomCallback) {
+    function Room(roomId, io, socket, data, deleteRoomCallback) {
         this.players = [];
         this.gameSettings = {};
         this.roomId = roomId;
@@ -133,6 +127,12 @@ var Room = /** @class */ (function () {
         this.isConnected = true;
         this.deleteRoomCallback = deleteRoomCallback;
         this.setSocket(socket);
+        var dataKeys = Object.keys(data);
+        for (var _i = 0, dataKeys_1 = dataKeys; _i < dataKeys_1.length; _i++) {
+            var key = dataKeys_1[_i];
+            // @ts-ignore
+            this[key] = data[key];
+        }
     }
     Room.prototype.setSocket = function (socket) {
         this.socket = socket;
@@ -198,7 +198,7 @@ var Room = /** @class */ (function () {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
             }
             else {
-                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
+                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
                 player.socket.emit(shared_stuff_1.stmd_game_starting);
             }
             return;
@@ -209,7 +209,7 @@ var Room = /** @class */ (function () {
         if (this.players.length === 1) {
             player.setLeader();
         }
-        player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } });
+        player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
         player.socket.join(this.roomId);
         this.alertWaitingRoom();
         if (this.gameStarted) {
@@ -226,6 +226,14 @@ var Room = /** @class */ (function () {
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 player.sendGameSettings(_this.gameSettings);
+            }
+        });
+        this.socket.on(shared_stuff_1.dts_game_settings_changed_callback, function () {
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                if (player.isLeader) {
+                    player.gameSettingsChangedCallback();
+                }
             }
         });
     };

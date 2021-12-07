@@ -1,5 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
@@ -53,21 +55,22 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
     props.store.userSettings.vehicleSettings.steeringSensitivity
   );
 
-  const [numberOfLaps, setNumberOfLaps] = useState(0);
-
   const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
     if (user) {
       setDBUserSettings(user.uid, newUserSettings);
-      props.socket.emit(mts_user_settings_changed, newUserSettings);
+      props.store.socket.emit(mts_user_settings_changed, newUserSettings);
       props.store.setUserSettings(newUserSettings);
     }
   };
 
-  const updateSettings = (key: keyof IGameSettings, value: any) => {
-    const newGameSettings = props.store.gameSettings;
+  const updateGameSettings = (key: keyof IGameSettings, value: any) => {
+    const newGameSettings = {
+      ...props.store.gameSettings,
+    };
 
     // @ts-ignore
     newGameSettings[key] = value;
+    props.store.setGameSettings(newGameSettings);
     setLocalGameSetting(key, value);
   };
 
@@ -107,7 +110,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           <Grid item xs={6} sm={4}>
             <Button
               fullWidth
-              variant="outlined"
+              variant="contained"
               onClick={() => {
                 props.gameActions.restart = true;
                 props.sendGameActions();
@@ -124,39 +127,33 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
             </Button>
           </Grid>
           <Grid item xs={6} sm={4}>
-            <Button
-              fullWidth
-              variant="outlined"
+            <IconButton
               onClick={() => {
-                props.gameActions.toggleSound = true;
-                props.sendGameActions();
-                /**
-                 * is this a hacky way to set restart to false?
-                 */
-                setTimeout(() => {
-                  props.gameActions.toggleSound = false;
-                }, 150);
+                updateGameSettings(
+                  "useSound",
+                  !props.store.gameSettings.useSound
+                );
               }}
             >
-              Toggle sound
-            </Button>
+              {props.store.gameSettings.useSound ? (
+                <VolumeUpIcon />
+              ) : (
+                <VolumeOffIcon />
+              )}
+            </IconButton>
           </Grid>
           <Grid item xs={6} sm={4}>
             <Button
               fullWidth
-              variant="outlined"
+              variant="contained"
               onClick={() => {
-                props.gameActions.toggleShadows = true;
-                props.sendGameActions();
-                /**
-                 * is this a hacky way to set restart to false?
-                 */
-                setTimeout(() => {
-                  props.gameActions.toggleShadows = false;
-                }, 150);
+                updateGameSettings(
+                  "useShadows",
+                  !props.store.gameSettings.useShadows
+                );
               }}
             >
-              Toggle shadows
+              Shadows {props.store.gameSettings.useShadows ? "On" : "Off"}
             </Button>
           </Grid>
 
@@ -172,46 +169,24 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               excludedTracks={nonActiveTrackNames}
               gameType={props.store.gameSettings.gameType}
               onChange={(value) => {
-                props.gameActions.changeTrack = value;
-                props.sendGameActions();
-
-                updateSettings("trackName", value);
-                setTimeout(() => {
-                  props.gameActions.changeTrack = undefined;
-                }, 150);
-
-                const newGameSettings: IGameSettings = {
-                  ...props.store.gameSettings,
-                  trackName: value,
-                };
-                props.store.setGameSettings(newGameSettings);
+                updateGameSettings("trackName", value);
               }}
             />
           </Grid>
 
           <Grid item xs={6} sm={4}>
             <TextField
-              value={numberOfLaps ? numberOfLaps : ""}
+              value={
+                props.store.gameSettings.numberOfLaps
+                  ? props.store.gameSettings.numberOfLaps
+                  : ""
+              }
               type="number"
               label="No. of laps"
-              onChange={(e) => setNumberOfLaps(+e.target.value)}
+              onChange={(e) =>
+                updateGameSettings("numberOfLaps", +e.target.value)
+              }
             />
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <Button
-              disableElevation
-              variant="contained"
-              onClick={() => {
-                props.gameActions.numberOfLaps = numberOfLaps;
-                props.sendGameActions();
-                setTimeout(() => {
-                  props.gameActions.numberOfLaps = undefined;
-                  // setNumberOfLaps(0)
-                }, 150);
-              }}
-            >
-              Send number of laps
-            </Button>
           </Grid>
         </>
       )}

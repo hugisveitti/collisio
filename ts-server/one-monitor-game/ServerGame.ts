@@ -26,7 +26,9 @@ import {
     stm_player_connected_callback,
     stmd_game_settings_changed,
     mdts_start_game,
-    std_send_game_actions
+    std_send_game_actions,
+    dts_game_settings_changed_callback,
+    stm_game_settings_changed_ballback
 } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
@@ -73,7 +75,7 @@ export default class RoomMaster {
         }
 
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest }: IPlayerConnectedData) => {
-            // console.log("connecting player", roomId, playerName)
+
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else if (!isStressTest && this.rooms[roomId].isFull()) {
@@ -86,8 +88,8 @@ export default class RoomMaster {
     }
 
 
-    createRoom(socket: Socket, roomId: string) {
-        this.rooms[roomId] = new Room(roomId, this.io, socket, () => {
+    createRoom(socket: Socket, roomId: string, data: any) {
+        this.rooms[roomId] = new Room(roomId, this.io, socket, data, () => {
             /** delete room callback */
             delete this.rooms[roomId]
         })
@@ -102,31 +104,32 @@ export default class RoomMaster {
         let roomId: string
         let isTestMode = false
         let onMobile: boolean
-        // console.log("adding socket", socket.id.slice(0, 4))
+
         this.allSocketIds.push(socket.id)
 
         socket.once(mdts_device_type, ({ deviceType, mode }) => {
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
             if (isTestMode) {
-                console.log("In testmode from", deviceType)
+
                 if (onMobile) {
                     this.testRoom.setMobileSocket(socket)
                 } else {
                     this.testRoom.setDesktopSocket(socket)
                 }
             } else {
-                // console.log("Connection from", deviceType)
+
                 if (deviceType === "desktop") {
-                    socket.on(dts_create_room, () => {
+                    socket.on(dts_create_room, (req: any) => {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = uuid().slice(0, 4)
-                        this.createRoom(socket, roomId)
+                        this.createRoom(socket, roomId, req.data)
+
                     })
 
                     socket.on("disconnect", () => {
-                        // console.log("disconnected from desktop", roomId)
+
                         if (roomId && this.rooms[roomId]) {
                             this.rooms[roomId].isConnected = false
                             delete this.rooms[roomId]
@@ -159,7 +162,7 @@ export default class RoomMaster {
             socket.on("disconnect", () => {
                 const idx = this.allSocketIds.indexOf(socket.id)
                 this.allSocketIds.splice(idx, 1)
-                // console.log("all connected sockets", this.allSocketIds)
+
             })
         })
     }
@@ -180,7 +183,7 @@ export class Room {
     isConnected
     deleteRoomCallback
 
-    constructor(roomId: string, io: Socket, socket: Socket, deleteRoomCallback: () => void) {
+    constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
         this.gameSettings = {}
         this.roomId = roomId
@@ -192,6 +195,12 @@ export class Room {
 
         this.setSocket(socket)
 
+        const dataKeys = Object.keys(data)
+
+        for (let key of dataKeys) {
+            // @ts-ignore
+            this[key] = data[key]
+        }
     }
 
 
@@ -264,7 +273,7 @@ export class Room {
 
 
             } else {
-                player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
+                player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)
             }
             return
@@ -279,7 +288,7 @@ export class Room {
         }
 
 
-        player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId } })
+        player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
         player.socket.join(this.roomId)
         this.alertWaitingRoom()
         if (this.gameStarted) {
@@ -296,6 +305,15 @@ export class Room {
             this.gameSettings = data.gameSettings
             for (let player of this.players) {
                 player.sendGameSettings(this.gameSettings)
+            }
+        })
+
+        this.socket.on(dts_game_settings_changed_callback, () => {
+            for (let player of this.players) {
+                if (player.isLeader) {
+
+                    player.gameSettingsChangedCallback()
+                }
             }
         })
     }

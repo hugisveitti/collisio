@@ -15,6 +15,8 @@ import BasicModal from "../modal/BasicModal";
 interface IDeviceOrientationPermissionComponent {
   onMobile: boolean;
   onIphone: boolean;
+  showModal?: boolean;
+  onClose?: () => void;
 }
 
 const DeviceOrientationPermissionComponent = (
@@ -24,8 +26,12 @@ const DeviceOrientationPermissionComponent = (
 
   // To my knowledge, I only need to ask on Iphones
   if (!props.onMobile || !props.onIphone) return null;
-
-  if (hasAskedDeviceOrientation) return null;
+  console.log(
+    "hasAskedDeviceOrientation && !props.showModal",
+    hasAskedDeviceOrientation,
+    !props.showModal
+  );
+  if (hasAskedDeviceOrientation && !props.showModal) return null;
 
   return (
     <BasicModal
@@ -59,6 +65,9 @@ const DeviceOrientationPermissionComponent = (
                       }
                     }
                   );
+                  if (props.onClose) {
+                    props.onClose();
+                  }
                 }}
               >
                 Click me!

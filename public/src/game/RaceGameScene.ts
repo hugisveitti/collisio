@@ -236,6 +236,12 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    _resetPlayer(idx: number) {
+        if (this.checkRaceOver()) {
+            this.restartGame()
+        }
+    }
+
 
     handleGoalCrossed(vehicle: ExtendedObject3D) {
 
@@ -279,6 +285,7 @@ export class RaceGameScene extends GameScene {
             this.gameStarted = false
             this.prepareEndOfGameData()
         }
+        return isRaceOver
     }
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D, checkpointNumber: number) {

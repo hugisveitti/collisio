@@ -75,6 +75,8 @@ const TestContainer = () => {
     setGameSettings,
     userSettings,
     setUserSettings,
+    socket,
+    setSocket,
   } as IStore;
 
   if (!socket) return <span>Loading test setup...</span>;
@@ -86,9 +88,9 @@ const TestContainer = () => {
   return (
     <React.Fragment>
       {onMobile ? (
-        <ControlsRoom socket={socket} store={store} />
+        <ControlsRoom store={store} />
       ) : (
-        <GameRoom store={store} socket={socket} useTestCourse isTestMode />
+        <GameRoom store={store} useTestCourse isTestMode />
       )}
       <ToastContainer />
     </React.Fragment>
