@@ -27,6 +27,7 @@ export const getPlayerBestScoreOnTrackAndLap = async (playerId: string, trackNam
     const q = query(highscoresRef, where("playerId", "==", playerId), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "desc"), limit(1))
     const data = await getDocs(q)
 
+
     if (data.empty) {
 
         callback(undefined)
@@ -41,6 +42,7 @@ export const getPlayerBestScoreOnTrackAndLap = async (playerId: string, trackNam
         })
 
     }
+
 }
 
 export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer, callback: (_gameDataInfo: string[]) => void) => {

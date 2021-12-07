@@ -51,13 +51,13 @@ export class TagGameScene extends GameScene {
 
         console.log("creating tag game scene")
 
-        document.body.appendChild(totalTimeDiv)
+        this.gameInfoDiv.appendChild(totalTimeDiv)
         totalTimeDiv.setAttribute("id", "totalTime")
 
         this.tagObjects = []
 
         stats.showPanel(0)
-        document.body.appendChild(stats.dom)
+        this.gameInfoDiv.appendChild(stats.dom)
 
         this.isItTimeout = false
         this.gameClock = new Clock(false)
@@ -70,7 +70,7 @@ export class TagGameScene extends GameScene {
     async create() {
         this.course = new TagCourse(this, this.gameSettings.trackName, (name, coin) => this.handleCoinCollidedCallback(name, coin))
         this.course.createCourse(this.useShadows, () => {
-            console.log("create course")
+
             this.courseLoaded = true
             const createVehiclePromise = new Promise((resolve, reject) => {
                 this.createVehicles(() => {
@@ -78,7 +78,7 @@ export class TagGameScene extends GameScene {
                         vehicle.useBadRotationTicks = false
                     }
                     resolve("successfully created all vehicles")
-                    console.log("created all vehicles")
+
                 })
             })
 
@@ -226,8 +226,15 @@ export class TagGameScene extends GameScene {
 
     resetVehicleCallback(vehicleNumber: number) {
         if (!this.gameStarted) return
+
+        if (this.tagObjects[vehicleNumber].isIt) {
+
+            return
+        }
+
         const changeTags = this.tagObjects[vehicleNumber].resetPressed()
         console.log("change tags", changeTags)
+
 
         if (changeTags) {
             let oldIt = -1
@@ -239,8 +246,11 @@ export class TagGameScene extends GameScene {
                     // }
                 }
             }
+
             if (oldIt !== -1) {
                 this.handleVehicleTagged(vehicleNumber, oldIt)
+            } else if (oldIt === vehicleNumber) {
+                console.log("old it is it")
             }
         } else {
             this.setViewImportantInfo(`${this.tagObjects[vehicleNumber].getRemainingResets()} resets left`, vehicleNumber, true)

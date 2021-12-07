@@ -78,5 +78,6 @@ export interface IVehicle {
     updateVehicleSettings: (vehicleSettings: IVehicleSettings) => void
     setColor: (color: string | number) => void
     toggleSound: (useSound: boolean) => void
+    destroy: () => void
 
 }

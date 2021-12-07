@@ -13,6 +13,8 @@ const loadImage = document.createElement("img")
 
 loadImage.src = "https://imgur.com/rpPch3m.jpg"
 loadImage.setAttribute("style", "z-index:998; width:100%; height:auto;position:absolute;display:none;")
+
+
 document.body.appendChild(loadImage)
 
 const loadDiv = document.createElement("div")
@@ -113,6 +115,7 @@ export class Course implements ICourse {
         this.trackName = trackName
         this.gamePhysicsObjects = []
         this.spawns = []
+
     }
 
     toggleShadows(useShadows: boolean) {

@@ -102,7 +102,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={2} lg={2} style={{ textAlign: "left" }}>
+      <Grid item xs={1} lg={2} style={{ textAlign: "left" }}>
         <FullscreenButton />
       </Grid>
       <Grid item xs={10} lg={4}>
@@ -110,6 +110,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           Waiting room
         </Typography>
       </Grid>
+      <Grid item xs={1} lg={false}></Grid>
       <Grid item xs={12} lg={4}>
         <Typography variant="h4">
           <span style={{ backgroundColor: green4, color: "white" }}>

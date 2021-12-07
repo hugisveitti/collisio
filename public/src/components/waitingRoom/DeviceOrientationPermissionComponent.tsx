@@ -25,8 +25,8 @@ const DeviceOrientationPermissionComponent = (
   const [modalOpen, setModalOpen] = useState(true);
 
   // To my knowledge, I only need to ask on Iphones
-
-  if (getHasAskedDeviceOrientation() && !props.showModal) return null;
+  if (!props.onMobile || (getHasAskedDeviceOrientation() && !props.showModal))
+    return null;
 
   return (
     <BasicModal

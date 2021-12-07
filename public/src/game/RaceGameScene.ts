@@ -43,12 +43,13 @@ export class RaceGameScene extends GameScene {
 
     hasShowStartAnimation: boolean
 
+    raceFinished: boolean
 
     constructor() {
         super()
 
 
-        document.body.appendChild(totalTimeDiv)
+        this.gameInfoDiv.appendChild(totalTimeDiv)
         totalTimeDiv.setAttribute("id", "totalTime")
 
 
@@ -57,13 +58,14 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
 
         stats.showPanel(0)
-        document.body.appendChild(stats.dom)
+        this.gameInfoDiv.appendChild(stats.dom)
 
         this.roomTicks = 0
         this.gameTicks = 0
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
         this.hasShowStartAnimation = false
+        this.raceFinished = false
     }
 
     async create() {
@@ -167,6 +169,7 @@ export class RaceGameScene extends GameScene {
     }
 
     _startAllVehicles() {
+        this.raceFinished = false
         this.gameTicks = 0
         for (let i = 0; i < this.vehicles.length; i++) {
             this.gameTimers[i].start()
@@ -237,7 +240,7 @@ export class RaceGameScene extends GameScene {
     }
 
     _resetPlayer(idx: number) {
-        if (this.checkRaceOver()) {
+        if (this.raceFinished) {
             this.restartGame()
         }
     }
@@ -283,6 +286,7 @@ export class RaceGameScene extends GameScene {
         if (isRaceOver) {
 
             this.gameStarted = false
+            this.raceFinished = true
             this.prepareEndOfGameData()
         }
         return isRaceOver

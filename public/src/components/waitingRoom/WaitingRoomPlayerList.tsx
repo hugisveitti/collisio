@@ -34,23 +34,6 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
 
   const showPB = onDesktop || isUser;
 
-  useEffect(() => {
-    if (props.gameType === "race" && showPB) {
-      getPlayerBestScoreOnTrackAndLap(
-        props.player.id,
-        props.trackName,
-        props.numberOfLaps,
-        (personalBest) => {
-          if (personalBest?.totalTime) {
-            setPersonalBest(personalBest.totalTime);
-          } else {
-            setPersonalBest(-1);
-          }
-        }
-      );
-    }
-  }, [props.trackName, props.numberOfLaps]);
-
   const renderPersonalBest = () => {
     const trackTitle = getTrackNameFromType(props.trackName);
     return (
@@ -97,6 +80,23 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
   const playerName = onDesktop
     ? props.player.playerName
     : props.player.playerName.split(" ")[0].slice(0, 5);
+
+  useEffect(() => {
+    if (props.gameType === "race" && showPB) {
+      getPlayerBestScoreOnTrackAndLap(
+        props.player.id,
+        props.trackName,
+        props.numberOfLaps,
+        (personalBest) => {
+          if (personalBest?.totalTime) {
+            setPersonalBest(personalBest.totalTime);
+          } else {
+            setPersonalBest(-1);
+          }
+        }
+      );
+    }
+  }, [props.trackName, props.numberOfLaps]);
 
   return (
     <Card
@@ -149,7 +149,6 @@ interface IWaitingRoomPlayerList {
 }
 
 const WaitingRoomPlayerList = (props: IWaitingRoomPlayerList) => {
-  console.log("props player list", props);
   const n = props.players.length;
   const containerWidth = Math.min(450, screen.availWidth) - 50;
   let containerHeight = onDesktop ? 600 : 400;

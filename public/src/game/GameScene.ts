@@ -1,13 +1,13 @@
 import { PhysicsLoader, Project, Scene3D } from "enable3d";
-import { Howl } from "howler";
 import { Socket } from "socket.io-client";
-import { Color, Font, Mesh, PerspectiveCamera, HemisphereLight, PointLight, AmbientLight, Fog, SphereGeometry, ShaderMaterial, BackSide, FontLoader } from "three";
+import { Audio, AudioListener, Color, Font, Mesh, PerspectiveCamera, HemisphereLight, PointLight, AmbientLight, Fog, SphereGeometry, ShaderMaterial, BackSide, FontLoader } from "three";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { getBeep } from "../sounds/gameSounds";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
@@ -26,26 +26,6 @@ export const viewBottoms = [0, 0, 0.5, 0.5]
 
 const vechicleFov = 60
 
-
-
-const beepC4 = new Howl({
-    src: [getStaticPath("sound/beepC4.mp3")],
-    html5: true,
-})
-
-
-const beepE4 = new Howl({
-    src: [getStaticPath("sound/beepE4.mp3")],
-    html5: true
-})
-
-
-
-const gameSong = new Howl({
-    src: [getStaticPath("sound/song2.mp3")],
-    html5: true,
-    volume: .5,
-})
 
 export interface IEndOfGameData {
     endOfRaceInfo?: IEndOfRaceInfoGame
@@ -116,6 +96,14 @@ export class GameScene extends Scene3D implements IGameScene {
      */
     needsReload: boolean
 
+    /**
+     * all spans and divs become children of this element to easily delete
+     * not calling it gameDiv since the game canvas doesnt go into this
+     */
+    gameInfoDiv: HTMLDivElement
+
+    beepE4: Audio
+    beepC4: Audio
 
 
 
@@ -132,10 +120,13 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameStarted = false
         this.gameId = uuid()
         this.gameSettings = defaultGameSettings
+        this.gameInfoDiv = document.createElement("div")
+        this.gameInfoDiv.setAttribute("id", "game-info")
+        document.body.appendChild(this.gameInfoDiv)
         this.importantInfoDiv = document.createElement("div")
 
         this.importantInfoDiv.setAttribute("id", "important-info")
-        document.body.appendChild(this.importantInfoDiv)
+        this.gameInfoDiv.appendChild(this.importantInfoDiv)
         this.gameRoomActions = {}
 
         this.viewsKmhInfo = []
@@ -150,13 +141,16 @@ export class GameScene extends Scene3D implements IGameScene {
             top:50px;
             left:5px;
         `)
-        document.body.appendChild(this.pingInfo)
+        this.gameInfoDiv.appendChild(this.pingInfo)
 
         this.needsReload = false
 
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
-        document.body.appendChild(this.playerInfosContainer)
+        this.gameInfoDiv.appendChild(this.playerInfosContainer)
+
+
+
     }
 
     async addLights() {
@@ -206,9 +200,19 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async preload() {
 
-        await this.warpSpeed("-ground", "-light", "-sky")
-
+        const warp = await this.warpSpeed("-ground", "-light", "-sky")
+        console.log("warp", warp)
         this.addLights()
+
+        const listener = new AudioListener()
+        this.camera.add(listener)
+        getBeep(getStaticPath("sound/beepC4.mp3"), listener, (beepC4) => {
+            this.beepC4 = beepC4
+        })
+
+        getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
+            this.beepE4 = beepE4
+        })
 
 
 
@@ -497,9 +501,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
     startGameSong() {
         // not use game song right now...
-        if (!!false && this.useSound && (!gameSong.playing() || !this.songIsPlaying) && !this.isGamePaused()) {
+        if (!!false && this.useSound && (!this.songIsPlaying) && !this.isGamePaused()) {
 
-            gameSong.play()
+
             this.songIsPlaying = true
         }
     }
@@ -514,7 +518,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     pauseGame() {
         if (this.isGamePaused()) return
-        gameSong.pause()
+
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].pause()
@@ -620,7 +624,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     toggleUseSound() {
         if (!this.useSound) {
-            gameSong.stop()
+
             this.songIsPlaying = false
         } else {
             this.startGameSong()
@@ -632,19 +636,23 @@ export class GameScene extends Scene3D implements IGameScene {
 
     playCountdownBeep() {
         if (this.useSound) {
-            beepC4.play()
+            this.beepC4.play()
+            setTimeout(() => {
+                this.beepC4.stop()
+            }, 250)
         }
     }
 
     playStartBeep() {
         if (this.useSound) {
-            beepE4.play()
+            this.beepE4.play()
         }
     }
 
     /** if song stops start it again */
     isGameSongPlaying() {
-        return gameSong.playing()
+        return false
+        //  return gameSong.playing()
     }
 
     startAllVehicles() {
@@ -676,7 +684,10 @@ export class GameScene extends Scene3D implements IGameScene {
             this.gameStarted = false
             this.courseLoaded = false
             this.needsReload = false
-
+            /** I think I need to delete ammo vecs */
+            for (let vehicle of this.vehicles) {
+                vehicle.destroy()
+            }
 
             this.restart().then(() => {
                 console.log("reset scene complete")
@@ -822,6 +833,15 @@ export class GameScene extends Scene3D implements IGameScene {
 
             this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour().toFixed(0)} km/h`
         }
+    }
+
+    async destroyGame() {
+        document.body.removeChild(this.gameInfoDiv)
+        document.body.removeChild(this.canvas)
+        for (let vehicle of this.vehicles) {
+            vehicle.destroy()
+        }
+        this.stop()
     }
 
 }

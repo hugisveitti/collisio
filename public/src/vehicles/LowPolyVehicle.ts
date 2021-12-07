@@ -896,13 +896,27 @@ export class LowPolyVehicle implements IVehicle {
         this.chaseCameraSpeed = chaseCameraSpeed
     }
 
-    destroy() {
-        this.scene.destroy(this.chassisMesh)
+    async destroy() {
+
+        if (this.scene && this.chassisMesh) {
+
+            this.scene.destroy(this.chassisMesh)
+        }
         for (let tire of this.tires) {
             // this.scene.
-            this.scene.scene.remove(tire)
+            if (this.scene?.scene && tire) {
+
+                this.scene.scene.remove(tire)
+            }
         }
 
+        Ammo.destroy(this.zeroVec)
+
+        Ammo.destroy(this.vector)
+        Ammo.destroy(this.vector2)
+        Ammo.destroy(this.tm)
+        Ammo.destroy(this.p)
+        Ammo.destroy(this.q)
     }
 
 }

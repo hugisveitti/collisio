@@ -1,13 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router";
 import PauseIcon from "@mui/icons-material/Pause";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
+import { blue4, orange2 } from "../providers/theme";
 // import {
 //   saveRaceDataGame,
 // } from "../firebase/firebaseFunctions";
@@ -29,8 +30,6 @@ import { inTestMode, isIphone } from "../utils/settings";
 import { invertedControllerKey } from "./ControllerSettingsComponent";
 import ControllerSettingsModal from "./ControllerSettingsModal";
 import "./ControlsRoom.css";
-import { Button, IconButton } from "@mui/material";
-import { blue4, green1, orange2, yellow1, yellow3 } from "../providers/theme";
 
 interface IControlsRoomProps {
   store: IStore;
@@ -203,6 +202,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
 
     return () => {
+      /**
+       * remove all socket listeners
+       */
+      props.store.socket.off(stm_game_settings_changed_ballback);
       props.store.socket.off(stm_game_finished);
       props.store.socket.off(stm_player_finished);
     };
@@ -317,7 +320,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             setSettingsModalOpen(false);
             setGameSettingsLoading(false);
           }
+
+          /** if the modal doesn't close, then just close it*/
+          const timout = setTimeout(() => {
+            setSettingsModalOpen(false);
+            setGameSettingsLoading(false);
+          }, 1000);
+
           props.store.socket.once(stm_game_settings_changed_ballback, () => {
+            clearTimeout(timout);
             setSettingsModalOpen(false);
             setGameSettingsLoading(false);
             gameActions.pause = false;

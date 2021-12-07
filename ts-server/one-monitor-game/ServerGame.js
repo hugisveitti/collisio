@@ -144,6 +144,17 @@ var Room = /** @class */ (function () {
         this.setupPingListener();
         this.setupVechilesReadyListener();
         this.setupLeftWebsiteListener();
+        this.setupBackToWaitingRoomListener();
+    };
+    Room.prototype.setupBackToWaitingRoomListener = function () {
+        var _this = this;
+        this.gameStarted = false;
+        this.socket.on(shared_stuff_1.dts_back_to_waiting_room, function () {
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                player.desktopDisconnected();
+            }
+        });
     };
     Room.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;

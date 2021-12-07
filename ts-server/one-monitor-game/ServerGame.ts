@@ -28,7 +28,8 @@ import {
     mdts_start_game,
     std_send_game_actions,
     dts_game_settings_changed_callback,
-    stm_game_settings_changed_ballback
+    stm_game_settings_changed_ballback,
+    dts_back_to_waiting_room
 } from "../../public/src/shared-backend/shared-stuff";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
@@ -214,8 +215,17 @@ export class Room {
         this.setupPingListener()
         this.setupVechilesReadyListener()
         this.setupLeftWebsiteListener()
+        this.setupBackToWaitingRoomListener()
     }
 
+    setupBackToWaitingRoomListener() {
+        this.gameStarted = false
+        this.socket.on(dts_back_to_waiting_room, () => {
+            for (let player of this.players) {
+                player.desktopDisconnected()
+            }
+        })
+    }
 
     setupLeftWaitingRoomListener() {
         this.socket.on(mdts_left_waiting_room, () => {
@@ -270,8 +280,6 @@ export class Room {
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
-
-
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)

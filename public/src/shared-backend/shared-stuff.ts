@@ -211,12 +211,14 @@ export const stm_desktop_disconnected = "stm_desktop_disconnected"
 export const std_player_disconnected = "std_player_disconnected"
 export const mts_connected_to_waiting_room = "mts_connected_to_waiting_room"
 export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
-
+export const dts_back_to_waiting_room = "dts_back_to_waiting_room"
+// not implmented yet
+export const stm_back_to_waiting_room = "stm_back_to_waiting_room"
 
 export const mdts_game_settings_changed = "mdts_game_settings_changed"
 export const stmd_game_settings_changed = "stmd_game_settings_changed"
-export const dts_game_settings_changed_callback = "mdts_game_settings_changed_callback"
-export const stm_game_settings_changed_ballback = "stmd_game_settings_changed_ballback"
+export const dts_game_settings_changed_callback = "mts_game_settings_changed_callback"
+export const stm_game_settings_changed_ballback = "stm_game_settings_changed_ballback"
 
 export const mts_send_game_actions = "mts_send_game_actions"
 export const std_send_game_actions = "std_send_game_actions"

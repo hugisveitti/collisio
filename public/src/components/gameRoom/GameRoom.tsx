@@ -16,6 +16,7 @@ import { RaceGameScene } from "../../game/RaceGameScene";
 import { TagGameScene } from "../../game/TagGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
+  dts_back_to_waiting_room,
   dts_player_finished,
   GameActions,
   std_game_data_info,
@@ -166,6 +167,12 @@ const GameRoom = (props: IGameRoom) => {
     });
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
+      if (gameObject) {
+        console.log("destroying game");
+        gameObject.destroyGame();
+        /** do some kind of back to waiting room? */
+        props.store.socket.emit(dts_back_to_waiting_room, {});
+      }
     };
   }, [gameObject]);
 
@@ -183,22 +190,6 @@ const GameRoom = (props: IGameRoom) => {
         setEndOfGameModalOpen(false);
         setSettingsModalOpen(false);
       }
-      // if (gameActions.toggleSound) {
-      //   updateSettings("useSound", !props.store.gameSettings.useSound);
-      // }
-
-      // if (gameActions.toggleShadows) {
-      //   updateSettings("useShadows", !props.store.gameSettings.useShadows);
-      // }
-
-      // if (gameActions.numberOfLaps) {
-      //   updateSettings("numberOfLaps", gameActions.numberOfLaps);
-      // }
-
-      // if (gameActions.changeTrack) {
-      //   gameObject.changeTrack(gameActions.changeTrack);
-      //   updateSettings("trackName", gameActions.changeTrack);
-      // }
     }
   }, [gameActions]);
 

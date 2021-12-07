@@ -41,9 +41,9 @@ export const inTestMode = false
 
 
 export const testGameSettings: IGameSettings = {
-    gameType: "race",
+    gameType: "tag",
     numberOfLaps: 2,
-    trackName: "f1-track",
+    trackName: "simple-tag-course",
     tagGameLength: 2,
     useShadows: true,
     useSound: true

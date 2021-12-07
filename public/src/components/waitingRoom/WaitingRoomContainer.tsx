@@ -72,7 +72,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const [showLoginInComponent, setShowLoginInComponent] = useState(false);
 
   const user = useContext(UserContext);
-
   const onMobile = getDeviceType() === "mobile";
   const history = useHistory();
   const params = useParams<WaitParamType>();
