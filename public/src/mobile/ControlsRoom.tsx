@@ -249,6 +249,36 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const sendGameActions = () => {
     props.store.socket.emit(mts_send_game_actions, gameActions);
+    // handle
+  };
+
+  const handleSendGameSettings = () => {
+    props.store.socket.emit(mdts_game_settings_changed, {
+      gameSettings: props.store.gameSettings,
+    });
+    setGameSettingsLoading(true);
+    if (inTestMode) {
+      setSettingsModalOpen(false);
+      setGameSettingsLoading(false);
+    }
+
+    /** if the modal doesn't close, then just close it*/
+    const timout = setTimeout(() => {
+      setSettingsModalOpen(false);
+      setGameSettingsLoading(false);
+    }, 1000);
+
+    props.store.socket.once(stm_game_settings_changed_ballback, () => {
+      clearTimeout(timout);
+      setSettingsModalOpen(false);
+      setGameSettingsLoading(false);
+      gameActions.pause = false;
+      sendGameActions();
+      setTimeout(() => {
+        gameActions.pause = false;
+        gameActions.restart = false;
+      }, 150);
+    });
   };
 
   const btnSizeStyle: React.CSSProperties = {
@@ -311,35 +341,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         resetOrientation={resetDeviceOrientationListener}
         open={settingsModalOpen}
         onClose={() => {
-          //  handleButtonAction(false, "pause", setSettingsModalOpen);
-          props.store.socket.emit(mdts_game_settings_changed, {
-            gameSettings: props.store.gameSettings,
-          });
-          setGameSettingsLoading(true);
-          if (inTestMode) {
-            setSettingsModalOpen(false);
-            setGameSettingsLoading(false);
-          }
-
-          /** if the modal doesn't close, then just close it*/
-          const timout = setTimeout(() => {
-            setSettingsModalOpen(false);
-            setGameSettingsLoading(false);
-          }, 1000);
-
-          props.store.socket.once(stm_game_settings_changed_ballback, () => {
-            clearTimeout(timout);
-            setSettingsModalOpen(false);
-            setGameSettingsLoading(false);
-            gameActions.pause = false;
-            sendGameActions();
-          });
+          handleSendGameSettings();
         }}
         user={user}
         store={props.store}
         socket={props.store.socket}
         gameActions={gameActions}
-        sendGameActions={sendGameActions}
         loading={gameSettingsLoading}
       />
 

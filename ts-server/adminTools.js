@@ -37,9 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminFunctions = void 0;
-var firebase_config_1 = require("./firebase-config");
 var firestore_1 = require("@firebase/firestore");
 var firestore_2 = require("firebase/firestore");
+var firebase_config_1 = require("./firebase-config");
 var buildFolder = "dist";
 var adminFunctions = function (app) {
     var adminsRefPath = "admins";
@@ -95,14 +95,6 @@ var adminFunctions = function (app) {
             });
         });
     });
-    // const createFirebaseQueries = (queryParams: IQueryParams): QueryConstraint[] => {
-    //     const queries = []
-    //     if (queryParams.n) {
-    //         queries.push(limitToLast(queryParams.n))
-    //     }
-    //     console.log("queries", queries)
-    //     return queries
-    // }
     var getRoomData = function (userId, queryParams, callback) {
         /** first check if user is admin */
         getIsAdmin(userId, function (isAdmin) { return __awaiter(void 0, void 0, void 0, function () {

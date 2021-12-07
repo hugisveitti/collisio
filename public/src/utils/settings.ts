@@ -31,7 +31,7 @@ export const isIphone = () => {
     return navigator.userAgent.toLowerCase().includes("iphone")
 }
 
-export const inDevelopment = window.location.href.includes("localhost")
+export const inDevelopment = window.location.href.includes("localhost") || window.location.href.includes("192.168.0.29")
 
 /** test mode means:
  * Not being redirected from pages

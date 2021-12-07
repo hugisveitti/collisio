@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
-import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection, IRoomInfo } from "../../classes/Game";
 import {
@@ -43,7 +42,6 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import LoginComponent from "../LoginComponent";
-import BasicModal from "../modal/BasicModal";
 import { controlsRoomPath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
@@ -64,6 +62,15 @@ let toSavePlayers = [];
 let toSaveRoomId = "";
 let toSaveGameSettings = {};
 
+// window.addEventListener(
+//   "beforeunload",
+//   () => {
+//     console.log("unload");
+//     alert("unload");
+//   },
+//   true
+// );
+
 const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const [userLoading, setUserLoading] = useState(true);
   const [displayNameModalOpen, setDisplayNameModalOpen] = useState(false);
@@ -76,6 +83,20 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
+
+  /**
+   * this suddenly doesnt work...
+   */
+  // window.addEventListener("beforeunload", (ev) => {
+  //   ev.preventDefault();
+  //   console.log("unload");
+  //   alert("unload");
+  //   if (user && !onMobile) {
+  //     removeFromAvailableRooms(user.uid);
+  //   }
+  //   //ev.returnValue = null;
+  //   return ""; //((ev.returnValue = null));
+  // });
 
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
@@ -154,15 +175,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [user]);
 
   useEffect(() => {
+    // TODO: create a function that verifies gameSettings
+
     if (!props.store.socket && !onMobile && !inTestMode) {
       /** Desktops should always have a socket when connected to waiting room */
-      // toast.error("No room connection");
+
       history.push(frontPagePath);
     }
-
-    // if (inTestMode && !onMobile) {
-    //   createSocket(getDeviceType(), (socket) => props.store.setSocket(socket));
-    // }
   }, []);
 
   useEffect(() => {
@@ -262,18 +281,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         userId: user.uid,
       });
     }
-    window.onbeforeunload = () => {
-      if (user && !onMobile) {
-        removeFromAvailableRooms(user.uid);
-      }
-    };
 
     return () => {
       if (user && !onMobile) {
         removeFromAvailableRooms(user.uid);
       }
     };
-  }, [user?.uid]);
+  }, [user]);
 
   const renderDisplayNameModal = () => {
     if (userLoading) return null;

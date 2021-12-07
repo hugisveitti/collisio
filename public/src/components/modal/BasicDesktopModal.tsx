@@ -22,6 +22,8 @@ const BasicDesktopModal = (props: IBasicDesktopModal) => {
           border: 0, //"2px solid #000",
           padding: 10,
           outline: 0,
+          overflowY: "auto",
+          maxHeight: "75%",
         }}
       >
         {props.children}

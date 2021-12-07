@@ -31,6 +31,7 @@ import {
     stm_game_settings_changed_ballback,
     dts_back_to_waiting_room
 } from "../../public/src/shared-backend/shared-stuff";
+import { removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
 
@@ -174,15 +175,17 @@ export default class RoomMaster {
 
 export class Room {
     players: Player[]
-    roomId
+    roomId: string
     io
     socket!: Socket
-    gameStarted
+    gameStarted: boolean
 
 
     gameSettings
     isConnected
     deleteRoomCallback
+
+    desktopUserId: string | undefined
 
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
@@ -190,6 +193,7 @@ export class Room {
         this.roomId = roomId
         this.io = io
         this.gameStarted = false
+        this.desktopUserId = undefined
 
         this.isConnected = true
         this.deleteRoomCallback = deleteRoomCallback
@@ -242,10 +246,14 @@ export class Room {
     setupLeftWebsiteListener() {
 
         this.socket.on("disconnect", () => {
+            console.log("disconnected")
             for (let player of this.players) {
                 player.desktopDisconnected()
             }
             this.deleteRoomCallback()
+            if (this.desktopUserId) {
+                removeAvailableRoom(this.desktopUserId)
+            }
         })
     }
 

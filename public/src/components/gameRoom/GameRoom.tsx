@@ -79,16 +79,15 @@ const GameRoom = (props: IGameRoom) => {
     props.store.socket.emit(dts_player_finished, data);
   };
 
-  const updateSettings = (key: keyof IGameSettings, value: any) => {
-    const newGameSettings = props.store.gameSettings;
-
-    // @ts-ignore
-    newGameSettings[key] = value;
-    setLocalGameSetting(key, value);
-
-    /** hacky way to make react update component */
+  const updateGameSettings = (newGameSettings: IGameSettings) => {
+    // this wont change right away so next if statement is okey
     props.store.setGameSettings({ ...newGameSettings });
-    gameObject.setGameSettings(newGameSettings);
+
+    if (props.store.gameSettings.gameType !== newGameSettings.gameType) {
+      toast("Not supported changing game type");
+    } else {
+      gameObject.setGameSettings(newGameSettings);
+    }
   };
 
   if (!props.store.socket && !inTestMode) {
@@ -168,7 +167,6 @@ const GameRoom = (props: IGameRoom) => {
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
       if (gameObject) {
-        console.log("destroying game");
         gameObject.destroyGame();
         /** do some kind of back to waiting room? */
         props.store.socket.emit(dts_back_to_waiting_room, {});
@@ -207,7 +205,7 @@ const GameRoom = (props: IGameRoom) => {
         store={props.store}
         userId={user?.uid}
         isTestMode={props.isTestMode}
-        updateSettings={updateSettings}
+        updateGameSettings={updateGameSettings}
       />
       <EndOfGameModal
         open={endOfGameModalOpen}

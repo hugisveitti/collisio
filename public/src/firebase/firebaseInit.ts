@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { createUserWithEmailAndPassword, FacebookAuthProvider, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { toast } from "react-toastify";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { getFirebaseConfig } from "./firebaseConfig";
 import { inDevelopment } from "../utils/settings";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -28,6 +28,9 @@ const getMyFirestore = () => {
 }
 
 export const firestore = getMyFirestore()
+if (inDevelopment) {
+    connectFirestoreEmulator(firestore, "localhost", 8000)
+}
 
 export const auth = getAuth(app)
 getRedirectResult(auth).then(res => {

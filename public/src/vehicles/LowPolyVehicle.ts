@@ -909,14 +909,20 @@ export class LowPolyVehicle implements IVehicle {
                 this.scene.scene.remove(tire)
             }
         }
+        if (this.zeroVec) {
+            Ammo.destroy(this.zeroVec)
+        }
+        /** dont know if I need to check */
+        if (this.vector) {
+            Ammo.destroy(this.vector)
+        }
+        if (this.vector2) {
+            Ammo.destroy(this.vector2)
+        }
+        if (this.p) {
 
-        Ammo.destroy(this.zeroVec)
-
-        Ammo.destroy(this.vector)
-        Ammo.destroy(this.vector2)
-        Ammo.destroy(this.tm)
-        Ammo.destroy(this.p)
-        Ammo.destroy(this.q)
+            //  Ammo.destroy(this.p)
+        }
     }
 
 }

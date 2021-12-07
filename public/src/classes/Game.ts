@@ -76,9 +76,27 @@ const getNonActiveTrackNames = (): TrackName[] => {
     return tracks
 }
 
+export const getGameTypeFromTrackName = (trackName: TrackName): GameType | undefined => {
+    for (let i = 0; i < allTrackNames.length; i++) {
+        if (allTrackNames[i].type === trackName) {
+            return allTrackNames[i].gameType
+        }
+    }
+    return undefined
+}
+
 export const nonActiveTrackNames: TrackName[] = getNonActiveTrackNames()
 export const defaultRaceTrack: TrackName = "farm-track"
 export const defaultTagTrack: TrackName = "simple-tag-course"
+
+export const getDefaultTrackFromGameType = (gameType: GameType) => {
+    switch (gameType) {
+        case "tag":
+            return defaultTagTrack
+        default:
+            return defaultRaceTrack
+    }
+}
 
 export interface IPlayerConnection {
     playerName: string
@@ -110,6 +128,9 @@ export interface IEndOfRaceInfoPlayer {
     steeringSensitivity: number
     roomTicks: number
     gameTicks: number
+    userAgent: string
+    totalPing: number
+    totalPingsGotten: number
 }
 
 export interface IPlayerGameInfo {

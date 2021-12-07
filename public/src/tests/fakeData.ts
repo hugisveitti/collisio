@@ -79,7 +79,10 @@ export const createFakeHighscoreData = () => {
                 breakingForce: -1,
                 vehicleType: "test",
                 roomTicks: 0,
-                gameTicks: 0
+                gameTicks: 0,
+                userAgent: "test data",
+                totalPing: -1,
+                totalPingsGotten: -1
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",

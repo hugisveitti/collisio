@@ -29,7 +29,7 @@ import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import GameSettingsComponent from "./GameSettingsComponent";
+import GameSettingsComponent from "./GameSettingsContainer";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { green4 } from "../../providers/theme";
@@ -209,8 +209,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               Start game
             </Button>
           </Grid>
-          <Divider variant="middle" style={{ margin: 15 }} />
-          <GameSettingsComponent store={props.store} userId={user?.uid} />
+
+          <GameSettingsComponent store={props.store} />
         </React.Fragment>
       )}
       {onMobile && (

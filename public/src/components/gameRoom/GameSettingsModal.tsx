@@ -1,20 +1,17 @@
 import CloseIcon from "@mui/icons-material/Close";
-import VolumeOff from "@mui/icons-material/VolumeOff";
-import VolumeUp from "@mui/icons-material/VolumeUp";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { useHistory } from "react-router-dom";
 import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { IStore } from "../store";
+import GameSettingsComponent from "../waitingRoom/GameSettingsComponent";
 
 interface IGameSettingsModal {
   open: boolean;
@@ -23,12 +20,10 @@ interface IGameSettingsModal {
   store: IStore;
   userId: string | undefined;
   isTestMode?: boolean;
-  updateSettings: (key: keyof IGameSettings, value: any) => void;
+  updateGameSettings: (gameSettings: IGameSettings) => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
-  const history = useHistory();
-
   if (!props.gameObject) return null;
   return (
     <BasicDesktopModal open={props.open} onClose={props.onClose}>
@@ -48,39 +43,13 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         <Grid item xs={12}>
           <ToFrontPageButton />
         </Grid>
-        <Grid item xs={4} xl={2}>
-          <Button
-            disableElevation
-            variant="contained"
-            onClick={() => {
-              props.updateSettings(
-                "useShadows",
-                !props.store.gameSettings.useShadows
-              );
-              const newGameSettings = {
-                ...props.store.gameSettings,
-                useShadows: !props.store.gameSettings.useSound,
-              };
-              props.store.setGameSettings(newGameSettings);
-            }}
-          >
-            Shadows {props.store.gameSettings.useShadows ? "On" : "Off"}
-          </Button>
-        </Grid>
-        <Grid item xs={4} xl={1}>
-          <IconButton
-            onClick={() => {
-              props.updateSettings(
-                "useSound",
-                !props.store.gameSettings.useSound
-              );
-            }}
-          >
-            {props.store.gameSettings.useSound ? <VolumeUp /> : <VolumeOff />}
-          </IconButton>
+        <Grid item xs={12}>
+          <GameSettingsComponent
+            gameSettings={props.store.gameSettings}
+            onChange={props.updateGameSettings}
+          />
         </Grid>
 
-        <Grid item xs={4} xl={9} />
         <Grid item xs={4}>
           <Button
             disableElevation
@@ -135,7 +104,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                 previewVehicle={false}
               />
             </Grid>
-            <Grid item xs={4}>
+            {/* <Grid item xs={4}>
               <TrackSelect
                 value={props.store.gameSettings.trackName}
                 onChange={(trackName) => {
@@ -155,7 +124,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                 gameType={props.store.gameSettings.gameType}
                 showMapPreview={false}
               />
-            </Grid>
+            </Grid> */}
           </React.Fragment>
         )}
       </Grid>

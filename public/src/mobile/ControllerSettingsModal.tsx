@@ -17,7 +17,7 @@ interface IControllerSettingsModal {
   resetOrientation: () => void;
   socket: Socket;
   gameActions: GameActions;
-  sendGameActions: () => void;
+
   loading: boolean;
 }
 
@@ -49,7 +49,6 @@ const ControllerSettingsModal = (props: IControllerSettingsModal) => {
           user={props.user}
           store={props.store}
           gameActions={props.gameActions}
-          sendGameActions={props.sendGameActions}
         />
       )}
     </BasicModal>

@@ -106,6 +106,9 @@ export class GameScene extends Scene3D implements IGameScene {
     beepC4: Audio
 
 
+    totalPing: number
+    totalPingsGotten: number
+
 
     constructor() {
         super()
@@ -150,7 +153,8 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameInfoDiv.appendChild(this.playerInfosContainer)
 
 
-
+        this.totalPing = 0
+        this.totalPingsGotten = 0
     }
 
     async addLights() {
@@ -599,6 +603,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setGameSettings(gameSettings: IGameSettings) {
+
         if (this.gameSettings.trackName !== gameSettings.trackName) {
             this.setNeedsReload(true)
         }
@@ -678,7 +683,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
     restartGame() {
-
+        console.log("restart game, needs reload:", this.needsReload)
         if (this.needsReload) {
             this._everythingReady = false
             this.gameStarted = false
@@ -787,7 +792,10 @@ export class GameScene extends Scene3D implements IGameScene {
         this.socket.once(std_ping_test_callback, () => {
             const ping = Date.now() - start
             this.pingInfo.innerHTML = `ping ${ping}ms`
+            this.totalPing += ping
+            this.totalPingsGotten += 1
         })
+
     }
 
     resetVehicles() {

@@ -30,6 +30,7 @@ import {
 } from "../shared-backend/shared-stuff";
 import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
 import FullscreenButton from "../components/inputs/FullscreenButton";
+import GameSettingsComponent from "../components/waitingRoom/GameSettingsComponent";
 
 export const invertedControllerKey = "invertedController";
 
@@ -42,7 +43,6 @@ interface IControllerSettingsComponent {
   user: IUser;
   store: IStore;
   gameActions: GameActions;
-  sendGameActions: () => void;
 }
 
 const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
@@ -62,17 +62,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       props.store.socket.emit(mts_user_settings_changed, newUserSettings);
       props.store.setUserSettings(newUserSettings);
     }
-  };
-
-  const updateGameSettings = (key: keyof IGameSettings, value: any) => {
-    const newGameSettings = {
-      ...props.store.gameSettings,
-    };
-
-    // @ts-ignore
-    newGameSettings[key] = value;
-    props.store.setGameSettings(newGameSettings);
-    setLocalGameSetting(key, value);
   };
 
   const updateVehicleSettings = (key: keyof IVehicleSettings, value: any) => {
@@ -111,85 +100,33 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       </Grid>
       {props.store.player.isLeader && (
         <>
+          <Grid item xs={12} sm={6}>
+            <Typography>
+              To update the track selection you must restart the game.
+            </Typography>
+          </Grid>
           <Grid item xs={6} sm={4}>
             <Button
               fullWidth
               variant="contained"
               onClick={() => {
                 props.gameActions.restart = true;
-                props.sendGameActions();
+                props.onClose();
+
                 /**
                  * is this a hacky way to set restart to false?
                  */
-                setTimeout(() => {
-                  props.gameActions.restart = false;
-                  props.onClose();
-                }, 150);
               }}
             >
               Restart Game
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4}>
-            <IconButton
-              onClick={() => {
-                updateGameSettings(
-                  "useSound",
-                  !props.store.gameSettings.useSound
-                );
+          <Grid item xs={12}>
+            <GameSettingsComponent
+              gameSettings={props.store.gameSettings}
+              onChange={(newGameSettings) => {
+                props.store.setGameSettings(newGameSettings);
               }}
-            >
-              {props.store.gameSettings.useSound ? (
-                <VolumeUpIcon />
-              ) : (
-                <VolumeOffIcon />
-              )}
-            </IconButton>
-          </Grid>
-          <Grid item xs={6} sm={4}>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={() => {
-                updateGameSettings(
-                  "useShadows",
-                  !props.store.gameSettings.useShadows
-                );
-              }}
-            >
-              Shadows {props.store.gameSettings.useShadows ? "On" : "Off"}
-            </Button>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Typography>
-              To update the track selection you must restart the game.
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TrackSelect
-              showMapPreview={false}
-              value={props.store.gameSettings.trackName}
-              excludedTracks={nonActiveTrackNames}
-              gameType={props.store.gameSettings.gameType}
-              onChange={(value) => {
-                updateGameSettings("trackName", value);
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={6} sm={4}>
-            <TextField
-              value={
-                props.store.gameSettings.numberOfLaps
-                  ? props.store.gameSettings.numberOfLaps
-                  : ""
-              }
-              type="number"
-              label="No. of laps"
-              onChange={(e) =>
-                updateGameSettings("numberOfLaps", +e.target.value)
-              }
             />
           </Grid>
         </>

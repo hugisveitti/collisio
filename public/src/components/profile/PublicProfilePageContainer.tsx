@@ -45,10 +45,9 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
           setProfile(res.data);
         } else {
           toast.error(res.message);
-          setTimeout(() => {
-            /** toast doesnt appear */
-            history.push(frontPagePath);
-          }, 3000);
+
+          /** toast doesnt appear */
+          history.push(frontPagePath);
         }
       });
       getPlayerBestScores(profileId, (data) => {

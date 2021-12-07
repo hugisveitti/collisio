@@ -2,6 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import {
+  getGameTypeFromTrackName,
+  getDefaultTrackFromGameType,
+} from "../classes/Game";
+import {
   defaultGameSettings,
   getAllLocalGameSettings,
 } from "../classes/localGameSettings";
@@ -71,6 +75,15 @@ const Routes = () => {
   useEffect(() => {
     if (!inTestMode) {
       const _gameSettings = getAllLocalGameSettings();
+
+      if (
+        _gameSettings.gameType !==
+        getGameTypeFromTrackName(_gameSettings.trackName)
+      ) {
+        _gameSettings.trackName = getDefaultTrackFromGameType(
+          _gameSettings.gameType
+        );
+      }
       store.setGameSettings(_gameSettings);
     }
 

@@ -54,6 +54,7 @@ const ConnectToWaitingRoomComponent = (
     socket.emit(dts_create_room, {
       data: {
         gameSettings: props.store.gameSettings,
+        desktopUserId: user?.uid,
       },
     });
     socket.once(std_room_created_callback, (response: ISocketCallback) => {

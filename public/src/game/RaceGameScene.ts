@@ -45,6 +45,8 @@ export class RaceGameScene extends GameScene {
 
     raceFinished: boolean
 
+
+
     constructor() {
         super()
 
@@ -66,6 +68,7 @@ export class RaceGameScene extends GameScene {
 
         this.hasShowStartAnimation = false
         this.raceFinished = false
+
     }
 
     async create() {
@@ -383,7 +386,10 @@ export class RaceGameScene extends GameScene {
             breakingForce: this.vehicles[i].breakingForce,
             steeringSensitivity: this.vehicles[i].steeringSensitivity,
             roomTicks: this.roomTicks,
-            gameTicks: this.gameTicks
+            gameTicks: this.gameTicks,
+            userAgent: navigator.userAgent,
+            totalPing: this.totalPing,
+            totalPingsGotten: this.totalPingsGotten
         }
 
         if (this.gameRoomActions.playerFinished) {

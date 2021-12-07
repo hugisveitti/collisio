@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
 var uuid_1 = require("uuid");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
+var serverFirebaseFunctions_1 = require("../serverFirebaseFunctions");
 var ServerPlayer_1 = require("./ServerPlayer");
 var TestRoom_1 = __importDefault(require("./TestRoom"));
 var successStatus = "success";
@@ -124,6 +125,7 @@ var Room = /** @class */ (function () {
         this.roomId = roomId;
         this.io = io;
         this.gameStarted = false;
+        this.desktopUserId = undefined;
         this.isConnected = true;
         this.deleteRoomCallback = deleteRoomCallback;
         this.setSocket(socket);
@@ -172,11 +174,15 @@ var Room = /** @class */ (function () {
     Room.prototype.setupLeftWebsiteListener = function () {
         var _this = this;
         this.socket.on("disconnect", function () {
+            console.log("disconnected");
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 player.desktopDisconnected();
             }
             _this.deleteRoomCallback();
+            if (_this.desktopUserId) {
+                (0, serverFirebaseFunctions_1.removeAvailableRoom)(_this.desktopUserId);
+            }
         });
     };
     Room.prototype.setupVechilesReadyListener = function () {

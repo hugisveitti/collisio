@@ -136,7 +136,7 @@ const AdminComponent = (props: IAdminComponent) => {
                 <Grid item xs={4} sm={3}>
                   <TextField
                     type="number"
-                    value={nRoomEntires}
+                    value={nRoomEntires ? nRoomEntires : ""}
                     onChange={(e) => setNRoomEntires(+e.target.value)}
                   />
                 </Grid>
@@ -189,7 +189,7 @@ const AdminComponent = (props: IAdminComponent) => {
                 <Grid item xs={4} sm={3}>
                   <TextField
                     type="number"
-                    value={nGameEntires}
+                    value={nGameEntires ? nGameEntires : ""}
                     onChange={(e) => setNGameEntires(+e.target.value)}
                   />
                 </Grid>

@@ -1,12 +1,8 @@
-import { admin, firestore } from "./firebase-config";
-import { Request, Response } from "express";
-
-import * as path from "path";
-//import { get, limitToLast, onValue, orderByChild, QueryConstraint, ref } from "@firebase/database";
-//import { query } from "firebase/database";
-import { isAdmin } from "@firebase/util";
 import { doc, getDoc, getDocs, limit, orderBy, query } from "@firebase/firestore";
+import { Request, Response } from "express";
 import { collection } from "firebase/firestore";
+import { admin, firestore } from "./firebase-config";
+
 
 const buildFolder = "dist"
 
@@ -71,15 +67,6 @@ export const adminFunctions = (app: any) => {
         n?: number
     }
 
-    // const createFirebaseQueries = (queryParams: IQueryParams): QueryConstraint[] => {
-    //     const queries = []
-
-    //     if (queryParams.n) {
-    //         queries.push(limitToLast(queryParams.n))
-    //     }
-    //     console.log("queries", queries)
-    //     return queries
-    // }
 
 
     const getRoomData = (userId: string, queryParams: IQueryParams, callback: (callbackData: ICallbackData) => void) => {
