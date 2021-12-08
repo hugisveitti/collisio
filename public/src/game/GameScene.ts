@@ -208,7 +208,7 @@ export class GameScene extends Scene3D implements IGameScene {
     async preload() {
 
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
-        console.log("warp", warp)
+
         this.addLights()
 
         const listener = new AudioListener()
@@ -707,7 +707,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
 
             this.restart().then(() => {
-                console.log("reset scene complete")
+
             })
 
         } else {

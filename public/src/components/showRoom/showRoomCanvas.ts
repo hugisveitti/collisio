@@ -118,7 +118,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     animate()
     // controls.addEventListener('change', () => {
-    //     console.log("change")
+    // 
     //     animate()
     // });
 

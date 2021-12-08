@@ -43,7 +43,7 @@ const AdminComponent = (props: IAdminComponent) => {
         .then((resData) => {
           if (resData.statusCode === 200) {
             const data = resData.data;
-            console.log("res data", data);
+
             const keys = Object.keys(data);
             const arr = [];
             for (let key of keys) {

@@ -486,8 +486,7 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     stop() {
-        // this.vehicle.setBrake(100, BACK_RIGHT)
-        // this.vehicle.setBrake(100, BACK_LEFT)
+
         this.zeroEngineForce()
         this.chassisMesh.body.setCollisionFlags(1)
         this.chassisMesh.body.setVelocity(0, 0, 0)
@@ -495,8 +494,7 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     start() {
-        // this.vehicle.setBrake(0, BACK_RIGHT)
-        // this.vehicle.setBrake(0, BACK_LEFT)
+
         this.chassisMesh.body.setCollisionFlags(0)
     };
 

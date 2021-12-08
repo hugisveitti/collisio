@@ -57,12 +57,6 @@ export class RaceCourse extends Course implements IRaceCourse {
             if (a.name > b.name) return 1
             return -1
         })
-
-        console.log("checkpoints and spawns", this.checkpoints, this.checkpointSpawns)
-
-
-
-
         this.setupCollisionListeners()
     }
 
@@ -80,7 +74,7 @@ export class RaceCourse extends Course implements IRaceCourse {
                     }
                 })
             } catch {
-                console.log("No goal object")
+                console.warn("No goal object")
             }
         }
         if (this.checkpoints) {
@@ -90,7 +84,7 @@ export class RaceCourse extends Course implements IRaceCourse {
                 if (checkpointNumber === 0) {
                     checkpointNumber = 1
                 }
-                console.log("checkpoint number", checkpointNumber)
+
 
                 checkpoint.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
                     if (otherObject.name.slice(0, 7) === "vehicle") {

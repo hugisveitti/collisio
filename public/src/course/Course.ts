@@ -60,10 +60,7 @@ const setLoadingDivText = async (text: string) => {
     createText()
 }
 
-// setTimeout(() => {
 
-//     setLoadingDivText("hello")
-// }, 100)
 
 const clearLoadingDivText = () => {
     loadImage.setAttribute("style", "display:none;")
@@ -143,7 +140,7 @@ export class Course implements ICourse {
         loader.load(getStaticPath(`models/${this.trackName}.gltf`), (gltf: GLTF) => {
             this.gameScene.scene.add(gltf.scene)
             this.courseScene = gltf.scene
-            console.log("gltf", gltf)
+
             const itemKeys = Object.keys(gameItems)
 
 

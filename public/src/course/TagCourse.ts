@@ -101,7 +101,7 @@ export class Coin {
     }
 
     update() {
-        console.log("update coin")
+
         this.model.rotation.y = this.ry //.set(0, this.ry, 0)
         this.ry += this.dry
 

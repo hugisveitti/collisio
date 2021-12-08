@@ -49,8 +49,6 @@ export class TagGameScene extends GameScene {
     constructor() {
         super()
 
-        console.log("creating tag game scene")
-
         this.gameInfoDiv.appendChild(totalTimeDiv)
         totalTimeDiv.setAttribute("id", "totalTime")
 
@@ -234,7 +232,6 @@ export class TagGameScene extends GameScene {
         }
 
         const changeTags = this.tagObjects[vehicleNumber].resetPressed()
-        console.log("change tags", changeTags)
 
 
         if (changeTags) {
@@ -251,7 +248,7 @@ export class TagGameScene extends GameScene {
             if (oldIt !== -1) {
                 this.handleVehicleTagged(vehicleNumber, oldIt)
             } else if (oldIt === vehicleNumber) {
-                console.log("old it is it")
+
             }
         } else {
             this.setViewImportantInfo(`${this.tagObjects[vehicleNumber].getRemainingResets()} resets left`, vehicleNumber, true)
@@ -290,7 +287,7 @@ export class TagGameScene extends GameScene {
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()
             }
-            // console.log("time", time, this.ticks)
+
             if (this.ticks % 60 === 0) {
 
                 this.updatePing()

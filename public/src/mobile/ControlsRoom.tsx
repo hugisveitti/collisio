@@ -85,11 +85,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     alpha: 0,
   });
 
-  const handleTouchStart = (evt) => {
-    evt.preventDefault();
-    console.log("touchstart.");
-  };
-
   // change these colors!
   const downColor = blue4; // "#005c46";
   const upColor = orange2; // "#fcba03";
@@ -168,11 +163,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       history.push(frontPagePath);
       /** go to front page? */
     });
-
-    // window.addEventListener("touchstart", handleTouchStart, false);
-    // window.addEventListener("touchend", handleTouchStart, false);
-    // window.addEventListener("touchcancel", handleTouchStart, false);
-    // window.addEventListener("touchmove", handleTouchStart, false);
 
     return () => {
       props.store.socket.off(stm_desktop_disconnected);

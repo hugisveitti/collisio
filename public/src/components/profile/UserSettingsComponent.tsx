@@ -34,7 +34,6 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
 
   useEffect(() => {
     getDBUserSettings(props.userId, (settings) => {
-      console.log("settings", settings);
       setUserSettings(settings);
 
       setVehicleSettings(settings.vehicleSettings);

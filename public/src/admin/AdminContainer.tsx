@@ -38,10 +38,7 @@ const AdminContainer = () => {
 
       <div>
         {!user ? (
-          <LoginComponent
-            onClose={() => console.log("close")}
-            signInWithPopup
-          />
+          <LoginComponent onClose={() => {}} signInWithPopup />
         ) : (
           <>{isAdmin && <AdminComponent userTokenId={userTokenId} />}</>
         )}

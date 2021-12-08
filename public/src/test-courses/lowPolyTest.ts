@@ -278,14 +278,13 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     handleCoinCollided(vehicleName: string, coin: Coin) {
-        console.log("vehcile", vehicleName, "collided")
+
         const vehicleNumber = getVehicleNumber(vehicleName)
-        console.log("vehicle number", vehicleNumber)
-        console.log("is it", this.isIt)
+
         if (vehicleNumber !== this.isIt) {
             coin.removeFromScene(this)
         } else {
-            console.log("players that are it cannot collect coins")
+
         }
     }
 
@@ -568,7 +567,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
             this.vehicles = allVehicles
-            console.log("game type", this.getGameType());
+
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {
                 v.unpause()
@@ -597,7 +596,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     resetVehicleCallback(vehicleNumber: number) {
-        console.log("vehicle reset", vehicleNumber)
+
     }
 
 

@@ -62,9 +62,7 @@ const StressTestRow = (props: IStressTestRow) => {
   }, [ping]);
 
   useEffect(() => {
-    props.connection.desktopSocket.on("disconnect", () => {
-      console.log("socket disconencted", props.connection.roomId);
-    });
+    props.connection.desktopSocket.on("disconnect", () => {});
   }, []);
 
   return (

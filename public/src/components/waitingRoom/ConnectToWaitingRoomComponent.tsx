@@ -129,7 +129,7 @@ const ConnectToWaitingRoomComponent = (
         setConnectingToRoom(false);
       } else {
         toast.success(response.message);
-        console.log("res", response);
+
         props.store.setGameSettings(response.data.gameSettings);
         props.store.setPlayer(response.data.player);
         goToWaitingRoom(response.data.roomId);
