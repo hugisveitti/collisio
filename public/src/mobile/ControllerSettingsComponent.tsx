@@ -195,9 +195,14 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       <Grid item xs={12}></Grid>
 
       <Grid item xs={12} style={{ textAlign: "center" }}>
-        <Link to={frontPagePath} style={{ textDecoration: "none" }}>
-          <Button startIcon={<ExitToAppIcon />}>Quit game</Button>
-        </Link>
+        <Button
+          onClick={() => {
+            window.location.href = frontPagePath;
+          }}
+          startIcon={<ExitToAppIcon />}
+        >
+          Quit game
+        </Button>
       </Grid>
     </Grid>
   );

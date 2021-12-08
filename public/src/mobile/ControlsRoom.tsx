@@ -3,6 +3,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
+import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
@@ -52,6 +53,23 @@ const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
   controller.beta = Math.round(beta);
 };
 
+const controller2 = new MobileControls();
+const createOrientationInterval = (callback: (c: MobileControls) => void) => {
+  window.addEventListener("deviceorientation", (e) => {
+    const gamma = e.gamma ?? 0;
+    const beta = e.beta ?? 0;
+    const alpha = e.alpha ?? 0;
+
+    controller2.alpha = Math.round(alpha);
+    controller2.gamma = Math.round(gamma);
+    controller2.beta = Math.round(beta);
+  });
+
+  setInterval(() => {
+    callback(controller2);
+  }, 1000 / 60);
+};
+
 const getSteeringDirection = () => {
   if (controller.beta < 0) {
     return "Right";
@@ -78,6 +96,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const [orientation, setOrientation] = useState({
+    gamma: 0,
+    beta: 0,
+    alpha: 0,
+  });
+
+  const [orientation2, setOrientation2] = useState({
     gamma: 0,
     beta: 0,
     alpha: 0,
@@ -162,6 +186,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       /** go to front page? */
     });
 
+    createOrientationInterval((c) => {
+      const { gamma, beta, alpha } = c;
+      setOrientation2({
+        gamma,
+        beta,
+        alpha,
+      });
+    });
+
     return () => {
       props.store.socket.off(stm_desktop_disconnected);
       window.clearInterval(sendControlsInterval);
@@ -203,6 +236,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       }
     });
 
+    // saving game data from game
     props.store.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
       if (user?.uid) {
         // saveRaceDataGame(data);
@@ -431,6 +465,21 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         Alpha:{orientation.alpha.toFixed(0)}
         <br />
         {steeringDirection}
+      </div>
+      <div
+        id="orientation-info"
+        style={{
+          ...infoStyles,
+          transform: isPortrait ? "rotate(-90deg)" : "",
+          top: 10,
+          left: screenWidth / 2,
+        }}
+      >
+        Beta2:{orientation2.beta.toFixed(0)}
+        <br />
+        Gamma2:{orientation2.gamma.toFixed(0)}
+        <br />
+        Alpha2:{orientation2.alpha.toFixed(0)}
       </div>
       <DeviceOrientationPermissionComponent
         onMobile={true}

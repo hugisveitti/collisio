@@ -252,9 +252,9 @@ export const vehicleConfigs = {
         suspensionRestLength: .4,
 
 
-        mass: 1000,
-        engineForce: 10000,
-        breakingForce: 200,
+        mass: 500,
+        engineForce: 5500,
+        breakingForce: 120,
         is4x4: false,
 
     },

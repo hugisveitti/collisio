@@ -50,6 +50,7 @@ const GameInfoRow = (props: IGameInfoRow) => {
             ? props.gameData.playersInfo[0].name
             : "No leader"}
         </TableCell>
+        <TableCell>{props.gameData.avgPing}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
@@ -118,6 +119,7 @@ const AdminGameDataTable = (props: IGameDataTable) => {
             <TableCell>Track name</TableCell>
             <TableCell>Number of laps</TableCell>
             <TableCell>Leader</TableCell>
+            <TableCell>Average ping</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
