@@ -15,7 +15,7 @@ interface IProps {
   userId: string;
 }
 
-export default (props: IProps) => {
+const GameDataTableRow = (props: IProps) => {
   const [open, setOpen] = useState(false);
   // let open = false;
   const { playerData } = props;
@@ -86,3 +86,5 @@ export default (props: IProps) => {
     </React.Fragment>
   );
 };
+
+export default GameDataTableRow;

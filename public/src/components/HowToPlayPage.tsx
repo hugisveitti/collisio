@@ -192,7 +192,7 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
             <Grid item xs={12}>
               <Typography>
                 The controller looks like the image above. There are four
-                buttons, 'F', 'B', 'reset' and 'settings'
+                buttons, 'F', 'B', 'reset' and 'settings / pause'
               </Typography>
             </Grid>
 
@@ -213,7 +213,7 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
                 <ListItem>
                   <ListItemText
                     primary="Reset"
-                    secondary="If your vehicle goes in some unwanted state such as lands on its back or gets stuck, the pressing the reset button will get you back to a checkpoint position."
+                    secondary="If your vehicle goes in some unwanted state such as lands on its back or gets stuck, the pressing the reset button will get you back to a checkpoint position. When the race is over the restart button will restart the game"
                   />
                 </ListItem>
                 <ListItem>

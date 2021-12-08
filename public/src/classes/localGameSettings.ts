@@ -57,3 +57,11 @@ export const getAllLocalGameSettings = () => {
 
     return gameSettings
 }
+
+export const setAllLocalGameSettings = (gameSettings: IGameSettings) => {
+    const keys = Object.keys(gameSettings)
+    for (let key of keys) {
+        // @ts-ignore
+        setLocalGameSetting(key, gameSettings[key])
+    }
+}

@@ -1,36 +1,27 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { nonActiveTrackNames } from "../classes/Game";
-import {
-  IGameSettings,
-  setLocalGameSetting,
-} from "../classes/localGameSettings";
 import { IUser, IUserSettings, IVehicleSettings } from "../classes/User";
-import TrackSelect from "../components/inputs/TrackSelect";
+import FullscreenButton from "../components/inputs/FullscreenButton";
 import VehicleSelect from "../components/inputs/VehicleSelect";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
+import GameSettingsComponent from "../components/waitingRoom/GameSettingsComponent";
 import { setDBUserSettings } from "../firebase/firestoreFunctions";
 import {
   GameActions,
   mts_user_settings_changed,
 } from "../shared-backend/shared-stuff";
 import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
-import FullscreenButton from "../components/inputs/FullscreenButton";
-import GameSettingsComponent from "../components/waitingRoom/GameSettingsComponent";
 
 export const invertedControllerKey = "invertedController";
 

@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import { defaultRaceTrack, defaultTagTrack } from "../../classes/Game";
 import {
   IGameSettings,
+  setAllLocalGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import {
@@ -24,6 +25,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
   useEffect(() => {
     props.store.socket.on(stmd_game_settings_changed, (data) => {
       props.store.setGameSettings(data.gameSettings);
+      setAllLocalGameSettings(data.gameSettings);
     });
     return () => {
       props.store.socket.off(stmd_game_settings_changed);

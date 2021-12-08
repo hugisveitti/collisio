@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IRoomInfo } from "../classes/Game";
 import { auth, signOut } from "../firebase/firebaseInit";
 import RoomDataTable from "./RoomDataTable";
-import GameDataTable from "./GameDataTable";
+import GameDataTable from "./AdminGameDataTable";
 import StressTestComponent from "../testMode/StressTestComponent";
 
 interface IAdminComponent {

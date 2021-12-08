@@ -1,6 +1,6 @@
 import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
-import { Audio, AudioListener, Color, Font, Mesh, PerspectiveCamera, HemisphereLight, PointLight, AmbientLight, Fog, SphereGeometry, ShaderMaterial, BackSide, FontLoader } from "three";
+import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, FontLoader, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
@@ -11,7 +11,7 @@ import { getBeep } from "../sounds/gameSounds";
 import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
-import { loadLowPolyVehicleModels, LowPolyVehicle, staticCameraPos } from "../vehicles/LowPolyVehicle";
+import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import "./game-styles.css";
 import { IGameScene } from "./IGameScene";
@@ -54,6 +54,7 @@ export interface IGameRoomActions {
     gameFinished?: (data: IEndOfGameData) => void
     updateScoreTable?: (data: IScoreInfo) => void
     playerFinished?: (data: IEndOfRaceInfoPlayer) => void
+    closeModals?: () => void
 }
 
 
@@ -525,7 +526,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].pause()
+            if (this.vehicles[i].isReady) {
+                this.vehicles[i].pause()
+            }
         }
         this._togglePauseGame(false)
     }
@@ -537,7 +540,10 @@ export class GameScene extends Scene3D implements IGameScene {
         this.startGameSong()
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].unpause()
+            if (this.vehicles[i].isReady) {
+                this.vehicles[i].unpause()
+            }
+
         }
         this._togglePauseGame(true)
     }
@@ -683,7 +689,11 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
     restartGame() {
-        console.log("restart game, needs reload:", this.needsReload)
+        if (this.gameRoomActions?.closeModals) {
+            this.gameRoomActions.closeModals()
+        }
+
+
         if (this.needsReload) {
             this._everythingReady = false
             this.gameStarted = false
@@ -719,7 +729,6 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setPlayers(players: IPlayerInfo[]) {
-        console.log("setting players", this.players)
         this.players = players
     }
 
@@ -806,10 +815,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this._resetVehicles()
     }
 
-    // to be overwritten
-    _resetVehicles() {
+    _resetVehicles() { }
 
-    }
+
 
     /** function called if vehicle position is reset */
     resetVehicleCallback(vehicleNumber: number) {

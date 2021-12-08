@@ -1,3 +1,11 @@
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Collapse from "@mui/material/Collapse";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -5,9 +13,8 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import React from "react";
+import React, { useState } from "react";
 import { IRoomInfo } from "../classes/Game";
-import { inputBackgroundColor } from "../providers/theme";
 import { getDateFromNumber } from "../utils/utilFunctions";
 
 interface IRoomInfoRow {
@@ -15,20 +22,53 @@ interface IRoomInfoRow {
 }
 
 const RoomInfoRow = (props: IRoomInfoRow) => {
+  const [open, setOpen] = useState(false);
+
+  const keys = Object.keys(props.roomInfo);
+
   return (
-    <TableRow>
-      <TableCell>{props.roomInfo.roomId}</TableCell>
-      <TableCell>{getDateFromNumber(props.roomInfo.date)}</TableCell>
-      <TableCell>{props.roomInfo.players?.length ?? "-"}</TableCell>
-      <TableCell>
-        {props.roomInfo.players?.length > 0
-          ? props.roomInfo.players[0].playerName
-          : "No leader"}
-      </TableCell>
-      <TableCell>{props.roomInfo.canceledGame ? "Yes" : "No"}</TableCell>
-      <TableCell>{props.roomInfo.gameSettings.trackName}</TableCell>
-      <TableCell>{props.roomInfo.gameSettings.numberOfLaps}</TableCell>
-    </TableRow>
+    <>
+      <TableRow>
+        <TableCell>
+          <IconButton onClick={() => setOpen(!open)}>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </TableCell>
+        <TableCell>{props.roomInfo.roomId}</TableCell>
+        <TableCell>{getDateFromNumber(props.roomInfo.date)}</TableCell>
+        <TableCell>{props.roomInfo.players?.length ?? "-"}</TableCell>
+        <TableCell>
+          {props.roomInfo.players?.length > 0
+            ? props.roomInfo.players[0].playerName
+            : "No leader"}
+        </TableCell>
+        <TableCell>{props.roomInfo.canceledGame ? "Yes" : "No"}</TableCell>
+        <TableCell>{props.roomInfo.gameSettings.trackName}</TableCell>
+        <TableCell>{props.roomInfo.gameSettings.numberOfLaps}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <Collapse in={open}>
+            <List>
+              {keys.map((k) => {
+                if (typeof props.roomInfo[k] === "object") {
+                  return null;
+                }
+                return (
+                  <ListItem key={k}>
+                    <ListItemText
+                      secondary={k}
+                      primary={props.roomInfo[k].toString()}
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+            <Divider variant="middle" />
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
   );
 };
 
@@ -48,6 +88,7 @@ const RoomDataTable = (props: IRoomDataTable) => {
       <Table>
         <TableHead>
           <TableRow>
+            <TableCell />
             <TableCell>RoomId</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Number of players</TableCell>

@@ -242,8 +242,10 @@ export class RaceGameScene extends GameScene {
         }
     }
 
-    _resetPlayer(idx: number) {
+    /** function called if vehicle position is reset */
+    resetVehicleCallback(vehicleNumber: number) {
         if (this.raceFinished) {
+            this.raceFinished = false
             this.restartGame()
         }
     }
@@ -423,7 +425,8 @@ export class RaceGameScene extends GameScene {
             roomId: this.roomId,
             date: getDateNow(),
             roomTicks: this.roomTicks,
-            gameTicks: this.gameTicks
+            gameTicks: this.gameTicks,
+            avgPing: this.totalPingsGotten === 0 ? -1 : this.totalPing / this.totalPingsGotten
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })

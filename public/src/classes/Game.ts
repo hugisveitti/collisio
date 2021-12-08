@@ -154,6 +154,7 @@ export interface IEndOfRaceInfoGame {
     gameSettings: IGameSettings
     roomTicks: number
     gameTicks: number
+    avgPing: number
 }
 
 /** while race is going on */

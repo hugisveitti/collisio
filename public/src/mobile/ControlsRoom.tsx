@@ -9,9 +9,6 @@ import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
 import { blue4, orange2 } from "../providers/theme";
-// import {
-//   saveRaceDataGame,
-// } from "../firebase/firebaseFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
   GameActions,
@@ -38,6 +35,36 @@ interface IControlsRoomProps {
 const controller = new MobileControls();
 const gameActions = new GameActions();
 
+const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
+  // -1 if inverted
+
+  const gamma = e.gamma ?? 0;
+  const beta = e.beta ?? 0;
+  const alpha = e.alpha ?? 0;
+  if (e.gamma === null && e.beta === 0 && e.alpha === null) {
+    toast.error(
+      "Your device orientation is not working. Please reset orientation in settings."
+    );
+  }
+
+  controller.alpha = Math.round(alpha);
+  controller.gamma = Math.round(gamma);
+  controller.beta = Math.round(beta);
+};
+
+const getSteeringDirection = () => {
+  if (controller.beta < 0) {
+    return "Right";
+  }
+  if (controller.beta > 0) {
+    return "Left";
+  }
+  return "Straight";
+};
+
+/** -1 if inverted */
+let invertedController = 1;
+
 const ControlsRoom = (props: IControlsRoomProps) => {
   const history = useHistory();
   const user = useContext(UserContext);
@@ -61,11 +88,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const upColor = orange2; // "#fcba03";
   const [isPortrait, setIsPortrait] = useState(false);
 
+  const [steeringDirection, setSteeringDirection] = useState("");
+
   const [sendControlsInterval, setSendControlsInterval] = useState(
     undefined as undefined | NodeJS.Timer
   );
-  /** -1 if inverted */
-  const [invertedController, setInvertedController] = useState(1);
 
   const handleUserLoggedIn = () => {};
 
@@ -75,29 +102,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     } else {
       setIsPortrait(window.orientation === 0);
     }
-  };
-
-  const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
-    // -1 if inverted
-
-    const gamma = e.gamma ?? 0;
-    const beta = e.beta ?? 0;
-    const alpha = e.alpha ?? 0;
-    if (e.gamma === null && e.beta === 0 && e.alpha === null) {
-      toast.error(
-        "Your device orientation is not working. Please reset orientation in settings."
-      );
-    }
-
-    controller.alpha = Math.round(alpha);
-    controller.gamma = Math.round(gamma);
-    controller.beta = Math.round(beta) * invertedController;
-
-    setOrientation({
-      gamma,
-      beta,
-      alpha,
-    });
   };
 
   if (!props.store?.roomId && !inTestMode) {
@@ -116,13 +120,19 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       window.addEventListener("deviceorientation", deviceOrientationHandler, {
         capture: true,
       });
-    }, 100);
+    }, 150);
   };
 
   const createSendControlsInterval = () => {
     const _sendControlsInterval = setInterval(() => {
       props.store.socket.emit(mts_controls, controller);
-
+      setSteeringDirection(getSteeringDirection());
+      const { gamma, beta, alpha } = controller;
+      setOrientation({
+        gamma,
+        beta,
+        alpha,
+      });
       // set fps
     }, 1000 / 60);
 
@@ -143,7 +153,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       invertedControllerKey
     );
     if (_invertedController) {
-      setInvertedController(+_invertedController);
+      invertedController = +_invertedController;
     }
 
     props.store.socket.on(stm_desktop_disconnected, () => {
@@ -236,16 +246,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const btnH = isPortrait ? screenHeight / 3 : screenHeight;
 
   const utilBtnSize = screenWidth < 350 ? 60 : 90;
-
-  const getSteeringDirection = () => {
-    if (controller.beta < 0) {
-      return "Right";
-    }
-    if (controller.beta > 0) {
-      return "Left";
-    }
-    return "Straight";
-  };
 
   const sendGameActions = () => {
     props.store.socket.emit(mts_send_game_actions, gameActions);
@@ -430,7 +430,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         <br />
         Alpha:{orientation.alpha.toFixed(0)}
         <br />
-        {getSteeringDirection()}
+        {steeringDirection}
       </div>
       <DeviceOrientationPermissionComponent
         onMobile={true}

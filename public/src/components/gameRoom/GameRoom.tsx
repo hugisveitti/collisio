@@ -6,6 +6,7 @@ import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoPlayer, IScoreInfo } from "../../classes/Game";
 import {
   IGameSettings,
+  setAllLocalGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
@@ -63,10 +64,6 @@ const GameRoom = (props: IGameRoom) => {
     setEndOfGameModalOpen(true);
     saveRaceDataGame(data.endOfRaceInfo);
     setEndOfGameData(data);
-    // if (!inTestMode) {
-    //   saveGameFinished(data.endOfRaceInfo);
-    //   props.store.socket.emit(dts_game_finished, data);
-    // }
   };
 
   const handleUpdateScoreTable = (data: IScoreInfo) => {
@@ -82,12 +79,19 @@ const GameRoom = (props: IGameRoom) => {
   const updateGameSettings = (newGameSettings: IGameSettings) => {
     // this wont change right away so next if statement is okey
     props.store.setGameSettings({ ...newGameSettings });
+    setAllLocalGameSettings(newGameSettings);
 
     if (props.store.gameSettings.gameType !== newGameSettings.gameType) {
       toast("Not supported changing game type");
     } else {
       gameObject.setGameSettings(newGameSettings);
     }
+  };
+
+  const handleCloseModals = () => {
+    setEndOfGameModalOpen(false);
+    setEndOfGameData({});
+    setSettingsModalOpen(false);
   };
 
   if (!props.store.socket && !inTestMode) {
@@ -139,6 +143,7 @@ const GameRoom = (props: IGameRoom) => {
         gameFinished: handelGameFinished,
         updateScoreTable: handleUpdateScoreTable,
         playerFinished: handlePlayerFinished,
+        closeModals: handleCloseModals,
       },
       (_gameObject) => {
         setGameObject(_gameObject);

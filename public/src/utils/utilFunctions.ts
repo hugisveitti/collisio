@@ -5,6 +5,11 @@ export const stringInArray = (st: string, arr: string[]) => {
     return false
 }
 
+/**
+ * 
+ * @param arr array to shuffle
+ * Shuffles the array in place, so it doesn't return anythin
+ */
 export const shuffleArray = (arr: any[]) => {
     const n = 10;
     let j = 0;
