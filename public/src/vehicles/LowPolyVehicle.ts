@@ -130,6 +130,7 @@ export class LowPolyVehicle implements IVehicle {
 
     oldPos: Vector3
 
+    engineSoundLoaded = false
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
 
@@ -503,7 +504,7 @@ export class LowPolyVehicle implements IVehicle {
         this.isPaused = true
         this.zeroEngineForce()
 
-        if (this.engineSound) {
+        if (this.engineSoundLoaded && this.engineSound) {
 
             this.engineSound.stop()
         }
@@ -555,6 +556,7 @@ export class LowPolyVehicle implements IVehicle {
 
             this.engineSound.setLoopEnd(2.5)
             //  this.engineSound.stop()
+            this.engineSoundLoaded = true
 
             /**
              * some bug here
