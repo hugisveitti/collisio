@@ -86,7 +86,7 @@ export const defaultVehicleConfig: IVehicleConfig = {
     maxSuspensionForce: 50000,
     frictionSlip: 8.5,
     rollInfluence: .01,
-    inertia: { x: 12000, y: 2000, z: 12000 },
+    inertia: { x: 4000, y: 2000, z: 4000 },
 
     maxSpeed: 300,
 }

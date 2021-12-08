@@ -20,6 +20,8 @@ export class TagObject {
 
     vehicle: IVehicle
 
+    chocolateTimeout: NodeJS.Timeout
+
     constructor(vehicle: IVehicle) {
         this.isIt = false
         this.coinCount = 0
@@ -52,7 +54,7 @@ export class TagObject {
 
                 this.isChocolate = true
                 this.vehicle.setColor(chocolateColor)
-                setTimeout(() => {
+                this.chocolateTimeout = setTimeout(() => {
                     this.vehicle.setColor(notItColor)
                     this.isChocolate = false
                 }, this.chocolateTime * 1000)
@@ -60,6 +62,7 @@ export class TagObject {
                 this.vehicle.setColor(notItColor)
             }
         } else {
+
             this.vehicle.setColor(itColor)
         }
     }

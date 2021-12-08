@@ -4,7 +4,10 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { IGameSettings } from "../../classes/localGameSettings";
+import {
+  IGameSettings,
+  setLocalGameSetting,
+} from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
@@ -69,13 +72,16 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               <VehicleSelect
                 value={props.store.userSettings.vehicleSettings.vehicleType}
                 onChange={(vehicleType) => {
-                  const newVehicleSettings =
-                    props.store.userSettings.vehicleSettings;
-                  newVehicleSettings.vehicleType = vehicleType;
+                  const newVehicleSettings = {
+                    ...props.store.userSettings.vehicleSettings,
+                    vehicleType,
+                  };
 
-                  const newUserSettings = props.store.userSettings;
-                  newUserSettings.vehicleSettings = newVehicleSettings;
-
+                  const newUserSettings = {
+                    ...props.store.userSettings,
+                    vehicleSettings: newVehicleSettings,
+                  };
+                  window.localStorage.setItem("vehicleType", vehicleType);
                   /**
                    * ONLY FOR TESTING
                    */
@@ -104,27 +110,6 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                 previewVehicle={false}
               />
             </Grid>
-            {/* <Grid item xs={4}>
-              <TrackSelect
-                value={props.store.gameSettings.trackName}
-                onChange={(trackName) => {
-                  props.updateSettings("trackName", trackName);
-                  const newGameSettings = {
-                    ...props.store.gameSettings,
-                    trackName,
-                  };
-                  props.store.setGameSettings(newGameSettings);
-                  props.gameObject.physics.debug.disable();
-                  props.gameObject.setGameSettings(newGameSettings);
-                  props.gameObject.setNeedsReload(true);
-
-                  props.gameObject.restartGame();
-                }}
-                excludedTracks={[]}
-                gameType={props.store.gameSettings.gameType}
-                showMapPreview={false}
-              />
-            </Grid> */}
           </React.Fragment>
         )}
       </Grid>

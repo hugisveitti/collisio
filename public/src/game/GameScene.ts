@@ -109,6 +109,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     totalPing: number
     totalPingsGotten: number
+    time: number
 
 
     constructor() {
@@ -156,6 +157,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.totalPing = 0
         this.totalPingsGotten = 0
+        this.time = 0
     }
 
     async addLights() {

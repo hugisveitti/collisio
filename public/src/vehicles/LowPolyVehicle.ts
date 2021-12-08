@@ -1,4 +1,3 @@
-import { throwStatement } from "@babel/types";
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -7,7 +6,7 @@ import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
-import { numberScaler } from "../utils/utilFunctions";
+import { logScaler, numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -29,7 +28,7 @@ export const getVehicleNumber = (vehicleName: string) => {
 
 
 const soundScaler = numberScaler(1, 5, 0, 330)
-
+const speedScaler = logScaler(300, 0.1, 1)
 
 
 const FRONT_LEFT = 0
@@ -129,9 +128,12 @@ export class LowPolyVehicle implements IVehicle {
     p: Ammo.btVector3
     q: Ammo.btQuaternion
 
+    oldPos: Vector3
+
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
 
+        this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
         this.color = color
         this.name = name
@@ -314,23 +316,16 @@ export class LowPolyVehicle implements IVehicle {
 
 
     toggleSound(useSound: boolean) {
+
+
         this.useEngineSound = useSound
+
         if (!this.engineSound) {
             console.warn("Engine sound not loaded")
             return
         }
 
-        if (useSound === this.engineSound.isPlaying) {
-            /** already doing what we want */
-            return
-        }
 
-        if (useSound) {
-            this.startEngineSound()
-
-        } else if (this.engineSound) {
-            this.engineSound.stop()
-        }
     }
 
 
@@ -507,7 +502,8 @@ export class LowPolyVehicle implements IVehicle {
     pause() {
         this.isPaused = true
         this.zeroEngineForce()
-        if (this.engineSound && this.engineSound.isPlaying) {
+
+        if (this.engineSound) {
 
             this.engineSound.stop()
         }
@@ -562,13 +558,9 @@ export class LowPolyVehicle implements IVehicle {
 
             /**
              * some bug here
+             * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
              */
-            if (this.useEngineSound) {
-                setTimeout(() => {
-
-                    this.toggleSound(true)
-                }, 500)
-            }
+            this.engineSound.stop()
         })
     }
 
@@ -609,8 +601,27 @@ export class LowPolyVehicle implements IVehicle {
 
             const rot = this.chassisMesh.rotation
 
-            const pos = this.getPosition()
+            // I think these are always the same
+            // this.chassisMesh.pos is set to the value of this.getPosition in update()
+            const pos = this.chassisMesh.position.clone() // this.getPosition()
 
+            /**
+             * I am not sure what to do with the chase speed
+             */
+
+
+            this.cameraDiff.subVectors(pos, this.oldPos)
+            let chaseSpeed = speedScaler(Math.abs(this.getCurrentSpeedKmHour()))// 1// this.chaseCameraSpeed
+
+            chaseSpeed = Math.min(1, chaseSpeed)
+            let chaseSpeedY = 0.005
+            if ((Math.abs(this.cameraDiff.x) > 2 || Math.abs(this.cameraDiff.z) > 2) && (Math.abs(this.cameraDiff.x) < 5 || Math.abs(this.cameraDiff.z) < 5)) {
+
+                chaseSpeed = 1
+                chaseSpeedY = 0
+            }
+
+            this.oldPos = pos.clone()
 
             // this is for the follow camera effect
             this.cameraTarget.set(
@@ -623,9 +634,9 @@ export class LowPolyVehicle implements IVehicle {
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
-            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseCameraSpeed))
-            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseCameraSpeed))
-            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * 0.005)) // have the y dir change slower?
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * chaseSpeed))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * chaseSpeed))
+            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
 
             //    this.cameraLookAtPos.set(0, 0, 0)
             const cs = 0.5
@@ -634,70 +645,25 @@ export class LowPolyVehicle implements IVehicle {
             this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
             this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
 
+            this.cameraLookAtPos = pos
             this.prevCahseCameraPos = this.cameraLookAtPos.clone()
 
 
-            if (this.cameraDiff.length() > 0.1) {
-                camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
-                camera.updateProjectionMatrix()
-                camera.lookAt(this.cameraLookAtPos)
+            // if (this.cameraDiff.length() > 0.1) {
+            camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+            camera.updateProjectionMatrix()
+            camera.lookAt(this.cameraLookAtPos)
 
 
-            } else {
-
-            }
+            //    } else {
+            //   }
 
         } else {
 
+            /** I dont think I can make the camera stuck to the chassis AND not make it go under ground */
             camera.lookAt(this.chassisMesh.position.clone())
+
         }
-
-
-        /** Don't let camera go into the ground
-         * This code could be better
-         */
-
-        // if the vehicle is starting to go on its back
-        // and the world coords is under chassis
-        /** also allow camera follow option? */
-        // if (wp.y < chassY + 3 && this.badRotationTicks > 2) {
-
-        //     const r = this.getRotation()
-
-        //     //   const ltw = camera.localToWorld(camera.position)
-
-        //     wp.setY(10)
-        //     camera.updateProjectionMatrix()
-
-
-        //     //            const wtl = camera.worldToLocal(camera.position)
-        //     // if (wp.y < 0) {
-
-
-        //     // } else {
-        //     //     camera.position.set(p.x, p.y *= .05, p.z)
-        //     // }
-        //     // if the vehicle is not flipped and the camera is not in the correct place
-        // } else if (p.y < 10 && this.badRotationTicks < 2) {
-
-        //     if (Math.abs(p.y) < (0.1)) {
-        //         camera.position.set(p.x, p.y += 0.5, p.z)
-
-        //     } else if (p.y > -0) {
-
-        //         camera.position.set(p.x, p.y *= 1.1, p.z)
-        //     } else {
-        //         camera.position.set(p.x, p.y *= .95, p.z)
-
-        //     }
-        // }
-        // // if camera is too much higher than the chassis
-        // else if (wp.y > chassY + 15 && this.badRotationTicks < 2) {
-        //     const p = camera.position
-        //     camera.position.set(p.x, p.y *= .9, p.z)
-        // } else {
-        // }
-        // camera.lookAt(this.chassisMesh.position.clone())
     };
 
     checkIfSpinning() {
@@ -717,14 +683,23 @@ export class LowPolyVehicle implements IVehicle {
 
             this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
-
         }
+
+        const v = this.vehicle.getRigidBody().getLinearVelocity()
+
+        if (Math.abs(v.y()) > 20) {
+            console.log("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
+            this.vector.setValue(v.x(), v.y() / 2, v.z())
+            this.vehicle.getRigidBody().setLinearVelocity(this.vector)
+        }
+
     }
 
     startEngineSound() {
+        if (this.isPaused) return
 
-        if (!this.engineSound?.isPlaying) {
-            // this.engineSound.play()
+        if (!this.engineSound?.isPlaying && this.useEngineSound) {
+            this.engineSound.play()
         }
     }
 
@@ -734,8 +709,6 @@ export class LowPolyVehicle implements IVehicle {
         if (!!this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
 
-            // if it has stopped
-            this.startEngineSound()
         }
 
 
@@ -862,9 +835,6 @@ export class LowPolyVehicle implements IVehicle {
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
         this.vehicleSettings = vehicleSettings
-        // this.engineForce = vehicleSettings.engineForce
-        // this.steeringSensitivity = vehicleSettings.steeringSensitivity
-
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
             this.scene.setNeedsReload(true)
@@ -877,13 +847,9 @@ export class LowPolyVehicle implements IVehicle {
             }
         }
 
-        // this.chaseCameraSpeed = vehicleSettings.chaseCameraSpeed
-        // this.mass = vehicleSettings.mass
-        // this.useChaseCamera = vehicleSettings.useChaseCamera
-
 
         this.chassisMesh.remove(this.camera)
-        if (!this.useChaseCamera) {
+        if (!this.useChaseCamera && this.camera) {
             const { x, y, z } = staticCameraPos
             this.camera.position.set(x, y, z)
             this.chassisMesh.add(this.camera)
@@ -897,6 +863,8 @@ export class LowPolyVehicle implements IVehicle {
     }
 
     async destroy() {
+
+        this.engineSound.stop()
 
         if (this.scene && this.chassisMesh) {
 

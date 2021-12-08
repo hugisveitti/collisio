@@ -38,6 +38,7 @@ const gameActions = new GameActions();
 
 const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
   // -1 if inverted
+  e.preventDefault();
 
   const gamma = e.gamma ?? 0;
   const beta = e.beta ?? 0;
@@ -51,23 +52,6 @@ const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
   controller.alpha = Math.round(alpha);
   controller.gamma = Math.round(gamma);
   controller.beta = Math.round(beta);
-};
-
-const controller2 = new MobileControls();
-const createOrientationInterval = (callback: (c: MobileControls) => void) => {
-  window.addEventListener("deviceorientation", (e) => {
-    const gamma = e.gamma ?? 0;
-    const beta = e.beta ?? 0;
-    const alpha = e.alpha ?? 0;
-
-    controller2.alpha = Math.round(alpha);
-    controller2.gamma = Math.round(gamma);
-    controller2.beta = Math.round(beta);
-  });
-
-  setInterval(() => {
-    callback(controller2);
-  }, 1000 / 60);
 };
 
 const getSteeringDirection = () => {
@@ -101,11 +85,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     alpha: 0,
   });
 
-  const [orientation2, setOrientation2] = useState({
-    gamma: 0,
-    beta: 0,
-    alpha: 0,
-  });
+  const handleTouchStart = (evt) => {
+    evt.preventDefault();
+    console.log("touchstart.");
+  };
 
   // change these colors!
   const downColor = blue4; // "#005c46";
@@ -186,14 +169,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       /** go to front page? */
     });
 
-    createOrientationInterval((c) => {
-      const { gamma, beta, alpha } = c;
-      setOrientation2({
-        gamma,
-        beta,
-        alpha,
-      });
-    });
+    // window.addEventListener("touchstart", handleTouchStart, false);
+    // window.addEventListener("touchend", handleTouchStart, false);
+    // window.addEventListener("touchcancel", handleTouchStart, false);
+    // window.addEventListener("touchmove", handleTouchStart, false);
 
     return () => {
       props.store.socket.off(stm_desktop_disconnected);
@@ -383,104 +362,111 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         gameActions={gameActions}
         loading={gameSettingsLoading}
       />
+      <div
+        className="controller-container"
+        style={{
+          overflow: "hidden",
+        }}
+      >
+        <div
+          className="controller-btn"
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleButtonAction(true, "f", setForward);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            handleButtonAction(false, "f", setForward);
+          }}
+          style={{
+            ...btnSizeStyle,
+            ...fButtonStyles,
+            right: 0,
+            color: forward ? upColor : downColor,
+            backgroundColor: forward ? downColor : upColor,
+          }}
+        >
+          <span style={rotateText}>F</span>
+        </div>
+        <div
+          className="controller-btn"
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleButtonAction(true, "b", setBackward);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            handleButtonAction(false, "b", setBackward);
+          }}
+          style={{
+            ...btnSizeStyle,
+            ...bButtonStyles,
+            bottom: 0,
+            color: backward ? upColor : downColor,
+            backgroundColor: backward ? downColor : upColor,
+          }}
+        >
+          <span style={rotateText}>B</span>
+        </div>
 
-      <div
-        className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "f", setForward)}
-        onTouchEnd={() => handleButtonAction(false, "f", setForward)}
-        style={{
-          ...btnSizeStyle,
-          ...fButtonStyles,
-          right: 0,
-          color: forward ? upColor : downColor,
-          backgroundColor: forward ? downColor : upColor,
-        }}
-      >
-        <span style={rotateText}>F</span>
-      </div>
-      <div
-        className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "b", setBackward)}
-        onTouchEnd={() => handleButtonAction(false, "b", setBackward)}
-        style={{
-          ...btnSizeStyle,
-          ...bButtonStyles,
-          bottom: 0,
-          color: backward ? upColor : downColor,
-          backgroundColor: backward ? downColor : upColor,
-        }}
-      >
-        <span style={rotateText}>B</span>
+        <div
+          className="controller-btn"
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleButtonAction(true, "resetVehicle", setReset);
+          }}
+          onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
+          style={{
+            ...utilBtnPos,
+            ...resetStyles,
+            ...utilbtnSizeStyle,
+            color: reset ? upColor : downColor,
+            backgroundColor: reset ? downColor : upColor,
+          }}
+        >
+          <span style={rotateText}>
+            <RefreshIcon fontSize="large" />
+          </span>
+        </div>
+
+        <div
+          className="controller-btn"
+          onClick={() => {
+            gameActions.pause = true;
+            sendGameActions();
+            setSettingsModalOpen(true);
+          }}
+          style={{
+            ...settingsStyles,
+            ...utilbtnSizeStyle,
+            ...utilBtnPos,
+            color: downColor,
+            backgroundColor: upColor,
+          }}
+        >
+          <span style={rotateText}>
+            <PauseIcon fontSize="large" />
+          </span>
+        </div>
+
+        <div
+          id="orientation-info"
+          style={{
+            ...infoStyles,
+            transform: isPortrait ? "rotate(-90deg)" : "",
+            top: 0,
+          }}
+        >
+          Beta:{orientation.beta.toFixed(0)}
+          <br />
+          Gamma:{orientation.gamma.toFixed(0)}
+          <br />
+          Alpha:{orientation.alpha.toFixed(0)}
+          <br />
+          {steeringDirection}
+        </div>
       </div>
 
-      <div
-        className="controller-btn"
-        onTouchStart={() => handleButtonAction(true, "resetVehicle", setReset)}
-        onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
-        style={{
-          ...utilBtnPos,
-          ...resetStyles,
-          ...utilbtnSizeStyle,
-          color: reset ? upColor : downColor,
-          backgroundColor: reset ? downColor : upColor,
-        }}
-      >
-        <span style={rotateText}>
-          <RefreshIcon fontSize="large" />
-        </span>
-      </div>
-
-      <div
-        className="controller-btn"
-        onClick={() => {
-          gameActions.pause = true;
-          sendGameActions();
-          setSettingsModalOpen(true);
-        }}
-        style={{
-          ...settingsStyles,
-          ...utilbtnSizeStyle,
-          ...utilBtnPos,
-          color: downColor,
-          backgroundColor: upColor,
-        }}
-      >
-        <span style={rotateText}>
-          <PauseIcon fontSize="large" />
-        </span>
-      </div>
-
-      <div
-        id="orientation-info"
-        style={{
-          ...infoStyles,
-          transform: isPortrait ? "rotate(-90deg)" : "",
-          top: 0,
-        }}
-      >
-        Beta:{orientation.beta.toFixed(0)}
-        <br />
-        Gamma:{orientation.gamma.toFixed(0)}
-        <br />
-        Alpha:{orientation.alpha.toFixed(0)}
-        <br />
-        {steeringDirection}
-      </div>
-      <div
-        id="orientation-info"
-        style={{
-          ...infoStyles,
-          transform: isPortrait ? "rotate(-90deg)" : "",
-          top: 10,
-          left: screenWidth / 2,
-        }}
-      >
-        Beta2:{orientation2.beta.toFixed(0)}
-        <br />
-        Gamma2:{orientation2.gamma.toFixed(0)}
-        <br />
-        Alpha2:{orientation2.alpha.toFixed(0)}
-      </div>
       <DeviceOrientationPermissionComponent
         onMobile={true}
         onIphone={isIphone()}

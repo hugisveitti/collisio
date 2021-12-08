@@ -18,7 +18,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
         // this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
-
+        //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
         if (intelligentDriveLine) {
 
             const material = new LineBasicMaterial({ color: 0x0000ff })

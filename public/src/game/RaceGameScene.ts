@@ -344,6 +344,7 @@ export class RaceGameScene extends GameScene {
 
 
     update(time: number) {
+        this.time = time
         this.gameTicks += 1
         this.roomTicks += 1
         if (this.everythingReady()) {
@@ -426,7 +427,8 @@ export class RaceGameScene extends GameScene {
             date: getDateNow(),
             roomTicks: this.roomTicks,
             gameTicks: this.gameTicks,
-            avgPing: this.totalPingsGotten === 0 ? -1 : this.totalPing / this.totalPingsGotten
+            avgPing: this.totalPingsGotten === 0 ? -1 : this.totalPing / this.totalPingsGotten,
+            time: this.time,
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })

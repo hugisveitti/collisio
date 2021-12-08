@@ -25,6 +25,8 @@
   text-align: center;
   vertical-align: middle;
   position: absolute;
+  touch-action: none;
+  -ms-touch-action: none;
 }
 
 /* @media only screen and (max-width: 350px) {

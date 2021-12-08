@@ -1,8 +1,7 @@
-import { CollisionEvent } from "@enable3d/common/dist/types"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import Stats from "stats.js"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { allTrackNames } from "../classes/Game"
 import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
@@ -14,7 +13,7 @@ import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
-import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
+import { getVehicleNumber, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
 import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
@@ -35,6 +34,7 @@ document.body.appendChild(vehicleInputsContainer)
 export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScene {
 
     vehicle?: LowPolyTestVehicle
+    vehicles: LowPolyTestVehicle[]
 
     font: THREE.Font
     textMesh?: any
@@ -212,7 +212,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
                 this.vehicle.stop()
                 this.vehicle.start()
                 this.vehicle.setPosition(4, 15, 0)
-                this.vehicle.setRotation(0, 0, 0)
+                this.vehicle.setRotation(0, 0, Math.PI)
             } else if (e.key === "u") {
                 this.vehicle.stop()
                 this.vehicle.start()
@@ -237,6 +237,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     initVehicles() {
         this.otherVehicles = []
         this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type, false)
@@ -259,7 +260,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
             this.courseLoaded = true
             this.createOtherVehicles(() => {
                 this.createVehicle().then(() => {
-
+                    this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
                 })
             })
         })
@@ -566,6 +567,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
             this.vehicle.useBadRotationTicks = false
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
+            this.vehicles = allVehicles
             console.log("game type", this.getGameType());
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {
@@ -724,7 +726,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     togglePauseGame() {
-
+        if (!this.vehicle.isReady) return
         if (this.isPaused) {
             this.gameTime.stop()
             this.vehicle.unpause()
@@ -745,20 +747,6 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         this.vehicle.pause()
         this.isPaused = true
     }
-
-    // setGameSettings(userGameSettings: IGameSettings) {
-    //     for (let key of Object.keys(userGameSettings)) {
-    //         if (userGameSettings[key] !== undefined) {
-    //             this[key] = userGameSettings[key]
-    //         }
-    //     }
-
-    //     if (this.pLight && this.course) {
-    //         this.pLight.castShadow = this.useShadows
-    //         this.pLight.shadow.bias = 0.01
-    //         this.course.toggleShadows(this.useShadows)
-    //     }
-    // }
 
 
     changeVehicle(vehicleNumber: number, vehicleType: VehicleType) {

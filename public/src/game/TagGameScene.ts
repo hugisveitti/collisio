@@ -63,6 +63,7 @@ export class TagGameScene extends GameScene {
         this.gameClock = new Clock(false)
 
         this.gameOver = false
+        this.ticks = 0
 
     }
 
@@ -227,7 +228,7 @@ export class TagGameScene extends GameScene {
     resetVehicleCallback(vehicleNumber: number) {
         if (!this.gameStarted) return
 
-        if (this.tagObjects[vehicleNumber].isIt) {
+        if (this.tagObjects[vehicleNumber].isIt || this.tagObjects[vehicleNumber].isChocolate) {
 
             return
         }
@@ -240,10 +241,10 @@ export class TagGameScene extends GameScene {
             let oldIt = -1
             for (let i = 0; i < this.vehicles.length; i++) {
                 if (this.tagObjects[i].isIt) {
-                    // if (this.tagObjects[vehicleNumber].resetPressed()) {
+
                     oldIt = i
                     this.tagObjects[i].setIsIt(false, true)
-                    // }
+
                 }
             }
 
@@ -274,6 +275,7 @@ export class TagGameScene extends GameScene {
 
     update(time: number) {
         this.ticks += 1
+
         if (this.everythingReady()) {
             stats.begin()
             if (inTestMode) {
@@ -282,6 +284,7 @@ export class TagGameScene extends GameScene {
             this.updateScoreTable()
             this.updateVehicles()
             this.updateClock()
+            this.course.updateCourse()
 
 
             if (!this.isGameSongPlaying()) {

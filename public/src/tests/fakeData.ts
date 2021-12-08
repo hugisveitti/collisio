@@ -105,7 +105,8 @@ export const createFakeHighscoreData = () => {
             date: getDateNow(),
             roomTicks: 10,
             gameTicks: 10,
-            avgPing: -1
+            avgPing: -1,
+            time: -1
         }
 
 

@@ -68,6 +68,12 @@ export const numberScaler = (a: number, b: number, min: number, max: number) => 
     }
 }
 
+export const logScaler = (a: number, min: number, max: number) => {
+    return (num: number) => {
+        return Math.min(Math.max(Math.log2((2 / a) * num), min), max)
+    }
+}
+
 
 export const getDateNow = (): number => {
     return Date.now()
