@@ -503,7 +503,7 @@ export class LowPolyVehicle implements IVehicle {
     pause() {
         this.isPaused = true
         this.zeroEngineForce()
-        console.log("engine sound", this.engineSound)
+
         if (this.engineSoundLoaded && this.engineSound?.source) {
 
             this.engineSound.stop()
