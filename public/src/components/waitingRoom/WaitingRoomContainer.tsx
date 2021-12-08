@@ -101,7 +101,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
       const roomInfo: IRoomInfo = {
-        desktopId: user?.uid,
+        desktopId: user?.uid ?? "undefined",
         desktopAuthenticated: !!user,
         roomId: toSaveRoomId,
         gameSettings: toSaveGameSettings as IGameSettings,
