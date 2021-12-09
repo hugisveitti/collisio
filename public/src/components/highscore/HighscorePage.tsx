@@ -24,7 +24,7 @@ import {
   getBestScoresOnTrack,
 } from "../../firebase/firestoreGameFunctions";
 import { TrackName } from "../../shared-backend/shared-stuff";
-import { stringInArray } from "../../utils/utilFunctions";
+import { itemInArray } from "../../utils/utilFunctions";
 
 interface IHighscorePage {}
 
@@ -57,6 +57,7 @@ const HighscorePage = (props: IHighscorePage) => {
 
   useEffect(() => {
     window.localStorage.setItem("highscoreTrackKey", trackKey);
+
     setHighscoreHasLoaded(false);
     getBestScoresOnTrack(trackKey, (data) => {
       setHighscoreHasLoaded(true);
@@ -65,10 +66,14 @@ const HighscorePage = (props: IHighscorePage) => {
       const nolKeys = Object.keys(data);
       setNumberOfLapsKeys(nolKeys);
 
-      if (nolKeys.length > 0) {
-        setNumberOfLapsKey(nolKeys[0]);
+      if (!itemInArray(numberOfLapsKey, numberOfLapsKeys)) {
+        if (nolKeys.length > 0) {
+          setNumberOfLapsKey(nolKeys[0]);
+        } else {
+          setNumberOfLapsKey("");
+        }
       } else {
-        setNumberOfLapsKey("");
+        setHighscoreList(data[numberOfLapsKey]);
       }
     });
   }, [trackKey]);
@@ -133,7 +138,7 @@ const HighscorePage = (props: IHighscorePage) => {
                     backgroundColor: inputBackgroundColor,
                   }}
                   value={
-                    stringInArray(numberOfLapsKey, numberOfLapsKeys)
+                    itemInArray(numberOfLapsKey, numberOfLapsKeys)
                       ? numberOfLapsKey
                       : ""
                   }

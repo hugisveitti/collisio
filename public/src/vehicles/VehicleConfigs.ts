@@ -1,5 +1,5 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
-import { stringInArray } from "../utils/utilFunctions"
+import { itemInArray } from "../utils/utilFunctions"
 import { IVehicle, SimpleVector } from "./IVehicle"
 
 
@@ -26,7 +26,7 @@ export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTy
 
 export const nonactiveVehcileTypes: VehicleType[] = ["test", "normal"]
 
-export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !stringInArray(vehicle.type, nonactiveVehcileTypes))
+export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !itemInArray(vehicle.type, nonactiveVehcileTypes))
 
 export interface IVehicleConfig {
     wheelAxisBackPosition: number
@@ -250,6 +250,9 @@ export const vehicleConfigs = {
         wheelAxisHeightFront: 0,
 
         suspensionRestLength: .4,
+        inertia: { x: 4000, y: 1000, z: 4000 },
+
+        frictionSlip: 27.5,
 
 
         mass: 500,

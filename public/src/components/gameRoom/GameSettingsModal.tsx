@@ -50,6 +50,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <GameSettingsComponent
             gameSettings={props.store.gameSettings}
             onChange={props.updateGameSettings}
+            inTestMode={props.isTestMode}
           />
         </Grid>
 

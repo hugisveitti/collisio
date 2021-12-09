@@ -7,7 +7,7 @@ import { ITagCourse } from "../course/ICourse";
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
-import { stringInArray } from "../utils/utilFunctions";
+import { itemInArray } from "../utils/utilFunctions";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { TagObject } from "./TagObjectClass";
@@ -204,7 +204,7 @@ export class TagGameScene extends GameScene {
             this.handleGameOver()
         }
 
-        if (stringInArray(time, importantTimes)) {
+        if (itemInArray(time, importantTimes)) {
             this.showViewsImportantInfo(`${time} sec left`, true)
         }
 

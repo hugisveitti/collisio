@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
-exports.getDateNow = exports.numberScaler = exports.removeUndefinedFromObject = exports.shuffleArray = exports.stringInArray = void 0;
-var stringInArray = function (st, arr) {
+exports.getDateNow = exports.numberScaler = exports.removeUndefinedFromObject = exports.shuffleArray = exports.itemInArray = void 0;
+var itemInArray = function (st, arr) {
     for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
         var t = arr_1[_i];
         if (t === st)
@@ -9,7 +9,7 @@ var stringInArray = function (st, arr) {
     }
     return false;
 };
-exports.stringInArray = stringInArray;
+exports.itemInArray = itemInArray;
 var shuffleArray = function (arr) {
     var n = 10;
     var j = 0;

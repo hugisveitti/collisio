@@ -11,7 +11,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { VehicleType } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
-import { stringInArray } from "../../utils/utilFunctions";
+import { itemInArray } from "../../utils/utilFunctions";
 import {
   allVehicleTypes,
   defaultVehicleType,
@@ -37,7 +37,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
 
   const possibleVehcileTypes = props.excludedVehicles
     ? allVehicleTypes.filter(
-        (vehicle) => !stringInArray(vehicle.type, props.excludedVehicles)
+        (vehicle) => !itemInArray(vehicle.type, props.excludedVehicles)
       )
     : allVehicleTypes;
 

@@ -99,6 +99,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   // });
 
   const handleSaveRoomInfo = () => {
+    console.log("to save roomi d", toSaveRoomId);
     if (toSaveRoomId) {
       const roomInfo: IRoomInfo = {
         desktopId: user?.uid ?? "undefined",
@@ -167,8 +168,10 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     } else {
       if (!props.store.player) {
         /** if gotten here through url */
-
-        connectToRoom(user.displayName);
+        /** shouldnt we catch this in the connect to room container */
+        connectToRoom(
+          user?.displayName ?? "Guest" + Math.floor(Math.random() * 20)
+        );
       }
       setDisplayNameModalOpen(false);
     }
@@ -182,6 +185,14 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       history.push(frontPagePath);
     }
+
+    return () => {
+      if (!onMobile) {
+        /** save on unmount only if no gameRoom */
+
+        handleSaveRoomInfo();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -237,10 +248,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
-      if (!onMobile) {
-        /** save on unmount only if no gameRoom */
-        handleSaveRoomInfo();
-      }
       window.clearTimeout(userLoadingTimout);
       props.store.socket.emit(mdts_left_waiting_room, {});
       props.store.socket.off(stmd_game_starting);
@@ -273,13 +280,15 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, [props.store.gameSettings]);
 
   useEffect(() => {
-    if (!onMobile && user && props.store.roomId) {
-      toSaveRoomId = props.store.roomId;
-      addToAvailableRooms(user.uid, {
-        roomId: props.store.roomId,
-        displayName: user.displayName,
-        userId: user.uid,
-      });
+    if (!onMobile && props.store.roomId) {
+      toSaveRoomId = props.store.roomId ?? roomId;
+      if (user) {
+        addToAvailableRooms(user.uid, {
+          roomId: props.store.roomId,
+          displayName: user.displayName,
+          userId: user.uid,
+        });
+      }
     }
 
     return () => {

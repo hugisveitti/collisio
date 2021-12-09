@@ -26,6 +26,7 @@ import TrackSelect from "../inputs/TrackSelect";
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;
   onChange: (gameSettings: IGameSettings) => void;
+  inTestMode?: boolean;
 }
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
@@ -113,7 +114,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               type="number"
               value={gameSettings.numberOfLaps ? gameSettings.numberOfLaps : ""}
               onChange={(ev) => {
-                updateGameSettings("numberOfLaps", +ev.target.value);
+                if (+ev.target.value > 0) {
+                  updateGameSettings("numberOfLaps", +ev.target.value);
+                }
               }}
               style={{
                 backgroundColor: inputBackgroundColor,
@@ -125,7 +128,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       <Grid item xs={12} lg={4}>
         <TrackSelect
           gameType={gameSettings.gameType}
-          excludedTracks={inTestMode ? [] : nonActiveTrackNames}
+          excludedTracks={
+            props.inTestMode || inTestMode ? [] : nonActiveTrackNames
+          }
           value={gameSettings.trackName}
           onChange={(newTrackName) => {
             updateGameSettings("trackName", newTrackName);

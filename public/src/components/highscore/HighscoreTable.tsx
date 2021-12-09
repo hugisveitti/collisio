@@ -7,7 +7,7 @@ import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { cardBackgroundColor } from "../../providers/theme";
-import { stringInArray } from "../../utils/utilFunctions";
+import { itemInArray } from "../../utils/utilFunctions";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 
 interface IHighscoreTable {

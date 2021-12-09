@@ -1,4 +1,4 @@
-export const stringInArray = (st: string, arr: string[]) => {
+export function itemInArray<Type>(st: Type, arr: Type[]) {
     for (let t of arr) {
         if (t === st) return true
     }

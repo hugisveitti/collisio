@@ -160,7 +160,9 @@ export const getUserSocials = async (userId: string, followersCallback: (followe
 export const saveRoom = (roomInfo: IRoomInfo) => {
     const roomKey = uuid()
     const roomRef = doc(firestore, roomDataRefPath, roomKey)
-    setDoc(roomRef, roomInfo)
+    setDoc(roomRef, roomInfo).catch(err => {
+        console.warn("Error saving room:", err)
+    })
 }
 
 

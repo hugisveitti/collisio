@@ -502,13 +502,12 @@ export class LowPolyVehicle implements IVehicle {
         this.isPaused = true
         this.zeroEngineForce()
 
-        if (this.engineSoundLoaded && this.engineSound?.source) {
-
-            this.engineSound.stop()
-        }
+        this.stopEngineSound()
         this.chassisMesh.body.setCollisionFlags(1)
 
     };
+
+
 
     unpause() {
         this.isPaused = false
@@ -539,6 +538,20 @@ export class LowPolyVehicle implements IVehicle {
         }
     }
 
+    stopEngineSound() {
+        if (this.engineSound && this.engineSound.source) {
+            this.engineSound.stop()
+        }
+    }
+
+    startEngineSound() {
+        if (this.isPaused) return
+
+        if (!this.engineSound?.isPlaying && this.useEngineSound) {
+            this.engineSound.play()
+        }
+    }
+
     createCarSounds() {
         const listener = new AudioListener()
         this.camera.add(listener)
@@ -553,14 +566,14 @@ export class LowPolyVehicle implements IVehicle {
 
 
             this.engineSound.setLoopEnd(2.5)
-            //  this.engineSound.stop()
+
             this.engineSoundLoaded = true
 
             /**
              * some bug here
              * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
              */
-            this.engineSound.stop()
+            this.stopEngineSound()
         })
     }
 
@@ -614,7 +627,7 @@ export class LowPolyVehicle implements IVehicle {
             let chaseSpeed = speedScaler(Math.abs(this.getCurrentSpeedKmHour()))// 1// this.chaseCameraSpeed
 
             chaseSpeed = Math.min(1, chaseSpeed)
-            let chaseSpeedY = 0.005
+            let chaseSpeedY = 0.5
             if ((Math.abs(this.cameraDiff.x) > 2 || Math.abs(this.cameraDiff.z) > 2) && (Math.abs(this.cameraDiff.x) < 5 || Math.abs(this.cameraDiff.z) < 5)) {
 
                 chaseSpeed = 1
@@ -695,13 +708,7 @@ export class LowPolyVehicle implements IVehicle {
 
     }
 
-    startEngineSound() {
-        if (this.isPaused) return
 
-        if (!this.engineSound?.isPlaying && this.useEngineSound) {
-            this.engineSound.play()
-        }
-    }
 
     update() {
         this.checkIfSpinning()
@@ -864,7 +871,7 @@ export class LowPolyVehicle implements IVehicle {
 
     async destroy() {
 
-        this.engineSound.stop()
+        this.stopEngineSound()
 
         if (this.scene && this.chassisMesh) {
 

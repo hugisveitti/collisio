@@ -1,5 +1,5 @@
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
-import { stringInArray } from "../utils/utilFunctions";
+import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
 
 /** change name to map
@@ -69,7 +69,7 @@ export const activeGameTypes: GameType[] = ["race", "tag"]
 const getNonActiveTrackNames = (): TrackName[] => {
     const tracks: TrackName[] = []
     for (let track of allTrackNames) {
-        if (!stringInArray(track.type, activeTrackNames)) {
+        if (!itemInArray(track.type, activeTrackNames)) {
             tracks.push(track.type)
         }
     }

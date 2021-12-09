@@ -14,7 +14,7 @@ import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
 import { inputBackgroundColor } from "../../providers/theme";
 import { GameType, TrackName } from "../../shared-backend/shared-stuff";
-import { stringInArray } from "../../utils/utilFunctions";
+import { itemInArray } from "../../utils/utilFunctions";
 
 interface ITrackImagePair {
   image: any;
@@ -51,7 +51,7 @@ const TrackSelect = (props: ITrackSelect) => {
   for (let track of allTrackNames) {
     if (
       track.gameType === props.gameType &&
-      !stringInArray(track.type, props.excludedTracks)
+      !itemInArray(track.type, props.excludedTracks)
     ) {
       trackOptions.push(track);
     }

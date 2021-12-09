@@ -24,7 +24,6 @@ const getMyFirestore = () => {
         return getFirestore()
     }
     return getFirestore(app)
-
 }
 
 export const firestore = getMyFirestore()

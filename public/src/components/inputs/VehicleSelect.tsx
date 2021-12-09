@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { inputBackgroundColor } from "../../providers/theme";
 import { VehicleType } from "../../shared-backend/shared-stuff";
-import { stringInArray } from "../../utils/utilFunctions";
+import { itemInArray } from "../../utils/utilFunctions";
 import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
 import ShowRoomComponent from "../showRoom/ShowRoomComponent";
 
@@ -26,7 +26,7 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
 
   const vehicleOptions = props.excludedVehicles
     ? allVehicleTypes.filter(
-        (vehicle) => !stringInArray(vehicle.type, props.excludedVehicles)
+        (vehicle) => !itemInArray(vehicle.type, props.excludedVehicles)
       )
     : allVehicleTypes;
 
