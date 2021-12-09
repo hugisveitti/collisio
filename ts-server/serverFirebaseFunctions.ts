@@ -10,6 +10,6 @@ const availableRoomsRefPath = "availableRooms"
 export const removeAvailableRoom = (userId: string) => {
     const roomRef = doc(firestore, availableRoomsRefPath, userId)
     deleteDoc(roomRef).catch(err => {
-        console.log("Error removing room:", err)
+        console.warn("Error removing room:", err)
     })
 }

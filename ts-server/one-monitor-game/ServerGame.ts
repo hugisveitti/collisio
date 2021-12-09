@@ -29,7 +29,8 @@ import {
     std_send_game_actions,
     dts_game_settings_changed_callback,
     stm_game_settings_changed_ballback,
-    dts_back_to_waiting_room
+    dts_back_to_waiting_room,
+    STD_SENDINTERVAL_MS
 } from "../../public/src/shared-backend/shared-stuff";
 import { removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
@@ -96,7 +97,6 @@ export default class RoomMaster {
             delete this.rooms[roomId]
         })
         console.log("creating room, all rooms", Object.keys(this.rooms))
-        // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
     }
@@ -357,7 +357,7 @@ export class Room {
         setInterval(() => {
             this.socket.emit(std_controls, { players: this.getPlayersControls() })
             // set fps
-        }, 1000 / 120)
+        }, STD_SENDINTERVAL_MS)
     }
 
     getPlayersControls() {

@@ -17,6 +17,7 @@ import {
   MobileControls,
   mts_controls,
   mts_game_data_info,
+  MTS_SENDINTERVAL_MS,
   mts_send_game_actions,
   mts_user_settings_changed,
   stm_desktop_disconnected,
@@ -136,7 +137,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         alpha,
       });
       // set fps
-    }, 1000 / 60);
+    }, MTS_SENDINTERVAL_MS);
 
     setSendControlsInterval(_sendControlsInterval);
   };

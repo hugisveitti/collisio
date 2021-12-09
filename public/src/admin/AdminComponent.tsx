@@ -23,11 +23,11 @@ interface IAdminComponent {
 
 const AdminComponent = (props: IAdminComponent) => {
   const [roomsInfo, setRoomsInfo] = useState([]);
-  const [nRoomEntires, setNRoomEntires] = useState(0);
+  const [nRoomEntires, setNRoomEntires] = useState(5);
   const [roomCardOpen, setRoomCardOpen] = useState(false);
 
   const [gamesData, setGamesData] = useState([]);
-  const [nGameEntires, setNGameEntires] = useState(0);
+  const [nGameEntires, setNGameEntires] = useState(5);
   const [gameCardOpen, setGameCardOpen] = useState(false);
 
   const [stressCardOpen, setStressCardOpen] = useState(false);

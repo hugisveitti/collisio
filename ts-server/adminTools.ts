@@ -18,7 +18,7 @@ export const adminFunctions = (app: any) => {
 
     const getIsAdmin = async (userId: string, callback: (isAdmin: boolean) => void) => {
         const adminsRef = doc(firestore, adminsRefPath, userId)
-        console.log("userId", userId)
+
         try {
 
             const data = await getDoc(adminsRef)
@@ -194,7 +194,7 @@ export const adminFunctions = (app: any) => {
             }))
 
         }).catch((err: any) => {
-            console.log("error", err)
+            console.warn("error", err)
             res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
         })
     })
@@ -208,14 +208,13 @@ export const adminFunctions = (app: any) => {
         const { userTokenId } = data
         const queryParams = getQueryParams(req)
         admin.auth().verifyIdToken(userTokenId).then((decodedToken: any) => {
-            console.log("userid", decodedToken.uid)
             getGameData(decodedToken.uid, queryParams, (gameDataRes => {
 
                 res.status(gameDataRes.statusCode).send(JSON.stringify(gameDataRes));
             }))
 
         }).catch((err: any) => {
-            console.log("error", err)
+            console.warn("error", err)
             res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
         })
     })

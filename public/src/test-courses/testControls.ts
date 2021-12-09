@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client"
 import { IVehicle } from "../vehicles/IVehicle"
 import { toast } from "react-toastify"
-import { MobileControls, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
+import { MobileControls, MTS_SENDINTERVAL_MS, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
 
 
 let speed = 40
@@ -95,7 +95,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
         } else {
             testDriveVehicleWithKeyboard(vehicle, vehicleControls)
         }
-    }, 1000 / 60)
+    }, MTS_SENDINTERVAL_MS)
 
 
 

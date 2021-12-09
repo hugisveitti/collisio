@@ -35,7 +35,7 @@ var TestRoom = /** @class */ (function () {
         setInterval(function () {
             _this.desktopSocket.emit(shared_stuff_1.std_controls, { mobileControls: _this.mobileControls });
             // set fps
-        }, 1000 / 90);
+        }, shared_stuff_1.STD_SENDINTERVAL_MS);
     };
     TestRoom.prototype.handleSettingsChanged = function (newUserSettings) {
         this.userSettingsChanged({ userSettings: newUserSettings, playerNumber: 0 });

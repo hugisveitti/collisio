@@ -42,10 +42,9 @@ export const removeUndefinedFromObject = (object: Object) => {
                 }
             } else {
 
-                console.log("not includeing", key, object[key])
             }
         } else {
-            console.log("not includeing", key, object[key])
+
         }
     }
     return newObject

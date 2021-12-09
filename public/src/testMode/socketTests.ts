@@ -3,7 +3,7 @@
  */
 
 import { io, Socket } from "socket.io-client"
-import { dts_create_room, IPlayerInfo, mdts_device_type, mdts_start_game, MobileControls, mts_controls, mts_player_connected, std_controls, std_room_created_callback, stmd_socket_ready, stm_player_connected_callback } from "../shared-backend/shared-stuff"
+import { dts_create_room, IPlayerInfo, mdts_device_type, mdts_start_game, MobileControls, mts_controls, mts_player_connected, MTS_SENDINTERVAL_MS, std_controls, std_room_created_callback, stmd_socket_ready, stm_player_connected_callback } from "../shared-backend/shared-stuff"
 import { ISocketCallback } from "../utils/connectSocket"
 
 export const removeSockets = (desktopSocket: Socket, mobileSockets: Socket[]) => {
@@ -13,7 +13,7 @@ export const removeSockets = (desktopSocket: Socket, mobileSockets: Socket[]) =>
     }
 }
 
-export const createSocketTest = (numberOfMobiles: number, callback: (roomId: string, desktopSocket: Socket, mobileSockets: Socket[]) => void) => {
+export const createSocketTest = async (numberOfMobiles: number, callback: (roomId: string, desktopSocket: Socket, mobileSockets: Socket[]) => void) => {
     createAllConnections(numberOfMobiles, (roomId, desktopSocket, mobileSockets) => {
         callback(roomId, desktopSocket, mobileSockets)
         desktopSocket.on("disconnect", () => {
@@ -31,7 +31,7 @@ export const createSocketTest = (numberOfMobiles: number, callback: (roomId: str
 
 
 
-export const startSocketTest = (desktopSocket: Socket, mobileSockets: Socket[], callback: (ping: number) => void) => {
+export const startSocketTest = async (desktopSocket: Socket, mobileSockets: Socket[], callback: (ping: number) => void) => {
 
     const mobileControllers = []
 
@@ -41,13 +41,19 @@ export const startSocketTest = (desktopSocket: Socket, mobileSockets: Socket[], 
         mobileControllers.push(new MobileControls())
     }
 
+    // using this too check how many ticks are sent in a second, they should match the MS_SENDINTERVAL_SEC
+    // let secStart = Date.now()
+    // let secEnd = 0
+    // let secTick = 0
     desktopSocket.on(std_controls, (data) => {
+
         const { players } = data as { players: IPlayerInfo[] }
         for (let i = 0; i < players.length; i++) {
             if (players[i]?.mobileControls.f) {
                 end = Date.now()
                 callback(end - start)
             }
+
         }
     })
 
@@ -63,7 +69,7 @@ export const startSocketTest = (desktopSocket: Socket, mobileSockets: Socket[], 
             }
             mobileSockets[i].emit(mts_controls, mobileControllers[i])
         }
-    }, 1000 / 60)
+    }, MTS_SENDINTERVAL_MS)
 
 }
 
@@ -105,7 +111,11 @@ const connectToRoom = (roomId: string, mobileSockets: Socket[], callback: () => 
 
 
 const createRoom = (desktopSocket: Socket, callback: (roomId: string) => void) => {
-    desktopSocket.emit(dts_create_room)
+    desktopSocket.emit(dts_create_room, {
+        data: {
+
+        }
+    })
     desktopSocket.on(std_room_created_callback, (response: ISocketCallback) => {
         if (response.status === "success") {
             const { roomId } = response.data

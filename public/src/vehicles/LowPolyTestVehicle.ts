@@ -243,8 +243,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
         //     const obj = this.closestRaycaster.getCollisionObject()
         //     if (log) {
 
-        //         // console.log("closest", x, y, z)
-        //         // console.log("hit object", obj)
+
         //     }
 
 

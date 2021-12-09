@@ -10,7 +10,7 @@ var availableRoomsRefPath = "availableRooms";
 var removeAvailableRoom = function (userId) {
     var roomRef = (0, firestore_1.doc)(firebase_config_1.firestore, availableRoomsRefPath, userId);
     (0, firestore_1.deleteDoc)(roomRef).catch(function (err) {
-        console.log("Error removing room:", err);
+        console.warn("Error removing room:", err);
     });
 };
 exports.removeAvailableRoom = removeAvailableRoom;

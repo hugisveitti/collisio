@@ -51,7 +51,6 @@ var adminFunctions = function (app) {
             switch (_a.label) {
                 case 0:
                     adminsRef = (0, firestore_1.doc)(firebase_config_1.firestore, adminsRefPath, userId);
-                    console.log("userId", userId);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
@@ -218,7 +217,7 @@ var adminFunctions = function (app) {
                 res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));
             }));
         }).catch(function (err) {
-            console.log("error", err);
+            console.warn("error", err);
             res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
         });
     });
@@ -231,12 +230,11 @@ var adminFunctions = function (app) {
         var userTokenId = data.userTokenId;
         var queryParams = getQueryParams(req);
         firebase_config_1.admin.auth().verifyIdToken(userTokenId).then(function (decodedToken) {
-            console.log("userid", decodedToken.uid);
             getGameData(decodedToken.uid, queryParams, (function (gameDataRes) {
                 res.status(gameDataRes.statusCode).send(JSON.stringify(gameDataRes));
             }));
         }).catch(function (err) {
-            console.log("error", err);
+            console.warn("error", err);
             res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
         });
     });

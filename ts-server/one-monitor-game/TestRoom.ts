@@ -5,6 +5,7 @@ import {
     mts_controls,
     mts_user_settings_changed,
     std_controls,
+    STD_SENDINTERVAL_MS,
     std_user_settings_changed
 } from "../../public/src/shared-backend/shared-stuff"
 
@@ -56,7 +57,7 @@ export default class TestRoom {
         setInterval(() => {
             this.desktopSocket!.emit(std_controls, { mobileControls: this.mobileControls })
             // set fps
-        }, 1000 / 90)
+        }, STD_SENDINTERVAL_MS)
     }
 
     handleSettingsChanged(newUserSettings: any) {

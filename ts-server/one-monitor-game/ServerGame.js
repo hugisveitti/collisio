@@ -52,7 +52,6 @@ var RoomMaster = /** @class */ (function () {
             delete _this.rooms[roomId];
         });
         console.log("creating room, all rooms", Object.keys(this.rooms));
-        // console.log(`creating room ${roomId}, rooms: ${Object.keys(this.rooms)}`)
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };
@@ -276,7 +275,7 @@ var Room = /** @class */ (function () {
         setInterval(function () {
             _this.socket.emit(shared_stuff_1.std_controls, { players: _this.getPlayersControls() });
             // set fps
-        }, 1000 / 120);
+        }, shared_stuff_1.STD_SENDINTERVAL_MS);
     };
     Room.prototype.getPlayersControls = function () {
         var playersControls = [];

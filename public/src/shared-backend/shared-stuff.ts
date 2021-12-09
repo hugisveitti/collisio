@@ -222,3 +222,10 @@ export const stm_game_settings_changed_ballback = "stm_game_settings_changed_bal
 
 export const mts_send_game_actions = "mts_send_game_actions"
 export const std_send_game_actions = "std_send_game_actions"
+
+
+
+/** FPS on emit */
+
+export const STD_SENDINTERVAL_MS = 1000 / 60
+export const MTS_SENDINTERVAL_MS = 1000 / 60

@@ -1,16 +1,15 @@
+import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
-import TableBody from "@mui/material/TableBody";
+import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
-import AppContainer from "../containers/AppContainer";
 import { createSocketTest, removeSockets } from "./socketTests";
 import StressTestRow, { IRoomConnection } from "./StressTestRow";
 
@@ -74,7 +73,7 @@ export const StressTestComponent = (props: IStressTestComponent) => {
       </Grid>
       <Grid item xs={12} sm={4}>
         <TextField
-          value={numberOfMobiles ?? ""}
+          value={numberOfMobiles ? numberOfMobiles : ""}
           type="number"
           onChange={(e) => setNumberOfMobiles(+e.target.value)}
           label="Number of mobiles"
@@ -92,29 +91,31 @@ export const StressTestComponent = (props: IStressTestComponent) => {
         <Typography>Number of playing sockets: {playingSockets()}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Room id</TableCell>
-              <TableCell>Number of mobiles</TableCell>
-              <TableCell>Ping (ms)</TableCell>
-              <TableCell>Max ping (ms)</TableCell>
-              <TableCell>Avg ping (ms) over last 100</TableCell>
-              <TableCell />
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {roomConnections.map((connection) => (
-              <StressTestRow
-                key={connection.roomId}
-                connection={connection}
-                removeRoom={removeRoom}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell />
+                <TableCell>Room id</TableCell>
+                <TableCell>Number of mobiles</TableCell>
+                <TableCell>Ping (ms)</TableCell>
+                <TableCell>Max ping (ms)</TableCell>
+                <TableCell>Avg ping (ms) over last 100</TableCell>
+                <TableCell />
+                <TableCell />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {roomConnections.map((connection) => (
+                <StressTestRow
+                  key={connection.roomId}
+                  connection={connection}
+                  removeRoom={removeRoom}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
     </Grid>
   );
