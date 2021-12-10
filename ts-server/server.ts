@@ -31,7 +31,7 @@ si.mem()
 
 console.log("Max event listeners", Socket.EventEmitter.defaultMaxListeners)
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 80
 
 
 // app.use(function (_:Request, res, next) {

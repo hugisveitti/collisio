@@ -53,9 +53,13 @@ export const allTrackNames: ITrackInfo[] = [
     {
         name: "Monaco track", type: "monaco-track", gameType: "race"
     }
+    ,
+    {
+        name: "Mountain track", type: "russia-track", gameType: "race"
+    }
 ]
 
-export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2"]
+export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2", "russia-track"]
 export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name => {
     for (let i = 0; i < allTrackNames.length; i++) {
         if (allTrackNames[i].type === name) {

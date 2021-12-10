@@ -48,7 +48,7 @@ si.mem()
 })
     .catch(function (error) { return console.error(error); });
 console.log("Max event listeners", socket_io_1.Socket.EventEmitter.defaultMaxListeners);
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 80;
 // app.use(function (_:Request, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header(
