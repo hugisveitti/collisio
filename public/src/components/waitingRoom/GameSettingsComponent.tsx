@@ -114,7 +114,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               type="number"
               value={gameSettings.numberOfLaps ? gameSettings.numberOfLaps : ""}
               onChange={(ev) => {
-                if (+ev.target.value > 0) {
+                if (+ev.target.value >= 0) {
                   updateGameSettings("numberOfLaps", +ev.target.value);
                 }
               }}
