@@ -503,7 +503,10 @@ export class LowPolyVehicle implements IVehicle {
         this.zeroEngineForce()
 
         this.stopEngineSound()
-        this.chassisMesh.body.setCollisionFlags(1)
+        if (this.chassisMesh?.body) {
+
+            this.chassisMesh.body.setCollisionFlags(1)
+        }
 
     };
 
@@ -514,10 +517,14 @@ export class LowPolyVehicle implements IVehicle {
         if (this.useEngineSound) {
             this.startEngineSound()
         }
-        this.chassisMesh.body.setCollisionFlags(0)
+        if (this.chassisMesh?.body) {
+
+            this.chassisMesh.body.setCollisionFlags(0)
+        }
     };
 
     addCamera(camera: PerspectiveCamera) {
+        if (!this.chassisMesh) return
         const c = this.chassisMesh.getObjectByName(camera.name)
         if (!this.useChaseCamera && !c) {
             camera.position.set(staticCameraPos.x, staticCameraPos.y, staticCameraPos.z)
@@ -870,6 +877,7 @@ export class LowPolyVehicle implements IVehicle {
     }
 
     async destroy() {
+        this.isReady = false
 
         this.stopEngineSound()
 

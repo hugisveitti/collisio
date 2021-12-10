@@ -195,8 +195,8 @@ export const vehicleConfigs = {
         wheelAxisHeightFront: -0.2,
 
 
-        mass: 800,
-        engineForce: 4500,
+        mass: 1200,
+        engineForce: 8000,
         breakingForce: 100,
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },
@@ -206,8 +206,6 @@ export const vehicleConfigs = {
         suspensionStiffness: 200,
         suspensionDamping: 10,
         suspensionCompression: 20,
-
-
 
         path: "off-roader.gltf"
     },
@@ -250,9 +248,9 @@ export const vehicleConfigs = {
         wheelAxisHeightFront: 0,
 
         suspensionRestLength: .4,
-        inertia: { x: 4000, y: 1000, z: 4000 },
+        //  inertia: { x: 4000, y: 1000, z: 4000 },
 
-        frictionSlip: 27.5,
+        //   frictionSlip: 27.5,
 
 
         mass: 500,

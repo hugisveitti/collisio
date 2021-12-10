@@ -1,3 +1,4 @@
+import { areDayPropsEqual } from "@mui/lab/PickersDay/PickersDay";
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { Socket } from "socket.io-client";
@@ -5,8 +6,13 @@ import {
   defaultGameSettings,
   getAllLocalGameSettings,
 } from "../classes/localGameSettings";
-import { defaultUserSettings } from "../classes/User";
+import {
+  defaultUserSettings,
+  IUserSettings,
+  IVehicleSettings,
+} from "../classes/User";
 import GameRoom from "../components/gameRoom/GameRoom";
+import UserSettingsComponent from "../components/profile/UserSettingsComponent";
 // import GameRoom from "../components/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";
@@ -27,8 +33,6 @@ const TestContainer = () => {
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
 
-  const [canStartGame, setCanStartGame] = useState(true);
-
   const deviceType = getDeviceType();
   const onMobile = deviceType === "mobile";
 
@@ -36,6 +40,20 @@ const TestContainer = () => {
     createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
+    const vehicleType: VehicleType =
+      (window.localStorage.getItem("vehicleType") as VehicleType) ?? "normal";
+
+    const newVehicleSettings: IVehicleSettings = {
+      ...userSettings.vehicleSettings,
+      vehicleType,
+    };
+
+    const newUserSettings: IUserSettings = {
+      ...userSettings,
+      vehicleSettings: newVehicleSettings,
+    };
+
+    setUserSettings(newUserSettings);
   }, []);
 
   useEffect(() => {

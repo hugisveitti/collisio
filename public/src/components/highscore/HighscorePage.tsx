@@ -67,7 +67,7 @@ const HighscorePage = (props: IHighscorePage) => {
       setNumberOfLapsKeys(nolKeys);
 
       if (!itemInArray(numberOfLapsKey, numberOfLapsKeys)) {
-        if (nolKeys.length > 0) {
+        if (nolKeys?.length > 0) {
           setNumberOfLapsKey(nolKeys[0]);
         } else {
           setNumberOfLapsKey("");

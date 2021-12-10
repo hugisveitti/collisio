@@ -31,7 +31,7 @@ document.body.appendChild(vehicleInputsContainer)
 
 
 
-export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScene {
+export class LowPolyTestScene extends GameScene {
 
     vehicle?: LowPolyTestVehicle
     vehicles: LowPolyTestVehicle[]
@@ -40,7 +40,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     textMesh?: any
     socket!: Socket
     vehicleControls!: VehicleControls
-    // course!: RaceCourse
+
     gameSettings: IGameSettings
     raceStarted: boolean
     checkpointCrossed: boolean
@@ -97,7 +97,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         stats.showPanel(0)
         document.body.appendChild(stats.dom)
         this.useShadows = true
-        // monsterTruck, tractor
+
 
         this.vehicleType = window.localStorage.getItem("vehicleType") as VehicleType ?? defaultVehicleType
         this.mobileControls = new MobileControls()
@@ -134,16 +134,13 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
-        // const helper = new THREE.CameraHelper(this.pLight.shadow.camera);
-        // this.scene.add(helper)
 
 
-        // const hLight = new THREE.HemisphereLight(0xffffff, 1)
+
         const hLight = new THREE.HemisphereLight(0xffffff, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
-        //  hLight.groundColor.setHSL(0.095, 1, 0.75);
-        // hLight.position.set(0, 1, 0)
+
         this.scene.add(hLight)
 
         const aLight = new THREE.AmbientLight(0xffffff, 1)
@@ -195,7 +192,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 
                 this.resetPlayer(0)
             } else if (e.key === "t") {
-                //  this.vehicle.chassisMesh.body.setCollisionFlags(0)
+
             } else if (e.key === "p") {
                 if (this.vehicle.isPaused) {
                     this.vehicle.unpause()
@@ -246,7 +243,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     async create() {
-        // test-course.gltf
+
         if (this.getGameType() === "race") {
 
             this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
@@ -293,7 +290,7 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
         const helper = (i: number) => {
             loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, (tires, chassises) => {
                 this.otherVehicles[i].addModels(tires, chassises[0])
-                //  this.otherVehicles[i].setPosition((Math.random() * 50) - 50, p.y + 2, (Math.random() * 50) - 50)
+
 
                 if (i < this.otherVehicles.length - 1) {
                     helper(i + 1)
@@ -570,7 +567,10 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
 
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {
-                v.unpause()
+                if (v.isReady) {
+
+                    v.unpause()
+                }
                 v.canDrive = true
                 v.start()
             }
@@ -738,12 +738,18 @@ export class LowPolyTestScene extends GameScene { //Scene3D implements IGameScen
     }
 
     unpauseGame() {
+
+
         this.vehicle.unpause()
+
         this.isPaused = false
     }
 
     pauseGame() {
-        this.vehicle.pause()
+        if (this.vehicle.isReady) {
+
+            this.vehicle.pause()
+        }
         this.isPaused = true
     }
 
