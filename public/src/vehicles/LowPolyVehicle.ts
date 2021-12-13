@@ -133,7 +133,6 @@ export class LowPolyVehicle implements IVehicle {
     engineSoundLoaded = false
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
-
         this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
         this.color = color
@@ -164,6 +163,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vector = new Ammo.btVector3(0, 0, 0)
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
+        console.log("Vehicle config for", this.vehicleType, ":", vehicleConfigs[this.vehicleType])
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -932,74 +932,74 @@ const tiresConfig = [
 
 let vehicleModels = {}
 
-export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, callback: (tires: ExtendedObject3D[], chassises: ExtendedObject3D[]) => void, onlyLoad?: boolean) => {
-    if (vehicleModels[vehicleType] !== undefined) {
-        callback(vehicleModels[vehicleType].tires, vehicleModels[vehicleType].chassises)
-        return
-    }
+export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoad?: boolean): Promise<[ExtendedObject3D[], ExtendedObject3D]> => {
+    const promise = new Promise<[ExtendedObject3D[], ExtendedObject3D]>((resolve, reject) => {
 
-    const loader = new GLTFLoader()
 
-    loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
-        let tires = [] as ExtendedObject3D[]
-        let chassises = [] as ExtendedObject3D[]
-        let extraCarStuff: ExtendedObject3D
-        for (let child of gltf.scene.children) {
-            if (child.type === "Mesh" || child.type === "Group") {
+        if (vehicleModels[vehicleType] !== undefined) {
 
-                if (child.name.includes("chassis")) {
-                    let chassis = (child as ExtendedObject3D);
-                    // import to clone the material since the tires share material
-                    const material = (chassis.material as MeshStandardMaterial).clone();
-                    //  material.color = new Color("");
-                    (chassis.material as MeshStandardMaterial) = material
-                    if (!onlyLoad) {
-                        // chassis.geometry.center();
-                    }
-                    chassises.push(chassis)
-                } else if (child.name.includes("extra-car-stuff")) {
-                    extraCarStuff = (child as ExtendedObject3D)
-                    if (!onlyLoad) {
-                        // extraCarStuff.geometry.center()
-                    }
+            resolve([vehicleModels[vehicleType].tires, vehicleModels[vehicleType].chassis])
+            return promise
+        }
 
-                } else if (child.name === "tire") {
-                    const tire = (child as ExtendedObject3D)
-                    if (!onlyLoad) {
-                        tire.geometry.center()
-                    }
-                    tires.push(tire)
-                } else {
-                    for (let tireConfig of tiresConfig) {
-                        if (child.name === tireConfig.name) {
-                            tires[tireConfig.number] = (child as ExtendedObject3D)
-                            if (!onlyLoad) {
-                                tires[tireConfig.number].geometry.center()
+        const loader = new GLTFLoader()
+
+        loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
+            let tires = [] as ExtendedObject3D[]
+            let chassis: ExtendedObject3D
+            let extraCarStuff: ExtendedObject3D
+            for (let child of gltf.scene.children) {
+                if (child.type === "Mesh" || child.type === "Group") {
+
+                    if (child.name.includes("chassis")) {
+                        let _chassis = (child as ExtendedObject3D);
+                        chassis = _chassis
+                        // import to clone the material since the tires share material
+                        const material = (chassis.material as MeshStandardMaterial).clone();
+                        //  material.color = new Color("");
+                        (chassis.material as MeshStandardMaterial) = material
+                        if (!onlyLoad) {
+                            // chassis.geometry.center();
+                        }
+                    } else if (child.name.includes("extra-car-stuff")) {
+                        extraCarStuff = (child as ExtendedObject3D)
+                        if (!onlyLoad) {
+                            // extraCarStuff.geometry.center()
+                        }
+
+                    } else if (child.name === "tire") {
+                        const tire = (child as ExtendedObject3D)
+                        if (!onlyLoad) {
+                            tire.geometry.center()
+                        }
+                        tires.push(tire)
+                    } else {
+                        for (let tireConfig of tiresConfig) {
+                            if (child.name === tireConfig.name) {
+                                tires[tireConfig.number] = (child as ExtendedObject3D)
+                                if (!onlyLoad) {
+                                    tires[tireConfig.number].geometry.center()
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
 
 
-        vehicleModels[vehicleType] = { tires, chassises }
+            vehicleModels[vehicleType] = { tires, chassis }
 
-        if (extraCarStuff) {
+            if (extraCarStuff) {
 
-            chassises[0].add(extraCarStuff)
-        }
-
-
-        if (!onlyLoad) {
-            for (let chassis of chassises) {
-                // chassis.geometry.center()
+                chassis.add(extraCarStuff)
             }
-        }
 
-        callback(tires, chassises)
 
+
+
+            resolve([tires, chassis])
+        })
     })
-
+    return promise
 }

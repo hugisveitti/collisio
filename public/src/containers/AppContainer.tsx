@@ -61,6 +61,12 @@ const AppContainer = (props: IAppContainer) => {
   }, [user]);
 
   const renderLoginLogoutButton = () => {
+    // if user is null then user hasnt been loaded
+    // if user is undefined then not logged in
+    if (user === null) {
+      return <CircularProgress style={{ color: "white" }} />;
+    }
+
     if (user) {
       return (
         <React.Fragment>

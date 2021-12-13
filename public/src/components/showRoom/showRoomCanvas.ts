@@ -6,25 +6,19 @@ import { VehicleType } from "../../shared-backend/shared-stuff"
 import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene) => {
-    loadLowPolyVehicleModels(vehicleType, (tires, chassises) => {
-        // const prePos = chassises[0].position;
+    loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
 
-
-        //  chassises[0].position.set(prePos.x, prePos.y, prePos.z);
-
-        (chassises[0].material as MeshStandardMaterial).color = new Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
-        scene.add(chassises[0])
+        (chassis.material as MeshStandardMaterial).color = new Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
+        scene.add(chassis)
 
         for (let tire of tires) {
-            const { x, y, z } = tire.position
 
-            //  tire.position.set(x + prePos.x, y + prePos.y, z+  prePos.z)
             scene.add(tire)
 
             tire.castShadow = tire.receiveShadow = true
         }
         scene.add(tires[0])
-    }, true)
+    })
 }
 
 const addLights = (scene: Scene) => {

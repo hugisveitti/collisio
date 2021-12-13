@@ -35,7 +35,7 @@ export class RaceCourse extends Course implements IRaceCourse {
 
     }
 
-    _createCourse() {
+    async _createCourse() {
 
         const tempCheckpoints = []
         for (let p of this.checkpoints) {

@@ -250,17 +250,17 @@ export class LowPolyTestScene extends GameScene {
         } else if (this.getGameType() === "tag") {
             this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
         }
-        this.course.createCourse(this.useShadows, () => {
-            if (this.getGameType() === "race") {
-                this.gameTime = new GameTime(3, (this.course as RaceCourse).getNumberOfCheckpoints())
-            }
-            this.courseLoaded = true
-            this.createOtherVehicles(() => {
-                this.createVehicle().then(() => {
-                    this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
-                })
+        await this.course.createCourse(this.useShadows)
+        if (this.getGameType() === "race") {
+            this.gameTime = new GameTime(3, (this.course as RaceCourse).getNumberOfCheckpoints())
+        }
+        this.courseLoaded = true
+        this.createOtherVehicles(() => {
+            this.createVehicle().then(() => {
+                this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
             })
         })
+
     }
 
     getGameType() {
@@ -288,8 +288,8 @@ export class LowPolyTestScene extends GameScene {
     createOtherVehicles(callback: () => void) {
         const p = this.course.ground.scale
         const helper = (i: number) => {
-            loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, (tires, chassises) => {
-                this.otherVehicles[i].addModels(tires, chassises[0])
+            loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, false).then(([tires, chassis]) => {
+                this.otherVehicles[i].addModels(tires, chassis)
 
 
                 if (i < this.otherVehicles.length - 1) {
@@ -426,9 +426,9 @@ export class LowPolyTestScene extends GameScene {
 
 
 
-        loadLowPolyVehicleModels(this.vehicleType, (tires, chassises,) => {
+        loadLowPolyVehicleModels(this.vehicleType, false).then(([tires, chassis]) => {
 
-            this.vehicle.addModels(tires, chassises[Math.floor(Math.random() * chassises.length)],)
+            this.vehicle.addModels(tires, chassis)
 
 
 

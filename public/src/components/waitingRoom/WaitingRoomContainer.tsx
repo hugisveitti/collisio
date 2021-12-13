@@ -99,7 +99,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   // });
 
   const handleSaveRoomInfo = () => {
-    console.log("to save roomi d", toSaveRoomId);
     if (toSaveRoomId) {
       const roomInfo: IRoomInfo = {
         desktopId: user?.uid ?? "undefined",

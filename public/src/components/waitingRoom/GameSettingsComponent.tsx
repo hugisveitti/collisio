@@ -157,6 +157,33 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           Shadows {gameSettings.useShadows ? "On" : "Off"}
         </Button>
       </Grid>
+      <Grid item xs={12} sm={4}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Grpahics</FormLabel>
+          <RadioGroup row aria-label="graphics" name="row-radio-buttons-group">
+            <FormControlLabel
+              value="low"
+              control={
+                <Radio
+                  onChange={() => updateGameSettings("graphics", "low")}
+                  checked={gameSettings.graphics === "low"}
+                />
+              }
+              label="Low"
+            />
+            <FormControlLabel
+              value="high"
+              control={
+                <Radio
+                  onChange={() => updateGameSettings("graphics", "high")}
+                  checked={gameSettings.graphics === "high"}
+                />
+              }
+              label="High"
+            />
+          </RadioGroup>
+        </FormControl>
+      </Grid>
     </Grid>
   );
 };

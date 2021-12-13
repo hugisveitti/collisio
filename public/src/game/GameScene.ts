@@ -88,6 +88,7 @@ export class GameScene extends Scene3D implements IGameScene {
     viewsImpornantInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
     pingInfo: HTMLSpanElement
+    fpsInfo: HTMLSpanElement
     playerInfosContainer: HTMLDivElement
 
     /**
@@ -112,8 +113,15 @@ export class GameScene extends Scene3D implements IGameScene {
     time: number
 
 
+    fpsTick: number
+    totalFpsTicks: number
+    totalNumberOfFpsTicks: number
+    oldTime: number
+
+
     constructor() {
         super()
+        this.needsReload = false
         this.players = []
         this.vehicles = []
         this.views = []
@@ -143,12 +151,24 @@ export class GameScene extends Scene3D implements IGameScene {
         this.pingInfo.setAttribute("class", "game-text")
         this.pingInfo.setAttribute("style", `
             position:absolute;
-            top:50px;
+            top:25px;
             left:5px;
         `)
-        this.gameInfoDiv.appendChild(this.pingInfo)
 
-        this.needsReload = false
+        this.fpsInfo = document.createElement("span")
+        this.fpsInfo.setAttribute("class", "game-text")
+        this.fpsInfo.setAttribute("style", `
+            position:absolute;
+            top:5px;
+            left:5px;
+        `)
+
+
+
+        this.gameInfoDiv.appendChild(this.pingInfo)
+        this.gameInfoDiv.appendChild(this.fpsInfo)
+
+
 
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
@@ -158,6 +178,10 @@ export class GameScene extends Scene3D implements IGameScene {
         this.totalPing = 0
         this.totalPingsGotten = 0
         this.time = 0
+        this.fpsTick = 0
+        this.totalFpsTicks = 0
+        this.totalNumberOfFpsTicks = 0
+        this.oldTime = 0
     }
 
     async addLights() {
@@ -235,16 +259,18 @@ export class GameScene extends Scene3D implements IGameScene {
 
         window.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
+                this.togglePauseGame()
                 if (this.gameRoomActions.escPressed) {
                     this.gameRoomActions.escPressed()
                 }
-                this.togglePauseGame()
             }
         })
 
         window.addEventListener("resize", () => this.onWindowResize())
-
+        await this.loadAssets()
     }
+
+    async loadAssets() { }
 
     async init() {
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
@@ -256,47 +282,49 @@ export class GameScene extends Scene3D implements IGameScene {
         this.physics.setGravity(0, -20, 0)
     }
 
-    async createVehicles(callback: () => void) {
-        this.vehicles = []
-        const loadedVehicleModels = {}
-        // get random color of chassis
-        let chassisColOffset = Math.floor(Math.random() * 4)
+    async createVehicles(): Promise<void> {
+        const promise = new Promise<void>((topresolve, reject) => {
 
-        /** make this better
-         * Currently doing async loading of models, when it could be sync
-         */
-        const recursiveCreate = (i: number) => {
+            this.vehicles = []
 
+            // get random color of chassis
+            let chassisColOffset = Math.floor(Math.random() * 4)
 
-            const color = possibleVehicleColors[i]
-
-            let newVehicle: IVehicle
-            newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
-            this.vehicles.push(newVehicle)
+            /** make this better
+             * Currently doing async loading of models, when it could be sync
+             */
+            const recursiveCreate = async (i: number) => {
 
 
+                const color = possibleVehicleColors[i]
 
-            let loadPromise = new Promise((resolve, reject) => {
+                let newVehicle: IVehicle
+                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+                this.vehicles.push(newVehicle)
 
-                loadLowPolyVehicleModels(this.players[i].vehicleType, (tires, chassises,) => {
-                    // only x colors of chassis
-                    loadedVehicleModels[this.players[i].vehicleType] = { chassises, tires };
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassises[0])
-                    resolve("success")
-                }, false)
-            })
-            loadPromise.then((msg) => {
+
+
+
+
+                await loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
+                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassis)
+
+                })
+
                 if (i === this.players.length - 1) {
-                    callback()
+
                     this.emitVehiclesReady()
+                    topresolve()
                 } else {
                     recursiveCreate(i + 1)
                 }
-            })
 
-        }
 
-        recursiveCreate(0)
+            }
+
+            recursiveCreate(0)
+        })
+        return promise
     }
 
     /**
@@ -338,6 +366,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setNeedsReload(needsReload: boolean) {
+
         this.needsReload = needsReload
     }
 
@@ -551,8 +580,8 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     togglePauseGame() {
-        let wasPaused = this.isGamePaused()
-        if (wasPaused) {
+        let isPaused = this.isGamePaused()
+        if (isPaused) {
             this.unpauseGame()
         } else {
             this.pauseGame()
@@ -612,7 +641,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     setGameSettings(gameSettings: IGameSettings) {
 
-        if (this.gameSettings.trackName !== gameSettings.trackName) {
+        if (this.courseLoaded && (this.gameSettings.trackName !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
             this.setNeedsReload(true)
         }
 
@@ -691,6 +720,12 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
     restartGame() {
+
+        this.oldTime = 0
+        this.totalPing = 0
+        this.totalPingsGotten = 0
+        this.totalNumberOfFpsTicks = 0
+        this.totalFpsTicks = 0
         if (this.gameRoomActions?.closeModals) {
             this.gameRoomActions.closeModals()
         }
@@ -712,6 +747,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         } else {
 
+            this.gameStarted = false
 
             this.resetVehicles()
 
@@ -763,24 +799,7 @@ export class GameScene extends Scene3D implements IGameScene {
         })
     }
 
-    loadFont() {
-        if (!this.font) {
 
-            const fontName = "helvetiker"
-            const fontWeight = "regular"
-            const loader = new FontLoader();
-            loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
-                this.font = response;
-                for (let vehicle of this.vehicles) {
-                    vehicle.setFont(this.font)
-                }
-            });
-        } else {
-            for (let vehicle of this.vehicles) {
-                vehicle.setFont(this.font)
-            }
-        }
-    }
 
     resetPlayer(idx: number) {
         this.vehicles[idx].resetPosition()
@@ -806,7 +825,17 @@ export class GameScene extends Scene3D implements IGameScene {
             this.totalPing += ping
             this.totalPingsGotten += 1
         })
+    }
 
+    updateFps(time: number) {
+        this.fpsTick += 1
+        if (Math.floor(time) > this.oldTime) {
+            this.fpsInfo.innerHTML = `fps ${this.fpsTick}`
+            this.totalFpsTicks += this.fpsTick
+            this.totalNumberOfFpsTicks += 1
+            this.fpsTick = 0
+            this.oldTime = Math.floor(time)
+        }
     }
 
     resetVehicles() {
@@ -867,6 +896,7 @@ export class GameScene extends Scene3D implements IGameScene {
 export const startGame = (SceneClass: typeof GameScene, socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: GameScene) => void) => {
     const config = { scenes: [SceneClass], antialias: true }
     PhysicsLoader("/ammo", () => {
+
         const project = new Project(config)
 
 

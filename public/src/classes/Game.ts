@@ -135,6 +135,7 @@ export interface IEndOfRaceInfoPlayer {
     userAgent: string
     totalPing: number
     totalPingsGotten: number
+    avgFps: number
 }
 
 export interface IPlayerGameInfo {
@@ -160,6 +161,7 @@ export interface IEndOfRaceInfoGame {
     gameTicks: number
     avgPing: number
     time: number
+    avgFps: number
 }
 
 /** while race is going on */

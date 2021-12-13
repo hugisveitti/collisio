@@ -43,10 +43,11 @@ export const inTestMode = false
 export const testGameSettings: IGameSettings = {
     gameType: "race",
     numberOfLaps: 2,
-    trackName: "test-course",
+    trackName: "russia-track",
     tagGameLength: 2,
     useShadows: true,
-    useSound: true
+    useSound: true,
+    graphics: "low"
 }
 
 

@@ -173,7 +173,7 @@ var Room = /** @class */ (function () {
     Room.prototype.setupLeftWebsiteListener = function () {
         var _this = this;
         this.socket.on("disconnect", function () {
-            console.log("disconnected");
+            console.log("disconnected", _this.roomId);
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 player.desktopDisconnected();
@@ -272,7 +272,7 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupControlsListener = function () {
         var _this = this;
-        setInterval(function () {
+        this.sendControlsInterval = setInterval(function () {
             _this.socket.emit(shared_stuff_1.std_controls, { players: _this.getPlayersControls() });
             // set fps
         }, shared_stuff_1.STD_SENDINTERVAL_MS);
@@ -338,6 +338,20 @@ var Room = /** @class */ (function () {
             }
         }
         this.alertWaitingRoom();
+        if (this.gameStarted && this.everyoneDisconnected()) {
+            if (this.sendControlsInterval) {
+                clearInterval(this.sendControlsInterval);
+            }
+        }
+    };
+    Room.prototype.everyoneDisconnected = function () {
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            if (p.isConnected) {
+                return false;
+            }
+        }
+        return true;
     };
     Room.prototype.userSettingsChanged = function (data) {
         this.socket.emit(shared_stuff_1.std_user_settings_changed, data);

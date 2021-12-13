@@ -6,7 +6,7 @@ import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 export interface ICourse {
     checkIfObjectOutOfBounds: (object: SimpleVector) => boolean
     toggleShadows: (useShadows: boolean) => void
-    createCourse: (useShadows: boolean, callback: () => void) => void
+    createCourse: (useShadows: boolean) => Promise<void>
     clearCourse: () => void
     updateCourse: () => void
     setStartPositions: (vehicle: IVehicle[]) => void

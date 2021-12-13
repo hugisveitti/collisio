@@ -138,10 +138,10 @@ export class Player {
 
     setupDisconnectListener() {
         this.socket.on("disconnect", () => {
+            this.isConnected = false
             if (this.game) {
                 this.game.playerDisconnected(this.playerName, this.id)
             }
-            this.isConnected = false
         })
     }
 

@@ -68,29 +68,24 @@ export class TagGameScene extends GameScene {
 
     async create() {
         this.course = new TagCourse(this, this.gameSettings.trackName, (name, coin) => this.handleCoinCollidedCallback(name, coin))
-        this.course.createCourse(this.useShadows, () => {
+        await this.course.createCourse(this.useShadows)
 
-            this.courseLoaded = true
-            const createVehiclePromise = new Promise((resolve, reject) => {
-                this.createVehicles(() => {
-                    for (let vehicle of this.vehicles) {
-                        vehicle.useBadRotationTicks = false
-                    }
-                    resolve("successfully created all vehicles")
+        this.courseLoaded = true
 
-                })
-            })
+        await this.createVehicles() //() => {
+        for (let vehicle of this.vehicles) {
+            vehicle.useBadRotationTicks = false
+        }
 
-            createVehiclePromise.then(() => {
-                this.loadFont()
-                this.createViews()
-                this.createController()
-                this.resetVehicles()
-                this.resetTagObjects()
-                this.createColliderListeners()
-                this.startGameCountdown()
-            })
-        })
+
+        this.createViews()
+        this.createController()
+        this.resetVehicles()
+        this.resetTagObjects()
+        this.createColliderListeners()
+        this.startGameCountdown()
+
+
     }
 
 
@@ -272,6 +267,7 @@ export class TagGameScene extends GameScene {
 
     update(time: number) {
         this.ticks += 1
+        this.updateFps(time)
 
         if (this.everythingReady()) {
             stats.begin()

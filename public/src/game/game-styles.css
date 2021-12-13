@@ -42,17 +42,6 @@
   text-align: center;
 }
 
-#load-screen {
-  color: black;
-  text-shadow: 1px 1px white;
-  font-size: 32px;
-  position: absolute;
-  left: 50%;
-  top: 150px;
-  transform: translate(-50%, 5px);
-  text-align: center;
-}
-
 .game-text {
   color: black;
   text-shadow: 1px 1px white;

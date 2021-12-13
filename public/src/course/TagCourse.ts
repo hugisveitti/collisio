@@ -162,7 +162,7 @@ export class TagCourse extends Course implements ITagCourse {
 
     }
 
-    _createCourse() {
+    async _createCourse() {
 
         this.setupGameObjects()
 

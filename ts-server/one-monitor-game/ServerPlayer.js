@@ -110,10 +110,10 @@ var Player = /** @class */ (function () {
     Player.prototype.setupDisconnectListener = function () {
         var _this = this;
         this.socket.on("disconnect", function () {
+            _this.isConnected = false;
             if (_this.game) {
                 _this.game.playerDisconnected(_this.playerName, _this.id);
             }
-            _this.isConnected = false;
         });
     };
     Player.prototype.setLeader = function () {

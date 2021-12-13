@@ -1,5 +1,4 @@
 import { ExtendedObject3D } from "enable3d";
-import Stats from "stats.js";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInfo } from "../classes/Game";
 import { IRaceCourse } from "../course/ICourse";
@@ -14,7 +13,7 @@ import { GameTime } from "./GameTimeClass";
 
 
 
-const stats = new Stats()
+// const stats = new Stats()
 const totalTimeDiv = document.createElement("div")
 
 
@@ -59,8 +58,6 @@ export class RaceGameScene extends GameScene {
         this.winTime = -1
         this.gameTimers = []
 
-        stats.showPanel(0)
-        this.gameInfoDiv.appendChild(stats.dom)
 
         this.roomTicks = 0
         this.gameTicks = 0
@@ -71,33 +68,31 @@ export class RaceGameScene extends GameScene {
 
     }
 
-    async create() {
+    async loadAssets(): Promise<void> {
+
         this.gameTimers = []
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
-        this.course.createCourse(this.useShadows, () => {
-            this.courseLoaded = true
-            const createVehiclePromise = new Promise((resolve, reject) => {
-                this.createVehicles(() => {
-                    resolve("successfully created all vehicles")
-                })
-            })
 
-            createVehiclePromise.then(() => {
-                this.currentNumberOfLaps = this.gameSettings.numberOfLaps
-                // adds font to vehicles, which displays names
-                for (let i = 0; i < this.players.length; i++) {
-                    this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
-                }
-                this.loadFont()
-                this.createViews()
-                this.createController()
-                this.resetVehicles()
-                this.restartGame()
+        await this.course.createCourse(this.useShadows)
 
+        this.courseLoaded = true
 
-            })
+        await this.createVehicles()
 
-        })
+        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        // adds font to vehicles, which displays names
+        for (let i = 0; i < this.players.length; i++) {
+            this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
+        }
+
+        this.createViews()
+        this.createController()
+        this.resetVehicles()
+        this.restartGame()
+
+    }
+
+    async create(): Promise<void> {
     }
 
     startRaceCountdown() {
@@ -181,6 +176,7 @@ export class RaceGameScene extends GameScene {
 
 
     _restartGame() {
+
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
         window.clearTimeout(this.countDownTimeout)
@@ -299,16 +295,17 @@ export class RaceGameScene extends GameScene {
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D, checkpointNumber: number) {
         const vehicleNumber = getVehicleNumber(vehicle.body.name)
-        if (!this.gameTimers[vehicleNumber].crossedCheckpoint(checkpointNumber)) {
+        // If player restarts game while inside the checkpoint it will register as a the checkpoint crossed in the new game
+        if (!this.gameTimers[vehicleNumber].crossedCheckpoint(checkpointNumber) && this.gameStarted) {
+
             this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
+            this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
 
+            const p = this.course.checkpointSpawns[checkpointNumber - 1].position
+            const r = this.course.checkpointSpawns[checkpointNumber - 1].rotation
+
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
         }
-        this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
-
-        const p = this.course.checkpointSpawns[checkpointNumber - 1].position
-        const r = this.course.checkpointSpawns[checkpointNumber - 1].rotation
-
-        this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
     }
 
 
@@ -345,10 +342,12 @@ export class RaceGameScene extends GameScene {
 
     update(time: number) {
         this.time = time
+        this.updateFps(time)
+
         this.gameTicks += 1
         this.roomTicks += 1
         if (this.everythingReady()) {
-            stats.begin()
+
             if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
@@ -362,7 +361,7 @@ export class RaceGameScene extends GameScene {
 
                 this.updatePing()
             }
-            stats.end()
+
         }
     }
 
@@ -392,7 +391,8 @@ export class RaceGameScene extends GameScene {
             gameTicks: this.gameTicks,
             userAgent: navigator.userAgent,
             totalPing: this.totalPing,
-            totalPingsGotten: this.totalPingsGotten
+            totalPingsGotten: this.totalPingsGotten,
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks
         }
 
         if (this.gameRoomActions.playerFinished) {
@@ -429,6 +429,7 @@ export class RaceGameScene extends GameScene {
             gameTicks: this.gameTicks,
             avgPing: this.totalPingsGotten === 0 ? -1 : this.totalPing / this.totalPingsGotten,
             time: this.time,
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks
         }
         if (this.gameRoomActions.gameFinished) {
             this.gameRoomActions.gameFinished({ endOfRaceInfo })

@@ -82,7 +82,8 @@ export const createFakeHighscoreData = () => {
                 gameTicks: 0,
                 userAgent: "test data",
                 totalPing: -1,
-                totalPingsGotten: -1
+                totalPingsGotten: -1,
+                avgFps: -1
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",
@@ -106,7 +107,8 @@ export const createFakeHighscoreData = () => {
             roomTicks: 10,
             gameTicks: 10,
             avgPing: -1,
-            time: -1
+            time: -1,
+            avgFps: -1
         }
 
 

@@ -186,6 +186,7 @@ export class Room {
     deleteRoomCallback
 
     desktopUserId: string | undefined
+    sendControlsInterval?: NodeJS.Timer
 
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
@@ -246,7 +247,7 @@ export class Room {
     setupLeftWebsiteListener() {
 
         this.socket.on("disconnect", () => {
-            console.log("disconnected")
+            console.log("disconnected", this.roomId)
             for (let player of this.players) {
                 player.desktopDisconnected()
             }
@@ -353,8 +354,9 @@ export class Room {
         this.socket.emit(stmd_game_settings_changed, { gameSettings })
     }
 
+
     setupControlsListener() {
-        setInterval(() => {
+        this.sendControlsInterval = setInterval(() => {
             this.socket.emit(std_controls, { players: this.getPlayersControls() })
             // set fps
         }, STD_SENDINTERVAL_MS)
@@ -427,6 +429,22 @@ export class Room {
         }
 
         this.alertWaitingRoom()
+        if (this.gameStarted && this.everyoneDisconnected()) {
+
+            if (this.sendControlsInterval) {
+                clearInterval(this.sendControlsInterval)
+            }
+        }
+    }
+
+    everyoneDisconnected() {
+
+        for (let p of this.players) {
+            if (p.isConnected) {
+                return false
+            }
+        }
+        return true
     }
 
     userSettingsChanged(data: any) {

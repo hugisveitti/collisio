@@ -1,5 +1,7 @@
 import { GameType, TrackName } from "../shared-backend/shared-stuff"
 
+export type GraphicsType = "low" | "high"
+
 /**
  * Store some things on the localStorage
  * like useSound and useShadows
@@ -13,7 +15,7 @@ export interface IGameSettings {
     trackName: TrackName
     gameType: GameType
     tagGameLength: number
-
+    graphics: GraphicsType
 }
 
 export const defaultGameSettings: IGameSettings = {
@@ -22,7 +24,8 @@ export const defaultGameSettings: IGameSettings = {
     numberOfLaps: 1,
     trackName: "farm-track",
     gameType: "race",
-    tagGameLength: 2
+    tagGameLength: 2,
+    graphics: "high"
 }
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {
