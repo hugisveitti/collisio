@@ -216,7 +216,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.scene.fog = new Fog(this.scene.background, 1, 5000);
         this.scene.fog.color.copy(uniforms["bottomColor"].value);
 
-        const skyGeo = new SphereGeometry(4000, 32, 15);
+        const skyGeo = new SphereGeometry(1000, 32, 15);
         const skyMat = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: skydomeVertexShader,

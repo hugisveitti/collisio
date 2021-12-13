@@ -51,9 +51,10 @@ const GameInfoRow = (props: IGameInfoRow) => {
             : "No leader"}
         </TableCell>
         <TableCell>{props.gameData.avgPing}</TableCell>
+        <TableCell>{props.gameData.avgFps}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>
           <Collapse in={open}>
             <Typography>PlayersInfo</Typography>
             {playersInfo.map((player) => {
@@ -120,6 +121,7 @@ const AdminGameDataTable = (props: IGameDataTable) => {
             <TableCell>Number of laps</TableCell>
             <TableCell>Leader</TableCell>
             <TableCell>Average ping</TableCell>
+            <TableCell>Average fps</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

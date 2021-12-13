@@ -124,54 +124,54 @@ export class LowPolyTestScene extends GameScene {
 
     }
 
-    async addLights() {
+    // async addLights() {
 
-        this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
-        this.pLight.position.set(100, 150, 100);
+    //     this.pLight = new THREE.PointLight(0xffffff, 1, 0, 1)
+    //     this.pLight.position.set(100, 150, 100);
 
-        this.scene.add(this.pLight);
-        if (this.useShadows) {
-            this.pLight.castShadow = true
-            this.pLight.shadow.bias = 0.01
-        }
+    //     this.scene.add(this.pLight);
+    //     if (this.useShadows) {
+    //         this.pLight.castShadow = true
+    //         this.pLight.shadow.bias = 0.01
+    //     }
 
 
 
-        const hLight = new THREE.HemisphereLight(0xffffff, 1)
-        hLight.position.set(0, 1, 0);
-        hLight.color.setHSL(0.6, 1, 0.4);
+    //     const hLight = new THREE.HemisphereLight(0xffffff, 1)
+    //     hLight.position.set(0, 1, 0);
+    //     hLight.color.setHSL(0.6, 1, 0.4);
 
-        this.scene.add(hLight)
+    //     this.scene.add(hLight)
 
-        const aLight = new THREE.AmbientLight(0xffffff, 1)
-        aLight.position.set(0, 0, 0)
-        this.scene.add(aLight)
+    //     const aLight = new THREE.AmbientLight(0xffffff, 1)
+    //     aLight.position.set(0, 0, 0)
+    //     this.scene.add(aLight)
 
-        // skydome
+    //     // skydome
 
-        const uniforms = {
-            "topColor": { value: new THREE.Color(0x0077ff) },
-            "bottomColor": { value: new THREE.Color(0xffffff) },
-            "offset": { value: 33 },
-            "exponent": { value: 0.6 }
-        };
-        uniforms["topColor"].value.copy(hLight.color);
-        this.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
-        this.scene.fog = new THREE.Fog(this.scene.background, 1, 5000);
-        this.scene.fog.color.copy(uniforms["bottomColor"].value);
+    //     const uniforms = {
+    //         "topColor": { value: new THREE.Color(0x0077ff) },
+    //         "bottomColor": { value: new THREE.Color(0xffffff) },
+    //         "offset": { value: 33 },
+    //         "exponent": { value: 0.6 }
+    //     };
+    //     uniforms["topColor"].value.copy(hLight.color);
+    //     this.scene.background = new THREE.Color().setHSL(0.6, 0, 1);
+    //     this.scene.fog = new THREE.Fog(this.scene.background, 1, 5000);
+    //     this.scene.fog.color.copy(uniforms["bottomColor"].value);
 
-        const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
-        const skyMat = new THREE.ShaderMaterial({
-            uniforms: uniforms,
-            vertexShader: skydomeVertexShader,
-            fragmentShader: skydomeFragmentShader,
-            side: THREE.BackSide
-        });
+    //     const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
+    //     const skyMat = new THREE.ShaderMaterial({
+    //         uniforms: uniforms,
+    //         vertexShader: skydomeVertexShader,
+    //         fragmentShader: skydomeFragmentShader,
+    //         side: THREE.BackSide
+    //     });
 
-        const sky = new THREE.Mesh(skyGeo, skyMat);
-        this.scene.add(sky);
+    //     const sky = new THREE.Mesh(skyGeo, skyMat);
+    //     this.scene.add(sky);
 
-    }
+    // }
 
     async preload() {
 

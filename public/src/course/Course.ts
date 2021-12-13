@@ -208,12 +208,13 @@ export class Course implements ICourse {
                                                     x: waterObject.position.x,
                                                     z: waterObject.position.z,
 
-                                                    width: waterObject.scale.z * 2,
-                                                    height: waterObject.scale.x * 2,
+
+                                                    width: waterObject.scale.x * 2,
+                                                    height: waterObject.scale.z * 2,
                                                     normalMap0: textures[0],
                                                     normalMap1: textures[1]
                                                 })
-
+                                                console.log("water object", waterObject)
 
                                             }).catch(err => {
                                                 console.warn("Error loading water texture", err)
@@ -224,6 +225,7 @@ export class Course implements ICourse {
                                                 y: waterObject.position.y,
                                                 x: waterObject.position.x,
                                                 z: waterObject.position.z,
+
 
                                                 width: waterObject.scale.z * 2,
                                                 height: waterObject.scale.x * 2,
