@@ -246,8 +246,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   //const btnSize = screenWidth < 350 ? 120 : 150;
 
-  const btnW = isPortrait ? screenWidth : screenWidth / 3;
-  const btnH = isPortrait ? screenHeight / 3 : screenHeight;
+  const btnMargin = 10;
+  const btnW = isPortrait ? screenWidth : screenWidth / 3 - btnMargin;
+  const btnH = isPortrait ? screenHeight / 3 - btnMargin : screenHeight;
 
   const utilBtnSize = screenWidth < 350 ? 60 : 90;
 
@@ -406,7 +407,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             e.preventDefault();
             handleButtonAction(true, "resetVehicle", setReset);
           }}
-          // onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
+          onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
           style={{
             ...utilBtnPos,
             ...resetStyles,

@@ -289,10 +289,11 @@ export class Course implements ICourse {
 
     calcSpawnAngle(p1: Vector3, p2: Vector3) {
 
-        const zeroVec = new Vector3(0, 0, 0)
+        const zeroVec1 = new Vector3(0, 0, 0)
+        const zeroVec2 = new Vector3(0, 0, 0)
         const a = p1.sub(p2).length()
-        const b = zeroVec.sub(p1).length()
-        const c = zeroVec.sub(p2).length()
+        const b = zeroVec1.sub(p1).length()
+        const c = zeroVec2.sub(p2).length()
         return Math.acos((a * a + c * c - b * b) / (a * a * c)) * radToDeg
     }
 
@@ -306,7 +307,7 @@ export class Course implements ICourse {
             aPos = this.sAlign.position
         }
         let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
-        console.log(usableSpawns)
+
         if (usableSpawns.length >= vehicles.length) {
             // const sortedSpawns = new Array(usableSpawns.length)
             // for (let spawn of usableSpawns) {
@@ -363,11 +364,11 @@ export class Course implements ICourse {
                 const sI = Math.floor(Math.random() * possibleStartingPos.length)
                 const sPos = possibleStartingPos[sI]
                 possibleStartingPos.splice(sI, 1)
-                const angle = this.calcSpawnAngle(aPos, sPos)
+                const angle = aPos ? this.calcSpawnAngle(aPos, sPos) : r.y
                 console.log("angle", angle)
 
 
-                vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
+                vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: angle, z: 0 } })
                 vehicles[i].resetPosition()
                 vehicles[i].stop()
             }

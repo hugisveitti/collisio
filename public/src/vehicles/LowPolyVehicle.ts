@@ -95,6 +95,8 @@ export class LowPolyVehicle implements IVehicle {
     is4x4: boolean
     isReady: boolean
 
+    transformCam: Ammo.btTransform
+
 
     forwardTicks = 0
 
@@ -164,6 +166,8 @@ export class LowPolyVehicle implements IVehicle {
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
         console.log("Vehicle config for", this.vehicleType, ":", vehicleConfigs[this.vehicleType])
+
+        this.transformCam = new Ammo.btTransform()
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -615,33 +619,50 @@ export class LowPolyVehicle implements IVehicle {
             camera.updateWorldMatrix(false, false)
             camera.updateMatrixWorld()
 
+
+
         } else if (this.useChaseCamera) {
 
 
 
+            this.vehicle.getRigidBody().getMotionState().getWorldTransform(this.transformCam)
             const rot = this.chassisMesh.rotation
 
             // I think these are always the same
             // this.chassisMesh.pos is set to the value of this.getPosition in update()
-            const pos = this.chassisMesh.position.clone() // this.getPosition()
+            let pos = this.chassisMesh.position.clone() // this.getPosition()
+
+            const p1 = this.vehicle.getChassisWorldTransform().getOrigin()
+
+            const vec = new Vector3(p1.x(), p1.y(), p1.z())
+            //  console.log(vec.sub(pos))
+            pos = vec
+            // console.log("p1", p1.x().toFixed(2), p1.y().toFixed(2), p1.z().toFixed(2))
+            // console.log("pos", pos.x.toFixed(2), pos.y.toFixed(2), pos.z.toFixed(2))
 
             /**
              * I am not sure what to do with the chase speed
              */
 
+            /**
+             * This will have the camera first few km/h catch up to the car and then be at the same speed
+             */
 
-            this.cameraDiff.subVectors(pos, this.oldPos)
-            let chaseSpeed = speedScaler(Math.abs(this.getCurrentSpeedKmHour()))// 1// this.chaseCameraSpeed
+            // this.cameraDiff.subVectors(pos, this.oldPos)
+            // let chaseSpeed = speedScaler(Math.abs(this.getCurrentSpeedKmHour()))// 1// this.chaseCameraSpeed
 
-            chaseSpeed = Math.min(1, chaseSpeed)
+            // chaseSpeed = Math.min(1, chaseSpeed)
+            // if ((Math.abs(this.cameraDiff.x) > 2 || Math.abs(this.cameraDiff.z) > 2) && (Math.abs(this.cameraDiff.x) < 5 || Math.abs(this.cameraDiff.z) < 5)) {
+
+            //     chaseSpeed = 1
+            //     chaseSpeedY = 0
+            // }
+
+
             let chaseSpeedY = 0.5
-            if ((Math.abs(this.cameraDiff.x) > 2 || Math.abs(this.cameraDiff.z) > 2) && (Math.abs(this.cameraDiff.x) < 5 || Math.abs(this.cameraDiff.z) < 5)) {
+            let chaseSpeed = this.chaseCameraSpeed
 
-                chaseSpeed = 1
-                chaseSpeedY = 0
-            }
-
-            this.oldPos = pos.clone()
+            // this.oldPos = pos.clone()
 
             // this is for the follow camera effect
             this.cameraTarget.set(

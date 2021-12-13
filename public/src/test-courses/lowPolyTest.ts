@@ -65,7 +65,7 @@ export class LowPolyTestScene extends GameScene {
     vehicleColorNumber = 0
 
     otherVehicles: LowPolyTestVehicle[]
-    numberOfOtherVehicles = 2
+    numberOfOtherVehicles = 1
 
     isIt: number
 
@@ -669,8 +669,8 @@ export class LowPolyTestScene extends GameScene {
 
 
     updateVehicles() {
-        this.vehicle.update()
         this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+        this.vehicle.update()
     }
 
     update() {

@@ -858,8 +858,12 @@ export class GameScene extends Scene3D implements IGameScene {
     updateVehicles() {
         for (let i = 0; i < this.views.length; i++) {
 
-            this.vehicles[i].update()
+            /**
+             * For the chase cam, we have to look at the vehicle and then update the position
+             * Maybe that is wrong but I think it shakes less
+             */
             this.vehicles[i].cameraLookAt(this.views[i].camera)
+            this.vehicles[i].update()
 
             const left = Math.floor(window.innerWidth * this.views[i].left);
             const bottom = Math.floor(window.innerHeight * this.views[i].bottom);
