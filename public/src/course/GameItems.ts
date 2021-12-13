@@ -187,6 +187,16 @@ export const gameItems = {
         shape: "concave",
         bounciness: 0
     },
+    // goal spawn align
+    "s-align": {
+        collisionFlags: 1,
+        shape: "concave",
+        notAddPhysics: true,
+        isCourseObject: true,
+        objectName: "sAlign",
+        notVisible: true,
+    },
+
 
 
 } as { [key: string]: IGameItem }

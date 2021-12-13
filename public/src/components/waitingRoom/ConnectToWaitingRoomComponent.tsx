@@ -128,7 +128,7 @@ const ConnectToWaitingRoomComponent = (
         toast.error(message);
         setConnectingToRoom(false);
       } else {
-        toast.success(response.message);
+        // toast.success(response.message);
 
         props.store.setGameSettings(response.data.gameSettings);
         props.store.setPlayer(response.data.player);

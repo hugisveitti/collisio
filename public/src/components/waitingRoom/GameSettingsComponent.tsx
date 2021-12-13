@@ -159,7 +159,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       </Grid>
       <Grid item xs={12} sm={4}>
         <FormControl component="fieldset">
-          <FormLabel component="legend">Grpahics</FormLabel>
+          <FormLabel component="legend">Graphics</FormLabel>
           <RadioGroup row aria-label="graphics" name="row-radio-buttons-group">
             <FormControlLabel
               value="low"

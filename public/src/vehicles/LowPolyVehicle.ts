@@ -6,7 +6,7 @@ import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
-import { logScaler, numberScaler } from "../utils/utilFunctions";
+import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -36,7 +36,7 @@ const FRONT_RIGHT = 1
 const BACK_LEFT = 2
 const BACK_RIGHT = 3
 
-const degToRad = 0.017453
+
 
 
 

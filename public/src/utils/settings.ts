@@ -37,13 +37,13 @@ export const inDevelopment = window.location.href.includes("localhost") || windo
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = false
+export const inTestMode = true
 
 
 export const testGameSettings: IGameSettings = {
     gameType: "race",
     numberOfLaps: 2,
-    trackName: "russia-track",
+    trackName: "f1-track",
     tagGameLength: 2,
     useShadows: true,
     useSound: true,

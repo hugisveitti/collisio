@@ -84,3 +84,6 @@ export const getDateFromNumber = (num: number | any): string => {
     }
     return "-"
 }
+
+export const degToRad = 0.017453
+export const radToDeg = 57.2957795

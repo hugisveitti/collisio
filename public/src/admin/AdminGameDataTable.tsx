@@ -50,8 +50,12 @@ const GameInfoRow = (props: IGameInfoRow) => {
             ? props.gameData.playersInfo[0].name
             : "No leader"}
         </TableCell>
-        <TableCell>{props.gameData.avgPing}</TableCell>
-        <TableCell>{props.gameData.avgFps}</TableCell>
+        <TableCell>
+          {props.gameData.avgPing ? props.gameData.avgPing.toFixed(2) : "-"}
+        </TableCell>
+        <TableCell>
+          {props.gameData.avgFps ? props.gameData.avgFps.toFixed(2) : "-"}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>

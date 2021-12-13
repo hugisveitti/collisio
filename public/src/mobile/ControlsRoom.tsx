@@ -406,7 +406,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             e.preventDefault();
             handleButtonAction(true, "resetVehicle", setReset);
           }}
-          onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
+          // onTouchEnd={() => handleButtonAction(false, "resetVehicle", setReset)}
           style={{
             ...utilBtnPos,
             ...resetStyles,

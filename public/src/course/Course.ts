@@ -9,6 +9,7 @@ import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
 import { ICourse } from "./ICourse";
 import "./course.css"
+import { radToDeg } from "../utils/utilFunctions";
 
 const loadImage = document.createElement("img")
 
@@ -110,6 +111,7 @@ export class Course implements ICourse {
 
     spawns: Object3D[]
 
+    sAlign: Object3D
 
 
 
@@ -214,7 +216,7 @@ export class Course implements ICourse {
                                                     normalMap0: textures[0],
                                                     normalMap1: textures[1]
                                                 })
-                                                console.log("water object", waterObject)
+
 
                                             }).catch(err => {
                                                 console.warn("Error loading water texture", err)
@@ -285,10 +287,26 @@ export class Course implements ICourse {
         }
     }
 
+    calcSpawnAngle(p1: Vector3, p2: Vector3) {
+
+        const zeroVec = new Vector3(0, 0, 0)
+        const a = p1.sub(p2).length()
+        const b = zeroVec.sub(p1).length()
+        const c = zeroVec.sub(p2).length()
+        return Math.acos((a * a + c * c - b * b) / (a * a * c)) * radToDeg
+    }
+
     setStartPositions(vehicles: IVehicle[]) {
 
-        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
 
+        // align position
+        let aPos: Vector3
+        if (this.sAlign) {
+
+            aPos = this.sAlign.position
+        }
+        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
+        console.log(usableSpawns)
         if (usableSpawns.length >= vehicles.length) {
             // const sortedSpawns = new Array(usableSpawns.length)
             // for (let spawn of usableSpawns) {
@@ -310,7 +328,10 @@ export class Course implements ICourse {
                 const p = sortedSpawns[i].position
                 const r = sortedSpawns[i].rotation
 
-                vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
+                const angle = aPos ? this.calcSpawnAngle(aPos, p) : r.y
+
+
+                vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: angle } })
                 vehicles[i].resetPosition()
                 vehicles[i].stop()
             }
@@ -342,6 +363,9 @@ export class Course implements ICourse {
                 const sI = Math.floor(Math.random() * possibleStartingPos.length)
                 const sPos = possibleStartingPos[sI]
                 possibleStartingPos.splice(sI, 1)
+                const angle = this.calcSpawnAngle(aPos, sPos)
+                console.log("angle", angle)
+
 
                 vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
                 vehicles[i].resetPosition()
