@@ -678,16 +678,16 @@ export class GameScene extends Scene3D implements IGameScene {
 
     playCountdownBeep() {
         if (this.useSound) {
-            this.beepC4.play()
+            this.beepC4?.play()
             setTimeout(() => {
-                this.beepC4.stop()
+                this.beepC4?.stop()
             }, 250)
         }
     }
 
     playStartBeep() {
         if (this.useSound) {
-            this.beepE4.play()
+            this.beepE4?.play()
         }
     }
 

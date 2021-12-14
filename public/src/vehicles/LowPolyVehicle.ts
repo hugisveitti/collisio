@@ -754,11 +754,11 @@ export class LowPolyVehicle implements IVehicle {
         this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
 
-        // if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
-        //     this.badRotationTicks += 1
-        // } else {
-        //     this.badRotationTicks = 0
-        // }
+        if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
+            this.badRotationTicks += 1
+        } else {
+            this.badRotationTicks = 0
+        }
 
         for (let i = 0; i < 5; i++) {
 
