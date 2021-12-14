@@ -256,9 +256,9 @@ export class RaceGameScene extends GameScene {
 
 
 
-            const p = this.course.goalSpawn.position
-            const r = this.course.goalSpawn.rotation
-            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
+            const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
+
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position, rotation })
 
             if (this.gameTimers[vehicleNumber].finished() && this.gameStarted) {
                 const totalTime = this.gameTimers[vehicleNumber].getTotalTime()
@@ -301,10 +301,10 @@ export class RaceGameScene extends GameScene {
             this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
             this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
 
-            const p = this.course.checkpointSpawns[checkpointNumber - 1].position
-            const r = this.course.checkpointSpawns[checkpointNumber - 1].rotation
+            const { position, rotation } = this.course.getCheckpointPositionRotation(checkpointNumber)
 
-            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: p.x, y: p.y + 1, z: p.z }, rotation: { x: 0, z: 0, y: r.y } })
+
+            this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: position.x, y: position.y + 1, z: position.z }, rotation: rotation })
         }
     }
 

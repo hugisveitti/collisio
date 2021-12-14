@@ -20,6 +20,8 @@ interface IGameItem {
 
     /** for stuff that is in arrays such as coin-points */
     isCourseObjectArray?: boolean
+    /** for stuff in a key value storage, such as the spawn aligns */
+    isCourseObjectDict?: boolean
 }
 export const gameItems = {
     "ground": {
@@ -194,6 +196,14 @@ export const gameItems = {
         notAddPhysics: true,
         isCourseObject: true,
         objectName: "sAlign",
+        notVisible: true,
+    },
+    "align": {
+        collisionFlags: 1,
+        shape: "concave",
+        notAddPhysics: true,
+        isCourseObjectDict: true,
+        objectName: "spawnAligners",
         notVisible: true,
     },
 

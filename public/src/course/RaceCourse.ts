@@ -15,8 +15,7 @@ export class RaceCourse extends Course implements IRaceCourse {
     goal: ExtendedObject3D
     goalSpawn: ExtendedObject3D
 
-    checkpoints: ExtendedObject3D[]
-    checkpointSpawns: ExtendedObject3D[]
+
 
 
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
@@ -37,26 +36,6 @@ export class RaceCourse extends Course implements IRaceCourse {
 
     async _createCourse() {
 
-        const tempCheckpoints = []
-        for (let p of this.checkpoints) {
-            if (!p.name.includes("spawn")) {
-                tempCheckpoints.push(p)
-            }
-        }
-        this.checkpoints = tempCheckpoints
-
-        /**
-         * make sure
-         * checkpoint 1 and spawn 1 have same index
-         */
-        this.checkpointSpawns.sort((a, b) => {
-            if (a.name > b.name) return 1
-            return -1
-        })
-        this.checkpoints.sort((a, b) => {
-            if (a.name > b.name) return 1
-            return -1
-        })
         this.setupCollisionListeners()
     }
 
@@ -106,5 +85,16 @@ export class RaceCourse extends Course implements IRaceCourse {
         if (this.goal) {
 
         }
+    }
+
+    getGoalCheckpoint() {
+        const pos = this.goalSpawn.position
+        const key = "goal-align"
+        if (key in this.spawnAligners) {
+            const aPos = this.spawnAligners[key].position
+            const q = this.calcSpawnAngle(aPos, pos)
+            return { position: pos, rotation: q }
+        }
+        return { position: pos, rotation: { x: 0, y: this.goalSpawn.rotation.y, z: 0 } }
     }
 }

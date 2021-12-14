@@ -1,6 +1,6 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Euler, Vector3 } from "three";
-import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
+import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 
 
 export interface ICourse {
@@ -13,6 +13,8 @@ export interface ICourse {
     ground: ExtendedObject3D
     startPosition: Vector3
     startRotation: Euler
+    // Maybe this is not a tag course thing
+    getCheckpointPositionRotation: (checkpointNumber: number) => IPositionRotation
 }
 
 export interface IRaceCourse extends ICourse {
@@ -21,6 +23,7 @@ export interface IRaceCourse extends ICourse {
     goal: ExtendedObject3D
     checkpoints: ExtendedObject3D[]
     getNumberOfCheckpoints: () => number
+    getGoalCheckpoint: () => IPositionRotation
 }
 
 export interface ITagCourse extends ICourse {

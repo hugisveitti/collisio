@@ -20,6 +20,7 @@ import { addTestControls } from "./testControls"
 
 const vechicleFov = 60
 
+let tA = 0
 
 const scoreTable = document.createElement("div")
 const lapTimeDiv = document.createElement("div")
@@ -65,7 +66,7 @@ export class LowPolyTestScene extends GameScene {
     vehicleColorNumber = 0
 
     otherVehicles: LowPolyTestVehicle[]
-    numberOfOtherVehicles = 1
+    numberOfOtherVehicles = 0
 
     isIt: number
 
@@ -217,6 +218,38 @@ export class LowPolyTestScene extends GameScene {
                 this.vehicle.setPosition(p.x, p.y + 5, p.z)
                 this.vehicle.setRotation(0, 0, 0)
             }
+            else if (e.key === "i") {
+                this.vehicle.stop()
+                this.vehicle.start()
+                const p = this.vehicle.getPosition()
+                const r = this.vehicle.getRotation()
+
+                this.vehicle.setPosition(p.x, p.y, p.z)
+                tA = tA + Math.PI / 20
+
+
+
+                const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
+
+                this.vehicle.setRotation(q)
+
+
+            }
+
+            else if (e.key === "y") {
+                this.vehicle.stop()
+                this.vehicle.start()
+                const p = this.vehicle.getPosition()
+                const r = this.vehicle.getRotation()
+
+                this.vehicle.setPosition(p.x, p.y, p.z)
+
+                this.vehicle.setRotation(0, Math.PI, 0)
+
+            } else if (e.key === "l") {
+                const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
+                this.vehicle.setRotation(q)
+            }
 
 
         })
@@ -251,6 +284,10 @@ export class LowPolyTestScene extends GameScene {
             this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
         }
         await this.course.createCourse(this.useShadows)
+        if (this.course instanceof RaceCourse) {
+
+            this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
+        }
         if (this.getGameType() === "race") {
             this.gameTime = new GameTime(3, (this.course as RaceCourse).getNumberOfCheckpoints())
         }
@@ -286,6 +323,9 @@ export class LowPolyTestScene extends GameScene {
     }
 
     createOtherVehicles(callback: () => void) {
+        if (this.numberOfOtherVehicles === 0) {
+            callback()
+        }
         const p = this.course.ground.scale
         const helper = (i: number) => {
             loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, false).then(([tires, chassis]) => {
@@ -302,6 +342,7 @@ export class LowPolyTestScene extends GameScene {
         if (this.otherVehicles.length > 0) {
             helper(0)
         }
+
     }
 
     changeTrack(trackName: TrackName) {
@@ -435,9 +476,6 @@ export class LowPolyTestScene extends GameScene {
             const useChaseCamera = window.localStorage.getItem("useChaseCamera")
             this.vehicle.useChaseCamera = eval(useChaseCamera)
             this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
-            const p = this.course.startPosition
-            const r = this.course.startRotation
-            this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, z: p.z, y: p.y }, rotation: { x: 0, z: 0, y: r.y } })
             this.vehicle.resetPosition()
             // this.dirLight.target = this.vehicle.chassisMesh
             this.camera.position.set(0, 10, -25)
@@ -602,9 +640,8 @@ export class LowPolyTestScene extends GameScene {
 
     handleGoalCrossed(o: ExtendedObject3D) {
         if (!this.goalCrossed) {
-            const p = (this.course as RaceCourse).goalSpawn.position
-            const r = (this.course as RaceCourse).goalSpawn.rotation
-            this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+            const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
+            this.vehicle.setCheckpointPositionRotation({ position, rotation })
             this.checkpointCrossed = false
 
             if (!this.raceStarted) {
@@ -618,12 +655,14 @@ export class LowPolyTestScene extends GameScene {
     }
 
     handleCheckpointCrossed(o: ExtendedObject3D, checkpointNumber: number) {
-        if (!this.checkpointCrossed) {
-            this.goalCrossed = false
-            const p = (this.course as RaceCourse).checkpointSpawns[checkpointNumber - 1].position
-            const r = (this.course as RaceCourse).checkpointSpawns[checkpointNumber - 1].rotation
 
-            this.vehicle.setCheckpointPositionRotation({ position: { x: p.x, y: p.y, z: p.z }, rotation: { x: 0, y: r.y, z: 0 } })
+        // if (!this.checkpointCrossed) {
+        if (!this.gameTime.crossedCheckpoint(checkpointNumber)) {
+            this.gameTime.checkpointCrossed(checkpointNumber)
+            this.goalCrossed = false
+            const { position, rotation } = this.course.getCheckpointPositionRotation(checkpointNumber)
+            this.vehicle.setCheckpointPositionRotation({ position: { x: position.x, y: position.y, z: position.z }, rotation: rotation })
+            //}
         }
         this.checkpointCrossed = true
     }
@@ -682,7 +721,10 @@ export class LowPolyTestScene extends GameScene {
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
+                const rot = this.vehicle.getRotation()
                 scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
+                <br />
+                rot y:${rot.y.toFixed(2)}, w:${rot.w.toFixed(2)}
                 <br />
                 km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
                 `

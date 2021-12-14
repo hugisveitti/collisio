@@ -52,10 +52,12 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Monaco track", type: "monaco-track", gameType: "race"
-    }
-    ,
+    },
     {
         name: "Mountain track", type: "russia-track", gameType: "race"
+    },
+    {
+        name: "Ferrari track", type: "ferrari-track", gameType: "race"
     }
 ]
 

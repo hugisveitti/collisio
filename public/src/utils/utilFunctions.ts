@@ -63,7 +63,7 @@ export const removeUndefinedFromObject = (object: Object) => {
  */
 export const numberScaler = (a: number, b: number, min: number, max: number) => {
     return (num: number) => {
-        return a + (((num - min) * (b - a)) / (max - min))
+        return +(a + (((num - min) * (b - a)) / (max - min))).toPrecision(2)
     }
 }
 

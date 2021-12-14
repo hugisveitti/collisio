@@ -1,11 +1,11 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Group, LoadingManager, Object3D, Vector3, Euler } from "three";
+import { Quaternion, Group, LoadingManager, Object3D, Vector3, Euler } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getDeviceType, getStaticPath } from "../utils/settings";
-import { IVehicle, SimpleVector } from "../vehicles/IVehicle";
+import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { gameItems } from "./GameItems";
 import { ICourse } from "./ICourse";
 import "./course.css"
@@ -113,6 +113,11 @@ export class Course implements ICourse {
 
     sAlign: Object3D
 
+    spawnAligners: { [key: string]: Object3D }
+
+    checkpoints: ExtendedObject3D[]
+    checkpointSpawns: ExtendedObject3D[]
+
 
 
 
@@ -121,7 +126,9 @@ export class Course implements ICourse {
         this.trackName = trackName
         this.gamePhysicsObjects = []
         this.spawns = []
-
+        this.spawnAligners = {}
+        this.checkpointSpawns = []
+        this.checkpoints = []
     }
 
     toggleShadows(useShadows: boolean) {
@@ -164,6 +171,7 @@ export class Course implements ICourse {
                     if (child.type === "Mesh" || child.type === "Group") {
 
                         for (let key of itemKeys) {
+
                             if (keyNameMatch(key, child.name)) {
                                 child.visible = !Boolean(gameItems[key].notVisible);
                                 if (!child.name.includes("ghost") && !Boolean(gameItems[key].notAddPhysics)) {
@@ -241,14 +249,16 @@ export class Course implements ICourse {
                                 }
 
 
-                                if (gameItems[key].isCourseObject || gameItems[key].isCourseObjectArray) {
+                                if (gameItems[key].isCourseObject || gameItems[key].isCourseObjectArray || gameItems[key].isCourseObjectDict) {
                                     // hacky ????
                                     if (!gameItems[key].objectName) {
                                         console.warn(`Object with key '${key}' is course object but doesn't have an object name`)
                                     }
                                     if (gameItems[key].isCourseObjectArray) {
                                         const code = `this.${gameItems[key].objectName}.push(child)`
-
+                                        eval(code)
+                                    } else if (gameItems[key].isCourseObjectDict) {
+                                        const code = `this.${gameItems[key].objectName}["${child.name}"] = child`
                                         eval(code)
                                     } else {
                                         const code = `this.${gameItems[key].objectName} = child`
@@ -259,19 +269,50 @@ export class Course implements ICourse {
                                 // child.visible = false
                             }
                         }
-                        if (child.name.includes("spawn")) {
+                        if (child.name.includes("spawn") && !child.name.includes("align")) {
                             this.spawns.push(child)
                             child.visible = false
                         }
                     }
                 }
+                this.filterAndOrderCheckpoints()
                 await this._createCourse()
-                // courseLoadedCallback()
+
 
                 resolve()
             })
         })
+
+
+
         return promise
+    }
+
+
+
+    filterAndOrderCheckpoints() {
+
+        const tempCheckpoints = []
+        for (let p of this.checkpoints) {
+            if (!p.name.includes("spawn") && !p.name.includes("align")) {
+                tempCheckpoints.push(p)
+            }
+
+            this.checkpoints = tempCheckpoints
+
+            /**
+             * make sure
+             * checkpoint 1 and spawn 1 have same index
+             */
+            this.checkpointSpawns.sort((a, b) => {
+                if (a.name > b.name) return 1
+                return -1
+            })
+            this.checkpoints.sort((a, b) => {
+                if (a.name > b.name) return 1
+                return -1
+            })
+        }
     }
 
     /** for child to override */
@@ -287,26 +328,30 @@ export class Course implements ICourse {
         }
     }
 
-    calcSpawnAngle(p1: Vector3, p2: Vector3) {
+    calcSpawnAngle(_p2: Vector3, _p1: Vector3) {
+        const p1 = _p1.clone()
+        const p2 = _p2.clone()
 
-        const zeroVec1 = new Vector3(0, 0, 0)
-        const zeroVec2 = new Vector3(0, 0, 0)
-        const a = p1.sub(p2).length()
-        const b = zeroVec1.sub(p1).length()
-        const c = zeroVec2.sub(p2).length()
-        return Math.acos((a * a + c * c - b * b) / (a * a * c)) * radToDeg
+
+        const angle = Math.atan2(p2.x - p1.x, p2.z - p1.z)
+
+        const q = new Quaternion().setFromEuler((new Euler(0, angle, 0, "XYZ")))
+
+        return q
     }
 
     setStartPositions(vehicles: IVehicle[]) {
-
 
         // align position
         let aPos: Vector3
         if (this.sAlign) {
 
             aPos = this.sAlign.position
+        } else if ("goal-align" in this.spawnAligners) {
+            aPos = this.spawnAligners["goal-align"].position
         }
-        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn")
+
+        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn" && !s.name.includes("align"))
 
         if (usableSpawns.length >= vehicles.length) {
             // const sortedSpawns = new Array(usableSpawns.length)
@@ -332,7 +377,16 @@ export class Course implements ICourse {
                 const angle = aPos ? this.calcSpawnAngle(aPos, p) : r.y
 
 
-                vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: angle } })
+                if (aPos) {
+                    // vehicles[i].setPosition(p.x, p.y, p.z)
+                    // vehicles[i].setRotation(this.calcSpawnAngle(aPos, p))
+                    vehicles[i].setCheckpointPositionRotation({ position: p, rotation: this.calcSpawnAngle(aPos, p) })
+
+                } else {
+
+
+                    vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
+                }
                 vehicles[i].resetPosition()
                 vehicles[i].stop()
             }
@@ -365,15 +419,42 @@ export class Course implements ICourse {
                 const sPos = possibleStartingPos[sI]
                 possibleStartingPos.splice(sI, 1)
                 const angle = aPos ? this.calcSpawnAngle(aPos, sPos) : r.y
-                console.log("angle", angle)
 
 
-                vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: angle, z: 0 } })
+                if (aPos) {
+
+
+                    vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: this.calcSpawnAngle(aPos, sPos) })
+
+
+                } else {
+
+                    vehicles[i].setCheckpointPositionRotation({ position: sPos, rotation: { x: 0, y: r.y, z: 0 } })
+                }
                 vehicles[i].resetPosition()
                 vehicles[i].stop()
             }
         }
     }
+
+    getCheckpointPositionRotation(checkpointNumber: number): IPositionRotation {
+
+
+        const p = this.checkpointSpawns[checkpointNumber - 1].position
+        const key = `checkpoint-align${checkpointNumber}`
+
+        if (key in this.spawnAligners) {
+            const aPos = this.spawnAligners[key].position
+
+            return { position: p, rotation: this.calcSpawnAngle(aPos, p) }
+        }
+
+        const r = this.checkpointSpawns[checkpointNumber - 1].rotation
+
+        return { position: p, rotation: r }
+    }
+
+
 
     updateCourse() { }
 }

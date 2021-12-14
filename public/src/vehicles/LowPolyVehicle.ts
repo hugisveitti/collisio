@@ -1,5 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
+import { Euler, Quaternion, Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
@@ -69,7 +69,7 @@ export class LowPolyVehicle implements IVehicle {
     engineForce: number
     chassis: Ammo.btRigidBody
     zeroVec = new Ammo.btVector3(0, 0, 0)
-    checkpointPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
+    checkpointPositionRotation: IPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
 
     tuning: Ammo.btVehicleTuning
     raycaster: Ammo.btDefaultVehicleRaycaster
@@ -165,8 +165,6 @@ export class LowPolyVehicle implements IVehicle {
         this.vector = new Ammo.btVector3(0, 0, 0)
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
-        console.log("Vehicle config for", this.vehicleType, ":", vehicleConfigs[this.vehicleType])
-
         this.transformCam = new Ammo.btTransform()
     }
 
@@ -635,7 +633,7 @@ export class LowPolyVehicle implements IVehicle {
             const p1 = this.vehicle.getChassisWorldTransform().getOrigin()
 
             const vec = new Vector3(p1.x(), p1.y(), p1.z())
-            //  console.log(vec.sub(pos))
+
             pos = vec
             // console.log("p1", p1.x().toFixed(2), p1.y().toFixed(2), p1.z().toFixed(2))
             // console.log("pos", pos.x.toFixed(2), pos.y.toFixed(2), pos.z.toFixed(2))
@@ -743,7 +741,6 @@ export class LowPolyVehicle implements IVehicle {
 
         if (!!this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
-
         }
 
 
@@ -751,15 +748,17 @@ export class LowPolyVehicle implements IVehicle {
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
         this.q = this.tm.getRotation()
-
         this.chassisMesh.position.set(this.p.x(), this.p.y(), this.p.z())
-        this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
-        if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
-            this.badRotationTicks += 1
-        } else {
-            this.badRotationTicks = 0
-        }
 
+
+        this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+
+
+        // if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
+        //     this.badRotationTicks += 1
+        // } else {
+        //     this.badRotationTicks = 0
+        // }
 
         for (let i = 0; i < 5; i++) {
 
@@ -813,13 +812,29 @@ export class LowPolyVehicle implements IVehicle {
     getRotation() {
         const tm = this.vehicle.getChassisWorldTransform()
         const o = tm.getRotation()
+        const qu = new Quaternion(o.x(), o.y(), o.z(), o.w())
+        const e = new Euler().setFromQuaternion(qu.normalize(), "XYZ", true)
+
+        // return { x: e.x, y: e.y, z: e.z, w: qu.w }
         return { x: o.x(), y: o.y(), z: o.z(), w: o.w() }
     }
 
-    setRotation(x: number, y: number, z: number) {
+    setRotation(x: number | Quaternion, y?: number, z?: number) {
         const tm = this.vehicle.getChassisWorldTransform()
-        this.quaternion.setValue(x, y, z, 1)
-        tm.setRotation(this.quaternion)
+
+        if (y !== undefined && z !== undefined) {
+
+
+            const qu = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), y)
+            this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
+            tm.setRotation(this.quaternion)
+        } else {
+            const qu = (x as Quaternion)
+
+            this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
+
+            tm.setRotation(this.quaternion)
+        }
     };
 
     getCurrentSpeedKmHour() {
@@ -859,7 +874,13 @@ export class LowPolyVehicle implements IVehicle {
         const backHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusBack
         const y = Math.max(backHeight, frontHeight) ?? 2
         this.setPosition(position.x, position.y + y, position.z)
-        this.setRotation(rotation.x, rotation.y, rotation.z)
+
+        if (!(rotation instanceof Quaternion)) {
+
+            this.setRotation(rotation.x, rotation.y, rotation.z)
+        } else {
+            this.setRotation(rotation as Quaternion)
+        }
 
         this.scene.resetVehicleCallback(this.vehicleNumber)
     };

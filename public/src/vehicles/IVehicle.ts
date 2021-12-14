@@ -1,5 +1,5 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
-import { Font, Vector3 } from "three"
+import { Font, Vector3, Quaternion } from "three"
 import { IVehicleSettings } from '../classes/User';
 import { VehicleType } from '../shared-backend/shared-stuff';
 
@@ -15,7 +15,7 @@ export const instanceOfSimpleVector = (object: any): object is SimpleVector => {
 
 export interface IPositionRotation {
     position: SimpleVector
-    rotation: SimpleVector
+    rotation: SimpleVector | Quaternion
 }
 
 export interface IVehicle {
@@ -67,7 +67,7 @@ export interface IVehicle {
     setPosition: (x: number, y: number, z: number) => void
     getPosition: () => SimpleVector
     getRotation: () => SimpleVector
-    setRotation: (x: number, y: number, z: number) => void
+    setRotation: (x: number | Quaternion, y?: number, z?: number) => void
     getCurrentSpeedKmHour: () => number
     setFont: (font: Font) => void
 
