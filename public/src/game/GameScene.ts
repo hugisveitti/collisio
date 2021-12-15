@@ -904,6 +904,8 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
+
+
     async destroyGame() {
         document.body.removeChild(this.gameInfoDiv)
         document.body.removeChild(this.canvas)

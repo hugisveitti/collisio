@@ -104,12 +104,12 @@ export const vehicleConfigs = {
         wheelRadiusFront: 1 / 2,
         wheelHalfTrackFront: 1.5,
         wheelAxisHeightFront: 0,
-
+        suspensionStiffness: 40,
         mass: 800,
         engineForce: 5000,
         breakingForce: 200,
         is4x4: false,
-
+        /// old car
         path: "simple-car.gltf",
 
         // path: "123456.js"
@@ -125,7 +125,7 @@ export const vehicleConfigs = {
         wheelRadiusFront: 1.45 / 2,
         wheelHalfTrackFront: 1.35,
         wheelAxisHeightFront: 0,
-
+        suspensionStiffness: 40,
         mass: 800,
         engineForce: 5000,
         breakingForce: 200,
@@ -147,11 +147,12 @@ export const vehicleConfigs = {
         wheelHalfTrackFront: 1.36,
         wheelAxisHeightFront: -.5,
 
+        suspensionStiffness: 40,
         suspensionRestLength: 1.6,
         mass: 1600,
-        engineForce: 5000,
+        engineForce: 7500,
         breakingForce: 200,
-        is4x4: true,
+        is4x4: false,
 
         path: "tractor.gltf"
     },
@@ -201,9 +202,9 @@ export const vehicleConfigs = {
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },
         suspensionRestLength: 1.6,
-
+        frictionSlip: 27.5,
         maxSuspensionTravelCm: 100,
-        suspensionStiffness: 200,
+        suspensionStiffness: 50,
         suspensionDamping: 10,
         suspensionCompression: 20,
 

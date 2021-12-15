@@ -797,13 +797,34 @@ export class LowPolyVehicle implements IVehicle {
             this.start()
 
             this.setRotation(0, this.chassisMesh.rotation.y, 0)
-            this.setPosition(undefined, 5, undefined)
+
+
+            const groundY = this.findClosesGround() + 1
+
+            this.setPosition(undefined, groundY, undefined)
         }
 
 
 
 
     };
+
+
+    findClosesGround(): number {
+        const pos = this.chassisMesh.position
+        this.vector2.setValue(pos.x, pos.y, pos.z);
+        this.vector.setValue(pos.x, pos.y + 4, pos.z);
+
+        var rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2);
+        this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, rayer)
+
+        let groundY = 3
+        if (rayer.hasHit()) {
+            groundY = rayer.get_m_hitPointWorld().y()
+        }
+        return groundY
+    }
+
     setPosition(x: number | undefined, y: number | undefined, z: number | undefined) {
         const tm = this.vehicle.getChassisWorldTransform()
         const p = tm.getOrigin()
@@ -832,10 +853,22 @@ export class LowPolyVehicle implements IVehicle {
 
         if (y !== undefined && z !== undefined) {
 
+            const qu = new Quaternion()
 
-            const qu = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), y)
-            this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
-            tm.setRotation(this.quaternion)
+            if (y) {
+                qu.setFromAxisAngle(new Vector3(0, 1, 0), y)
+                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
+                tm.setRotation(this.quaternion)
+            } if (x) {
+                qu.setFromAxisAngle(new Vector3(1, 0, 0), x as number)
+                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
+                tm.setRotation(this.quaternion)
+            } if (z) {
+                qu.setFromAxisAngle(new Vector3(0, 0, 1), z as number)
+                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
+                tm.setRotation(this.quaternion)
+            }
+
         } else {
             const qu = (x as Quaternion)
 
