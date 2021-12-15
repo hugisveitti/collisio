@@ -119,7 +119,7 @@ export class Course implements ICourse {
     checkpoints: ExtendedObject3D[]
     checkpointSpawns: ExtendedObject3D[]
 
-
+    lights: PointLight[]
 
 
     constructor(gameScene: GameScene, trackName: TrackName,) {
@@ -130,6 +130,7 @@ export class Course implements ICourse {
         this.spawnAligners = {}
         this.checkpointSpawns = []
         this.checkpoints = []
+        this.lights = []
     }
 
     toggleShadows(useShadows: boolean) {
@@ -140,6 +141,12 @@ export class Course implements ICourse {
                     object.receiveShadow = useShadows && gameItems[key].receiveShadow
                     object.castShadow = useShadows && gameItems[key].castsShadow
                 }
+            }
+        }
+        for (let light of this.lights) {
+            light.castShadow = useShadows
+            if (useShadows) {
+                light.shadow.bias = 0.01
             }
         }
     }
@@ -170,7 +177,8 @@ export class Course implements ICourse {
                 for (let child of gltf.scene.children) {
                     if (child.name.includes("light")) {
                         child.visible = false
-                        if (this.gameScene.gameSettings.graphics === "high" && !child.name.includes("ghost")) {
+
+                        if (!child.name.includes("ghost")) {
 
 
                             let sDistance = child.name.split("_")[0]
@@ -180,6 +188,7 @@ export class Course implements ICourse {
                             }
 
                             const pLight = new PointLight(yellow2, 1, distance, 1)
+                            this.lights.push(pLight)
 
                             const p = child.position
                             pLight.position.set(p.x, p.y, p.z)

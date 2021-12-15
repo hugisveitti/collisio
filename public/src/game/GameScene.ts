@@ -674,7 +674,7 @@ export class GameScene extends Scene3D implements IGameScene {
         if (this.pLight && this.course) {
             this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
             this.pLight.shadow.bias = 0.1
-            this.course.toggleShadows(this.useShadows && this.timeOfDay === "day")
+            this.course.toggleShadows(this.useShadows)
         }
 
         this.toggleUseSound()

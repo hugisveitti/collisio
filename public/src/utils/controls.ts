@@ -21,7 +21,9 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, 
 
     if (!btnDown) {
         vehicle.noForce()
-        // vehicle.break(false)
+
+    } else if (mobileControls.f) {
+        vehicle.zeroBreakForce()
     }
 
     vehicle.turn(mobileControls.beta)

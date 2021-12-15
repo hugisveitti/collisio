@@ -386,6 +386,7 @@ export class LowPolyVehicle implements IVehicle {
     goForward(moreSpeed: boolean) {
         if (!this.canDrive) return
 
+
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
         if (this.getCurrentSpeedKmHour() > vehicleConfigs[this.vehicleType].maxSpeed + (this.maxSpeedTicks / 10)) {
 
@@ -396,8 +397,10 @@ export class LowPolyVehicle implements IVehicle {
         } else {
             this.maxSpeedTicks -= 1
         }
+
         if (this.getCurrentSpeedKmHour() < 2) {
             this.break(true)
+
         }
 
 
@@ -414,7 +417,6 @@ export class LowPolyVehicle implements IVehicle {
 
     goBackward() {
         if (!this.canDrive) return
-
         if (this.getCurrentSpeedKmHour() > 10) {
             this.break()
             return
@@ -480,12 +482,19 @@ export class LowPolyVehicle implements IVehicle {
     break(notBreak?: boolean) {
 
         const breakForce = !!notBreak ? 0 : this.breakingForce
+
         this.zeroEngineForce()
+        this.vehicle.setBrake(breakForce, BACK_RIGHT)
+        this.vehicle.setBrake(breakForce, BACK_LEFT)
+    };
+
+    zeroBreakForce() {
+        const breakForce = 0
         this.vehicle.setBrake(breakForce, BACK_RIGHT)
         this.vehicle.setBrake(breakForce, BACK_LEFT)
         this.vehicle.setBrake(breakForce, FRONT_RIGHT)
         this.vehicle.setBrake(breakForce, FRONT_LEFT)
-    };
+    }
 
     stop() {
 
@@ -635,8 +644,7 @@ export class LowPolyVehicle implements IVehicle {
             const vec = new Vector3(p1.x(), p1.y(), p1.z())
 
             pos = vec
-            // console.log("p1", p1.x().toFixed(2), p1.y().toFixed(2), p1.z().toFixed(2))
-            // console.log("pos", pos.x.toFixed(2), pos.y.toFixed(2), pos.z.toFixed(2))
+
 
             /**
              * I am not sure what to do with the chase speed
@@ -711,7 +719,6 @@ export class LowPolyVehicle implements IVehicle {
 
             this.vector.setValue(vel.x() / 2, vel.y(), vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
-
         }
         if (Math.abs(vel.y()) > 5) {
 
@@ -726,7 +733,8 @@ export class LowPolyVehicle implements IVehicle {
 
         const v = this.vehicle.getRigidBody().getLinearVelocity()
 
-        if (Math.abs(v.y()) > 20) {
+
+        if (Math.abs(v.y()) > 40) {
             console.log("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
             this.vector.setValue(v.x(), v.y() / 2, v.z())
             this.vehicle.getRigidBody().setLinearVelocity(this.vector)

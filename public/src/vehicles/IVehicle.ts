@@ -55,6 +55,7 @@ export interface IVehicle {
     noTurn: () => void
     turn: (angle: number) => void
     break: (notBreak?: boolean) => void
+    zeroBreakForce: () => void
     stop: () => void
     start: () => void
     pause: () => void

@@ -1,5 +1,6 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Euler, Vector3 } from "three";
+import { TimeOfDay } from "../classes/Game";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 
 

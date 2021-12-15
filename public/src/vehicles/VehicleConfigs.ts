@@ -107,7 +107,7 @@ export const vehicleConfigs = {
 
         mass: 800,
         engineForce: 5000,
-        breakingForce: 100,
+        breakingForce: 200,
         is4x4: false,
 
         path: "simple-car.gltf",
@@ -128,7 +128,7 @@ export const vehicleConfigs = {
 
         mass: 800,
         engineForce: 5000,
-        breakingForce: 100,
+        breakingForce: 200,
         is4x4: false,
 
         path: "normal-car-2.gltf",
@@ -150,7 +150,7 @@ export const vehicleConfigs = {
         suspensionRestLength: 1.6,
         mass: 1600,
         engineForce: 5000,
-        breakingForce: 100,
+        breakingForce: 200,
         is4x4: true,
 
         path: "tractor.gltf"
@@ -197,7 +197,7 @@ export const vehicleConfigs = {
 
         mass: 1200,
         engineForce: 8000,
-        breakingForce: 100,
+        breakingForce: 200,
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },
         suspensionRestLength: 1.6,
@@ -226,7 +226,7 @@ export const vehicleConfigs = {
 
         mass: 600,
         engineForce: 12000,
-        breakingForce: 200,
+        breakingForce: 300,
         is4x4: false,
 
         inertia: { x: 3000, y: 2000, z: 4000 },
@@ -255,7 +255,7 @@ export const vehicleConfigs = {
 
         mass: 500,
         engineForce: 5500,
-        breakingForce: 120,
+        breakingForce: 250,
         is4x4: false,
 
     },

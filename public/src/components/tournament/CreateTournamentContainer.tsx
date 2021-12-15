@@ -6,8 +6,10 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
+import { frontPagePath } from "../Routes";
 import CreateGlobalTournamentComponent from "./CreateGlobalTournamentComponent";
 import CreateLocalTournamentComponent from "./CreateLocalTournamentComponent";
 
@@ -15,6 +17,7 @@ interface ICreateTournamentContainer {}
 
 const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
   const user = useContext(UserContext);
+  const history = useHistory();
 
   const [tournamentType, setTournamentType] = useState("local");
 
@@ -70,7 +73,7 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
       </Grid>
       <br />
       {tournamentType === "local" ? (
-        <CreateLocalTournamentComponent />
+        <CreateLocalTournamentComponent user={user} />
       ) : (
         <CreateGlobalTournamentComponent />
       )}

@@ -1,9 +1,10 @@
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import {
+  Button,
   Collapse,
   Divider,
   FormControl,
@@ -11,16 +12,37 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
-  Tooltip,
 } from "@mui/material";
 import VehicleSelect from "../inputs/VehicleSelect";
 import TrackSelect from "../inputs/TrackSelect";
 import { nonActiveTrackNames } from "../../classes/Game";
 import NumberSelect from "../inputs/NumberSelect";
+import { LocalTournament } from "../../classes/Tournament";
+import { UserContext } from "../../providers/UserProvider";
+import { IUser } from "../../classes/User";
 
-const CreateLocalTournamentComponent = () => {
+interface ICreateLocalTournamentComponent {
+  user: IUser;
+}
+
+const CreateLocalTournamentComponent = (
+  props: ICreateLocalTournamentComponent
+) => {
   const [onlyAllowSpecificVechileType, setOnlyAllowSpecificVechileType] =
     useState(false);
+
+  const [tournament, setTournament] = useState(
+    new LocalTournament(props.user?.uid)
+  );
+
+  const updateTournament = (key: keyof LocalTournament, value: any) => {
+    const newTournament = { ...tournament };
+
+    // @ts-ignore
+    newTournament[key] = value;
+
+    setTournament(newTournament);
+  };
 
   return (
     <Grid container spacing={3}>
@@ -40,10 +62,28 @@ const CreateLocalTournamentComponent = () => {
         <Typography variant="h5">Create local tournament</Typography>
       </Grid>
       <Grid item xs={12}>
-        <TextField label="Tournament name" />
+        <TextField
+          label="Tournament name"
+          value={tournament.name}
+          onChange={(e) => {
+            if (e.target.value.length <= 32) {
+              updateTournament("name", e.target.value);
+            }
+          }}
+        />
       </Grid>
       <Grid item xs={12}>
-        <FormControlLabel label="Use lower bracket" control={<Checkbox />} />
+        <FormControlLabel
+          label="Use lower bracket"
+          control={
+            <Checkbox
+              value={tournament.useLowerbracket}
+              onChange={() =>
+                updateTournament("useLowerbracket", !tournament.useLowerbracket)
+              }
+            />
+          }
+        />
       </Grid>
       <Grid item xs={12}>
         <FormControlLabel
@@ -51,9 +91,14 @@ const CreateLocalTournamentComponent = () => {
           control={
             <Checkbox
               value={onlyAllowSpecificVechileType}
-              onChange={() =>
-                setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType)
-              }
+              onChange={() => {
+                setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
+                if (!onlyAllowSpecificVechileType) {
+                  updateTournament("vehicleType", "normal");
+                } else {
+                  updateTournament("vehicleType", undefined);
+                }
+              }}
             />
           }
         />
@@ -64,17 +109,22 @@ const CreateLocalTournamentComponent = () => {
           <VehicleSelect
             value="normal"
             onChange={(vehicleType) => {
-              console.log("not imple");
+              updateTournament("vehicleType", vehicleType);
             }}
           />
         </Collapse>
       </Grid>
       <Grid item xs={12}>
-        <TextField label="Number of laps" />
+        <TextField
+          label="Number of laps"
+          type="number"
+          value={tournament.numberOfLaps ? tournament.numberOfLaps : ""}
+          onChange={(e) => {
+            updateTournament("numberOfLaps", +e.target.value);
+          }}
+        />
       </Grid>
-      <Grid item xs={12}>
-        <TextField label="Number of games per series" />
-      </Grid>
+
       <Grid item xs={12}>
         <NumberSelect
           value={3}
@@ -138,6 +188,15 @@ const CreateLocalTournamentComponent = () => {
             />
           </RadioGroup>
         </FormControl>
+      </Grid>
+      <Grid item xs={12}>
+        <Button
+          onClick={() => {
+            console.log("not implement");
+          }}
+        >
+          Create tournament!
+        </Button>
       </Grid>
     </Grid>
   );
