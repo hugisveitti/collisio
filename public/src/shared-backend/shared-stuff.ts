@@ -212,6 +212,8 @@ export const std_player_disconnected = "std_player_disconnected"
 export const mts_connected_to_waiting_room = "mts_connected_to_waiting_room"
 export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
 export const dts_back_to_waiting_room = "dts_back_to_waiting_room"
+export const stm_player_info = "stm_player_info"
+
 // not implmented yet
 export const stm_back_to_waiting_room = "stm_back_to_waiting_room"
 

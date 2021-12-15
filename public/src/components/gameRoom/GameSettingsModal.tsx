@@ -35,7 +35,9 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <FullscreenButton />
         </Grid>
         <Grid item xs={6} style={{ textAlign: "center" }}>
-          <Typography variant="h6">Game is paused</Typography>
+          <Typography variant="h6">
+            Game is paused, room <i>{props.store.roomId}</i>
+          </Typography>
         </Grid>
         <Grid item xs={3} style={{ textAlign: "right" }}>
           <IconButton onClick={props.onClose}>

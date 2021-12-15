@@ -258,6 +258,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const handleSendGameSettings = () => {
+    if (!props.store.player.isLeader) {
+      setSettingsModalOpen(false);
+      setGameSettingsLoading(false);
+      return;
+    }
     props.store.socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
     });
@@ -424,8 +429,10 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         <div
           className="controller-btn"
           onClick={() => {
-            gameActions.pause = true;
-            sendGameActions();
+            if (props.store.player.isLeader) {
+              gameActions.pause = true;
+              sendGameActions();
+            }
             setSettingsModalOpen(true);
           }}
           style={{

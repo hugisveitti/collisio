@@ -206,6 +206,7 @@ var Room = /** @class */ (function () {
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 this.players[i].setSocket(player.socket);
+                player = this.players[i];
                 playerExists = true;
             }
         }
@@ -219,12 +220,12 @@ var Room = /** @class */ (function () {
             }
             return;
         }
+        if (this.players.length === 0) {
+            player.setLeader();
+        }
         this.players.push(player);
         player.setGame(this);
         player.playerNumber = this.players.length - 1;
-        if (this.players.length === 1) {
-            player.setLeader();
-        }
         player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
         player.socket.join(this.roomId);
         this.alertWaitingRoom();
@@ -334,6 +335,7 @@ var Room = /** @class */ (function () {
             if (wasLeader) {
                 if (this.players.length > 0) {
                     this.players[0].setLeader();
+                    this.players[0].sendPlayerInfo();
                 }
             }
         }

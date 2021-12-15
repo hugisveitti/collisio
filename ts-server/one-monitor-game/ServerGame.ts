@@ -281,28 +281,32 @@ export class Room {
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 this.players[i].setSocket(player.socket)
+                player = this.players[i]
 
                 playerExists = true
             }
         }
 
+
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
             } else {
+
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)
             }
             return
         }
 
+        if (this.players.length === 0) {
+            player.setLeader()
+        }
 
         this.players.push(player)
         player.setGame(this)
         player.playerNumber = this.players.length - 1
-        if (this.players.length === 1) {
-            player.setLeader()
-        }
+
 
 
         player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
@@ -424,6 +428,7 @@ export class Room {
             if (wasLeader) {
                 if (this.players.length > 0) {
                     this.players[0].setLeader()
+                    this.players[0].sendPlayerInfo()
                 }
             }
         }

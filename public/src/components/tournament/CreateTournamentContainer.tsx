@@ -8,8 +8,12 @@ import Typography from "@mui/material/Typography";
 import React, { useContext, useState } from "react";
 import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
+import CreateGlobalTournamentComponent from "./CreateGlobalTournamentComponent";
+import CreateLocalTournamentComponent from "./CreateLocalTournamentComponent";
 
-const CreateTournamentContainer = () => {
+interface ICreateTournamentContainer {}
+
+const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
   const user = useContext(UserContext);
 
   const [tournamentType, setTournamentType] = useState("local");
@@ -64,6 +68,12 @@ const CreateTournamentContainer = () => {
           </>
         )}
       </Grid>
+      <br />
+      {tournamentType === "local" ? (
+        <CreateLocalTournamentComponent />
+      ) : (
+        <CreateGlobalTournamentComponent />
+      )}
     </AppContainer>
   );
 };

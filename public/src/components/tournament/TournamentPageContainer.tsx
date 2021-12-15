@@ -1,14 +1,17 @@
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
-import React from "react";
-import AppContainer from "../../containers/AppContainer";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import React from "react";
+import { useHistory } from "react-router";
+import AppContainer from "../../containers/AppContainer";
+import { createTournamentPagePath } from "../Routes";
+import AvailableTournamentsComponent from "./AvailableTournamentsComponent";
 
 interface ITournamentPageContainer {}
 
 const TournamentPageContainer = (props: ITournamentPageContainer) => {
+  const history = useHistory();
   return (
     <AppContainer>
       <Grid container spacing={3}>
@@ -26,14 +29,14 @@ const TournamentPageContainer = (props: ITournamentPageContainer) => {
             startIcon={<EmojiEventsIcon />}
             disableElevation
             onClick={() => {
-              toast("Tournaments not available");
+              history.push(createTournamentPagePath);
             }}
           >
             Create a tournament
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <Typography>List of available tournaments</Typography>
+          <AvailableTournamentsComponent />
         </Grid>
       </Grid>
     </AppContainer>

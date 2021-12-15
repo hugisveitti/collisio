@@ -2,6 +2,7 @@ import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
 
+export type TimeOfDay = "day" | "evening"
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
  */
@@ -9,6 +10,7 @@ export interface ITrackInfo {
     name: string
     type: TrackName
     gameType: GameType
+    timeOfDay?: TimeOfDay
 }
 
 export const getTrackNameFromType = (trackName: TrackName) => {
@@ -57,11 +59,51 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Mountain track", type: "russia-track", gameType: "race"
     },
     {
-        name: "Ferrari track", type: "ferrari-track", gameType: "race"
+        name: "Snow track", type: "ferrari-track", gameType: "race",
+        timeOfDay: "evening"
     }
 ]
 
-export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2", "russia-track"]
+export const getTimeOfDay = (trackName: TrackName) => {
+    for (let t of allTrackNames) {
+        if (trackName === t.type) return t.timeOfDay ?? "day"
+    }
+    return "day"
+}
+
+interface ITimeOfDayColors {
+    ambientLightColor: number
+    hemisphereTopColor: number
+    hemisphereBottomColor: number
+}
+
+const dayColors: ITimeOfDayColors = {
+    ambientLightColor: 0xffffff,
+    hemisphereBottomColor: 0xffffff,
+    hemisphereTopColor: 0x0077ff
+}
+
+const eveningColors: ITimeOfDayColors = {
+    ambientLightColor: 0x0077ff,
+    hemisphereBottomColor: 0x003168,
+    hemisphereTopColor: 0x0077ff
+}
+
+export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDayColors => {
+    if (!timeOfDay) return dayColors
+    switch (timeOfDay) {
+        case "evening":
+            return eveningColors
+        case "day":
+            return dayColors
+        default:
+            return dayColors
+    }
+
+}
+
+
+export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2", "russia-track", "ferrari-track"]
 export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name => {
     for (let i = 0; i < allTrackNames.length; i++) {
         if (allTrackNames[i].type === name) {

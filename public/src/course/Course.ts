@@ -1,6 +1,6 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Quaternion, Group, LoadingManager, Object3D, Vector3, Euler } from "three";
+import { Quaternion, Group, LoadingManager, Object3D, Vector3, Euler, PointLight } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
@@ -10,6 +10,7 @@ import { gameItems } from "./GameItems";
 import { ICourse } from "./ICourse";
 import "./course.css"
 import { radToDeg } from "../utils/utilFunctions";
+import { yellow2 } from "../providers/theme";
 
 const loadImage = document.createElement("img")
 
@@ -167,51 +168,91 @@ export class Course implements ICourse {
                 *  but then render a box in their place for the physics
                 */
                 for (let child of gltf.scene.children) {
+                    if (child.name.includes("light")) {
+                        child.visible = false
+                        if (this.gameScene.gameSettings.graphics === "high" && !child.name.includes("ghost")) {
 
-                    if (child.type === "Mesh" || child.type === "Group") {
 
-                        for (let key of itemKeys) {
+                            let sDistance = child.name.split("_")[0]
+                            let distance = 100
+                            if (!isNaN(+sDistance)) {
+                                distance = +sDistance
+                            }
 
-                            if (keyNameMatch(key, child.name)) {
-                                child.visible = !Boolean(gameItems[key].notVisible);
-                                if (!child.name.includes("ghost") && !Boolean(gameItems[key].notAddPhysics)) {
-                                    const eObject = (child as ExtendedObject3D)
-                                    this.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
-                                    eObject.castShadow = useShadows && Boolean(gameItems[key].castsShadow);
-                                    eObject.receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
-                                    //  eObject.visible = !Boolean(gameItems[key].notVisible);
-                                    eObject.body.checkCollisions = true
-                                    if (gameItems[key].bounciness) {
-                                        eObject.body.setBounciness(gameItems[key].bounciness)
+                            const pLight = new PointLight(yellow2, 1, distance, 1)
+
+                            const p = child.position
+                            pLight.position.set(p.x, p.y, p.z)
+                            if (this.gameScene.useShadows) {
+                                pLight.castShadow = true
+                                pLight.shadow.bias = 0.01
+                            }
+                            this.gameScene.add.existing(pLight)
+                        }
+                    } else if (child.type === "Mesh" || child.type === "Group") {
+                        if (child.name.includes("ghost")) {
+
+                        }
+                        else {
+
+                            for (let key of itemKeys) {
+
+                                if (keyNameMatch(key, child.name)) {
+                                    child.visible = !Boolean(gameItems[key].notVisible);
+                                    if (!Boolean(gameItems[key].notAddPhysics)) {
+                                        const eObject = (child as ExtendedObject3D)
+                                        this.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
+                                        eObject.castShadow = useShadows && Boolean(gameItems[key].castsShadow);
+                                        eObject.receiveShadow = useShadows && Boolean(gameItems[key].receiveShadow);
+                                        //  eObject.visible = !Boolean(gameItems[key].notVisible);
+                                        eObject.body.checkCollisions = true
+                                        if (gameItems[key].bounciness) {
+                                            eObject.body.setBounciness(gameItems[key].bounciness)
+                                        }
+                                        if (gameItems[key].friction) {
+                                            eObject.body.setFriction(gameItems[key].friction)
+                                        }
+                                        if (gameItems[key].gravityY) {
+                                            eObject.body.setGravity(0, gameItems[key].gravityY, 0)
+                                        }
+                                        if (child.name.includes("hidden")) {
+                                            child.visible = false
+                                        }
+
+                                        this.gamePhysicsObjects.push(eObject)
                                     }
-                                    if (gameItems[key].friction) {
-                                        eObject.body.setFriction(gameItems[key].friction)
-                                    }
-                                    if (gameItems[key].gravityY) {
-                                        eObject.body.setGravity(0, gameItems[key].gravityY, 0)
-                                    }
-                                    if (child.name.includes("hidden")) {
-                                        child.visible = false
-                                    }
+                                    if (child.name.includes("water")) {
+                                        if (this.gameScene.gameSettings.graphics === "high") {
+                                            const waterObject = child
+                                            if (!waterTextures) {
 
-                                    this.gamePhysicsObjects.push(eObject)
-                                } else if (child.name.includes("ghost")) {
+                                                const texturesPromise = Promise.all([
+                                                    this.gameScene.load.texture('/textures/Water_1_M_Normal.jpg'),
+                                                    this.gameScene.load.texture('/textures/Water_2_M_Normal.jpg')
+                                                ])
+                                                texturesPromise.then(textures => {
+                                                    textures[0].needsUpdate = true
+                                                    textures[1].needsUpdate = true
+                                                    waterTextures = textures
 
-                                }
-                                if (child.name.includes("water")) {
-                                    if (this.gameScene.gameSettings.graphics === "high") {
-                                        const waterObject = child
-                                        if (!waterTextures) {
+                                                    waterObject.visible = false
+                                                    this.gameScene.misc.water({
+                                                        y: waterObject.position.y,
+                                                        x: waterObject.position.x,
+                                                        z: waterObject.position.z,
 
-                                            const texturesPromise = Promise.all([
-                                                this.gameScene.load.texture('/textures/Water_1_M_Normal.jpg'),
-                                                this.gameScene.load.texture('/textures/Water_2_M_Normal.jpg')
-                                            ])
-                                            texturesPromise.then(textures => {
-                                                textures[0].needsUpdate = true
-                                                textures[1].needsUpdate = true
-                                                waterTextures = textures
 
+                                                        width: waterObject.scale.x * 2,
+                                                        height: waterObject.scale.z * 2,
+                                                        normalMap0: textures[0],
+                                                        normalMap1: textures[1]
+                                                    })
+
+
+                                                }).catch(err => {
+                                                    console.warn("Error loading water texture", err)
+                                                })
+                                            } else {
                                                 waterObject.visible = false
                                                 this.gameScene.misc.water({
                                                     y: waterObject.position.y,
@@ -219,59 +260,42 @@ export class Course implements ICourse {
                                                     z: waterObject.position.z,
 
 
-                                                    width: waterObject.scale.x * 2,
-                                                    height: waterObject.scale.z * 2,
-                                                    normalMap0: textures[0],
-                                                    normalMap1: textures[1]
+                                                    width: waterObject.scale.z * 2,
+                                                    height: waterObject.scale.x * 2,
+                                                    normalMap0: waterTextures[0],
+                                                    normalMap1: waterTextures[1],
                                                 })
-
-
-                                            }).catch(err => {
-                                                console.warn("Error loading water texture", err)
-                                            })
+                                            }
                                         } else {
-                                            waterObject.visible = false
-                                            this.gameScene.misc.water({
-                                                y: waterObject.position.y,
-                                                x: waterObject.position.x,
-                                                z: waterObject.position.z,
-
-
-                                                width: waterObject.scale.z * 2,
-                                                height: waterObject.scale.x * 2,
-                                                normalMap0: waterTextures[0],
-                                                normalMap1: waterTextures[1],
-                                            })
+                                            // simply add the water with no physics
                                         }
-                                    } else {
-                                        // simply add the water with no physics
                                     }
+
+
+                                    if (gameItems[key].isCourseObject || gameItems[key].isCourseObjectArray || gameItems[key].isCourseObjectDict) {
+                                        // hacky ????
+                                        if (!gameItems[key].objectName) {
+                                            console.warn(`Object with key '${key}' is course object but doesn't have an object name`)
+                                        }
+                                        if (gameItems[key].isCourseObjectArray) {
+                                            const code = `this.${gameItems[key].objectName}.push(child)`
+                                            eval(code)
+                                        } else if (gameItems[key].isCourseObjectDict) {
+                                            const code = `this.${gameItems[key].objectName}["${child.name}"] = child`
+                                            eval(code)
+                                        } else {
+                                            const code = `this.${gameItems[key].objectName} = child`
+                                            eval(code)
+
+                                        }
+                                    }
+                                    // child.visible = false
                                 }
-
-
-                                if (gameItems[key].isCourseObject || gameItems[key].isCourseObjectArray || gameItems[key].isCourseObjectDict) {
-                                    // hacky ????
-                                    if (!gameItems[key].objectName) {
-                                        console.warn(`Object with key '${key}' is course object but doesn't have an object name`)
-                                    }
-                                    if (gameItems[key].isCourseObjectArray) {
-                                        const code = `this.${gameItems[key].objectName}.push(child)`
-                                        eval(code)
-                                    } else if (gameItems[key].isCourseObjectDict) {
-                                        const code = `this.${gameItems[key].objectName}["${child.name}"] = child`
-                                        eval(code)
-                                    } else {
-                                        const code = `this.${gameItems[key].objectName} = child`
-                                        eval(code)
-
-                                    }
-                                }
-                                // child.visible = false
                             }
-                        }
-                        if (child.name.includes("spawn") && !child.name.includes("align")) {
-                            this.spawns.push(child)
-                            child.visible = false
+                            if (child.name.includes("spawn") && !child.name.includes("align")) {
+                                this.spawns.push(child)
+                                child.visible = false
+                            }
                         }
                     }
                 }

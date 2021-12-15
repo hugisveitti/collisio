@@ -41,7 +41,8 @@ interface ITrackSelect {
   excludedTracks: TrackName[];
   onChange: (trackName: TrackName) => void;
   value: TrackName;
-  showMapPreview: boolean;
+  showMapPreview?: boolean;
+  fullWidth?: boolean;
 }
 
 const TrackSelect = (props: ITrackSelect) => {
@@ -60,7 +61,7 @@ const TrackSelect = (props: ITrackSelect) => {
   const trackImage = getTrackImage(props.value);
   return (
     <React.Fragment>
-      <FormControl>
+      <FormControl fullWidth={props.fullWidth}>
         <InputLabel id="vehicle-select">Track</InputLabel>
         <Select
           style={{

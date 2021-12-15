@@ -113,7 +113,7 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
         subheader={getVehicleNameFromType(props.player.vehicleType)}
         action={
           <>
-            {props.user && (
+            {props.user && props.player.isAuthenticated && (
               <FollowButton
                 userData={userData}
                 otherUserData={playerFollowingData}

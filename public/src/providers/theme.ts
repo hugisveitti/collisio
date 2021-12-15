@@ -21,7 +21,7 @@ const green3 = "#669132"
 export const green4 = "#365b13"
 
 export const yellow1 = "#f9f3a6"
-const yellow2 = "#f8e325"
+export const yellow2 = "#f8e325"
 export const yellow3 = "#dfb70a"
 const yellow4 = "#af9000"
 

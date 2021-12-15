@@ -35,6 +35,7 @@ import {
   stmd_waiting_room_alert,
   stm_desktop_disconnected,
   stm_player_connected_callback,
+  stm_player_info,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { createSocket, ISocketCallback } from "../../utils/connectSocket";
@@ -172,6 +173,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           user?.displayName ?? "Guest" + Math.floor(Math.random() * 20)
         );
       }
+
       setDisplayNameModalOpen(false);
     }
   }, [user]);
@@ -225,6 +227,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     if (onMobile) {
       props.store.socket.emit(mts_connected_to_waiting_room);
 
+      props.store.socket.on(stm_player_info, (res) => {
+        const { player } = res;
+        if (player) {
+          props.store.setPlayer(player);
+        }
+      });
+
       getPlayersInRoom();
       props.store.socket.on(stmd_game_settings_changed, (data) => {
         toSaveGameSettings = data.gameSettings;
@@ -256,6 +265,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.store.socket.off(std_player_disconnected);
       props.store.socket.off(stmd_players_in_room_callback);
       props.store.socket.off(stm_player_connected_callback);
+      props.store.socket.off(stm_player_info);
     };
   }, [props.store.socket]);
 

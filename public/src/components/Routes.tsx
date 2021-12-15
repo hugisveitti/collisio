@@ -37,6 +37,7 @@ import PrivateProfilePage from "./profile/PrivateProfilePage";
 import PublicProfilePageContainer from "./profile/PublicProfilePageContainer";
 import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
+import CreateTournamentContainer from "./tournament/CreateTournamentContainer";
 import TournamentPageContainer from "./tournament/TournamentPageContainer";
 import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
@@ -56,6 +57,7 @@ export const buyPremiumPagePath = "/premium";
 export const aboutPagePath = "/about";
 export const connectPagePath = "/connect";
 export const tournamentPagePath = "/tournament";
+export const createTournamentPagePath = "/tournament/create";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -187,7 +189,13 @@ const Routes = () => {
         />
         <Route
           path={tournamentPagePath}
+          exact
           render={(props) => <TournamentPageContainer {...props} />}
+        />
+        <Route
+          path={createTournamentPagePath}
+          exact
+          render={(props) => <CreateTournamentContainer {...props} />}
         />
         <Route
           path={connectPagePath}

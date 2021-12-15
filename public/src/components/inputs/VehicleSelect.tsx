@@ -19,6 +19,7 @@ interface IVehicleSelect {
   onChange: (vehicleType: VehicleType) => void;
   previewVehicle?: boolean;
   excludedVehicles?: VehicleType[];
+  fullWidth?: boolean;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
@@ -32,7 +33,7 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
 
   return (
     <React.Fragment>
-      <FormControl fullWidth>
+      <FormControl fullWidth={props.fullWidth}>
         <InputLabel id="vehicle-select">Vehicle</InputLabel>
         <Select
           style={{

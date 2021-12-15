@@ -141,12 +141,14 @@ const ConnectToWaitingRoomComponent = (
     if (props.quickConnection && !onMobile) {
       connectButtonClicked();
     }
+    return () => {};
   }, []);
 
   useEffect(() => {
     return () => {
       if (props.store.socket) {
         props.store.socket.off(stm_player_connected_callback);
+        props.store.socket.off(std_room_created_callback);
       }
     };
   }, [props.store.socket]);

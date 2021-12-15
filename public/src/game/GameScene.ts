@@ -2,7 +2,7 @@ import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, FontLoader, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
-import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
+import { getTimeOfDay, getTimeOfDayColors, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
@@ -64,6 +64,7 @@ export class GameScene extends Scene3D implements IGameScene {
     vehicles: IVehicle[]
     font: Font
     gameSettings: IGameSettings
+    timeOfDay: TimeOfDay
     useSound: boolean
     useShadows: boolean
     pLight: PointLight
@@ -122,6 +123,7 @@ export class GameScene extends Scene3D implements IGameScene {
     constructor() {
         super()
         this.needsReload = false
+        this.timeOfDay = this.timeOfDay
         this.players = []
         this.vehicles = []
         this.views = []
@@ -185,29 +187,43 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async addLights() {
+
+        this.timeOfDay = getTimeOfDay(this.gameSettings.trackName)
+
+        const { ambientLightColor,
+            hemisphereTopColor,
+            hemisphereBottomColor } = getTimeOfDayColors(this.timeOfDay)
+
+        // this.pLight = new PointLight(0xffffff, 1, 0, 1)
+        // maybe if evening then dont show shadows?
         this.pLight = new PointLight(0xffffff, 1, 0, 1)
         this.pLight.position.set(100, 150, 100);
-        if (this.useShadows) {
+        if (this.useShadows && this.timeOfDay === "day") {
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
 
         this.scene.add(this.pLight)
 
-        const hLight = new HemisphereLight(0xffffff, 1)
+        //  const hLight = new HemisphereLight(0x000000, 1)
+        //const hLight = new HemisphereLight(0xffffff, 1)
+        const hLight = new HemisphereLight(hemisphereTopColor, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
         this.scene.add(hLight)
 
-        const aLight = new AmbientLight(0xffffff, 1)
+        // const aLight = new AmbientLight(0xffffff, 1)
+        const aLight = new AmbientLight(ambientLightColor, 1)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
 
 
 
         const uniforms = {
-            "topColor": { value: new Color(0x0077ff) },
-            "bottomColor": { value: new Color(0xffffff) },
+            "topColor": { value: new Color(hemisphereTopColor) },
+
+            // "bottomColor": { value: new Color(0xffffff) },
+            "bottomColor": { value: new Color(hemisphereBottomColor) },
             "offset": { value: 33 },
             "exponent": { value: 0.6 }
         };
@@ -653,10 +669,12 @@ export class GameScene extends Scene3D implements IGameScene {
                 this[key] = gameSettings[key]
             }
         }
+
+        this.timeOfDay = getTimeOfDay(this.gameSettings.trackName)
         if (this.pLight && this.course) {
-            this.pLight.castShadow = this.useShadows
+            this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
             this.pLight.shadow.bias = 0.1
-            this.course.toggleShadows(this.useShadows)
+            this.course.toggleShadows(this.useShadows && this.timeOfDay === "day")
         }
 
         this.toggleUseSound()
