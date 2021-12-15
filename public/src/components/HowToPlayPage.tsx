@@ -417,6 +417,24 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
           </Grid>
         </HowToPlayItem>
 
+        <HowToPlayItem header="Tips">
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography>
+                To make the game run smoother, close all applications on your
+                computer, all other tabs in your browser and have your computer
+                plugged in.
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>
+                You can also put the graphics in low settings and turn off
+                shadows.
+              </Typography>
+            </Grid>
+          </Grid>
+        </HowToPlayItem>
+
         <Grid item xs={12}>
           <iframe
             src="https://www.youtube.com/embed/0YBLvMXrdPo"

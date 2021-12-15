@@ -34,7 +34,7 @@ let numDots = 0
 
 let waterTextures: [THREE.Texture, THREE.Texture] | undefined
 
-const loadingScreenTips = ["Lock the orientation of your mobile phone.", "The leader can change tracks, using the settings on the mobile.", "The leader can restart a game from the mobile."]
+const loadingScreenTips = ["Lock the orientation of your mobile phone.", "The leader can change tracks, using the settings on the mobile.", "The leader can restart a game from the mobile.", "If the game is lagging, plug in your computer and close all other tabs."]
 let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
 const setLoadingDivText = async (text: string) => {

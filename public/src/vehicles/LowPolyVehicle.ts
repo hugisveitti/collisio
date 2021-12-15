@@ -761,8 +761,8 @@ export class LowPolyVehicle implements IVehicle {
 
         this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
-
-        if (Math.abs(this.q.z()) > 0.1 || Math.abs(this.q.x()) > 0.1) {
+        // maybe this 0.2 value could use more thought
+        if (Math.abs(this.q.z()) > 0.2 || Math.abs(this.q.x()) > 0.2) {
             this.badRotationTicks += 1
         } else {
             this.badRotationTicks = 0
@@ -796,7 +796,7 @@ export class LowPolyVehicle implements IVehicle {
             this.stop()
             this.start()
 
-            this.setRotation(0, this.chassisMesh.rotation.y, 0)
+            this.setRotation(0, this.chassisMesh.rotation.y + Math.PI, 0)
 
 
             const groundY = this.findClosesGround() + 1
@@ -851,23 +851,14 @@ export class LowPolyVehicle implements IVehicle {
     setRotation(x: number | Quaternion, y?: number, z?: number) {
         const tm = this.vehicle.getChassisWorldTransform()
 
-        if (y !== undefined && z !== undefined) {
+        if (!(x instanceof Quaternion)) {
 
             const qu = new Quaternion()
+            qu.setFromEuler(new Euler(x, y, z))
+            this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
 
-            if (y) {
-                qu.setFromAxisAngle(new Vector3(0, 1, 0), y)
-                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
-                tm.setRotation(this.quaternion)
-            } if (x) {
-                qu.setFromAxisAngle(new Vector3(1, 0, 0), x as number)
-                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
-                tm.setRotation(this.quaternion)
-            } if (z) {
-                qu.setFromAxisAngle(new Vector3(0, 0, 1), z as number)
-                this.quaternion.setValue(qu.x, qu.y, qu.z, qu.w)
-                tm.setRotation(this.quaternion)
-            }
+            tm.setRotation(this.quaternion)
+
 
         } else {
             const qu = (x as Quaternion)

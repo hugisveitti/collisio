@@ -1,4 +1,5 @@
 import { PhysicsLoader, Project, Scene3D } from "enable3d";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, FontLoader, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
@@ -119,6 +120,7 @@ export class GameScene extends Scene3D implements IGameScene {
     totalNumberOfFpsTicks: number
     oldTime: number
 
+    hasAskedToLowerSettings: boolean
 
     constructor() {
         super()
@@ -184,6 +186,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.totalFpsTicks = 0
         this.totalNumberOfFpsTicks = 0
         this.oldTime = 0
+        this.hasAskedToLowerSettings = eval(window.localStorage.getItem("hasAskedToLowerSettings")) ?? false
     }
 
     async addLights() {
@@ -679,6 +682,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.toggleUseSound()
 
+        // if gameSettings change and needs reload then restart without user say?
+
+
         this.socket.emit(dts_game_settings_changed_callback, {})
     }
 
@@ -853,6 +859,15 @@ export class GameScene extends Scene3D implements IGameScene {
             this.totalNumberOfFpsTicks += 1
             this.fpsTick = 0
             this.oldTime = Math.floor(time)
+        }
+        if (time > 5 && !this.hasAskedToLowerSettings) {
+            this.hasAskedToLowerSettings = true
+            window.localStorage.setItem("hasAskedToLowerSettings", "true")
+            if (this.totalFpsTicks / this.totalNumberOfFpsTicks < 40) {
+                if (this.gameSettings.graphics === "high" || this.gameSettings.useShadows) {
+                    toast.warn("We noticed low fps, to increase fps and a more smooth game, go into settings (esc) and turn off shadows and put the graphics on low.")
+                }
+            }
         }
     }
 

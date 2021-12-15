@@ -178,12 +178,11 @@ export class LowPolyTestScene extends GameScene {
 
                 this.vehicle.setPosition(p.x, p.y, p.z)
                 tA = tA + Math.PI / 20
+                tA = tA % (Math.PI * 2)
 
+                // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
 
-
-                const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
-
-                this.vehicle.setRotation(q)
+                this.vehicle.setRotation(0, tA, 0)
 
 
             }
@@ -195,8 +194,12 @@ export class LowPolyTestScene extends GameScene {
                 const r = this.vehicle.getRotation()
 
                 this.vehicle.setPosition(p.x, p.y, p.z)
+                tA = tA + Math.PI / 20
+                tA = tA % (Math.PI * 2)
 
-                this.vehicle.setRotation(0, Math.PI, 0)
+                // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
+
+                this.vehicle.setRotation(0, tA, tA)
 
             } else if (e.key === "l") {
                 const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
@@ -550,7 +553,7 @@ export class LowPolyTestScene extends GameScene {
             // const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 10, y: 4, z: 40 })
             // ball.body.setBounciness(1)
 
-            this.vehicle.useBadRotationTicks = false
+            this.vehicle.useBadRotationTicks = true
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
             this.vehicles = allVehicles
@@ -663,12 +666,13 @@ export class LowPolyTestScene extends GameScene {
         this.vehicle.update()
     }
 
-    update() {
+    update(time: number) {
         if (this.canStartUpdate && this.everythingReady()) {
 
             stats.begin()
             if (this.vehicle) {
                 //     this.vehicle.intelligentDrive(true)
+                this.updateFps(time)
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
@@ -679,6 +683,7 @@ export class LowPolyTestScene extends GameScene {
                 <br />
                 km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
                 `
+
             }
             this.course.updateCourse()
             for (let oVehicle of this.otherVehicles) {
