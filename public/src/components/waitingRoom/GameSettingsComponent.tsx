@@ -92,7 +92,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       </Grid>
       {gameSettings.gameType === "tag" ? (
         <React.Fragment>
-          <Grid item xs={6} lg={4} xl={4}>
+          <Grid item xs={12} lg={4} xl={4}>
             <TextField
               type="number"
               label="Tag game length in minutes"

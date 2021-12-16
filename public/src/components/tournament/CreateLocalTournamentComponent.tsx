@@ -1,25 +1,17 @@
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
+import { Button, Divider } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import React, { useContext, useState } from "react";
-import Checkbox from "@mui/material/Checkbox";
+import Typography from "@mui/material/Typography";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import {
-  Button,
-  Collapse,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-} from "@mui/material";
-import VehicleSelect from "../inputs/VehicleSelect";
-import TrackSelect from "../inputs/TrackSelect";
-import { nonActiveTrackNames } from "../../classes/Game";
-import NumberSelect from "../inputs/NumberSelect";
-import { LocalTournament } from "../../classes/Tournament";
-import { UserContext } from "../../providers/UserProvider";
+  LocalTournament,
+  validateCreateTournament,
+} from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
+import { addTournament } from "../../firebase/firestoreTournamentFunctions";
+import { getTournamentPagePath } from "../Routes";
+import EditTournamentComponent from "./EditTournamentComponent";
 
 interface ICreateLocalTournamentComponent {
   user: IUser;
@@ -28,20 +20,17 @@ interface ICreateLocalTournamentComponent {
 const CreateLocalTournamentComponent = (
   props: ICreateLocalTournamentComponent
 ) => {
-  const [onlyAllowSpecificVechileType, setOnlyAllowSpecificVechileType] =
-    useState(false);
+  const history = useHistory();
 
   const [tournament, setTournament] = useState(
-    new LocalTournament(props.user?.uid)
+    new LocalTournament(props.user?.uid, props.user?.displayName)
   );
 
   const updateTournament = (key: keyof LocalTournament, value: any) => {
     const newTournament = { ...tournament };
-
     // @ts-ignore
     newTournament[key] = value;
-
-    setTournament(newTournament);
+    setTournament(newTournament as LocalTournament);
   };
 
   return (
@@ -61,138 +50,37 @@ const CreateLocalTournamentComponent = (
       <Grid item xs={12}>
         <Typography variant="h5">Create local tournament</Typography>
       </Grid>
-      <Grid item xs={12}>
-        <TextField
-          label="Tournament name"
-          value={tournament.name}
-          onChange={(e) => {
-            if (e.target.value.length <= 32) {
-              updateTournament("name", e.target.value);
-            }
-          }}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <FormControlLabel
-          label="Use lower bracket"
-          control={
-            <Checkbox
-              value={tournament.useLowerbracket}
-              onChange={() =>
-                updateTournament("useLowerbracket", !tournament.useLowerbracket)
-              }
-            />
-          }
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <FormControlLabel
-          label="Only allow specific vehcile"
-          control={
-            <Checkbox
-              value={onlyAllowSpecificVechileType}
-              onChange={() => {
-                setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
-                if (!onlyAllowSpecificVechileType) {
-                  updateTournament("vehicleType", "normal");
-                } else {
-                  updateTournament("vehicleType", undefined);
-                }
-              }}
-            />
-          }
-        />
-      </Grid>
 
-      <Grid item xs={12}>
-        <Collapse in={onlyAllowSpecificVechileType}>
-          <VehicleSelect
-            value="normal"
-            onChange={(vehicleType) => {
-              updateTournament("vehicleType", vehicleType);
-            }}
-          />
-        </Collapse>
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          label="Number of laps"
-          type="number"
-          value={tournament.numberOfLaps ? tournament.numberOfLaps : ""}
-          onChange={(e) => {
-            updateTournament("numberOfLaps", +e.target.value);
-          }}
-        />
-      </Grid>
-
-      <Grid item xs={12}>
-        <NumberSelect
-          value={3}
-          onChange={() => console.log("not impl")}
-          numbers={[1, 3, 5, 7]}
-          title="Number of games per series"
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TrackSelect
-          gameType="race"
-          value="farm-track"
-          excludedTracks={nonActiveTrackNames}
-          onChange={(trackName) => {
-            console.log("not impl");
-          }}
-          showMapPreview
-        />
-      </Grid>
+      <EditTournamentComponent<LocalTournament>
+        tournament={tournament}
+        user={props.user}
+        // setTournament={(newTournament) => {
+        //   setTournament(newTournament);
+        // }}
+        updateTournament={updateTournament}
+      />
 
       <Grid item xs={12}>
         <Divider variant="middle" />
-      </Grid>
-
-      <Grid item xs={12}>
-        <FormControlLabel
-          label="Use group stage to determine bracket placement"
-          control={<Checkbox />}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <Typography>
-          The group stage is either played with four or 2 player splitscreen.
-          This determines the bracet placement. The player with the best time
-          competes agains the player with the worst time.
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12}>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">
-            How to determine bracket/group placement?
-          </FormLabel>
-          <RadioGroup
-            row
-            aria-label="determine bracet placement"
-            name="determine-radio-buttons-group"
-            style={{ margin: "auto" }}
-          >
-            <FormControlLabel
-              value="random"
-              control={<Radio />}
-              label="Random"
-            />
-            <FormControlLabel
-              value="manual"
-              control={<Radio />}
-              label="Manual"
-            />
-          </RadioGroup>
-        </FormControl>
       </Grid>
       <Grid item xs={12}>
         <Button
+          variant="contained"
+          disableElevation
           onClick={() => {
-            console.log("not implement");
+            const { status, message } = validateCreateTournament(tournament);
+            if (status === "error") {
+              toast.error(message);
+            } else {
+              addTournament(tournament)
+                .then(() => {
+                  history.push(getTournamentPagePath(tournament.id));
+                })
+                .catch(() => {
+                  // ekki endilega rétt
+                  toast.error("Some error.");
+                });
+            }
           }}
         >
           Create tournament!

@@ -22,7 +22,7 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
   const [tournamentType, setTournamentType] = useState("local");
 
   return (
-    <AppContainer>
+    <AppContainer loading={user === null}>
       <Grid container spacing={3}>
         {!user?.uid ? (
           <Grid item xs={12}>
@@ -68,15 +68,20 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
                 </RadioGroup>
               </FormControl>
             </Grid>
+            <br />
+
+            {tournamentType === "local" ? (
+              <Grid item xs={12}>
+                <CreateLocalTournamentComponent user={user} />
+              </Grid>
+            ) : (
+              <Grid item xs={12}>
+                <CreateGlobalTournamentComponent />
+              </Grid>
+            )}
           </>
         )}
       </Grid>
-      <br />
-      {tournamentType === "local" ? (
-        <CreateLocalTournamentComponent user={user} />
-      ) : (
-        <CreateGlobalTournamentComponent />
-      )}
     </AppContainer>
   );
 };

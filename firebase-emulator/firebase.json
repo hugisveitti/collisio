@@ -1,19 +1,22 @@
 {
-  "database": {
-    "rules": "database.rules.json"
-  },
   "emulators": {
     "auth": {
       "port": 9099
     },
     "database": {
-      "port": 9000
+      "port": 9000,
+      "rules": "database.rules.json"
     },
     "ui": {
       "enabled": true
     },
     "firestore": {
-      "port": "8000"
+      "port": 8000,
+      "rules": "./firestore/firestore.rules"
     }
+  },
+  "firestore": {
+    "port": 8000,
+    "rules": "./firestore/firestore.rules"
   }
 }

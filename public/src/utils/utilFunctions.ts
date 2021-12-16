@@ -87,3 +87,31 @@ export const getDateFromNumber = (num: number | any): string => {
 
 export const degToRad = 0.017453
 export const radToDeg = 57.2957795
+
+
+export function arrayToDict<T>(array: T[], key: string): { [id: string]: T } {
+    if (array.length === 0) return {}
+
+
+    const dict = {}
+    for (let item of array) {
+        const id = item[key]
+
+        if (!id) {
+            console.warn(`Item doesn't have field ${key} arrayToDict`)
+            return {}
+        }
+        // @ts-ignore
+        dict[id] = item
+    }
+
+    return dict
+}
+
+export function dictToArray<T>(dict: { [id: string]: T }): T[] {
+    const array: T[] = []
+    for (let key of Object.keys(dict)) {
+        array.push(dict[key])
+    }
+    return array
+}

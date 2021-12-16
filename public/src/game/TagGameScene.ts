@@ -1,6 +1,5 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import Stats from "stats.js";
 import { Clock } from "three";
 import { ITagScoreInfo } from "../classes/Game";
 import { ITagCourse } from "../course/ICourse";
@@ -18,9 +17,6 @@ import { TagObject } from "./TagObjectClass";
        */
 let importantTimes = ["60", "30", "10", "5", "4", "3", "2", "1"]
 
-
-
-const stats = new Stats()
 
 const totalTimeDiv = document.createElement("div")
 
@@ -54,8 +50,6 @@ export class TagGameScene extends GameScene {
 
         this.tagObjects = []
 
-        stats.showPanel(0)
-        this.gameInfoDiv.appendChild(stats.dom)
 
         this.isItTimeout = false
         this.gameClock = new Clock(false)
@@ -132,7 +126,7 @@ export class TagGameScene extends GameScene {
         }
     }
 
-    restartGame() {
+    _restartGame() {
         this.gameStarted = false
         this.gameOver = false
         this.gameClock.stop()
@@ -270,7 +264,7 @@ export class TagGameScene extends GameScene {
         this.updateFps(time)
 
         if (this.everythingReady()) {
-            stats.begin()
+
             if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
@@ -288,7 +282,7 @@ export class TagGameScene extends GameScene {
 
                 this.updatePing()
             }
-            stats.end()
+
         }
     }
 }

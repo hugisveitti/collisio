@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+      match /profiles/{userId} {
+      allow read;
+      allow write: if request.auth.uid == userId;
+    }
+    match /socials/{userId} {
+    	match /{docs=**}{
+    		allow read;
+      }
+      match /followings/{followingUserId} {
+      	allow write: if request.auth.uid == userId;
+      }
+      match /followers/{followerUserId}{
+      allow write: if request.auth.uid == followerUserId;
+      }
+    }
+    match /bestHighscores {
+    	match/{docs=**}{
+      	allow read;
+   
+      }
+      match /{gameId} {
+      	allow update, delete: if resource.data.playerId == request.auth.uid ;
+        allow create: if !exists(/databases/$(database)/documents/bestHighscores/$(request.resource.id));
+      }
+    }
+      match /allHighscores {
+      	match /{docs=**} {
+     			allow read; 
+         
+      	}
+       match /{gameId} {
+     	 	allow update, delete: if resource.data.playerId == request.auth.uid ;
+        allow create: if !exists(/databases/$(database)/documents/allHighscores/$(request.resource.id));
+      }
+    }
+    match /allGames {
+    	match /{gameId} {
+     		allow read;
+    		allow write;
+   	 }
+    }
+    match /roomData/{roomId} {
+    	allow create: if !exists(/databases/$(database)/documents/roomData/$(request.resource.id));
+      allow read; //: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    match /availableRooms/{userId} {
+      allow create, update: if request.auth.uid == userId;
+      allow delete; // change
+      allow read;
+    }
+    match /admins/{userId} {
+    	allow read;//: if request.auth.uid == userId;
+    }
+    match /tournaments/{tournamentId} {
+    	// only followers can read?
+    	allow read;
+     
+       allow create, update: if !exists(/databases/$(database)/documents/tournaments/$(request.resource.id));
+       allow delete:if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
+
+       match /players/{playerId} {
+        allow read;
+      	allow create: if !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.hasStarted;
+      	allow delete: if request.auth.uid == playerId;
+        allow update: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId ;
+      }
+    }
+  }
+}

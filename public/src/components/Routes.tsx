@@ -16,6 +16,7 @@ import {
 } from "../firebase/firestoreFunctions";
 
 import ControlsRoom from "../mobile/ControlsRoom";
+import ControlsRoomContainer from "../mobile/ControlsRoomContainer";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
 import {
@@ -33,12 +34,13 @@ import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";
+import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
 import PublicProfilePageContainer from "./profile/PublicProfilePageContainer";
 import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
 import CreateTournamentContainer from "./tournament/CreateTournamentContainer";
-import TournamentPageContainer from "./tournament/TournamentPageContainer";
+import TournamentPageContainer from "./tournament/TournamentOverviewContainer";
 import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 
@@ -46,10 +48,13 @@ export const frontPagePath = "/";
 export const waitingRoomPath = "/wait";
 export const waitingRoomGameIdPath = "/wait/:roomId";
 export const gameRoomPath = "/game";
+export const gameRoomIdPath = "/game/:roomId";
 export const controlsRoomPath = "/controls";
+export const controlsRoomIdPath = "/controls/:roomId";
 export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
 export const privateProfilePagePath = "/private-profile";
+export const privateProfileTournamentsPagePath = "/private-profile/tournaments";
 export const publicProfilePagePath = "/user/:profileId";
 export const publicProfilePath = "/user";
 export const showRoomPagePath = "/show-room";
@@ -58,9 +63,21 @@ export const aboutPagePath = "/about";
 export const connectPagePath = "/connect";
 export const tournamentPagePath = "/tournament";
 export const createTournamentPagePath = "/tournament/create";
+export const tournamentIdPagePath = "/tournament/:tournamentId";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
+
+export const getTournamentPagePath = (tournamentId: string) =>
+  `${tournamentPagePath}/${tournamentId}`;
+
+export const getGameRoomPath = (roomId: string) => `${gameRoomPath}/${roomId}`;
+
+export const getWaitingRoomPath = (roomId: string) =>
+  `${waitingRoomPath}/${roomId}`;
+
+export const getControlsRoomPath = (roomId: string) =>
+  `${controlsRoomPath}/${roomId}`;
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -71,6 +88,9 @@ const Routes = () => {
   const [gameSettings, setGameSettings] = useState(
     inTestMode ? testGameSettings : defaultGameSettings
   );
+
+  // not sure how to implement tournaments
+  const [tournament, setTournament] = useState(undefined);
 
   const deviceType = getDeviceType();
 
@@ -114,6 +134,8 @@ const Routes = () => {
     setGameSettings,
     socket,
     setSocket,
+    tournament,
+    setTournament,
   };
 
   const user = useContext(UserContext);
@@ -156,8 +178,8 @@ const Routes = () => {
           )}
         />
         <Route
-          path={controlsRoomPath}
-          render={(props) => <ControlsRoom {...props} store={store} />}
+          path={[controlsRoomIdPath, controlsRoomPath]}
+          render={(props) => <ControlsRoomContainer {...props} store={store} />}
         />
         <Route
           path={howToPlayPagePath}
@@ -166,6 +188,11 @@ const Routes = () => {
         <Route
           path={highscorePagePath}
           render={(props) => <HighscorePage {...props} />}
+        />
+        <Route
+          exact
+          path={privateProfileTournamentsPagePath}
+          render={(props) => <PrivateProfileAllTournamentsList {...props} />}
         />
         <Route
           path={privateProfilePagePath}
@@ -188,14 +215,14 @@ const Routes = () => {
           render={(props) => <PublicProfilePageContainer {...props} />}
         />
         <Route
-          path={tournamentPagePath}
-          exact
-          render={(props) => <TournamentPageContainer {...props} />}
-        />
-        <Route
           path={createTournamentPagePath}
           exact
           render={(props) => <CreateTournamentContainer {...props} />}
+        />
+        <Route
+          /** the order matters */
+          path={[tournamentIdPagePath, tournamentPagePath]}
+          render={(props) => <TournamentPageContainer {...props} />}
         />
         <Route
           path={connectPagePath}

@@ -11,13 +11,8 @@ import {
   getFirestorePublicUser,
   getUserSocials,
 } from "../../firebase/firestoreFunctions";
-import {
-  getBestScoresOnTrackAndLap,
-  getPlayerBestScoreOnTrackAndLap,
-  getPlayerBestScores,
-} from "../../firebase/firestoreGameFunctions";
+import { getPlayerBestScores } from "../../firebase/firestoreGameFunctions";
 import { UserContext } from "../../providers/UserProvider";
-import { createFakeHighscoreData } from "../../tests/fakeData";
 import { frontPagePath } from "../Routes";
 import PublicProfilePageComponent from "./PublicProfilePageComponent";
 

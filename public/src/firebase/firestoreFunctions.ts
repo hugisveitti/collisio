@@ -172,10 +172,14 @@ export interface AvailableRoomsFirebaseObject {
     userId: string
 }
 
-export const addToAvailableRooms = (userId: string, object: AvailableRoomsFirebaseObject) => {
-
+export const addToAvailableRooms = async (userId: string, object: AvailableRoomsFirebaseObject) => {
+    console.log("adding to rooms")
     const roomRef = doc(firestore, availableRoomsRefPath, userId)
-    setDoc(roomRef, object)
+    try {
+        await setDoc(roomRef, object)
+    } catch (e) {
+        console.warn("Error adding available room:", e)
+    }
 
 }
 

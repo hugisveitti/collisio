@@ -860,12 +860,12 @@ export class GameScene extends Scene3D implements IGameScene {
             this.fpsTick = 0
             this.oldTime = Math.floor(time)
         }
-        if (time > 5 && !this.hasAskedToLowerSettings) {
+        if (time > 30 && !this.hasAskedToLowerSettings) {
             this.hasAskedToLowerSettings = true
             window.localStorage.setItem("hasAskedToLowerSettings", "true")
             if (this.totalFpsTicks / this.totalNumberOfFpsTicks < 40) {
                 if (this.gameSettings.graphics === "high" || this.gameSettings.useShadows) {
-                    toast.warn("We noticed low fps, to increase fps and a more smooth game, go into settings (esc) and turn off shadows and put the graphics on low.")
+                    toast.warn("Low fps detected, to increase fps and a more smooth game, go into settings (esc) and turn off shadows and put the graphics on low. Also close other tabs in your browser.", {})
                 }
             }
         }

@@ -30,6 +30,7 @@ import rightTurnImage from "../images/phone-orientation-rightTurn.PNG";
 import splitScreenImage from "../images/split-screen.PNG";
 import vehicleSelect1 from "../images/vehicle-select-1.PNG";
 import vehicleSelect2 from "../images/vehicle-select-2.PNG";
+import resetOrientation from "../images/resetorient.jpg";
 import { inputBackgroundColor } from "../providers/theme";
 import "../styles/main.css";
 import { buyPremiumPagePath, highscorePagePath } from "./Routes";
@@ -321,6 +322,24 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
                 the first image, so the beta value dictates the steering.
               </Typography>
             </Grid>
+          </Grid>
+        </HowToPlayItem>
+
+        <HowToPlayItem header="Steering problems">
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography>
+                Sometimes your browser revokes the permission to use the phones
+                orientation.
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>
+                To re grant the permission you go into setting while in game and
+                press the "Reset orienation" button.
+              </Typography>
+            </Grid>
+            <CardMedia src={resetOrientation} component="img" />
           </Grid>
         </HowToPlayItem>
 

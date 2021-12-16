@@ -43,7 +43,12 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import LoginComponent from "../LoginComponent";
-import { controlsRoomPath, frontPagePath, gameRoomPath } from "../Routes";
+import {
+  controlsRoomPath,
+  frontPagePath,
+  gameRoomPath,
+  getControlsRoomPath,
+} from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
@@ -218,7 +223,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
     props.store.socket.on(stmd_game_starting, () => {
       if (onMobile) {
-        history.push(controlsRoomPath);
+        history.push(getControlsRoomPath(roomId));
       } else {
         history.push(gameRoomPath);
       }

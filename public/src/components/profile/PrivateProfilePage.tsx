@@ -19,7 +19,11 @@ import AppContainer from "../../containers/AppContainer";
 import { auth, signOut } from "../../firebase/firebaseInit";
 import { cardBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
-import { frontPagePath, getUserPagePath } from "../Routes";
+import {
+  frontPagePath,
+  getUserPagePath,
+  privateProfileTournamentsPagePath,
+} from "../Routes";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { getDateNow } from "../../utils/utilFunctions";
@@ -230,6 +234,15 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 disableElevation
               >
                 Logout
+              </Button>
+            </Grid>
+            <Grid item xs={3} style={{ textAlign: "left" }}>
+              <Button
+                onClick={() => history.push(privateProfileTournamentsPagePath)}
+                variant="contained"
+                disableElevation
+              >
+                Your Tournaments
               </Button>
             </Grid>
           </React.Fragment>

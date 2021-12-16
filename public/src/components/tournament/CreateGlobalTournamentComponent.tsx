@@ -3,6 +3,9 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import React from "react";
 import Divider from "@mui/material/Divider";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import { LocalizationProvider } from "@mui/lab";
 
 const CreateGlobalTournamentComponent = () => {
   return (
@@ -26,6 +29,31 @@ const CreateGlobalTournamentComponent = () => {
       </Grid>
       <Grid item xs={12}>
         <TextField label="Name" />
+      </Grid>
+      <Grid item xs={12}>
+        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateTimePicker
+            renderInput={(props) => <TextField {...props} />}
+            label="Tournament start"
+            //value={value}
+            value={new Date()}
+            onChange={(newValue) => {
+              console.log("not impl", newValue);
+            }}
+          />
+        </LocalizationProvider> */}
+      </Grid>
+      <Grid item xs={12}>
+        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateTimePicker
+            renderInput={(props) => <TextField {...props} />}
+            label="Tournament end"
+            value={new Date()}
+            onChange={(newValue) => {
+              console.log("not impl", newValue);
+            }}
+          />
+        </LocalizationProvider> */}
       </Grid>
     </Grid>
   );

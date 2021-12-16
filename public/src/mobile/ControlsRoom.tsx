@@ -24,6 +24,7 @@ import {
   stm_game_finished,
   stm_game_settings_changed_ballback,
   stm_player_finished,
+  stm_player_info,
 } from "../shared-backend/shared-stuff";
 import { inTestMode, isIphone } from "../utils/settings";
 import { invertedControllerKey } from "./ControllerSettingsComponent";
@@ -165,8 +166,16 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       /** go to front page? */
     });
 
+    props.store.socket.on(stm_player_info, (res) => {
+      const { player } = res;
+      if (player) {
+        props.store.setPlayer(player);
+      }
+    });
+
     return () => {
       props.store.socket.off(stm_desktop_disconnected);
+      props.store.socket.off(stm_player_info);
       window.clearInterval(sendControlsInterval);
       window.removeEventListener("deviceorientation", deviceOrientationHandler);
       window.removeEventListener("orientationchange", handleDeviceOrientChange);

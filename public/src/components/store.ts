@@ -1,6 +1,8 @@
 
+import React from "react";
 import { Socket } from "socket.io-client";
 import { IGameSettings } from "../classes/localGameSettings";
+import { ITournament } from "../classes/Tournament";
 import { IUserSettings } from "../classes/User";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
 
@@ -18,4 +20,6 @@ export interface IStore {
     setUserSettings: React.Dispatch<React.SetStateAction<IUserSettings>>
     socket: Socket | undefined
     setSocket: React.Dispatch<React.SetStateAction<Socket>>
+    tournament: ITournament | undefined
+    setTournament: React.Dispatch<React.SetStateAction<ITournament | undefined>>
 }

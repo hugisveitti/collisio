@@ -13,11 +13,13 @@ import { inDevelopment } from "../utils/settings";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 // Initialize Firebase
-const app = initializeApp(getFirebaseConfig());
+const app = initializeApp(getFirebaseConfig())
 
 // const analytics = getAnalytics(app);
 
 export const database = getDatabase(app)
+
+
 
 const getMyFirestore = () => {
     if (inDevelopment) {
@@ -28,6 +30,7 @@ const getMyFirestore = () => {
 
 export const firestore = getMyFirestore()
 if (inDevelopment) {
+
     connectFirestoreEmulator(firestore, "localhost", 8000)
 }
 

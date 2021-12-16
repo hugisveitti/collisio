@@ -14,6 +14,7 @@ interface INumberSelect {
   fullWidth?: boolean;
   title: string;
   minWidth?: number;
+  style?: React.CSSProperties;
 }
 
 const NumberSelect = (props: INumberSelect) => {
@@ -24,6 +25,7 @@ const NumberSelect = (props: INumberSelect) => {
     >
       <InputLabel id="vehicle-select">{props.title}</InputLabel>
       <Select
+        style={props.style}
         label={props.title}
         name={props.title}
         value={props.value}
