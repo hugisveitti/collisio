@@ -120,6 +120,7 @@ export class Course implements ICourse {
     checkpointSpawns: ExtendedObject3D[]
 
     lights: PointLight[]
+    rotatingObjects: Object3D[]
 
 
     constructor(gameScene: GameScene, trackName: TrackName,) {
@@ -131,6 +132,7 @@ export class Course implements ICourse {
         this.checkpointSpawns = []
         this.checkpoints = []
         this.lights = []
+        this.rotatingObjects = []
     }
 
     toggleShadows(useShadows: boolean) {
@@ -162,7 +164,7 @@ export class Course implements ICourse {
         const loader = new GLTFLoader(manager)
         const promise = new Promise<void>(async (resolve, reject) => {
 
-            await loader.loadAsync(getStaticPath(`models/${this.trackName}.gltf`)).then(async (gltf: GLTF) => {
+            await loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`)).then(async (gltf: GLTF) => {
                 this.gameScene.scene.add(gltf.scene)
                 this.courseScene = gltf.scene
 
@@ -175,7 +177,7 @@ export class Course implements ICourse {
                 *  but then render a box in their place for the physics
                 */
                 for (let child of gltf.scene.children) {
-                    if (child.name.includes("light")) {
+                    if (child.name.includes("_light")) {
                         child.visible = false
 
                         if (!child.name.includes("ghost")) {
@@ -199,6 +201,10 @@ export class Course implements ICourse {
                             this.gameScene.add.existing(pLight)
                         }
                     } else if (child.type === "Mesh" || child.type === "Group") {
+                        if (child.name.includes("rotate")) {
+                            this.rotatingObjects.push(child)
+                        }
+
                         if (child.name.includes("ghost")) {
 
                         }
@@ -324,6 +330,7 @@ export class Course implements ICourse {
 
 
     filterAndOrderCheckpoints() {
+
 
         const tempCheckpoints = []
         for (let p of this.checkpoints) {
@@ -489,5 +496,19 @@ export class Course implements ICourse {
 
 
 
-    updateCourse() { }
+    updateCourse() {
+        // not sure if this slows down stuff
+        if (this.gameScene.gameSettings.graphics === "high") {
+            for (let object of this.rotatingObjects) {
+                const r = object.rotation
+                object.rotateX(Math.PI / 120)
+            }
+        }
+
+        this._updateCourse()
+    }
+
+    _updateCourse() {
+
+    }
 }

@@ -116,7 +116,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
     setCenterOfMass(vec: SimpleVector) {
         let tf = new Ammo.btTransform()
         tf.setOrigin(new Ammo.btVector3(vec.x, vec.y, vec.z))
-        this.chassisMesh.body.ammo.setCenterOfMassTransform(tf)
+        this.vehicleBody.body.ammo.setCenterOfMassTransform(tf)
     }
 
 
@@ -175,7 +175,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
         this.setLocalStorage("mass", mass)
 
         const inertia = this.getAmmoInertia()
-        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(mass, inertia)
+        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, inertia)
 
         this.vehicle.getRigidBody().setMassProps(this.mass, inertia)
     }

@@ -1,7 +1,7 @@
 import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, FontLoader, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
 import { getTimeOfDay, getTimeOfDayColors, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
@@ -13,7 +13,8 @@ import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
-import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
+import { loadSphereModel } from "../vehicles/SphereVehicle";
+import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import "./game-styles.css";
 import { IGameScene } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
@@ -321,14 +322,16 @@ export class GameScene extends Scene3D implements IGameScene {
                 newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
                 this.vehicles.push(newVehicle)
 
+                if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
 
-
-
-
-                await loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
-                    (this.vehicles[i] as LowPolyVehicle).addModels(tires, chassis)
-
-                })
+                    await loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
+                        this.vehicles[i].addModels(tires, chassis)
+                    })
+                } else {
+                    await loadSphereModel(this.players[i].vehicleType, false).then((body) => {
+                        this.vehicles[i].addModels([], body)
+                    })
+                }
 
                 if (i === this.players.length - 1) {
 

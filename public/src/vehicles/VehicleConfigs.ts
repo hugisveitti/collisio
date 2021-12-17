@@ -1,6 +1,7 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
 import { itemInArray } from "../utils/utilFunctions"
 import { IVehicle, SimpleVector } from "./IVehicle"
+import { SphereVehicle } from "./SphereVehicle"
 
 
 // #FF8000 is orange
@@ -8,8 +9,9 @@ import { IVehicle, SimpleVector } from "./IVehicle"
 //  0x1d8a47 is green
 export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", "black", "white"]
 
+type VehicleClass = "LowPoly" | "Sphere"
 
-export const allVehicleTypes: { name: string, type: VehicleType }[] = [
+export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: VehicleClass }[] = [
     { name: "MacNormie", type: "normal2" },
     { name: "Old Normie", type: "normal" },
     { name: "Trakkie Tractor", type: "tractor" },
@@ -17,8 +19,18 @@ export const allVehicleTypes: { name: string, type: VehicleType }[] = [
     // { name: "Monster truck", type: "monsterTruck" },
     { name: "test", type: "test" },
     { name: "Big girl Sally", type: "offRoader" },
-    { name: "Thunderparrot", type: "sportsCar" }
+    { name: "Thunderparrot", type: "sportsCar" },
+    { name: "Sphere", type: "simpleSphere", vehicleClass: "Sphere" }
 ]
+
+export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass => {
+    for (let v of allVehicleTypes) {
+        if (v.type === vehicleType) {
+            return v.vehicleClass ?? "LowPoly"
+        }
+    }
+    return "LowPoly"
+}
 
 export const defaultVehicleType: VehicleType = "normal2"
 
@@ -277,6 +289,16 @@ export const vehicleConfigs = {
         breakingForce: 100,
         is4x4: false,
     },
+    simpleSphere: {
+        ...defaultVehicleConfig,
+        path: "simple-sphere.gltf",
+        mass: 400,
+        // this isnt engineforece but the rate angular velocity
+        engineForce: 30,
+        //  inertia: { x: 100000, y: 100000, z: 100000 }
+
+
+    }
 
 } as { [key: string]: IVehicleConfig }
 

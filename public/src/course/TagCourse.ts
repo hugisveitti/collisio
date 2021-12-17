@@ -168,7 +168,7 @@ export class TagCourse extends Course implements ITagCourse {
 
     }
 
-    updateCourse() {
+    _updateCourse() {
         for (let coin of this.coins) {
             // too slow for now
             //   coin.update()

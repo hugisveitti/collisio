@@ -11,10 +11,11 @@ import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
 import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
-import { instanceOfSimpleVector, SimpleVector } from "../vehicles/IVehicle"
+import { instanceOfSimpleVector, IVehicle, SimpleVector } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
-import { getVehicleNumber, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
-import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
+import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
+import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle"
+import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, getVehicleClassFromType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
 
@@ -34,8 +35,9 @@ document.body.appendChild(vehicleInputsContainer)
 
 export class LowPolyTestScene extends GameScene {
 
-    vehicle?: LowPolyTestVehicle
-    vehicles: LowPolyTestVehicle[]
+    //vehicle?: LowPolyTestVehicle
+    vehicle: IVehicle
+    vehicles: IVehicle[]
 
     font: THREE.Font
     textMesh?: any
@@ -65,13 +67,14 @@ export class LowPolyTestScene extends GameScene {
     usingDebug: boolean
     vehicleColorNumber = 0
 
-    otherVehicles: LowPolyTestVehicle[]
-    numberOfOtherVehicles = 0
+    otherVehicles: IVehicle[] // LowPolyTestVehicle[]
+    numberOfOtherVehicles = 2
 
     isIt: number
 
     constructor() {
         super()
+
 
         scoreTable.setAttribute("id", "score-info")
         lapTimeDiv.setAttribute("id", "lap-time")
@@ -127,7 +130,7 @@ export class LowPolyTestScene extends GameScene {
 
 
     async preload() {
-
+        // this.physics.debug.enable()
         if (this.usingDebug) {
             this.physics.debug?.enable()
         }
@@ -161,7 +164,7 @@ export class LowPolyTestScene extends GameScene {
             } else if (e.key === "h") {
                 this.vehicle.stop()
                 this.vehicle.start()
-                //  this.vehicle.setPosition(4, 15, 0)
+                this.vehicle.setPosition(4, 15, 0)
                 this.vehicle.setRotation(0, 0, Math.PI)
             } else if (e.key === "u") {
                 this.vehicle.stop()
@@ -221,8 +224,8 @@ export class LowPolyTestScene extends GameScene {
 
     initVehicles() {
         this.otherVehicles = []
-        this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
-
+        //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+        this.vehicle = new SphereVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type, false)
@@ -249,6 +252,40 @@ export class LowPolyTestScene extends GameScene {
         this.courseLoaded = true
         this.createOtherVehicles(() => {
             this.createVehicle().then(() => {
+                this.vehicle.useBadRotationTicks = true
+
+                const allVehicles = this.otherVehicles.concat(this.vehicle)
+                this.vehicles = allVehicles
+
+                this.course.setStartPositions(allVehicles)
+                for (let v of allVehicles) {
+                    if (v.isReady) {
+                        v.unpause()
+                    }
+                    v.canDrive = true
+                    v.start()
+                }
+                if (this.getGameType() === "tag") {
+
+                    this.vehicle.setPosition(0, 2, 0)
+                }
+
+
+                this.createController()
+
+                this.canStartUpdate = true
+                if (this.gameSettings.gameType === "tag") {
+
+                    this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
+                        if (isVehicle(otherObject)) {
+                            console.log("collide with vehicle", otherObject)
+                            const vehicleNumber = getVehicleNumber(otherObject.name)
+                            this.vehicle.setColor(notItColor)
+                            this.otherVehicles[vehicleNumber - 1].setColor(itColor)
+                            this.isIt = vehicleNumber
+                        }
+                    })
+                }
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
             })
         })
@@ -309,14 +346,6 @@ export class LowPolyTestScene extends GameScene {
         this.scene.clear()
         this.addLights()
 
-        /** TODO Cannot destroy vehicles */
-        // this.vehicle.destroy()
-        // for (let ovehicle of this.otherVehicles) {
-        //     ovehicle.destroy()
-        // }
-        // this.vehicle = undefined
-        // this.otherVehicles = []
-        // this.initVehicles()
         this.create()
 
     }
@@ -419,172 +448,167 @@ export class LowPolyTestScene extends GameScene {
 
 
     async createVehicle() {
+        const promise = new Promise<void>((resolve, reject) => {
 
 
+            const vehicleClass = getVehicleClassFromType(this.vehicleType)
+            if (vehicleClass === "Sphere") {
+                loadSphereModel(this.vehicleType, false).then((sphere) => {
+                    this.vehicle.addModels([sphere], sphere)
 
-        loadLowPolyVehicleModels(this.vehicleType, false).then(([tires, chassis]) => {
-
-            this.vehicle.addModels(tires, chassis)
-
-
-
-            const useChaseCamera = window.localStorage.getItem("useChaseCamera")
-            this.vehicle.useChaseCamera = eval(useChaseCamera)
-            this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
-            this.vehicle.resetPosition()
-            // this.dirLight.target = this.vehicle.chassisMesh
-            this.camera.position.set(0, 10, -25)
-            this.loadFont()
-
-
-            const createVehicleInputButtons = () => {
-
-
-                while (vehicleInputsContainer.children.length > 0) {
-                    vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
-                }
-
-                let key: keyof IVehicleConfig = "engineForce"
-
-                let topOffset = 25
-                let top = 0
-                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => {
-                    this.vehicle.setVehicleConfigKey("engineForce", val)
+                    const useChaseCamera = window.localStorage.getItem("useChaseCamera")
+                    this.vehicle.useChaseCamera = eval(useChaseCamera)
+                    this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+                    this.vehicle.resetPosition()
+                    // this.dirLight.target = this.vehicle.chassisMesh
+                    this.camera.position.set(0, 10, -25)
+                    this.loadFont()
+                    this.vehicle.unpause()
+                    resolve()
                 })
+            } else {
+
+
+                loadLowPolyVehicleModels(this.vehicleType, false).then(([tires, chassis]) => {
+
+                    this.vehicle.addModels(tires, chassis)
 
 
 
-                key = "mass"
-                top += topOffset
-                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => this.vehicle.updateMass(val as number))
+                    const useChaseCamera = window.localStorage.getItem("useChaseCamera")
+                    this.vehicle.useChaseCamera = eval(useChaseCamera)
+                    this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+                    this.vehicle.resetPosition()
+                    // this.dirLight.target = this.vehicle.chassisMesh
+                    this.camera.position.set(0, 10, -25)
+                    this.loadFont()
 
-                key = "breakingForce"
-                top += topOffset
-                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => this.vehicle.setVehicleConfigKey(key, val))
+
+                    const createVehicleInputButtons = () => {
 
 
-                /** These cannot be mass and inertia */
-                const keys = ["suspensionDamping", "suspensionStiffness", "suspensionCompression", "suspensionRestLength", "maxSuspensionTravelCm", "maxSuspensionForce", "rollInfluence", "frictionSlip"]
-                for (let key of keys) {
-                    key = key as keyof IVehicleConfig
-                    top += topOffset
-                    if (!(key in defaultVehicleConfig)) {
-                        console.warn(key, "is not a part the VehicleConfig")
+                        while (vehicleInputsContainer.children.length > 0) {
+                            vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
+                        }
+
+                        if (this.vehicle instanceof LowPolyTestVehicle) {
+
+                            let key: keyof IVehicleConfig = "engineForce"
+
+                            let topOffset = 25
+                            let top = 0
+                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => {
+                                (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey("engineForce", val)
+                            })
+
+
+
+                            key = "mass"
+                            top += topOffset
+                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).updateMass(val as number))
+
+                            key = "breakingForce"
+                            top += topOffset
+                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey(key, val))
+
+
+                            /** These cannot be mass and inertia */
+                            const keys = ["suspensionDamping", "suspensionStiffness", "suspensionCompression", "suspensionRestLength", "maxSuspensionTravelCm", "maxSuspensionForce", "rollInfluence", "frictionSlip"]
+                            for (let key of keys) {
+                                key = key as keyof IVehicleConfig
+                                top += topOffset
+                                if (!(key in defaultVehicleConfig)) {
+                                    console.warn(key, "is not a part the VehicleConfig")
+                                }
+                                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key as keyof IVehicleConfig), top, key, (val) => (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey(key as keyof IVehicleConfig, val))
+
+                            }
+
+
+                            top += topOffset
+                            this.createXYZInput(this.vehicle.getInertia(), top, "inertia", (newI) => {
+                                (this.vehicle as LowPolyTestVehicle).setInertia(newI)
+                            })
+
+                            top += topOffset
+                            this.createXYZInput(this.vehicle.getCenterOfMass(), top, "Set position", (newCM) => {
+                                (this.vehicle as LowPolyTestVehicle).setCenterOfMass(newCM)
+                            })
+
+
+                            top += topOffset
+                            const useChaseCamButtontDiv = document.createElement("div")
+                            useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
+                            useChaseCamButtontDiv.setAttribute("style", `top:${top}px;`)
+                            useChaseCamButtontDiv.innerHTML = "Chase cam"
+                            const useChaseCamButton = document.createElement("button")
+
+
+                            useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
+                            useChaseCamButton.addEventListener("click", (e) => {
+                                window.localStorage.setItem("useChaseCamera", (!this.vehicle.useChaseCamera).toString())
+                                this.vehicle.updateVehicleSettings({
+                                    ...this.vehicle.vehicleSettings,
+                                    useChaseCamera: !this.vehicle.useChaseCamera
+                                })
+                                useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
+
+                            })
+
+                            useChaseCamButtontDiv.appendChild(useChaseCamButton)
+                            vehicleInputsContainer.appendChild(useChaseCamButtontDiv)
+
+                            top += topOffset
+                            const resetDefaultBtnDiv = document.createElement("div")
+                            resetDefaultBtnDiv.setAttribute("class", "vehicle-input")
+                            resetDefaultBtnDiv.setAttribute("style", `top:${top}px;`)
+                            resetDefaultBtnDiv.innerHTML = "Reset to default"
+                            const resetDefaultBtn = document.createElement("button")
+
+
+                            resetDefaultBtn.innerHTML = "RESET "
+                            resetDefaultBtn.addEventListener("click", (e) => {
+                                (this.vehicle as LowPolyTestVehicle).resetConfigToDefault()
+                                createVehicleInputButtons()
+
+                            })
+                            resetDefaultBtnDiv.appendChild(resetDefaultBtn)
+                            vehicleInputsContainer.appendChild(resetDefaultBtnDiv)
+
+                            top += topOffset
+                            const debugBtnDiv = document.createElement("div")
+                            debugBtnDiv.setAttribute("class", "vehicle-input")
+                            debugBtnDiv.setAttribute("style", `top:${top}px;`)
+                            debugBtnDiv.innerHTML = "use debug "
+                            const debugBtn = document.createElement("button")
+
+
+                            debugBtn.innerHTML = `Debug ${this.usingDebug ? "ON" : "OFF"}`
+                            debugBtn.addEventListener("click", (e) => {
+                                this.usingDebug = !this.usingDebug
+                                window.localStorage.setItem("usingDebug", this.usingDebug + "")
+                                if (this.usingDebug) {
+                                    this.physics.debug.enable()
+                                } else {
+                                    this.physics.debug.disable()
+                                }
+
+                            })
+                            debugBtnDiv.appendChild(debugBtn)
+                            vehicleInputsContainer.appendChild(debugBtnDiv)
+                        }
+
                     }
-                    this.createVehcileInput(this.vehicle.getVehicleConfigKey(key as keyof IVehicleConfig), top, key, (val) => this.vehicle.setVehicleConfigKey(key as keyof IVehicleConfig, val))
-
-                }
-
-
-                top += topOffset
-                this.createXYZInput(this.vehicle.getInertia(), top, "inertia", (newI) => {
-                    this.vehicle.setInertia(newI)
-                })
-
-                top += topOffset
-                this.createXYZInput(this.vehicle.getCenterOfMass(), top, "Set position", (newCM) => {
-                    this.vehicle.setCenterOfMass(newCM)
-                })
-
-
-                top += topOffset
-                const useChaseCamButtontDiv = document.createElement("div")
-                useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
-                useChaseCamButtontDiv.setAttribute("style", `top:${top}px;`)
-                useChaseCamButtontDiv.innerHTML = "Chase cam"
-                const useChaseCamButton = document.createElement("button")
-
-
-                useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
-                useChaseCamButton.addEventListener("click", (e) => {
-                    window.localStorage.setItem("useChaseCamera", (!this.vehicle.useChaseCamera).toString())
-                    this.vehicle.updateVehicleSettings({
-                        ...this.vehicle.vehicleSettings,
-                        useChaseCamera: !this.vehicle.useChaseCamera
-                    })
-                    useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
-
-                })
-
-                useChaseCamButtontDiv.appendChild(useChaseCamButton)
-                vehicleInputsContainer.appendChild(useChaseCamButtontDiv)
-
-                top += topOffset
-                const resetDefaultBtnDiv = document.createElement("div")
-                resetDefaultBtnDiv.setAttribute("class", "vehicle-input")
-                resetDefaultBtnDiv.setAttribute("style", `top:${top}px;`)
-                resetDefaultBtnDiv.innerHTML = "Reset to default"
-                const resetDefaultBtn = document.createElement("button")
-
-
-                resetDefaultBtn.innerHTML = "RESET "
-                resetDefaultBtn.addEventListener("click", (e) => {
-                    this.vehicle.resetConfigToDefault()
                     createVehicleInputButtons()
 
-                })
-                resetDefaultBtnDiv.appendChild(resetDefaultBtn)
-                vehicleInputsContainer.appendChild(resetDefaultBtnDiv)
-
-                top += topOffset
-                const debugBtnDiv = document.createElement("div")
-                debugBtnDiv.setAttribute("class", "vehicle-input")
-                debugBtnDiv.setAttribute("style", `top:${top}px;`)
-                debugBtnDiv.innerHTML = "use debug "
-                const debugBtn = document.createElement("button")
-
-
-                debugBtn.innerHTML = `Debug ${this.usingDebug ? "ON" : "OFF"}`
-                debugBtn.addEventListener("click", (e) => {
-                    this.usingDebug = !this.usingDebug
-                    window.localStorage.setItem("usingDebug", this.usingDebug + "")
-                    if (this.usingDebug) {
-                        this.physics.debug.enable()
-                    } else {
-                        this.physics.debug.disable()
-                    }
+                    // const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 10, y: 4, z: 40 })
+                    // ball.body.setBounciness(1)
+                    resolve()
 
                 })
-                debugBtnDiv.appendChild(debugBtn)
-                vehicleInputsContainer.appendChild(debugBtnDiv)
             }
-            createVehicleInputButtons()
-
-            // const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 10, y: 4, z: 40 })
-            // ball.body.setBounciness(1)
-
-            this.vehicle.useBadRotationTicks = true
-
-            const allVehicles = this.otherVehicles.concat(this.vehicle)
-            this.vehicles = allVehicles
-
-            this.course.setStartPositions(allVehicles)
-            for (let v of allVehicles) {
-                if (v.isReady) {
-                    v.unpause()
-                }
-                v.canDrive = true
-                v.start()
-            }
-            if (this.getGameType() === "tag") {
-
-                this.vehicle.setPosition(0, 2, 0)
-            }
-
-
-            this.createController()
-
-            this.canStartUpdate = true
-            // this.vehicle.chassisMesh.body.on.collision((otherObject: ExtendedObject3D, e: CollisionEvent) => {
-            //     if (isVehicle(otherObject)) {
-            //         console.log("collide with vehicle", otherObject)
-            //         const vehicleNumber = getVehicleNumber(otherObject.name)
-            //         this.vehicle.setColor(notItColor)
-            //         this.otherVehicles[vehicleNumber - 1].setColor(itColor)
-            //         this.isIt = vehicleNumber
-            //     }
-            // })
         })
+        return promise
     }
 
     resetVehicleCallback(vehicleNumber: number) {

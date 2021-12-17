@@ -5,8 +5,20 @@
  * So this limits the .js to one file.
  */
 /** trackName.gltf */
-export type TrackName = "farm-track" | "f1-track" | "test-course" | "sea-side-track" | "simple-tag-course" | "town-track" | "f1-track-2" | "monaco-track" | "russia-track" | "ferrari-track"
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar" | "normal2"
+export type TrackName =
+    "farm-track"
+    | "f1-track"
+    | "test-course"
+    | "sea-side-track"
+    | "simple-tag-course"
+    | "town-track"
+    | "f1-track-2"
+    | "monaco-track"
+    | "russia-track"
+    | "ferrari-track"
+    | "skii-map"
+
+export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar" | "normal2" | "simpleSphere"
 
 export type GameType = "ball" | "race" | "tag"
 

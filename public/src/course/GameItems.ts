@@ -33,6 +33,15 @@ export const gameItems = {
         objectName: "ground",
         friction: 3.0
     },
+    "snow": {
+        collisionFlags: 1,
+        shape: "concave",
+        receiveShadow: true,
+        bounciness: .05,
+        isCourseObject: true,
+        objectName: "ground",
+        friction: 0.7
+    },
     "road": {
         collisionFlags: 1,
         shape: "concave",

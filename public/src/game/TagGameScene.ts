@@ -106,7 +106,7 @@ export class TagGameScene extends GameScene {
     createColliderListeners() {
         for (let i = 0; i < this.vehicles.length; i++) {
 
-            this.vehicles[i].chassisMesh.body.on.collision((otherObject: ExtendedObject3D, ev: CollisionEvent) => {
+            this.vehicles[i].vehicleBody.body.on.collision((otherObject: ExtendedObject3D, ev: CollisionEvent) => {
 
 
                 if (!this.isItTimeout && !this.gameOver && this.tagObjects[i].isIt && isVehicle(otherObject)) {

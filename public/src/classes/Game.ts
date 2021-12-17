@@ -59,8 +59,10 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Mountain track", type: "russia-track", gameType: "race"
     },
     {
-        name: "Snow track", type: "ferrari-track", gameType: "race",
-        timeOfDay: "evening"
+        name: "Snow track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
+    },
+    {
+        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
     }
 ]
 

@@ -54,7 +54,7 @@ export class LowPolyVehicle implements IVehicle {
     isPaused: boolean;
     mass: number;
     tires: ExtendedObject3D[]
-    chassisMesh!: ExtendedObject3D
+    vehicleBody!: ExtendedObject3D
 
 
     scene: IGameScene
@@ -146,18 +146,18 @@ export class LowPolyVehicle implements IVehicle {
         this.chaseCameraSpeed = 0.3
         this.chaseCameraTicks = 0
         this.vehicleSettings = defaultVehicleSettings
-        this.vehicleType = vehicleType
         this.isReady = false
 
         this.maxSpeedTicks = 0
+        this.useEngineSound = useEngineSound
 
 
+        this.vehicleType = vehicleType
         this.mass = vehicleConfigs[this.vehicleType].mass
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
 
-        this.useEngineSound = useEngineSound
 
         this.currentEngineForce = 0
 
@@ -176,14 +176,14 @@ export class LowPolyVehicle implements IVehicle {
             this.tires.push(tire.clone())
         }
 
-        this.chassisMesh = chassis.clone()
-        this.chassisMesh.receiveShadow = false
-        this.chassisMesh.castShadow = true
+        this.vehicleBody = chassis.clone()
+        this.vehicleBody.receiveShadow = false
+        this.vehicleBody.castShadow = true
         this.modelsLoaded = true;
-        const material = (this.chassisMesh.material as MeshStandardMaterial).clone();
-        this.chassisMesh.material = material;
+        const material = (this.vehicleBody.material as MeshStandardMaterial).clone();
+        this.vehicleBody.material = material;
 
-        (this.chassisMesh.material as MeshStandardMaterial).color = new Color(this.color);
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
 
 
 
@@ -192,7 +192,7 @@ export class LowPolyVehicle implements IVehicle {
 
     setColor(color: string | number) {
         this.color = color;
-        (this.chassisMesh.material as MeshStandardMaterial).color = new Color(this.color);
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
     }
 
 
@@ -200,19 +200,19 @@ export class LowPolyVehicle implements IVehicle {
     createVehicle() {
 
 
-        this.scene.add.existing(this.chassisMesh)
+        this.scene.add.existing(this.vehicleBody)
 
         if (useBad) {
-            this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass })
+            this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass })
         } else {
-            this.scene.physics.add.existing(this.chassisMesh, { mass: this.mass, shape: "convex", autoCenter: false, })
+            this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: "convex", autoCenter: false, })
         }
 
 
 
-        this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+        this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
 
-        this.chassisMesh.body.setBounciness(.0)
+        this.vehicleBody.body.setBounciness(.0)
 
         // how to lower center of mass
 
@@ -229,17 +229,17 @@ export class LowPolyVehicle implements IVehicle {
 
         this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
 
-        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.chassisMesh.body.ammo, this.raycaster)
-        this.chassisMesh.body.ammo.setActivationState(DISABLE_DEACTIVATION)
-        this.chassisMesh.body.skipUpdate = true
+        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
+        this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+        this.vehicleBody.body.skipUpdate = true
         this.vehicle.setCoordinateSystem(0, 1, 2)
 
 
 
 
 
-        this.chassisMesh.body.name = "vehicle-" + this.vehicleNumber
-        this.chassisMesh.name = "vehicle-" + this.vehicleNumber
+        this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
+        this.vehicleBody.name = "vehicle-" + this.vehicleNumber
 
 
 
@@ -303,7 +303,7 @@ export class LowPolyVehicle implements IVehicle {
         const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
         this.vector.setValue(x, y, z)
         this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
-        this.chassisMesh.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
+        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
 
         this.isReady = true
         /** don't start the vehicle until race */
@@ -499,14 +499,14 @@ export class LowPolyVehicle implements IVehicle {
     stop() {
 
         this.zeroEngineForce()
-        this.chassisMesh.body.setCollisionFlags(1)
-        this.chassisMesh.body.setVelocity(0, 0, 0)
-        this.chassisMesh.body.setAngularVelocity(0, 0, 0)
+        this.vehicleBody.body.setCollisionFlags(1)
+        this.vehicleBody.body.setVelocity(0, 0, 0)
+        this.vehicleBody.body.setAngularVelocity(0, 0, 0)
     };
 
     start() {
 
-        this.chassisMesh.body.setCollisionFlags(0)
+        this.vehicleBody.body.setCollisionFlags(0)
     };
 
     pause() {
@@ -514,9 +514,9 @@ export class LowPolyVehicle implements IVehicle {
         this.zeroEngineForce()
 
         this.stopEngineSound()
-        if (this.chassisMesh?.body) {
+        if (this.vehicleBody?.body) {
 
-            this.chassisMesh.body.setCollisionFlags(1)
+            this.vehicleBody.body.setCollisionFlags(1)
         }
 
     };
@@ -528,18 +528,18 @@ export class LowPolyVehicle implements IVehicle {
         if (this.useEngineSound) {
             this.startEngineSound()
         }
-        if (this.chassisMesh?.body) {
+        if (this.vehicleBody?.body) {
 
-            this.chassisMesh.body.setCollisionFlags(0)
+            this.vehicleBody.body.setCollisionFlags(0)
         }
     };
 
     addCamera(camera: PerspectiveCamera) {
-        if (!this.chassisMesh) return
-        const c = this.chassisMesh.getObjectByName(camera.name)
+        if (!this.vehicleBody) return
+        const c = this.vehicleBody.getObjectByName(camera.name)
         if (!this.useChaseCamera && !c) {
             camera.position.set(staticCameraPos.x, staticCameraPos.y, staticCameraPos.z)
-            this.chassisMesh.add(camera)
+            this.vehicleBody.add(camera)
         }
 
         this.camera = camera
@@ -549,9 +549,9 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     removeCamera() {
-        for (let i = 0; i < this.chassisMesh.children.length; i++) {
-            if (this.chassisMesh.children[i].type === "PerspectiveCamera") {
-                this.chassisMesh.remove(this.chassisMesh.children[i])
+        for (let i = 0; i < this.vehicleBody.children.length; i++) {
+            if (this.vehicleBody.children[i].type === "PerspectiveCamera") {
+                this.vehicleBody.remove(this.vehicleBody.children[i])
             }
         }
     }
@@ -602,7 +602,7 @@ export class LowPolyVehicle implements IVehicle {
         if (this.spinCameraAroundVehicle) {
 
 
-            const rot = this.chassisMesh.rotation
+            const rot = this.vehicleBody.rotation
             this.vehicle.updateVehicle(0)
             const pos = this.getPosition()
 
@@ -620,7 +620,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
-            camera.lookAt(this.chassisMesh.position.clone())
+            camera.lookAt(this.vehicleBody.position.clone())
             camera.updateProjectionMatrix()
             camera.updateMatrix()
             camera.updateWorldMatrix(false, false)
@@ -632,12 +632,13 @@ export class LowPolyVehicle implements IVehicle {
 
 
 
-            this.vehicle.getRigidBody().getMotionState().getWorldTransform(this.transformCam)
-            const rot = this.chassisMesh.rotation
+            // this.vehicle.getRigidBody().getMotionState().getWorldTransform(this.transformCam)
+            // this.vehicle.updateWheelTransform(4)
+            const rot = this.vehicleBody.rotation
 
             // I think these are always the same
-            // this.chassisMesh.pos is set to the value of this.getPosition in update()
-            let pos = this.chassisMesh.position.clone() // this.getPosition()
+            // this.vehicleBody.pos is set to the value of this.getPosition in update()
+            let pos = this.vehicleBody.position.clone() // this.getPosition()
 
             const p1 = this.vehicle.getChassisWorldTransform().getOrigin()
 
@@ -708,7 +709,7 @@ export class LowPolyVehicle implements IVehicle {
         } else {
 
             /** I dont think I can make the camera stuck to the chassis AND not make it go under ground */
-            camera.lookAt(this.chassisMesh.position.clone())
+            camera.lookAt(this.vehicleBody.position.clone())
 
         }
     };
@@ -756,10 +757,10 @@ export class LowPolyVehicle implements IVehicle {
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
         this.q = this.tm.getRotation()
-        this.chassisMesh.position.set(this.p.x(), this.p.y(), this.p.z())
+        this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
 
 
-        this.chassisMesh.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+        this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
         // maybe this 0.2 value could use more thought
         if (Math.abs(this.q.z()) > 0.2 || Math.abs(this.q.x()) > 0.2) {
@@ -778,9 +779,9 @@ export class LowPolyVehicle implements IVehicle {
 
 
             if (i < 4) {
-                const x = this.vehicle.getWheelTransformWS(i).getOrigin().x()
+                // const x = this.vehicle.getWheelTransformWS(i).getOrigin().x()
 
-                const fa = this.vehicle.getRightAxis()
+                // const fa = this.vehicle.getRightAxis()
 
                 this.wheelMeshes[i].position.set(this.p.x(), this.p.y(), this.p.z())
                 this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
@@ -796,7 +797,7 @@ export class LowPolyVehicle implements IVehicle {
             this.stop()
             this.start()
 
-            this.setRotation(0, this.chassisMesh.rotation.y + Math.PI, 0)
+            this.setRotation(0, this.vehicleBody.rotation.y + Math.PI, 0)
 
 
             const groundY = this.findClosesGround() + 1
@@ -811,7 +812,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
     findClosesGround(): number {
-        const pos = this.chassisMesh.position
+        const pos = this.vehicleBody.position
         this.vector2.setValue(pos.x, pos.y, pos.z);
         this.vector.setValue(pos.x, pos.y + 4, pos.z);
 
@@ -845,7 +846,7 @@ export class LowPolyVehicle implements IVehicle {
         const e = new Euler().setFromQuaternion(qu.normalize(), "XYZ", true)
 
         // return { x: e.x, y: e.y, z: e.z, w: qu.w }
-        return { x: o.x(), y: o.y(), z: o.z(), w: o.w() }
+        return qu
     }
 
     setRotation(x: number | Quaternion, y?: number, z?: number) {
@@ -891,15 +892,15 @@ export class LowPolyVehicle implements IVehicle {
         this.scene.add.existing(textMesh)
 
         textMesh.position.set(1.2, 3, 0)
-        this.chassisMesh.add(textMesh)
+        this.vehicleBody.add(textMesh)
 
     }
 
     lookForwardsBackwards(lookBackwards: boolean) { };
 
     resetPosition() {
-        this.chassisMesh.body.setAngularVelocity(0, 0, 0)
-        this.chassisMesh.body.setVelocity(0, 0, 0)
+        this.vehicleBody.body.setAngularVelocity(0, 0, 0)
+        this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
 
         const frontHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightFront + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusFront
@@ -936,11 +937,11 @@ export class LowPolyVehicle implements IVehicle {
         }
 
 
-        this.chassisMesh.remove(this.camera)
+        this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
             const { x, y, z } = staticCameraPos
             this.camera.position.set(x, y, z)
-            this.chassisMesh.add(this.camera)
+            this.vehicleBody.add(this.camera)
         }
 
 
@@ -955,9 +956,9 @@ export class LowPolyVehicle implements IVehicle {
 
         this.stopEngineSound()
 
-        if (this.scene && this.chassisMesh) {
+        if (this.scene && this.vehicleBody) {
 
-            this.scene.destroy(this.chassisMesh)
+            this.scene.destroy(this.vehicleBody)
         }
         for (let tire of this.tires) {
             // this.scene.
@@ -981,6 +982,8 @@ export class LowPolyVehicle implements IVehicle {
             //  Ammo.destroy(this.p)
         }
     }
+
+    randomDrive(): void { }
 
 }
 

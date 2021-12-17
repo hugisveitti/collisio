@@ -23,7 +23,7 @@ export interface IVehicle {
     /** could try and have a function getCollisionBody
      * But I couldn't import the definition of PhysicsBody
      */
-    chassisMesh: ExtendedObject3D
+    vehicleBody: ExtendedObject3D
 
     canDrive: boolean
     isPaused: boolean
@@ -67,7 +67,7 @@ export interface IVehicle {
     update: () => void
     setPosition: (x: number, y: number, z: number) => void
     getPosition: () => SimpleVector
-    getRotation: () => SimpleVector
+    getRotation: () => Quaternion
     setRotation: (x: number | Quaternion, y?: number, z?: number) => void
     getCurrentSpeedKmHour: () => number
     setFont: (font: Font) => void
@@ -81,4 +81,6 @@ export interface IVehicle {
     toggleSound: (useSound: boolean) => void
     destroy: () => void
 
+    addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
+    randomDrive: () => void
 }
