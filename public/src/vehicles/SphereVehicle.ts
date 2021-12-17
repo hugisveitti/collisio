@@ -381,12 +381,12 @@ export class SphereVehicle implements IVehicle {
         }
 
 
-        this.vehicleBody.remove(this.camera)
-        if (!this.useChaseCamera && this.camera) {
-            const { x, y, z } = staticCameraPos
-            this.camera.position.set(x, y, z)
-            this.vehicleBody.add(this.camera)
-        }
+        // this.vehicleBody.remove(this.camera)
+        // if (!this.useChaseCamera && this.camera) {
+        //     const { x, y, z } = staticCameraPos
+        //     this.camera.position.set(x, y, z)
+        //     this.vehicleBody.add(this.camera)
+        // }
 
     }
 

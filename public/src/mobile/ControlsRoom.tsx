@@ -263,7 +263,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const sendGameActions = () => {
     props.store.socket.emit(mts_send_game_actions, gameActions);
-    // handle
+    gameActions.pause = false;
+    gameActions.restart = false;
   };
 
   const handleSendGameSettings = () => {
@@ -293,10 +294,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
       gameActions.pause = false;
       sendGameActions();
-      setTimeout(() => {
-        gameActions.pause = false;
-        gameActions.restart = false;
-      }, 150);
     });
   };
 
