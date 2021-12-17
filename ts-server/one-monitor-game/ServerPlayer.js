@@ -61,7 +61,7 @@ var Player = /** @class */ (function () {
         this.socket.emit(shared_stuff_1.stm_player_info, { player: this.getPlayerInfo() });
     };
     Player.prototype.gameSettingsChangedCallback = function () {
-        this.socket.emit(shared_stuff_1.stm_game_settings_changed_ballback, {});
+        this.socket.emit(shared_stuff_1.stm_game_settings_changed_callback, {});
     };
     Player.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;

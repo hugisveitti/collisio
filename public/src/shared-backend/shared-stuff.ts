@@ -232,7 +232,7 @@ export const stm_back_to_waiting_room = "stm_back_to_waiting_room"
 export const mdts_game_settings_changed = "mdts_game_settings_changed"
 export const stmd_game_settings_changed = "stmd_game_settings_changed"
 export const dts_game_settings_changed_callback = "mts_game_settings_changed_callback"
-export const stm_game_settings_changed_ballback = "stm_game_settings_changed_ballback"
+export const stm_game_settings_changed_callback = "stm_game_settings_changed_callback"
 
 export const mts_send_game_actions = "mts_send_game_actions"
 export const std_send_game_actions = "std_send_game_actions"

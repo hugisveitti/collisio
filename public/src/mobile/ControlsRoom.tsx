@@ -22,7 +22,7 @@ import {
   mts_user_settings_changed,
   stm_desktop_disconnected,
   stm_game_finished,
-  stm_game_settings_changed_ballback,
+  stm_game_settings_changed_callback,
   stm_player_finished,
   stm_player_info,
 } from "../shared-backend/shared-stuff";
@@ -228,7 +228,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       /**
        * remove all socket listeners
        */
-      props.store.socket.off(stm_game_settings_changed_ballback);
+      props.store.socket.off(stm_game_settings_changed_callback);
       props.store.socket.off(stm_game_finished);
       props.store.socket.off(stm_player_finished);
     };
@@ -287,7 +287,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
     }, 1000);
 
-    props.store.socket.once(stm_game_settings_changed_ballback, () => {
+    props.store.socket.once(stm_game_settings_changed_callback, () => {
       clearTimeout(timout);
       setSettingsModalOpen(false);
       setGameSettingsLoading(false);

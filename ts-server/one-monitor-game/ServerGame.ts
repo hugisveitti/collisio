@@ -28,7 +28,7 @@ import {
     mdts_start_game,
     std_send_game_actions,
     dts_game_settings_changed_callback,
-    stm_game_settings_changed_ballback,
+    stm_game_settings_changed_callback,
     dts_back_to_waiting_room,
     STD_SENDINTERVAL_MS
 } from "../../public/src/shared-backend/shared-stuff";

@@ -123,6 +123,7 @@ const GameRoom = (props: IGameRoom) => {
       toast.warn("No room connection found.");
       return null;
     }
+
     if (props.store.gameSettings.gameType === "ball") {
       console.warn("ball game not supported");
     }

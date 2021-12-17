@@ -347,6 +347,7 @@ export class RaceGameScene extends GameScene {
         this.gameTicks += 1
         this.roomTicks += 1
         if (this.everythingReady()) {
+            this.course.updateCourse()
 
             if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)

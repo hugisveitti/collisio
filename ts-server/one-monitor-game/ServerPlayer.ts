@@ -1,6 +1,6 @@
 import { Socket } from "socket.io"
 import {
-    IPlayerInfo, mdts_game_settings_changed, mdts_left_waiting_room, mdts_start_game, MobileControls, mts_connected_to_waiting_room, mts_controls, mts_game_data_info, mts_ping_test, mts_send_game_actions, mts_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stm_desktop_disconnected, stm_game_finished, stm_game_settings_changed_ballback, stm_ping_test_callback, stm_player_finished, stm_player_info, VehicleControls
+    IPlayerInfo, mdts_game_settings_changed, mdts_left_waiting_room, mdts_start_game, MobileControls, mts_connected_to_waiting_room, mts_controls, mts_game_data_info, mts_ping_test, mts_send_game_actions, mts_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stm_desktop_disconnected, stm_game_finished, stm_game_settings_changed_callback, stm_ping_test_callback, stm_player_finished, stm_player_info, VehicleControls
 } from "../../public/src/shared-backend/shared-stuff"
 import { Room } from "./ServerGame"
 
@@ -89,7 +89,7 @@ export class Player {
     }
 
     gameSettingsChangedCallback() {
-        this.socket.emit(stm_game_settings_changed_ballback, {})
+        this.socket.emit(stm_game_settings_changed_callback, {})
     }
 
     setupLeftWaitingRoomListener() {

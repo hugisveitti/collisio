@@ -40,6 +40,9 @@ export class SphereVehicle implements IVehicle {
     cameraDiff = new Vector3()
     cameraTarget = new Vector3()
 
+    quaternion = new Quaternion()
+    euler = new Euler()
+
     chaseCameraSpeed: number
     useChaseCamera: boolean
     chaseCameraTicks: number
@@ -230,31 +233,30 @@ export class SphereVehicle implements IVehicle {
 
     stop(): void {
         this.zVel = 0
-        this.vehicleBody.body.setCollisionFlags(1)
+        if (!this.vehicleBody?.body)
+            this.vehicleBody.body.setCollisionFlags(1)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.applyForce(0, 0, 0)
     }
 
     start(): void {
-
-        this.vehicleBody.body.setCollisionFlags(0)
+        this.vehicleBody?.body?.setCollisionFlags(0)
     }
 
     pause(): void {
-
         this.isPaused = true
         this.canDrive = false
         this.zVel = 0
         this.xVel = 0
         this.yVel = 0
-        this.vehicleBody.body.setCollisionFlags(1)
+        this.vehicleBody?.body?.setCollisionFlags(1)
     }
 
     unpause(): void {
         this.isPaused = false
         this.canDrive = true
-        this.vehicleBody.body.setCollisionFlags(0)
+        this.vehicleBody?.body?.setCollisionFlags(0)
     }
 
     addCamera(camera: any): void {
@@ -291,26 +293,10 @@ export class SphereVehicle implements IVehicle {
 
 
     setPosition(x: number, y: number, z: number): void {
-
         this.scene.physics.destroy(this.vehicleBody)
 
         this.vehicleBody.position.set(x, y + 1, z)
         this.scene.physics.add.existing(this.vehicleBody, this.physicsConfig)
-
-        const rot = new Euler().setFromQuaternion(this.getRotation())
-
-        // I think these are always the same
-        // this.vehicleBody.pos is set to the value of this.getPosition in update()
-        let pos = this.vehicleBody.position.clone() // this.getPosition()
-
-
-
-        this.camera.position.set(
-            pos.x - ((Math.sin(this.yRot) * cameraOffset)),
-            pos.y + staticCameraPos.y,
-            pos.z + ((Math.cos(this.yRot) * cameraOffset)) //* Math.sign(Math.cos(rot.z)))
-        )
-
     }
 
     getPosition(): Vector3 {
@@ -319,16 +305,16 @@ export class SphereVehicle implements IVehicle {
     }
 
     getRotation(): Quaternion {
-
-        return new Quaternion().setFromEuler(this.vehicleBody.rotation)
+        this.quaternion.setFromEuler(this.vehicleBody.rotation)
+        return this.quaternion
     }
 
 
     setRotation(x: number | Quaternion, y?: number, z?: number): void {
         this.scene.physics.destroy(this.vehicleBody)
         if (x instanceof Quaternion) {
-            const e = new Euler().setFromQuaternion(x)
-            this.yRot = e.y
+            this.euler.setFromQuaternion(x)
+            this.yRot = this.euler.y
             this.vehicleBody.setRotationFromQuaternion(x)
         } else {
             this.yRot = y
@@ -350,7 +336,7 @@ export class SphereVehicle implements IVehicle {
     }
 
     lookForwardsBackwards(lookBackwards: boolean): void {
-        console.warn("not imple")
+        console.warn("lookForwardsBackwards not imple")
     }
 
     resetPosition(): void {
@@ -379,7 +365,9 @@ export class SphereVehicle implements IVehicle {
     updateVehicleSettings(vehicleSettings: IVehicleSettings): void {
         this.vehicleSettings = vehicleSettings
 
-
+        if (this.vehicleSettings.vehicleType !== this.vehicleType) {
+            this.scene.setNeedsReload(true)
+        }
 
         const keys = Object.keys(vehicleSettings)
         for (let key of keys) {
@@ -409,7 +397,7 @@ export class SphereVehicle implements IVehicle {
     }
 
     destroy(): void {
-        console.warn("not implemented")
+        this.scene.destroy(this.vehicleBody)
     }
 
     rotateY(num: number) {
@@ -420,12 +408,6 @@ export class SphereVehicle implements IVehicle {
 
     // update mesh and model to vehicle place
     update(): void {
-
-
-
-
-
-
         this.vehicleBody.body.setAngularVelocity(this.zVel * Math.cos(this.yRot) * .05, 0, this.zVel * Math.sin(this.yRot) * .05)
         // this.vehicleBody.body.ammo.
         // this.vehicleBody.body.setVelocity(-this.zVel * Math.sin(this.yRot), 0, this.zVel * Math.cos(this.yRot))
