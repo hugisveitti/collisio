@@ -188,12 +188,15 @@ export class Room {
     desktopUserId: string | undefined
     sendControlsInterval?: NodeJS.Timer
 
+    sendingControls: boolean
+
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
         this.gameSettings = {}
         this.roomId = roomId
         this.io = io
         this.gameStarted = false
+        this.sendingControls = false
         this.desktopUserId = undefined
 
         this.isConnected = true
@@ -292,9 +295,9 @@ export class Room {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
             } else {
-
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)
+                this.playerReconnected()
             }
             return
         }
@@ -360,6 +363,7 @@ export class Room {
 
 
     setupControlsListener() {
+        this.sendingControls = true
         this.sendControlsInterval = setInterval(() => {
             this.socket.emit(std_controls, { players: this.getPlayersControls() })
             // set fps
@@ -437,8 +441,15 @@ export class Room {
         if (this.gameStarted && this.everyoneDisconnected()) {
 
             if (this.sendControlsInterval) {
+                this.sendingControls = false
                 clearInterval(this.sendControlsInterval)
             }
+        }
+    }
+
+    playerReconnected() {
+        if (!this.sendingControls) {
+            this.setupControlsListener()
         }
     }
 

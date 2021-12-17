@@ -124,6 +124,7 @@ var Room = /** @class */ (function () {
         this.roomId = roomId;
         this.io = io;
         this.gameStarted = false;
+        this.sendingControls = false;
         this.desktopUserId = undefined;
         this.isConnected = true;
         this.deleteRoomCallback = deleteRoomCallback;
@@ -217,6 +218,7 @@ var Room = /** @class */ (function () {
             else {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
                 player.socket.emit(shared_stuff_1.stmd_game_starting);
+                this.playerReconnected();
             }
             return;
         }
@@ -273,6 +275,7 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupControlsListener = function () {
         var _this = this;
+        this.sendingControls = true;
         this.sendControlsInterval = setInterval(function () {
             _this.socket.emit(shared_stuff_1.std_controls, { players: _this.getPlayersControls() });
             // set fps
@@ -342,8 +345,14 @@ var Room = /** @class */ (function () {
         this.alertWaitingRoom();
         if (this.gameStarted && this.everyoneDisconnected()) {
             if (this.sendControlsInterval) {
+                this.sendingControls = false;
                 clearInterval(this.sendControlsInterval);
             }
+        }
+    };
+    Room.prototype.playerReconnected = function () {
+        if (!this.sendingControls) {
+            this.setupControlsListener();
         }
     };
     Room.prototype.everyoneDisconnected = function () {

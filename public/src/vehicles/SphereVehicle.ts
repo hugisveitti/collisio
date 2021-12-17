@@ -163,10 +163,14 @@ export class SphereVehicle implements IVehicle {
         // if (this.zVel > -this.engineForce) {
         //     this.zVel -= this.dzVel
         // }
+        if (!this.canDrive) return
+
 
         this.zVel = -this.engineForce
     }
     goBackward(speed?: number): void {
+        if (!this.canDrive) return
+
         if (this.zVel < 10) {
             this.zVel += 10
         } else {
