@@ -166,6 +166,9 @@ const GameRoom = (props: IGameRoom) => {
   useEffect(() => {
     props.store.socket.on(stmd_game_settings_changed, (data) => {
       props.store.setGameSettings(data.gameSettings);
+      if (data.gameSettings) {
+        setAllLocalGameSettings(data.gameSettings);
+      }
       if (gameObject) {
         gameObject.setGameSettings(data.gameSettings);
       }
