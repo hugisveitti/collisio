@@ -280,18 +280,50 @@ export class SphereVehicle implements IVehicle {
     cameraLookAt(camera: PerspectiveCamera): void {
 
 
-        let pos = this.vehicleBody.position.clone()
+        const pos = this.vehicleBody.position.clone()
+        const rot = this.vehicleBody.rotation
 
+        const chaseSpeedY = 0.9
+        const chaseSpeed = .9 //this.chaseCameraSpeed
 
+        // this.oldPos = pos.clone()
 
-        camera.position.set(
+        // this is for the follow camera effect
+        this.cameraTarget.set(
             pos.x - ((Math.sin(this.yRot) * cameraOffset)),
             pos.y + staticCameraPos.y,
             pos.z + ((Math.cos(this.yRot) * cameraOffset))
         )
 
 
-        camera.lookAt(pos)
+
+        this.cameraDiff.subVectors(this.cameraTarget, camera.position)
+
+        this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * chaseSpeed))
+        this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * chaseSpeed))
+        this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
+
+        //    this.cameraLookAtPos.set(0, 0, 0)
+        const cs = 0.5
+
+        this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((pos.x - this.prevCahseCameraPos.x) * cs))
+        this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
+        this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
+
+        this.prevCahseCameraPos = this.cameraLookAtPos.clone()
+
+
+        // camera.position.set(
+        //     pos.x - ((Math.sin(this.yRot) * cameraOffset)),
+        //     pos.y + staticCameraPos.y,
+        //     pos.z + ((Math.cos(this.yRot) * cameraOffset))
+        // )
+
+        camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
+        camera.updateProjectionMatrix()
+
+        camera.lookAt(this.cameraLookAtPos)
+        this.cameraLookAtPos = pos
 
 
 

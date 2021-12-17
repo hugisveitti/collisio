@@ -225,7 +225,13 @@ export class LowPolyTestScene extends GameScene {
     initVehicles() {
         this.otherVehicles = []
         //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
-        this.vehicle = new SphereVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+        if (getVehicleClassFromType(this.vehicleType) === "LowPoly") {
+            this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+
+        } else {
+
+            this.vehicle = new SphereVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+        }
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type, false)
@@ -491,6 +497,8 @@ export class LowPolyTestScene extends GameScene {
                             vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
                         }
 
+                        console.log("this.vehicle instanceof LowPolyTestVehicle", this.vehicle instanceof LowPolyTestVehicle)
+                        console.log("this vehice", this.vehicle)
                         if (this.vehicle instanceof LowPolyTestVehicle) {
 
                             let key: keyof IVehicleConfig = "engineForce"

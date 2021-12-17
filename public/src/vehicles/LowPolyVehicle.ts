@@ -693,7 +693,6 @@ export class LowPolyVehicle implements IVehicle {
             this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
             this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
 
-            this.cameraLookAtPos = pos
             this.prevCahseCameraPos = this.cameraLookAtPos.clone()
 
 
@@ -701,6 +700,7 @@ export class LowPolyVehicle implements IVehicle {
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.updateProjectionMatrix()
             camera.lookAt(this.cameraLookAtPos)
+            this.cameraLookAtPos = pos
 
 
             //    } else {
