@@ -448,6 +448,11 @@ export class Room {
     }
 
     playerReconnected() {
+
+        if (this.players.length === 1) {
+            this.players[0].setLeader()
+        }
+
         if (!this.sendingControls) {
             this.setupControlsListener()
         }

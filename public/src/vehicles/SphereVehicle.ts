@@ -71,6 +71,8 @@ export class SphereVehicle implements IVehicle {
 
     physicsConfig: {}
 
+
+
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
@@ -108,6 +110,7 @@ export class SphereVehicle implements IVehicle {
 
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
         this.engineForce = 300
+        this.breakingForce = -1
         this.dVel = 3
         this.dzVel = -1
 

@@ -32,8 +32,7 @@ export class RaceGameScene extends GameScene {
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
 
-    roomTicks: number
-    gameTicks: number
+
 
     /**
      * this is if players change number of laps in middle of game
@@ -59,8 +58,7 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
 
 
-        this.roomTicks = 0
-        this.gameTicks = 0
+
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
         this.hasShowStartAnimation = false

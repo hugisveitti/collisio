@@ -121,6 +121,9 @@ export class GameScene extends Scene3D implements IGameScene {
     totalNumberOfFpsTicks: number
     oldTime: number
 
+    roomTicks: number
+    gameTicks: number
+
     hasAskedToLowerSettings: boolean
 
     constructor() {
@@ -187,6 +190,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.totalFpsTicks = 0
         this.totalNumberOfFpsTicks = 0
         this.oldTime = 0
+
+        this.roomTicks = 0
+        this.gameTicks = 0
         this.hasAskedToLowerSettings = eval(window.localStorage.getItem("hasAskedToLowerSettings")) ?? false
     }
 
