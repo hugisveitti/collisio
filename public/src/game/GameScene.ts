@@ -13,7 +13,7 @@ import { addControls } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
-import { loadSphereModel } from "../vehicles/SphereVehicle";
+import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import "./game-styles.css";
 import { IGameScene } from "./IGameScene";
@@ -319,7 +319,13 @@ export class GameScene extends Scene3D implements IGameScene {
                 const color = possibleVehicleColors[i]
 
                 let newVehicle: IVehicle
-                newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+                if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
+
+                    newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+                } else {
+                    newVehicle = new SphereVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+
+                }
                 this.vehicles.push(newVehicle)
 
                 if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {

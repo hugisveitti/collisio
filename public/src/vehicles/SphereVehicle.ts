@@ -114,7 +114,7 @@ export class SphereVehicle implements IVehicle {
 
 
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D): void {
-        console.log("body", body)
+
         this.isReady = false
 
         this.scene.physics.destroy(this.vehicleBody)
@@ -152,6 +152,7 @@ export class SphereVehicle implements IVehicle {
         this.vehicleBody.body.setBounciness(0.4)
         this.isReady = true
         this.canDrive = true
+        this.isPaused = false
     };
 
 
@@ -232,6 +233,7 @@ export class SphereVehicle implements IVehicle {
         this.vehicleBody.body.setCollisionFlags(1)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
+        this.vehicleBody.body.applyForce(0, 0, 0)
     }
 
     start(): void {
@@ -240,16 +242,19 @@ export class SphereVehicle implements IVehicle {
     }
 
     pause(): void {
+
         this.isPaused = true
         this.canDrive = false
         this.zVel = 0
         this.xVel = 0
         this.yVel = 0
+        this.vehicleBody.body.setCollisionFlags(1)
     }
 
     unpause(): void {
         this.isPaused = false
         this.canDrive = true
+        this.vehicleBody.body.setCollisionFlags(0)
     }
 
     addCamera(camera: any): void {
@@ -286,10 +291,10 @@ export class SphereVehicle implements IVehicle {
 
 
     setPosition(x: number, y: number, z: number): void {
-        console.log("set position", x, y, z)
+
         this.scene.physics.destroy(this.vehicleBody)
 
-        this.vehicleBody.position.set(x, y, z)
+        this.vehicleBody.position.set(x, y + 1, z)
         this.scene.physics.add.existing(this.vehicleBody, this.physicsConfig)
 
         const rot = new Euler().setFromQuaternion(this.getRotation())
@@ -335,9 +340,7 @@ export class SphereVehicle implements IVehicle {
 
     getCurrentSpeedKmHour(): number {
         const { x, z } = this.vehicleBody.body.velocity
-        console.log("x", x.toFixed(2))
-        console.log("z", z.toFixed(2))
-        console.log("rotY", this.yRot)
+
         const num = Math.sqrt(x * x + z * z)
         return num
     }
@@ -418,7 +421,8 @@ export class SphereVehicle implements IVehicle {
     // update mesh and model to vehicle place
     update(): void {
 
-        if (!this.canDrive) return
+
+
 
 
 

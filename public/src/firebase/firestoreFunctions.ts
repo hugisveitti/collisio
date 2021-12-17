@@ -173,7 +173,6 @@ export interface AvailableRoomsFirebaseObject {
 }
 
 export const addToAvailableRooms = async (userId: string, object: AvailableRoomsFirebaseObject) => {
-    console.log("adding to rooms")
     const roomRef = doc(firestore, availableRoomsRefPath, userId)
     try {
         await setDoc(roomRef, object)

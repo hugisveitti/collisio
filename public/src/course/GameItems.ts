@@ -47,7 +47,8 @@ export const gameItems = {
         shape: "concave",
         // notAddPhysics: true,
         receiveShadow: true,
-        bounciness: .05
+        bounciness: .05,
+        friction: 3.0
     },
     "checkered-flag": {
         collisionFlags: 1,
