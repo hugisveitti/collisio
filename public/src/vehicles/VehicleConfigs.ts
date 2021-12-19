@@ -20,7 +20,7 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "test", type: "test" },
     { name: "Big girl Sally", type: "offRoader" },
     { name: "Thunderparrot", type: "sportsCar" },
-    { name: "Sphere", type: "simpleSphere", vehicleClass: "Sphere" }
+    { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" }
 ]
 
 export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass => {
@@ -209,7 +209,7 @@ export const vehicleConfigs = {
 
 
         mass: 1200,
-        engineForce: 8000,
+        engineForce: 6000,
         breakingForce: 200,
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },

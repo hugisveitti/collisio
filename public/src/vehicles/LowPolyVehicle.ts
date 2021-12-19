@@ -158,6 +158,8 @@ export class LowPolyVehicle implements IVehicle {
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
 
+        console.log("vehicle config", this.vehicleType, ":", vehicleConfigs[this.vehicleType])
+
 
         this.currentEngineForce = 0
 
@@ -449,28 +451,25 @@ export class LowPolyVehicle implements IVehicle {
 
     zeroEngineForce() {
         const ef = 0
-
         if (this.is4x4) {
             this.vehicle.applyEngineForce(ef, FRONT_LEFT)
             this.vehicle.applyEngineForce(ef, FRONT_RIGHT)
         }
-
         this.vehicle.applyEngineForce(ef, BACK_LEFT)
         this.vehicle.applyEngineForce(ef, BACK_RIGHT)
     }
 
     turnLeft(angle: number) { };
-    turnRight(angle: number) { };
-    noTurn() {
 
+    turnRight(angle: number) { };
+
+    noTurn() {
         this.vehicle.setSteeringValue(0, FRONT_LEFT)
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
-
     };
+
     turn(angle: number) {
         if (this.canDrive) {
-            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_LEFT)
-            // this.vehicle.setSteeringValue(angle / turnDivder, FRONT_RIGHT)
             this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_LEFT)
             this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_RIGHT)
         } else {
