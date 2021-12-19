@@ -148,6 +148,11 @@ export const getAvailableTournamentsListener = async (userId: string, callback: 
     let fIds = followings.map(f => f.uid)
     fIds = fIds.concat(userId)
 
+    console.warn("fids length needs a fix getAvailableTournamentsListener")
+    if (fIds.length > 10) {
+        fIds = fIds.slice(fIds.length - 10, fIds.length)
+    }
+
     const q = query(collection(firestore, tournamentPath), where("leaderId", "in", fIds), where("hasStarted", "==", false), where("isFinished", "==", false))
     const unsub = onSnapshot(q, (qSnap) => {
         const tournaments: ITournament[] = []

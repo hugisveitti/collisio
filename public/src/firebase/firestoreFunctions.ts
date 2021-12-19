@@ -5,6 +5,7 @@ import { v4 as uuid } from "uuid"
 
 import { firestore } from "./firebaseInit"
 import { IRoomInfo } from "../classes/Game"
+import { ids } from "webpack"
 
 const usersCollectionRefPath = "users"
 const publicUserCollectionPath = "profiles"
@@ -143,6 +144,18 @@ export const getUserFollowings = async (userId: string, followingsCallback: (fol
     return arr
 }
 
+/**
+ * 
+ * @param userId 
+ * @returns list of followers that are online
+ */
+export const getOnlineFollowings = async (userId: string): Promise<IFollower[]> => {
+    console.warn("GET ONLINE FOLLOWINGS NOT IMPLEMENTED")
+    return new Promise<IFollower[]>((resolve, reject) => {
+
+    })
+}
+
 
 /**
  * I don't expect users to follow many users
@@ -194,6 +207,20 @@ export const createAvailableRoomsListeners = async (userId: string, callback: (r
     let fIds = followings.map(f => f.uid)
     fIds = fIds.concat(userId)
 
+    // const collectionPath = collection(firestore, availableRoomsRefPath)
+
+    // let batches = []
+    // while (fIds.length) {
+    //     const batch = fIds.splice(0, 10)
+    //     batches.push(new Promise(res => {
+    //         const q = query(collectionPath, where("userId", "in", fIds))
+    //     }))
+    // }
+    console.warn("fids length needs a fix createAvailableRoomsListeners")
+    if (fIds.length > 10) {
+        fIds = fIds.slice(fIds.length - 10, fIds.length)
+    }
+    // fIds can be at most 10, need to fix this
     const q = query(collection(firestore, availableRoomsRefPath), where("userId", "in", fIds))
     const unsub = onSnapshot(
         q,
