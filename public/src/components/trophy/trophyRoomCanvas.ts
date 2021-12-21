@@ -1,22 +1,30 @@
-import { Object3D, Color, Scene, MeshStandardMaterial, PointLight, AmbientLight, WebGLRenderer, sRGBEncoding, PerspectiveCamera } from "three"
+import { AmbientLight, Color, Object3D, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { loadLowPolyVehicleModels, } from "../../vehicles/LowPolyVehicle"
-import { getDeviceType, getStaticPath } from "../../utils/settings"
-import { VehicleType } from "../../shared-backend/shared-stuff"
-import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
+import { getDeviceType, getStaticPath } from "../../utils/settings";
 
 
-const loadTrophyModel = async (): Promise<Object3D> => {
+const loadTrophyModel = async (id: string): Promise<Object3D> => {
     return new Promise<Object3D>((resolve, reject) => {
         const loader = new GLTFLoader()
-        loader.load(getStaticPath(`models/trophy.glb`), (gltf: GLTF) => {
-            for (let child of gltf.scene.children) {
-                console.log("child")
-                if (child.name.includes("trophy")) {
-                    resolve(child)
 
+
+        loader.load(getStaticPath(`models/trophies/trophy${id}.glb`), (gltf: GLTF) => {
+
+            let trophy: Object3D
+            for (let child of gltf.scene.children) {
+
+                if (child.name.includes("trophy")) {
+                    trophy = child
+                    break
                 }
+            }
+
+            try {
+
+                resolve(trophy)
+            } catch (e) {
+                console.warn("error resolving:", e)
             }
         })
     })
@@ -42,10 +50,16 @@ const addLights = (scene: Scene) => {
 let renderer: WebGLRenderer | undefined, scene: Scene | undefined
 
 
-export const createTrophyRoomCanvas = async () => {
+export const createTrophyRoomCanvas = async (id: string) => {
+
     if (scene && renderer) {
         scene.clear()
-        const trophy = await loadTrophyModel()
+
+        const trophy = await loadTrophyModel(id)
+
+        if (!trophy) {
+            return undefined
+        }
         scene.add(trophy)
         addLights(scene)
         return undefined
@@ -80,8 +94,11 @@ export const createTrophyRoomCanvas = async () => {
     camera.lookAt(0, 0, 0)
 
 
+    const trophy = await loadTrophyModel(id)
 
-    const trophy = await loadTrophyModel()
+    if (!trophy) {
+        return
+    }
     scene.add(trophy)
 
 
@@ -95,7 +112,7 @@ export const createTrophyRoomCanvas = async () => {
 
     };
 
-    let ry = 0
+    let ry = 0.01
     let offset = 15
     camera.rotateY(ry)
     const animate = () => {
@@ -103,13 +120,14 @@ export const createTrophyRoomCanvas = async () => {
         requestAnimationFrame(animate);
 
 
-        // controls.update();
+        controls.update();
         if (renderer) {
 
             renderer.render(scene, camera);
         }
-        // ry += .01
-        // // camera.rotateY(ry)
+        //  ry += .01
+        trophy.rotateY(ry)
+        // camera.rotateY(ry)
         // camera.position.setX(Math.cos(ry) * offset)
         // camera.position.setZ(Math.sin(ry) * offset)
         // camera.lookAt(0, 0, 0)

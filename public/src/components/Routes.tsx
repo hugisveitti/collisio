@@ -66,6 +66,7 @@ export const tournamentPagePath = "/tournament";
 export const createTournamentPagePath = "/tournament/create";
 export const tournamentIdPagePath = "/tournament/:tournamentId";
 export const trophyRoomPath = "/trophy";
+export const trophyRoomIdPath = "/trophy/:id";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -80,6 +81,8 @@ export const getWaitingRoomPath = (roomId: string) =>
 
 export const getControlsRoomPath = (roomId: string) =>
   `${controlsRoomPath}/${roomId}`;
+
+export const getTrophyRoomPath = (id: string) => `${trophyRoomPath}/${id}`;
 
 const Routes = () => {
   const [socket, setSocket] = useState(undefined as Socket | undefined);
@@ -233,7 +236,7 @@ const Routes = () => {
           )}
         />
         <Route
-          path={trophyRoomPath}
+          path={[trophyRoomIdPath, trophyRoomPath]}
           render={(props) => <TrophyRoomContainer {...props} />}
         />
 
