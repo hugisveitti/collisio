@@ -51,7 +51,7 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
         }
       });
     }
-  }, []);
+  }, [profileId]);
 
   useEffect(() => {
     if (profile) {

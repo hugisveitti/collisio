@@ -8,7 +8,11 @@ import {
 } from "@mui/material";
 import List from "@mui/material/List";
 import React, { useEffect, useState } from "react";
-import { ITournament, ITournamentUser } from "../../classes/Tournament";
+import {
+  ITournament,
+  ITournamentUser,
+  TournamentType,
+} from "../../classes/Tournament";
 import { IFollower, IUser } from "../../classes/User";
 import {
   getPlayersInTournamentListener,
@@ -23,6 +27,7 @@ interface IPlayerListItem {
   possibleRanks: number[];
   setPlayer: (player: ITournamentUser) => void;
   isLeader: boolean;
+  tournamentType: TournamentType;
 }
 
 const PlayerListItem = (props: IPlayerListItem) => {
@@ -47,7 +52,7 @@ const PlayerListItem = (props: IPlayerListItem) => {
             {player.displayName} {props.isLeader && <i>Leader</i>}
           </Typography>
         }
-        secondary={player.ranking}
+        secondary={props.tournamentType === "local" && player.ranking}
       />
       {/* <ListItemButton>
         {props.user && (
@@ -169,6 +174,7 @@ const TournamentPlayersList = (props: ITournamentPlayersList) => {
               newPlayers[i] = newPlayer;
               props.setPlayers(newPlayers);
             }}
+            tournamentType={props.tournament.tournamentType}
             isLeader={props.tournament.leaderId === player.uid}
           />
         );

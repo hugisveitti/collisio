@@ -3,7 +3,7 @@ import { IPreGamePlayerInfo, TrackName, VehicleType } from "../shared-backend/sh
 import { getDateNow, shuffleArray } from "../utils/utilFunctions";
 import { IUser } from "./User";
 
-type TournamentType = "local" | "global"
+export type TournamentType = "local" | "global"
 
 export interface ITournamentUser extends IUser {
     ranking: number
@@ -34,6 +34,8 @@ export interface ITournament {
     private: boolean
 
     creationDate: Date
+    /** useful for queries */
+    playersIds: string[]
 }
 
 
@@ -52,6 +54,7 @@ export class Tournament implements ITournament {
     isFinished: boolean
     private: boolean
     creationDate: Date;
+    playersIds: string[]
 
     constructor(leaderId: string, leaderName: string) {
         this.tournamentType = "local"
@@ -70,6 +73,7 @@ export class Tournament implements ITournament {
         this.private = false
 
         this.creationDate = new Date()
+        this.playersIds = []
     }
 }
 
@@ -166,6 +170,14 @@ export const validateCreateTournament = (tournament: ITournament): Validation =>
             status: "error", message: "Number of laps must be positive"
         }
     }
+    if (tournament.tournamentType === "global") {
+        const t = tournament as GlobalTournament
+        if (t.tournamentStart > t.tournamentEnd) {
+            return {
+                status: "error", message: "Tournament cannot start after it ends"
+            }
+        }
+    }
 
     return {
         status: "success", message: ""
@@ -173,22 +185,39 @@ export const validateCreateTournament = (tournament: ITournament): Validation =>
 }
 
 interface IGlobalTournament extends ITournament {
-    tournamentStart: number
-    tournamentEnd: number
-    runsPerPlayer: number | undefined
+    tournamentStart: Date
+    tournamentEnd: Date
+    runsPerPlayer: number | false
+
+
 }
 
 export class GlobalTournament extends Tournament implements IGlobalTournament {
 
-    tournamentStart: number
-    tournamentEnd: number
-    runsPerPlayer: number
+    tournamentStart: Date
+    tournamentEnd: Date
+    runsPerPlayer: number | false
 
     constructor(leaderId: string, leaderName: string) {
         super(leaderId, leaderName)
         this.tournamentType = "global"
-        this.tournamentStart = -1
-        this.tournamentEnd = -1
-        this.runsPerPlayer = -1
+        this.tournamentStart = new Date()
+        this.tournamentEnd = new Date(Date.now() + 1000 * 60 * 60 * 2)
+        this.runsPerPlayer = false
     }
 }
+
+export interface ISingleRaceData {
+    vehicleType: VehicleType
+    totalTime: number
+    lapTimes: number[]
+}
+
+// interface IGlobalTournamentRaceData {
+//     playerName: string
+//     date: Date
+//     uid: string
+//     photoUrl: string
+//     raceData: ISingleRaceData[]
+// }
+

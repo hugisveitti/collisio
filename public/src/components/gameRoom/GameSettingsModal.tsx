@@ -4,10 +4,7 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import {
-  IGameSettings,
-  setLocalGameSetting,
-} from "../../classes/localGameSettings";
+import { IGameSettings } from "../../classes/localGameSettings";
 import { IGameScene } from "../../game/IGameScene";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";

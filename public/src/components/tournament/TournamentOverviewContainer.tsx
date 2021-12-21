@@ -1,4 +1,5 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import { Divider } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -7,6 +8,7 @@ import { useHistory, useParams } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
 import { createTournamentPagePath } from "../Routes";
+import ActiveTournamentsComponent from "./ActiveTournamentsComponent";
 import AvailableTournamentsComponent from "./AvailableTournamentsComponent";
 import TournamentContainer from "./TournamentContainer";
 
@@ -50,8 +52,17 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
             Create a tournament
           </Button>
         </Grid>
+        <Grid item xs={12}>
+          <Divider style={{ margin: "auto", width: 100 }} />
+        </Grid>
 
         <AvailableTournamentsComponent user={user} />
+
+        <Grid item xs={12}>
+          <Divider style={{ margin: "auto", width: 100 }} />
+        </Grid>
+
+        <ActiveTournamentsComponent user={user} />
       </Grid>
     </AppContainer>
   );

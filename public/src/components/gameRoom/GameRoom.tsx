@@ -152,6 +152,8 @@ const GameRoom = (props: IGameRoom) => {
     );
 
     props.store.socket.on(std_game_data_info, (data: string[]) => {
+      console.log("old game data info", gameDataInfo);
+      console.log("new game data info", data);
       setGameDataInfo(gameDataInfo.concat(data));
     });
 

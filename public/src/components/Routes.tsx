@@ -41,6 +41,7 @@ import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
 import CreateTournamentContainer from "./tournament/CreateTournamentContainer";
 import TournamentPageContainer from "./tournament/TournamentOverviewContainer";
+import TrophyRoomContainer from "./trophy/TrophyRoomContainer";
 import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
 
@@ -64,6 +65,7 @@ export const connectPagePath = "/connect";
 export const tournamentPagePath = "/tournament";
 export const createTournamentPagePath = "/tournament/create";
 export const tournamentIdPagePath = "/tournament/:tournamentId";
+export const trophyRoomPath = "/trophy";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -230,6 +232,11 @@ const Routes = () => {
             <ConnectToWaitingRoomContainer {...props} store={store} />
           )}
         />
+        <Route
+          path={trophyRoomPath}
+          render={(props) => <TrophyRoomContainer {...props} />}
+        />
+
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>
     </Router>

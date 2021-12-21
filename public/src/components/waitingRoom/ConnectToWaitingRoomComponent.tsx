@@ -1,15 +1,19 @@
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
-import CircularProgress from "@mui/material/CircularProgress";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { IPlayerConnection } from "../../classes/Game";
+import {
+  getLocalStorageItem,
+  saveLocalStorageItem,
+} from "../../classes/localStorage";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
@@ -21,7 +25,6 @@ import {
 import { createSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import AvailableRoomsComponent from "../AvailableRoomsComponent";
-import NotLoggedInModal from "../NotLoggedInModal";
 import { waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 
@@ -80,7 +83,6 @@ const ConnectToWaitingRoomComponent = (
         toast.error("Room id cannot be undefined");
         return;
       }
-
       connectToRoomMobile(roomId, playerName, socket);
     }
   };
@@ -96,12 +98,6 @@ const ConnectToWaitingRoomComponent = (
       handleConnection(props.store.socket, roomId);
     }
   };
-
-  useEffect(() => {
-    if (user?.displayName) {
-      setPlayerName(user.displayName);
-    }
-  }, [user]);
 
   const goToWaitingRoom = (roomId: string) => {
     history.push(waitingRoomPath + "/" + roomId);
@@ -138,6 +134,18 @@ const ConnectToWaitingRoomComponent = (
   };
 
   useEffect(() => {
+    if (user?.displayName) {
+      setPlayerName(user.displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const roomId = getLocalStorageItem<string>("roomId");
+    console.log("getting room id ", roomId);
+    if (roomId) {
+      props.store.setRoomId(roomId);
+    }
+
     if (props.quickConnection && !onMobile) {
       connectButtonClicked();
     }

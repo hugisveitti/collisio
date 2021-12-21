@@ -233,6 +233,13 @@ export class Course implements ICourse {
                                         if (child.name.includes("hidden")) {
                                             child.visible = false
                                         }
+                                        if (child.name.includes("breakable")) {
+                                            eObject.breakable = true
+                                            console.log("breakable", eObject)
+                                        }
+                                        if (child.name.includes("softbody")) {
+                                            eObject.body.isSoftBody = true
+                                        }
 
                                         this.gamePhysicsObjects.push(eObject)
                                     }

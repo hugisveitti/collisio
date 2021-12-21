@@ -16,6 +16,7 @@ export interface IGameSettings {
     gameType: GameType
     tagGameLength: number
     graphics: GraphicsType
+    tournamentId?: string
 }
 
 export const defaultGameSettings: IGameSettings = {

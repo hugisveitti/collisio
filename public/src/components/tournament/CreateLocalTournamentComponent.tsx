@@ -9,7 +9,7 @@ import {
   validateCreateTournament,
 } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
-import { addTournament } from "../../firebase/firestoreTournamentFunctions";
+import { setTournament } from "../../firebase/firestoreTournamentFunctions";
 import { getTournamentPagePath } from "../Routes";
 import EditTournamentComponent from "./EditTournamentComponent";
 
@@ -22,12 +22,12 @@ const CreateLocalTournamentComponent = (
 ) => {
   const history = useHistory();
 
-  const [tournament, setTournament] = useState(
+  const [editTournament, setEditTournament] = useState(
     new LocalTournament(props.user?.uid, props.user?.displayName)
   );
 
   const updateTournament = (key: keyof LocalTournament, value: any) => {
-    const newTournament = { ...tournament };
+    const newTournament = { ...editTournament };
     // @ts-ignore
     newTournament[key] = value;
     setTournament(newTournament as LocalTournament);
@@ -52,11 +52,8 @@ const CreateLocalTournamentComponent = (
       </Grid>
 
       <EditTournamentComponent<LocalTournament>
-        tournament={tournament}
+        tournament={editTournament}
         user={props.user}
-        // setTournament={(newTournament) => {
-        //   setTournament(newTournament);
-        // }}
         updateTournament={updateTournament}
       />
 
@@ -68,13 +65,14 @@ const CreateLocalTournamentComponent = (
           variant="contained"
           disableElevation
           onClick={() => {
-            const { status, message } = validateCreateTournament(tournament);
+            const { status, message } =
+              validateCreateTournament(editTournament);
             if (status === "error") {
               toast.error(message);
             } else {
-              addTournament(tournament)
+              setTournament(editTournament)
                 .then(() => {
-                  history.push(getTournamentPagePath(tournament.id));
+                  history.push(getTournamentPagePath(editTournament.id));
                 })
                 .catch(() => {
                   // ekki endilega rétt
@@ -83,7 +81,7 @@ const CreateLocalTournamentComponent = (
             }
           }}
         >
-          Create tournament!
+          Create local tournament!
         </Button>
       </Grid>
     </Grid>

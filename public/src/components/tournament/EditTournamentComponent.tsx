@@ -10,6 +10,7 @@ import {
   Tournament,
 } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
+import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
 import EditGlobalTournamentComponent from "./EditGlocalTournament";
@@ -73,10 +74,10 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
               onChange={() => {
                 setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
                 if (!onlyAllowSpecificVechileType) {
-                  updateTournament("vehicleType", "normal");
+                  updateTournament("vehicleType", "normal2");
                 } else {
                   // will give bug
-                  updateTournament("vehicleType", undefined);
+                  updateTournament("vehicleType", false);
                 }
               }}
             />
@@ -90,11 +91,12 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
             value={
               onlyAllowSpecificVechileType
                 ? props.tournament.vehicleType
-                : "normal"
+                : "normal2"
             }
             onChange={(vehicleType) => {
               updateTournament("vehicleType", vehicleType);
             }}
+            excludedVehicles={nonactiveVehcileTypes}
           />
         </Collapse>
       </Grid>

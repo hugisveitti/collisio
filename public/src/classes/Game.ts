@@ -11,6 +11,7 @@ export interface ITrackInfo {
     type: TrackName
     gameType: GameType
     timeOfDay?: TimeOfDay
+
 }
 
 export const getTrackNameFromType = (trackName: TrackName) => {
@@ -63,6 +64,9 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
+    },
+    {
+        name: "Challenge map", type: "challenge-track", gameType: "tag"
     }
 ]
 
@@ -77,18 +81,24 @@ interface ITimeOfDayColors {
     ambientLightColor: number
     hemisphereTopColor: number
     hemisphereBottomColor: number
+    pointLightIntesity: number
+    ambientLightIntesity: number
 }
 
 const dayColors: ITimeOfDayColors = {
     ambientLightColor: 0xffffff,
     hemisphereBottomColor: 0xffffff,
-    hemisphereTopColor: 0x0077ff
+    hemisphereTopColor: 0x0077ff,
+    pointLightIntesity: 1,
+    ambientLightIntesity: 1
 }
 
 const eveningColors: ITimeOfDayColors = {
     ambientLightColor: 0x0077ff,
     hemisphereBottomColor: 0x003168,
-    hemisphereTopColor: 0x0077ff
+    hemisphereTopColor: 0x0077ff,
+    pointLightIntesity: .1,
+    ambientLightIntesity: .01
 }
 
 export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDayColors => {
@@ -182,6 +192,7 @@ export interface IEndOfRaceInfoPlayer {
     totalPing: number
     totalPingsGotten: number
     avgFps: number
+    tournamentId?: string
 }
 
 export interface IPlayerGameInfo {

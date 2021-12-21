@@ -13,6 +13,7 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
+import { saveLocalStorageItem } from "../../classes/localStorage";
 import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
@@ -43,12 +44,7 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import LoginComponent from "../LoginComponent";
-import {
-  controlsRoomPath,
-  frontPagePath,
-  gameRoomPath,
-  getControlsRoomPath,
-} from "../Routes";
+import { frontPagePath, gameRoomPath, getControlsRoomPath } from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
@@ -185,6 +181,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     // TODO: create a function that verifies gameSettings
+    if (onMobile) {
+      saveLocalStorageItem("roomId", roomId.toLowerCase());
+    }
 
     if (!props.store.socket && !onMobile && !inTestMode) {
       /** Desktops should always have a socket when connected to waiting room */

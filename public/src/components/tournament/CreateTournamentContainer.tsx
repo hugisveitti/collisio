@@ -76,7 +76,7 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
               </Grid>
             ) : (
               <Grid item xs={12}>
-                <CreateGlobalTournamentComponent />
+                <CreateGlobalTournamentComponent user={user} />
               </Grid>
             )}
           </>

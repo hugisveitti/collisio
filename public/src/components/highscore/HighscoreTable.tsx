@@ -42,7 +42,7 @@ const HighscoreTable = (props: IHighscoreTable) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.data.length === 0 ? (
+          {props.data?.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5 + (props.includeTrackAndNumLaps ? 2 : 0)}>
                 {props.noDataText}

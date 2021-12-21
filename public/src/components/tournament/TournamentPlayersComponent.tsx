@@ -1,5 +1,5 @@
 import { Button, CircularProgress, Grid, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ITournament, ITournamentUser } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
@@ -45,6 +45,14 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
     }
   };
 
+  useEffect(() => {
+    for (let i = 0; i < props.players.length; i++) {
+      if (props.players[i].uid === props.user?.uid) {
+        setPlayerInTournament(true);
+      }
+    }
+  }, [props.players]);
+
   return (
     <React.Fragment>
       {!props.tournamentStarted && (
@@ -82,6 +90,7 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
         />
       </Grid>
       {!props.tournamentStarted &&
+        props.tournament.tournamentType === "local" &&
         props.tournament.leaderId === props.user.uid && (
           <Grid item xs={12}>
             <Button

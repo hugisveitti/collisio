@@ -11,6 +11,8 @@ import { useHistory } from "react-router";
 import { IUser } from "../../classes/User";
 import { getActiveTournaments } from "../../firebase/firestoreTournamentFunctions";
 import { getTournamentPagePath } from "../Routes";
+import { toast } from "react-toastify";
+import TournamentsTable from "./TournamentsTable";
 
 interface IActiveTournamentsComponent {
   user: IUser;
@@ -24,10 +26,15 @@ const ActiveTournamentsComponent = (props: IActiveTournamentsComponent) => {
   useEffect(() => {
     if (!props.user?.uid) return;
 
-    getActiveTournaments(props.user.uid, (_tournaments) => {
-      console.log("tournaments", _tournaments);
-      setTournements(_tournaments);
-    });
+    getActiveTournaments(props.user.uid)
+      .then((_tournaments) => {
+        console.log("active tournaments", _tournaments);
+        setTournements(_tournaments);
+      })
+      .catch(() => {
+        toast.error("Error getting active tournaments");
+        setTournements([]);
+      });
   }, [props.user]);
 
   if (!props.user) {
@@ -64,32 +71,12 @@ const ActiveTournamentsComponent = (props: IActiveTournamentsComponent) => {
       <Grid item xs={12}>
         <Typography>List of active tournaments</Typography>
       </Grid>
-      <Grid item xs={12}>
-        <List>
-          {tournaments.map((tournament) => {
-            return (
-              <ListItem key={tournament.id}>
-                <ListItemText
-                  style={{ textAlign: "center" }}
-                  primary={tournament.leaderName}
-                />
-                <ListItemText
-                  style={{ textAlign: "center" }}
-                  primary={tournament.name}
-                />
-                <ListItemButton
-                  style={{ textAlign: "center" }}
-                  onClick={() => {
-                    history.push(getTournamentPagePath(tournament.id));
-                  }}
-                >
-                  <Button variant="outlined">View</Button>
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
+      <Grid item xs={false} lg={3} />
+      <Grid item xs={12} lg={6}>
+        <TournamentsTable tournaments={tournaments} />
       </Grid>
+
+      <Grid item xs={false} lg={3} />
     </React.Fragment>
   );
 };

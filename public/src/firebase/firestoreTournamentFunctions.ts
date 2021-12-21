@@ -1,6 +1,7 @@
-import { collection, deleteDoc, doc, getDocs, onSnapshot, query, setDoc, where, writeBatch } from "@firebase/firestore";
+import { arrayUnion, collection, deleteDoc, doc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
 import { Unsubscribe, User } from "firebase/auth";
-import { ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
+import { IEndOfRaceInfoPlayer } from "../classes/Game";
+import { GlobalTournament, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
 import { IUser } from "../classes/User";
 import { firestore } from "./firebaseInit";
 import { getUserFollowings } from "./firestoreFunctions"
@@ -9,7 +10,7 @@ const tournamentPath = "tournaments"
 const tournamentPlayersPath = "players"
 
 
-export const addTournament = async (tournament: LocalTournament): Promise<void> => {
+export const setTournament = async (tournament: ITournament): Promise<void> => {
     const p = new Promise<void>(async (resolve, reject) => {
         console.log("tournament to add", tournament)
 
@@ -46,7 +47,25 @@ export const createGetTournametListener = (tournamentId: string, callback: (t: I
 
         unsub = onSnapshot(d, (qSnap) => {
             if (qSnap.exists()) {
-                callback(qSnap.data() as ITournament)
+                const tournament = qSnap.data() as ITournament
+                if (tournament?.tournamentType === "global") {
+                    const gTournament = (tournament as GlobalTournament);
+                    // @ts-ignore
+                    if (gTournament.tournamentStart?.seconds) {
+
+                        gTournament.tournamentStart = (gTournament.tournamentStart as unknown as Timestamp)?.toDate();
+                    }
+
+                    // @ts-ignore
+                    if (gTournament.tournamentEnd?.seconds) {
+                        gTournament.tournamentEnd = (gTournament.tournamentEnd as unknown as Timestamp)?.toDate();
+
+                    }
+                    callback(gTournament)
+                } else {
+
+                    callback(qSnap.data() as ITournament)
+                }
             } else {
                 callback(undefined)
             }
@@ -167,18 +186,62 @@ export const getAvailableTournamentsListener = async (userId: string, callback: 
     return (unsub)
 }
 
-export const getActiveTournaments = async (userId: string, callback: (tournaments: ITournament[]) => void) => {
-    // this where makes no sence
-    const q = query(collection(firestore, tournamentPath), where(userId, "in", "players.uid"), where("isFinished", "==", false))
+export const getAvailableTournaments = async (userId: string): Promise<ITournament[]> => {
+    return new Promise(async (resolve, reject) => {
+        const followings = await getUserFollowings(userId, (followings) => { })
+        let fIds = followings.map(f => f.uid)
+        fIds = fIds.concat(userId)
 
-    const docs = await getDocs(q)
+        const collectionPath = collection(firestore, tournamentPath)
+
+        let batches = []
+        try {
+
+            while (fIds.length) {
+                const batch = fIds.splice(0, 10)
+
+                batches.push(new Promise(async (res) => {
+
+                    const docs = await getDocs(query(collectionPath, where("leaderId", "in", batch), where("hasStarted", "==", false), where("isFinished", "==", false)))
+                    const rooms = []
+                    docs.forEach(d => rooms.push(d.data()))
+                    res(rooms)
+                }
+                ))
+            }
 
 
-    const tournaments: ITournament[] = []
-    docs.forEach(doc => {
-        tournaments.push(doc.data() as ITournament)
+            Promise.all(batches).then(content => {
+
+                resolve(content.flat())
+            })
+        } catch (err) {
+            console.warn("Error getting rooms:", err)
+        }
     })
-    callback(tournaments)
+}
+
+export const getActiveTournaments = async (userId: string): Promise<ITournament[]> => {
+    return new Promise<ITournament[]>(async (resolve, reject) => {
+
+
+        console.log("userId", userId)
+        const q = query(collection(firestore, tournamentPath), where("playersIds", "array-contains", userId), where("isFinished", "==", false), where("hasStarted", "==", true))
+
+        try {
+            const docs = await getDocs(q)
+
+
+            const tournaments: ITournament[] = []
+            docs.forEach(doc => {
+                tournaments.push(doc.data() as ITournament)
+            })
+            resolve(tournaments)
+        } catch (err) {
+            reject()
+            console.warn("Error getting active tournaments:", err)
+        }
+    })
 }
 
 export const getAllUserTournaments = async (userId: string): Promise<Tournament[]> => {
@@ -199,4 +262,29 @@ export const getAllUserTournaments = async (userId: string): Promise<Tournament[
     })
 
     return p
+}
+
+
+export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
+    console.log("saving to tournament")
+    if (data.tournamentId && data.isAuthenticated) {
+        const ref = doc(firestore, tournamentPath, data.tournamentId, tournamentPlayersPath, data.playerId)
+
+        const singleRace: ISingleRaceData = {
+            vehicleType: data.vehicleType,
+            totalTime: data.totalTime,
+            lapTimes: data.lapTimes,
+        }
+
+        try {
+            await updateDoc(ref, {
+                raceData: arrayUnion(singleRace)
+            })
+        } catch (err) {
+            console.warn("Error adding values to tournament:", err)
+        }
+
+    } else {
+        console.log("No tournament id and not saving tournament")
+    }
 }

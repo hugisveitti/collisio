@@ -11,6 +11,7 @@ import AppContainer from "../../containers/AppContainer";
 import { createGetTournametListener } from "../../firebase/firestoreTournamentFunctions";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import GlobalTournamentComponent from "./GlobalTournamentComponent";
+import GlobalTournamentWaitingRoomComponent from "./GlobalTournamentWaitingRoomComponent";
 import LocalTournamentComponent from "./LocalTournamentComponent";
 import LocalTournamentWaitingRoomComponent from "./LocalTournamentWaitingRoomComponent";
 
@@ -67,8 +68,20 @@ const TournamentContainer = (props: ITournamentContainer) => {
       );
     }
 
+    if (tournament.hasStarted) {
+      return (
+        <GlobalTournamentComponent
+          user={props.user}
+          tournament={tournament as GlobalTournament}
+        />
+      );
+    }
+
     return (
-      <GlobalTournamentComponent tournament={tournament as GlobalTournament} />
+      <GlobalTournamentWaitingRoomComponent
+        tournament={tournament as GlobalTournament}
+        user={props.user}
+      />
     );
   };
 

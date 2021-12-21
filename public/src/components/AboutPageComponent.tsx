@@ -1,13 +1,19 @@
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 import React from "react";
 import AppContainer from "../containers/AppContainer";
 import hugi from "../images/hugi.jpg";
 import collisioPic from "../images/collisio-fb.png";
+import { useHistory } from "react-router";
+import { buyPremiumPagePath } from "./Routes";
+import DonateButton from "./monitary/DonateButton";
 
 interface IAboutPageComponent {}
 
 const AboutPageComponent = (props: IAboutPageComponent) => {
+  const history = useHistory();
+
   return (
     <AppContainer>
       <Grid container spacing={3}>
@@ -50,6 +56,22 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           <Typography>
             <i>Me, Hugi :)</i>
           </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            Help support this project by buying a premium account or donating.
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            onClick={() => history.push(buyPremiumPagePath)}
+          >
+            Go Premium
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <DonateButton />
         </Grid>
       </Grid>
     </AppContainer>

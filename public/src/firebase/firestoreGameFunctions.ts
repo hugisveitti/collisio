@@ -3,6 +3,7 @@ import { collection, doc, orderBy, query, getDoc, limit, where, getDocs, updateD
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRoomInfo } from "../classes/Game"
 import { TrackName } from "../shared-backend/shared-stuff"
 import { firestore } from "./firebaseInit"
+import { saveTournamentRaceData } from "./firestoreTournamentFunctions"
 
 const highscoresRefPath = "highscores"
 const bestHighscoresRefPath = "bestHighscores"
@@ -83,7 +84,7 @@ export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPla
 const getAllHighscoreKey = (playerId: string, gameId: string) => `${playerId}#${gameId}`
 
 export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer, callback: (gameDataInfo: string[]) => void) => {
-
+    saveTournamentRaceData(data)
 
     let gameDataInfo: string[] = []
     // const highscoresRef = doc(firestore, highscoresRefPath, playerId, allHighscoresRefPath, data.gameId)

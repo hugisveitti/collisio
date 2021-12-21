@@ -1,3 +1,5 @@
+import { Timestamp } from "@firebase/firestore";
+
 export function itemInArray<Type>(st: Type, arr: Type[]) {
     for (let t of arr) {
         if (t === st) return true
@@ -115,3 +117,23 @@ export function dictToArray<T>(dict: { [id: string]: T }): T[] {
     }
     return array
 }
+
+
+// stupid
+export const getDateString = (date: any): string => {
+    if (date instanceof Date) {
+        return date.toISOString()
+    }
+
+    if (date instanceof Timestamp) {
+        return date.toDate().toISOString()
+    }
+
+    if (date?.seconds) {
+        return new Date(date.seconds).toISOString();
+    }
+    if (typeof date === "string") return date;
+    if (typeof date === "number") return new Date(date).toISOString()
+    return "unknown date";
+};
+

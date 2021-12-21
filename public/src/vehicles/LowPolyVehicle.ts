@@ -666,7 +666,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
             let chaseSpeedY = 0.5
-            let chaseSpeed = this.chaseCameraSpeed
+            let chaseSpeed = 0.1//this.chaseCameraSpeed
 
             // this.oldPos = pos.clone()
 
@@ -697,9 +697,9 @@ export class LowPolyVehicle implements IVehicle {
 
             // if (this.cameraDiff.length() > 0.1) {
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
-            camera.updateProjectionMatrix()
             camera.lookAt(this.cameraLookAtPos)
-            this.cameraLookAtPos = pos
+            camera.updateProjectionMatrix()
+            this.cameraLookAtPos = pos.clone()
 
 
             //    } else {

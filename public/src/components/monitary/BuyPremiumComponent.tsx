@@ -84,7 +84,7 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
             <CardHeader
               title="Full game"
               header="Full game"
-              subheader="$10 one time payment"
+              subheader="$10 one time payment, all future update included"
             />
             <CardContent>
               <List>

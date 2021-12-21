@@ -24,26 +24,18 @@ export class RaceGameScene extends GameScene {
     winner: string
     winTime: number
 
-
     gameTimers: GameTime[]
-
     /** delete if reset */
     countDownTimeout: NodeJS.Timeout
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
 
-
-
     /**
      * this is if players change number of laps in middle of game
      */
     currentNumberOfLaps: number
-
     hasShowStartAnimation: boolean
-
     raceFinished: boolean
-
-
 
     constructor() {
         super()

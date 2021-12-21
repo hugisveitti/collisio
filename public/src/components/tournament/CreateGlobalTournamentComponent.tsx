@@ -1,13 +1,38 @@
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import React from "react";
+import { Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import DateTimePicker from "@mui/lab/DateTimePicker";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import { LocalizationProvider } from "@mui/lab";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
+import { toast } from "react-toastify";
+import {
+  GlobalTournament,
+  validateCreateTournament,
+} from "../../classes/Tournament";
+import { IUser } from "../../classes/User";
+import { setTournament } from "../../firebase/firestoreTournamentFunctions";
+import { getTournamentPagePath } from "../Routes";
+import EditTournamentComponent from "./EditTournamentComponent";
 
-const CreateGlobalTournamentComponent = () => {
+interface ICreateGlobalTournamentComponent {
+  user: IUser;
+}
+
+const CreateGlobalTournamentComponent = (
+  props: ICreateGlobalTournamentComponent
+) => {
+  const history = useHistory();
+  const [editTournament, setEditTournament] = useState(
+    new GlobalTournament(props.user?.uid, props.user?.displayName)
+  );
+
+  const updateTournament = (key: keyof GlobalTournament, value: any) => {
+    const newTournament = { ...editTournament };
+    // @ts-ignore
+    newTournament[key] = value;
+    setEditTournament(newTournament as GlobalTournament);
+  };
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -27,33 +52,34 @@ const CreateGlobalTournamentComponent = () => {
       <Grid item xs={12}>
         <Typography>Create Global tournament</Typography>
       </Grid>
+      <EditTournamentComponent<GlobalTournament>
+        tournament={editTournament}
+        user={props.user}
+        updateTournament={updateTournament}
+      />
       <Grid item xs={12}>
-        <TextField label="Name" />
-      </Grid>
-      <Grid item xs={12}>
-        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            renderInput={(props) => <TextField {...props} />}
-            label="Tournament start"
-            //value={value}
-            value={new Date()}
-            onChange={(newValue) => {
-              console.log("not impl", newValue);
-            }}
-          />
-        </LocalizationProvider> */}
-      </Grid>
-      <Grid item xs={12}>
-        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            renderInput={(props) => <TextField {...props} />}
-            label="Tournament end"
-            value={new Date()}
-            onChange={(newValue) => {
-              console.log("not impl", newValue);
-            }}
-          />
-        </LocalizationProvider> */}
+        <Button
+          variant="contained"
+          disableElevation
+          onClick={() => {
+            const { status, message } =
+              validateCreateTournament(editTournament);
+            if (status === "error") {
+              toast.error(message);
+            } else {
+              setTournament(editTournament)
+                .then(() => {
+                  history.push(getTournamentPagePath(editTournament.id));
+                })
+                .catch(() => {
+                  // ekki endilega rétt
+                  toast.error("Some error.");
+                });
+            }
+          }}
+        >
+          Create global tournament!
+        </Button>
       </Grid>
     </Grid>
   );

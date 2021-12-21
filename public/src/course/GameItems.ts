@@ -217,6 +217,10 @@ export const gameItems = {
         notVisible: true,
     },
 
+    "towel": {
+        collisionFlags: 0,
+        shape: "convex",
+    }
 
 
 } as { [key: string]: IGameItem }

@@ -32,7 +32,7 @@ export const isIphone = () => {
 }
 
 // this will only work on my network
-export const inDevelopment = false// window.location.href.includes("localhost") || window.location.href.includes("192.168.0.29")
+export const inDevelopment = window.location.href.includes("localhost") || window.location.href.includes("192.168")
 
 /** test mode means:
  * Not being redirected from pages
@@ -48,7 +48,7 @@ export const testGameSettings: IGameSettings = {
     tagGameLength: 2,
     useShadows: true,
     useSound: true,
-    graphics: "low"
+    graphics: "high"
 }
 
 

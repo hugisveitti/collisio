@@ -323,7 +323,7 @@ export class SphereVehicle implements IVehicle {
         camera.updateProjectionMatrix()
 
         camera.lookAt(this.cameraLookAtPos)
-        this.cameraLookAtPos = pos
+        this.cameraLookAtPos = pos.clone()
 
 
 

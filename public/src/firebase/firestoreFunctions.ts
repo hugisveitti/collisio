@@ -201,7 +201,43 @@ export const removeFromAvailableRooms = (userId: string) => {
 }
 
 
-export const createAvailableRoomsListeners = async (userId: string, callback: (rooms: AvailableRoomsFirebaseObject[]) => void) => {
+export const getAllAvailableRooms = async (userId: string): Promise<AvailableRoomsFirebaseObject[]> => {
+    return new Promise(async (resolve, reject) => {
+        const followings = await getUserFollowings(userId, (followings) => { })
+        let fIds = followings.map(f => f.uid)
+        fIds = fIds.concat(userId)
+
+        const collectionPath = collection(firestore, availableRoomsRefPath)
+
+        let batches = []
+        try {
+
+            while (fIds.length) {
+                const batch = fIds.splice(0, 10)
+
+                batches.push(new Promise(async (res) => {
+
+                    const docs = await getDocs(query(collectionPath, where("userId", "in", batch)))
+                    const rooms = []
+                    docs.forEach(d => rooms.push(d.data()))
+                    res(rooms)
+                }
+                ))
+            }
+
+
+            Promise.all(batches).then(content => {
+
+                resolve(content.flat())
+            })
+        } catch (err) {
+            console.warn("Error getting rooms:", err)
+        }
+
+    })
+}
+
+export const create10AvailableRoomsListeners = async (userId: string, callback: (rooms: AvailableRoomsFirebaseObject[]) => void) => {
 
     const followings = await getUserFollowings(userId, (followings) => { })
     let fIds = followings.map(f => f.uid)

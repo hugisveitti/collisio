@@ -1,15 +1,19 @@
 import { Timestamp } from "@firebase/firestore";
+import { List, ListItemButton, ListItemText, Button } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
+import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { IFollower, IPublicUser, IUser } from "../../classes/User";
 import { cardBackgroundColor } from "../../providers/theme";
 import HighscoreTable from "../highscore/HighscoreTable";
+import { getUserPagePath } from "../Routes";
 import FollowButton from "./FollowButton";
 
 interface IPublicProfilePageComponent {
@@ -21,6 +25,10 @@ interface IPublicProfilePageComponent {
 }
 
 const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
+  const [followersOpen, setFollowersOpen] = useState(false);
+  const [followingsOpen, setFollowingsOpen] = useState(false);
+
+  const history = useHistory();
   const userData: IFollower = {
     displayName: props.user?.displayName,
     uid: props.user?.uid,
@@ -54,10 +62,39 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
             }
           />
           <CardContent>
-            <Typography>{props.followers.length} followers</Typography>
+            <Button onClick={() => setFollowersOpen(!followersOpen)}>
+              {props.followers.length} followers
+            </Button>
+            <Collapse in={followersOpen}>
+              <List>
+                {props.followers.map((f) => (
+                  <ListItemButton
+                    key={f.uid}
+                    onClick={() => history.push(getUserPagePath(f.uid))}
+                  >
+                    {f.displayName}
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
           </CardContent>
           <CardContent>
-            <Typography>{props.followings.length} following</Typography>
+            <Button onClick={() => setFollowingsOpen(!followingsOpen)}>
+              {props.followings.length} following
+            </Button>
+
+            <Collapse in={followingsOpen}>
+              <List>
+                {props.followings.map((f) => (
+                  <ListItemButton
+                    key={f.uid}
+                    onClick={() => history.push(getUserPagePath(f.uid))}
+                  >
+                    {f.displayName}
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
           </CardContent>
           {props.profile.photoURL ? (
             <CardMedia

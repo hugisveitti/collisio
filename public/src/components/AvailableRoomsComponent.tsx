@@ -4,17 +4,19 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-
-import { off } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
 import { IStore } from "./store";
 import {
-  createAvailableRoomsListeners,
+  create10AvailableRoomsListeners,
   AvailableRoomsFirebaseObject,
+  getAllAvailableRooms,
 } from "../firebase/firestoreFunctions";
 import { Unsubscribe } from "@firebase/firestore";
+import { CircularProgress, Grid, IconButton } from "@mui/material";
+import Refresh from "@mui/icons-material/Refresh";
+import { toast } from "react-toastify";
 
 interface IAvailableRoomsComponent {
   userId: string;
@@ -28,52 +30,104 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
     [] as AvailableRoomsFirebaseObject[]
   );
 
-  useEffect(() => {
-    let unsubRoomListener: Unsubscribe;
-    createAvailableRoomsListeners(props.userId, (_availRooms) =>
-      setAvailRoomIds(_availRooms)
-    ).then((sub) => {
-      unsubRoomListener = sub;
-    });
+  const [gettingRooms, setGettingRooms] = useState(true);
 
-    return () => {
-      if (unsubRoomListener) {
-        unsubRoomListener();
-      }
-    };
+  const handleGetAllAvailableRooms = async () => {
+    setGettingRooms(true);
+    getAllAvailableRooms(props.userId)
+      .then((allRooms) => {
+        setAvailRoomIds(allRooms);
+        setGettingRooms(false);
+      })
+      .catch(() => {
+        setGettingRooms(false);
+        toast.error("Error getting rooms");
+      });
+  };
+
+  useEffect(() => {
+    if (!props.userId) return;
+    handleGetAllAvailableRooms();
+    /**
+     * The reason I dont use a subscriber here
+     * is that firebase only allows 10 values in arry with "in" operator
+     * solution: https://stackoverflow.com/questions/61354866/is-there-a-workaround-for-the-firebase-query-in-limit-to-10
+     */
+
+    // let unsubRoomListener: Unsubscribe;
+    // create10AvailableRoomsListeners(props.userId, (_availRooms) =>
+    //   setAvailRoomIds(_availRooms)
+    // ).then((sub) => {
+    //   unsubRoomListener = sub;
+    // });
+
+    // return () => {
+    //   if (unsubRoomListener) {
+    //     unsubRoomListener();
+    //   }
+    // };
   }, [props.userId]);
 
   return (
-    <React.Fragment>
-      {availRoomIds.length > 0 && (
-        <Typography color="textInfo">Available rooms</Typography>
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <Button
+          onClick={() => handleGetAllAvailableRooms()}
+          startIcon={<Refresh />}
+          variant="contained"
+          disableElevation
+          disabled={gettingRooms}
+        >
+          Get available rooms
+        </Button>
+      </Grid>
+      {gettingRooms ? (
+        <>
+          <Grid item xs={12}>
+            <CircularProgress />
+          </Grid>
+        </>
+      ) : (
+        <>
+          {availRoomIds.length > 0 ? (
+            <Grid item xs={12}>
+              <Typography color="textInfo">Available rooms</Typography>
+            </Grid>
+          ) : (
+            <Grid item xs={12}>
+              <Typography color="textInfo">No rooms available</Typography>
+            </Grid>
+          )}
+          <Grid item xs={12}>
+            <List>
+              {availRoomIds.map((availRoom) => {
+                return (
+                  <ListItem key={availRoom.roomId}>
+                    <ListItemText
+                      style={{ textAlign: "center" }}
+                      primary={availRoom.displayName}
+                    />
+                    <ListItemText
+                      style={{ textAlign: "center" }}
+                      primary={availRoom.roomId}
+                    />
+                    <ListItemButton
+                      style={{ textAlign: "center" }}
+                      onClick={() => {
+                        props.store.setRoomId(availRoom.roomId);
+                        props.connectButtonClicked(availRoom.roomId);
+                      }}
+                    >
+                      <Button variant="outlined">Join</Button>
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Grid>
+        </>
       )}
-      <List>
-        {availRoomIds.map((availRoom) => {
-          return (
-            <ListItem key={availRoom.roomId}>
-              <ListItemText
-                style={{ textAlign: "center" }}
-                primary={availRoom.displayName}
-              />
-              <ListItemText
-                style={{ textAlign: "center" }}
-                primary={availRoom.roomId}
-              />
-              <ListItemButton
-                style={{ textAlign: "center" }}
-                onClick={() => {
-                  props.store.setRoomId(availRoom.roomId);
-                  props.connectButtonClicked(availRoom.roomId);
-                }}
-              >
-                <Button variant="outlined">Join</Button>
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-    </React.Fragment>
+    </Grid>
   );
 };
 

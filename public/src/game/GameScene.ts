@@ -202,11 +202,14 @@ export class GameScene extends Scene3D implements IGameScene {
 
         const { ambientLightColor,
             hemisphereTopColor,
-            hemisphereBottomColor } = getTimeOfDayColors(this.timeOfDay)
+            hemisphereBottomColor,
+            pointLightIntesity,
+            ambientLightIntesity
+        } = getTimeOfDayColors(this.timeOfDay)
 
         // this.pLight = new PointLight(0xffffff, 1, 0, 1)
         // maybe if evening then dont show shadows?
-        this.pLight = new PointLight(0xffffff, 1, 0, 1)
+        this.pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
         this.pLight.position.set(100, 150, 100);
         if (this.useShadows && this.timeOfDay === "day") {
             this.pLight.castShadow = true
@@ -223,7 +226,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.scene.add(hLight)
 
         // const aLight = new AmbientLight(0xffffff, 1)
-        const aLight = new AmbientLight(ambientLightColor, 1)
+        const aLight = new AmbientLight(ambientLightColor, ambientLightIntesity)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
 

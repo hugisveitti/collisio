@@ -339,7 +339,15 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
                 press the "Reset orienation" button.
               </Typography>
             </Grid>
-            <CardMedia src={resetOrientation} component="img" />
+            <Grid item xs={12}>
+              <CardMedia src={resetOrientation} component="img" />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>
+                If that does not work, try changing browsers on your mobile. Try
+                Google Chrome, Safari or Firefox.
+              </Typography>
+            </Grid>
           </Grid>
         </HowToPlayItem>
 

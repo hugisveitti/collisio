@@ -1,17 +1,19 @@
+import Refresh from "@mui/icons-material/Refresh";
+import { CircularProgress } from "@mui/material";
 import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItemText from "@mui/material/ListItemText";
 import Grid from "@mui/material/Grid";
-import ListItemButton from "@mui/material/ListItemButton";
+import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { Unsubscribe } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import { IUser } from "../../classes/User";
-import { getAvailableTournamentsListener } from "../../firebase/firestoreTournamentFunctions";
+import { getAvailableTournaments } from "../../firebase/firestoreTournamentFunctions";
 import { getTournamentPagePath } from "../Routes";
-import { CircularProgress } from "@mui/material";
+import TournamentsTable from "./TournamentsTable";
 
 interface IAvailableTournamentsComponent {
   user: IUser;
@@ -21,24 +23,42 @@ const AvailableTournamentsComponent = (
   props: IAvailableTournamentsComponent
 ) => {
   const [tournaments, setTournements] = useState(undefined);
-
+  const [gettingTournaments, setGettingTournaments] = useState(true);
   const history = useHistory();
+
+  const handleGetAllAvailableTournaments = () => {
+    setGettingTournaments(true);
+    getAvailableTournaments(props.user.uid)
+      .then((_tournaments) => {
+        console.log("tournaments", _tournaments);
+        setTournements(_tournaments);
+        setGettingTournaments(false);
+      })
+      .catch(() => {
+        setTournements(undefined);
+        setGettingTournaments(false);
+        toast.error("Error getting tournaments.s");
+      });
+  };
 
   useEffect(() => {
     if (!props.user?.uid) return;
-    let unsub: Unsubscribe;
-    getAvailableTournamentsListener(props.user.uid, (_tournaments) => {
-      console.log("tournaments", _tournaments);
-      setTournements(_tournaments);
-    }).then((_unsub) => {
-      unsub = _unsub;
-    });
+    handleGetAllAvailableTournaments();
 
-    return () => {
-      if (unsub) {
-        unsub();
-      }
-    };
+    // cannot use subscriber since "in" only supports 10 items in firestore
+    // let unsub: Unsubscribe;
+    // getAvailableTournamentsListener(props.user.uid, (_tournaments) => {
+    //   console.log("tournaments", _tournaments);
+    //   setTournements(_tournaments);
+    // }).then((_unsub) => {
+    //   unsub = _unsub;
+    // });
+
+    // return () => {
+    //   if (unsub) {
+    //     unsub();
+    //   }
+    // };
   }, [props.user]);
 
   if (!props.user) {
@@ -62,45 +82,44 @@ const AvailableTournamentsComponent = (
     );
   }
 
-  if (tournaments.length === 0) {
-    return (
-      <Grid item xs={12}>
-        <Typography>No tournaments available</Typography>
-      </Grid>
-    );
-  }
-
   return (
     <React.Fragment>
       <Grid item xs={12}>
-        <Typography>List of available tournaments</Typography>
+        <Button
+          onClick={() => handleGetAllAvailableTournaments()}
+          startIcon={<Refresh />}
+          variant="contained"
+          disableElevation
+          disabled={gettingTournaments}
+        >
+          Get available tournaments
+        </Button>
       </Grid>
-      <Grid item xs={12}>
-        <List>
-          {tournaments.map((tournament) => {
-            return (
-              <ListItem key={tournament.id}>
-                <ListItemText
-                  style={{ textAlign: "center" }}
-                  primary={tournament.leaderName}
-                />
-                <ListItemText
-                  style={{ textAlign: "center" }}
-                  primary={tournament.name}
-                />
-                <ListItemButton
-                  style={{ textAlign: "center" }}
-                  onClick={() => {
-                    history.push(getTournamentPagePath(tournament.id));
-                  }}
-                >
-                  <Button variant="outlined">View</Button>
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Grid>
+      {gettingTournaments ? (
+        <Grid item xs={12}>
+          <CircularProgress />
+        </Grid>
+      ) : (
+        <>
+          {tournaments.length === 0 ? (
+            <Grid item xs={12}>
+              <Typography>No tournaments available</Typography>
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={12}>
+                <Typography>List of available tournaments</Typography>
+              </Grid>
+              <Grid item xs={false} lg={3} />
+              <Grid item xs={12} lg={6}>
+                <TournamentsTable tournaments={tournaments} />
+              </Grid>
+
+              <Grid item xs={false} lg={3} />
+            </>
+          )}
+        </>
+      )}
     </React.Fragment>
   );
 };

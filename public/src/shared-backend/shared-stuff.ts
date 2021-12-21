@@ -17,8 +17,16 @@ export type TrackName =
     | "russia-track"
     | "ferrari-track"
     | "skii-map"
+    | "challenge-track"
 
-export type VehicleType = "normal" | "tractor" | "f1" | "test" | "offRoader" | "sportsCar" | "normal2" | "simpleSphere"
+export type VehicleType = "normal"
+    | "tractor"
+    | "f1"
+    | "test"
+    | "offRoader"
+    | "sportsCar"
+    | "normal2"
+    | "simpleSphere"
 
 export type GameType = "ball" | "race" | "tag"
 
