@@ -383,7 +383,12 @@ export class RaceGameScene extends GameScene {
             userAgent: navigator.userAgent,
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
-            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
+        }
+
+        // need to do it this way because firestore cannot have undefined
+        if (this.gameSettings.tournamentId) {
+            playerData.tournamentId = this.gameSettings.tournamentId
         }
 
         if (this.gameRoomActions.playerFinished) {

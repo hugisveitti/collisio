@@ -151,7 +151,7 @@ export const updatePlayersInTournament = (tournamentId: string, players: ITourna
     const batch = writeBatch(firestore)
     players.forEach(player => {
         const ref = doc(firestore, tournamentPath, tournamentId, tournamentPlayersPath, player.uid)
-        batch.set(ref, player)
+        batch.set(ref, player, { merge: true })
     })
 
     batch.commit().then(() => {

@@ -81,7 +81,6 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
                 getActiveTournaments(user.uid).then((_t) => {
                   console.log("_t active tour", _t);
                   setActiveTournamnets(_t);
-                  toast.success("Got active tournaments");
                 });
               } else {
                 toast.error("Only logged in users can look for tounaments");

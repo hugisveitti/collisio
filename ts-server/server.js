@@ -75,6 +75,8 @@ var sendIndexHTML = function (_, res) {
 };
 app.get("/trophy", sendIndexHTML);
 app.get("/trophy/:id", sendIndexHTML);
+app.get("/tournament", sendIndexHTML);
+app.get("/tournament/:id", sendIndexHTML);
 // There must be some better way to do this shit
 app.get("/wait", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));

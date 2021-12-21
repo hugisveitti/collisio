@@ -7,8 +7,12 @@ export type TournamentType = "local" | "global"
 
 export interface ITournamentUser extends IUser {
     ranking: number
+    raceData?: ISingleRaceData[]
 }
 
+// global tournaments in firestore both have a map value players and a collection players
+// the collection is copied into the map when the tournament starts
+// but the collection is still updated since the race data is saved there
 export interface ITournament {
     // store as key value pairs?
     players: { [userId: string]: ITournamentUser }
@@ -61,7 +65,7 @@ export class Tournament implements ITournament {
         this.leaderId = leaderId
         this.leaderName = leaderName
         this.players = {}
-        this.id = uuid()
+        this.id = uuid().slice(0, 8)
 
         this.trackName = "farm-track"
         this.name = ""

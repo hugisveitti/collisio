@@ -1,12 +1,9 @@
 import { Button, Collapse, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
-import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { GlobalTournament } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
-import { dictToArray } from "../../utils/utilFunctions";
-import CopyTextButton from "../inputs/CopyTextButton";
-import TournamentPlayersList from "./TournamentPlayersList";
+import GlobalTournamentScoreboard from "./GlobalTournamentScoreboard";
 import TournamentSettingsComponent from "./TournamentSettingsComponent";
 
 interface IGlobalTournamentComponent {
@@ -29,13 +26,6 @@ const GlobalTournamentComponent = (props: IGlobalTournamentComponent) => {
       </Grid>
 
       <Grid item xs={12}>
-        <CopyTextButton
-          infoText={`Link to tournament: ${window.location.href}`}
-          copyText={window.location.href}
-        />
-      </Grid>
-
-      <Grid item xs={12}>
         <Button
           onClick={() => setSettingsOpen(!settingsOpen)}
           variant="contained"
@@ -50,7 +40,7 @@ const GlobalTournamentComponent = (props: IGlobalTournamentComponent) => {
         </Collapse>
       </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <TournamentPlayersList
           user={props.user}
           tournament={props.tournament}
@@ -58,6 +48,10 @@ const GlobalTournamentComponent = (props: IGlobalTournamentComponent) => {
           players={dictToArray(props.tournament.players)}
           setPlayers={() => console.log("do nothing")}
         />
+      </Grid> */}
+
+      <Grid item xs={12}>
+        <GlobalTournamentScoreboard tournamentId={props.tournament.id} />
       </Grid>
     </>
   );

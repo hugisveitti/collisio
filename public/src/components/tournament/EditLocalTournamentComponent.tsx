@@ -58,7 +58,7 @@ const EditLocalTournamentComponent = (props: IEditLocalTournamentComponent) => {
                   !props.editTournament.useGroupStageToDetermineBracketPlacement
                 )
               }
-              checked={
+              value={
                 props.editTournament.useGroupStageToDetermineBracketPlacement
               }
             />

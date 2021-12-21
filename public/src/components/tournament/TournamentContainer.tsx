@@ -9,6 +9,7 @@ import {
 import { IUser } from "../../classes/User";
 import AppContainer from "../../containers/AppContainer";
 import { createGetTournametListener } from "../../firebase/firestoreTournamentFunctions";
+import CopyTextButton from "../inputs/CopyTextButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import GlobalTournamentComponent from "./GlobalTournamentComponent";
 import GlobalTournamentWaitingRoomComponent from "./GlobalTournamentWaitingRoomComponent";
@@ -98,7 +99,15 @@ const TournamentContainer = (props: ITournamentContainer) => {
             </Grid>
           </>
         ) : (
-          renderTournament()
+          <>
+            <Grid item xs={12}>
+              <CopyTextButton
+                infoText={`Link to tournament: ${window.location.href}`}
+                copyText={window.location.href}
+              />
+            </Grid>
+            {renderTournament()}
+          </>
         )}
       </Grid>
     </AppContainer>

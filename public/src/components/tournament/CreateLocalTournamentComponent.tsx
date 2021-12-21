@@ -30,7 +30,7 @@ const CreateLocalTournamentComponent = (
     const newTournament = { ...editTournament };
     // @ts-ignore
     newTournament[key] = value;
-    setTournament(newTournament as LocalTournament);
+    setEditTournament(newTournament as LocalTournament);
   };
 
   return (

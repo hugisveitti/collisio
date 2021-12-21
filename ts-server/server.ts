@@ -72,6 +72,9 @@ const sendIndexHTML = (_: Request, res: Response) => {
 app.get("/trophy", sendIndexHTML)
 app.get("/trophy/:id", sendIndexHTML)
 
+app.get("/tournament", sendIndexHTML)
+app.get("/tournament/:id", sendIndexHTML)
+
 
 // There must be some better way to do this shit
 app.get("/wait", (_: Request, res: Response) => {
