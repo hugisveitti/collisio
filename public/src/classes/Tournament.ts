@@ -211,6 +211,7 @@ export interface ISingleRaceData {
     vehicleType: VehicleType
     totalTime: number
     lapTimes: number[]
+
 }
 
 // interface IGlobalTournamentRaceData {

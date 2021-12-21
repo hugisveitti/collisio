@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -8,12 +9,16 @@ import { inputBackgroundColor } from "../../providers/theme";
 import { VehicleType } from "../../shared-backend/shared-stuff";
 
 interface ITournamentSelect {
-  tournaments: ITournament[];
-  onChange: (tournamentId: string) => void;
+  tournaments: ITournament[] | undefined;
+  onChange: (tournament: ITournament | undefined) => void;
   selectedId: string | undefined;
 }
 
 const TournamentSelect = (props: ITournamentSelect) => {
+  if (!props.tournaments) {
+    return <CircularProgress />;
+  }
+
   const tournamentOptions: any[] = props.tournaments.concat([
     {
       name: "No tournament",
@@ -31,7 +36,13 @@ const TournamentSelect = (props: ITournamentSelect) => {
         label="Tournament"
         name="tournament"
         onChange={(e) => {
-          props.onChange(e.target.value);
+          const tourId = e.target.value as string;
+          const tournament = tournamentOptions.find((t) => t.id === tourId);
+          if (!tournament?.id || tournament?.id === "undefined") {
+            props.onChange(undefined);
+          } else {
+            props.onChange(tournament);
+          }
         }}
         value={props.selectedId ?? "undefined"}
       >

@@ -72,10 +72,12 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
         </CardContent>
         <CardActions>
           <Button
+            style={{ marginRight: 10 }}
             variant="contained"
             disableElevation
             onClick={() => {
               if (user?.uid) {
+                setActiveTournamnets(undefined);
                 getActiveTournaments(user.uid).then((_t) => {
                   console.log("_t active tour", _t);
                   setActiveTournamnets(_t);
@@ -92,13 +94,18 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
           <TournamentSelect
             tournaments={activeTournaments}
             selectedId={props.store.gameSettings.tournamentId}
-            onChange={(newTournamentId) => {
+            onChange={(tournament) => {
               const newGameSettings: IGameSettings = {
                 ...props.store.gameSettings,
-                tournamentId: newTournamentId,
+                tournamentId: tournament?.id,
               };
-              if (newTournamentId === "undefined") {
+              if (!tournament || tournament?.id === "undefined") {
                 delete newGameSettings.tournamentId;
+              } else {
+                newGameSettings.numberOfLaps = tournament.numberOfLaps;
+                newGameSettings.trackName = tournament.trackName;
+                // compete in other than race ?
+                newGameSettings.gameType = "race";
               }
               console.log("new game settings", newGameSettings);
               props.store.setGameSettings(newGameSettings);

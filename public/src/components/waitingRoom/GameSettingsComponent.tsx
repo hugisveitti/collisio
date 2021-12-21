@@ -55,10 +55,12 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
     setGameSettings(props.gameSettings);
   }, [props.gameSettings]);
 
+  const disableInputs = !!props.gameSettings.tournamentId;
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} lg={4}>
-        <FormControl component="fieldset">
+        <FormControl component="fieldset" disabled={disableInputs}>
           <FormLabel component="legend">Type of game</FormLabel>
           <RadioGroup
             row
@@ -94,6 +96,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         <React.Fragment>
           <Grid item xs={12} lg={4} xl={4}>
             <TextField
+              disabled={disableInputs}
               type="number"
               label="Tag game length in minutes"
               value={
@@ -110,6 +113,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         <React.Fragment>
           <Grid item xs={12} lg={4} xl={4}>
             <TextField
+              disabled={disableInputs}
               label="No. of laps"
               type="number"
               value={gameSettings.numberOfLaps ? gameSettings.numberOfLaps : ""}
@@ -127,6 +131,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       )}
       <Grid item xs={12} lg={4}>
         <TrackSelect
+          disabled={disableInputs}
           gameType={gameSettings.gameType}
           excludedTracks={
             props.inTestMode || inTestMode ? [] : nonActiveTrackNames

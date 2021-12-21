@@ -48,7 +48,7 @@ si.mem()
 })
     .catch(function (error) { return console.error(error); });
 console.log("Max event listeners", socket_io_1.Socket.EventEmitter.defaultMaxListeners);
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 5000;
 // app.use(function (_:Request, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header(
@@ -73,6 +73,8 @@ app.get("/", function (_, res) {
 var sendIndexHTML = function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 };
+app.get("/trophy", sendIndexHTML);
+app.get("/trophy/:id", sendIndexHTML);
 // There must be some better way to do this shit
 app.get("/wait", function (_, res) {
     res.sendFile(path.join(__dirname, indexHTMLPath));

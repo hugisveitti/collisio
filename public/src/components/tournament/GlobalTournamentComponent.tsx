@@ -5,6 +5,7 @@ import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { GlobalTournament } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
 import { dictToArray } from "../../utils/utilFunctions";
+import CopyTextButton from "../inputs/CopyTextButton";
 import TournamentPlayersList from "./TournamentPlayersList";
 import TournamentSettingsComponent from "./TournamentSettingsComponent";
 
@@ -25,6 +26,13 @@ const GlobalTournamentComponent = (props: IGlobalTournamentComponent) => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h6">Global tournament room</Typography>
+      </Grid>
+
+      <Grid item xs={12}>
+        <CopyTextButton
+          infoText={`Link to tournament: ${window.location.href}`}
+          copyText={window.location.href}
+        />
       </Grid>
 
       <Grid item xs={12}>

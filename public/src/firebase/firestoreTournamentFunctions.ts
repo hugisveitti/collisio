@@ -266,7 +266,8 @@ export const getAllUserTournaments = async (userId: string): Promise<Tournament[
 
 
 export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
-    console.log("saving to tournament")
+    console.log("saving to tournament", data)
+
     if (data.tournamentId && data.isAuthenticated) {
         const ref = doc(firestore, tournamentPath, data.tournamentId, tournamentPlayersPath, data.playerId)
 
@@ -274,7 +275,10 @@ export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
             vehicleType: data.vehicleType,
             totalTime: data.totalTime,
             lapTimes: data.lapTimes,
+
         }
+
+        console.log("single race", singleRace)
 
         try {
             await updateDoc(ref, {

@@ -31,7 +31,7 @@ si.mem()
 
 console.log("Max event listeners", Socket.EventEmitter.defaultMaxListeners)
 
-const port = process.env.PORT || 80
+const port = process.env.PORT || 5000
 
 
 // app.use(function (_:Request, res, next) {
@@ -68,6 +68,9 @@ app.get("/", (_: Request, res: Response) => {
 const sendIndexHTML = (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, indexHTMLPath));
 }
+
+app.get("/trophy", sendIndexHTML)
+app.get("/trophy/:id", sendIndexHTML)
 
 
 // There must be some better way to do this shit

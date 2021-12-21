@@ -1,4 +1,3 @@
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import HelpIcon from "@mui/icons-material/Help";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
@@ -34,6 +33,7 @@ import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { green4 } from "../../providers/theme";
 import FullscreenButton from "../inputs/FullscreenButton";
+import CopyTextButton from "../inputs/CopyTextButton";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -44,7 +44,6 @@ interface IWaitingRoomProps {
 
 const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const [roomQrCode, setRoomQrCode] = useState("");
-  const [copyTooltipOpen, setCopyTooltipOpen] = useState(false);
 
   const history = useHistory();
 
@@ -143,31 +142,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Grid>
 
           <Grid item xs={12} lg={3}>
-            <Typography component="span">
-              Link to room: {window.location.href}
-            </Typography>{" "}
-            <Tooltip
-              title="Link copied!"
-              arrow
-              placement="top"
-              open={copyTooltipOpen}
-              disableFocusListener
-              disableHoverListener
-              disableTouchListener
-              onClose={() => setCopyTooltipOpen(false)}
-            >
-              <IconButton
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setCopyTooltipOpen(true);
-                  setTimeout(() => {
-                    setCopyTooltipOpen(false);
-                  }, 2000);
-                }}
-              >
-                <ContentCopyIcon />
-              </IconButton>
-            </Tooltip>
+            <CopyTextButton
+              infoText={`Link to room: ${window.location.href}`}
+              copyText={window.location.href}
+            />
           </Grid>
 
           {roomQrCode && (
