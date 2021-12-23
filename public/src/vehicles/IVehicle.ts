@@ -90,3 +90,13 @@ export interface ITestVehicle extends IVehicle {
     randomDrive: () => void
     intelligentDrive: (log: boolean) => void
 }
+
+export const getStaticCameraPos = (onlyMobile: boolean) => {
+    if (onlyMobile) {
+        return { x: 0, y: 5, z: -15 }
+    }
+
+    return { x: 0, y: 10, z: -25 }
+}
+
+

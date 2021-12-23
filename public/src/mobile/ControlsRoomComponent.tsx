@@ -76,7 +76,6 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     key: keyof MobileControls,
     action: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    console.log("button", key);
     action(b);
     // dont know why this dont work
     // @ts-ignore

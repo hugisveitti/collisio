@@ -58,3 +58,10 @@
   font-size: 64px;
   text-shadow: 1px 1px white;
 }
+
+@media only screen and (max-width: 800px) {
+  #totalTime {
+    top: 5px;
+    font-size: 42px;
+  }
+}

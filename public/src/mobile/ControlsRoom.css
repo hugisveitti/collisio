@@ -27,6 +27,7 @@
   position: absolute;
   touch-action: none;
   -ms-touch-action: none;
+  z-index: 99;
 }
 
 /* @media only screen and (max-width: 350px) {

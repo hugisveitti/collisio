@@ -49,6 +49,8 @@ const TestApp = () => {
       vehicleSettings: newVehicleSettings,
     };
 
+    console.log("new user settings", newUserSettings);
+
     setUserSettings(newUserSettings);
   }, []);
 

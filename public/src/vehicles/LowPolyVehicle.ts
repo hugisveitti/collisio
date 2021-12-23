@@ -7,7 +7,7 @@ import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
-import { IPositionRotation, IVehicle } from "./IVehicle";
+import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
 
@@ -41,9 +41,6 @@ const BACK_RIGHT = 3
 
 
 const DISABLE_DEACTIVATION = 4;
-
-export const staticCameraPos = { x: 0, y: 10, z: -25 }
-const cameraOffset = -staticCameraPos.z
 
 
 let useBad = false
@@ -134,6 +131,8 @@ export class LowPolyVehicle implements IVehicle {
 
     engineSoundLoaded = false
 
+    staticCameraPos: { x: number, y: number, z: number }
+
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
@@ -168,6 +167,8 @@ export class LowPolyVehicle implements IVehicle {
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
         this.transformCam = new Ammo.btTransform()
+
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig.onlyMobile)
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -537,7 +538,7 @@ export class LowPolyVehicle implements IVehicle {
         if (!this.vehicleBody) return
         const c = this.vehicleBody.getObjectByName(camera.name)
         if (!this.useChaseCamera && !c) {
-            camera.position.set(staticCameraPos.x, staticCameraPos.y, staticCameraPos.z)
+            camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
             this.vehicleBody.add(camera)
         }
 
@@ -607,9 +608,9 @@ export class LowPolyVehicle implements IVehicle {
 
 
             this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * cameraOffset)),
-                pos.y + staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * cameraOffset) * Math.sign(Math.cos(rot.z)))
+                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+                pos.y + this.staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             )
 
 
@@ -672,9 +673,9 @@ export class LowPolyVehicle implements IVehicle {
 
             // this is for the follow camera effect
             this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * cameraOffset)),
-                pos.y + staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * cameraOffset) * Math.sign(Math.cos(rot.z)))
+                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+                pos.y + this.staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             )
 
 
@@ -925,6 +926,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicleSettings = vehicleSettings
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
+
             this.scene.setNeedsReload(true)
         }
 
@@ -938,7 +940,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
-            const { x, y, z } = staticCameraPos
+            const { x, y, z } = this.staticCameraPos
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
         }

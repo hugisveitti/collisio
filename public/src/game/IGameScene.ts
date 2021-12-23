@@ -1,8 +1,20 @@
 
 import { Scene3D } from "enable3d";
-import { Vector3 } from "three"
+import { Socket } from "socket.io-client";
 import { IGameSettings } from "../classes/localGameSettings";
-import { VehicleType, TrackName } from "../shared-backend/shared-stuff";
+import { IVehicleSettings } from "../classes/User";
+import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { IGameRoomActions } from "./GameScene";
+
+export interface IGameSceneConfig {
+    socket?: Socket
+    players: IPlayerInfo[]
+    gameSettings: IGameSettings
+    roomId?: string
+    gameRoomActions: IGameRoomActions
+    onlyMobile?: boolean
+    mobileController?: MobileControls
+}
 
 export interface IGameScene extends Scene3D {
     togglePauseGame: () => void
@@ -15,5 +27,8 @@ export interface IGameScene extends Scene3D {
     resetVehicleCallback: (vehicleNumber: number) => void
     setNeedsReload: (needsReload: boolean) => void
     destroyGame: () => void
+    setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
     //  getClosestGround: (pos: Vector3) => Vector3
+
+    gameSceneConfig: IGameSceneConfig
 }

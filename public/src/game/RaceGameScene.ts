@@ -7,14 +7,15 @@ import { VehicleControls } from '../shared-backend/shared-stuff';
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
-import { getVehicleNumber, staticCameraPos } from "../vehicles/LowPolyVehicle";
+import { getStaticCameraPos } from "../vehicles/IVehicle";
+import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
 
 
 // const stats = new Stats()
-const totalTimeDiv = document.createElement("div")
+// const totalTimeDiv = document.createElement("div")
 
 
 export class RaceGameScene extends GameScene {
@@ -37,19 +38,20 @@ export class RaceGameScene extends GameScene {
     hasShowStartAnimation: boolean
     raceFinished: boolean
 
+    totalTimeDiv: HTMLDivElement
+
     constructor() {
         super()
 
+        this.totalTimeDiv = document.createElement("div")
 
-        this.gameInfoDiv.appendChild(totalTimeDiv)
-        totalTimeDiv.setAttribute("id", "totalTime")
+        this.gameInfoDiv.appendChild(this.totalTimeDiv)
+        this.totalTimeDiv.setAttribute("id", "totalTime")
 
 
         this.winner = ""
         this.winTime = -1
         this.gameTimers = []
-
-
 
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
 
@@ -212,7 +214,7 @@ export class RaceGameScene extends GameScene {
                 for (let i = 0; i < this.vehicles.length; i++) {
 
                     if (!this.vehicles[i].useChaseCamera) {
-                        const { x, y, z } = staticCameraPos
+                        const { x, y, z } = getStaticCameraPos(this.gameSceneConfig.onlyMobile)
                         this.camera.position.set(x, y, z)
                         this.vehicles[i].addCamera(this.views[i].camera)
                     }
@@ -325,7 +327,7 @@ export class RaceGameScene extends GameScene {
             this.gameRoomActions.updateScoreTable({ timeInfos })
         }
 
-        totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
+        this.totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
     }
 
 

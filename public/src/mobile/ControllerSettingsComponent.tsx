@@ -49,8 +49,10 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
     if (user) {
       setDBUserSettings(user.uid, newUserSettings);
-      props.store.socket.emit(mts_user_settings_changed, newUserSettings);
-      props.store.setUserSettings(newUserSettings);
+      if (props.store.socket) {
+        props.store.socket.emit(mts_user_settings_changed, newUserSettings);
+        props.store.setUserSettings(newUserSettings);
+      }
     }
   };
 

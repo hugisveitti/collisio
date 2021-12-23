@@ -7,11 +7,10 @@ import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
-import { IPositionRotation, IVehicle } from "./IVehicle";
-import { staticCameraPos } from "./LowPolyVehicle";
+import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
-const cameraOffset = -staticCameraPos.z
+
 
 
 export class SphereVehicle implements IVehicle {
@@ -71,6 +70,8 @@ export class SphereVehicle implements IVehicle {
 
     physicsConfig: {}
 
+    staticCameraPos: { x: number, y: number, z: number }
+
 
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
@@ -115,6 +116,9 @@ export class SphereVehicle implements IVehicle {
         this.dzVel = -1
 
         this.vector = new Ammo.btVector3(0, 0, 0)
+
+
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig.onlyMobile)
     }
 
 
@@ -290,9 +294,9 @@ export class SphereVehicle implements IVehicle {
 
         // this is for the follow camera effect
         this.cameraTarget.set(
-            pos.x - ((Math.sin(this.yRot) * cameraOffset)),
-            pos.y + staticCameraPos.y,
-            pos.z + ((Math.cos(this.yRot) * cameraOffset))
+            pos.x - ((Math.sin(this.yRot) * -this.staticCameraPos.z)),
+            pos.y + this.staticCameraPos.y,
+            pos.z + ((Math.cos(this.yRot) * -this.staticCameraPos.z))
         )
 
 

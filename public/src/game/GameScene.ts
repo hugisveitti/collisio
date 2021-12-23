@@ -5,9 +5,9 @@ import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, Hemisph
 import { v4 as uuid } from "uuid";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
-import { IUserSettings } from "../classes/User";
+import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, MobileControls, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getBeep } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -16,7 +16,7 @@ import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVeh
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import "./game-styles.css";
-import { IGameScene } from "./IGameScene";
+import { IGameScene, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 
@@ -33,15 +33,7 @@ export interface IEndOfGameData {
     endOfRaceInfo?: IEndOfRaceInfoGame
 }
 
-interface IGameSceneConfig {
-    socket?: Socket
-    players: IPlayerInfo[]
-    gameSettings: IGameSettings
-    roomId?: string
-    gameRoomActions: IGameRoomActions
-    onlyMobile?: boolean
-    mobileController?: MobileControls
-}
+
 
 interface IUserSettingsMessage {
     playerNumber: number
@@ -152,8 +144,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameStarted = false
         this.gameId = uuid()
         this.gameSettings = defaultGameSettings
-        this.gameInfoDiv = document.getElementById("game-info") as HTMLDivElement // document.createElement("div")
-        //   this.gameInfoDiv.setAttribute("id", "game-info")
+        this.gameInfoDiv = document.createElement("div")
+        this.gameInfoDiv.setAttribute("id", "game-info")
+
         document.body.appendChild(this.gameInfoDiv)
         this.importantInfoDiv = document.createElement("div")
 
@@ -426,10 +419,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     createViews() {
 
-        if (!this.gameSceneConfig.onlyMobile) {
-
-            this.gameInfoDiv.appendChild(this.playerInfosContainer)
-        }
+        this.gameInfoDiv.appendChild(this.playerInfosContainer)
 
         this.views = []
 
@@ -864,18 +854,21 @@ export class GameScene extends Scene3D implements IGameScene {
     userSettingsListener() {
         this.socket?.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
-                this.players[data.playerNumber].vehicleType = data.userSettings.vehicleSettings.vehicleType
                 if (this.vehicles.length >= data.playerNumber - 1) {
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
                     */
-                    this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
+                    this.setVehicleSettings(data.playerNumber, data.userSettings.vehicleSettings)
+                    //   this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
                 }
             }
         })
     }
 
-
+    setVehicleSettings(vehicleNumber: number, vehicleSettings: IVehicleSettings) {
+        this.players[vehicleNumber].vehicleType = vehicleSettings.vehicleType
+        this.vehicles[vehicleNumber].updateVehicleSettings(vehicleSettings)
+    }
 
     resetPlayer(idx: number) {
         this.vehicles[idx].resetPosition()
