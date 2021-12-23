@@ -27,7 +27,6 @@ export const invertedControllerKey = "invertedController";
 
 interface IControllerSettingsComponent {
   onClose: () => void;
-
   userLoggedIn: () => void;
   resetOrientation: () => void;
   socket: Socket;

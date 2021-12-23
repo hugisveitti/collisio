@@ -1,33 +1,52 @@
-import { LineBasicMaterial, Line, BufferGeometry, Vector3 } from "three"
+import { ClosestRaycaster } from "@enable3d/ammo-physics";
+import { LineBasicMaterial, Line, BufferGeometry, Vector3, Euler } from "three"
 import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { instanceOfSimpleVector, SimpleVector } from "./IVehicle";
+import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
 import { initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 
-const intelligentDriveLine = false
+const intelligentDriveLine = true
 
-export class LowPolyTestVehicle extends LowPolyVehicle {
+export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
-    //    closestRaycaster: ClosestRaycaster
-    line: Line
+    closestRaycaster: ClosestRaycaster
+    lineForward: Line
+    lineLeft: Line
+    lineRight: Line
 
+    l1: Vector3
+    l2: Vector3
+    l3: Vector3
+    l4: Vector3
 
 
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
-        // this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
+        this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
         //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
         if (intelligentDriveLine) {
 
+            this.l1 = new Vector3(0, 0, 0)
+            this.l2 = new Vector3(2, -10, 0)
+            this.l3 = new Vector3(2, -10, 0)
+            this.l4 = new Vector3(2, -10, 0)
             const material = new LineBasicMaterial({ color: 0x0000ff })
             const geometry = new BufferGeometry().setFromPoints([
-                new Vector3(0, 0, 0),
-                new Vector3(2, -10, 0)
+                this.l1, this.l2
             ])
-            this.line = new Line(geometry, material)
-            this.scene.add.existing(this.line)
+            this.lineForward = new Line(geometry, material)
+
+
+
+            this.lineRight = new Line(geometry.clone(), material)
+            this.lineLeft = new Line(geometry.clone(), material)
+            this.scene.scene.add(this.lineForward)
+            this.scene.scene.add(this.lineLeft)
+            this.scene.scene.add(this.lineRight)
+
+
         }
 
     }
@@ -199,54 +218,93 @@ export class LowPolyTestVehicle extends LowPolyVehicle {
 
     intelligentDrive(log: boolean) {
         /** wait with this */
-        console.warn("no intelligent drive")
-
-        //  const p = this.getPosition()
-        // const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
-        // const po = tm.getOrigin()
-        // const q = tm.getRotation()
-        // const r = this.chassisMesh.rotation
-        // const p = this.getPosition()
-        // let px = po.x()
-        // let py = po.y()
-        // let pz = po.z()
-
-        // px = p.x
-        // py = p.y
-        // pz = p.z
-
-        // const tm1 = this.vehicle.getWheelInfo(3).get_m_worldTransform();
-        // const po1 = tm.getOrigin()
-
-        // const w = this.vehicle.getWheelInfo(2).get_m_wheelDirectionCS()
-
-        // const d = this.chassisMesh.getWorldDirection(new Vector3(px, py, pz))
-        // const offset = 1
-
-        // const rx = ((Math.sin(r.y) * offset)) + Math.PI / 2
-        // const ry = r.y// 0// Math.PI / 2 // p.y
-        // const rz = ((Math.cos(r.y) * offset) * Math.sign(Math.cos(r.z))) - Math.PI
 
 
-        // this.closestRaycaster.setRayFromWorld(rx, ry, rz)
-        // this.closestRaycaster.setRayToWorld(px, py, pz)
-        // if (intelligentDriveLine) {
 
-        //     this.line.position.set(px, py, pz)
-        //     this.line.rotation.set(rx, ry, rz)
-        // }
+        const p = this.getPosition()
+        const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
 
+        const r = this.vehicleBody.rotation //  new Euler().setFromQuaternion(q)
+
+        const q = this.getRotation()
+
+
+
+
+        const lineLenght = 20
+        this.l1.set(p.x, p.y, p.z)
+
+        this.l2.set(
+            p.x + ((Math.sin(r.y) * lineLenght)),
+            p.y,
+            p.z + ((Math.cos(r.y) * lineLenght) * Math.sign(Math.cos(r.z)))
+        )
+
+        this.lineForward.geometry.setFromPoints([this.l1, this.l2])
+
+        this.closestRaycaster.setRayFromWorld(p.x, p.y, p.z)
+        this.closestRaycaster.setRayToWorld(this.l2.x, this.l2.y, this.l2.z)
+
+        this.closestRaycaster.rayTest()
+        if (this.closestRaycaster.hasHit()) {
+            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
+            const obj = this.closestRaycaster.getCollisionObject()
+            if (log) {
+                const normal = this.closestRaycaster.getHitNormalWorld()
+                console.log("normal", normal)
+                console.log("forward hit", obj,)
+            }
+        }
+
+
+        const right = -Math.PI / 4
+        this.l3.set(
+            p.x + ((Math.sin(r.y + right) * lineLenght)),
+            p.y,
+            p.z + ((Math.cos(r.y + right) * lineLenght) * Math.sign(Math.cos(r.z)))
+        )
+
+        //this.lineRight.geometry.setFromPoints([this.l1, this.l3])
+
+        // this.closestRaycaster.setRayFromWorld(p.x, p.y, p.z)
+        // this.closestRaycaster.setRayToWorld(this.l3.x, this.l3.y, this.l3.z)
 
         // this.closestRaycaster.rayTest()
         // if (this.closestRaycaster.hasHit()) {
         //     //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
         //     const obj = this.closestRaycaster.getCollisionObject()
         //     if (log) {
-
-
+        //         const normal = this.closestRaycaster.getHitNormalWorld()
+        //         const hitPoint = this.closestRaycaster.getHitPointWorld()
+        //         console.log("normal", normal)
+        //         console.log("hitpoint", hitPoint)
+        //         console.log("right hit", obj,)
         //     }
-
-
         // }
+
+        const left = Math.PI / 4
+        this.l4.set(
+            p.x + ((Math.sin(r.y + left) * lineLenght)),
+            p.y,
+            p.z + ((Math.cos(r.y + left) * lineLenght) * Math.sign(Math.cos(r.z)))
+        )
+
+        this.lineLeft.geometry.setFromPoints([this.l1, this.l4])
+
+        this.closestRaycaster.setRayFromWorld(p.x, p.y, p.z)
+        this.closestRaycaster.setRayToWorld(this.l4.x, this.l4.y, this.l4.z)
+
+        this.closestRaycaster.rayTest()
+        if (this.closestRaycaster.hasHit()) {
+            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
+            const obj = this.closestRaycaster.getCollisionObject()
+            if (log) {
+                const normal = this.closestRaycaster.getHitNormalWorld()
+                console.log("normal", normal)
+                console.log("left hit", obj,)
+            }
+        }
     }
 }
+
+

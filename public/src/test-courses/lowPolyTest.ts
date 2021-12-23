@@ -1,20 +1,20 @@
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
-import Stats from "stats.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { allTrackNames } from "../classes/Game"
+import { getGameTypeFromTrackName } from "../classes/Game"
 import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
+import { StoryCourse } from "../course/StoryCourse"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { skydomeFragmentShader, skydomeVertexShader } from "../game/shaders"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
-import { instanceOfSimpleVector, IVehicle, SimpleVector } from "../vehicles/IVehicle"
+import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
-import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle"
+import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
+import { loadSphereModel } from "../vehicles/SphereVehicle"
 import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, getVehicleClassFromType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
@@ -26,7 +26,6 @@ let tA = 0
 const scoreTable = document.createElement("div")
 const lapTimeDiv = document.createElement("div")
 const bestLapTimeDiv = document.createElement("div")
-const stats = new Stats()
 
 const vehicleInputsContainer = document.createElement("div")
 document.body.appendChild(vehicleInputsContainer)
@@ -36,8 +35,8 @@ document.body.appendChild(vehicleInputsContainer)
 export class LowPolyTestScene extends GameScene {
 
     //vehicle?: LowPolyTestVehicle
-    vehicle: IVehicle
-    vehicles: IVehicle[]
+    vehicle: ITestVehicle
+    vehicles: ITestVehicle[]
 
     font: THREE.Font
     textMesh?: any
@@ -53,7 +52,7 @@ export class LowPolyTestScene extends GameScene {
     bestLapTime: number
     canStartUpdate: boolean
 
-    course: RaceCourse | TagCourse
+    course: RaceCourse | TagCourse | StoryCourse
     gameType: GameType
 
     pLight: THREE.PointLight
@@ -67,7 +66,7 @@ export class LowPolyTestScene extends GameScene {
     usingDebug: boolean
     vehicleColorNumber = 0
 
-    otherVehicles: IVehicle[] // LowPolyTestVehicle[]
+    otherVehicles: ITestVehicle[] // LowPolyTestVehicle[]
     numberOfOtherVehicles = 2
 
     isIt: number
@@ -98,8 +97,6 @@ export class LowPolyTestScene extends GameScene {
         this.timeStarted = 0
 
 
-        stats.showPanel(0)
-        document.body.appendChild(stats.dom)
         this.useShadows = true
 
 
@@ -135,7 +132,6 @@ export class LowPolyTestScene extends GameScene {
             this.physics.debug?.enable()
         }
         await this.warpSpeed('-ground', "-light", "-sky")
-
 
 
         this.addLights()
@@ -230,7 +226,7 @@ export class LowPolyTestScene extends GameScene {
 
         } else {
 
-            this.vehicle = new SphereVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+            this.vehicle = new SphereTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         }
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
             this.otherVehicles.push(
@@ -246,10 +242,13 @@ export class LowPolyTestScene extends GameScene {
             this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
         } else if (this.getGameType() === "tag") {
             this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
+        } else if (this.getGameType() === "story") {
+            this.course = new StoryCourse(this, this.trackName)
+        } else {
+            console.warn("Unknown game type when creating course", this.getGameType())
         }
         await this.course.createCourse(this.useShadows)
         if (this.course instanceof RaceCourse) {
-
             this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
         }
         if (this.getGameType() === "race") {
@@ -299,14 +298,9 @@ export class LowPolyTestScene extends GameScene {
     }
 
     getGameType() {
-        for (let i = 0; i < allTrackNames.length; i++) {
-            if (allTrackNames[i].type === this.trackName) {
-                this.gameType = allTrackNames[i].gameType
-                return allTrackNames[i].gameType
-            }
-        }
-        console.warn("Game type not known")
-        return this.gameType
+
+        return getGameTypeFromTrackName(this.trackName)
+
     }
 
     handleCoinCollided(vehicleName: string, coin: Coin) {
@@ -694,16 +688,18 @@ export class LowPolyTestScene extends GameScene {
 
 
     updateVehicles() {
-        this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
         this.vehicle.update()
+        this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
     }
 
     update(time: number) {
+
+        // console.log("this phy", this.physics.physicsWorld.getWorldInfo())
         if (this.canStartUpdate && this.everythingReady()) {
 
-            stats.begin()
+
             if (this.vehicle) {
-                //     this.vehicle.intelligentDrive(true)
+                //    this.vehicle.intelligentDrive(true)
                 this.updateFps(time)
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
@@ -711,7 +707,7 @@ export class LowPolyTestScene extends GameScene {
                 const rot = this.vehicle.getRotation()
                 scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
                 <br />
-                rot y:${rot.y.toFixed(2)}, w:${rot.w.toFixed(2)}
+                rot x:${rot.x.toFixed(2)}, y:${rot.y.toFixed(2)}, z:${rot.z.toFixed(2)}, w:${rot.w.toFixed(2)}
                 <br />
                 km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
                 `
@@ -720,10 +716,10 @@ export class LowPolyTestScene extends GameScene {
             this.course.updateCourse()
             for (let oVehicle of this.otherVehicles) {
                 oVehicle.randomDrive()
-                // oVehicle.intelligentDrive(false)
+                //oVehicle.intelligentDrive(false)
                 oVehicle.update()
             }
-            stats.end()
+
 
             if (this.raceStarted) {
                 lapTimeDiv.innerHTML = this.gameTime.getCurrentLapTime() + ""

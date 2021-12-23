@@ -82,5 +82,11 @@ export interface IVehicle {
     destroy: () => void
 
     addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
+
+}
+
+
+export interface ITestVehicle extends IVehicle {
     randomDrive: () => void
+    intelligentDrive: (log: boolean) => void
 }

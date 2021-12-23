@@ -64,6 +64,15 @@ var indexHTMLPath = "../public/" + buildFolder + "/index.html";
 app.get("/test", function (_, res) {
     res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
 });
+app.get("/mobiletest", function (_, res) {
+    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
+});
+// app.get("/test/ammo.wasm.js", (_: Request, res: Response) => {
+//     res.sendFile(path.join(__dirname, `../public/${buildFolder}/ammo/ammo.wasm.js`));
+// })
+// app.get("/test/*", (_: Request, res: Response) => {
+//     res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
+// });
 app.get("/ammo.wasm.js", function (_, res) {
     res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
 });

@@ -17,7 +17,7 @@ export type TrackName =
     | "russia-track"
     | "ferrari-track"
     | "skii-map"
-    | "challenge-track"
+    | "farmers-little-helper-map"
 
 export type VehicleType = "normal"
     | "tractor"
@@ -28,7 +28,7 @@ export type VehicleType = "normal"
     | "normal2"
     | "simpleSphere"
 
-export type GameType = "ball" | "race" | "tag"
+export type GameType = "ball" | "race" | "tag" | "story"
 
 
 

@@ -12,6 +12,7 @@ import TextField from "@mui/material/TextField";
 import React, { useEffect, useState } from "react";
 import {
   defaultRaceTrack,
+  defaultStoryTrack,
   defaultTagTrack,
   nonActiveTrackNames,
 } from "../../classes/Game";
@@ -42,6 +43,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         newGameSettings.trackName = defaultTagTrack;
       } else if (value === "race") {
         newGameSettings.trackName = defaultRaceTrack;
+      } else if (value === "story") {
+        newGameSettings.trackName = defaultStoryTrack;
       }
     }
 
@@ -88,6 +91,18 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 />
               }
               label="Tag"
+            />
+            <FormControlLabel
+              value="story"
+              control={
+                <Radio
+                  onChange={() => {
+                    updateGameSettings("gameType", "story");
+                  }}
+                  checked={gameSettings.gameType === "story"}
+                />
+              }
+              label="Story"
             />
           </RadioGroup>
         </FormControl>

@@ -3,7 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify/";
 import { Socket } from "socket.io-client";
-import { IEndOfRaceInfoPlayer, IScoreInfo } from "../../classes/Game";
+import {
+  getGameSceneClass,
+  IEndOfRaceInfoPlayer,
+  IScoreInfo,
+} from "../../classes/Game";
 import {
   IGameSettings,
   setAllLocalGameSettings,
@@ -128,23 +132,22 @@ const GameRoom = (props: IGameRoom) => {
       console.warn("ball game not supported");
     }
 
-    const CurrGameScene =
-      props.store.gameSettings.gameType === "race"
-        ? RaceGameScene
-        : TagGameScene;
+    const CurrGameScene = getGameSceneClass(props.store.gameSettings.gameType);
 
     startGame(
       CurrGameScene,
-      props.store.socket,
-      props.store.players,
-      props.store.gameSettings,
-      props.store.roomId,
       {
-        escPressed: handleEscPressed,
-        gameFinished: handelGameFinished,
-        updateScoreTable: handleUpdateScoreTable,
-        playerFinished: handlePlayerFinished,
-        closeModals: handleCloseModals,
+        socket: props.store.socket,
+        players: props.store.players,
+        gameSettings: props.store.gameSettings,
+        roomId: props.store.roomId,
+        gameRoomActions: {
+          escPressed: handleEscPressed,
+          gameFinished: handelGameFinished,
+          updateScoreTable: handleUpdateScoreTable,
+          playerFinished: handlePlayerFinished,
+          closeModals: handleCloseModals,
+        },
       },
       (_gameObject) => {
         setGameObject(_gameObject);

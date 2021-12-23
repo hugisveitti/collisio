@@ -22,6 +22,9 @@ interface IGameItem {
     isCourseObjectArray?: boolean
     /** for stuff in a key value storage, such as the spawn aligns */
     isCourseObjectDict?: boolean
+
+    /** if object is breakable */
+    fractureImpulse?: number
 }
 export const gameItems = {
     "ground": {
@@ -122,6 +125,7 @@ export const gameItems = {
         shape: "concave",
         castsShadow: false,
         bounciness: structureBounciness,
+        fractureImpulse: 5
     },
     "wall": {
         collisionFlags: 1,
@@ -220,7 +224,9 @@ export const gameItems = {
     "towel": {
         collisionFlags: 0,
         shape: "convex",
-    }
+    },
+
+
 
 
 } as { [key: string]: IGameItem }

@@ -3,13 +3,13 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
-import { getTimeOfDay, getTimeOfDayColors, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
+import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, MobileControls, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getBeep } from "../sounds/gameSounds";
-import { addControls } from "../utils/controls";
+import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
@@ -33,6 +33,15 @@ export interface IEndOfGameData {
     endOfRaceInfo?: IEndOfRaceInfoGame
 }
 
+interface IGameSceneConfig {
+    socket?: Socket
+    players: IPlayerInfo[]
+    gameSettings: IGameSettings
+    roomId?: string
+    gameRoomActions: IGameRoomActions
+    onlyMobile?: boolean
+    mobileController?: MobileControls
+}
 
 interface IUserSettingsMessage {
     playerNumber: number
@@ -126,6 +135,8 @@ export class GameScene extends Scene3D implements IGameScene {
 
     hasAskedToLowerSettings: boolean
 
+    gameSceneConfig: IGameSceneConfig
+
     constructor() {
         super()
         this.needsReload = false
@@ -141,8 +152,8 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameStarted = false
         this.gameId = uuid()
         this.gameSettings = defaultGameSettings
-        this.gameInfoDiv = document.createElement("div")
-        this.gameInfoDiv.setAttribute("id", "game-info")
+        this.gameInfoDiv = document.getElementById("game-info") as HTMLDivElement // document.createElement("div")
+        //   this.gameInfoDiv.setAttribute("id", "game-info")
         document.body.appendChild(this.gameInfoDiv)
         this.importantInfoDiv = document.createElement("div")
 
@@ -180,7 +191,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
-        this.gameInfoDiv.appendChild(this.playerInfosContainer)
+
 
 
         this.totalPing = 0
@@ -245,7 +256,11 @@ export class GameScene extends Scene3D implements IGameScene {
         this.scene.fog = new Fog(this.scene.background, 1, 5000);
         this.scene.fog.color.copy(uniforms["bottomColor"].value);
 
-        const skyGeo = new SphereGeometry(1000, 32, 15);
+        const trackInfo = getTrackInfo(this.gameSettings.trackName)
+
+        const hemisphereRadius = trackInfo?.hemisphereRadius ?? 1000
+
+        const skyGeo = new SphereGeometry(hemisphereRadius, 32, 15);
         const skyMat = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: skydomeVertexShader,
@@ -410,6 +425,12 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
     createViews() {
+
+        if (!this.gameSceneConfig.onlyMobile) {
+
+            this.gameInfoDiv.appendChild(this.playerInfosContainer)
+        }
+
         this.views = []
 
         this.playerInfosContainer.innerHTML = ""
@@ -704,7 +725,7 @@ export class GameScene extends Scene3D implements IGameScene {
         // if gameSettings change and needs reload then restart without user say?
 
 
-        this.socket.emit(dts_game_settings_changed_callback, {})
+        this.socket?.emit(dts_game_settings_changed_callback, {})
     }
 
     toggleUseSound() {
@@ -814,22 +835,34 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     createController() {
-        /** if reset */
-        this.socket.off(std_controls)
-        /** Vehicle controls is only for testing */
-        this.vehicleControls = new VehicleControls()
-        addControls(this.vehicleControls, this.socket, this.vehicles)
+        if (this.gameSceneConfig.onlyMobile) {
+            if (this.gameSceneConfig.mobileController && this.vehicles.length > 0) {
+
+                const controllerInterval = setInterval(() => {
+                    driveVehicle(this.gameSceneConfig.mobileController, this.vehicles[0])
+                }, 1000 / 60)
+            } else {
+                console.warn("not able to drive")
+            }
+        } else {
+
+            /** if reset */
+            this.socket?.off(std_controls)
+            /** Vehicle controls is only for testing */
+            this.vehicleControls = new VehicleControls()
+            addControls(this.vehicleControls, this.socket, this.vehicles)
+        }
     }
 
     emitVehiclesReady() {
         /** send info about vehiclesTypes and have the server check if 
          * non premium accounts have premium vehicles
          */
-        this.socket.emit(dts_vehicles_ready, { numberOfVehicles: this.vehicles.length })
+        this.socket?.emit(dts_vehicles_ready, { numberOfVehicles: this.vehicles.length })
     }
 
     userSettingsListener() {
-        this.socket.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
+        this.socket?.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
                 this.players[data.playerNumber].vehicleType = data.userSettings.vehicleSettings.vehicleType
                 if (this.vehicles.length >= data.playerNumber - 1) {
@@ -861,8 +894,8 @@ export class GameScene extends Scene3D implements IGameScene {
     updatePing() {
         const start = Date.now()
 
-        this.socket.emit(dts_ping_test)
-        this.socket.once(std_ping_test_callback, () => {
+        this.socket?.emit(dts_ping_test)
+        this.socket?.once(std_ping_test_callback, () => {
             const ping = Date.now() - start
             this.pingInfo.innerHTML = `ping ${ping}ms`
             this.totalPing += ping
@@ -938,6 +971,15 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
+    setGameSceneConfig(config: IGameSceneConfig) {
+        this.gameSceneConfig = config
+        this.setSocket(config.socket)
+        this.setGameSettings(config.gameSettings)
+        this.setPlayers(config.players)
+        this.roomId = config.roomId
+        this.setGameRoomActions(config.gameRoomActions)
+    }
+
 
 
     async destroyGame() {
@@ -951,23 +993,23 @@ export class GameScene extends Scene3D implements IGameScene {
 
 }
 
-export const startGame = (SceneClass: typeof GameScene, socket: Socket, players: IPlayerInfo[], gameSettings: IGameSettings, roomId: string, gameRoomActions: IGameRoomActions, callback: (gameObject: GameScene) => void) => {
+
+
+export const startGame = (SceneClass: typeof GameScene, gameSceneConfig: IGameSceneConfig, callback: (gameObject: GameScene) => void) => {
     const config = { scenes: [SceneClass], antialias: true }
     PhysicsLoader("/ammo", () => {
 
         const project = new Project(config)
-
-
-
         const key = project.scenes.keys().next().value;
 
         // hacky way to get the project's scene
         const gameObject = (project.scenes.get(key) as GameScene);
-        gameObject.setSocket(socket);
-        gameObject.setPlayers(players);
-        gameObject.setGameRoomActions(gameRoomActions)
-        gameObject.roomId = roomId
-        gameObject.setGameSettings(gameSettings);
+        gameObject.setGameSceneConfig(gameSceneConfig)
+        // gameObject.setSocket(socket);
+        // gameObject.setPlayers(players);
+        // gameObject.setGameRoomActions(gameRoomActions)
+        // gameObject.roomId = roomId
+        // gameObject.setGameSettings(gameSettings);
         callback(gameObject)
 
         return project

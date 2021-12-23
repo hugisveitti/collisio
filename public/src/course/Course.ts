@@ -120,7 +120,7 @@ export class Course implements ICourse {
     checkpointSpawns: ExtendedObject3D[]
 
     lights: PointLight[]
-    rotatingObjects: Object3D[]
+    rotatingObjects: { speed: number, object: Object3D }[]
 
 
     constructor(gameScene: GameScene, trackName: TrackName,) {
@@ -157,6 +157,64 @@ export class Course implements ICourse {
         return false
     }
 
+
+    createSoftObject(object: Object3D) {
+
+        return
+        const gravityConstant = -10
+
+        const collisionConfiguration = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
+        const dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+        const broadphase = new Ammo.btDbvtBroadphase();
+        const solver = new Ammo.btSequentialImpulseConstraintSolver();
+        const softBodySolver = new Ammo.btDefaultSoftBodySolver();
+        this.gameScene.physics.physicsWorld = new Ammo.btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration, softBodySolver);
+        this.gameScene.physics.physicsWorld.setGravity(new Ammo.btVector3(0, gravityConstant, 0));
+        this.gameScene.physics.physicsWorld.getWorldInfo().set_m_gravity(new Ammo.btVector3(0, gravityConstant, 0));
+        console.log("physics world", this.gameScene.physics.physicsWorld)
+        // transformAux1 = new Ammo.btTransform();
+        // softBodyHelpers = new Ammo.btSoftBodyHelpers();
+
+        const clothPos = object.position
+        const clothHeight = object.scale.x
+        const clothWidth = object.scale.z
+        console.log("sotf object", object)
+        const clothNumSegmentsZ = 4
+        const clothNumSegmentsY = 3
+
+        // Cloth physic object
+        const softBodyHelpers = new Ammo.btSoftBodyHelpers()
+        const clothCorner00 = new Ammo.btVector3(clothPos.x, clothPos.y + clothHeight, clothPos.z)
+        const clothCorner01 = new Ammo.btVector3(clothPos.x, clothPos.y + clothHeight, clothPos.z - clothWidth)
+        const clothCorner10 = new Ammo.btVector3(clothPos.x, clothPos.y, clothPos.z)
+        const clothCorner11 = new Ammo.btVector3(clothPos.x, clothPos.y, clothPos.z - clothWidth)
+        const worldInfo = new Ammo.btSoftBodyWorldInfo()
+
+        // console.log("this.gamescene.physicswolrd", this.gameScene.physics.physicsWorld.getWorldInfo())
+        const clothSoftBody = softBodyHelpers.CreatePatch(
+            worldInfo,
+            // this.gameScene.physics.physicsWorld.getWorldInfo(),
+            clothCorner00,
+            clothCorner01,
+            clothCorner10,
+            clothCorner11,
+            clothNumSegmentsZ + 1,
+            clothNumSegmentsY + 1,
+            0,
+            true
+        )
+        const sbConfig = clothSoftBody.get_m_cfg()
+        sbConfig.set_viterations(10)
+        sbConfig.set_piterations(10)
+
+        clothSoftBody.setTotalMass(0.9, false)
+        // @ts-ignore
+        Ammo.castObject(clothSoftBody, Ammo.btCollisionObject).getCollisionShape().setMargin(0.04)
+        this.gameScene.physics.physicsWorld.addSoftBody(clothSoftBody, 1, -1)
+        object.userData.physicsBody = clothSoftBody
+        // Disable deactivation
+        clothSoftBody.setActivationState(4)
+    }
 
 
     async createCourse(useShadows: boolean): Promise<void> {
@@ -202,10 +260,15 @@ export class Course implements ICourse {
                         }
                     } else if (child.type === "Mesh" || child.type === "Group") {
                         if (child.name.includes("rotate")) {
-                            this.rotatingObjects.push(child)
+                            const num = !isNaN(+child.name.split("_")[0]) ? Math.PI / +child.name.split("_")[0] : Math.PI / 120
+                            console.log("num", num, child.name)
+                            this.rotatingObjects.push({ object: child, speed: num })
+
                         }
 
                         if (child.name.includes("ghost")) {
+                        } else if (child.name.includes("softbody")) {
+                            this.createSoftObject(child)
 
                         }
                         else {
@@ -235,11 +298,22 @@ export class Course implements ICourse {
                                         }
                                         if (child.name.includes("breakable")) {
                                             eObject.breakable = true
+                                            let snum = child.name.split("_")[0]
+                                            let num = gameItems[key].fractureImpulse ?? 5
+                                            if (!isNaN(+snum)) {
+                                                num = +snum
+                                            }
+                                            eObject.body.on.collision((o, e) => {
+                                                console.log("o", o)
+                                                console.log("event", e)
+                                            })
+                                            console.log("num", num)
+                                            eObject.fractureImpulse = num
+                                            eObject.body.setCollisionFlags(3)
+                                            eObject.body.breakable = true
                                             console.log("breakable", eObject)
                                         }
-                                        if (child.name.includes("softbody")) {
-                                            eObject.body.isSoftBody = true
-                                        }
+
 
                                         this.gamePhysicsObjects.push(eObject)
                                     }
@@ -259,7 +333,7 @@ export class Course implements ICourse {
 
                                                     waterObject.visible = false
                                                     this.gameScene.misc.water({
-                                                        y: waterObject.position.y,
+                                                        y: waterObject.position.y + .1,
                                                         x: waterObject.position.x,
                                                         z: waterObject.position.z,
 
@@ -506,9 +580,10 @@ export class Course implements ICourse {
     updateCourse() {
         // not sure if this slows down stuff
         if (this.gameScene.gameSettings.graphics === "high") {
-            for (let object of this.rotatingObjects) {
-                const r = object.rotation
-                object.rotateX(Math.PI / 120)
+            for (let item of this.rotatingObjects) {
+
+
+                item.object.rotateX(item.speed)
             }
         }
 

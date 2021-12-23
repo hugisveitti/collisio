@@ -25,92 +25,26 @@ import {
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType } from "../utils/settings";
 
-const TestContainer = () => {
-  const [socket, setSocket] = useState(undefined as Socket | undefined);
-  const [roomId, setRoomId] = useState("testRoom");
-  const [players, setPlayers] = useState([] as IPlayerInfo[]);
-  const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
-  const [userSettings, setUserSettings] = useState(defaultUserSettings);
-  const [gameSettings, setGameSettings] = useState(defaultGameSettings);
+interface ITestContainer {
+  store: IStore;
+  onMobile: boolean;
+}
 
-  const deviceType = getDeviceType();
-  const onMobile = deviceType === "mobile";
-
-  useEffect(() => {
-    createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
-    const _gameSettings = getAllLocalGameSettings();
-    store.setGameSettings(_gameSettings);
-    const vehicleType: VehicleType =
-      (window.localStorage.getItem("vehicleType") as VehicleType) ?? "normal";
-
-    const newVehicleSettings: IVehicleSettings = {
-      ...userSettings.vehicleSettings,
-      vehicleType,
-    };
-
-    const newUserSettings: IUserSettings = {
-      ...userSettings,
-      vehicleSettings: newVehicleSettings,
-    };
-
-    setUserSettings(newUserSettings);
-  }, []);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const nplayer = {
-      playerName: "tester",
-      isLeader: true,
-      playerNumber: 0,
-      teamName: "no team",
-      mobileControls: new MobileControls(),
-      vehicleControls: new VehicleControls(),
-      id: "1",
-      vehicleType:
-        (window.localStorage.getItem("vehicleType") as VehicleType) ?? "f1",
-    } as IPlayerInfo;
-    setPlayers([nplayer]);
-    // setPlayer(nplayer);
-    setRoomId("testRoom");
-    setPlayer(nplayer);
-
-    socket.on("test-made-connection", () => {
-      toast("A test connection was made");
-    });
-
-    return () => {};
-  }, [socket]);
-
-  const store = {
-    roomId,
-    setRoomId,
-    players,
-    setPlayers,
-    player,
-    setPlayer,
-    gameSettings,
-    setGameSettings,
-    userSettings,
-    setUserSettings,
-    socket,
-    setSocket,
-  } as IStore;
-
-  if (!socket) return <span>Loading test setup...</span>;
-  if (onMobile && !store.player) return <span>Loading test setup...</span>;
+const TestContainer = (props: ITestContainer) => {
+  if (props.onMobile && !props.store.player)
+    return <span>Loading test setup...</span>;
+  if (!props.store.socket) return <span>Loading test setup...</span>;
 
   // if (!onMobile && !canStartGame)
   //   return <span>Loading test setup desktop...</span>;
 
   return (
     <React.Fragment>
-      {onMobile ? (
-        <ControlsRoom store={store} />
+      {props.onMobile ? (
+        <ControlsRoom store={props.store} />
       ) : (
-        <GameRoom store={store} useTestCourse isTestMode />
+        <GameRoom store={props.store} useTestCourse isTestMode />
       )}
-      <ToastContainer />
     </React.Fragment>
   );
 };

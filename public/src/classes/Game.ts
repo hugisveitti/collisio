@@ -1,3 +1,7 @@
+import { GameScene } from "../game/GameScene";
+import { RaceGameScene } from "../game/RaceGameScene";
+import { StoryGameScene } from "../game/StoryGameScene";
+import { TagGameScene } from "../game/TagGameScene";
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
@@ -11,7 +15,7 @@ export interface ITrackInfo {
     type: TrackName
     gameType: GameType
     timeOfDay?: TimeOfDay
-
+    hemisphereRadius?: number
 }
 
 export const getTrackNameFromType = (trackName: TrackName) => {
@@ -26,6 +30,8 @@ export const getGameTypeNameFromType = (gameType: GameType) => {
             return "Tag"
         case "ball":
             return "Ball"
+        case "story":
+            return "Story"
         default:
             return "Unknown game type"
     }
@@ -66,9 +72,17 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
     },
     {
-        name: "Challenge map", type: "challenge-track", gameType: "tag"
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 4000
     }
 ]
+
+export const getTrackInfo = (trackName: TrackName) => {
+    for (let track of allTrackNames) {
+        if (track.type === trackName) return track
+    }
+    return undefined
+}
+
 
 export const getTimeOfDay = (trackName: TrackName) => {
     for (let t of allTrackNames) {
@@ -148,11 +162,29 @@ export const getGameTypeFromTrackName = (trackName: TrackName): GameType | undef
 export const nonActiveTrackNames: TrackName[] = getNonActiveTrackNames()
 export const defaultRaceTrack: TrackName = "farm-track"
 export const defaultTagTrack: TrackName = "simple-tag-course"
+export const defaultStoryTrack: TrackName = "farmers-little-helper-map"
+
+
+export const getGameSceneClass = (gameType: GameType): typeof GameScene => {
+    switch (gameType) {
+        case "race":
+            return RaceGameScene
+        case "tag"
+            : return TagGameScene
+        case "story":
+            return StoryGameScene
+        default:
+            console.warn("Unknown gametype", gameType)
+            return GameScene
+    }
+}
 
 export const getDefaultTrackFromGameType = (gameType: GameType) => {
     switch (gameType) {
         case "tag":
             return defaultTagTrack
+        case "story":
+            return defaultStoryTrack
         default:
             return defaultRaceTrack
     }
