@@ -22,6 +22,7 @@ import {
 } from "../../classes/localGameSettings";
 import { inputBackgroundColor } from "../../providers/theme";
 import { inTestMode } from "../../utils/settings";
+import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
 
 interface IGameSettingsComponent {
@@ -59,6 +60,51 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   }, [props.gameSettings]);
 
   const disableInputs = !!props.gameSettings.tournamentId;
+
+  const renderGameTypeInputs = () => {
+    if (props.gameSettings.gameType === "race") {
+      return (
+        <React.Fragment>
+          <Grid item xs={12} lg={4} xl={4}>
+            <NumberSelect
+              disabled={disableInputs}
+              title="No. of laps"
+              value={gameSettings.numberOfLaps}
+              numbers={[1, 2, 3, 5, 7]}
+              onChange={(val) => {
+                updateGameSettings("numberOfLaps", val);
+              }}
+              style={{
+                backgroundColor: inputBackgroundColor,
+              }}
+            />
+          </Grid>
+        </React.Fragment>
+      );
+    }
+    if (props.gameSettings.gameType === "tag") {
+      return (
+        <React.Fragment>
+          <Grid item xs={12} lg={4} xl={4}>
+            <TextField
+              disabled={disableInputs}
+              type="number"
+              label="Tag game length in minutes"
+              value={
+                gameSettings.tagGameLength ? gameSettings.tagGameLength : ""
+              }
+              style={{ backgroundColor: inputBackgroundColor }}
+              onChange={(ev) => {
+                updateGameSettings("tagGameLength", +ev.target.value);
+              }}
+            />
+          </Grid>
+        </React.Fragment>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <Grid container spacing={3}>
@@ -107,43 +153,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           </RadioGroup>
         </FormControl>
       </Grid>
-      {gameSettings.gameType === "tag" ? (
-        <React.Fragment>
-          <Grid item xs={12} lg={4} xl={4}>
-            <TextField
-              disabled={disableInputs}
-              type="number"
-              label="Tag game length in minutes"
-              value={
-                gameSettings.tagGameLength ? gameSettings.tagGameLength : ""
-              }
-              style={{ backgroundColor: inputBackgroundColor }}
-              onChange={(ev) => {
-                updateGameSettings("tagGameLength", +ev.target.value);
-              }}
-            />
-          </Grid>
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <Grid item xs={12} lg={4} xl={4}>
-            <TextField
-              disabled={disableInputs}
-              label="No. of laps"
-              type="number"
-              value={gameSettings.numberOfLaps ? gameSettings.numberOfLaps : ""}
-              onChange={(ev) => {
-                if (+ev.target.value >= 0) {
-                  updateGameSettings("numberOfLaps", +ev.target.value);
-                }
-              }}
-              style={{
-                backgroundColor: inputBackgroundColor,
-              }}
-            />
-          </Grid>
-        </React.Fragment>
-      )}
+      {renderGameTypeInputs()}
       <Grid item xs={12} lg={4}>
         <TrackSelect
           disabled={disableInputs}

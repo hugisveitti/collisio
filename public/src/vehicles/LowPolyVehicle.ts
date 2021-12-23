@@ -667,7 +667,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
             let chaseSpeedY = 0.5
-            let chaseSpeed = 0.1//this.chaseCameraSpeed
+            let chaseSpeed = this.chaseCameraSpeed
 
             // this.oldPos = pos.clone()
 

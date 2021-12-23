@@ -15,11 +15,13 @@ interface INumberSelect {
   title: string;
   minWidth?: number;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }
 
 const NumberSelect = (props: INumberSelect) => {
   return (
     <FormControl
+      disabled={props.disabled}
       fullWidth={props.fullWidth}
       style={{ minWidth: props.minWidth ?? 200, textAlign: "left" }}
     >
