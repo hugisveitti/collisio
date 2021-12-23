@@ -146,7 +146,7 @@ const Routes = () => {
   const user = useContext(UserContext);
   useEffect(() => {
     if (user?.uid) {
-      getDBUserSettings(user.uid, (dbUserSettings) => {
+      getDBUserSettings(user.uid).then((dbUserSettings) => {
         if (dbUserSettings) {
           const newUserSettings = {
             ...userSettings,

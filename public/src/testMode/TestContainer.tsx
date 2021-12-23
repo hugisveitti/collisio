@@ -1,29 +1,8 @@
-import { areDayPropsEqual } from "@mui/lab/PickersDay/PickersDay";
-import React, { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { Socket } from "socket.io-client";
-import {
-  defaultGameSettings,
-  getAllLocalGameSettings,
-} from "../classes/localGameSettings";
-import {
-  defaultUserSettings,
-  IUserSettings,
-  IVehicleSettings,
-} from "../classes/User";
+import React from "react";
 import GameRoom from "../components/gameRoom/GameRoom";
-import UserSettingsComponent from "../components/profile/UserSettingsComponent";
 // import GameRoom from "../components/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";
-import {
-  IPlayerInfo,
-  MobileControls,
-  VehicleControls,
-  VehicleType,
-} from "../shared-backend/shared-stuff";
-import { createSocket } from "../utils/connectSocket";
-import { getDeviceType } from "../utils/settings";
 
 interface ITestContainer {
   store: IStore;

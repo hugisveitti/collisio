@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -13,7 +13,8 @@ import {
   IUserSettings,
 } from "./classes/User";
 import { IStore } from "./components/store";
-import UserProvider from "./providers/UserProvider";
+import { getDBUserSettings } from "./firebase/firestoreFunctions";
+import UserProvider, { UserContext } from "./providers/UserProvider";
 import { IPlayerInfo, VehicleType } from "./shared-backend/shared-stuff";
 import MobileGameExperiment from "./testMode/MobileGameExperiment";
 
@@ -22,6 +23,8 @@ import { createSocket } from "./utils/connectSocket";
 import { getDeviceType } from "./utils/settings";
 
 const TestApp = () => {
+  const user = useContext(UserContext);
+
   const [socket, setSocket] = useState(undefined as Socket | undefined);
   const [roomId, setRoomId] = useState("testRoom");
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
@@ -36,8 +39,11 @@ const TestApp = () => {
     createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
+  }, []);
+
+  useEffect(() => {
     const vehicleType: VehicleType =
-      (window.localStorage.getItem("vehicleType") as VehicleType) ?? "normal";
+      (window.localStorage.getItem("vehicleType") as VehicleType) ?? "normal2";
 
     const newVehicleSettings: IVehicleSettings = {
       ...userSettings.vehicleSettings,

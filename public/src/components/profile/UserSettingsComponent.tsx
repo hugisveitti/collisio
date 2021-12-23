@@ -33,7 +33,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
   const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(0.3);
 
   useEffect(() => {
-    getDBUserSettings(props.userId, (settings) => {
+    getDBUserSettings(props.userId).then((settings) => {
       setUserSettings(settings);
 
       setVehicleSettings(settings.vehicleSettings);

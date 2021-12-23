@@ -289,20 +289,21 @@ export const setDBUserSettings = async (userId: string, settings: IUserSettings)
 
 
 
-export const getDBUserSettings = async (userId: string, callback: (settings: IUserSettings | undefined) => void) => {
+export const getDBUserSettings = async (userId: string): Promise<IUserSettings | undefined> => {
+    return new Promise<IUserSettings | undefined>(async (resolve, reject) => {
 
+        const userSettingsRef = doc(firestore, usersCollectionRefPath, userId)
 
-    const userSettingsRef = doc(firestore, usersCollectionRefPath, userId)
+        const data = await getDoc(userSettingsRef)
+        if (data.exists()) {
 
-    const data = await getDoc(userSettingsRef)
-    if (data.exists()) {
+            const settings = data.data()["settings"]
 
-        const settings = data.data()["settings"]
-
-        callback(settings as IUserSettings)
-    } else {
-        callback(undefined)
-    }
+            resolve(settings as IUserSettings)
+        } else {
+            reject(undefined)
+        }
+    })
 }
 
 

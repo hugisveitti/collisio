@@ -12,13 +12,22 @@ import {
 import EndOfGameModal from "../components/gameRoom/EndOfGameModal";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
-import { saveRaceDataGame } from "../firebase/firestoreGameFunctions";
+import { getDBUserSettings } from "../firebase/firestoreFunctions";
+import {
+  saveBestRaceData,
+  saveRaceDataGame,
+} from "../firebase/firestoreGameFunctions";
 import { IEndOfGameData, startGame } from "../game/GameScene";
 import { IGameScene } from "../game/IGameScene";
 import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
 import ControlsRoomComponent from "../mobile/ControlsRoomComponent";
 import { UserContext } from "../providers/UserProvider";
-import { GameActions, MobileControls } from "../shared-backend/shared-stuff";
+import {
+  GameActions,
+  IPlayerInfo,
+  IPreGamePlayerInfo,
+  MobileControls,
+} from "../shared-backend/shared-stuff";
 import { fakePlayer1 } from "../tests/fakeData";
 import { isIphone } from "../utils/settings";
 
@@ -68,7 +77,14 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    //  props.store.socket.emit(dts_player_finished, data);
+    console.log("player finished", data);
+    if (data.isAuthenticated) {
+      saveBestRaceData(data.playerId, data, (gameInfo) => {
+        setGameDataInfo(gameInfo);
+        console.log("game info", gameInfo);
+        setEndOfGameModalOpen(true);
+      });
+    }
   };
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
@@ -95,9 +111,54 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   };
 
   useEffect(() => {
-    const player = fakePlayer1;
-    props.store.setPlayer(player);
-  }, []);
+    if (props.store.socket) {
+      console.log("disconnecting socket");
+      props.store.socket.disconnect();
+    }
+  }, [props.store.socket]);
+
+  useEffect(() => {
+    if (user === null) return;
+    getDBUserSettings(user.uid).then((settings) => {
+      let newPlayer: IPreGamePlayerInfo;
+      if (settings) {
+        props.store.setUserSettings(settings);
+
+        if (user) {
+          newPlayer = {
+            playerName: user.displayName,
+            teamName: "",
+            teamNumber: -1,
+            playerNumber: 0,
+            id: user.uid,
+            isAuthenticated: true,
+            vehicleType: settings.vehicleSettings.vehicleType,
+            photoURL: user.photoURL,
+          };
+        }
+      } else {
+        newPlayer = {
+          playerName: "Guest",
+          teamName: "",
+          teamNumber: -1,
+          playerNumber: 0,
+          id: "guest-id",
+          isAuthenticated: false,
+          vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
+          photoURL: "",
+        };
+      }
+      const player: IPlayerInfo = {
+        ...newPlayer,
+        isLeader: true,
+        isConnected: true,
+        mobileControls: controller,
+      };
+      console.log("player", player);
+
+      props.store.setPlayer(player);
+    });
+  }, [user]);
 
   useEffect(() => {
     console.log("store", props.store);

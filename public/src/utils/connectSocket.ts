@@ -40,7 +40,7 @@ export const createSocket = (deviceType: string, callback: (socket: Socket) => v
 
 
     socket.on("disconnect", () => {
-        toast.error("Connection lost, you will probably have to refresh")
+        // toast.error("Connection lost, you will probably have to refresh")
         /** send to front page? */
     })
 
