@@ -1,4 +1,4 @@
-import { ExtendedObject3D } from "@enable3d/ammo-physics";
+import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Euler, Quaternion, Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
@@ -85,7 +85,7 @@ export class LowPolyVehicle implements IVehicle {
     chaseCameraSpeed: number
     useChaseCamera: boolean
     chaseCameraTicks: number
-    prevCahseCameraPos: Vector3 = new Vector3(0, 0, 0)
+    prevChaseCameraPos: Vector3 = new Vector3(0, 0, 0)
     vehicleSettings: IVehicleSettings
     camera: PerspectiveCamera
     vehicleType: VehicleType
@@ -133,6 +133,9 @@ export class LowPolyVehicle implements IVehicle {
 
     staticCameraPos: { x: number, y: number, z: number }
 
+    // too see if camera is inside wall
+    cameraRay: ClosestRaycaster
+
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
@@ -168,7 +171,9 @@ export class LowPolyVehicle implements IVehicle {
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
         this.transformCam = new Ammo.btTransform()
 
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig.onlyMobile)
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+
+        this.cameraRay = new ClosestRaycaster(this.scene.physics)
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -201,6 +206,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
     createVehicle() {
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
 
 
         this.scene.add.existing(this.vehicleBody)
@@ -638,33 +644,16 @@ export class LowPolyVehicle implements IVehicle {
 
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
-            let pos = this.vehicleBody.position.clone() // this.getPosition()
+            // let pos = this.vehicleBody.position.clone() // this.getPosition()
 
             const p1 = this.vehicle.getChassisWorldTransform().getOrigin()
 
             const vec = new Vector3(p1.x(), p1.y(), p1.z())
 
-            pos = vec
+            // pos = vec
 
 
-            /**
-             * I am not sure what to do with the chase speed
-             */
-
-            /**
-             * This will have the camera first few km/h catch up to the car and then be at the same speed
-             */
-
-            // this.cameraDiff.subVectors(pos, this.oldPos)
-            // let chaseSpeed = speedScaler(Math.abs(this.getCurrentSpeedKmHour()))// 1// this.chaseCameraSpeed
-
-            // chaseSpeed = Math.min(1, chaseSpeed)
-            // if ((Math.abs(this.cameraDiff.x) > 2 || Math.abs(this.cameraDiff.z) > 2) && (Math.abs(this.cameraDiff.x) < 5 || Math.abs(this.cameraDiff.z) < 5)) {
-
-            //     chaseSpeed = 1
-            //     chaseSpeedY = 0
-            // }
-
+            const pos = vec
 
             let chaseSpeedY = 0.5
             let chaseSpeed = this.chaseCameraSpeed
@@ -689,18 +678,50 @@ export class LowPolyVehicle implements IVehicle {
             //    this.cameraLookAtPos.set(0, 0, 0)
             const cs = 0.5
 
-            this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((pos.x - this.prevCahseCameraPos.x) * cs))
-            this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
-            this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
+            this.cameraLookAtPos.x = (this.prevChaseCameraPos.x + ((pos.x - this.prevChaseCameraPos.x) * cs))
+            this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z - this.prevChaseCameraPos.z) * cs))
+            this.cameraLookAtPos.y = (this.prevChaseCameraPos.y + ((pos.y - this.prevChaseCameraPos.y) * cs))
 
-            this.prevCahseCameraPos = this.cameraLookAtPos.clone()
 
+
+
+            // const staticPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+            // const cameraTarget2 = new Vector3(
+            //     pos.x - ((Math.sin(rot.y) * -staticPos.z)),
+            //     pos.y + staticPos.y,
+            //     pos.z - ((Math.cos(rot.y) * -staticPos.z) * Math.sign(Math.cos(rot.z)))
+            // )
 
             // if (this.cameraDiff.length() > 0.1) {
+            // if (!this.cameraSeesVehicle(cameraTarget2)) {
+            //     if (this.staticCameraPos.z < -2.5) {
+
+            //         this.staticCameraPos.z += .5
+            //     }
+            //     if (this.staticCameraPos.x > 2.5) {
+
+            //         this.staticCameraPos.x -= .5
+            //     }
+            //     if (this.staticCameraPos.y > 1.25)
+            //         this.staticCameraPos.y -= .35
+            // } else {
+            //     const scp = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+            //     if (this.staticCameraPos.z > scp.z) {
+
+            //         this.staticCameraPos.z -= .5 * 2
+            //     }
+            //     if (this.staticCameraPos.x < scp.z) {
+
+            //         this.staticCameraPos.x += .5 * 2
+            //     }
+            //     if (this.staticCameraPos.y < scp.y)
+            //         this.staticCameraPos.y += .35 * 2
+            // }
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
             camera.updateProjectionMatrix()
-            this.cameraLookAtPos = pos.clone()
+            this.prevChaseCameraPos = this.cameraLookAtPos.clone()
+            // this.cameraLookAtPos = pos.clone()
 
 
             //    } else {
@@ -708,11 +729,36 @@ export class LowPolyVehicle implements IVehicle {
 
         } else {
 
-            /** I dont think I can make the camera stuck to the chassis AND not make it go under ground */
+
             camera.lookAt(this.vehicleBody.position.clone())
+
+
 
         }
     };
+
+
+    cameraSeesVehicle(cameraPos: Vector3) {
+        const pos = this.getPosition()
+        this.cameraRay.setRayToWorld(pos.x, pos.y + 2, pos.z)
+        this.cameraRay.setRayFromWorld(cameraPos.x, cameraPos.y, cameraPos.z)
+        this.cameraRay.rayTest()
+        if (this.cameraRay.hasHit()) {
+            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
+            const obj = this.cameraRay.getCollisionObject()
+            if (obj.name.includes("house")) {
+                return false
+            }
+            const normal = this.cameraRay.getHitNormalWorld()
+            console.log("normal", normal)
+            console.log("left hit", obj,)
+            return true
+        }
+        return true
+
+
+
+    }
 
     checkIfSpinning() {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()

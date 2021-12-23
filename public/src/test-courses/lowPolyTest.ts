@@ -247,13 +247,13 @@ export class LowPolyTestScene extends GameScene {
         } else {
             console.warn("Unknown game type when creating course", this.getGameType())
         }
+
+
         await this.course.createCourse(this.useShadows)
         if (this.course instanceof RaceCourse) {
             this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
         }
-        if (this.getGameType() === "race") {
-            this.gameTime = new GameTime(3, (this.course as RaceCourse).getNumberOfCheckpoints())
-        }
+
         this.courseLoaded = true
         this.createOtherVehicles(() => {
             this.createVehicle().then(() => {

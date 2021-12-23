@@ -825,7 +825,8 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     createController() {
-        if (this.gameSceneConfig.onlyMobile) {
+        this.socket?.off(std_controls)
+        if (this.gameSceneConfig?.onlyMobile) {
             if (this.gameSceneConfig.mobileController && this.vehicles.length > 0) {
 
                 const controllerInterval = setInterval(() => {
@@ -836,8 +837,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
         } else {
 
-            /** if reset */
-            this.socket?.off(std_controls)
+
             /** Vehicle controls is only for testing */
             this.vehicleControls = new VehicleControls()
             addControls(this.vehicleControls, this.socket, this.vehicles)
@@ -971,6 +971,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.setPlayers(config.players)
         this.roomId = config.roomId
         this.setGameRoomActions(config.gameRoomActions)
+        // if (config.onlyMobile) {
+        //   this.createController()
+        //}
     }
 
 

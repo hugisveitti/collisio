@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import GameRoom from "../components/gameRoom/GameRoom";
 // import GameRoom from "../components/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";
+import { fakePlayer1 } from "../tests/fakeData";
 
 interface ITestContainer {
   store: IStore;
@@ -10,8 +11,12 @@ interface ITestContainer {
 }
 
 const TestContainer = (props: ITestContainer) => {
+  useEffect(() => {
+    props.store.setPlayer(fakePlayer1);
+  }, []);
+
   if (props.onMobile && !props.store.player)
-    return <span>Loading test setup...</span>;
+    return <span>Loading on mobile test setup...</span>;
   if (!props.store.socket) return <span>Loading test setup...</span>;
 
   // if (!onMobile && !canStartGame)

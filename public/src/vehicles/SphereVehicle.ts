@@ -117,13 +117,16 @@ export class SphereVehicle implements IVehicle {
 
         this.vector = new Ammo.btVector3(0, 0, 0)
 
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
 
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig.onlyMobile)
     }
 
 
 
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D): void {
+
+        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+
 
         this.isReady = false
 
