@@ -268,6 +268,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async preload() {
 
+
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
 
         this.addLights()

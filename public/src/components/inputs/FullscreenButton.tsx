@@ -15,6 +15,7 @@ const FullscreenButton = () => {
   return (
     <IconButton
       onClick={() => {
+        screen?.orientation?.lock?.("landscape");
         if (!document.body.requestFullscreen) {
           toast.error("Connot enter fullscreen");
         }

@@ -30,6 +30,7 @@ import {
 } from "../shared-backend/shared-stuff";
 import { fakePlayer1 } from "../tests/fakeData";
 import { isIphone } from "../utils/settings";
+import "./MobileExperiment.css";
 
 interface IMobileGameExperiment {
   store: IStore;
@@ -58,6 +59,29 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
     gamma: 0,
     beta: 0,
   });
+
+  const [gameCanvas, setGameCanvas] = useState(undefined as HTMLCanvasElement);
+
+  useEffect(() => {
+    if (gameObject) {
+      const canvases = document.getElementsByTagName("canvas");
+      if (canvases.length > 0) {
+        canvases[0].classList.add("game-canvas");
+        setGameCanvas(canvases[0]);
+      }
+    }
+  }, [gameObject]);
+
+  useEffect(() => {
+    if (gameCanvas) {
+      setInterval(() => {
+        gameCanvas.setAttribute(
+          "style",
+          `transform: rotateZ(${controller.beta}deg)`
+        );
+      }, 1000 / 45);
+    }
+  }, [gameCanvas]);
 
   const handleEscPressed = () => {
     // basically have to create a modal in the game class and show it there...
