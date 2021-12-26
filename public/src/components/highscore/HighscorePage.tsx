@@ -16,7 +16,6 @@ import {
 } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import { inputBackgroundColor } from "../../providers/theme";
-import AdSense from "../monitary/AdSense";
 import "../../styles/main.css";
 import HighscoreTable from "./HighscoreTable";
 import {
@@ -101,10 +100,6 @@ const HighscorePage = (props: IHighscorePage) => {
         ) : (
           <>
             <Grid item xs={12} sm={3}>
-              <Grid item xs={12}>
-                <AdSense slotId="7059022973" />
-              </Grid>
-
               <FormControl fullWidth>
                 <InputLabel>Track name</InputLabel>
                 <Select

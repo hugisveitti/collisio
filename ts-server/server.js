@@ -49,6 +49,12 @@ si.mem()
     .catch(function (error) { return console.error(error); });
 console.log("Max event listeners", socket_io_1.Socket.EventEmitter.defaultMaxListeners);
 var port = process.env.PORT || 80;
+var os = __importStar(require("os"));
+/** only works on my PC */
+if (os.hostname().includes("Lisa")) {
+    console.log("On localhost");
+    port = 5000;
+}
 // app.use(function (_:Request, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header(
@@ -64,7 +70,7 @@ var indexHTMLPath = "../public/" + buildFolder + "/index.html";
 app.get("/test", function (_, res) {
     res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
 });
-app.get("/mobiletest", function (_, res) {
+app.get("/mobileonly", function (_, res) {
     res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
 });
 // app.get("/test/ammo.wasm.js", (_: Request, res: Response) => {

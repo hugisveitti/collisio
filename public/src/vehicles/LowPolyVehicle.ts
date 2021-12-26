@@ -779,8 +779,12 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         const v = this.vehicle.getRigidBody().getLinearVelocity()
+        if (this.vehicleNumber === 0) {
+            if (Math.abs(v.y()) > 10) {
 
-
+                console.log("v", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
+            }
+        }
         if (Math.abs(v.y()) > 40) {
             console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
             this.vector.setValue(v.x(), v.y() / 2, v.z())

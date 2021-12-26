@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import {
-  getGameTypeFromTrackName,
   getDefaultTrackFromGameType,
+  getGameTypeFromTrackName,
 } from "../classes/Game";
 import {
   defaultGameSettings,
@@ -14,8 +14,6 @@ import {
   getDBUserSettings,
   setDBUserSettings,
 } from "../firebase/firestoreFunctions";
-
-import ControlsRoom from "../mobile/ControlsRoom";
 import ControlsRoomContainer from "../mobile/ControlsRoomContainer";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
@@ -32,6 +30,7 @@ import OneMonitorFrontPage from "./FrontPage";
 import GameRoom from "./gameRoom/GameRoom";
 import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
+import MobileOnlyWaitingRoom from "./mobileOnly/MobileOnlyWaitingRoom";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
@@ -67,6 +66,7 @@ export const createTournamentPagePath = "/tournament/create";
 export const tournamentIdPagePath = "/tournament/:tournamentId";
 export const trophyRoomPath = "/trophy";
 export const trophyRoomIdPath = "/trophy/:id";
+export const mobileOnlyWaitingRoomPath = "/mobile-only-wait";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -239,7 +239,10 @@ const Routes = () => {
           path={[trophyRoomIdPath, trophyRoomPath]}
           render={(props) => <TrophyRoomContainer {...props} />}
         />
-
+        <Route
+          path={mobileOnlyWaitingRoomPath}
+          render={(props) => <MobileOnlyWaitingRoom {...props} />}
+        />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>
     </Router>

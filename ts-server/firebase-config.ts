@@ -2,7 +2,7 @@ import { FirebaseOptions, initializeApp } from "firebase/app";
 import { initializeApp as adminApp, } from "firebase-admin/app"
 import { getDatabase } from "firebase/database";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import *as os from "os"
+import * as os from "os"
 
 
 export const admin = require("firebase-admin");

@@ -31,7 +31,13 @@ si.mem()
 
 console.log("Max event listeners", Socket.EventEmitter.defaultMaxListeners)
 
-const port = process.env.PORT || 80
+let port = process.env.PORT || 80
+import * as os from "os"
+/** only works on my PC */
+if (os.hostname().includes("Lisa")) {
+    console.log("On localhost")
+    port = 5000
+}
 
 
 // app.use(function (_:Request, res, next) {
@@ -55,7 +61,8 @@ const indexHTMLPath = `../public/${buildFolder}/index.html`
 app.get("/test", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
 });
-app.get("/mobiletest", (_: Request, res: Response) => {
+
+app.get("/mobileonly", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
 });
 

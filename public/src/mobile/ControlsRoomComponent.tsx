@@ -15,6 +15,8 @@ interface IControlsRoomComponent {
   orientation: { alpha: number; beta: number; gamma: number };
   handlePausePressed: () => void;
   transparantButtons?: boolean;
+  // hacky way to reset the event listeners
+  resetOrientation: boolean;
   //setDeviceOrientationHandler:React.Dispatch<React.SetStateAction<void>>
 }
 
@@ -83,7 +85,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   };
 
   useEffect(() => {
-    //   handleDeviceOrientChange();
+    handleDeviceOrientChange();
     // for portait mode
     window.addEventListener("orientationchange", handleDeviceOrientChange);
     // for gamma, beta, alpha
@@ -96,6 +98,17 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
       window.removeEventListener("orientationchange", handleDeviceOrientChange);
     };
   }, []);
+
+  useEffect(() => {
+    window.removeEventListener("deviceorientation", deviceOrientationHandler, {
+      capture: true,
+    });
+    setTimeout(() => {
+      window.addEventListener("deviceorientation", deviceOrientationHandler, {
+        capture: true,
+      });
+    }, 150);
+  }, [props.resetOrientation]);
 
   const screenHeight =
     document.fullscreenElement === null

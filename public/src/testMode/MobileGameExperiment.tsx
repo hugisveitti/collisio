@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
-  IScoreInfo,
-  IEndOfRaceInfoPlayer,
   getGameSceneClass,
+  IEndOfRaceInfoPlayer,
+  IScoreInfo,
 } from "../classes/Game";
 import {
   IGameSettings,
@@ -28,7 +28,6 @@ import {
   IPreGamePlayerInfo,
   MobileControls,
 } from "../shared-backend/shared-stuff";
-import { fakePlayer1 } from "../tests/fakeData";
 import { isIphone } from "../utils/settings";
 import "./MobileExperiment.css";
 
@@ -53,6 +52,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
 
   const [scoreInfo, setScoreInfo] = useState({} as IScoreInfo);
+  const [resetOrientation, setResetOrientation] = useState(false);
 
   const [orientation, setOrientation] = useState({
     alpha: 0,
@@ -126,6 +126,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");
     setShowPermissionModal(true);
+    setResetOrientation(!resetOrientation);
   };
 
   const handleCloseModals = () => {
@@ -143,13 +144,12 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
 
   useEffect(() => {
     if (user === null) return;
-    getDBUserSettings(user.uid).then((settings) => {
-      let newPlayer: IPreGamePlayerInfo;
-      if (settings) {
-        props.store.setUserSettings(settings);
+    if (user?.uid) {
+      getDBUserSettings(user?.uid)
+        .then((settings) => {
+          props.store.setUserSettings(settings);
 
-        if (user) {
-          newPlayer = {
+          const newPlayer = {
             playerName: user.displayName,
             teamName: "",
             teamNumber: -1,
@@ -159,19 +159,30 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
             vehicleType: settings.vehicleSettings.vehicleType,
             photoURL: user.photoURL,
           };
-        }
-      } else {
-        newPlayer = {
-          playerName: "Guest",
-          teamName: "",
-          teamNumber: -1,
-          playerNumber: 0,
-          id: "guest-id",
-          isAuthenticated: false,
-          vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
-          photoURL: "",
-        };
-      }
+          const player: IPlayerInfo = {
+            ...newPlayer,
+            isLeader: true,
+            isConnected: true,
+            mobileControls: controller,
+          };
+          console.log("player", player);
+
+          props.store.setPlayer(player);
+        })
+        .catch(() => {
+          console.warn("user settings not found");
+        });
+    } else {
+      let newPlayer = {
+        playerName: "Guest",
+        teamName: "",
+        teamNumber: -1,
+        playerNumber: 0,
+        id: "guest-id",
+        isAuthenticated: false,
+        vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
+        photoURL: "",
+      };
       const player: IPlayerInfo = {
         ...newPlayer,
         isLeader: true,
@@ -181,7 +192,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       console.log("player", player);
 
       props.store.setPlayer(player);
-    });
+    }
   }, [user]);
 
   useEffect(() => {
@@ -238,6 +249,8 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         setSettingsModalOpen(false);
       }
     }
+    gameActions.pause = false;
+    gameActions.restart = false;
   };
 
   return (
@@ -267,6 +280,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
           setSettingsModalOpen(true);
         }}
         transparantButtons
+        resetOrientation={resetOrientation}
       />
 
       <EndOfGameModal

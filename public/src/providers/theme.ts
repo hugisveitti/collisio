@@ -56,7 +56,7 @@ export const basicColor = gray1
 
 export const themeOptions = createTheme({
     typography: {
-        "fontFamily": "monospace"
+        fontFamily: "monospace" // "Roboto"
     },
 
     palette: {

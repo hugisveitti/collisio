@@ -1,5 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { Collapse } from "@mui/material";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
@@ -150,25 +151,27 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       </Grid>
 
       <Grid item xs={12}>
-        <Typography>Chase camera speed</Typography>
-        <Slider
-          min={0.01}
-          max={1}
-          valueLabelDisplay="auto"
-          step={0.01}
-          defaultValue={chaseSpeedDefaultVal}
-          onChange={(e, value) => {}}
-          onChangeCommitted={(e, value) => {
-            updateVehicleSettings("chaseCameraSpeed", value);
-          }}
-        />
+        <Collapse in={props.store.userSettings.vehicleSettings.useChaseCamera}>
+          <Typography>Chase camera speed</Typography>
+          <Slider
+            min={0.01}
+            max={1}
+            valueLabelDisplay="auto"
+            step={0.01}
+            defaultValue={chaseSpeedDefaultVal}
+            onChange={(e, value) => {}}
+            onChangeCommitted={(e, value) => {
+              updateVehicleSettings("chaseCameraSpeed", value);
+            }}
+          />
+        </Collapse>
       </Grid>
 
       <Grid item xs={12}>
         <Typography>Steering sensitivity</Typography>
         <Slider
           min={0.01}
-          max={2}
+          max={1}
           valueLabelDisplay="auto"
           step={0.01}
           defaultValue={steerSenceDefaultVal}

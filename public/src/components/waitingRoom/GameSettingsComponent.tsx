@@ -1,5 +1,6 @@
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import { Slider } from "@mui/material";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -9,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
   defaultRaceTrack,
@@ -33,6 +35,9 @@ interface IGameSettingsComponent {
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const [gameSettings, setGameSettings] = useState(props.gameSettings);
+  const [drawDistanceDefaultVal, setDrawDistanceDefaultVal] = useState(
+    props.gameSettings.drawDistance
+  );
 
   const updateGameSettings = (key: keyof IGameSettings, value: any) => {
     const newGameSettings = { ...props.gameSettings };
@@ -213,6 +218,20 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             />
           </RadioGroup>
         </FormControl>
+      </Grid>
+      <Grid item xs={12}>
+        <Typography>Draw distance</Typography>
+        <Slider
+          min={50}
+          max={10000}
+          valueLabelDisplay="auto"
+          step={50}
+          defaultValue={drawDistanceDefaultVal}
+          onChange={(e, value) => {}}
+          onChangeCommitted={(e, value) => {
+            updateGameSettings("drawDistance", value);
+          }}
+        />
       </Grid>
     </Grid>
   );

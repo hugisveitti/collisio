@@ -2,6 +2,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import HelpIcon from "@mui/icons-material/Help";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -32,6 +33,7 @@ import {
   frontPagePath,
   highscorePagePath,
   howToPlayPagePath,
+  mobileOnlyWaitingRoomPath,
   privateProfilePagePath,
   showRoomPagePath,
   tournamentPagePath,
@@ -137,6 +139,15 @@ const AppContainer = (props: IAppContainer) => {
               <ListItemText
                 primary={!onMobile ? "Create a Game" : "Join a Game"}
               />
+            </ListItem>
+            <ListItem
+              button
+              onClick={() => history.push(mobileOnlyWaitingRoomPath)}
+            >
+              <ListItemIcon>
+                <PhoneAndroidIcon />
+              </ListItemIcon>
+              <ListItemText primary="Play mobile only" />
             </ListItem>
             <ListItem button onClick={() => history.push(tournamentPagePath)}>
               <ListItemIcon>

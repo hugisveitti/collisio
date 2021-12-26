@@ -40,6 +40,8 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 
 
+
+
 export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle) => {
 
     let driveWithKeyboard = !!window.localStorage.getItem("driveWithKeyboard") ? eval(window.localStorage.getItem("driveWithKeyboard")) : false
@@ -86,18 +88,7 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
 
-    setInterval(() => {
-        if (!driveWithKeyboard) {
-            socket.once(std_controls, (data) => {
-                const { mobileControls } = data as { mobileControls: MobileControls }
-                if (mobileControls?.f !== undefined) {
-                    driveVehicle(mobileControls, vehicle)
-                }
-            })
-        } else {
-            testDriveVehicleWithKeyboard(vehicle, vehicleControls)
-        }
-    }, MTS_SENDINTERVAL_MS)
+
 
 
 
@@ -136,6 +127,22 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
     //     }, 5)
     // }
 
+
+
+
+    return () => {
+
+        if (!driveWithKeyboard) {
+            socket.once(std_controls, (data) => {
+                const { mobileControls } = data as { mobileControls: MobileControls }
+                if (mobileControls?.f !== undefined) {
+                    driveVehicle(mobileControls, vehicle)
+                }
+            })
+        } else {
+            testDriveVehicleWithKeyboard(vehicle, vehicleControls)
+        }
+    }
 
 }
 

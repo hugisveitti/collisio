@@ -13,11 +13,6 @@ import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
 
-
-// const stats = new Stats()
-// const totalTimeDiv = document.createElement("div")
-
-
 export class RaceGameScene extends GameScene {
 
     vehicleControls!: VehicleControls

@@ -48,7 +48,8 @@ export const testGameSettings: IGameSettings = {
     tagGameLength: 2,
     useShadows: true,
     useSound: true,
-    graphics: "high"
+    graphics: "high",
+    drawDistance: 5000
 }
 
 

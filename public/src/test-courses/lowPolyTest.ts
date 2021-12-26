@@ -71,6 +71,8 @@ export class LowPolyTestScene extends GameScene {
 
     isIt: number
 
+    driveVehicle: () => void
+
     constructor() {
         super()
 
@@ -116,14 +118,6 @@ export class LowPolyTestScene extends GameScene {
         this.isIt = 0
     }
 
-    async init() {
-        this.camera = new THREE.PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
-        this.renderer.setPixelRatio(1)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-
-        this.physics.setGravity(0, -50, 0)
-
-    }
 
 
     async preload() {
@@ -509,6 +503,11 @@ export class LowPolyTestScene extends GameScene {
                             top += topOffset
                             this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).updateMass(val as number))
 
+                            key = "maxSpeed"
+                            top += topOffset
+                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).updateMaxSpeed(val as number))
+
+
                             key = "breakingForce"
                             top += topOffset
                             this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey(key, val))
@@ -681,7 +680,7 @@ export class LowPolyTestScene extends GameScene {
         if (this.vehicle) {
             this.vehicleControls = new VehicleControls()
 
-            addTestControls(this.vehicleControls, this.socket, this.vehicle,)
+            this.driveVehicle = addTestControls(this.vehicleControls, this.socket, this.vehicle,)
 
         }
     }
@@ -699,8 +698,10 @@ export class LowPolyTestScene extends GameScene {
 
 
             if (this.vehicle) {
+                this.driveVehicle?.()
                 //    this.vehicle.intelligentDrive(true)
                 this.updateFps(time)
+                this.updatePing()
                 this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
@@ -726,7 +727,6 @@ export class LowPolyTestScene extends GameScene {
                 bestLapTimeDiv.innerHTML = this.gameTime.getBestLapTime() + ""
             }
         }
-
     }
 
     resetPlayer(idx: number, y?: number) {

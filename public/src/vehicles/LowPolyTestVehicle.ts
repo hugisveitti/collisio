@@ -199,6 +199,14 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         this.vehicle.getRigidBody().setMassProps(this.mass, inertia)
     }
 
+    updateMaxSpeed(speed: number) {
+        this.setLocalStorage("maxSpeed", speed)
+
+        vehicleConfigs[this.vehicleType].maxSpeed = speed
+        this.setVehicleConfigKey("maxSpeed", speed)
+
+    }
+
     updateBreakingForce(breakingForce: number) {
         this.setLocalStorage("breakingForce", breakingForce)
         this.breakingForce = breakingForce

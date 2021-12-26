@@ -1,15 +1,11 @@
-import PauseIcon from "@mui/icons-material/Pause";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
-import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
-import { blue4, orange2 } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
 import {
   GameActions,
@@ -60,6 +56,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [sendControlsInterval, setSendControlsInterval] = useState(
     undefined as undefined | NodeJS.Timer
   );
+  const [resetOrientation, setResetOrientation] = useState(false);
 
   // const [deviceOrientationHandler, setDeviceOrientationHandler] = useState(undefined as () => void)
 
@@ -171,14 +168,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");
     setShowPermissionModal(true);
-    // window.removeEventListener("deviceorientation", deviceOrientationHandler, {
-    //   capture: true,
-    // });
-    // setTimeout(() => {
-    //   window.addEventListener("deviceorientation", deviceOrientationHandler, {
-    //     capture: true,
-    //   });
-    // }, 150);
+    setResetOrientation(!resetOrientation);
   };
 
   const sendGameActions = () => {
@@ -244,6 +234,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         gameActions={gameActions}
         controller={controller}
         orientation={orientation}
+        resetOrientation={resetOrientation}
       />
 
       <DeviceOrientationPermissionComponent

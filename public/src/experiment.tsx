@@ -22,6 +22,8 @@ import TestContainer from "./testMode/TestContainer";
 import { createSocket } from "./utils/connectSocket";
 import { getDeviceType } from "./utils/settings";
 
+export const mobileOnlyPath = "/mobileonly";
+
 const TestApp = () => {
   const user = useContext(UserContext);
 
@@ -81,7 +83,7 @@ const TestApp = () => {
         <Router basename="/">
           <Switch>
             <Route
-              path="/mobiletest"
+              path={mobileOnlyPath}
               render={() => <MobileGameExperiment store={store} />}
             />
             <Route

@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 import AppContainer from "../containers/AppContainer";
 import logo from "../images/collisio-logo.png";
 import "../styles/main.css";
-import AdSense from "./monitary/AdSense";
 import { highscorePagePath, howToPlayPagePath } from "./Routes";
 import { IStore } from "./store";
 import ConnectToWaitingRoomComponent from "./waitingRoom/ConnectToWaitingRoomComponent";
@@ -45,11 +44,6 @@ const FrontPage = (props: FrontPageProps) => {
             fuss, just a desktop browser and a smartphone browser.
           </Typography>
         </Grid>
-
-        <Grid item xs={12}>
-          <AdSense slotId="7059022973" />
-        </Grid>
-
         <Grid item xs={12}>
           <Divider variant="middle" />
         </Grid>

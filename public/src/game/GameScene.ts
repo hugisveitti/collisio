@@ -261,7 +261,9 @@ export class GameScene extends Scene3D implements IGameScene {
             side: BackSide
         });
 
+        // move the sky?
         const sky = new Mesh(skyGeo, skyMat);
+
         this.scene.add(sky);
 
     }
@@ -311,6 +313,7 @@ export class GameScene extends Scene3D implements IGameScene {
     async loadAssets() { }
 
     async init() {
+        // need to do some test with performance and the draw distance
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -331,10 +334,12 @@ export class GameScene extends Scene3D implements IGameScene {
             /** make this better
              * Currently doing async loading of models, when it could be sync
              */
-            const recursiveCreate = async (i: number) => {
+            //    const recursiveCreate = async (i: number) => {
+            const batches = []
+            for (let i = 0; i < this.players.length; i++) {
 
 
-                const color = possibleVehicleColors[i]
+                const color = possibleVehicleColors[chassisColOffset + i]
 
                 let newVehicle: IVehicle
 
@@ -346,30 +351,24 @@ export class GameScene extends Scene3D implements IGameScene {
 
                 }
                 this.vehicles.push(newVehicle)
-
                 if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
-
-                    await loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
-                        this.vehicles[i].addModels(tires, chassis)
-                    })
+                    batches.push(
+                        loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
+                            this.vehicles[i].addModels(tires, chassis)
+                        }))
                 } else {
-                    await loadSphereModel(this.players[i].vehicleType, false).then((body) => {
+                    batches.push(loadSphereModel(this.players[i].vehicleType, false).then((body) => {
                         this.vehicles[i].addModels([], body)
-                    })
+                    }))
                 }
-
-                if (i === this.players.length - 1) {
-
-                    this.emitVehiclesReady()
-                    topresolve()
-                } else {
-                    recursiveCreate(i + 1)
-                }
-
 
             }
 
-            recursiveCreate(0)
+            Promise.all(batches).then(content => {
+                this.emitVehiclesReady()
+                topresolve()
+            })
+
         })
         return promise
     }
@@ -442,7 +441,7 @@ export class GameScene extends Scene3D implements IGameScene {
             const fov = vechicleFov
             // for some reason the last view needs to use the Scene's camera
             // maybe remove camera from warpSpeed ("-camera")
-            const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, 10000)
+            const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, this.gameSettings.drawDistance)
 
             const view = {
                 left: viewLefts[i % 2],
@@ -712,6 +711,10 @@ export class GameScene extends Scene3D implements IGameScene {
         }
 
         this.toggleUseSound()
+
+        for (let i = 0; i < this.views.length; i++) {
+            this.views[i].camera.far = gameSettings.drawDistance
+        }
 
         // if gameSettings change and needs reload then restart without user say?
 

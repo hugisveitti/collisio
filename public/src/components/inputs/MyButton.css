@@ -1,0 +1,25 @@
+.my-button {
+  font-family: inherit;
+  transform: skew(-30deg);
+  height: 30px;
+  line-height: 30px;
+  box-shadow: 2px 2px #8ec6e2;
+  border: 1px solid #8ec6e2;
+  width: 100%;
+  display: inline-flex;
+  width: auto;
+  padding: 5px 13px 5px 13px;
+  vertical-align: middle;
+
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.my-button-text {
+  font-family: monospace;
+  transform: skew(30deg);
+}
+
+.my-button:hover {
+  box-shadow: 5px 5px #4b93b8;
+}

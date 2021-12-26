@@ -17,6 +17,7 @@ export interface IGameSettings {
     tagGameLength: number
     graphics: GraphicsType
     tournamentId?: string
+    drawDistance: number
 }
 
 export const defaultGameSettings: IGameSettings = {
@@ -26,7 +27,8 @@ export const defaultGameSettings: IGameSettings = {
     trackName: "farm-track",
     gameType: "race",
     tagGameLength: 2,
-    graphics: "high"
+    graphics: "high",
+    drawDistance: 2000
 }
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {
