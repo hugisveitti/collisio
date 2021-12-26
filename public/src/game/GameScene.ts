@@ -314,7 +314,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async init() {
         // need to do some test with performance and the draw distance
-        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, 10000)
+        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.gameSettings.drawDistance)
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
@@ -715,6 +715,7 @@ export class GameScene extends Scene3D implements IGameScene {
         for (let i = 0; i < this.views.length; i++) {
             this.views[i].camera.far = gameSettings.drawDistance
         }
+        this.camera.far = gameSettings.drawDistance
 
         // if gameSettings change and needs reload then restart without user say?
 

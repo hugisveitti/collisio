@@ -241,6 +241,7 @@ export const vehicleConfigs = {
         engineForce: 12000,
         breakingForce: 300,
         is4x4: false,
+        maxSpeed: 320,
 
         inertia: { x: 3000, y: 2000, z: 4000 },
 

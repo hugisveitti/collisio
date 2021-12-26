@@ -222,6 +222,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       <Grid item xs={12}>
         <Typography>Draw distance</Typography>
         <Slider
+          style={{
+            width: "90%",
+          }}
           min={50}
           max={10000}
           valueLabelDisplay="auto"

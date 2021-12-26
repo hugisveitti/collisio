@@ -128,6 +128,7 @@ export class LowPolyTestScene extends GameScene {
         await this.warpSpeed('-ground', "-light", "-sky")
 
 
+
         this.addLights()
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
