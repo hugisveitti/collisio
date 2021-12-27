@@ -175,17 +175,11 @@ export class GameScene extends Scene3D implements IGameScene {
             left:5px;
         `)
 
-
-
         this.gameInfoDiv.appendChild(this.pingInfo)
         this.gameInfoDiv.appendChild(this.fpsInfo)
 
-
-
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
-
-
 
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -997,7 +991,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
 export const startGame = (SceneClass: typeof GameScene, gameSceneConfig: IGameSceneConfig, callback: (gameObject: GameScene) => void) => {
-    const config = { scenes: [SceneClass], antialias: true }
+    const config = { scenes: [SceneClass], antialias: true, fixedTimeStep: 0.005 }
     PhysicsLoader("/ammo", () => {
 
         const project = new Project(config)
@@ -1006,11 +1000,6 @@ export const startGame = (SceneClass: typeof GameScene, gameSceneConfig: IGameSc
         // hacky way to get the project's scene
         const gameObject = (project.scenes.get(key) as GameScene);
         gameObject.setGameSceneConfig(gameSceneConfig)
-        // gameObject.setSocket(socket);
-        // gameObject.setPlayers(players);
-        // gameObject.setGameRoomActions(gameRoomActions)
-        // gameObject.roomId = roomId
-        // gameObject.setGameSettings(gameSettings);
         callback(gameObject)
 
         return project

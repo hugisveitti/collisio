@@ -226,7 +226,28 @@ export const gameItems = {
         shape: "convex",
     },
 
+    "engine-off": {
+        collisionFlags: 5,
+        shape: "concave",
+        isCourseObjectArray: true,
+        objectName: "engineOffObjects"
+    },
+
+    "break-block": {
+        collisionFlags: 5,
+        shape: "concave",
+        isCourseObjectArray: true,
+        objectName: "breakBlocks"
+    }
 
 
 
 } as { [key: string]: IGameItem }
+
+
+export const keyNameMatch = (key: string, name: string) => {
+    if (gameItems[key].exactMatch) {
+        return key === name
+    }
+    return name.includes(key)
+}

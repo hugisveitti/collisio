@@ -18,6 +18,7 @@ export type TrackName =
     | "ferrari-track"
     | "skii-map"
     | "farmers-little-helper-map"
+    | "speed-test-track"
 
 export type VehicleType = "normal"
     | "tractor"
@@ -70,21 +71,18 @@ export class MobileControls {
 
 
 export class VehicleControls {
-    left: boolean
     f: boolean
     b: boolean
     right: boolean
+    left: boolean
     steerValue: number
 
-
-
-
     constructor() {
-        this.left = false
-        this.right = false
         this.f = false
         this.b = false
         this.steerValue = 0
+        this.left = false
+        this.right = false
 
     }
 }
@@ -106,7 +104,7 @@ export interface IPreGamePlayerInfo {
 export interface IPlayerInfo extends IPreGamePlayerInfo {
     mobileControls: MobileControls
     vehicleControls?: VehicleControls
-    isConnected: true,
+    isConnected: boolean,
     isLeader: boolean
 }
 

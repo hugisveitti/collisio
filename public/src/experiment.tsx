@@ -17,12 +17,14 @@ import { getDBUserSettings } from "./firebase/firestoreFunctions";
 import UserProvider, { UserContext } from "./providers/UserProvider";
 import { IPlayerInfo, VehicleType } from "./shared-backend/shared-stuff";
 import MobileGameExperiment from "./testMode/MobileGameExperiment";
+import SpeedTestContainer from "./testMode/SpeedTestContainer";
 
 import TestContainer from "./testMode/TestContainer";
 import { createSocket } from "./utils/connectSocket";
 import { getDeviceType } from "./utils/settings";
 
 export const mobileOnlyPath = "/mobileonly";
+export const speedTestPath = "/speedtest";
 
 const TestApp = () => {
   const user = useContext(UserContext);
@@ -90,6 +92,7 @@ const TestApp = () => {
               path="/test"
               render={() => <TestContainer onMobile={onMobile} store={store} />}
             />
+            <Route path={speedTestPath} render={() => <SpeedTestContainer />} />
           </Switch>
         </Router>
       </UserProvider>

@@ -60,7 +60,7 @@ export class RaceGameScene extends GameScene {
         this.gameTimers = []
         this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
 
-        await this.course.createCourse(this.useShadows)
+        await this.course.createCourse()
 
         this.courseLoaded = true
 
@@ -76,7 +76,6 @@ export class RaceGameScene extends GameScene {
         this.createController()
         this.resetVehicles()
         this.restartGame()
-
     }
 
     async create(): Promise<void> {

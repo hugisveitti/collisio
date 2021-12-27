@@ -245,6 +245,11 @@ export class SphereVehicle implements IVehicle {
 
     zeroBreakForce(): void { }
 
+    zeroEngineForce() {
+        this.zVel = 0
+
+    }
+
     stop(): void {
         this.zVel = 0
         if (!this.vehicleBody?.body)

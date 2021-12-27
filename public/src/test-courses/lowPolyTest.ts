@@ -1,6 +1,7 @@
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import { runInThisContext } from "vm"
 import { getGameTypeFromTrackName } from "../classes/Game"
 import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
@@ -10,6 +11,7 @@ import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { driveVehicle } from "../utils/controls"
 import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
@@ -17,7 +19,9 @@ import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
 import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, getVehicleClassFromType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
 import "./lowPolyTest.css"
-import { addTestControls } from "./testControls"
+import { addTestControls, getDriveInstruction } from "./testControls"
+import { saveRecordedInstructionsToServer, TestDriver } from "./TestDriver"
+import { createTestVehicleInputs, createVehcileInput, createXYZInput } from "./testVehicleInputs"
 
 const vechicleFov = 60
 
@@ -30,7 +34,7 @@ const bestLapTimeDiv = document.createElement("div")
 const vehicleInputsContainer = document.createElement("div")
 document.body.appendChild(vehicleInputsContainer)
 
-
+let recording = false
 
 export class LowPolyTestScene extends GameScene {
 
@@ -67,11 +71,18 @@ export class LowPolyTestScene extends GameScene {
     vehicleColorNumber = 0
 
     otherVehicles: ITestVehicle[] // LowPolyTestVehicle[]
-    numberOfOtherVehicles = 2
+    numberOfOtherVehicles = 1
 
     isIt: number
 
-    driveVehicle: () => void
+    driveVehicle: () => MobileControls
+    controls: MobileControls
+    recordingInstructions: string[]
+
+
+    testDriver: TestDriver
+
+    otherDrivers: TestDriver[]
 
     constructor() {
         super()
@@ -93,6 +104,7 @@ export class LowPolyTestScene extends GameScene {
         this.bestLapTime = 10000
         this.canStartUpdate = false
 
+
         this.gameSettings = defaultGameSettings
 
         this.currentLaptime = 0
@@ -100,7 +112,6 @@ export class LowPolyTestScene extends GameScene {
 
 
         this.useShadows = true
-
 
         this.vehicleType = window.localStorage.getItem("vehicleType") as VehicleType ?? defaultVehicleType
         this.mobileControls = new MobileControls()
@@ -113,9 +124,12 @@ export class LowPolyTestScene extends GameScene {
 
 
         this.otherVehicles = []
+        this.otherDrivers = []
+        this.recordingInstructions = []
 
         // in tag game
         this.isIt = 0
+        this.testDriver = new TestDriver(this.vehicleType)
     }
 
 
@@ -126,7 +140,13 @@ export class LowPolyTestScene extends GameScene {
             this.physics.debug?.enable()
         }
         await this.warpSpeed('-ground', "-light", "-sky")
+        console.log("this physics config", this.physics.config)
+        console.log("this", this)
 
+        // this could do something for the jitter of the vehicle
+        // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
+        // this.physics.config.maxSubSteps = 10
+        // this.physics.config.fixedTimeStep = 1 / (60 * 4)
 
 
         this.addLights()
@@ -224,9 +244,11 @@ export class LowPolyTestScene extends GameScene {
             this.vehicle = new SphereTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         }
         for (let i = 0; i < this.numberOfOtherVehicles; i++) {
+            const vehicleType = allVehicleTypes[i % allVehicleTypes.length].type
             this.otherVehicles.push(
-                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, allVehicleTypes[i % allVehicleTypes.length].type, false)
+                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
             )
+            this.otherDrivers.push(new TestDriver(vehicleType))
         }
     }
 
@@ -244,15 +266,17 @@ export class LowPolyTestScene extends GameScene {
         }
 
 
-        await this.course.createCourse(this.useShadows)
+        await this.course.createCourse()
         if (this.course instanceof RaceCourse) {
             this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
         }
 
+
+
         this.courseLoaded = true
         this.createOtherVehicles(() => {
             this.createVehicle().then(() => {
-                this.vehicle.useBadRotationTicks = true
+                this.vehicle.useBadRotationTicks = false
 
                 const allVehicles = this.otherVehicles.concat(this.vehicle)
                 this.vehicles = allVehicles
@@ -309,6 +333,8 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
+
+
     createOtherVehicles(callback: () => void) {
         if (this.numberOfOtherVehicles === 0) {
             callback()
@@ -343,101 +369,6 @@ export class LowPolyTestScene extends GameScene {
 
         this.create()
 
-    }
-
-    createVehcileInput(value: number | SimpleVector | boolean | string, top: number, innerHtml: string, onChange: (val: number | SimpleVector) => void) {
-
-        if (instanceOfSimpleVector(value)) {
-            this.createXYZInput(value, top, innerHtml, onChange)
-        }
-
-        const inputDiv = document.createElement("div")
-        inputDiv.setAttribute("class", "vehicle-input")
-        inputDiv.setAttribute("style", `top:${top}px;`)
-        inputDiv.innerHTML = innerHtml
-        const input = document.createElement("input")
-
-        input.setAttribute("type", "number")
-        input.setAttribute("value", value + "")
-        input.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                e.target.value
-
-                if (!isNaN(+e.target.value)) {
-                    onChange(+e.target.value)
-                }
-            }
-        })
-
-        inputDiv.appendChild(input)
-        vehicleInputsContainer.appendChild(inputDiv)
-    }
-
-    createXYZInput(currVec: SimpleVector, top: number, innerHtml: string, onChange: (vec: SimpleVector) => void) {
-
-        let cVec = currVec
-        let inputWidth = 60
-        const inputDiv = document.createElement("div")
-        inputDiv.setAttribute("class", "vehicle-input")
-        inputDiv.setAttribute("style", `top:${top}px;`)
-        inputDiv.innerHTML = innerHtml
-        const inputX = document.createElement("input")
-
-        inputX.setAttribute("type", "number")
-        inputX.setAttribute("value", cVec.x + "")
-        inputX.setAttribute("style", `width:${inputWidth}px;`)
-        inputX.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                e.target.value
-
-                if (!isNaN(+e.target.value)) {
-                    cVec.x = +e.target.value
-                    onChange(cVec)
-                }
-            }
-        })
-
-        inputDiv.appendChild(inputX)
-
-        const inputY = document.createElement("input")
-
-        inputY.setAttribute("type", "number")
-        inputY.setAttribute("value", cVec.y + "")
-        inputY.setAttribute("style", `width:${inputWidth}px;`)
-        inputY.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                e.target.value
-
-                if (!isNaN(+e.target.value)) {
-                    cVec.y = +e.target.value
-                    onChange(cVec)
-                }
-            }
-        })
-
-        inputDiv.appendChild(inputY)
-
-        const inputZ = document.createElement("input")
-
-        inputZ.setAttribute("type", "number")
-        inputZ.setAttribute("value", cVec.z + "")
-        inputZ.setAttribute("style", `width:${inputWidth}px;`)
-        inputZ.addEventListener("input", (e) => {
-            if (e.target instanceof HTMLInputElement) {
-                e.target.value
-
-                if (!isNaN(+e.target.value)) {
-                    cVec.z = +e.target.value
-                    onChange(cVec)
-                }
-            }
-        })
-
-        inputDiv.appendChild(inputZ)
-
-
-
-        vehicleInputsContainer.appendChild(inputDiv)
     }
 
 
@@ -481,124 +412,7 @@ export class LowPolyTestScene extends GameScene {
 
                     const createVehicleInputButtons = () => {
 
-
-                        while (vehicleInputsContainer.children.length > 0) {
-                            vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
-                        }
-
-                        console.log("this.vehicle instanceof LowPolyTestVehicle", this.vehicle instanceof LowPolyTestVehicle)
-                        console.log("this vehice", this.vehicle)
-                        if (this.vehicle instanceof LowPolyTestVehicle) {
-
-                            let key: keyof IVehicleConfig = "engineForce"
-
-                            let topOffset = 25
-                            let top = 0
-                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => {
-                                (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey("engineForce", val)
-                            })
-
-
-
-                            key = "mass"
-                            top += topOffset
-                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).updateMass(val as number))
-
-                            key = "maxSpeed"
-                            top += topOffset
-                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).updateMaxSpeed(val as number))
-
-
-                            key = "breakingForce"
-                            top += topOffset
-                            this.createVehcileInput(this.vehicle.getVehicleConfigKey(key), top, key, (val) => (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey(key, val))
-
-
-                            /** These cannot be mass and inertia */
-                            const keys = ["suspensionDamping", "suspensionStiffness", "suspensionCompression", "suspensionRestLength", "maxSuspensionTravelCm", "maxSuspensionForce", "rollInfluence", "frictionSlip"]
-                            for (let key of keys) {
-                                key = key as keyof IVehicleConfig
-                                top += topOffset
-                                if (!(key in defaultVehicleConfig)) {
-                                    console.warn(key, "is not a part the VehicleConfig")
-                                }
-                                this.createVehcileInput(this.vehicle.getVehicleConfigKey(key as keyof IVehicleConfig), top, key, (val) => (this.vehicle as LowPolyTestVehicle).setVehicleConfigKey(key as keyof IVehicleConfig, val))
-
-                            }
-
-
-                            top += topOffset
-                            this.createXYZInput(this.vehicle.getInertia(), top, "inertia", (newI) => {
-                                (this.vehicle as LowPolyTestVehicle).setInertia(newI)
-                            })
-
-                            top += topOffset
-                            this.createXYZInput(this.vehicle.getCenterOfMass(), top, "Set position", (newCM) => {
-                                (this.vehicle as LowPolyTestVehicle).setCenterOfMass(newCM)
-                            })
-
-
-                            top += topOffset
-                            const useChaseCamButtontDiv = document.createElement("div")
-                            useChaseCamButtontDiv.setAttribute("class", "vehicle-input")
-                            useChaseCamButtontDiv.setAttribute("style", `top:${top}px;`)
-                            useChaseCamButtontDiv.innerHTML = "Chase cam"
-                            const useChaseCamButton = document.createElement("button")
-
-
-                            useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
-                            useChaseCamButton.addEventListener("click", (e) => {
-                                window.localStorage.setItem("useChaseCamera", (!this.vehicle.useChaseCamera).toString())
-                                this.vehicle.updateVehicleSettings({
-                                    ...this.vehicle.vehicleSettings,
-                                    useChaseCamera: !this.vehicle.useChaseCamera
-                                })
-                                useChaseCamButton.innerHTML = this.vehicle.useChaseCamera ? "ON" : "OFF"
-
-                            })
-
-                            useChaseCamButtontDiv.appendChild(useChaseCamButton)
-                            vehicleInputsContainer.appendChild(useChaseCamButtontDiv)
-
-                            top += topOffset
-                            const resetDefaultBtnDiv = document.createElement("div")
-                            resetDefaultBtnDiv.setAttribute("class", "vehicle-input")
-                            resetDefaultBtnDiv.setAttribute("style", `top:${top}px;`)
-                            resetDefaultBtnDiv.innerHTML = "Reset to default"
-                            const resetDefaultBtn = document.createElement("button")
-
-
-                            resetDefaultBtn.innerHTML = "RESET "
-                            resetDefaultBtn.addEventListener("click", (e) => {
-                                (this.vehicle as LowPolyTestVehicle).resetConfigToDefault()
-                                createVehicleInputButtons()
-
-                            })
-                            resetDefaultBtnDiv.appendChild(resetDefaultBtn)
-                            vehicleInputsContainer.appendChild(resetDefaultBtnDiv)
-
-                            top += topOffset
-                            const debugBtnDiv = document.createElement("div")
-                            debugBtnDiv.setAttribute("class", "vehicle-input")
-                            debugBtnDiv.setAttribute("style", `top:${top}px;`)
-                            debugBtnDiv.innerHTML = "use debug "
-                            const debugBtn = document.createElement("button")
-
-
-                            debugBtn.innerHTML = `Debug ${this.usingDebug ? "ON" : "OFF"}`
-                            debugBtn.addEventListener("click", (e) => {
-                                this.usingDebug = !this.usingDebug
-                                window.localStorage.setItem("usingDebug", this.usingDebug + "")
-                                if (this.usingDebug) {
-                                    this.physics.debug.enable()
-                                } else {
-                                    this.physics.debug.disable()
-                                }
-
-                            })
-                            debugBtnDiv.appendChild(debugBtn)
-                            vehicleInputsContainer.appendChild(debugBtnDiv)
-                        }
+                        createTestVehicleInputs(this, vehicleInputsContainer)
 
                     }
                     createVehicleInputButtons()
@@ -620,6 +434,10 @@ export class LowPolyTestScene extends GameScene {
 
     handleGoalCrossed(o: ExtendedObject3D) {
         if (!this.goalCrossed) {
+            if (getVehicleNumber(o.name) === 0 && recording) {
+
+                saveRecordedInstructionsToServer(this.recordingInstructions, this.trackName, 1, this.vehicleType)
+            }
             const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
             this.vehicle.setCheckpointPositionRotation({ position, rotation })
             this.checkpointCrossed = false
@@ -681,7 +499,7 @@ export class LowPolyTestScene extends GameScene {
         if (this.vehicle) {
             this.vehicleControls = new VehicleControls()
 
-            this.driveVehicle = addTestControls(this.vehicleControls, this.socket, this.vehicle,)
+            this.driveVehicle = addTestControls(this.socket, this.vehicle)
 
         }
     }
@@ -689,17 +507,33 @@ export class LowPolyTestScene extends GameScene {
 
     updateVehicles() {
         this.vehicle.update()
-        this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+        //    this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+
+    }
+
+    async _upd() {
+        if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
+
+            this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+        }
     }
 
     update(time: number) {
+        //      this.physics.physicsWorld.stepSimulation(1)
 
         // console.log("this phy", this.physics.physicsWorld.getWorldInfo())
         if (this.canStartUpdate && this.everythingReady()) {
 
 
             if (this.vehicle) {
-                this.driveVehicle?.()
+
+                // if (recording) {
+                this.mobileControls = this.driveVehicle?.()
+                this.recordingInstructions.push(getDriveInstruction(time, this.mobileControls))
+                // } else {
+                // this.testDriver.setMobileController(time)
+                //  driveVehicle(this.testDriver.controller, this.vehicle)
+                // }
                 //    this.vehicle.intelligentDrive(true)
                 this.updateFps(time)
                 this.updatePing()
@@ -716,9 +550,13 @@ export class LowPolyTestScene extends GameScene {
 
             }
             this.course.updateCourse()
-            for (let oVehicle of this.otherVehicles) {
-                oVehicle.randomDrive()
+            for (let i = 0; i < this.otherVehicles.length; i++) {
+                let oVehicle = this.otherVehicles[i]
+                // oVehicle.randomDrive()
                 //oVehicle.intelligentDrive(false)
+                this.otherDrivers[i].setMobileController(time)
+                driveVehicle(this.otherDrivers[i].controller, oVehicle)
+
                 oVehicle.update()
             }
 
@@ -728,6 +566,7 @@ export class LowPolyTestScene extends GameScene {
                 bestLapTimeDiv.innerHTML = this.gameTime.getBestLapTime() + ""
             }
         }
+        this._upd()
     }
 
     resetPlayer(idx: number, y?: number) {
@@ -765,16 +604,12 @@ export class LowPolyTestScene extends GameScene {
     }
 
     unpauseGame() {
-
-
         this.vehicle.unpause()
-
         this.isPaused = false
     }
 
     pauseGame() {
         if (this.vehicle.isReady) {
-
             this.vehicle.pause()
         }
         this.isPaused = true
@@ -803,7 +638,7 @@ export class LowPolyTestScene extends GameScene {
 
 
 export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
-    const config = { scenes: [LowPolyTestScene], antialias: true, randomStuff: "hello" }
+    const config = { scenes: [LowPolyTestScene], antialias: true }
     PhysicsLoader("./ammo", () => {
         const project = new Project(config)
 

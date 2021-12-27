@@ -94,6 +94,8 @@ export class LowPolyVehicle implements IVehicle {
 
     transformCam: Ammo.btTransform
 
+    chassisWorldTransfrom: Ammo.btTransform
+
 
     forwardTicks = 0
 
@@ -170,6 +172,8 @@ export class LowPolyVehicle implements IVehicle {
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
         this.transformCam = new Ammo.btTransform()
+
+        this.chassisWorldTransfrom = new Ammo.btTransform()
 
         this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
 
@@ -393,6 +397,7 @@ export class LowPolyVehicle implements IVehicle {
 
 
     goForward(moreSpeed: boolean) {
+
         if (!this.canDrive) return
 
 
@@ -516,7 +521,9 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     pause() {
+        this.break()
         this.isPaused = true
+        this.canDrive = false
         this.zeroEngineForce()
 
         this.stopEngineSound()
@@ -531,6 +538,7 @@ export class LowPolyVehicle implements IVehicle {
 
     unpause() {
         this.isPaused = false
+        this.canDrive = true
         if (this.useEngineSound) {
             this.startEngineSound()
         }
@@ -608,6 +616,7 @@ export class LowPolyVehicle implements IVehicle {
         if (this.spinCameraAroundVehicle) {
 
 
+
             const rot = this.vehicleBody.rotation
             this.vehicle.updateVehicle(0)
             const pos = this.getPosition()
@@ -638,9 +647,13 @@ export class LowPolyVehicle implements IVehicle {
 
 
 
-            // this.vehicle.getRigidBody().getMotionState().getWorldTransform(this.transformCam)
-            // this.vehicle.updateWheelTransform(4)
-            const rot = this.vehicleBody.rotation
+
+
+            this.tm = this.vehicle.getChassisWorldTransform()
+            this.p = this.tm.getOrigin()
+            this.q = this.tm.getRotation()
+
+            const rot = new Euler().setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
 
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
@@ -779,15 +792,17 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         const v = this.vehicle.getRigidBody().getLinearVelocity()
-        if (this.vehicleNumber === 0) {
-            if (Math.abs(v.y()) > 10) {
 
-                console.log("v", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
-            }
-        }
-        if (Math.abs(v.y()) > 40) {
+        // if (this.vehicleNumber === 0) {
+        //     if (Math.abs(v.y()) > 10) {
+
+        //         console.log("v", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
+        //     }
+        // }
+        // if you are going slow and pop up in the air, that fuggin bugg
+        if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour()) < 150) {
             console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
-            this.vector.setValue(v.x(), v.y() / 2, v.z())
+            this.vector.setValue(v.x(), v.y() / 4, v.z())
             this.vehicle.getRigidBody().setLinearVelocity(this.vector)
         }
 
@@ -804,13 +819,20 @@ export class LowPolyVehicle implements IVehicle {
 
 
 
+        // This p and q cause the wheels to be out of place
+        // this.vehicle.getRigidBody().getMotionState().getWorldTransform(this.chassisWorldTransfrom)
+        //    this.p = this.chassisWorldTransfrom.getOrigin() // this.tm.getOrigin()
+        //    this.q = this.chassisWorldTransfrom.getRotation() // this.tm.getRotation()
+
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
         this.q = this.tm.getRotation()
+
         this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
-
-
         this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+
+        // this.camera?.position.set(this.p.x(), this.p.y(), this.p.z())
+        // this.camera?.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
         // maybe this 0.2 value could use more thought
         if (Math.abs(this.q.z()) > 0.2 || Math.abs(this.q.x()) > 0.2) {
@@ -854,10 +876,6 @@ export class LowPolyVehicle implements IVehicle {
 
             this.setPosition(undefined, groundY, undefined)
         }
-
-
-
-
     };
 
 

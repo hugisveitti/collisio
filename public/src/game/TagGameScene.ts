@@ -62,7 +62,7 @@ export class TagGameScene extends GameScene {
 
     async create() {
         this.course = new TagCourse(this, this.gameSettings.trackName, (name, coin) => this.handleCoinCollidedCallback(name, coin))
-        await this.course.createCourse(this.useShadows)
+        await this.course.createCourse()
 
         this.courseLoaded = true
 

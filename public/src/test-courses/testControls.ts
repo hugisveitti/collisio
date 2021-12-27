@@ -42,7 +42,9 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 
 
-export const addTestControls = (vehicleControls: VehicleControls, socket: Socket, vehicle: IVehicle) => {
+export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
+
+    let mobileControls = new MobileControls()
 
     let driveWithKeyboard = !!window.localStorage.getItem("driveWithKeyboard") ? eval(window.localStorage.getItem("driveWithKeyboard")) : false
     if (!eval(window.localStorage.getItem("k-info-done"))) {
@@ -58,32 +60,16 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
         }
     })
 
-    const testDriveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
-        if (vehicleControls.f) {
+    const testDriveVehicleWithKeyboard = () => {
+        if (mobileControls.f) {
             vehicle.goForward(false)
-        } else if (vehicleControls.b) {
+        } else if (mobileControls.b) {
             vehicle.goBackward(speed)
         } else {
             vehicle.noForce()
         }
 
-
-        if (vehicleControls.left) {
-            angle += dAngle
-            angle = Math.min(angle, maxAngle)
-            vehicle.turn(angle)
-        } else if (vehicleControls.right) {
-            angle -= dAngle
-            angle = Math.max(angle, -maxAngle)
-            vehicle.turn(angle)
-        } else {
-            if (angle > 0) {
-                angle -= dAngle
-            } else if (angle < 0) {
-                angle += dAngle
-            }
-            vehicle.turn(angle)
-        }
+        vehicle.turn(mobileControls.beta)
     }
 
 
@@ -97,19 +83,24 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
         switch (e.key) {
             case "w":
-                vehicleControls.f = isDown
-                break;
-            case "d":
-                vehicleControls.right = isDown
+                mobileControls.f = isDown
                 break;
             case "a":
-                vehicleControls.left = isDown
+                mobileControls.beta = isDown ? 40 : 0
+                //   mobileControls.beta += 2
+                // mobileControls.beta = Math.min(mobileControls.beta, maxAngle)
+                break;
+            case "d":
+                mobileControls.beta = isDown ? -40 : 0
+
+                //  mobileControls.beta -= 2
+                mobileControls.beta = Math.max(mobileControls.beta, - maxAngle)
                 break;
             case "s":
-                vehicleControls.b = isDown
+                mobileControls.b = isDown
                 break;
             case " ":
-                vehicleControls.b = isDown
+                mobileControls.b = isDown
                 break
             default:
                 break;
@@ -131,20 +122,32 @@ export const addTestControls = (vehicleControls: VehicleControls, socket: Socket
 
 
     return () => {
-
         if (!driveWithKeyboard) {
             socket.once(std_controls, (data) => {
-                const { mobileControls } = data as { mobileControls: MobileControls }
+                const { mobileControls: _mobileControls } = data as { mobileControls: MobileControls }
+                mobileControls = _mobileControls
                 if (mobileControls?.f !== undefined) {
                     driveVehicle(mobileControls, vehicle)
                 }
             })
         } else {
-            testDriveVehicleWithKeyboard(vehicle, vehicleControls)
+            testDriveVehicleWithKeyboard()
         }
+        return mobileControls
     }
 
 }
 
 
 
+
+export const getDriveInstruction = (time: number, controller: MobileControls) => {
+    return `${time} ${controller.beta} ${controller.f} ${controller.b}`
+}
+
+export const setControllerFromInstruction = (str: string, controller: MobileControls) => {
+    const instr = str.split(" ")
+    controller.beta = +instr[1]
+    controller.f = eval(instr[2])
+    controller.b = eval(instr[3])
+}

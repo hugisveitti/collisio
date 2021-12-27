@@ -23,11 +23,11 @@ var MobileControls = /** @class */ (function () {
 exports.MobileControls = MobileControls;
 var VehicleControls = /** @class */ (function () {
     function VehicleControls() {
-        this.left = false;
-        this.right = false;
         this.f = false;
         this.b = false;
         this.steerValue = 0;
+        this.left = false;
+        this.right = false;
     }
     return VehicleControls;
 }());

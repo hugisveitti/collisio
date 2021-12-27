@@ -226,7 +226,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             width: "90%",
           }}
           min={50}
-          max={10000}
+          max={5000}
           valueLabelDisplay="auto"
           step={50}
           defaultValue={drawDistanceDefaultVal}

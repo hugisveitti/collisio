@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var path = __importStar(require("path"));
 var si = __importStar(require("systeminformation"));
+var fs = __importStar(require("fs"));
 var socket_io_1 = require("socket.io");
 var app = express();
 // promises style - new since version 3
@@ -55,14 +56,6 @@ if (os.hostname().includes("Lisa")) {
     console.log("On localhost");
     port = 5000;
 }
-// app.use(function (_:Request, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     res.header(
-//         "Access-Control-Allow-Headers",
-//         "Origin, X-_uested-With, Content-Type, Accept"
-//     );
-//     next();
-// });
 var buildFolder = "dist";
 app.use(express.static(path.join(__dirname, "../public/" + buildFolder)));
 app.use(express.static(path.join(__dirname, "../public/src")));
@@ -73,12 +66,40 @@ app.get("/test", function (_, res) {
 app.get("/mobileonly", function (_, res) {
     res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
 });
-// app.get("/test/ammo.wasm.js", (_: Request, res: Response) => {
-//     res.sendFile(path.join(__dirname, `../public/${buildFolder}/ammo/ammo.wasm.js`));
-// })
-// app.get("/test/*", (_: Request, res: Response) => {
-//     res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
-// });
+app.get("/speedtest", function (_, res) {
+    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
+});
+app.get("/driveinstructions/:filename", function (req, res) {
+    var filename = req.params.filename;
+    console.log("filename", filename);
+    res.sendFile(path.join(__dirname, "./testDriving/recordings/" + filename));
+});
+app.get("/vehicleconfig/:filename", function (req, res) {
+    var filename = req.params.filename;
+    console.log("filename", filename);
+    res.sendFile(path.join(__dirname, "./testDriving/" + filename));
+});
+var bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.post("/saverecording", function (req, res) {
+    var data = req.body;
+    var date = new Date().toISOString().slice(0, 10);
+    var trackName = data.trackName;
+    var numberOfLaps = data.numberOfLaps;
+    var vehicleType = data.vehicleType;
+    //const fn = path.join(__dirname, `./testDriving/recordings/recording_${trackName}_${numberOfLaps}_${vehicleType}_${date}.txt`)
+    var fn = path.join(__dirname, "./testDriving/recordings/recording_" + trackName + "_" + numberOfLaps + "_" + vehicleType + ".txt");
+    // fs.open(fn)
+    fs.writeFile(fn, data.instructions, function (err) {
+        if (err) {
+            console.warn("Error saving recording:", err);
+            res.status(500).send({ "message": "Error saving file", err: err });
+        }
+        else {
+            res.status(200).send({ "message": "nice", fn: fn });
+        }
+    });
+});
 app.get("/ammo.wasm.js", function (_, res) {
     res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
 });
