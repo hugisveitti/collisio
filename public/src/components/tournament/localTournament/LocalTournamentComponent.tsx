@@ -1,10 +1,10 @@
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { LocalTournament } from "../../classes/Tournament";
-import { IUser } from "../../classes/User";
-import { dictToArray } from "../../utils/utilFunctions";
-import TournamentPlayersList from "./TournamentPlayersList";
+import { LocalTournament } from "../../../classes/Tournament";
+import { IUser } from "../../../classes/User";
+import { dictToArray } from "../../../utils/utilFunctions";
+import TournamentPlayersList from "../TournamentPlayersList";
 
 interface ILocalTournamentComponent {
   tournament: LocalTournament;

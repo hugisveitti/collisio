@@ -4,8 +4,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { LocalTournament } from "../../classes/Tournament";
-import NumberSelect from "../inputs/NumberSelect";
+import { LocalTournament } from "../../../classes/Tournament";
+import NumberSelect from "../../inputs/NumberSelect";
 
 interface IEditLocalTournamentComponent {
   editTournament: LocalTournament;

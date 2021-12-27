@@ -1,62 +1,65 @@
-import { Button } from "@mui/material";
-import Divider from "@mui/material/Divider";
+import { Button, Divider } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import {
-  GlobalTournament,
+  LocalTournament,
   validateCreateTournament,
-} from "../../classes/Tournament";
-import { IUser } from "../../classes/User";
-import { setTournament } from "../../firebase/firestoreTournamentFunctions";
-import { getTournamentPagePath } from "../Routes";
-import EditTournamentComponent from "./EditTournamentComponent";
+} from "../../../classes/Tournament";
+import { IUser } from "../../../classes/User";
+import { setTournament } from "../../../firebase/firestoreTournamentFunctions";
+import { getTournamentPagePath } from "../../Routes";
+import EditTournamentComponent from "../EditTournamentComponent";
 
-interface ICreateGlobalTournamentComponent {
+interface ICreateLocalTournamentComponent {
   user: IUser;
 }
 
-const CreateGlobalTournamentComponent = (
-  props: ICreateGlobalTournamentComponent
+const CreateLocalTournamentComponent = (
+  props: ICreateLocalTournamentComponent
 ) => {
   const history = useHistory();
+
   const [editTournament, setEditTournament] = useState(
-    new GlobalTournament(props.user?.uid, props.user?.displayName)
+    new LocalTournament(props.user?.uid, props.user?.displayName)
   );
 
-  const updateTournament = (key: keyof GlobalTournament, value: any) => {
+  const updateTournament = (key: keyof LocalTournament, value: any) => {
     const newTournament = { ...editTournament };
     // @ts-ignore
     newTournament[key] = value;
-    setEditTournament(newTournament as GlobalTournament);
+    setEditTournament(newTournament as LocalTournament);
   };
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography>
-          Global tournaments can be for players that are not physically
-          together. Each player tries to get their best time on a give
-          track/number of laps combination. There can be set a limit for the
-          number of runs each player is allowed. A predetermined window of time
-          is allowed for this tournament. The player with the quickest time when
-          the tournament finishes is the winner.
-          {/** This could be used to determine placement for the local tournament bracets */}
+          Local tournaments are for players that are physically together. The
+          format is a knockout tournament, where two players face off in each
+          round, the winner advances until there is one player left. In the
+          knockout tournament there is also the possibility of having a lower
+          bracket, this way everyone plays the same amount of games.
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <Divider variant="middle" />
       </Grid>
       <Grid item xs={12}>
-        <Typography>Create Global tournament</Typography>
+        <Typography variant="h5">Create local tournament</Typography>
       </Grid>
-      <EditTournamentComponent<GlobalTournament>
+
+      <EditTournamentComponent<LocalTournament>
         tournament={editTournament}
         user={props.user}
         updateTournament={updateTournament}
       />
+
+      <Grid item xs={12}>
+        <Divider variant="middle" />
+      </Grid>
       <Grid item xs={12}>
         <Button
           variant="contained"
@@ -78,11 +81,11 @@ const CreateGlobalTournamentComponent = (
             }
           }}
         >
-          Create global tournament!
+          Create local tournament!
         </Button>
       </Grid>
     </Grid>
   );
 };
 
-export default CreateGlobalTournamentComponent;
+export default CreateLocalTournamentComponent;

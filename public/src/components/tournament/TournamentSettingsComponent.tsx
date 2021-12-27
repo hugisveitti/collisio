@@ -2,8 +2,8 @@ import Grid from "@mui/material/Grid";
 import React from "react";
 import { LocalTournament, GlobalTournament } from "../../classes/Tournament";
 import { getDateString } from "../../utils/utilFunctions";
-import GlobalTournamentSettingsComponent from "./GlobalTournamentSettingsComponent";
-import LocalTournamentSettingsComponent from "./LocalTournamentSettingsComponent";
+import GlobalTournamentSettingsComponent from "./globalTournament/GlobalTournamentSettingsComponent";
+import LocalTournamentSettingsComponent from "./localTournament/LocalTournamentSettingsComponent";
 
 interface ITournamentSettingsComponent<V> {
   tournament: V;

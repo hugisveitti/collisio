@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import React from "react";
-import { LocalTournament } from "../../classes/Tournament";
+import { LocalTournament } from "../../../classes/Tournament";
 
 interface ILocalTournamentSettingsComponent {
   tournament: LocalTournament;

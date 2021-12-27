@@ -1,10 +1,10 @@
 import { Button, Collapse, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
-import { GlobalTournament } from "../../classes/Tournament";
-import { IUser } from "../../classes/User";
+import { GlobalTournament } from "../../../classes/Tournament";
+import { IUser } from "../../../classes/User";
 import GlobalTournamentScoreboard from "./GlobalTournamentScoreboard";
-import TournamentSettingsComponent from "./TournamentSettingsComponent";
+import TournamentSettingsComponent from "../TournamentSettingsComponent";
 
 interface IGlobalTournamentComponent {
   tournament: GlobalTournament;

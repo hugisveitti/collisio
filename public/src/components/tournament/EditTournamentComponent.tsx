@@ -13,8 +13,8 @@ import { IUser } from "../../classes/User";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
-import EditGlobalTournamentComponent from "./EditGlocalTournament";
-import EditLocalTournamentComponent from "./EditLocalTournamentComponent";
+import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
+import EditLocalTournamentComponent from "./localTournament/EditLocalTournamentComponent";
 
 interface IEditTournamentComponent<V> {
   user: IUser;

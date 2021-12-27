@@ -5,39 +5,38 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
   ITournamentUser,
-  GlobalTournament,
-  validateStartTournament,
+  LocalTournament,
   validateCreateTournament,
-} from "../../classes/Tournament";
-import { IUser } from "../../classes/User";
+  validateStartTournament,
+} from "../../../classes/Tournament";
+import { IUser } from "../../../classes/User";
 import {
   setTournament,
   deleteTournament,
-} from "../../firebase/firestoreTournamentFunctions";
-import { arrayToDict } from "../../utils/utilFunctions";
-import TournamentPlayersComponent from "./TournamentPlayersComponent";
-import DeleteButton from "../inputs/DeleteButton";
-import EditTournamentComponent from "./EditTournamentComponent";
-import TournamentSettingsComponent from "./TournamentSettingsComponent";
+} from "../../../firebase/firestoreTournamentFunctions";
+import { arrayToDict } from "../../../utils/utilFunctions";
+import TournamentPlayersComponent from "../TournamentPlayersComponent";
+import DeleteButton from "../../inputs/DeleteButton";
+import EditTournamentComponent from "../EditTournamentComponent";
+import TournamentSettingsComponent from "../TournamentSettingsComponent";
 
-interface IGlobalTournamentWaitingRoomComponent {
-  tournament: GlobalTournament;
+interface ILocalTournamentWaitingRoomComponent {
+  tournament: LocalTournament;
   user: IUser;
 }
 
-const GlobalTournamentWaitingRoomComponent = (
-  props: IGlobalTournamentWaitingRoomComponent
+const LocalTournamentWaitingRoomComponent = (
+  props: ILocalTournamentWaitingRoomComponent
 ) => {
   const [players, setPlayers] = useState([] as ITournamentUser[]);
-
   const [editing, setEditing] = useState(false);
   const [editTournament, setEditTournament] = useState(props.tournament);
 
-  const updateTournament = (key: keyof GlobalTournament, value: any) => {
+  const updateTournament = (key: keyof LocalTournament, value: any) => {
     const newTournament = { ...editTournament };
     // @ts-ignore
     newTournament[key] = value;
-    setEditTournament(newTournament as GlobalTournament);
+    setEditTournament(newTournament as LocalTournament);
   };
 
   return (
@@ -49,7 +48,7 @@ const GlobalTournamentWaitingRoomComponent = (
         <Typography variant="h6">Tournament waiting room</Typography>
       </Grid>
       <Grid xs={12} item>
-        <Typography>Global tournament</Typography>
+        <Typography>Local tournament</Typography>
       </Grid>
 
       <TournamentPlayersComponent
@@ -92,14 +91,14 @@ const GlobalTournamentWaitingRoomComponent = (
               }}
               color="info"
             >
-              {!editing ? "Edit tournament" : "Submit edit"}
+              Edit tournament
             </Button>
           </Grid>
           <Grid item xs={12}>
             <Button
               variant="contained"
               onClick={() => {
-                const tournament: GlobalTournament = {
+                const tournament: LocalTournament = {
                   ...props.tournament,
                   players: arrayToDict(players, "uid"),
                   playersIds: players.map((p) => p.uid),
@@ -109,7 +108,8 @@ const GlobalTournamentWaitingRoomComponent = (
                 if (val.status === "error") {
                   toast.error(val.message);
                 } else {
-                  const startTournament: GlobalTournament = {
+                  console.log("not impl");
+                  const startTournament: LocalTournament = {
                     ...tournament,
                     hasStarted: true,
                   };
@@ -145,4 +145,4 @@ const GlobalTournamentWaitingRoomComponent = (
   );
 };
 
-export default GlobalTournamentWaitingRoomComponent;
+export default LocalTournamentWaitingRoomComponent;

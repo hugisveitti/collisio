@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import React, { useEffect, useState } from "react";
-import { ISingleRaceData, ITournamentUser } from "../../classes/Tournament";
-import { getPlayersInTournamentListener } from "../../firebase/firestoreTournamentFunctions";
+import { ISingleRaceData, ITournamentUser } from "../../../classes/Tournament";
+import { getPlayersInTournamentListener } from "../../../firebase/firestoreTournamentFunctions";
 
 interface IScoreItem {
   player: ITournamentUser;

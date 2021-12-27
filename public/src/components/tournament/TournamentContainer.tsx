@@ -11,10 +11,10 @@ import AppContainer from "../../containers/AppContainer";
 import { createGetTournametListener } from "../../firebase/firestoreTournamentFunctions";
 import CopyTextButton from "../inputs/CopyTextButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import GlobalTournamentComponent from "./GlobalTournamentComponent";
-import GlobalTournamentWaitingRoomComponent from "./GlobalTournamentWaitingRoomComponent";
-import LocalTournamentComponent from "./LocalTournamentComponent";
-import LocalTournamentWaitingRoomComponent from "./LocalTournamentWaitingRoomComponent";
+import GlobalTournamentComponent from "./globalTournament/GlobalTournamentComponent";
+import GlobalTournamentWaitingRoomComponent from "./globalTournament/GlobalTournamentWaitingRoomComponent";
+import LocalTournamentComponent from "./localTournament/LocalTournamentComponent";
+import LocalTournamentWaitingRoomComponent from "./localTournament/LocalTournamentWaitingRoomComponent";
 
 interface ITournamentContainer {
   tournamentId: string;

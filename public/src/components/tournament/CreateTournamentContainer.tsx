@@ -10,8 +10,8 @@ import { useHistory } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
 import { frontPagePath } from "../Routes";
-import CreateGlobalTournamentComponent from "./CreateGlobalTournamentComponent";
-import CreateLocalTournamentComponent from "./CreateLocalTournamentComponent";
+import CreateGlobalTournamentComponent from "./globalTournament/CreateGlobalTournamentComponent";
+import CreateLocalTournamentComponent from "./localTournament/CreateLocalTournamentComponent";
 
 interface ICreateTournamentContainer {}
 

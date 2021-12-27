@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
-import { GlobalTournament } from "../../classes/Tournament";
+import { GlobalTournament } from "../../../classes/Tournament";
 
 interface IEditGlobalTournamentComponent {
   editTournament: GlobalTournament;
