@@ -17,9 +17,8 @@ export class TestDriver {
     timeIndex = 0
 
     constructor(vehicleType: VehicleType) {
-        console.log("test driver")
-        this.loadVechileConfig("f1VehicleConfig.json")
-        this.loadDriveInstructions("recording_farm-track_1_f1.txt")
+        //    this.loadVechileConfig("f1VehicleConfig.json")
+        //  this.loadDriveInstructions("recording_farm-track_1_f1.txt")
         this.controller = new MobileControls()
         this.di = []
     }
@@ -27,7 +26,6 @@ export class TestDriver {
 
     async loadVechileConfig(filename: string) {
         fetch(`vehicleconfig/${filename}`).then(res => res.json()).then(data => {
-            console.log("vehicle config data", data)
         })
     }
 

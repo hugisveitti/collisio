@@ -1,4 +1,4 @@
-import { PhysicsLoader, Project, Scene3D } from "enable3d";
+import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
@@ -15,6 +15,7 @@ import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
+import { Wagon } from "../vehicles/Wagon";
 import "./game-styles.css";
 import { IGameScene, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
@@ -263,10 +264,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async preload() {
-
-
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
-
         this.addLights()
 
         const listener = new AudioListener()
@@ -278,8 +276,6 @@ export class GameScene extends Scene3D implements IGameScene {
         getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
             this.beepE4 = beepE4
         })
-
-
 
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
@@ -319,30 +315,18 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async createVehicles(): Promise<void> {
         const promise = new Promise<void>((topresolve, reject) => {
-
             this.vehicles = []
-
             // get random color of chassis
             let chassisColOffset = Math.floor(Math.random() * 4)
 
-            /** make this better
-             * Currently doing async loading of models, when it could be sync
-             */
-            //    const recursiveCreate = async (i: number) => {
             const batches = []
             for (let i = 0; i < this.players.length; i++) {
-
-
                 const color = possibleVehicleColors[chassisColOffset + i]
-
                 let newVehicle: IVehicle
-
                 if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
-
                     newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
                 } else {
                     newVehicle = new SphereVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
-
                 }
                 this.vehicles.push(newVehicle)
                 if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
@@ -355,9 +339,7 @@ export class GameScene extends Scene3D implements IGameScene {
                         this.vehicles[i].addModels([], body)
                     }))
                 }
-
             }
-
             Promise.all(batches).then(content => {
                 this.emitVehiclesReady()
                 topresolve()
@@ -383,20 +365,10 @@ export class GameScene extends Scene3D implements IGameScene {
                 this.clearViewImportantInfo(i)
             }, fadeSecs * 1000)
         }
-        // this.viewsImpornantInfo[i].setAttribute("style", `
-        // opacity:1;
-        // `)
-        // setTimeout(() => {
-        //     this.viewsImpornantInfo[i].setAttribute("style", `
-        //     opacity:0;
-        //     `)
-        // }, fadeSecs * 1000)
     }
 
     clearViewImportantInfo(i: number) {
-
         this.viewsImpornantInfo[i].innerHTML = ""
-
     }
 
     clearTimouts() {
@@ -406,23 +378,17 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setNeedsReload(needsReload: boolean) {
-
         this.needsReload = needsReload
     }
 
-
     createViews() {
-
         this.gameInfoDiv.appendChild(this.playerInfosContainer)
-
         this.views = []
-
         this.playerInfosContainer.innerHTML = ""
         this.viewsImpornantInfo = []
         this.viewsKmhInfo = []
 
 
-        // only works for 2 players right now, need algorithm to make it dynamically calculate the size of each view
         const n = this.players.length
         for (let i = 0; i < this.players.length; i++) {
             const viewHeight = n > 2 ? .5 : 1.0
@@ -463,9 +429,7 @@ export class GameScene extends Scene3D implements IGameScene {
             const viewDivHeight = viewHeight * window.innerHeight
 
             const viewDiv = document.createElement("div")
-
             const nameInfo = document.createElement("span")
-
 
             nameInfo.innerHTML = this.players[i].playerName
             viewDiv.appendChild(nameInfo)
@@ -581,8 +545,6 @@ export class GameScene extends Scene3D implements IGameScene {
     startGameSong() {
         // not use game song right now...
         if (!!false && this.useSound && (!this.songIsPlaying) && !this.isGamePaused()) {
-
-
             this.songIsPlaying = true
         }
     }
@@ -597,7 +559,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
     pauseGame() {
         if (this.isGamePaused()) return
-
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicles[i].isReady) {
@@ -629,7 +590,6 @@ export class GameScene extends Scene3D implements IGameScene {
         } else {
             this.pauseGame()
         }
-
     }
 
     /** to be overritten by child
@@ -653,7 +613,6 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     showImportantInfo(text: string) {
-
         this.importantInfoDiv.innerHTML = text
     }
 
@@ -667,7 +626,6 @@ export class GameScene extends Scene3D implements IGameScene {
             return false
         }
         if (this._everythingReady) return true
-
 
         for (let vehicle of this.vehicles) {
             if (!vehicle.isReady) return false
@@ -712,8 +670,6 @@ export class GameScene extends Scene3D implements IGameScene {
         this.camera.far = gameSettings.drawDistance
 
         // if gameSettings change and needs reload then restart without user say?
-
-
         this.socket?.emit(dts_game_settings_changed_callback, {})
     }
 
@@ -768,12 +724,9 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-
     async create() { }
 
-
     restartGame() {
-
         this.oldTime = 0
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -782,8 +735,6 @@ export class GameScene extends Scene3D implements IGameScene {
         if (this.gameRoomActions?.closeModals) {
             this.gameRoomActions.closeModals()
         }
-
-
         if (this.needsReload) {
             this._everythingReady = false
             this.gameStarted = false
@@ -793,17 +744,11 @@ export class GameScene extends Scene3D implements IGameScene {
             for (let vehicle of this.vehicles) {
                 vehicle.destroy()
             }
-
             this.restart().then(() => {
-
             })
-
         } else {
-
             this.gameStarted = false
-
             this.resetVehicles()
-
             this._restartGame()
         }
     }
@@ -812,6 +757,13 @@ export class GameScene extends Scene3D implements IGameScene {
 
     changeTrack(trackName: TrackName) {
         this.setNeedsReload(true)
+    }
+
+    vehicleCollidedWithObject(object: any, vehicleNumber: number) {
+        console.warn("Not implmented vehicle collided with object")
+        if (object instanceof Wagon) {
+            //(object as Wagon).connectToVehicle(vehicle)
+        }
     }
 
     setSocket(socket: Socket) {

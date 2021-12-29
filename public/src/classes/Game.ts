@@ -138,7 +138,7 @@ export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name =>
     }
     return false
 })
-export const activeGameTypes: GameType[] = ["race", "tag"]
+export const activeGameTypes: GameType[] = ["race", "tag", "story"]
 
 const getNonActiveTrackNames = (): TrackName[] => {
     const tracks: TrackName[] = []

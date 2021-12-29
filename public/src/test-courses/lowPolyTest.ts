@@ -1,7 +1,6 @@
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
 import { Socket } from "socket.io-client"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { runInThisContext } from "vm"
 import { getGameTypeFromTrackName } from "../classes/Game"
 import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
@@ -12,16 +11,18 @@ import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { driveVehicle } from "../utils/controls"
-import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "../vehicles/IVehicle"
+import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
 import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
-import { allVehicleTypes, defaultVehicleConfig, defaultVehicleType, getVehicleClassFromType, IVehicleConfig, possibleVehicleColors } from "../vehicles/VehicleConfigs"
+import { allVehicleTypes, defaultVehicleType, getVehicleClassFromType, possibleVehicleColors } from "../vehicles/VehicleConfigs"
+import { Wagon } from "../vehicles/Wagon"
+import { WagonType } from "../vehicles/WagonConfigs"
 import "./lowPolyTest.css"
 import { addTestControls, getDriveInstruction } from "./testControls"
 import { saveRecordedInstructionsToServer, TestDriver } from "./TestDriver"
-import { createTestVehicleInputs, createVehcileInput, createXYZInput } from "./testVehicleInputs"
+import { createTestVehicleInputs } from "./testVehicleInputs"
 
 const vechicleFov = 60
 
@@ -35,6 +36,7 @@ const vehicleInputsContainer = document.createElement("div")
 document.body.appendChild(vehicleInputsContainer)
 
 let recording = false
+let playRecording = false
 
 export class LowPolyTestScene extends GameScene {
 
@@ -84,6 +86,9 @@ export class LowPolyTestScene extends GameScene {
 
     otherDrivers: TestDriver[]
 
+    wagon: Wagon
+    wagonType: WagonType
+
     constructor() {
         super()
 
@@ -130,14 +135,16 @@ export class LowPolyTestScene extends GameScene {
         // in tag game
         this.isIt = 0
         this.testDriver = new TestDriver(this.vehicleType)
+        this.wagonType = "smallWagon"
+
     }
 
 
 
     async preload() {
-        // this.physics.debug.enable()
         if (this.usingDebug) {
             this.physics.debug?.enable()
+            this.physics.debug?.mode(2048 + 4096)
         }
         await this.warpSpeed('-ground', "-light", "-sky")
         console.log("this physics config", this.physics.config)
@@ -218,9 +225,9 @@ export class LowPolyTestScene extends GameScene {
             } else if (e.key === "l") {
                 const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
                 this.vehicle.setRotation(q)
+            } else if (e.key === "m") {
+                this.wagon.removeConnection()
             }
-
-
         })
 
         window.addEventListener("keydown", (e) => {
@@ -253,6 +260,7 @@ export class LowPolyTestScene extends GameScene {
     }
 
     async create() {
+        this.wagon = new Wagon(this, this.wagonType)
 
         if (this.getGameType() === "race") {
 
@@ -265,13 +273,10 @@ export class LowPolyTestScene extends GameScene {
             console.warn("Unknown game type when creating course", this.getGameType())
         }
 
-
         await this.course.createCourse()
         if (this.course instanceof RaceCourse) {
             this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
         }
-
-
 
         this.courseLoaded = true
         this.createOtherVehicles(() => {
@@ -289,11 +294,13 @@ export class LowPolyTestScene extends GameScene {
                     v.canDrive = true
                     v.start()
                 }
+
+                //this.vehicle.setPosition(5, 2, 5)
+                // this.vehicle.setRotation(0, 0, 0)
                 if (this.getGameType() === "tag") {
 
                     this.vehicle.setPosition(0, 2, 0)
                 }
-
 
                 this.createController()
 
@@ -311,9 +318,18 @@ export class LowPolyTestScene extends GameScene {
                     })
                 }
                 this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+                if (this.wagon.isReady) {
+                    console.log("adding wagon to vehicle")
+                    const p = this.vehicle.getPosition()
+
+                    this.wagon.setPosition(new THREE.Vector3(p.x - 10, p.y, p.z))
+                    const r = this.vehicle.getRotation()
+                    this.wagon.setRotation(r)
+                    //this.wagon.connectToVehicle(this.vehicle)
+
+                }
             })
         })
-
     }
 
     getGameType() {
@@ -332,8 +348,6 @@ export class LowPolyTestScene extends GameScene {
 
         }
     }
-
-
 
     createOtherVehicles(callback: () => void) {
         if (this.numberOfOtherVehicles === 0) {
@@ -504,16 +518,21 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
+    vehicleCollidedWithObject(object: any, vehicleNumber: number) {
+        if (object instanceof Wagon) {
+            if (vehicleNumber === 0) {
+                (object as Wagon).connectToVehicle(this.vehicle)
+            }
+            //(object as Wagon).connectToVehicle(vehicle)
+        }
+    }
 
     updateVehicles() {
         this.vehicle.update()
-        //    this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
-
     }
 
     async _upd() {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
-
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
         }
     }
@@ -526,18 +545,18 @@ export class LowPolyTestScene extends GameScene {
 
 
             if (this.vehicle) {
-
-                // if (recording) {
+                this.updateVehicles()
                 this.mobileControls = this.driveVehicle?.()
-                this.recordingInstructions.push(getDriveInstruction(time, this.mobileControls))
-                // } else {
-                // this.testDriver.setMobileController(time)
-                //  driveVehicle(this.testDriver.controller, this.vehicle)
-                // }
+                if (recording) {
+                    this.recordingInstructions.push(getDriveInstruction(time, this.mobileControls))
+                } else if (playRecording) {
+                    this.testDriver.setMobileController(time)
+                    driveVehicle(this.testDriver.controller, this.vehicle)
+                }
+
                 //    this.vehicle.intelligentDrive(true)
                 this.updateFps(time)
                 this.updatePing()
-                this.updateVehicles()
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
                 const rot = this.vehicle.getRotation()
@@ -554,8 +573,8 @@ export class LowPolyTestScene extends GameScene {
                 let oVehicle = this.otherVehicles[i]
                 // oVehicle.randomDrive()
                 //oVehicle.intelligentDrive(false)
-                this.otherDrivers[i].setMobileController(time)
-                driveVehicle(this.otherDrivers[i].controller, oVehicle)
+                //this.otherDrivers[i].setMobileController(time)
+                //  driveVehicle(this.otherDrivers[i].controller, oVehicle)
 
                 oVehicle.update()
             }
@@ -565,6 +584,9 @@ export class LowPolyTestScene extends GameScene {
                 lapTimeDiv.innerHTML = this.gameTime.getCurrentLapTime() + ""
                 bestLapTimeDiv.innerHTML = this.gameTime.getBestLapTime() + ""
             }
+        }
+        if (this.wagon.isReady) {
+            this.wagon.update()
         }
         this._upd()
     }
@@ -623,6 +645,8 @@ export class LowPolyTestScene extends GameScene {
         this.canStartUpdate = false
 
         this.vehicleColorNumber += 1
+        this.wagon.destroy()
+        this.wagon = new Wagon(this, this.wagonType)
         this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType, true)
         this.createVehicle()
 

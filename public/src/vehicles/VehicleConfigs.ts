@@ -1,7 +1,8 @@
-import { VehicleType } from "../shared-backend/shared-stuff"
-import { itemInArray } from "../utils/utilFunctions"
-import { IVehicle, SimpleVector } from "./IVehicle"
-import { SphereVehicle } from "./SphereVehicle"
+import { Vector3 } from "three";
+import { VehicleType } from "../shared-backend/shared-stuff";
+import { itemInArray } from "../utils/utilFunctions";
+import { SimpleVector } from "./IVehicle";
+
 
 
 // #FF8000 is orange
@@ -70,6 +71,8 @@ export interface IVehicleConfig {
     inertia: SimpleVector
 
     maxSpeed: number
+
+    towPosition: Vector3
 }
 
 export const defaultVehicleConfig: IVehicleConfig = {
@@ -101,6 +104,7 @@ export const defaultVehicleConfig: IVehicleConfig = {
     inertia: { x: 4000, y: 2000, z: 4000 },
 
     maxSpeed: 300,
+    towPosition: new Vector3(0, -.5, -4)
 }
 
 
@@ -125,6 +129,7 @@ export const vehicleConfigs = {
         path: "simple-car.gltf",
 
         // path: "123456.js"
+        towPosition: new Vector3(0, -0.5, -4.7)
     },
     normal2: {
         ...defaultVehicleConfig,
@@ -144,6 +149,7 @@ export const vehicleConfigs = {
         is4x4: false,
 
         path: "normal-car-2.gltf",
+        towPosition: new Vector3(0, -0.9, -4.7)
 
         // path: "123456.js"
     },
@@ -166,7 +172,9 @@ export const vehicleConfigs = {
         breakingForce: 200,
         is4x4: false,
 
-        path: "tractor.gltf"
+        path: "tractor.gltf",
+
+        towPosition: new Vector3(0, -1.9, -3.2)
     },
     monsterTruck: {
         ...defaultVehicleConfig,
@@ -220,7 +228,9 @@ export const vehicleConfigs = {
         suspensionDamping: 10,
         suspensionCompression: 20,
 
-        path: "off-roader.gltf"
+        path: "off-roader.gltf",
+
+        towPosition: new Vector3(0, -1.35, -3.3)
     },
     sportsCar: {
         ...defaultVehicleConfig,
@@ -244,7 +254,7 @@ export const vehicleConfigs = {
         maxSpeed: 320,
 
         inertia: { x: 3000, y: 2000, z: 4000 },
-
+        towPosition: new Vector3(0, -.5, -4),
         path: "sports-car.gltf"
     },
     f1: {
@@ -271,6 +281,7 @@ export const vehicleConfigs = {
         engineForce: 5500,
         breakingForce: 250,
         is4x4: false,
+        towPosition: new Vector3(0, 0.5, -3.7)
 
     },
     test: {

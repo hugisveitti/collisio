@@ -82,6 +82,7 @@ export class Coin {
          * 
          * mabey gameScene.physics.removeAllListeners( event )
          */
+        //      gameScene.physics.physicsWorld.removeCollisionObject(this.model.body.ammo.getCollisionShape())
         this.model.body.checkCollisions = false
         this.model.clear()
 

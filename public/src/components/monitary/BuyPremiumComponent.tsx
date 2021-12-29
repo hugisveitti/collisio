@@ -32,7 +32,8 @@ import { frontPagePath } from "../Routes";
 
 interface IPremiumOptionListItem {
   title: string;
-  extraText: string[];
+  listText: string[];
+  extraText?: string;
 }
 
 const PremiumOptionListItem = (props: IPremiumOptionListItem) => {
@@ -46,12 +47,13 @@ const PremiumOptionListItem = (props: IPremiumOptionListItem) => {
       </ListItemButton>
       <Collapse in={open}>
         <List>
-          {props.extraText.map((t) => (
+          {props.listText.map((t) => (
             <ListItem key={t} style={{ paddingLeft: 25 }}>
               <ListItemText key={t} primary={`- ${t}`} />
             </ListItem>
           ))}
         </List>
+        {props.extraText && <Typography>{props.extraText} </Typography>}
       </Collapse>
     </>
   );
@@ -84,25 +86,30 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
             <CardHeader
               title="Full game"
               header="Full game"
-              subheader="$10 one time payment, all future update included"
+              subheader="$10 one time payment, all future updates included"
             />
             <CardContent>
               <List>
                 <PremiumOptionListItem
                   title="Access to all maps"
-                  extraText={activeTrackNames.map((tn) =>
+                  listText={activeTrackNames.map((tn) =>
                     getTrackNameFromType(tn)
                   )}
                 />
                 <PremiumOptionListItem
                   title="Access to all vehicles"
-                  extraText={activeVehicleTypes.map((v) => v.name)}
+                  listText={activeVehicleTypes.map((v) => v.name)}
                 />
                 <PremiumOptionListItem
                   title="Access to game modes"
-                  extraText={activeGameTypes.map((gt) =>
+                  listText={activeGameTypes.map((gt) =>
                     getGameTypeNameFromType(gt)
                   )}
+                />
+                <PremiumOptionListItem
+                  title="More info"
+                  extraText="The full game includes more features, such as the tournament feature, buying trophies."
+                  listText={[]}
                 />
               </List>
             </CardContent>
@@ -130,15 +137,15 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
               <List>
                 <PremiumOptionListItem
                   title="Access to one map"
-                  extraText={["Farm"]}
+                  listText={["Farm"]}
                 />
                 <PremiumOptionListItem
                   title="Access to all vehicles"
-                  extraText={activeVehicleTypes.map((v) => v.name)}
+                  listText={activeVehicleTypes.map((v) => v.name)}
                 />
                 <PremiumOptionListItem
                   title="Access to one game mode"
-                  extraText={["Race"]}
+                  listText={["Race"]}
                 />
               </List>
             </CardContent>
@@ -161,15 +168,15 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
               <List>
                 <PremiumOptionListItem
                   title="Access to one map"
-                  extraText={[getTrackNameFromType("farm-track")]}
+                  listText={[getTrackNameFromType("farm-track")]}
                 />
                 <PremiumOptionListItem
                   title="Access to one vehicle"
-                  extraText={[getVehicleNameFromType(defaultVehicleType)]}
+                  listText={[getVehicleNameFromType(defaultVehicleType)]}
                 />
                 <PremiumOptionListItem
                   title="Access to one mode"
-                  extraText={["Race"]}
+                  listText={["Race"]}
                 />
               </List>
             </CardContent>

@@ -341,7 +341,10 @@ export class SphereVehicle implements IVehicle {
 
     }
 
-
+    getTowPivot() {
+        console.warn("Tow pivot not implemented for sphere")
+        return new Vector3(1, 0, 1)
+    }
 
     setPosition(x: number, y: number, z: number): void {
         this.scene.physics.destroy(this.vehicleBody)

@@ -207,6 +207,7 @@ export const createTestVehicleInputs = (testScene: LowPolyTestScene, vehicleInpu
             window.localStorage.setItem("usingDebug", testScene.usingDebug + "")
             if (testScene.usingDebug) {
                 testScene.physics.debug.enable()
+                //    testScene.physics.debug?.mode(2048 + 4096)
             } else {
                 testScene.physics.debug.disable()
             }

@@ -84,6 +84,7 @@ export interface IVehicle {
 
     addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
 
+    getTowPivot: () => Vector3
 }
 
 
