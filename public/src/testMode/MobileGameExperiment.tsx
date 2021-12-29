@@ -79,7 +79,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
           "style",
           `transform: rotateZ(${controller.beta}deg)`
         );
-      }, 1000 / 45);
+      }, 1000 / 90);
     }
   }, [gameCanvas]);
 

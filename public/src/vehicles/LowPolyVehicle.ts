@@ -323,7 +323,7 @@ export class LowPolyVehicle implements IVehicle {
         wheelInfo.set_m_wheelsDampingCompression(vehicleConfigs[this.vehicleType].suspensionDamping)
         wheelInfo.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip)
         wheelInfo.set_m_rollInfluence(vehicleConfigs[this.vehicleType].rollInfluence)
-        this.vehicle.updateSuspension(1 / 60)
+        this.vehicle.updateSuspension(0)
 
         this.wheelMeshes.push(this.createWheelMesh(index))
     }
