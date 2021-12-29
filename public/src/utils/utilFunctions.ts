@@ -1,4 +1,6 @@
 import { Timestamp } from "@firebase/firestore";
+import { Vector3, Quaternion } from "three";
+
 
 export function itemInArray<Type>(st: Type, arr: Type[]) {
     for (let t of arr) {
@@ -137,3 +139,30 @@ export const getDateString = (date: any): string => {
     return "unknown date";
 };
 
+/**
+ * First the number then the number to check
+ * Order doesnt matter
+ */
+export const isBetweenNumbers = (a: number, b: number, num: number) => {
+    const max = Math.max(a, b)
+    const min = Math.min(a, b)
+
+    return max > num && num > min
+}
+
+// 
+// 
+export const isBetweenAngles = (smallerAngle: number, biggerAngle: number, angle: number) => {
+    return smallerAngle < angle && angle < biggerAngle
+}
+
+/**
+ * 
+ * @param p1 
+ * @param p2
+ * @returns 2d angle, ignoring y
+ */
+export const get2DAngleBetweenPoints = (p1: Vector3, p2: Vector3) => {
+
+    return Math.atan2((p2.z - p1.z), (p2.x - p1.x))
+}

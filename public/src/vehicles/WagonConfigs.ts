@@ -1,4 +1,4 @@
-export type WagonType = "smallWagon"
+export type WagonType = "smallWagon" | "tractorWagon"
 
 export interface IWagonConfig {
     path: string
@@ -44,5 +44,10 @@ export const wagonConfigs = {
     smallWagon: {
         ...defaultWagonConfig,
         path: "small-wagon.glb"
+    },
+    tractorWagon: {
+        ...defaultWagonConfig,
+        path: "tractor-wagon.glb"
     }
+
 }

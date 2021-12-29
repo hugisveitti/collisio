@@ -497,18 +497,9 @@ export class LowPolyVehicle implements IVehicle {
         }
     }
 
+    // this could be configured in blender, using a connection-point object4d
     getTowPivot() {
-        // relative to the car
-        const wP = this.wheelMeshes[0].position
-        console.log("wp", wP)
-        console.log("p", this.vehicleBody.position)
-
-        const y = wP.y - this.vehicleBody.position.y //-vehicleConfigs[this.vehicleType].wheelRadiusBack //vehicleConfigs[this.vehicleType].wheelAxisHeightBack - vehicleConfigs[this.vehicleType].suspensionRestLength
-        const x = 0
-        const z = vehicleConfigs[this.vehicleType].wheelAxisBackPosition - vehicleConfigs[this.vehicleType].wheelRadiusBack - .75
-        console.log("x,y,z", x, y, z)
-        console.log("tow pos", vehicleConfigs[this.vehicleType].towPosition)
-        return vehicleConfigs[this.vehicleType].towPosition // new Vector3(x, y, z)
+        return vehicleConfigs[this.vehicleType].towPosition
     }
 
     toggleSound(useSound: boolean) {

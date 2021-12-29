@@ -135,7 +135,7 @@ export class LowPolyTestScene extends GameScene {
         // in tag game
         this.isIt = 0
         this.testDriver = new TestDriver(this.vehicleType)
-        this.wagonType = "smallWagon"
+        this.wagonType = "tractorWagon"
 
     }
 
