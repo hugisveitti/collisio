@@ -7,7 +7,7 @@ import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, IEndOfRaceInfoGame, IEn
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
 import { getBeep } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -15,7 +15,8 @@ import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
-import { Wagon } from "../vehicles/Wagon";
+import { getWagonNumber, Wagon } from "../vehicles/Wagon";
+import { WagonType } from "../vehicles/WagonConfigs";
 import "./game-styles.css";
 import { IGameScene, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
@@ -129,6 +130,8 @@ export class GameScene extends Scene3D implements IGameScene {
     hasAskedToLowerSettings: boolean
 
     gameSceneConfig: IGameSceneConfig
+    extraVehicles: IVehicle[]
+    wagons: Wagon[]
 
     constructor() {
         super()
@@ -193,6 +196,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.roomTicks = 0
         this.gameTicks = 0
         this.hasAskedToLowerSettings = eval(window.localStorage.getItem("hasAskedToLowerSettings")) ?? false
+
+        this.extraVehicles = []
+        this.wagons = []
     }
 
     async addLights() {
@@ -217,28 +223,22 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.scene.add(this.pLight)
 
-        //  const hLight = new HemisphereLight(0x000000, 1)
-        //const hLight = new HemisphereLight(0xffffff, 1)
         const hLight = new HemisphereLight(hemisphereTopColor, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
         this.scene.add(hLight)
 
-        // const aLight = new AmbientLight(0xffffff, 1)
         const aLight = new AmbientLight(ambientLightColor, ambientLightIntesity)
         aLight.position.set(0, 0, 0)
         this.scene.add(aLight)
 
-
-
         const uniforms = {
             "topColor": { value: new Color(hemisphereTopColor) },
-
-            // "bottomColor": { value: new Color(0xffffff) },
             "bottomColor": { value: new Color(hemisphereBottomColor) },
             "offset": { value: 33 },
             "exponent": { value: 0.6 }
         };
+
         uniforms["topColor"].value.copy(hLight.color);
         this.scene.background = new Color().setHSL(0.6, 0, 1);
         this.scene.fog = new Fog(this.scene.background, 1, 5000);
@@ -311,6 +311,83 @@ export class GameScene extends Scene3D implements IGameScene {
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
+    }
+
+    createWagons(wagonTypes: WagonType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
+        const batch: Promise<Wagon>[] = []
+        console.log("wagon types", wagonTypes)
+        for (let i = 0; i < wagonTypes.length; i++) {
+            batch.push(this.createWagon(wagonTypes[i], i))
+        }
+
+        Promise.all(batch).then(wagons => {
+            console.log("wagons created", wagons)
+            for (let i = 0; i < wagons.length; i++) {
+                if (positions && positions.length === wagons.length && rotations && rotations.length === wagons.length) {
+                    wagons[i].setPositionRotation(positions[i], rotations[i])
+                }
+
+                this.wagons.push(wagons[i])
+            }
+        })
+    }
+
+
+    createWagon(wagonType: WagonType, wagonNumber: number): Promise<Wagon> {
+        return new Promise<Wagon>(async (resolve, reject) => {
+            const wagon = new Wagon(this, wagonType, wagonNumber)
+            await wagon.constructWagon()
+            resolve(wagon)
+        })
+    }
+
+    /**
+     * To be used in e.g. storyCourse to create interactive vehicles
+     * @param vehicleTypes list of VehicleTypes
+     */
+    async createExtraVehicles(vehicleTypes: VehicleType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
+        const batch: Promise<IVehicle>[] = []
+        for (let i = 0; i < vehicleTypes.length; i++) {
+            batch.push(this.createVehicle(vehicleTypes[i], possibleVehicleColors[0], `extra-vehicle-${i}`, i + this.players.length))
+        }
+
+        Promise.all(batch).then(vehicles => {
+            for (let i = 0; i < vehicles.length; i++) {
+                if (positions && positions.length === vehicles.length) {
+                    vehicles[i].setPosition(positions[i].x, positions[i].y, positions[i].z)
+                }
+                if (rotations && rotations.length === vehicles.length) {
+                    vehicles[i].setRotation(rotations[i])
+                }
+                vehicles[i].start()
+                vehicles[i].unpause()
+
+                this.extraVehicles.push(vehicles[i])
+            }
+        })
+    }
+
+
+    async createVehicle(vehicleType: VehicleType, color: string | number, name: string, vehicleNumber: number): Promise<IVehicle> {
+        return new Promise<IVehicle>(async (resolve, reject) => {
+            let newVehicle: IVehicle
+            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
+                newVehicle = new LowPolyVehicle(this, color, name, vehicleNumber, vehicleType, this.useSound)
+            } else {
+                newVehicle = new SphereVehicle(this, color, name, vehicleNumber, vehicleType, this.useSound)
+            }
+            this.vehicles.push(newVehicle)
+            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
+                await loadLowPolyVehicleModels(vehicleType, false).then(([tires, chassis]) => {
+                    newVehicle.addModels(tires, chassis)
+                })
+            } else {
+                await loadSphereModel(vehicleType, false).then((body) => {
+                    newVehicle.addModels([], body)
+                })
+            }
+            resolve(newVehicle)
+        })
     }
 
     async createVehicles(): Promise<void> {
@@ -744,6 +821,21 @@ export class GameScene extends Scene3D implements IGameScene {
             for (let vehicle of this.vehicles) {
                 vehicle.destroy()
             }
+
+            this.vehicles = []
+
+            for (let vehicle of this.extraVehicles) {
+                vehicle.destroy()
+            }
+
+            this.extraVehicles = []
+
+            for (let wagon of this.wagons) {
+                wagon.destroy()
+            }
+
+            this.wagons = []
+
             this.restart().then(() => {
             })
         } else {
@@ -759,9 +851,11 @@ export class GameScene extends Scene3D implements IGameScene {
         this.setNeedsReload(true)
     }
 
-    vehicleCollidedWithObject(object: any, vehicleNumber: number) {
+    vehicleCollidedWithObject(object: ExtendedObject3D, vehicleNumber: number) {
         console.warn("Not implmented vehicle collided with object")
         if (object instanceof Wagon) {
+            const wagonNumber = getWagonNumber(object.name)
+            this.wagons[wagonNumber].connectToVehicle(this.vehicles[vehicleNumber])
             //(object as Wagon).connectToVehicle(vehicle)
         }
     }
@@ -927,7 +1021,22 @@ export class GameScene extends Scene3D implements IGameScene {
         //}
     }
 
+    update(_time: number, _delta: number): void {
+        for (let vehicle of this.extraVehicles) {
+            vehicle.update()
+        }
 
+        for (let wagon of this.wagons) {
+            wagon.update()
+        }
+
+        this._updateChild(_time)
+    }
+
+
+    public _updateChild(time: number) {
+
+    }
 
     async destroyGame() {
         document.body.removeChild(this.gameInfoDiv)

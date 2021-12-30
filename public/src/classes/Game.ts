@@ -72,7 +72,7 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
     },
     {
-        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 4000
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
     }
 ]
 

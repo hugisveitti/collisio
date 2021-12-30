@@ -15,12 +15,8 @@ export class StoryGameScene extends GameScene {
     }
 
 
-    update(time: number) {
-
+    _updateChild(time: number) {
         this.updatePing()
         this.updateFps(time)
-
-
-
     }
 }

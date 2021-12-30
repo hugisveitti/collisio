@@ -17,7 +17,7 @@ import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicl
 import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
 import { allVehicleTypes, defaultVehicleType, getVehicleClassFromType, possibleVehicleColors } from "../vehicles/VehicleConfigs"
-import { Wagon } from "../vehicles/Wagon"
+import { getWagonNumber, isWagon, Wagon } from "../vehicles/Wagon"
 import { WagonType } from "../vehicles/WagonConfigs"
 import "./lowPolyTest.css"
 import { addTestControls, getDriveInstruction } from "./testControls"
@@ -86,9 +86,6 @@ export class LowPolyTestScene extends GameScene {
 
     otherDrivers: TestDriver[]
 
-    wagon: Wagon
-    wagonType: WagonType
-
     constructor() {
         super()
 
@@ -135,8 +132,6 @@ export class LowPolyTestScene extends GameScene {
         // in tag game
         this.isIt = 0
         this.testDriver = new TestDriver(this.vehicleType)
-        this.wagonType = "tractorWagon"
-
     }
 
 
@@ -144,7 +139,7 @@ export class LowPolyTestScene extends GameScene {
     async preload() {
         if (this.usingDebug) {
             this.physics.debug?.enable()
-            this.physics.debug?.mode(2048 + 4096)
+            //    this.physics.debug?.mode(2048 + 4096)
         }
         await this.warpSpeed('-ground', "-light", "-sky")
         console.log("this physics config", this.physics.config)
@@ -226,7 +221,11 @@ export class LowPolyTestScene extends GameScene {
                 const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
                 this.vehicle.setRotation(q)
             } else if (e.key === "m") {
-                this.wagon.removeConnection()
+                for (let wagon of this.wagons) {
+                    if (wagon.isConnectedToVehicle(this.vehicle)) {
+                        wagon.removeConnection()
+                    }
+                }
             }
         })
 
@@ -260,7 +259,6 @@ export class LowPolyTestScene extends GameScene {
     }
 
     async create() {
-        this.wagon = new Wagon(this, this.wagonType)
 
         if (this.getGameType() === "race") {
 
@@ -279,69 +277,56 @@ export class LowPolyTestScene extends GameScene {
         }
 
         this.courseLoaded = true
-        this.createOtherVehicles(() => {
-            this.createVehicle().then(() => {
-                this.vehicle.useBadRotationTicks = false
+        await this.createOtherVehicles()
+        await this.createTestVehicle()
+        this.vehicle.useBadRotationTicks = false
 
-                const allVehicles = this.otherVehicles.concat(this.vehicle)
-                this.vehicles = allVehicles
+        const allVehicles = this.otherVehicles.concat(this.vehicle)
+        this.vehicles = allVehicles
 
-                this.course.setStartPositions(allVehicles)
-                for (let v of allVehicles) {
-                    if (v.isReady) {
-                        v.unpause()
-                    }
-                    v.canDrive = true
-                    v.start()
-                }
+        this.course.setStartPositions(allVehicles)
+        for (let v of allVehicles) {
+            if (v.isReady) {
+                v.unpause()
+            }
+            v.canDrive = true
+            v.start()
+        }
 
-                //this.vehicle.setPosition(5, 2, 5)
-                // this.vehicle.setRotation(0, 0, 0)
-                if (this.getGameType() === "tag") {
+        //this.vehicle.setPosition(5, 2, 5)
+        // this.vehicle.setRotation(0, 0, 0)
+        if (this.getGameType() === "tag") {
 
-                    this.vehicle.setPosition(0, 2, 0)
-                }
+            this.vehicle.setPosition(0, 2, 0)
+        }
 
-                this.createController()
+        this.createController()
 
-                this.canStartUpdate = true
-                if (this.gameSettings.gameType === "tag") {
+        this.canStartUpdate = true
+        if (this.gameSettings.gameType === "tag") {
 
-                    this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
-                        if (isVehicle(otherObject)) {
-                            console.log("collide with vehicle", otherObject)
-                            const vehicleNumber = getVehicleNumber(otherObject.name)
-                            this.vehicle.setColor(notItColor)
-                            this.otherVehicles[vehicleNumber - 1].setColor(itColor)
-                            this.isIt = vehicleNumber
-                        }
-                    })
-                }
-                this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
-                if (this.wagon.isReady) {
-                    console.log("adding wagon to vehicle")
-                    const p = this.vehicle.getPosition()
-
-                    this.wagon.setPosition(new THREE.Vector3(p.x - 10, p.y, p.z))
-                    const r = this.vehicle.getRotation()
-                    this.wagon.setRotation(r)
-                    //this.wagon.connectToVehicle(this.vehicle)
-
+            this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
+                if (isVehicle(otherObject)) {
+                    console.log("collide with vehicle", otherObject)
+                    const vehicleNumber = getVehicleNumber(otherObject.name)
+                    this.vehicle.setColor(notItColor)
+                    this.otherVehicles[vehicleNumber - 1].setColor(itColor)
+                    this.isIt = vehicleNumber
                 }
             })
-        })
+        }
+        this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+
     }
 
+
+
     getGameType() {
-
         return getGameTypeFromTrackName(this.trackName)
-
     }
 
     handleCoinCollided(vehicleName: string, coin: Coin) {
-
         const vehicleNumber = getVehicleNumber(vehicleName)
-
         if (vehicleNumber !== this.isIt) {
             coin.removeFromScene(this)
         } else {
@@ -349,27 +334,27 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
-    createOtherVehicles(callback: () => void) {
-        if (this.numberOfOtherVehicles === 0) {
-            callback()
-        }
-        const p = this.course.ground.scale
-        const helper = (i: number) => {
-            loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, false).then(([tires, chassis]) => {
-                this.otherVehicles[i].addModels(tires, chassis)
+    async createOtherVehicles() {
+        return new Promise<void>((resolve, reject) => {
 
-
-                if (i < this.otherVehicles.length - 1) {
-                    helper(i + 1)
-                } else {
-                    callback()
-                }
-            })
-        }
-        if (this.otherVehicles.length > 0) {
-            helper(0)
-        }
-
+            if (this.numberOfOtherVehicles === 0) {
+                resolve()
+            }
+            const p = this.course.ground.scale
+            const helper = (i: number) => {
+                loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, false).then(([tires, chassis]) => {
+                    this.otherVehicles[i].addModels(tires, chassis)
+                    if (i < this.otherVehicles.length - 1) {
+                        helper(i + 1)
+                    } else {
+                        resolve()
+                    }
+                })
+            }
+            if (this.otherVehicles.length > 0) {
+                helper(0)
+            }
+        })
     }
 
     changeTrack(trackName: TrackName) {
@@ -387,7 +372,7 @@ export class LowPolyTestScene extends GameScene {
 
 
 
-    async createVehicle() {
+    async createTestVehicle() {
         const promise = new Promise<void>((resolve, reject) => {
 
 
@@ -518,10 +503,12 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
-    vehicleCollidedWithObject(object: any, vehicleNumber: number) {
-        if (object instanceof Wagon) {
+    vehicleCollidedWithObject(object: ExtendedObject3D, vehicleNumber: number) {
+
+        if (isWagon(object)) {
             if (vehicleNumber === 0) {
-                (object as Wagon).connectToVehicle(this.vehicle)
+                const wagonNumber = getWagonNumber(object.name)
+                this.wagons[wagonNumber].connectToVehicle(this.vehicle)
             }
             //(object as Wagon).connectToVehicle(vehicle)
         }
@@ -537,7 +524,7 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
-    update(time: number) {
+    _updateChild(time: number) {
         //      this.physics.physicsWorld.stepSimulation(1)
 
         // console.log("this phy", this.physics.physicsWorld.getWorldInfo())
@@ -585,9 +572,7 @@ export class LowPolyTestScene extends GameScene {
                 bestLapTimeDiv.innerHTML = this.gameTime.getBestLapTime() + ""
             }
         }
-        if (this.wagon.isReady) {
-            this.wagon.update()
-        }
+
         this._upd()
     }
 
@@ -645,10 +630,9 @@ export class LowPolyTestScene extends GameScene {
         this.canStartUpdate = false
 
         this.vehicleColorNumber += 1
-        this.wagon.destroy()
-        this.wagon = new Wagon(this, this.wagonType)
+
         this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType, true)
-        this.createVehicle()
+        this.createTestVehicle()
 
     }
 

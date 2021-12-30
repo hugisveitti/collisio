@@ -1,18 +1,16 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Quaternion, Group, LoadingManager, Object3D, Vector3, Euler, PointLight } from "three";
+import { Euler, Group, Object3D, PointLight, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
-import { getDeviceType, getStaticPath } from "../utils/settings";
+import { getStaticPath } from "../utils/settings";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
+import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
+import "./course.css";
+import { CourseItemsLoader } from "./CoursetemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
 import { ICourse } from "./ICourse";
-import "./course.css"
-import { radToDeg } from "../utils/utilFunctions";
-import { yellow2 } from "../providers/theme";
-import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
-import { CourseItemsLoader } from "./CoursetemsLoader";
 import { courseManager } from "./loadingManager";
 
 
@@ -47,6 +45,9 @@ export class Course implements ICourse {
 
     courseItemsLoader: CourseItemsLoader
 
+    vehicles: ExtendedObject3D[]
+    wagons: ExtendedObject3D[]
+
     constructor(gameScene: GameScene, trackName: TrackName) {
         this.gameScene = gameScene
         this.trackName = trackName
@@ -59,6 +60,8 @@ export class Course implements ICourse {
         this.rotatingObjects = []
         this.engineOffObjects = []
         this.breakBlocks = []
+        this.vehicles = []
+        this.wagons = []
         this.courseItemsLoader = new CourseItemsLoader(this)
     }
 
@@ -168,9 +171,18 @@ export class Course implements ICourse {
         this.gameScene.scene.remove(this.courseScene)
         for (let obj of this.gamePhysicsObjects) {
             this.gameScene.destroy(obj)
-
         }
     }
+
+    restartCourse() {
+        this._restartCourse()
+    }
+
+    _restartCourse() {
+
+    }
+
+
 
     calcSpawnAngle(_p2: Vector3, _p1: Vector3) {
         const p1 = _p1.clone()

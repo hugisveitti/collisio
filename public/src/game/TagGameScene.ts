@@ -259,7 +259,7 @@ export class TagGameScene extends GameScene {
     }
 
 
-    update(time: number) {
+    _updateChild(time: number) {
         this.ticks += 1
         this.updateFps(time)
 

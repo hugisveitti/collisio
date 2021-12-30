@@ -155,9 +155,6 @@ export class LowPolyVehicle implements IVehicle {
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
         this.is4x4 = vehicleConfigs[this.vehicleType].is4x4
 
-        console.log("vehicle config", this.vehicleType, ":", vehicleConfigs[this.vehicleType])
-
-
         this.currentEngineForce = 0
         this.spinCameraAroundVehicle = false
         this.vector = new Ammo.btVector3(0, 0, 0)
@@ -385,7 +382,7 @@ export class LowPolyVehicle implements IVehicle {
         this.break(true)
         let slowBreakForce = 2000
         slowBreakForce *= -Math.sign(this.getCurrentSpeedKmHour())
-        if (Math.abs(this.getCurrentSpeedKmHour()) < 10) slowBreakForce = 0
+        if (Math.abs(this.getCurrentSpeedKmHour()) < 5) slowBreakForce = 0
 
 
         if (this.is4x4) {
@@ -497,7 +494,7 @@ export class LowPolyVehicle implements IVehicle {
         }
     }
 
-    // this could be configured in blender, using a connection-point object4d
+    // this could be configured in blender, using a connection-point object3d
     getTowPivot() {
         return vehicleConfigs[this.vehicleType].towPosition
     }
@@ -627,8 +624,6 @@ export class LowPolyVehicle implements IVehicle {
                 return false
             }
             const normal = this.cameraRay.getHitNormalWorld()
-            console.log("normal", normal)
-            console.log("left hit", obj,)
             return true
         }
         return true
@@ -722,7 +717,8 @@ export class LowPolyVehicle implements IVehicle {
     setPosition(x: number | undefined, y: number | undefined, z: number | undefined) {
         const tm = this.vehicle.getChassisWorldTransform()
         const p = tm.getOrigin()
-        this.vector.setValue(x ?? p.x(), y ?? p.y(), z ?? p.z())
+        const wheelY = this.getVehicleYOffset()
+        this.vector.setValue(x ?? p.x(), (y ?? p.y()) + wheelY, z ?? p.z())
         tm.setOrigin(this.vector)
     };
 
@@ -782,15 +778,23 @@ export class LowPolyVehicle implements IVehicle {
         console.warn("Not implemented")
     };
 
+    /**
+     * return the height vehicle needs to offset from its relative origin to reach to bottom of the wheels 
+     */
+    getVehicleYOffset() {
+        const frontHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightFront + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusFront
+        const backHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusBack
+        const y = Math.max(backHeight, frontHeight) ?? 2
+        return y
+    }
+
     resetPosition() {
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
 
-        const frontHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightFront + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusFront
-        const backHeight = - vehicleConfigs[this.vehicleType].wheelAxisHeightBack + vehicleConfigs[this.vehicleType].suspensionRestLength + vehicleConfigs[this.vehicleType].wheelRadiusBack
-        const y = Math.max(backHeight, frontHeight) ?? 2
-        this.setPosition(position.x, position.y + y, position.z)
+
+        this.setPosition(position.x, position.y, position.z)
 
         if (!(rotation instanceof Quaternion)) {
             this.setRotation(rotation.x, rotation.y, rotation.z)

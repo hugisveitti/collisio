@@ -1,5 +1,16 @@
 export type WagonType = "smallWagon" | "tractorWagon"
 
+export const allWagonTypes: { name: string, type: WagonType }[] = [
+    {
+        type: "smallWagon",
+        name: "Small wagon"
+    },
+    {
+        type: "tractorWagon",
+        name: "Tractor Wagon"
+    }
+]
+
 export interface IWagonConfig {
     path: string
     mass: number

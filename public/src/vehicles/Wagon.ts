@@ -24,6 +24,13 @@ const tiresConfig = [
     },
 ]
 
+export const getWagonNumber = (name: string) => {
+    return +name.split("-")[1]
+}
+
+export const isWagon = (object: ExtendedObject3D) => {
+    return object.name.slice(0, 5) === "wagon"
+}
 
 export class Wagon {
 
@@ -41,16 +48,29 @@ export class Wagon {
 
     axisDiff: Vector3
     connectionDiff: Vector3
+    wagonNumber: number
 
-    constructor(scene: GameScene, wagonType: WagonType) {
+    vehicleConnectionNumber: number
+
+    constructor(scene: GameScene, wagonType: WagonType, wagonNumber: number) {
+        this.wagonNumber = wagonNumber
         this.wagonType = wagonType
         this.config = wagonConfigs[this.wagonType]
         this.tires = []
         this.scene = scene
-        console.log("creating wagon")
-        this.loadModels().then(() => {
-            console.log("wagon loaded")
+        this.vehicleConnectionNumber = -1
+    }
+
+    /**
+     * Async load models and create the constraints
+     * @returns a promise
+     */
+    async constructWagon() {
+        return new Promise<void>(async (resolve, reject) => {
+            await this.loadModels()
             this.createWagonWithAxis()
+            console.log("created wagon with axis")
+            resolve()
         })
     }
 
@@ -64,6 +84,7 @@ export class Wagon {
 
         this.scene.add.existing(this.axis)
         this.scene.add.existing(this.wagonBody)
+        this.wagonBody.name = `wagon-${this.wagonNumber}`
 
         this.wagonBody.position.setY(this.wagonBody.position.y + yPos);
         this.axis.position.setY(this.axis.position.y + yPos);
@@ -79,12 +100,8 @@ export class Wagon {
         this.isReady = true
     }
 
-    createAxis() {
-        const axisMass = 50
-        this.scene.physics.add.existing(this.axis, { mass: axisMass, shape: "convex" })
-        // this.axis.body.setAngularFactor(0, .1, 1)
-        // const a = this.axis.body.ammo.getAngularFactor()
-        // console.log("ang fac", a.x(), a.y(), a.z())
+    async createAxis() {
+        this.scene.physics.add.existing(this.axis, { mass: 50, shape: "convex" })
     }
 
 
@@ -92,7 +109,7 @@ export class Wagon {
         this.wagonBody.body.checkCollisions = true
         this.wagonBody.body.on.collision((otherObject, e) => {
             if (isVehicle(otherObject)) {
-                this.scene.vehicleCollidedWithObject(this, getVehicleNumber(otherObject.name))
+                this.scene.vehicleCollidedWithObject(this.wagonBody, getVehicleNumber(otherObject.name))
             }
         })
 
@@ -103,14 +120,6 @@ export class Wagon {
     }
 
     update() {
-        // const p = this.wagonBody.position
-        // const r = this.wagonBody.rotation
-        // this.connectPoint.position.set(
-        //     p.x,
-        //     p.y,
-        //     p.z ,
-        // )
-        // this.connectPoint.body.needUpdate = true
     }
 
     createAxisHinge() {
@@ -164,14 +173,21 @@ export class Wagon {
         const awp0 = wR.y + dAngle
         const awp1 = wR.y - dAngle
 
+        // console.log("awp1 < awv && awv < awp0 && isBetweenAngles(smallerAngle, biggerAngle, vR.y)")
+        // console.log(awp1 < awv)
+        // console.log(awv < awp0)
 
-        if (awp1 < awv && awv < awp0 && isBetweenAngles(smallerAngle, biggerAngle, vR.y)) {
+        console.log(isBetweenAngles(smallerAngle, biggerAngle, vR.y))
+
+        if ((awp1 < awv || awv < awp0) && isBetweenAngles(smallerAngle, biggerAngle, vR.y)) {
+
             this.hinge = this.scene.physics.add.constraints.hinge(vehicle.vehicleBody.body, this.wagonBody.body, {
                 axisA: { y: 1, },
                 axisB: { y: 1 },
                 pivotA: vehicle.getTowPivot(),
-                pivotB: { ...this.connectPoint.position, y: -.5 }
+                pivotB: { ...this.connectPoint.position }
             }, false)
+            this.vehicleConnectionNumber = vehicle.vehicleNumber
             this.removeWagonCollisionDetection()
             return true
         } else {
@@ -180,13 +196,14 @@ export class Wagon {
         }
     }
 
-    setPosition(pos: Vector3) {
+    async setPositionRotation(pos: Vector3, q: Quaternion) {
+
         if (this.axisHinge) {
             this.scene.physics.physicsWorld.removeConstraint(this.axisHinge)
         }
 
-        this.scene.physics.destroy(this.wagonBody.body)
         this.scene.physics.destroy(this.axis.body)
+        this.scene.physics.destroy(this.wagonBody.body)
         const yOff = 2
 
         this.wagonBody.position.set(pos.x, pos.y + yOff, pos.z)
@@ -196,30 +213,27 @@ export class Wagon {
             this.wagonBody.position.y - this.axisDiff.y,
             this.wagonBody.position.z - this.axisDiff.z
         )
-
-        this.scene.physics.add.existing(this.wagonBody, { shape: "convex", mass: this.config.mass })
-        this.createAxis()
-        this.createAxisHinge()
-        this.createWagonCollisionDetection()
-    }
-
-    setRotation(q: Quaternion) {
-        if (this.axisHinge) {
-            this.scene.physics.physicsWorld.removeConstraint(this.axisHinge)
-        }
-        this.scene.physics.destroy(this.wagonBody.body)
-        this.scene.physics.destroy(this.axis.body)
-
         this.wagonBody.rotation.setFromQuaternion(q)
         this.axis.rotation.setFromQuaternion(q)
 
-        this.scene.physics.add.existing(this.wagonBody, { shape: "convex", mass: this.config.mass })
-        this.createAxis()
-        this.createAxisHinge()
-        this.createWagonCollisionDetection()
+        // dont know why but the axis wasnt being rendere correctly, this fixed it
+        // I suspect some timing stuff and something being async
+        setTimeout(() => {
+            this.scene.physics.add.existing(this.axis, { mass: 50, shape: "convex" })
+            this.scene.physics.add.existing(this.wagonBody, { shape: "convex", mass: this.config.mass })
+            this.createAxisHinge()
+            this.createWagonCollisionDetection()
+        }, 100)
+
+    }
+
+
+    isConnectedToVehicle(vehicle: IVehicle) {
+        return vehicle.vehicleNumber === this.vehicleConnectionNumber
     }
 
     removeConnection() {
+        this.vehicleConnectionNumber = -1
         // how to destroy
         // this.hinge.
         if (this.hinge) {
@@ -235,128 +249,6 @@ export class Wagon {
     }
 
 
-    /**
-     * Configure where the wheels will be and stuff
-     */
-    createWagonConstraint() {
-        if (!this.connectPoint || !this.wagonBody || this.tires.length < 2) {
-            console.warn("Error loading models:")
-            console.warn(this.connectPoint, this.wagonBody, this.tires)
-            return
-        }
-        console.log("models")
-        console.log(this.connectPoint, this.wagonBody, this.tires)
-
-        let tireMass = 20
-
-        const p = new Vector3(0, 5, 0)
-        this.scene.add.existing(this.wagonBody)
-        this.wagonBody.geometry.center()
-        this.wagonBody.position.set(p.x, p.y, p.z)
-
-        const wheelXOffset = (this.config.wheelHalfTrack / 2)
-        const wheelZOffset = this.config.wheelAxisPosition
-        const wheelYOffset = this.config.wheelAxisHeight
-
-        this.scene.add.existing(this.tires[RIGHT])
-        this.tires[RIGHT].position.set(p.x - wheelXOffset, p.y + wheelYOffset, p.z + wheelZOffset)
-
-        this.scene.add.existing(this.tires[LEFT])
-        this.tires[LEFT].position.set(p.x + wheelXOffset, p.y + wheelYOffset, p.z + wheelZOffset);
-
-        //   (this.tires[LEFT].material as MeshLambertMaterial).transparent = true
-        // this.tires[RIGHT].visible = false
-
-        this.tires[LEFT].geometry.center()
-        this.tires[RIGHT].geometry.center()
-        for (let tire of this.tires) {
-            this.scene.physics.add.existing(tire, { mass: tireMass, shape: "convex" })
-
-        }
-        //    this.wagonBody.visible = false
-        // this.scene.physics.add.existing(this.wagonBody,
-        //     { mass: 100, shape: "box" }
-        // )
-        const pLeft = this.tires[LEFT].position
-        const pRight = this.tires[RIGHT].position
-
-        console.log("pleft", pLeft, pRight)
-
-
-        const axisRadius = 0.06
-        const axisHeight = pLeft.distanceTo(pRight) + .8
-
-        const axis = this.scene.add.cylinder({
-            mass: 10, radiusTop: axisRadius, radiusBottom: axisRadius, height: axisHeight
-        }, {
-            lambert: { color: "blue", opacity: 0.5 }
-        })
-        //  axis.geometry.center()
-        axis.rotateZ(Math.PI / 2)
-        axis.position.setZ(pLeft.z)
-        axis.position.setY(pLeft.y)
-
-        this.scene.physics.add.existing(axis)
-
-
-        const leftRotor = this.addRotor(pLeft.x, pLeft.y, pLeft.z)
-        const rightRotor = this.addRotor(pRight.x, pRight.y, pRight.z)
-
-
-
-
-        const lockRight = this.scene.physics.add.constraints.fixed(rightRotor.body, axis.body, true)
-        const lockLeft = this.scene.physics.add.constraints.fixed(leftRotor.body, axis.body, true)
-
-
-
-        let wheelToRotorConstraint = { axisA: { y: 1 }, axisB: { z: 1 } }
-
-        const left = this.scene.physics.add.constraints.hinge(
-            leftRotor.body,
-            this.tires[LEFT].body,
-            {
-                ...wheelToRotorConstraint,
-                pivotA: {
-                    y: -.8
-                },
-                pivotB: {
-
-                }
-            },
-            true
-        )
-
-        const right = this.scene.physics.add.constraints.hinge(
-            rightRotor.body,
-            this.tires[RIGHT].body,
-            {
-                ...wheelToRotorConstraint,
-                pivotA: {
-                    y: .8
-                },
-                pivotB: {
-
-                }
-            },
-            true
-        )
-    }
-
-    addRotor(x: number, y: number, z: number) {
-        let transparent = true
-        const rotorMass = 10
-        const rotor = this.scene.add.cylinder(
-            { mass: rotorMass, radiusBottom: 0.35, radiusTop: 0.35, radiusSegments: 24, height: 0.5 },
-            { lambert: { color: 'green', opacity: 0.5, transparent } }
-        )
-
-        rotor.position.set(x, y, z)
-        rotor.rotateZ(Math.PI / 2)
-
-        this.scene.physics.add.existing(rotor)
-        return rotor
-    }
 
     destroy() {
         if (this.hinge) {
@@ -376,11 +268,11 @@ export class Wagon {
             loader.load(getStaticPath(`models/${this.config.path}`), (gltf: GLTF) => {
                 for (let child of gltf.scene.children) {
                     if (child.name.includes("wagon")) {
-                        this.wagonBody = child as ExtendedObject3D
+                        this.wagonBody = (child as ExtendedObject3D)
                     } else if (child.name === "connect-point") {
-                        this.connectPoint = child as ExtendedObject3D
+                        this.connectPoint = (child as ExtendedObject3D)
                     } else if (child.name === "axis") {
-                        this.axis = child as ExtendedObject3D
+                        this.axis = (child as ExtendedObject3D)
                     }
                     else {
                         for (let tireConfig of tiresConfig) {

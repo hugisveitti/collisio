@@ -1,3 +1,8 @@
+import { VehicleType } from "../shared-backend/shared-stuff"
+import { itemInArray } from "../utils/utilFunctions"
+import { allVehicleTypes } from "../vehicles/VehicleConfigs"
+import { allWagonTypes, WagonType } from "../vehicles/WagonConfigs"
+
 const structureBounciness = 0.05
 const treeBounciness = 0.1
 
@@ -238,6 +243,20 @@ export const gameItems = {
         shape: "concave",
         isCourseObjectArray: true,
         objectName: "breakBlocks"
+    },
+    "vehicle": {
+        shape: "concave",
+        collisionFlags: 5,
+        notAddPhysics: true,
+        isCourseObjectArray: true,
+        objectName: "vehicles"
+    },
+    "wagon": {
+        shape: "concave",
+        collisionFlags: 5,
+        notAddPhysics: true,
+        isCourseObjectArray: true,
+        objectName: "wagons"
     }
 
 
@@ -250,4 +269,37 @@ export const keyNameMatch = (key: string, name: string) => {
         return key === name
     }
     return name.includes(key)
+}
+
+
+/**
+ * 
+ * in blender vehicles can have name such as:
+ * vehicle-tractor.001 
+ * and we want only tractor
+ * @param name to parse
+ */
+export const getVehicleTypeFromName = (name: string): VehicleType | undefined => {
+    for (let vehicle of allVehicleTypes) {
+        if (name.includes(vehicle.type)) {
+            return vehicle.type
+        }
+    }
+    return undefined
+}
+
+/**
+ * 
+ * in blender vehicles can have name such as:
+ * wagon-tractorWagon.001 
+ * and we want only tractorWagon
+ * @param name to parse
+ */
+export const getWagonTypeFromName = (name: string): WagonType | undefined => {
+    for (let vehicle of allWagonTypes) {
+        if (name.includes(vehicle.type)) {
+            return vehicle.type
+        }
+    }
+    return undefined
 }

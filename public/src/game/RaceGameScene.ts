@@ -320,13 +320,11 @@ export class RaceGameScene extends GameScene {
         if (this.gameRoomActions.updateScoreTable) {
             this.gameRoomActions.updateScoreTable({ timeInfos })
         }
-
         this.totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
     }
 
 
-
-    update(time: number) {
+    _updateChild(time: number) {
         this.time = time
         this.updateFps(time)
 
@@ -345,7 +343,6 @@ export class RaceGameScene extends GameScene {
                 this.startGameSong()
             }
             if (this.roomTicks % 90 === 0) {
-
                 this.updatePing()
             }
 
