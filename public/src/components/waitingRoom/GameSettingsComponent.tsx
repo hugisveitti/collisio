@@ -75,7 +75,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               disabled={disableInputs}
               title="No. of laps"
               value={gameSettings.numberOfLaps}
-              numbers={[1, 2, 3, 5, 7]}
+              numbers={[1, 2, 3, 5, 7, 13]}
               onChange={(val) => {
                 updateGameSettings("numberOfLaps", val);
               }}

@@ -1,5 +1,5 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Object3D, PointLight } from "three";
+import { Object3D, PointLight, MeshStandardMaterial } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { yellow2 } from "../providers/theme";
 import { Course } from "./Course";
@@ -157,6 +157,7 @@ export class CourseItemsLoader {
 
     loadGameItemsToCourse(gltf: GLTF) {
         const itemKeys = Object.keys(gameItems)
+        console.log("gltf", gltf.scene.children)
 
         /* items named hidden-X in blender, will have physics but will be invisible
         *  items named ghost-X in blender won't have physics but will be visible
@@ -164,6 +165,7 @@ export class CourseItemsLoader {
         *  but then render a box in their place for the physics
         */
         for (let child of gltf.scene.children) {
+
             if (child.name.includes("_light")) {
                 this.handleCreateLight(child)
             } else if (child.type === "Mesh" || child.type === "Group") {

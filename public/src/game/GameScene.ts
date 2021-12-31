@@ -223,6 +223,16 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.scene.add(this.pLight)
 
+
+        const pLight2 = new PointLight(0xffffff, pointLightIntesity, 0, 1)
+        pLight2.position.set(-100, 150, -100);
+        if (this.useShadows && this.timeOfDay === "day") {
+            this.pLight.castShadow = true
+            this.pLight.shadow.bias = 0.01
+        }
+
+        this.scene.add(pLight2)
+
         const hLight = new HemisphereLight(hemisphereTopColor, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
