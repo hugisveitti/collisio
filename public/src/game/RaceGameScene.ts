@@ -321,6 +321,9 @@ export class RaceGameScene extends GameScene {
             this.gameRoomActions.updateScoreTable({ timeInfos })
         }
         this.totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
+        if (this.gameSceneConfig.onlyMobile) {
+            this.viewsNameInfo[0].innerHTML = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
+        }
     }
 
 
@@ -345,7 +348,6 @@ export class RaceGameScene extends GameScene {
             if (this.roomTicks % 90 === 0) {
                 this.updatePing()
             }
-
         }
     }
 

@@ -147,9 +147,9 @@ export class LowPolyTestScene extends GameScene {
 
         // this could do something for the jitter of the vehicle
         // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
-        // this.physics.config.maxSubSteps = 10
-        // this.physics.config.fixedTimeStep = 1 / (60 * 4)
-
+        //this.physics.config.maxSubSteps = 10
+        // this.physics.config.fixedTimeStep = 1 / 120
+        // this.__config.fixedTimeStep =  1 / 120
 
         this.addLights()
 
@@ -279,7 +279,7 @@ export class LowPolyTestScene extends GameScene {
         this.courseLoaded = true
         await this.createOtherVehicles()
         await this.createTestVehicle()
-        this.vehicle.useBadRotationTicks = false
+        this.vehicle.useBadRotationTicks = true
 
         const allVehicles = this.otherVehicles.concat(this.vehicle)
         this.vehicles = allVehicles
@@ -477,8 +477,6 @@ export class LowPolyTestScene extends GameScene {
         `
     }
 
-
-
     onWindowResize() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -499,7 +497,7 @@ export class LowPolyTestScene extends GameScene {
             this.vehicleControls = new VehicleControls()
 
             this.driveVehicle = addTestControls(this.socket, this.vehicle)
-
+            //this.driveVehicle()
         }
     }
 
@@ -514,6 +512,7 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
+    // this.vehicle isnt appart of allVehicles in GameScene class
     updateVehicles() {
         this.vehicle.update()
     }

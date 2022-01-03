@@ -21,11 +21,14 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     l3: Vector3
     l4: Vector3
 
+    inertia: Ammo.btVector3
+
 
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
         super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
         //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
+        this.inertia = new Ammo.btVector3(0, 0, 0)
         if (intelligentDriveLine) {
 
             this.l1 = new Vector3(0, 0, 0)
@@ -126,16 +129,17 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     /** Maybe better to have one vector we set values to, instead of always new */
     getAmmoInertia(): Ammo.btVector3 {
         const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
-        return new Ammo.btVector3(x, y, z)
+        this.inertia.setValue(x, y, z)
+        return this.inertia
     }
 
     /** This is actually setting the position of the chassis relative to the world, 
      * To actually set the center of mass, then would probably have to do it when creating the mesh,https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2209
      */
     setCenterOfMass(vec: SimpleVector) {
-        let tf = new Ammo.btTransform()
-        tf.setOrigin(new Ammo.btVector3(vec.x, vec.y, vec.z))
-        this.vehicleBody.body.ammo.setCenterOfMassTransform(tf)
+        this.vector.setValue(vec.x, vec.y, vec.z)
+        this.tm.setOrigin(this.vector)
+        this.vehicleBody.body.ammo.setCenterOfMassTransform(this.tm)
     }
 
 

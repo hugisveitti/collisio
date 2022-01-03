@@ -123,7 +123,7 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
 
     return () => {
         if (!driveWithKeyboard) {
-            socket.once(std_controls, (data) => {
+            socket.on(std_controls, (data) => {
                 const { mobileControls: _mobileControls } = data as { mobileControls: MobileControls }
                 mobileControls = _mobileControls
                 if (mobileControls?.f !== undefined) {

@@ -92,6 +92,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     viewsKmhInfo: HTMLSpanElement[]
     viewsImpornantInfo: HTMLSpanElement[]
+    viewsNameInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
     pingInfo: HTMLSpanElement
     fpsInfo: HTMLSpanElement
@@ -133,6 +134,13 @@ export class GameScene extends Scene3D implements IGameScene {
     extraVehicles: IVehicle[]
     wagons: Wagon[]
 
+    // for some reason on mobile you could get much higher (100+) fps
+    // but that never happened on desktop
+    targetFPS = 1 / 60
+    deltaFPS = 0
+    updateDelta = 0
+
+
     constructor() {
         super()
         this.needsReload = false
@@ -161,6 +169,8 @@ export class GameScene extends Scene3D implements IGameScene {
         this.viewsKmhInfo = []
         this.viewsImpornantInfo = []
         this.viewsImpornantInfoClearTimeout = [] as NodeJS.Timeout[]
+
+        this.viewsNameInfo = []
 
 
         this.pingInfo = document.createElement("span")
@@ -223,15 +233,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.scene.add(this.pLight)
 
-
-        const pLight2 = new PointLight(0xffffff, pointLightIntesity, 0, 1)
-        pLight2.position.set(-100, 150, -100);
-        if (this.useShadows && this.timeOfDay === "day") {
-            this.pLight.castShadow = true
-            this.pLight.shadow.bias = 0.01
-        }
-
-        this.scene.add(pLight2)
 
         const hLight = new HemisphereLight(hemisphereTopColor, 1)
         hLight.position.set(0, 1, 0);
@@ -312,7 +313,8 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async loadAssets() { }
 
-    async init() {
+    async init(data: any) {
+        console.log("data in init", data)
         // need to do some test with performance and the draw distance
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.gameSettings.drawDistance)
         this.renderer.setPixelRatio(1)
@@ -321,6 +323,56 @@ export class GameScene extends Scene3D implements IGameScene {
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
+
+        console.log("cache,", this.cache)
+    }
+
+
+    public async start(key?: string, data?: any) {
+
+        await this.init?.(data)
+        await this.preload()
+        await this.create()
+
+        // console.log('start')
+
+        this.renderer.setAnimationLoop(() => {
+            this._myupdate()
+        })
+
+        // this._isRunning = true
+    }
+
+    private _myupdate() {
+
+        const currDelta = this.clock.getDelta()
+        this.deltaFPS += currDelta
+        this.updateDelta += currDelta
+        if (this.deltaFPS > this.targetFPS) {
+            const delta = this.updateDelta * 1000
+            //   console.log("delta", delta.toFixed(3), (this.deltaFPS * 1000).toFixed(3))
+            this.updateDelta = 0
+            this.deltaFPS = this.deltaFPS % this.targetFPS
+            const time = this.clock.getElapsedTime()
+
+            this.physics?.update(delta)
+            this.physics?.updateDebugger()
+
+            this.update?.(parseFloat(time.toFixed(3)), parseInt(delta.toString()))
+
+            this.animationMixers.update(delta)
+
+            this.preRender()
+            if (this.composer) {
+                this.composer.render()
+            }
+            else {
+                this.renderer.render(this.scene, this.camera)
+            }
+            this.postRender()
+        } else {
+            // console.log("not rendering")
+        }
     }
 
     createWagons(wagonTypes: WagonType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
@@ -473,6 +525,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.views = []
         this.playerInfosContainer.innerHTML = ""
         this.viewsImpornantInfo = []
+        this.viewsNameInfo = []
         this.viewsKmhInfo = []
 
 
@@ -520,6 +573,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
             nameInfo.innerHTML = this.players[i].playerName
             viewDiv.appendChild(nameInfo)
+            this.viewsNameInfo.push(nameInfo)
 
             const kmInfo = document.createElement("span")
             viewDiv.appendChild(kmInfo)
@@ -1032,15 +1086,14 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     update(_time: number, _delta: number): void {
+        this._updateChild(_time)
         for (let vehicle of this.extraVehicles) {
             vehicle.update()
         }
-
         for (let wagon of this.wagons) {
             wagon.update()
         }
 
-        this._updateChild(_time)
     }
 
 
@@ -1056,13 +1109,12 @@ export class GameScene extends Scene3D implements IGameScene {
         }
         this.stop()
     }
-
 }
 
 
 
 export const startGame = (SceneClass: typeof GameScene, gameSceneConfig: IGameSceneConfig, callback: (gameObject: GameScene) => void) => {
-    const config = { scenes: [SceneClass], antialias: true, fixedTimeStep: 0.005 }
+    const config = { scenes: [SceneClass], antialias: true, autoStart: false }
     PhysicsLoader("/ammo", () => {
 
         const project = new Project(config)

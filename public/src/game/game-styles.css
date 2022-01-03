@@ -59,9 +59,9 @@
   text-shadow: 1px 1px white;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 1000px) {
   #totalTime {
     top: 5px;
-    font-size: 42px;
+    font-size: 24px;
   }
 }

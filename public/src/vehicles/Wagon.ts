@@ -52,6 +52,9 @@ export class Wagon {
 
     vehicleConnectionNumber: number
 
+    v = new Vector2(0, 0)
+    w = new Vector2(0, 0)
+
     constructor(scene: GameScene, wagonType: WagonType, wagonNumber: number) {
         this.wagonNumber = wagonNumber
         this.wagonType = wagonType
@@ -162,10 +165,10 @@ export class Wagon {
         // theta is the angle between v and the wagon through the origin (0,0)
         // we want the angle between v and (0,0) through w
         const theta = Math.abs(get2DAngleBetweenPoints(this.wagonBody.position, vehicle.vehicleBody.position))
-        const v = new Vector2(vP.x, vP.z)
-        const w = new Vector2(wP.x, wP.z)
-        const wv = v.distanceTo(w)
-        const val = v.length() * Math.sin(theta) / wv
+        this.v.set(vP.x, vP.z)
+        this.w.set(wP.x, wP.z)
+        const wv = this.v.distanceTo(this.w)
+        const val = this.v.length() * Math.sin(theta) / wv
         const awv = Math.asin(
             val % 1
         )
@@ -178,7 +181,8 @@ export class Wagon {
         // console.log(awv < awp0)
 
         console.log(isBetweenAngles(smallerAngle, biggerAngle, vR.y))
-
+        // TODO: there is a bug here
+        // the or (||) is just a temp fix to make it atleast possible to connect
         if ((awp1 < awv || awv < awp0) && isBetweenAngles(smallerAngle, biggerAngle, vR.y)) {
 
             this.hinge = this.scene.physics.add.constraints.hinge(vehicle.vehicleBody.body, this.wagonBody.body, {

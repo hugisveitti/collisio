@@ -130,6 +130,7 @@ export class LowPolyVehicle implements IVehicle {
     staticCameraPos: { x: number, y: number, z: number }
     // too see if camera is inside wall
     cameraRay: ClosestRaycaster
+    rayer: Ammo.ClosestRayResultCallback
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
@@ -159,6 +160,7 @@ export class LowPolyVehicle implements IVehicle {
         this.spinCameraAroundVehicle = false
         this.vector = new Ammo.btVector3(0, 0, 0)
         this.vector2 = new Ammo.btVector3(0, 0, 0)
+        this.rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2);
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
         this.transformCam = new Ammo.btTransform()
 
@@ -242,7 +244,7 @@ export class LowPolyVehicle implements IVehicle {
 
         this.addWheel(
             true,
-            this.vector,//   new Ammo.btVector3(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
+            this.vector,
             wheelRadiusFront,
             FRONT_LEFT
         )
@@ -250,7 +252,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vector.setValue(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
         this.addWheel(
             true,
-            this.vector,//new Ammo.btVector3(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition),
+            this.vector,
             wheelRadiusFront,
             FRONT_RIGHT
         )
@@ -259,7 +261,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
         this.addWheel(
             false,
-            this.vector,//  new Ammo.btVector3(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
+            this.vector,
             wheelRadiusBack,
             BACK_LEFT
         )
@@ -267,7 +269,7 @@ export class LowPolyVehicle implements IVehicle {
         this.vector.setValue(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
         this.addWheel(
             false,
-            this.vector,// new Ammo.btVector3(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition),
+            this.vector,
             wheelRadiusBack,
             BACK_RIGHT
         )
@@ -704,12 +706,15 @@ export class LowPolyVehicle implements IVehicle {
         this.vector2.setValue(pos.x, pos.y, pos.z);
         this.vector.setValue(pos.x, pos.y + 4, pos.z);
 
-        var rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2);
-        this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, rayer)
+
+
+        this.rayer.set_m_rayFromWorld(this.vector)
+        this.rayer.set_m_rayToWorld(this.vector2)
+        this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
 
         let groundY = 3
-        if (rayer.hasHit()) {
-            groundY = rayer.get_m_hitPointWorld().y()
+        if (this.rayer.hasHit()) {
+            groundY = this.rayer.get_m_hitPointWorld().y()
         }
         return groundY
     }
