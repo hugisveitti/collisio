@@ -35,8 +35,6 @@ export interface IEndOfGameData {
     endOfRaceInfo?: IEndOfRaceInfoGame
 }
 
-
-
 interface IUserSettingsMessage {
     playerNumber: number
     userSettings: IUserSettings
@@ -462,19 +460,20 @@ export class GameScene extends Scene3D implements IGameScene {
             for (let i = 0; i < this.players.length; i++) {
                 const color = possibleVehicleColors[chassisColOffset + i]
                 let newVehicle: IVehicle
-                if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
-                    newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+                const vehicleType = this.gameSceneConfig.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
+                if (getVehicleClassFromType(vehicleType) === "LowPoly") {
+                    newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, vehicleType, this.useSound)
                 } else {
-                    newVehicle = new SphereVehicle(this, color, this.players[i].playerName, i, this.players[i].vehicleType, this.useSound)
+                    newVehicle = new SphereVehicle(this, color, this.players[i].playerName, i, vehicleType, this.useSound)
                 }
                 this.vehicles.push(newVehicle)
-                if (getVehicleClassFromType(this.players[i].vehicleType) === "LowPoly") {
+                if (getVehicleClassFromType(vehicleType) === "LowPoly") {
                     batches.push(
-                        loadLowPolyVehicleModels(this.players[i].vehicleType, false).then(([tires, chassis]) => {
+                        loadLowPolyVehicleModels(vehicleType, false).then(([tires, chassis]) => {
                             this.vehicles[i].addModels(tires, chassis)
                         }))
                 } else {
-                    batches.push(loadSphereModel(this.players[i].vehicleType, false).then((body) => {
+                    batches.push(loadSphereModel(vehicleType, false).then((body) => {
                         this.vehicles[i].addModels([], body)
                     }))
                 }

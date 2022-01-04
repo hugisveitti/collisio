@@ -1,9 +1,8 @@
 import HelpIcon from "@mui/icons-material/Help";
-import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import QRCode from "qrcode";
 import React, { useEffect, useState } from "react";
@@ -11,6 +10,9 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IUser, IVehicleSettings } from "../../classes/User";
+import { setDBUserSettings } from "../../firebase/firestoreFunctions";
+import { checkIfCanStartGame } from "../../functions/validationFunctions";
+import { green4 } from "../../providers/theme";
 import {
   IPlayerInfo,
   std_start_game_callback,
@@ -24,17 +26,14 @@ import {
   socketHandleStartGame,
 } from "../../utils/socketFunctions";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import CopyTextButton from "../inputs/CopyTextButton";
+import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
 import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import GameSettingsComponent from "./GameSettingsContainer";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
-import { setDBUserSettings } from "../../firebase/firestoreFunctions";
-import { green4 } from "../../providers/theme";
-import FullscreenButton from "../inputs/FullscreenButton";
-import CopyTextButton from "../inputs/CopyTextButton";
-import { checkIfCanStartGame } from "../../functions/validationFunctions";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -214,6 +213,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       {onMobile && (
         <Grid item xs={12}>
           <VehicleSelect
+            disabled={!!props.store.tournament?.vehicleType}
             onChange={(vehicleType) => {
               if (!user) {
                 toast.error("You have to log in to change vehicles");
@@ -231,7 +231,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
                 );
               }
             }}
-            value={props.store.player.vehicleType}
+            value={
+              !!props.store.tournament?.vehicleType
+                ? props.store.tournament?.vehicleType
+                : props.store.player.vehicleType
+            }
             previewVehicle
             excludedVehicles={nonactiveVehcileTypes}
           />

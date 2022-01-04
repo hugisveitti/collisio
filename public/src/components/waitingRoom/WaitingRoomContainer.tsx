@@ -166,7 +166,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         props.store.setSocket(_socket);
         setDisplayNameModalOpen(true);
       });
-    } else {
+    } else if (props.store.socket) {
       if (!props.store.player) {
         /** if gotten here through url */
         /** shouldnt we catch this in the connect to room container */

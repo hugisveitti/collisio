@@ -19,6 +19,7 @@ export type TrackName =
     | "skii-map"
     | "farmers-little-helper-map"
     | "speed-test-track"
+    | "small-track"
 
 export type VehicleType = "normal"
     | "tractor"

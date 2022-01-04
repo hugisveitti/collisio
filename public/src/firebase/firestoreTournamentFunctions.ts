@@ -1,11 +1,10 @@
 import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
-import { Unsubscribe, User } from "firebase/auth";
+import { Unsubscribe } from "firebase/auth";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
 import { IUser } from "../classes/User";
-import GameSettingsComponent from "../components/waitingRoom/GameSettingsComponent";
 import { firestore } from "./firebaseInit";
-import { getUserFollowings } from "./firestoreFunctions"
+import { getUserFollowings } from "./firestoreFunctions";
 
 const tournamentPath = "tournaments"
 const tournamentPlayersPath = "players"
@@ -306,6 +305,7 @@ export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBrack
             message: "No tournament",
             status: "error"
         })
+        return
     }
 
     if (activeBracketNode) {
@@ -318,6 +318,7 @@ export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBrack
             message: "Global tournament going on.",
             status: "error"
         })
+        return
     }
 }
 

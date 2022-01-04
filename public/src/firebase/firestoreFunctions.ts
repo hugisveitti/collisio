@@ -1,11 +1,10 @@
-import { addDoc, deleteDoc, doc, getDoc, getDocs, where } from "@firebase/firestore"
+import { deleteDoc, doc, getDoc, getDocs, where } from "@firebase/firestore"
 import { collection, onSnapshot, query, setDoc } from "firebase/firestore"
-import { IFollower, IPrivateUser, IPublicUser, IUser, IUserSettings } from "../classes/User"
 import { v4 as uuid } from "uuid"
-
-import { firestore } from "./firebaseInit"
 import { IRoomInfo } from "../classes/Game"
-import { ids } from "webpack"
+import { IFollower, IPrivateUser, IPublicUser, IUserSettings } from "../classes/User"
+import { firestore } from "./firebaseInit"
+
 
 const usersCollectionRefPath = "users"
 const publicUserCollectionPath = "profiles"

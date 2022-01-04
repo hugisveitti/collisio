@@ -1,10 +1,10 @@
-import { collection, doc, orderBy, query, getDoc, limit, where, getDocs, updateDoc, arrayUnion, setDoc, onSnapshot, deleteDoc } from "@firebase/firestore"
-
-import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRoomInfo } from "../classes/Game"
+import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, setDoc, where } from "@firebase/firestore"
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game"
 import { IFlattendBracketNode } from "../classes/Tournament"
 import { TrackName } from "../shared-backend/shared-stuff"
 import { firestore } from "./firebaseInit"
 import { saveTournamentRaceDataPlayer, saveTournamentRaceGame, TournamentFinishedResponse } from "./firestoreTournamentFunctions"
+
 
 const highscoresRefPath = "highscores"
 const bestHighscoresRefPath = "bestHighscores"

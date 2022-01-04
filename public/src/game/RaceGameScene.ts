@@ -255,11 +255,15 @@ export class RaceGameScene extends GameScene {
                 if (this.winner === "") {
                     this.winner = this.players[vehicleNumber].playerName
                     this.winTime = totalTime
-
                 }
-                this.setViewImportantInfo(`Race finished, total time: ${totalTime}`, +vehicleNumber)
-                this.prepareEndOfRacePlayer(+vehicleNumber)
-                this.checkRaceOver()
+
+                if (!this.gameTimers[vehicleNumber].hasSendRaceData) {
+
+                    this.setViewImportantInfo(`Race finished, total time: ${totalTime}`, +vehicleNumber)
+                    this.prepareEndOfRacePlayer(+vehicleNumber)
+                    this.checkRaceOver()
+                    this.gameTimers[vehicleNumber].hasSendRaceData = true
+                }
             } else {
                 this.setViewImportantInfo(`Lap time: ${cLapTime.toFixed(2)}`, +vehicleNumber, true)
             }

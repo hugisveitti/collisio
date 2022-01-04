@@ -17,6 +17,7 @@ export class GameTime {
     totalNumberOfLaps: number
     lapTimes: number[]
     totalTime: number
+    hasSendRaceData: boolean
 
     constructor(totalNumberOfLaps: number, numberOfCheckpoints: number) {
         this.totalNumberOfLaps = totalNumberOfLaps
@@ -31,6 +32,7 @@ export class GameTime {
         }
         this.lapTimes = []
         this.totalTime = 0
+        this.hasSendRaceData = false
     }
 
     resetCheckpoints() {
@@ -114,5 +116,8 @@ export class GameTime {
         this.lapNumber = 1
         this.lapTimes = []
         this.bestLapTime = Infinity
+        this.hasSendRaceData = false
     }
+
+
 }

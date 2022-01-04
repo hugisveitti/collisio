@@ -2,6 +2,7 @@
 import { Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IGameSettings } from "../classes/localGameSettings";
+import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { IGameRoomActions } from "./GameScene";
@@ -14,6 +15,7 @@ export interface IGameSceneConfig {
     gameRoomActions: IGameRoomActions
     onlyMobile?: boolean
     mobileController?: MobileControls
+    tournament?: Tournament
 }
 
 export interface IGameScene extends Scene3D {

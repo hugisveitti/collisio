@@ -20,6 +20,7 @@ interface IVehicleSelect {
   previewVehicle?: boolean;
   excludedVehicles?: VehicleType[];
   fullWidth?: boolean;
+  disabled?: boolean;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
@@ -36,6 +37,7 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
       <FormControl fullWidth={props.fullWidth}>
         <InputLabel id="vehicle-select">Vehicle</InputLabel>
         <Select
+          disabled={props.disabled}
           style={{
             backgroundColor: inputBackgroundColor,
           }}

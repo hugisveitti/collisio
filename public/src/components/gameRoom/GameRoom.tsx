@@ -164,6 +164,7 @@ const GameRoom = (props: IGameRoom) => {
           playerFinished: handlePlayerFinished,
           closeModals: handleCloseModals,
         },
+        tournament: props.store.tournament,
       },
       (_gameObject) => {
         setGameObject(_gameObject);
@@ -217,8 +218,7 @@ const GameRoom = (props: IGameRoom) => {
       }
       if (gameActions.restart) {
         gameObject.restartGame();
-        setEndOfGameModalOpen(false);
-        setSettingsModalOpen(false);
+        handleCloseModals();
       }
     }
   }, [gameActions]);
@@ -241,15 +241,13 @@ const GameRoom = (props: IGameRoom) => {
       />
       <EndOfGameModal
         open={endOfGameModalOpen}
-        onClose={() => setEndOfGameModalOpen(false)}
+        onClose={() => handleCloseModals()}
         data={endOfGameData}
         restartGame={() => {
           if (gameObject) {
             gameObject.restartGame();
-            setEndOfGameModalOpen(false);
           }
-          currentRaceInfo = [];
-          setGameDataInfo([]);
+          handleCloseModals();
         }}
         scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}

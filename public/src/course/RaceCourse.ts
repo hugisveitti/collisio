@@ -15,9 +15,6 @@ export class RaceCourse extends Course implements IRaceCourse {
     goal: ExtendedObject3D
     goalSpawn: ExtendedObject3D
 
-
-
-
     goalCrossedCallback: (vehicle: ExtendedObject3D) => void
     checkpointCrossedCallback: (vehicle: ExtendedObject3D, checkpointNumber: number) => void
 
