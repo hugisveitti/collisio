@@ -4,8 +4,8 @@ import { saveRaceData, saveRaceDataGame } from "../firebase/firestoreGameFunctio
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
 
-const id1 = "LdEGkMu2r2QCdJ8wMerp1bkRrqd2"
-const id2 = "LEzfm3UQl7b6CKUupasInidva9W2"
+const id1 = "123"
+const id2 = "123"
 const id3 = null
 
 const name1 = "test-player-1"
@@ -112,7 +112,9 @@ export const createFakeHighscoreData = () => {
         }
 
 
-        saveRaceDataGame(gameData)
+        saveRaceDataGame(gameData, res => {
+            console.log("res", res)
+        })
 
         //  saveRaceData(playerData[1].playerId, playerData[1])
         saveRaceData(playerData[0].playerId, playerData[0], (info) => console.log("info about race", info))

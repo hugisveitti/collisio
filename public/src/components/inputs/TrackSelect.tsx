@@ -10,6 +10,10 @@ import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { allTrackNames, ITrackInfo } from "../../classes/Game";
 import f1TrackImage from "../../images/tracks/f1-track.PNG";
+import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
+import russiaTrackImage from "../../images/tracks/russia-top.png";
+import ferrariTrackImage from "../../images/tracks/ferrari-top.png";
+
 import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
 import { inputBackgroundColor } from "../../providers/theme";
@@ -23,8 +27,11 @@ interface ITrackImagePair {
 
 const trackImagePair: ITrackImagePair[] = [
   { trackName: "f1-track", image: f1TrackImage },
+  { trackName: "f1-track-2", image: f12TrackImage },
   { trackName: "farm-track", image: farmTrackImage },
   { trackName: "sea-side-track", image: seaSideTrackImage },
+  { trackName: "russia-track", image: russiaTrackImage },
+  { trackName: "ferrari-track", image: ferrariTrackImage },
 ];
 
 const getTrackImage = (trackName: TrackName) => {

@@ -66,7 +66,17 @@ const GameRoom = (props: IGameRoom) => {
 
   const handelGameFinished = (data: IEndOfGameData) => {
     setEndOfGameModalOpen(true);
-    saveRaceDataGame(data.endOfRaceInfo);
+    saveRaceDataGame(
+      data.endOfRaceInfo,
+      (res) => {
+        console.log("res after saving game!", res);
+        console.log("pre game data info ", res.message);
+        if (res.status === "success") {
+          setGameDataInfo(gameDataInfo.concat(res.message));
+        }
+      },
+      props.store.activeBracketNode
+    );
     setEndOfGameData(data);
   };
 

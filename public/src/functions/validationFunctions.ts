@@ -4,7 +4,6 @@ import { itemInArray } from "../utils/utilFunctions";
 export const checkIfCanStartGame = (store: IStore): { canStartGame: boolean, message: string } => {
 
     if (store.activeBracketNode) {
-
         const activeIds = [store.activeBracketNode.player1?.uid, store.activeBracketNode.player2?.uid]
         if (store.players.length === 2 && itemInArray(store.players[0].id, activeIds) && itemInArray(store.players[1].id, activeIds)) {
             return {
@@ -20,6 +19,5 @@ export const checkIfCanStartGame = (store: IStore): { canStartGame: boolean, mes
         }
 
     }
-
     return { canStartGame: true, message: "" }
 }

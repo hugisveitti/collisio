@@ -227,7 +227,7 @@ export const gameItems = {
     },
 
     "towel": {
-        collisionFlags: 0,
+        collisionFlags: 1,
         shape: "convex",
     },
 

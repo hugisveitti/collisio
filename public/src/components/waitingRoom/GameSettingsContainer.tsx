@@ -59,6 +59,8 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
       );
       console.log("active bracket node", activeBracketNode);
       props.store.setActiveBracketNode(activeBracketNode);
+    } else {
+      props.store.setActiveBracketNode(undefined);
     }
   };
 

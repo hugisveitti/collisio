@@ -1,5 +1,7 @@
-import { createBracketTree, ITournamentUser } from "../classes/Tournament";
-import { joinTournament } from "../firebase/firestoreTournamentFunctions";
+import { createBracketTree, ITournamentUser, LocalTournament } from "../classes/Tournament";
+import { IPrivateUser } from "../classes/User";
+import { setFirestorePrivateUser } from "../firebase/firestoreFunctions";
+import { getTournamentWithId, joinTournament, setTournament } from "../firebase/firestoreTournamentFunctions";
 
 const createTournamentUser = (name: string, id: string, ranking): ITournamentUser => {
     return {
@@ -33,15 +35,34 @@ export const createFakeBrackets = () => {
     return root
 }
 
-export const addFakesToTournament = (tournamentId: string, numberOfFakes: number) => {
+export const addFakesToTournament = async (tournamentId: string, numberOfFakes: number) => {
     const players: ITournamentUser[] = []
     for (let i = 0; i < numberOfFakes; i++) {
         players.push(createTournamentUser(`${i}player with the name ${i}`, `p${i}_id`, i))
     }
-    for (let p of players) {
 
+    const batch = []
+    for (let p of players) {
+        batch.push(setFirestorePrivateUser({
+            ...p,
+            latestLogin: -1
+        }))
+    }
+
+    await Promise.all(batch)
+
+    for (let p of players) {
         joinTournament(p, tournamentId).then(() => {
             console.log("p joined", p.displayName)
         })
     }
+
+    const tournament = await getTournamentWithId(tournamentId) as LocalTournament
+    const root = createBracketTree(players.length)
+    root.populateTree(players)
+    tournament.hasStarted = true
+    tournament.flattenBracket = root.flatten()
+
+    setTournament(tournament)
 }
+

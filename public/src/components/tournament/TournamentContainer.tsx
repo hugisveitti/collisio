@@ -1,6 +1,7 @@
 import { CircularProgress, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   GlobalTournament,
   ITournament,
@@ -120,7 +121,13 @@ const TournamentContainer = (props: ITournamentContainer) => {
           <Grid item xs={12}>
             <DeleteButton
               onDelete={() => {
-                deleteTournament(tournament.id);
+                deleteTournament(tournament.id)
+                  .then(() => {
+                    toast.success("Tournament successfully deleted");
+                  })
+                  .catch(() => {
+                    toast.error("Error deleting tournament");
+                  });
               }}
             />
           </Grid>

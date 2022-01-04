@@ -85,8 +85,8 @@ export class Tournament implements ITournament {
 export interface IFlattendBracketNode {
     player1?: ITournamentUser
     player2?: ITournamentUser
-    player1Score?: string
-    player2Score?: string
+    player1Score: number
+    player2Score: number
     height: number
     id: string
     parentId?: string
@@ -98,8 +98,8 @@ export interface IFlattendBracketNode {
 export class BracketTree {
     player1?: ITournamentUser
     player2?: ITournamentUser
-    player1Score?: string
-    player2Score?: string
+    player1Score: number
+    player2Score: number
     child1?: BracketTree
     child2?: BracketTree
     parent?: BracketTree
@@ -120,6 +120,8 @@ export class BracketTree {
         } else {
             this.id = "root"
         }
+        this.player1Score = 0
+        this.player2Score = 0
 
     }
 

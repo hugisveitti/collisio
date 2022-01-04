@@ -1,9 +1,10 @@
 import { collection, doc, orderBy, query, getDoc, limit, where, getDocs, updateDoc, arrayUnion, setDoc, onSnapshot, deleteDoc } from "@firebase/firestore"
 
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRoomInfo } from "../classes/Game"
+import { IFlattendBracketNode } from "../classes/Tournament"
 import { TrackName } from "../shared-backend/shared-stuff"
 import { firestore } from "./firebaseInit"
-import { saveTournamentRaceData } from "./firestoreTournamentFunctions"
+import { saveTournamentRaceDataPlayer, saveTournamentRaceGame, TournamentFinishedResponse } from "./firestoreTournamentFunctions"
 
 const highscoresRefPath = "highscores"
 const bestHighscoresRefPath = "bestHighscores"
@@ -84,7 +85,7 @@ export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPla
 const getAllHighscoreKey = (playerId: string, gameId: string) => `${playerId}#${gameId}`
 
 export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer, callback: (gameDataInfo: string[]) => void) => {
-    saveTournamentRaceData(data)
+    saveTournamentRaceDataPlayer(data)
 
     let gameDataInfo: string[] = []
     // const highscoresRef = doc(firestore, highscoresRefPath, playerId, allHighscoresRefPath, data.gameId)
@@ -153,7 +154,10 @@ export const getBestScoresOnTrackAndLap = async (trackName: TrackName, numberOfL
     }
 }
 
-export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame) => {
+export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame, callback: (res: TournamentFinishedResponse) => void, activeBracketNode?: IFlattendBracketNode) => {
+
+    saveTournamentRaceGame(gameInfo, activeBracketNode, callback)
+
     const gameRef = doc(firestore, allGamesRefPath, gameInfo.gameId)
     try {
         await setDoc(gameRef, gameInfo)
@@ -161,6 +165,8 @@ export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame) => {
         console.warn("Error saving race:", e)
     }
 }
+
+
 
 export const getPlayerBestScores = async (playerId: string, callback: (data: IEndOfRaceInfoPlayer[] | undefined) => void) => {
     const bestScoreRef = collection(firestore, bestHighscoresRefPath)

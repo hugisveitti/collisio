@@ -1,8 +1,9 @@
 import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
 import { Unsubscribe, User } from "firebase/auth";
-import { IEndOfRaceInfoPlayer } from "../classes/Game";
-import { GlobalTournament, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
+import { GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
 import { IUser } from "../classes/User";
+import GameSettingsComponent from "../components/waitingRoom/GameSettingsComponent";
 import { firestore } from "./firebaseInit";
 import { getUserFollowings } from "./firestoreFunctions"
 
@@ -262,8 +263,9 @@ export const getAllUserTournaments = async (userId: string): Promise<Tournament[
     return p
 }
 
-
-export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
+// to save individual runs by players
+// must for global, but also nice to have for local
+export const saveTournamentRaceDataPlayer = async (data: IEndOfRaceInfoPlayer) => {
     console.log("saving to tournament", data)
 
     if (data.tournamentId && data.isAuthenticated) {
@@ -273,7 +275,6 @@ export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
             vehicleType: data.vehicleType,
             totalTime: data.totalTime,
             lapTimes: data.lapTimes,
-
         }
 
         console.log("single race", singleRace)
@@ -289,6 +290,96 @@ export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
     } else {
         console.log("No tournament id and not saving tournament")
     }
+}
+
+export interface TournamentFinishedResponse {
+    isFinished: boolean
+    message: string
+    status: "success" | "error"
+}
+
+export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBracketNode: IFlattendBracketNode | undefined, callback: (res: TournamentFinishedResponse) => void) => {
+    if (!gameInfo.gameSettings.tournamentId) {
+        callback({
+            isFinished: false,
+            message: "No tournament",
+            status: "error"
+        })
+    }
+
+    if (activeBracketNode) {
+        // means we have an active bracket node and thus this is a local tournament
+        saveTournamentLocalRaceGame(gameInfo, activeBracketNode, callback)
+    } else {
+        // Currently not saving the game data.
+        callback({
+            isFinished: false,
+            message: "Global tournament going on.",
+            status: "error"
+        })
+    }
+}
+
+const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeBracketNode: IFlattendBracketNode | undefined, callback: (res: TournamentFinishedResponse) => void) => {
+
+    if (gameInfo.playersInfo.length !== 2) {
+        console.warn("Not 2 players in game info", gameInfo)
+        callback({ isFinished: false, message: "Wrong amount of players.", status: "error" })
+        return
+    }
+    const tournament = await getTournamentWithId(gameInfo.gameSettings.tournamentId) as LocalTournament
+    if (tournament.tournamentType !== "local") {
+        console.warn("Incorrect tournament type", tournament)
+        callback({ isFinished: false, message: "Corrupted tounament type.", status: "error" })
+        return
+    }
+
+    const bracket = tournament.flattenBracket.find(bracket => bracket.id === activeBracketNode.id)
+
+
+    let player1: IPlayerGameInfo
+    let player2: IPlayerGameInfo
+
+    for (let player of gameInfo.playersInfo) {
+        if (player.id === bracket.player1.uid) {
+            player1 = player
+        } else if (player.id === bracket.player2.uid) {
+            player2 = player
+        }
+    }
+
+    console.log("player1", player1)
+    console.log("player2", player2)
+
+    if (player1.totalTime < player2.totalTime) {
+        bracket.player1Score += 1
+    } else if (player1.totalTime > player2.totalTime) {
+        bracket.player2Score += 1
+    }
+
+    const biggerScore = Math.max(bracket.player1Score, bracket.player2Score)
+
+    const isFinished = biggerScore > tournament.numberOfGamesInSeries / 2
+
+    bracket.seriesFinished = isFinished
+
+    console.log("bracket to save", bracket)
+
+    let message = `Current score is: ${bracket.player1.displayName} ${bracket.player1Score} - ${bracket.player2Score} ${bracket.player2.displayName}.`
+    if (isFinished) {
+        const winnerName = player1.totalTime < player2.totalTime ? player1.name : player2.name
+        if (bracket.id === "root") {
+            message += `\nThe tournament is finished, ${winnerName} is the winner!`
+        } else {
+            message += `\nThis series is finished. ${winnerName} goes to the next round!`
+        }
+    }
+    callback({
+        isFinished,
+        message,
+        status: "success"
+    })
+
 }
 
 export const getTournamentWithId = async (tournamentId: string) => {

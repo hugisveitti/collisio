@@ -90,7 +90,9 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
 
   const handelGameFinished = (data: IEndOfGameData) => {
     setEndOfGameModalOpen(true);
-    saveRaceDataGame(data.endOfRaceInfo);
+    saveRaceDataGame(data.endOfRaceInfo, (res) => {
+      // do nothing
+    });
     setEndOfGameData(data);
   };
 
