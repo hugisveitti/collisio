@@ -43,6 +43,8 @@ interface IGameRoom {
   isTestMode?: boolean;
 }
 
+let currentRaceInfo = [];
+
 const GameRoom = (props: IGameRoom) => {
   // this breaks iphone
   // if (!props.store.roomId) {
@@ -72,7 +74,8 @@ const GameRoom = (props: IGameRoom) => {
         console.log("res after saving game!", res);
         console.log("pre game data info ", res.message);
         if (res.status === "success") {
-          setGameDataInfo(gameDataInfo.concat(res.message));
+          currentRaceInfo = currentRaceInfo.concat(res.message);
+          setGameDataInfo(currentRaceInfo);
         }
       },
       props.store.activeBracketNode
@@ -167,7 +170,9 @@ const GameRoom = (props: IGameRoom) => {
     props.store.socket.on(std_game_data_info, (data: string[]) => {
       console.log("old game data info", gameDataInfo);
       console.log("new game data info", data);
-      setGameDataInfo(gameDataInfo.concat(data));
+      console.log("current race info ", currentRaceInfo);
+      currentRaceInfo = currentRaceInfo.concat(data);
+      setGameDataInfo(currentRaceInfo);
     });
 
     props.store.socket.on(
@@ -240,6 +245,7 @@ const GameRoom = (props: IGameRoom) => {
             gameObject.restartGame();
             setEndOfGameModalOpen(false);
           }
+          currentRaceInfo = [];
           setGameDataInfo([]);
         }}
         scoreInfo={scoreInfo}

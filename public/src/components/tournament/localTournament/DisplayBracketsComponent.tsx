@@ -43,12 +43,12 @@ const DisplayBracketsComponent = (props: IDisplayBracketsComponent) => {
         >
           <div style={{ ...slotStyle }}>
             <span>{node.player1?.displayName}</span>
-            <span style={{ float: "right" }}>{node.player1Score} 2</span>
+            <span style={{ float: "right" }}>{node.player1Score}</span>
           </div>
           <hr />
           <div style={{ ...slotStyle }}>
             <span>{node.player2?.displayName}</span>
-            <span style={{ float: "right" }}>{node.player2Score} 2</span>
+            <span style={{ float: "right" }}>{node.player2Score}</span>
           </div>
         </div>
 

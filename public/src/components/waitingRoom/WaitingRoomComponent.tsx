@@ -117,7 +117,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       {props.store.tournament?.id && (
         <Grid item xs={12}>
           <Typography>
-            This game will be registered in the tournament{" "}
+            This game will be registered in the{" "}
+            {props.store.tournament.tournamentType} tournament{" "}
             <i>{props.store.tournament.name}</i>
           </Typography>
         </Grid>

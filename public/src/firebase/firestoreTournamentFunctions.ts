@@ -351,8 +351,12 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
     console.log("player1", player1)
     console.log("player2", player2)
 
+    bracket.player1Score = bracket.player1Score ?? 0
+    bracket.player2Score = bracket.player2Score ?? 0
+
     if (player1.totalTime < player2.totalTime) {
         bracket.player1Score += 1
+
     } else if (player1.totalTime > player2.totalTime) {
         bracket.player2Score += 1
     }
