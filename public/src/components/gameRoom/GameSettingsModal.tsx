@@ -36,6 +36,11 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             Game is paused, room <i>{props.store.roomId}</i>
           </Typography>
         </Grid>
+        <Grid item xs={3} style={{ textAlign: "right" }}>
+          <IconButton onClick={props.onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Grid>
         {props.store.tournament?.id && (
           <Grid item xs={12}>
             <Typography>
@@ -44,11 +49,6 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             </Typography>
           </Grid>
         )}
-        <Grid item xs={3} style={{ textAlign: "right" }}>
-          <IconButton onClick={props.onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Grid>
 
         <Grid item xs={12}>
           <ToFrontPageButton />

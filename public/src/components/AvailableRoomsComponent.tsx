@@ -1,22 +1,20 @@
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
+import Refresh from "@mui/icons-material/Refresh";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import Button from "@mui/material/Button";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-
-import { IStore } from "./store";
+import { toast } from "react-toastify";
 import {
-  create10AvailableRoomsListeners,
   AvailableRoomsFirebaseObject,
   getAllAvailableRooms,
 } from "../firebase/firestoreFunctions";
-import { Unsubscribe } from "@firebase/firestore";
-import { CircularProgress, Grid, IconButton } from "@mui/material";
-import Refresh from "@mui/icons-material/Refresh";
-import { toast } from "react-toastify";
+import { IStore } from "./store";
 
 interface IAvailableRoomsComponent {
   userId: string;

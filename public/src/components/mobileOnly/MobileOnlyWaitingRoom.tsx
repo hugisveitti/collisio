@@ -1,9 +1,10 @@
-import { Grid, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React from "react";
 import AppContainer from "../../containers/AppContainer";
-import { getDeviceType } from "../../utils/settings";
-import MyButton from "../inputs/MyButton";
 import settingsImage from "../../images/mobile-settings.PNG";
+import FullscreenButton from "../inputs/FullscreenButton";
+import MyButton from "../inputs/MyButton";
 
 interface IMobileOnlyWaitingRoom {}
 
@@ -27,7 +28,12 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
             the ground in the real world.
           </Typography>
         </Grid>
-
+        <Grid item xs={6}>
+          <FullscreenButton />
+        </Grid>
+        <Grid item xs={6}>
+          <Typography>Go into fullscreen by pressing this button.</Typography>
+        </Grid>
         <Grid item xs={12}>
           <Typography>
             <strong>Use your phone in landscape and go into fullscreen.</strong>

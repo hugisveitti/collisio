@@ -1,12 +1,9 @@
-import {
-  Avatar,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemSecondaryAction,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemButton from "@mui/material/ListItemButton";
 import List from "@mui/material/List";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -140,7 +137,7 @@ const TournamentPlayersList = (props: ITournamentPlayersList) => {
   useEffect(() => {
     // sortPlayersByRank(players);
 
-    if (!props.editingRanking) {
+    if (!props.editingRanking && !props.tournament.hasStarted) {
       updatePlayersInTournament(props.tournament.id, props.players);
     } else {
       const newPlayers: ITournamentUser[] = [];

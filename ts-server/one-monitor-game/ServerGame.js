@@ -373,7 +373,7 @@ var Room = /** @class */ (function () {
     Room.prototype.setupPlayerFinishedListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.dts_player_finished, function (data) {
-            console.log("player finehsd", data.playerId);
+            console.log("player finished", data.playerId);
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 if (player.id === data.playerId) {

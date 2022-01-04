@@ -474,7 +474,7 @@ export class Room {
 
     setupPlayerFinishedListener() {
         this.socket.on(dts_player_finished, (data: any) => {
-            console.log("player finehsd", data.playerId)
+            console.log("player finished", data.playerId)
             for (let player of this.players) {
 
                 if (player.id === data.playerId) {

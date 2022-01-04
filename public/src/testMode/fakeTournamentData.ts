@@ -1,5 +1,4 @@
 import { createBracketTree, ITournamentUser, LocalTournament } from "../classes/Tournament";
-import { IPrivateUser } from "../classes/User";
 import { setFirestorePrivateUser } from "../firebase/firestoreFunctions";
 import { getTournamentWithId, joinTournament, setTournament } from "../firebase/firestoreTournamentFunctions";
 

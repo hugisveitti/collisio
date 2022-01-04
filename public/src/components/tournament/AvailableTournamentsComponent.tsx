@@ -1,18 +1,13 @@
 import Refresh from "@mui/icons-material/Refresh";
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { IUser } from "../../classes/User";
 import { getAvailableTournaments } from "../../firebase/firestoreTournamentFunctions";
-import { getTournamentPagePath } from "../Routes";
 import TournamentsTable from "./TournamentsTable";
 
 interface IAvailableTournamentsComponent {

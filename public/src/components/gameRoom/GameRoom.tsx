@@ -1,8 +1,6 @@
-import { DocumentReference } from "@firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify/";
-import { Socket } from "socket.io-client";
 import {
   getGameSceneClass,
   IEndOfRaceInfoPlayer,
@@ -11,14 +9,10 @@ import {
 import {
   IGameSettings,
   setAllLocalGameSettings,
-  setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
-
 import { IEndOfGameData, startGame } from "../../game/GameScene";
 import { IGameScene } from "../../game/IGameScene";
-import { RaceGameScene } from "../../game/RaceGameScene";
-import { TagGameScene } from "../../game/TagGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_back_to_waiting_room,
@@ -77,6 +71,12 @@ const GameRoom = (props: IGameRoom) => {
           currentRaceInfo = currentRaceInfo.concat(res.message);
           setGameDataInfo(currentRaceInfo);
         }
+        if (res.activeBracketNode) {
+          // will this work?
+          props.store.activeBracketNode = res.activeBracketNode;
+          // i dont think this does anything here
+          props.store.setActiveBracketNode(res.activeBracketNode);
+        }
       },
       props.store.activeBracketNode
     );
@@ -90,6 +90,7 @@ const GameRoom = (props: IGameRoom) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
+    console.log("handle player finished", data);
     props.store.socket.emit(dts_player_finished, data);
   };
 
@@ -106,6 +107,8 @@ const GameRoom = (props: IGameRoom) => {
   };
 
   const handleCloseModals = () => {
+    currentRaceInfo = [];
+    setGameDataInfo([]);
     setEndOfGameModalOpen(false);
     setEndOfGameData({});
     setSettingsModalOpen(false);
@@ -170,8 +173,8 @@ const GameRoom = (props: IGameRoom) => {
     props.store.socket.on(std_game_data_info, (data: string[]) => {
       console.log("old game data info", gameDataInfo);
       console.log("new game data info", data);
-      console.log("current race info ", currentRaceInfo);
       currentRaceInfo = currentRaceInfo.concat(data);
+      console.log("current race info ", currentRaceInfo);
       setGameDataInfo(currentRaceInfo);
     });
 

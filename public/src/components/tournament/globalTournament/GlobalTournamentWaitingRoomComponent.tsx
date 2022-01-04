@@ -123,19 +123,6 @@ const GlobalTournamentWaitingRoomComponent = (
               Start tournament
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            <DeleteButton
-              onDelete={() => {
-                deleteTournament(props.tournament.id)
-                  .then(() => {
-                    toast.success("Tournament successfully deleted");
-                  })
-                  .catch(() => {
-                    toast.error("Error deleting tournament");
-                  });
-              }}
-            />
-          </Grid>
         </>
       )}
 

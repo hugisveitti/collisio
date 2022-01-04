@@ -1,7 +1,10 @@
-import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import React, { useState } from "react";
-import { Box, Modal, Typography, Grid } from "@mui/material";
 import { basicColor, cardBackgroundColor } from "../../providers/theme";
 
 interface IDeleteButton {

@@ -1,4 +1,7 @@
-import { Button, CircularProgress, Grid, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ITournament, ITournamentUser } from "../../classes/Tournament";
@@ -7,7 +10,6 @@ import {
   joinTournament,
   leaveTournament,
 } from "../../firebase/firestoreTournamentFunctions";
-import { addFakesToTournament } from "../../testMode/fakeTournamentData";
 import TournamentPlayersList from "./TournamentPlayersList";
 
 interface ITournamentPlayersComponent {

@@ -296,6 +296,7 @@ export interface TournamentFinishedResponse {
     isFinished: boolean
     message: string
     status: "success" | "error"
+    activeBracketNode?: IFlattendBracketNode
 }
 
 export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBracketNode: IFlattendBracketNode | undefined, callback: (res: TournamentFinishedResponse) => void) => {
@@ -367,6 +368,8 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
 
     bracket.seriesFinished = isFinished
 
+    setTournament(tournament)
+
     console.log("bracket to save", bracket)
 
     let message = `Current score is: ${bracket.player1.displayName} ${bracket.player1Score} - ${bracket.player2Score} ${bracket.player2.displayName}.`
@@ -381,7 +384,8 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
     callback({
         isFinished,
         message,
-        status: "success"
+        status: "success",
+        activeBracketNode: bracket
     })
 
 }

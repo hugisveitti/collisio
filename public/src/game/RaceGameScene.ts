@@ -104,7 +104,10 @@ export class RaceGameScene extends GameScene {
         }, (2) * 1000)
 
         const timer = () => {
-            this.playCountdownBeep()
+            if (this.raceCountdownTime < 4) {
+                // dont always play beep
+                this.playCountdownBeep()
+            }
             // this.showImportantInfo(countdown + "")
             this.showViewsImportantInfo(this.raceCountdownTime + "")
             this.raceCountdownTime -= 1
@@ -357,6 +360,7 @@ export class RaceGameScene extends GameScene {
      * @i player number
      */
     prepareEndOfRacePlayer(i: number) {
+        console.log("prepare end of race player", i)
         const playerData: IEndOfRaceInfoPlayer = {
             totalTime: this.gameTimers[i].getTotalTime(),
             numberOfLaps: this.currentNumberOfLaps,

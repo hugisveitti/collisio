@@ -1,6 +1,7 @@
-import { Button, Divider } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -11,14 +12,10 @@ import {
   validateStartTournament,
 } from "../../../classes/Tournament";
 import { IUser } from "../../../classes/User";
-import {
-  setTournament,
-  deleteTournament,
-} from "../../../firebase/firestoreTournamentFunctions";
+import { setTournament } from "../../../firebase/firestoreTournamentFunctions";
 import { arrayToDict } from "../../../utils/utilFunctions";
-import TournamentPlayersComponent from "../TournamentPlayersComponent";
-import DeleteButton from "../../inputs/DeleteButton";
 import EditTournamentComponent from "../EditTournamentComponent";
+import TournamentPlayersComponent from "../TournamentPlayersComponent";
 import TournamentSettingsComponent from "../TournamentSettingsComponent";
 
 interface ILocalTournamentWaitingRoomComponent {
@@ -111,7 +108,6 @@ const LocalTournamentWaitingRoomComponent = (
                 if (val.status === "error") {
                   toast.error(val.message);
                 } else {
-                  console.log("not impl");
                   console.log("players", players);
                   const root = createBracketTree(players.length);
                   root.populateTree(players);

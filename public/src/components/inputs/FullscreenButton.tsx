@@ -1,6 +1,6 @@
-import { IconButton } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import IconButton from "@mui/material/IconButton";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 

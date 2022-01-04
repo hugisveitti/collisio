@@ -1,4 +1,5 @@
-import { Collapse, FormControlLabel } from "@mui/material";
+import Collapse from "@mui/material/Collapse";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";

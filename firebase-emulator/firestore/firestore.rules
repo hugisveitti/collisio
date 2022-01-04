@@ -61,7 +61,7 @@ service cloud.firestore {
     	// only followers can read?
     	allow read;
       allow create: if !exists(/databases/$(database)/documents/tournaments/$(request.resource.id));
-      allow update: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
+      allow update: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId || request.auth.uid in get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.playerIds;
       allow delete: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
       match /players/{playerId} {
         allow read;

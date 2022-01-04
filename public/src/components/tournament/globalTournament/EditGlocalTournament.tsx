@@ -1,11 +1,9 @@
-import {
-  Divider,
-  FormControlLabel,
-  TextField,
-  Typography,
-  Checkbox,
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { GlobalTournament } from "../../../classes/Tournament";
 

@@ -1,4 +1,5 @@
-import { CircularProgress, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";

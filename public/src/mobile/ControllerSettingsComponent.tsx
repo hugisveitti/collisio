@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { Collapse } from "@mui/material";
+import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
