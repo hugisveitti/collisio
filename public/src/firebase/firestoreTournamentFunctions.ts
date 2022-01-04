@@ -368,7 +368,6 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
 
     bracket.seriesFinished = isFinished
 
-    setTournament(tournament)
 
     console.log("bracket to save", bracket)
 
@@ -376,11 +375,17 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
     if (isFinished) {
         const winnerName = player1.totalTime < player2.totalTime ? player1.name : player2.name
         if (bracket.id === "root") {
+            tournament.isFinished = true
             message += `\nThe tournament is finished, ${winnerName} is the winner!`
         } else {
             message += `\nThis series is finished. ${winnerName} goes to the next round!`
         }
     }
+
+    console.log("setting the tournament", tournament)
+    setTournament(tournament)
+
+
     callback({
         isFinished,
         message,

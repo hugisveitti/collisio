@@ -1,5 +1,5 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import { Divider } from "@mui/material";
+import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";

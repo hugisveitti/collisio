@@ -1,4 +1,5 @@
-import { Button, Collapse } from "@mui/material";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";

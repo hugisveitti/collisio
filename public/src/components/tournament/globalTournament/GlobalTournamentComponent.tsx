@@ -1,5 +1,7 @@
-import { Button, Collapse, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { GlobalTournament } from "../../../classes/Tournament";
 import { IUser } from "../../../classes/User";

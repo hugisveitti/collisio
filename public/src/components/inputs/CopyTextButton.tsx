@@ -1,4 +1,6 @@
-import { Typography, Tooltip, IconButton } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
 import React, { useState } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 

@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import React, { useEffect } from "react";
 import { BracketTree } from "../../../classes/Tournament";
 import { green1, red1, red2, red4 } from "../../../providers/theme";

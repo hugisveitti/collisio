@@ -1,4 +1,5 @@
-import { Button, Divider } from "@mui/material";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
