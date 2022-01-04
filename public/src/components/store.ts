@@ -2,7 +2,7 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 import { IGameSettings } from "../classes/localGameSettings";
-import { ITournament } from "../classes/Tournament";
+import { IFlattendBracketNode, ITournament } from "../classes/Tournament";
 import { IUserSettings } from "../classes/User";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
 
@@ -22,4 +22,6 @@ export interface IStore {
     setSocket: React.Dispatch<React.SetStateAction<Socket>>
     tournament: ITournament | undefined
     setTournament: React.Dispatch<React.SetStateAction<ITournament | undefined>>
+    activeBracketNode: IFlattendBracketNode | undefined
+    setActiveBracketNode: React.Dispatch<React.SetStateAction<IFlattendBracketNode | undefined>>
 }

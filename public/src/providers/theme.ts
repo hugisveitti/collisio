@@ -36,9 +36,9 @@ const gray3 = "#65787f"
 const gray4 = "#374274"
 
 export const red1 = "#fb4a1"
-const red2 = "#dc5a3a"
+export const red2 = "#dc5a3a"
 const red3 = "#ab3a1d"
-const red4 = "#7e1a09"
+export const red4 = "#7e1a09"
 
 export const containerBackgroundColor = yellow1 // "#dbb165"
 

@@ -17,7 +17,9 @@ interface IEditGlobalTournamentComponent {
 const EditGlobalTournamentComponent = (
   props: IEditGlobalTournamentComponent
 ) => {
-  const [useRunsPerPlayer, setUseRunsPerPlayer] = useState(false);
+  const [useRunsPerPlayer, setUseRunsPerPlayer] = useState(
+    !!props.editTournament.runsPerPlayer
+  );
   console.log("edit torunament", props.editTournament);
   console.log("start", props.editTournament.tournamentStart.toISOString());
 

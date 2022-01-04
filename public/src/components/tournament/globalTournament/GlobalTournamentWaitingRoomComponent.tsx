@@ -78,15 +78,17 @@ const GlobalTournamentWaitingRoomComponent = (
             <Button
               variant="contained"
               onClick={() => {
-                setEditing(!editing);
                 if (editing) {
                   const res = validateCreateTournament(editTournament);
+                  console.log("res", res);
                   if (res.status === "error") {
                     toast.error(res.message);
                   } else {
                     setTournament(editTournament);
+                    setEditing(!editing);
                   }
                 } else {
+                  setEditing(!editing);
                   setEditTournament(props.tournament);
                 }
               }}
@@ -98,6 +100,7 @@ const GlobalTournamentWaitingRoomComponent = (
           <Grid item xs={12}>
             <Button
               variant="contained"
+              disabled={editing}
               onClick={() => {
                 const tournament: GlobalTournament = {
                   ...props.tournament,

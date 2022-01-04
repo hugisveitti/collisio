@@ -26,6 +26,8 @@ export class RaceGameScene extends GameScene {
     gameStartingTimeOut: NodeJS.Timeout
     course: IRaceCourse
 
+    /** the first race count down is longer then after pressing restart game */
+    raceCountdownTime: number
     /**
      * this is if players change number of laps in middle of game
      */
@@ -52,6 +54,8 @@ export class RaceGameScene extends GameScene {
 
         this.hasShowStartAnimation = false
         this.raceFinished = false
+
+        this.raceCountdownTime = 7
 
     }
 
@@ -83,8 +87,8 @@ export class RaceGameScene extends GameScene {
 
     startRaceCountdown() {
         this.currentNumberOfLaps = this.gameSettings.numberOfLaps
-        let countdown = 3
         this.startGameSong()
+        if (this.raceCountdownTime < 3) this.raceCountdownTime = 3
         // makes vehicle fall
         for (let vehicle of this.vehicles) {
             vehicle.canDrive = false
@@ -95,28 +99,24 @@ export class RaceGameScene extends GameScene {
          */
         setTimeout(() => {
             for (let vehicle of this.vehicles) {
-                const r = vehicle.getRotation()
-                // const gR = this.course.startRotation
-                // vehcile.setRotation(0, gR.y, 0)
-                //     vehicle.stop()
                 vehicle.start()
-
             }
         }, (2) * 1000)
 
         const timer = () => {
             this.playCountdownBeep()
             // this.showImportantInfo(countdown + "")
-            this.showViewsImportantInfo(countdown + "")
-            countdown -= 1
+            this.showViewsImportantInfo(this.raceCountdownTime + "")
+            this.raceCountdownTime -= 1
             this.countDownTimeout = setTimeout(() => {
-                if (countdown > 0) {
+                if (this.raceCountdownTime > 0) {
                     timer()
                 } else {
                     this.playStartBeep()
                     this.showViewsImportantInfo("GO!")
                     this.startAllVehicles()
                     this.gameStarted = true
+                    this.raceCountdownTime = 3
 
                     setTimeout(() => {
                         this.clearViewsImportantInfo()

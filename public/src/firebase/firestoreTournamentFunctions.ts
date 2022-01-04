@@ -1,4 +1,4 @@
-import { arrayUnion, collection, deleteDoc, doc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
+import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
 import { Unsubscribe, User } from "firebase/auth";
 import { IEndOfRaceInfoPlayer } from "../classes/Game";
 import { GlobalTournament, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
@@ -209,8 +209,6 @@ export const getAvailableTournaments = async (userId: string): Promise<ITourname
                 }
                 ))
             }
-
-
             Promise.all(batches).then(content => {
 
                 resolve(content.flat())
@@ -291,4 +289,21 @@ export const saveTournamentRaceData = async (data: IEndOfRaceInfoPlayer) => {
     } else {
         console.log("No tournament id and not saving tournament")
     }
+}
+
+export const getTournamentWithId = async (tournamentId: string) => {
+    return new Promise<Tournament>((resolve, reject) => {
+
+        const ref = doc(firestore, tournamentPath, tournamentId)
+        getDoc(ref).then(tournament => {
+            if (tournament.exists()) {
+                resolve(tournament.data() as ITournament)
+            } else {
+                reject("No tournament with given id found")
+            }
+        }).catch(err => {
+            console.warn("Error getting tournament with id:", err)
+            reject()
+        })
+    })
 }

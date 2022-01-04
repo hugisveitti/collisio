@@ -2,12 +2,14 @@ import {
   Avatar,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
   ListItemSecondaryAction,
   ListItemText,
   Typography,
 } from "@mui/material";
 import List from "@mui/material/List";
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import {
   ITournament,
   ITournamentUser,
@@ -20,6 +22,7 @@ import {
 } from "../../firebase/firestoreTournamentFunctions";
 import { cardBackgroundColor, red1 } from "../../providers/theme";
 import NumberSelect from "../inputs/NumberSelect";
+import { getUserPagePath } from "../Routes";
 
 interface IPlayerListItem {
   player: ITournamentUser;
@@ -32,6 +35,7 @@ interface IPlayerListItem {
 
 const PlayerListItem = (props: IPlayerListItem) => {
   const player = props.player;
+  const history = useHistory();
 
   const [ranking, setRanking] = useState(player.ranking);
 
@@ -42,7 +46,10 @@ const PlayerListItem = (props: IPlayerListItem) => {
   };
 
   return (
-    <ListItem key={player.uid}>
+    <ListItemButton
+      key={player.uid}
+      onClick={() => history.push(getUserPagePath(player.uid))}
+    >
       <ListItemAvatar>
         <Avatar src={player.photoURL} />
       </ListItemAvatar>
@@ -84,7 +91,7 @@ const PlayerListItem = (props: IPlayerListItem) => {
           />
         </ListItemSecondaryAction>
       )}
-    </ListItem>
+    </ListItemButton>
   );
 };
 

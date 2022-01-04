@@ -6,6 +6,8 @@ import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
 
+export const numberOfLapsPossibilities = [1, 2, 3, 5, 7, 13]
+
 export type TimeOfDay = "day" | "evening"
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....

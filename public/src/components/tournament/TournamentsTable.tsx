@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router";
+import { getTrackNameFromType } from "../../classes/Game";
 import { Tournament } from "../../classes/Tournament";
 import { getDateString } from "../../utils/utilFunctions";
 import { getTournamentPagePath } from "../Routes";
@@ -49,7 +50,9 @@ const TournamentsTable = (props: ITournamentsTable) => {
                 </TableCell>
                 <TableCell>{tournament.name}</TableCell>
                 <TableCell>{tournament.leaderName}</TableCell>
-                <TableCell>{tournament.trackName}</TableCell>
+                <TableCell>
+                  {getTrackNameFromType(tournament.trackName)}
+                </TableCell>
                 <TableCell>{getDateString(tournament.creationDate)}</TableCell>
                 <TableCell>{tournament.tournamentType}</TableCell>
               </TableRow>

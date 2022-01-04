@@ -7,11 +7,13 @@ import React from "react";
 import { ITournament } from "../../classes/Tournament";
 import { inputBackgroundColor } from "../../providers/theme";
 import { VehicleType } from "../../shared-backend/shared-stuff";
+import { itemInArray } from "../../utils/utilFunctions";
 
 interface ITournamentSelect {
   tournaments: ITournament[] | undefined;
   onChange: (tournament: ITournament | undefined) => void;
   selectedId: string | undefined;
+  selectedName: string | undefined;
 }
 
 const TournamentSelect = (props: ITournamentSelect) => {
@@ -25,6 +27,20 @@ const TournamentSelect = (props: ITournamentSelect) => {
       id: "undefined",
     } as ITournament,
   ]);
+
+  // if id is set on other device
+  if (
+    props.selectedId &&
+    !itemInArray(
+      props.selectedId,
+      tournamentOptions.map((t) => t.id)
+    )
+  ) {
+    tournamentOptions.push({
+      name: props.selectedName ?? "Selected tournament",
+      id: props.selectedId,
+    });
+  }
 
   return (
     <FormControl style={{ minWidth: 150 }}>

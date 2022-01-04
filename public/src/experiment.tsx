@@ -36,6 +36,11 @@ const TestApp = () => {
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
 
+  const [activeBracketNode, setActiveBracketNode] = useState(undefined);
+
+  // not sure how to implement tournaments
+  const [tournament, setTournament] = useState(undefined);
+
   const deviceType = getDeviceType();
   const onMobile = deviceType === "mobile";
 
@@ -77,6 +82,10 @@ const TestApp = () => {
     setUserSettings,
     socket,
     setSocket,
+    tournament,
+    setTournament,
+    activeBracketNode,
+    setActiveBracketNode,
   } as IStore;
 
   return (

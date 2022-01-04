@@ -3,14 +3,19 @@ import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import React, { useEffect, useState } from "react";
-import { nonActiveTrackNames } from "../../classes/Game";
+import {
+  nonActiveTrackNames,
+  numberOfLapsPossibilities,
+} from "../../classes/Game";
 import {
   GlobalTournament,
   LocalTournament,
   Tournament,
 } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
+import { inputBackgroundColor } from "../../providers/theme";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
@@ -67,7 +72,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
 
       <Grid item xs={12}>
         <FormControlLabel
-          label="Only allow specific vehcile"
+          label="Only allow specific vehicle"
           control={
             <Checkbox
               value={onlyAllowSpecificVechileType}
@@ -101,14 +106,15 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
         </Collapse>
       </Grid>
       <Grid item xs={12}>
-        <TextField
-          label="Number of laps"
-          type="number"
-          value={
-            props.tournament.numberOfLaps ? props.tournament.numberOfLaps : ""
-          }
-          onChange={(e) => {
-            updateTournament("numberOfLaps", +e.target.value);
+        <NumberSelect
+          title="No. of laps"
+          value={props.tournament.numberOfLaps}
+          numbers={numberOfLapsPossibilities}
+          onChange={(val) => {
+            updateTournament("numberOfLaps", val);
+          }}
+          style={{
+            backgroundColor: inputBackgroundColor,
           }}
         />
       </Grid>

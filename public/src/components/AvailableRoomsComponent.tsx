@@ -34,7 +34,7 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
 
   const handleGetAllAvailableRooms = async () => {
     setGettingRooms(true);
-    getAllAvailableRooms(props.userId)
+    const p = getAllAvailableRooms(props.userId)
       .then((allRooms) => {
         setAvailRoomIds(allRooms);
         setGettingRooms(false);
@@ -48,24 +48,6 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
   useEffect(() => {
     if (!props.userId) return;
     handleGetAllAvailableRooms();
-    /**
-     * The reason I dont use a subscriber here
-     * is that firebase only allows 10 values in arry with "in" operator
-     * solution: https://stackoverflow.com/questions/61354866/is-there-a-workaround-for-the-firebase-query-in-limit-to-10
-     */
-
-    // let unsubRoomListener: Unsubscribe;
-    // create10AvailableRoomsListeners(props.userId, (_availRooms) =>
-    //   setAvailRoomIds(_availRooms)
-    // ).then((sub) => {
-    //   unsubRoomListener = sub;
-    // });
-
-    // return () => {
-    //   if (unsubRoomListener) {
-    //     unsubRoomListener();
-    //   }
-    // };
   }, [props.userId]);
 
   return (

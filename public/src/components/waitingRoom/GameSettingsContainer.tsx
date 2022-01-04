@@ -10,8 +10,16 @@ import {
   IGameSettings,
   setAllLocalGameSettings,
 } from "../../classes/localGameSettings";
-import { ITournament } from "../../classes/Tournament";
-import { getActiveTournaments } from "../../firebase/firestoreTournamentFunctions";
+import {
+  BracketTree,
+  ITournament,
+  LocalTournament,
+  Tournament,
+} from "../../classes/Tournament";
+import {
+  getActiveTournaments,
+  getTournamentWithId,
+} from "../../firebase/firestoreTournamentFunctions";
 import { UserContext } from "../../providers/UserProvider";
 import {
   mdts_game_settings_changed,
@@ -28,7 +36,7 @@ interface IGameSettingsContainer {
 
 const GameSettingsContainer = (props: IGameSettingsContainer) => {
   const user = useContext(UserContext);
-
+  console.log("store", props.store);
   const [activeTournaments, setActiveTournamnets] = useState(
     [] as ITournament[]
   );
@@ -42,6 +50,35 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
       props.store.socket.off(stmd_game_settings_changed);
     };
   }, []);
+
+  const handleGetBracketNode = (tournament: Tournament) => {
+    if (tournament.tournamentType === "local") {
+      const activeBracketNode = BracketTree.FindActiveBracketNode(
+        (tournament as LocalTournament).flattenBracket,
+        user?.uid
+      );
+      console.log("active bracket node", activeBracketNode);
+      props.store.setActiveBracketNode(activeBracketNode);
+    }
+  };
+
+  useEffect(() => {
+    if (props.store.gameSettings.tournamentId !== props.store.tournament?.id) {
+      console.log("tournament changed");
+      if (props.store.gameSettings.tournamentId) {
+        getTournamentWithId(props.store.gameSettings.tournamentId).then(
+          (tournament) => {
+            console.log("new tournament gotten", tournament);
+            props.store.setTournament(tournament);
+            handleGetBracketNode(tournament);
+          }
+        );
+      } else {
+        props.store.setTournament(undefined);
+        props.store.setActiveBracketNode(undefined);
+      }
+    }
+  }, [props.store.gameSettings]);
 
   return (
     <Grid item xs={12}>
@@ -93,6 +130,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
           <TournamentSelect
             tournaments={activeTournaments}
             selectedId={props.store.gameSettings.tournamentId}
+            selectedName={props.store.tournament?.name}
             onChange={(tournament) => {
               const newGameSettings: IGameSettings = {
                 ...props.store.gameSettings,
@@ -100,13 +138,19 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
               };
               if (!tournament || tournament?.id === "undefined") {
                 delete newGameSettings.tournamentId;
+                props.store.setTournament(undefined);
+                props.store.setActiveBracketNode(undefined);
               } else {
                 newGameSettings.numberOfLaps = tournament.numberOfLaps;
                 newGameSettings.trackName = tournament.trackName;
                 // compete in other than race ?
                 newGameSettings.gameType = "race";
+
+                props.store.setTournament(tournament);
+                handleGetBracketNode(tournament);
               }
               console.log("new game settings", newGameSettings);
+
               props.store.setGameSettings(newGameSettings);
               props.store.socket.emit(mdts_game_settings_changed, {
                 gameSettings: newGameSettings,

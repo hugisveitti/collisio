@@ -15,7 +15,7 @@ interface IEditLocalTournamentComponent {
 const EditLocalTournamentComponent = (props: IEditLocalTournamentComponent) => {
   return (
     <React.Fragment>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <FormControlLabel
           label="Use lower bracket"
           control={
@@ -30,7 +30,7 @@ const EditLocalTournamentComponent = (props: IEditLocalTournamentComponent) => {
             />
           }
         />
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={12}>
         <NumberSelect
@@ -43,7 +43,7 @@ const EditLocalTournamentComponent = (props: IEditLocalTournamentComponent) => {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Divider variant="middle" />
       </Grid>
 
@@ -71,7 +71,7 @@ const EditLocalTournamentComponent = (props: IEditLocalTournamentComponent) => {
           This determines the bracet placement. The player with the best time
           competes agains the player with the worst time.
         </Typography>
-      </Grid>
+      </Grid> */}
     </React.Fragment>
   );
 };

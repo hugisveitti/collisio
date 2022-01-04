@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
+  createBracketTree,
   ITournamentUser,
   LocalTournament,
   validateCreateTournament,
@@ -77,15 +78,16 @@ const LocalTournamentWaitingRoomComponent = (
             <Button
               variant="contained"
               onClick={() => {
-                setEditing(!editing);
                 if (editing) {
                   const res = validateCreateTournament(editTournament);
                   if (res.status === "error") {
                     toast.error(res.message);
                   } else {
                     setTournament(editTournament);
+                    setEditing(!editing);
                   }
                 } else {
+                  setEditing(!editing);
                   setEditTournament(props.tournament);
                 }
               }}
@@ -97,6 +99,7 @@ const LocalTournamentWaitingRoomComponent = (
           <Grid item xs={12}>
             <Button
               variant="contained"
+              disabled={editing}
               onClick={() => {
                 const tournament: LocalTournament = {
                   ...props.tournament,
@@ -109,10 +112,16 @@ const LocalTournamentWaitingRoomComponent = (
                   toast.error(val.message);
                 } else {
                   console.log("not impl");
+                  console.log("players", players);
+                  const root = createBracketTree(players.length);
+                  root.populateTree(players);
                   const startTournament: LocalTournament = {
                     ...tournament,
                     hasStarted: true,
+                    flattenBracket: root.flatten(),
                   };
+
+                  console.log("starting tournament", startTournament);
                   setTournament(startTournament);
                 }
               }}

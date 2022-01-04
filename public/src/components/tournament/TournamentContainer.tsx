@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   GlobalTournament,
   ITournament,
@@ -8,8 +8,13 @@ import {
 } from "../../classes/Tournament";
 import { IUser } from "../../classes/User";
 import AppContainer from "../../containers/AppContainer";
-import { createGetTournametListener } from "../../firebase/firestoreTournamentFunctions";
+import {
+  createGetTournametListener,
+  deleteTournament,
+} from "../../firebase/firestoreTournamentFunctions";
+import { UserContext } from "../../providers/UserProvider";
 import CopyTextButton from "../inputs/CopyTextButton";
+import DeleteButton from "../inputs/DeleteButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import GlobalTournamentComponent from "./globalTournament/GlobalTournamentComponent";
 import GlobalTournamentWaitingRoomComponent from "./globalTournament/GlobalTournamentWaitingRoomComponent";
@@ -25,6 +30,8 @@ const TournamentContainer = (props: ITournamentContainer) => {
   const [tournament, setTournament] = useState(
     null as null | undefined | ITournament
   );
+
+  const user = useContext(UserContext);
 
   useEffect(() => {
     const unsub = createGetTournametListener(
@@ -108,6 +115,15 @@ const TournamentContainer = (props: ITournamentContainer) => {
             </Grid>
             {renderTournament()}
           </>
+        )}
+        {tournament?.id && tournament.leaderId === user?.uid && (
+          <Grid item xs={12}>
+            <DeleteButton
+              onDelete={() => {
+                deleteTournament(tournament.id);
+              }}
+            />
+          </Grid>
         )}
       </Grid>
     </AppContainer>

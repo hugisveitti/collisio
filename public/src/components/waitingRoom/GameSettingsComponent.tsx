@@ -17,6 +17,7 @@ import {
   defaultStoryTrack,
   defaultTagTrack,
   nonActiveTrackNames,
+  numberOfLapsPossibilities,
 } from "../../classes/Game";
 import {
   IGameSettings,
@@ -75,7 +76,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               disabled={disableInputs}
               title="No. of laps"
               value={gameSettings.numberOfLaps}
-              numbers={[1, 2, 3, 5, 7, 13]}
+              numbers={numberOfLapsPossibilities}
               onChange={(val) => {
                 updateGameSettings("numberOfLaps", val);
               }}

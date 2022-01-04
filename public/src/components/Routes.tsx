@@ -93,6 +93,7 @@ const Routes = () => {
   const [gameSettings, setGameSettings] = useState(
     inTestMode ? testGameSettings : defaultGameSettings
   );
+  const [activeBracketNode, setActiveBracketNode] = useState(undefined);
 
   // not sure how to implement tournaments
   const [tournament, setTournament] = useState(undefined);
@@ -141,6 +142,8 @@ const Routes = () => {
     setSocket,
     tournament,
     setTournament,
+    activeBracketNode,
+    setActiveBracketNode,
   };
 
   const user = useContext(UserContext);

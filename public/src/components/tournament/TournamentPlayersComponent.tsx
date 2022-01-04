@@ -7,6 +7,7 @@ import {
   joinTournament,
   leaveTournament,
 } from "../../firebase/firestoreTournamentFunctions";
+import { addFakesToTournament } from "../../testMode/fakeTournamentData";
 import TournamentPlayersList from "./TournamentPlayersList";
 
 interface ITournamentPlayersComponent {
@@ -53,6 +54,13 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
     }
   }, [props.players]);
 
+  useEffect(() => {
+    // setTimeout(() => {
+    //   console.log("creating fakes");
+    //   addFakesToTournament(props.tournament.id, 6);
+    // }, 2000);
+  }, []);
+
   return (
     <React.Fragment>
       {!props.tournamentStarted && (
@@ -91,7 +99,7 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
       </Grid>
       {!props.tournamentStarted &&
         props.tournament.tournamentType === "local" &&
-        props.tournament.leaderId === props.user.uid && (
+        props.tournament.leaderId === props.user?.uid && (
           <Grid item xs={12}>
             <Button
               variant="contained"

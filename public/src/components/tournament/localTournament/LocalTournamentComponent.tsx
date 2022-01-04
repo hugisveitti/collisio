@@ -1,10 +1,14 @@
+import { Button, Collapse } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React from "react";
-import { LocalTournament } from "../../../classes/Tournament";
+import React, { useEffect, useState } from "react";
+import { BracketTree, LocalTournament } from "../../../classes/Tournament";
 import { IUser } from "../../../classes/User";
+import { createFakeBrackets } from "../../../testMode/fakeTournamentData";
 import { dictToArray } from "../../../utils/utilFunctions";
 import TournamentPlayersList from "../TournamentPlayersList";
+import TournamentSettingsComponent from "../TournamentSettingsComponent";
+import DisplayBracketsComponent from "./DisplayBracketsComponent";
 
 interface ILocalTournamentComponent {
   tournament: LocalTournament;
@@ -12,6 +16,18 @@ interface ILocalTournamentComponent {
 }
 
 const LocalTournamentComponent = (props: ILocalTournamentComponent) => {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bracket, setBracket] = useState({} as BracketTree);
+
+  useEffect(() => {
+    setBracket(
+      BracketTree.Deflatten(
+        props.tournament.flattenBracket,
+        props.tournament.playersIds.length
+      )
+    );
+  }, []);
+
   return (
     <React.Fragment>
       <Grid item xs={12}>
@@ -21,6 +37,21 @@ const LocalTournamentComponent = (props: ILocalTournamentComponent) => {
         <Typography variant="h6">Tournament room</Typography>
       </Grid>
       <Grid item xs={12}>
+        <Button
+          onClick={() => setSettingsOpen(!settingsOpen)}
+          variant="contained"
+          disableElevation
+        >
+          See settings
+        </Button>
+      </Grid>
+      <Grid item xs={12}>
+        <Collapse in={settingsOpen}>
+          <TournamentSettingsComponent tournament={props.tournament} />
+        </Collapse>
+      </Grid>
+
+      <Grid item xs={12}>
         <TournamentPlayersList
           user={props.user}
           tournament={props.tournament}
@@ -29,6 +60,9 @@ const LocalTournamentComponent = (props: ILocalTournamentComponent) => {
           setPlayers={() => console.log("do nothing")}
         />
       </Grid>
+
+      <Grid item xs={12}></Grid>
+      <DisplayBracketsComponent bracket={bracket} />
     </React.Fragment>
   );
 };

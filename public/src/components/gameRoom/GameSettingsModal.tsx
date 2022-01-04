@@ -36,6 +36,14 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             Game is paused, room <i>{props.store.roomId}</i>
           </Typography>
         </Grid>
+        {props.store.tournament?.id && (
+          <Grid item xs={12}>
+            <Typography>
+              In {props.store.tournament.tournamentType} tournament,{" "}
+              <i>{props.store.tournament.name}</i>
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={3} style={{ textAlign: "right" }}>
           <IconButton onClick={props.onClose}>
             <CloseIcon />

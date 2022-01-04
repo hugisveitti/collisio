@@ -34,6 +34,7 @@ import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { green4 } from "../../providers/theme";
 import FullscreenButton from "../inputs/FullscreenButton";
 import CopyTextButton from "../inputs/CopyTextButton";
+import { checkIfCanStartGame } from "../../functions/validationFunctions";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -99,6 +100,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
     }
   };
 
+  const { canStartGame, message: startGameMessage } = checkIfCanStartGame(
+    props.store
+  );
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={1} lg={2} style={{ textAlign: "left" }}>
@@ -109,6 +114,14 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           Waiting room
         </Typography>
       </Grid>
+      {props.store.tournament?.id && (
+        <Grid item xs={12}>
+          <Typography>
+            This game will be registered in the tournament{" "}
+            <i>{props.store.tournament.name}</i>
+          </Typography>
+        </Grid>
+      )}
       <Grid item xs={1} lg={false}></Grid>
       <Grid item xs={12} lg={4}>
         <Typography variant="h4">
@@ -183,10 +196,16 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               variant="contained"
               onClick={handleStartGame}
               disableElevation
+              disabled={!canStartGame}
             >
               Start game
             </Button>
           </Grid>
+          {!canStartGame && (
+            <Grid item xs={12}>
+              <Typography color="error">{startGameMessage}</Typography>
+            </Grid>
+          )}
 
           <GameSettingsComponent store={props.store} />
         </React.Fragment>
