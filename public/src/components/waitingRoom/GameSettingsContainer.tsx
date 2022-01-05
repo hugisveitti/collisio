@@ -58,6 +58,12 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
         user?.uid
       );
       console.log("active bracket node", activeBracketNode);
+      if (!activeBracketNode) {
+        toast.error(
+          `No active bracket found for ${props.store.players[0].playerName}`
+        );
+        props.store.setTournament(undefined);
+      }
       props.store.setActiveBracketNode(activeBracketNode);
     } else {
       props.store.setActiveBracketNode(undefined);
@@ -115,15 +121,32 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
             variant="contained"
             disableElevation
             onClick={() => {
-              if (user?.uid) {
-                setActiveTournamnets(undefined);
-                getActiveTournaments(user.uid).then((_t) => {
-                  console.log("_t active tour", _t);
-                  setActiveTournamnets(_t);
-                });
-              } else {
-                toast.error("Only logged in users can look for tounaments");
+              if (props.store.players.length === 0) {
+                toast.error(
+                  "No players in waiting room. Players are needed to search for tournaments."
+                );
+                return;
               }
+              if (!props.store.players[0].isAuthenticated) {
+                toast.error(
+                  "Players must be logged in to search for tournaments."
+                );
+                return;
+              }
+              setActiveTournamnets(undefined);
+              getActiveTournaments(props.store.players[0].id).then((_t) => {
+                console.log("_t active tour", _t);
+                setActiveTournamnets(_t);
+                if (_t?.length > 0) {
+                  console.log("setting tournament");
+                  const newGameSettings: IGameSettings = {
+                    ...props.store.gameSettings,
+                    tournamentId: _t[0].id,
+                  };
+                  props.store.setGameSettings(newGameSettings);
+                  props.store.setTournament(_t[0]);
+                }
+              });
             }}
           >
             Find active tournaments
