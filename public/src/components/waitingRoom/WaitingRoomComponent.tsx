@@ -113,6 +113,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           Waiting room
         </Typography>
       </Grid>
+      <Grid item xs={1} lg={false}></Grid>
       {props.store.tournament?.id && (
         <Grid item xs={12}>
           <Typography>
@@ -122,7 +123,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Typography>
         </Grid>
       )}
-      <Grid item xs={1} lg={false}></Grid>
       <Grid item xs={12} lg={4}>
         <Typography variant="h4">
           <span style={{ backgroundColor: green4, color: "white" }}>

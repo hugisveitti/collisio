@@ -380,6 +380,16 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
 
     console.log("player1", player1)
     console.log("player2", player2)
+    if (!player1 || !player2) {
+
+        console.warn("player1 or player2 undefined", player1, player2)
+        callback({
+            status: "error",
+            isFinished: false,
+            message: "Error finding correct players."
+        })
+        return
+    }
 
     bracket.player1Score = bracket.player1Score ?? 0
     bracket.player2Score = bracket.player2Score ?? 0

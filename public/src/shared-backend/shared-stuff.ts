@@ -20,6 +20,7 @@ export type TrackName =
     | "farmers-little-helper-map"
     | "speed-test-track"
     | "small-track"
+    | "small-jump-track"
 
 export type VehicleType = "normal"
     | "tractor"

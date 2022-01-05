@@ -76,13 +76,15 @@ export class RaceGameScene extends GameScene {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
 
-        this.createViews()
-        this.createController()
-        this.resetVehicles()
-        this.restartGame()
+
     }
 
     async create(): Promise<void> {
+        this.createViews()
+        this.createController()
+        this.resetVehicles()
+
+        this.restartGame()
     }
 
     startRaceCountdown() {
@@ -94,6 +96,11 @@ export class RaceGameScene extends GameScene {
             vehicle.canDrive = false
             vehicle.stop()
         }
+
+        if (this.raceCountdownTime > 3) {
+            this.showImportantInfo(`Race starting in ${this.raceCountdownTime} seconds`, true)
+        }
+
         /** hacky way to make vehicles stopp
          * TODO: not this, find a way to make vechicles reliably start on the ground paused..
          */
@@ -170,7 +177,7 @@ export class RaceGameScene extends GameScene {
 
         window.clearTimeout(this.countDownTimeout)
         window.clearTimeout(this.gameStartingTimeOut)
-        this.clearTimouts()
+        this.clearTimeouts()
 
         this.gameStarted = false
         this.winner = ""

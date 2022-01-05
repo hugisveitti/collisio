@@ -1,4 +1,3 @@
-
 import { CollisionEvent } from "@enable3d/common/dist/types";
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { IVehicle } from "../vehicles/IVehicle";

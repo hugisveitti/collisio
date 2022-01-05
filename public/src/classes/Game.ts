@@ -78,6 +78,9 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Small track", type: "small-track", gameType: "race"
+    },
+    {
+        name: "Small jump track", type: "small-jump-track", gameType: "race"
     }
 ]
 
@@ -133,7 +136,19 @@ export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDay
 }
 
 
-export const activeTrackNames: TrackName[] = ["farm-track", "sea-side-track", "simple-tag-course", "f1-track", "f1-track-2", "russia-track", "ferrari-track", "farmers-little-helper-map", "small-track"]
+export const activeTrackNames: TrackName[] = [
+    "farm-track",
+    "sea-side-track",
+    "simple-tag-course",
+    "f1-track",
+    "f1-track-2",
+    "russia-track",
+    "ferrari-track",
+    "farmers-little-helper-map",
+    "small-track",
+    "small-jump-track"
+]
+
 export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name => {
     for (let i = 0; i < allTrackNames.length; i++) {
         if (allTrackNames[i].type === name) {

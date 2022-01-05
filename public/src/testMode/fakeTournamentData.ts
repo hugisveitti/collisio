@@ -2,7 +2,7 @@ import { createBracketTree, ITournamentUser, LocalTournament } from "../classes/
 import { setFirestorePrivateUser } from "../firebase/firestoreFunctions";
 import { getTournamentWithId, joinTournament, setTournament } from "../firebase/firestoreTournamentFunctions";
 
-const createTournamentUser = (name: string, id: string, ranking): ITournamentUser => {
+const createTournamentUser = (name: string, id: string, ranking: number): ITournamentUser => {
     return {
         displayName: name,
         uid: id,

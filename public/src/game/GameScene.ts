@@ -29,6 +29,7 @@ export const viewLefts = [0, 0.5]
 export const viewBottoms = [0, 0, 0.5, 0.5]
 
 const vechicleFov = 60
+const fadeSecs = 2
 
 
 export interface IEndOfGameData {
@@ -92,6 +93,7 @@ export class GameScene extends Scene3D implements IGameScene {
     viewsImpornantInfo: HTMLSpanElement[]
     viewsNameInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
+    importantInfoTimeout: NodeJS.Timeout
     pingInfo: HTMLSpanElement
     fpsInfo: HTMLSpanElement
     playerInfosContainer: HTMLDivElement
@@ -307,6 +309,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         window.addEventListener("resize", () => this.onWindowResize())
         await this.loadAssets()
+
     }
 
     async loadAssets() { }
@@ -497,7 +500,7 @@ export class GameScene extends Scene3D implements IGameScene {
     setViewImportantInfo(info: string, i: number, clear?: boolean) {
         this.viewsImpornantInfo[i].innerHTML = info
 
-        const fadeSecs = 2
+
         if (clear) {
             this.viewsImpornantInfoClearTimeout[i] = setTimeout(() => {
                 this.clearViewImportantInfo(i)
@@ -509,10 +512,11 @@ export class GameScene extends Scene3D implements IGameScene {
         this.viewsImpornantInfo[i].innerHTML = ""
     }
 
-    clearTimouts() {
+    clearTimeouts() {
         for (let to of this.viewsImpornantInfoClearTimeout) {
             window.clearTimeout(to)
         }
+        window.clearTimeout(this.importantInfoTimeout)
     }
 
     setNeedsReload(needsReload: boolean) {
@@ -752,8 +756,13 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-    showImportantInfo(text: string) {
+    showImportantInfo(text: string, clear?: boolean) {
         this.importantInfoDiv.innerHTML = text
+        if (clear) {
+            this.importantInfoTimeout = setTimeout(() => {
+                this.clearImportantInfo()
+            }, fadeSecs * 1000)
+        }
     }
 
     clearImportantInfo() {
