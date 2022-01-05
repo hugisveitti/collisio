@@ -153,7 +153,7 @@ export class RaceGameScene extends GameScene {
     }
 
     getNumberOfLaps() {
-        return this.gameSceneConfig.tournament?.numberOfLaps ?? this.gameSettings.numberOfLaps
+        return this.gameSceneConfig?.tournament?.numberOfLaps ?? this.gameSettings.numberOfLaps
     }
 
     _resetVehicles() {
