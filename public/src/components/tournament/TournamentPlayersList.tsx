@@ -20,6 +20,7 @@ import {
 import { cardBackgroundColor, red1 } from "../../providers/theme";
 import NumberSelect from "../inputs/NumberSelect";
 import { getUserPagePath } from "../Routes";
+import { ListItem } from "@mui/material";
 
 interface IPlayerListItem {
   player: ITournamentUser;
@@ -43,30 +44,28 @@ const PlayerListItem = (props: IPlayerListItem) => {
   };
 
   return (
-    <ListItemButton
-      key={player.uid}
-      onClick={() => history.push(getUserPagePath(player.uid))}
-    >
-      <ListItemAvatar>
-        <Avatar src={player.photoURL} />
-      </ListItemAvatar>
-      <ListItemText
-        primary={
-          <Typography>
-            {player.displayName} {props.isLeader && <i>Leader</i>}
-          </Typography>
-        }
-        secondary={props.tournamentType === "local" && player.ranking}
-      />
-      {/* <ListItemButton>
-        {props.user && (
-          <FollowButton
-            userData={userData}
-            otherUserData={followingData}
-            onlyIcon
-          />
-        )}
-      </ListItemButton> */}
+    <ListItem key={player.uid}>
+      <ListItemButton
+        style={{ marginRight: 40 }}
+        key={player.uid}
+        onClick={() => {
+          if (!props.editingRanking) {
+            history.push(getUserPagePath(player.uid));
+          }
+        }}
+      >
+        <ListItemAvatar>
+          <Avatar src={player.photoURL} />
+        </ListItemAvatar>
+        <ListItemText
+          primary={
+            <Typography>
+              {player.displayName} {props.isLeader && <i>Leader</i>}
+            </Typography>
+          }
+          secondary={props.tournamentType === "local" && player.ranking}
+        />
+      </ListItemButton>
       {props.editingRanking && (
         <ListItemSecondaryAction>
           <NumberSelect
@@ -88,7 +87,7 @@ const PlayerListItem = (props: IPlayerListItem) => {
           />
         </ListItemSecondaryAction>
       )}
-    </ListItemButton>
+    </ListItem>
   );
 };
 
