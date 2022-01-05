@@ -1,7 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { node } from "webpack";
-import { IPreGamePlayerInfo, TrackName, VehicleType } from "../shared-backend/shared-stuff";
-import { getDateNow, shuffleArray } from "../utils/utilFunctions";
+import { TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { IUser } from "./User";
 
 export type TournamentType = "local" | "global"
@@ -345,6 +343,25 @@ export class BracketTree {
             }
         }
         return currentItem
+    }
+}
+
+export const getBracketNameFromHeight = (height: number) => {
+    switch (height) {
+        case 1:
+            return "Final"
+        case 2:
+            return "Semi finals"
+        case 3:
+            return "Quarter finals"
+        case 4:
+            return "Eighth finals"
+        case 5:
+            return "16th finals"
+        case 6:
+            return "32th finals"
+        default:
+            return `${2 ** (height - 1)}th finals`
     }
 }
 

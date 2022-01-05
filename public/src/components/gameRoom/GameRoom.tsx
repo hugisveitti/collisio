@@ -68,7 +68,7 @@ const GameRoom = (props: IGameRoom) => {
         console.log("res after saving game!", res);
         console.log("pre game data info ", res.message);
         if (res.status === "success") {
-          currentRaceInfo = currentRaceInfo.concat(res.message);
+          currentRaceInfo = [res.message].concat(currentRaceInfo);
           setGameDataInfo(currentRaceInfo);
         }
         if (res.activeBracketNode) {

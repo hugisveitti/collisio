@@ -1,7 +1,7 @@
 import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
 import { Unsubscribe } from "firebase/auth";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
+import { getBracketNameFromHeight, GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
 import { IUser } from "../classes/User";
 import { firestore } from "./firebaseInit";
 import { getUserFollowings } from "./firestoreFunctions";
@@ -221,10 +221,29 @@ export const getAvailableTournaments = async (userId: string): Promise<ITourname
 
 export const getActiveTournaments = async (userId: string): Promise<ITournament[]> => {
     return new Promise<ITournament[]>(async (resolve, reject) => {
-
-
         console.log("userId", userId)
         const q = query(collection(firestore, tournamentPath), where("playersIds", "array-contains", userId), where("isFinished", "==", false), where("hasStarted", "==", true))
+
+        try {
+            const docs = await getDocs(q)
+
+
+            const tournaments: ITournament[] = []
+            docs.forEach(doc => {
+                tournaments.push(doc.data() as ITournament)
+            })
+            resolve(tournaments)
+        } catch (err) {
+            reject()
+            console.warn("Error getting active tournaments:", err)
+        }
+    })
+}
+
+export const getPreviousTournaments = async (userId: string): Promise<ITournament[]> => {
+    return new Promise<ITournament[]>(async (resolve, reject) => {
+        console.log("userId", userId)
+        const q = query(collection(firestore, tournamentPath), where("playersIds", "array-contains", userId), where("isFinished", "==", true))
 
         try {
             const docs = await getDocs(q)
@@ -336,8 +355,17 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
         return
     }
 
+    if (tournament.isFinished) {
+        callback({ isFinished: true, message: "Tournament is already finished.", status: "error" })
+        return
+    }
+
     const bracket = tournament.flattenBracket.find(bracket => bracket.id === activeBracketNode.id)
 
+    if (bracket.seriesFinished) {
+        callback({ isFinished: true, message: "Bracket is already finished.", status: "error" })
+        return
+    }
 
     let player1: IPlayerGameInfo
     let player2: IPlayerGameInfo
@@ -372,14 +400,14 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
 
     console.log("bracket to save", bracket)
 
-    let message = `Current score is: ${bracket.player1.displayName} ${bracket.player1Score} - ${bracket.player2Score} ${bracket.player2.displayName}.`
+    let message = `Current score in the ${getBracketNameFromHeight(bracket.height)}, best of ${tournament.numberOfGamesInSeries} is: ${bracket.player1.displayName} ${bracket.player1Score} - ${bracket.player2Score} ${bracket.player2.displayName}.`
     if (isFinished) {
         const winnerName = player1.totalTime < player2.totalTime ? player1.name : player2.name
         if (bracket.id === "root") {
             tournament.isFinished = true
-            message += `\nThe tournament is finished, ${winnerName} is the winner!`
+            message += `\nThe tournament is finished, <strong>${winnerName}</strong> is the winner!`
         } else {
-            message += `\nThis series is finished. ${winnerName} goes to the next round!`
+            message += `\nThis series is finished. <strong>${winnerName}</strong> goes to the next round!`
         }
     }
 

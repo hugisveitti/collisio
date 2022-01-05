@@ -1,6 +1,6 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useContext } from "react";
@@ -10,6 +10,7 @@ import { UserContext } from "../../providers/UserProvider";
 import { createTournamentPagePath } from "../Routes";
 import ActiveTournamentsComponent from "./ActiveTournamentsComponent";
 import AvailableTournamentsComponent from "./AvailableTournamentsComponent";
+import PreviousTournamentsComponent from "./PreviousTournamentsComponent";
 import TournamentContainer from "./TournamentContainer";
 
 interface TournamentPageParamType {
@@ -63,6 +64,12 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
         </Grid>
 
         <ActiveTournamentsComponent user={user} />
+
+        <Grid item xs={12}>
+          <Divider style={{ margin: "auto", width: 100 }} />
+        </Grid>
+
+        <PreviousTournamentsComponent user={user} />
       </Grid>
     </AppContainer>
   );

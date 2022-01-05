@@ -1,17 +1,11 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { toast } from "react-toastify";
 import { IUser } from "../../classes/User";
 import { getActiveTournaments } from "../../firebase/firestoreTournamentFunctions";
-import { getTournamentPagePath } from "../Routes";
-import { toast } from "react-toastify";
 import TournamentsTable from "./TournamentsTable";
 
 interface IActiveTournamentsComponent {
@@ -69,7 +63,9 @@ const ActiveTournamentsComponent = (props: IActiveTournamentsComponent) => {
   return (
     <React.Fragment>
       <Grid item xs={12}>
-        <Typography>List of active tournaments</Typography>
+        <Typography>
+          List of active tournaments, those that have already started.
+        </Typography>
       </Grid>
       <Grid item xs={false} lg={3} />
       <Grid item xs={12} lg={6}>
