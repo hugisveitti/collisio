@@ -213,7 +213,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async addLights() {
 
-        this.timeOfDay = getTimeOfDay(this.gameSettings.trackName)
+        this.timeOfDay = getTimeOfDay(this.getTrackName())
 
         const { ambientLightColor,
             hemisphereTopColor,
@@ -255,7 +255,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.scene.fog = new Fog(this.scene.background, 1, 5000);
         this.scene.fog.color.copy(uniforms["bottomColor"].value);
 
-        const trackInfo = getTrackInfo(this.gameSettings.trackName)
+        const trackInfo = getTrackInfo(this.getTrackName())
 
         const hemisphereRadius = trackInfo?.hemisphereRadius ?? 1000
 
@@ -488,6 +488,11 @@ export class GameScene extends Scene3D implements IGameScene {
 
         })
         return promise
+    }
+
+
+    getTrackName() {
+        return this.gameSceneConfig.tournament?.trackName ?? this.gameSettings.trackName
     }
 
     /**
@@ -791,7 +796,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     setGameSettings(gameSettings: IGameSettings) {
 
-        if (this.courseLoaded && (this.gameSettings.trackName !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
+        if (this.courseLoaded && (this.getTrackName() !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
             this.setNeedsReload(true)
         }
 
@@ -804,7 +809,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
         }
 
-        this.timeOfDay = getTimeOfDay(this.gameSettings.trackName)
+        this.timeOfDay = getTimeOfDay(this.getTrackName())
         if (this.pLight && this.course) {
             this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
             this.pLight.shadow.bias = 0.1

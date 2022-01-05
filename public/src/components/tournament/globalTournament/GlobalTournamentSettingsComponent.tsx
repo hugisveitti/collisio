@@ -7,7 +7,7 @@ interface IGlobalTournamentSettingsComponent {
   tournament: GlobalTournament;
 }
 
-const GlobalTournamentComponent = (
+const GlobalTournamentSettingsComponent = (
   props: IGlobalTournamentSettingsComponent
 ) => {
   return (
@@ -19,10 +19,14 @@ const GlobalTournamentComponent = (
         End of tournament {getDateString(props.tournament.tournamentEnd)}
       </Grid>
       <Grid item xs={12}>
-        Runs per player {props.tournament.runsPerPlayer}
+        {props.tournament.runsPerPlayer ? (
+          <>Runs per player {props.tournament.runsPerPlayer}</>
+        ) : (
+          <>No limit on runs per player.</>
+        )}
       </Grid>
     </>
   );
 };
 
-export default GlobalTournamentComponent;
+export default GlobalTournamentSettingsComponent;

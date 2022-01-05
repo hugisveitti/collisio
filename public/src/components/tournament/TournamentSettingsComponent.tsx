@@ -2,6 +2,7 @@ import Grid from "@mui/material/Grid";
 import React from "react";
 import { getTrackNameFromType } from "../../classes/Game";
 import { LocalTournament, GlobalTournament } from "../../classes/Tournament";
+import { cardBackgroundColor } from "../../providers/theme";
 import { getDateString } from "../../utils/utilFunctions";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import GlobalTournamentSettingsComponent from "./globalTournament/GlobalTournamentSettingsComponent";
@@ -32,16 +33,26 @@ const TournamentSettingsComponent: <
   };
 
   return (
-    <Grid container spacing={3}>
+    <Grid
+      container
+      spacing={3}
+      style={{
+        backgroundColor: cardBackgroundColor,
+        width: 500,
+        maxWidth: "90%",
+        margin: "auto",
+        paddingBottom: 15,
+      }}
+    >
       <Grid item xs={12}>
         {props.tournament.hasStarted
-          ? "This tournament has started."
-          : "This tournament hasn't started."}
+          ? "The tournament has started."
+          : "The tournament hasn't started."}
       </Grid>
       <Grid item xs={12}>
         {props.tournament.isFinished
-          ? "This tournament is finished"
-          : "This tournament hasn't finished."}
+          ? "The tournament is finished"
+          : "The tournament isn't finished."}
       </Grid>
       <Grid item xs={12}>
         The leader of the tournament is {props.tournament.leaderName}

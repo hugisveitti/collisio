@@ -22,6 +22,7 @@ import GlobalTournamentComponent from "./globalTournament/GlobalTournamentCompon
 import GlobalTournamentWaitingRoomComponent from "./globalTournament/GlobalTournamentWaitingRoomComponent";
 import LocalTournamentComponent from "./localTournament/LocalTournamentComponent";
 import LocalTournamentWaitingRoomComponent from "./localTournament/LocalTournamentWaitingRoomComponent";
+import HowToPlayTournamentComponent from "./HowToPlayTournamentComponent";
 
 interface ITournamentContainer {
   tournamentId: string;
@@ -118,6 +119,9 @@ const TournamentContainer = (props: ITournamentContainer) => {
             {renderTournament()}
           </>
         )}
+        <Grid item xs={12}>
+          <HowToPlayTournamentComponent />
+        </Grid>
         {tournament?.id && tournament.leaderId === user?.uid && (
           <Grid item xs={12}>
             <DeleteButton

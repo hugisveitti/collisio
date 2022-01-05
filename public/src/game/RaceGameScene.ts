@@ -59,10 +59,12 @@ export class RaceGameScene extends GameScene {
 
     }
 
+
+
     async loadAssets(): Promise<void> {
 
         this.gameTimers = []
-        this.course = new RaceCourse(this, this.gameSettings.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
+        this.course = new RaceCourse(this, this.getTrackName(), (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
 
         await this.course.createCourse()
 
@@ -378,7 +380,7 @@ export class RaceGameScene extends GameScene {
             playerName: this.players[i].playerName,
             playerId: this.players[i].id,
             bestLapTime: this.gameTimers[i].getBestLapTime(),
-            trackName: this.gameSettings.trackName,
+            trackName: this.getTrackName(),
             lapTimes: this.gameTimers[i].getLapTimes(),
             gameId: this.gameId,
             date: getDateNow(),

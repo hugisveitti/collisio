@@ -12,11 +12,11 @@ const LocalTournamentComponent = (props: ILocalTournamentSettingsComponent) => {
       <Grid item xs={12}>
         {props.tournament.numberOfGamesInSeries} games per series.
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         {props.tournament.useGroupStageToDetermineBracketPlacement
           ? "Using group stage to determine bracket placement."
           : "Not using a group stage to determine bracket placement."}
-      </Grid>
+      </Grid> */}
     </>
   );
 };

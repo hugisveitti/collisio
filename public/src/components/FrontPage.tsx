@@ -56,7 +56,7 @@ const FrontPage = (props: FrontPageProps) => {
               size="small"
               startIcon={<HelpIcon />}
             >
-              How to play game
+              How to play
             </Button>
           </Link>
         </Grid>
