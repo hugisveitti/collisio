@@ -90,7 +90,7 @@ const LocalTournamentWaitingRoomComponent = (
               }}
               color="info"
             >
-              Edit tournament
+              {!editing ? "Edit tournament" : "Submit edit"}
             </Button>
           </Grid>
           <Grid item xs={12}>

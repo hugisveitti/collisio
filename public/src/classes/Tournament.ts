@@ -344,6 +344,34 @@ export class BracketTree {
         }
         return currentItem
     }
+
+    static FindParentBracketNode(list: IFlattendBracketNode[], id: string): IFlattendBracketNode | undefined {
+        const splitId = id.split("_")
+        const parentId = splitId.slice(0, splitId.length - 1).join("_")
+        for (let item of list) {
+            if (item.id === parentId) {
+                return item
+            }
+        }
+        return undefined
+    }
+
+    static AdvancePlayer(list: IFlattendBracketNode[], id: string, winner: ITournamentUser) {
+        const splitId = id.split("_")
+        const parentId = splitId.slice(0, splitId.length - 1).join("_")
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id === parentId) {
+                if (!list[i].player1) {
+                    list[i].player1 = winner
+                } else if (!list[i].player2) {
+                    list[i].player2 = winner
+                } else {
+                    console.warn("Both players have been set", list)
+                }
+            }
+        }
+        return list
+    }
 }
 
 export const getBracketNameFromHeight = (height: number) => {

@@ -1,7 +1,7 @@
 import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, Timestamp, updateDoc, where, writeBatch } from "@firebase/firestore";
 import { Unsubscribe } from "firebase/auth";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { getBracketNameFromHeight, GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
+import { BracketTree, getBracketNameFromHeight, GlobalTournament, IFlattendBracketNode, ISingleRaceData, ITournament, ITournamentUser, LocalTournament, Tournament } from "../classes/Tournament";
 import { IUser } from "../classes/User";
 import { firestore } from "./firebaseInit";
 import { getUserFollowings } from "./firestoreFunctions";
@@ -408,18 +408,23 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
     bracket.seriesFinished = isFinished
 
 
-    console.log("bracket to save", bracket)
 
     let message = `Current score in the ${getBracketNameFromHeight(bracket.height)}, best of ${tournament.numberOfGamesInSeries} is: ${bracket.player1.displayName} ${bracket.player1Score} - ${bracket.player2Score} ${bracket.player2.displayName}.`
     if (isFinished) {
-        const winnerName = player1.totalTime < player2.totalTime ? player1.name : player2.name
+        const winner = player1.totalTime < player2.totalTime ? bracket.player1 : bracket.player2
         if (bracket.id === "root") {
             tournament.isFinished = true
-            message += `\nThe tournament is finished, <strong>${winnerName}</strong> is the winner!`
+            message += `\nThe tournament is finished, ${winner.displayName} is the winner!`
         } else {
-            message += `\nThis series is finished. <strong>${winnerName}</strong> goes to the next round!`
+            message += `\nThis series is finished. ${winner.displayName} goes to the next round!`
+
+            // set winner as player in parent
+            tournament.flattenBracket = BracketTree.AdvancePlayer(tournament.flattenBracket, bracket.id, winner)
         }
     }
+
+    console.log("bracket to save", bracket)
+
 
     console.log("setting the tournament", tournament)
     setTournament(tournament)
