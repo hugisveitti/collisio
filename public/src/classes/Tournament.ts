@@ -328,8 +328,9 @@ export class BracketTree {
         let currentItem: IFlattendBracketNode
         console.log("player id", playerId)
         for (let item of list) {
-            console.log("item.player1?.uid === playerId || item.player2?.uid", item.player1?.uid === playerId, item.player2?.uid === playerId)
+            console.log("item.player1?.uid === playerId || item.player2?.uid", item.player1?.uid === playerId, item.player2?.uid === playerId,)
             if (!item.seriesFinished && (item.player1?.uid === playerId || item.player2?.uid === playerId)) {
+                console.log("currentiiitttem", item)
                 if (!currentItem) {
                     console.log("current item", item)
 

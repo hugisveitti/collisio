@@ -12,9 +12,17 @@ export const checkIfCanStartGame = (store: IStore): { canStartGame: boolean, mes
             }
         }
         else {
-            return {
-                canStartGame: false,
-                message: `Incorrect players are connected to play this tournament bracket, the only connected players should be ${store.activeBracketNode.player1?.displayName} and ${store.activeBracketNode.player2.displayName}.`
+            if (store.activeBracketNode.player1 && store.activeBracketNode.player2) {
+
+                return {
+                    canStartGame: false,
+                    message: `Incorrect players are connected to play this tournament bracket, the only connected players should be ${store.activeBracketNode.player1?.displayName} and ${store.activeBracketNode.player2.displayName}.`
+                }
+            } else {
+                return {
+                    canStartGame: false,
+                    message: `Incorrect players are connected to play this tournament bracket, there is still one slot open for this series.`
+                }
             }
         }
 

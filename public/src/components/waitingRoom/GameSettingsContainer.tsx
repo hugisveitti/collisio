@@ -55,7 +55,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
     if (tournament.tournamentType === "local") {
       const activeBracketNode = BracketTree.FindActiveBracketNode(
         (tournament as LocalTournament).flattenBracket,
-        user?.uid
+        props.store.players[0]?.id
       );
       console.log("active bracket node", activeBracketNode);
       if (!activeBracketNode) {
@@ -78,7 +78,9 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
           (tournament) => {
             console.log("new tournament gotten", tournament);
             props.store.setTournament(tournament);
-            handleGetBracketNode(tournament);
+            if (props.store.players.length > 0) {
+              handleGetBracketNode(tournament);
+            }
           }
         );
       } else {
@@ -143,6 +145,9 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
                     ...props.store.gameSettings,
                     tournamentId: _t[0].id,
                   };
+                  props.store.socket.emit(mdts_game_settings_changed, {
+                    gameSettings: newGameSettings,
+                  });
                   props.store.setGameSettings(newGameSettings);
                   props.store.setTournament(_t[0]);
                 }
