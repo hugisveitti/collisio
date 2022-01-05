@@ -18,12 +18,21 @@ interface IScoreItem {
   player: ITournamentUser;
 }
 
+const getBestRace = (raceData: ISingleRaceData[]): ISingleRaceData => {
+  if (!raceData || raceData?.length === 0)
+    return { vehicleType: "normal", totalTime: Infinity, lapTimes: [] };
+
+  let bestRace = raceData[0];
+  for (let race of raceData) {
+    if (race.totalTime < bestRace.totalTime) bestRace = race;
+  }
+  return bestRace;
+};
+
 const ScoreItem = (props: IScoreItem) => {
   const [open, setOpen] = useState(false);
 
-  const bestRun: ISingleRaceData = props.player.raceData?.sort(
-    (a, b) => a.totalTime - b.totalTime
-  )[0];
+  const bestRun: ISingleRaceData = getBestRace(props.player.raceData);
 
   return (
     <>
@@ -72,10 +81,16 @@ interface IGlobalTournamentScoreboard {
 
 // need to specifically get players since they are its own collection
 const GlobalTournamentScoreboard = (props: IGlobalTournamentScoreboard) => {
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState([] as ITournamentUser[]);
 
   useEffect(() => {
     const unsub = getPlayersInTournamentListener(props.tournamentId, (_p) => {
+      // TODO: not this
+      _p.sort((a, b) => {
+        return (
+          getBestRace(a.raceData).totalTime - getBestRace(b.raceData).totalTime
+        );
+      });
       setPlayers(_p);
       console.log("_p", _p);
     });

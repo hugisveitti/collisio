@@ -50,7 +50,7 @@ export class RaceGameScene extends GameScene {
         this.winTime = -1
         this.gameTimers = []
 
-        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        this.currentNumberOfLaps = this.getNumberOfLaps()
 
         this.hasShowStartAnimation = false
         this.raceFinished = false
@@ -72,7 +72,7 @@ export class RaceGameScene extends GameScene {
 
         await this.createVehicles()
 
-        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        this.currentNumberOfLaps = this.getNumberOfLaps()
         // adds font to vehicles, which displays names
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
@@ -90,7 +90,7 @@ export class RaceGameScene extends GameScene {
     }
 
     startRaceCountdown() {
-        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        this.currentNumberOfLaps = this.getNumberOfLaps()
         this.startGameSong()
         if (this.raceCountdownTime < 3) this.raceCountdownTime = 3
         // makes vehicle fall
@@ -152,13 +152,17 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    getNumberOfLaps() {
+        return this.gameSceneConfig.tournament?.numberOfLaps ?? this.gameSettings.numberOfLaps
+    }
+
     _resetVehicles() {
         for (let timer of this.gameTimers) {
             timer.stop()
         }
 
         this.gameTimers = []
-        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        this.currentNumberOfLaps = this.getNumberOfLaps()
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
@@ -175,7 +179,7 @@ export class RaceGameScene extends GameScene {
 
     _restartGame() {
 
-        this.currentNumberOfLaps = this.gameSettings.numberOfLaps
+        this.currentNumberOfLaps = this.getNumberOfLaps()
 
         window.clearTimeout(this.countDownTimeout)
         window.clearTimeout(this.gameStartingTimeOut)

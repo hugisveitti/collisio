@@ -67,10 +67,13 @@ service cloud.firestore {
         allow read;
       	allow create: if !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.hasStarted;
       	allow delete: if request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
-        allow update: if request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
+        allow update: if 
+        (request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId)
+         && (!get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer || get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer > get(/databases/$(database)/documents/tournaments/$(tournamentId)/players/$(playerId)).raceData.size());
       }
       match /raceData/{playerId} {
         allow read;
+       
         allow write: if request.auth.uid == playerId;
       }
     }

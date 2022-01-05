@@ -150,6 +150,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
                   });
                   props.store.setGameSettings(newGameSettings);
                   props.store.setTournament(_t[0]);
+                  handleGetBracketNode(_t[0]);
                 }
               });
             }}
