@@ -90,6 +90,32 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
     }
   }, [props.store.gameSettings]);
 
+  const handleChangeSettings = (tournament: ITournament) => {
+    const newGameSettings: IGameSettings = {
+      ...props.store.gameSettings,
+      tournamentId: tournament?.id,
+    };
+    if (!tournament || tournament?.id === "undefined") {
+      delete newGameSettings.tournamentId;
+      props.store.setTournament(undefined);
+      props.store.setActiveBracketNode(undefined);
+    } else {
+      newGameSettings.numberOfLaps = tournament.numberOfLaps;
+      newGameSettings.trackName = tournament.trackName;
+      // compete in other than race ?
+      newGameSettings.gameType = "race";
+
+      props.store.setTournament(tournament);
+      handleGetBracketNode(tournament);
+    }
+    console.log("new game settings", newGameSettings);
+
+    props.store.setGameSettings(newGameSettings);
+    props.store.socket.emit(mdts_game_settings_changed, {
+      gameSettings: newGameSettings,
+    });
+  };
+
   return (
     <Grid item xs={12}>
       <Card
@@ -140,17 +166,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
                 console.log("_t active tour", _t);
                 setActiveTournamnets(_t);
                 if (_t?.length > 0) {
-                  console.log("setting tournament");
-                  const newGameSettings: IGameSettings = {
-                    ...props.store.gameSettings,
-                    tournamentId: _t[0].id,
-                  };
-                  props.store.socket.emit(mdts_game_settings_changed, {
-                    gameSettings: newGameSettings,
-                  });
-                  props.store.setGameSettings(newGameSettings);
-                  props.store.setTournament(_t[0]);
-                  handleGetBracketNode(_t[0]);
+                  handleChangeSettings(_t[0]);
                 }
               });
             }}
@@ -163,29 +179,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
             selectedId={props.store.gameSettings.tournamentId}
             selectedName={props.store.tournament?.name}
             onChange={(tournament) => {
-              const newGameSettings: IGameSettings = {
-                ...props.store.gameSettings,
-                tournamentId: tournament?.id,
-              };
-              if (!tournament || tournament?.id === "undefined") {
-                delete newGameSettings.tournamentId;
-                props.store.setTournament(undefined);
-                props.store.setActiveBracketNode(undefined);
-              } else {
-                newGameSettings.numberOfLaps = tournament.numberOfLaps;
-                newGameSettings.trackName = tournament.trackName;
-                // compete in other than race ?
-                newGameSettings.gameType = "race";
-
-                props.store.setTournament(tournament);
-                handleGetBracketNode(tournament);
-              }
-              console.log("new game settings", newGameSettings);
-
-              props.store.setGameSettings(newGameSettings);
-              props.store.socket.emit(mdts_game_settings_changed, {
-                gameSettings: newGameSettings,
-              });
+              handleChangeSettings(tournament);
             }}
           />
         </CardActions>
