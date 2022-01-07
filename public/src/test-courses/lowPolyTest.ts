@@ -511,8 +511,8 @@ export class LowPolyTestScene extends GameScene {
     }
 
     // this.vehicle isnt appart of allVehicles in GameScene class
-    updateVehicles() {
-        this.vehicle.update()
+    updateVehicles(delta: number) {
+        this.vehicle.update(delta)
     }
 
     async _upd() {
@@ -528,7 +528,7 @@ export class LowPolyTestScene extends GameScene {
 
 
             if (this.vehicle) {
-                this.updateVehicles()
+                this.updateVehicles(delta)
                 this.mobileControls = this.driveVehicle?.()
                 if (recording) {
                     this.recordingInstructions.push(getDriveInstruction(time, this.mobileControls))
@@ -559,7 +559,7 @@ export class LowPolyTestScene extends GameScene {
                 //this.otherDrivers[i].setMobileController(time)
                 //  driveVehicle(this.otherDrivers[i].controller, oVehicle)
 
-                oVehicle.update()
+                oVehicle.update(delta)
             }
 
 

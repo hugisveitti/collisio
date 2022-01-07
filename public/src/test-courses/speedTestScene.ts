@@ -71,10 +71,10 @@ class SpeedTestScene extends GameScene {
     }
 
 
-    updateVehicles() {
+    updateVehicles(delta: number) {
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].goForward()
-            this.vehicles[i].update()
+            this.vehicles[i].update(delta)
             if (i === 0) {
                 this.vehicles[i].cameraLookAt(this.camera)
             }
@@ -82,10 +82,10 @@ class SpeedTestScene extends GameScene {
     }
 
 
-    update(time: number) {
+    update(time: number, delta: number) {
         this.updateFps(time)
         if (this.everythingReady()) {
-            this.updateVehicles()
+            this.updateVehicles(delta)
         }
     }
 }

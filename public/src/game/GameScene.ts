@@ -354,10 +354,11 @@ export class GameScene extends Scene3D implements IGameScene {
             const time = this.clock.getElapsedTime()
 
             // update physics, then update models, opposite to enabled3d
+
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
-            this.update?.(parseFloat(time.toFixed(3)), parseInt(delta.toString()))
+            this.update?.(parseFloat(time.toFixed(3)), delta)
 
             this.animationMixers.update(delta)
 
@@ -1062,7 +1063,7 @@ export class GameScene extends Scene3D implements IGameScene {
              * Maybe that is wrong but I think it shakes less
              */
             this.vehicles[i].cameraLookAt(this.views[i].camera)
-            this.vehicles[i].update()
+            this.vehicles[i].update(delta)
 
             const left = Math.floor(window.innerWidth * this.views[i].left);
             const bottom = Math.floor(window.innerHeight * this.views[i].bottom);
@@ -1101,7 +1102,7 @@ export class GameScene extends Scene3D implements IGameScene {
         if (this.everythingReady()) {
             this._updateChild(_time, _delta)
             for (let vehicle of this.extraVehicles) {
-                vehicle.update()
+                vehicle.update(_delta)
             }
             for (let wagon of this.wagons) {
                 wagon.update()

@@ -473,7 +473,7 @@ export class SphereVehicle implements IVehicle {
     }
 
     // update mesh and model to vehicle place
-    update(): void {
+    update(delta: number): void {
         this.vehicleBody.body.setAngularVelocity(this.zVel * Math.cos(this.yRot) * .05, 0, this.zVel * Math.sin(this.yRot) * .05)
         // this.vehicleBody.body.ammo.
         // this.vehicleBody.body.setVelocity(-this.zVel * Math.sin(this.yRot), 0, this.zVel * Math.cos(this.yRot))

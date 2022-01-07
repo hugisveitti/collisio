@@ -65,7 +65,7 @@ export interface IVehicle {
     addCamera: (camera: any) => void
     removeCamera: () => void
     cameraLookAt: (camera: any) => void
-    update: () => void
+    update: (delta: number) => void
     setPosition: (x: number, y: number, z: number) => void
     getPosition: () => SimpleVector
     getRotation: () => Quaternion

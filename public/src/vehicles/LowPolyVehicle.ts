@@ -130,6 +130,8 @@ export class LowPolyVehicle implements IVehicle {
     cameraRay: ClosestRaycaster
     rayer: Ammo.ClosestRayResultCallback
 
+    prevPosition = new Vector3(0, 0, 0)
+
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
         this.scene = scene
@@ -549,7 +551,7 @@ export class LowPolyVehicle implements IVehicle {
     cameraLookAt(camera: PerspectiveCamera) {
         if (this.spinCameraAroundVehicle) {
             const rot = this.vehicleBody.rotation
-            this.vehicle.updateVehicle(0)
+            this.vehicle.updateVehicle(1 / 60)
             const pos = this.getPosition()
 
             this.cameraTarget.set(
@@ -661,28 +663,47 @@ export class LowPolyVehicle implements IVehicle {
         }
     }
 
+    detectJitter(delta: number) {
+        // this is somehow wrong
+        // the expected DX and expDZ are not correct
+        this.tm = this.vehicle.getChassisWorldTransform()
+        this.p = this.tm.getOrigin()
+        this.q = this.tm.getRotation()
+
+        const newPos = new Vector3(this.p.x(), this.p.y(), this.p.z())
+        // sometime
+        const dist = newPos.distanceTo(this.prevPosition)
+        const mps = Math.abs(this.getCurrentSpeedKmHour()) / 3.6
+        const expDist = mps * (delta / 1000)
+
+        const e = new Euler().setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w()))
+        const expDX = Math.sin(e.y) * expDist
+        const DX = (newPos.x - this.prevPosition.x)
+
+        const expDZ = Math.cos(e.y) * expDist
+        const DZ = (newPos.z - this.prevPosition.z)
 
 
-    update() {
+        if (Math.abs(expDist - dist) > .3 && Math.abs(expDist - dist) < 2) {
+
+            console.warn("JITTER", "dist", dist.toFixed(2), "exp dist", expDist)
+
+        }
+        this.prevPosition = newPos.clone()
+
+    }
+
+
+
+    update(delta: number) {
         this.checkIfSpinning()
 
         if (!!this.engineSound && this.useEngineSound) {
             this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour(0))))
         }
 
-        this.tm = this.vehicle.getChassisWorldTransform()
-        this.p = this.tm.getOrigin()
-        this.q = this.tm.getRotation()
 
-        this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
-        this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
-        // maybe this 0.2 value could use more thought
-        if (Math.abs(this.q.z()) > 0.2 || Math.abs(this.q.x()) > 0.2) {
-            this.badRotationTicks += 1
-        } else {
-            this.badRotationTicks = 0
-        }
 
         for (let i = 0; i < 5; i++) {
             // this.vehicle.updateWheelTransform(i, true)
@@ -697,6 +718,26 @@ export class LowPolyVehicle implements IVehicle {
 
             }
         }
+
+
+        //  this.detectJitter(delta)
+
+        this.tm = this.vehicle.getChassisWorldTransform()
+        this.p = this.tm.getOrigin()
+        this.q = this.tm.getRotation()
+
+        this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
+        this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+
+
+        // maybe this 0.2 value could use more thought
+        if (Math.abs(this.q.z()) > 0.2 || Math.abs(this.q.x()) > 0.2) {
+            this.badRotationTicks += 1
+        } else {
+            this.badRotationTicks = 0
+        }
+
+
         if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour(0)) < 20 && this.useBadRotationTicks) {
             // make this flip smoother ??
             this.stop()
@@ -761,7 +802,7 @@ export class LowPolyVehicle implements IVehicle {
         }
     };
 
-    getCurrentSpeedKmHour(delta: number) {
+    getCurrentSpeedKmHour(delta?: number) {
         return this.vehicle.getCurrentSpeedKmHour()
     };
 
@@ -864,9 +905,9 @@ export class LowPolyVehicle implements IVehicle {
         if (this.vector2) {
             Ammo.destroy(this.vector2)
         }
-        if (this.tuning) {
-            Ammo.destroy(this.tuning)
-        }
+        // if (this.tuning) {
+        //     Ammo.destroy(this.tuning)
+        // }
     }
 }
 
