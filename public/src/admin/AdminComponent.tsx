@@ -8,14 +8,17 @@ import Grid from "@mui/material/Grid";
 import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IRoomInfo } from "../classes/Game";
 import { auth, signOut } from "../firebase/firebaseInit";
 import RoomDataTable from "./RoomDataTable";
-import GameDataTable from "./AdminGameDataTable";
+import AdminGameDataTable from "./AdminGameDataTable";
 import StressTestComponent from "../testMode/StressTestComponent";
+import { calculateGamesDataStats } from "./statisticsFunctions";
 
 interface IAdminComponent {
   userTokenId: string;
@@ -26,11 +29,15 @@ const AdminComponent = (props: IAdminComponent) => {
   const [nRoomEntires, setNRoomEntires] = useState(5);
   const [roomCardOpen, setRoomCardOpen] = useState(false);
 
-  const [gamesData, setGamesData] = useState([]);
+  const [gamesData, setGamesData] = useState([] as IEndOfRaceInfoGame[]);
+  const [gamesDataStats, setGamesDataStats] = useState([] as string[]);
   const [nGameEntires, setNGameEntires] = useState(5);
   const [gameCardOpen, setGameCardOpen] = useState(false);
+  const [gameStatsOpen, setGameStatsOpen] = useState(false);
 
   const [stressCardOpen, setStressCardOpen] = useState(false);
+
+  const [only24HourData, setOnly24HourData] = useState(false);
 
   const handleGetRoomData = () => {
     auth.currentUser.getIdToken().then((userTokenId) => {
@@ -82,7 +89,8 @@ const AdminComponent = (props: IAdminComponent) => {
             arr.sort((a: IRoomInfo, b: IRoomInfo) =>
               a.date < b.date ? 1 : -1
             );
-            setGamesData(arr);
+            setGamesData(arr as IEndOfRaceInfoGame[]);
+            setGamesDataStats(calculateGamesDataStats(arr, only24HourData));
           } else if (resData.statusCode === 403) {
             toast.error("Unauthorized user");
             window.location.href = "/";
@@ -204,8 +212,43 @@ const AdminComponent = (props: IAdminComponent) => {
                 </Grid>
                 <Grid item xs={false} sm={3} />
 
+                <Grid item xs={6} lg={3}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setGameStatsOpen(!gameStatsOpen)}
+                    startIcon={gameStatsOpen ? <ExpandLess /> : <ExpandMore />}
+                  >
+                    Game data
+                  </Button>
+                </Grid>
+                <Grid item xs={6} lg={9}>
+                  <FormControlLabel
+                    label="Only last 24 hours?"
+                    control={
+                      <Checkbox
+                        value={only24HourData}
+                        onChange={() => {
+                          setOnly24HourData(!only24HourData);
+                          setGamesDataStats(
+                            calculateGamesDataStats(gamesData, !only24HourData)
+                          );
+                        }}
+                      />
+                    }
+                  />
+                </Grid>
                 <Grid item xs={12}>
-                  <GameDataTable gamesData={gamesData} />
+                  <Collapse in={gameStatsOpen}>
+                    {gamesDataStats.map((stats, i) => {
+                      return (
+                        <Typography key={`gamestas-${i}`}>{stats}</Typography>
+                      );
+                    })}
+                  </Collapse>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <AdminGameDataTable gamesData={gamesData} />
                 </Grid>
               </Grid>
             </Collapse>

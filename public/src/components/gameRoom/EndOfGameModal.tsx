@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import React from "react";
 import { IScoreInfo } from "../../classes/Game";
 import { IEndOfGameData } from "../../game/GameScene";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { frontPagePath, highscorePagePath } from "../Routes";
 import RaceTimeTable from "./RaceTimeTable";
@@ -55,7 +56,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
           </Button>
         </Grid>
         <Grid item xs={6} xl={2}>
-          <a href={frontPagePath}>Back to front page</a>
+          <ToFrontPageButton />
         </Grid>
         <Grid item xs={6} xl={2}>
           <a href={highscorePagePath}>See highscores</a>

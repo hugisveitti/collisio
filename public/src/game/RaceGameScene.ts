@@ -347,7 +347,7 @@ export class RaceGameScene extends GameScene {
     }
 
 
-    _updateChild(time: number) {
+    _updateChild(time: number, delta: number) {
         this.time = time
         this.updateFps(time)
 
@@ -360,7 +360,7 @@ export class RaceGameScene extends GameScene {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
             this.updateScoreTable()
-            this.updateVehicles()
+            this.updateVehicles(delta)
 
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()

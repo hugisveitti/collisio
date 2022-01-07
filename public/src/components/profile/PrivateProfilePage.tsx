@@ -169,10 +169,6 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
         <Grid item xs={12} sm={12} md={3}>
           <Grid spacing={3} container>
             <Grid item xs={12}>
-              {/* <div style={{ margin: 15 }}>
-                <Link to={frontPagePath}>Back to front page</Link>
-              </div> */}
-
               {!user ? (
                 <div
                   style={{

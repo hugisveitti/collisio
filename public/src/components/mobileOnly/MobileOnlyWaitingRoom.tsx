@@ -18,6 +18,23 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
           <Typography>Play only using your mobile.</Typography>
         </Grid>
         <Grid item xs={12}>
+          {onMobile ? (
+            <MyButton
+              onClick={() => {
+                window.location.href = "/mobileonly";
+              }}
+            >
+              Play only mobile
+            </MyButton>
+          ) : (
+            <Typography>
+              We have detected that you are not on a mobile and thus you cannot
+              play on mobile only. If you think this is a mistake, please
+              refresh your browser.
+            </Typography>
+          )}
+        </Grid>
+        <Grid item xs={12}>
           <Typography>
             Even though the game is intended to be played on a pc, using your
             phone as a controller, it can be quite fun to play only using the
@@ -46,23 +63,6 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
         </Grid>
         <Grid item xs={12}>
           <img style={{ maxWidth: "80%", width: 400 }} src={settingsImage} />
-        </Grid>
-        <Grid item xs={12}>
-          {onMobile ? (
-            <MyButton
-              onClick={() => {
-                window.location.href = "/mobileonly";
-              }}
-            >
-              Play only mobile
-            </MyButton>
-          ) : (
-            <Typography>
-              We have detected that you are not on a mobile and thus you cannot
-              play on mobile only. If you think this is a mistake, please
-              refresh your browser.
-            </Typography>
-          )}
         </Grid>
       </Grid>
     </AppContainer>

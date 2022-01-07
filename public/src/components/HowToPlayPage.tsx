@@ -81,10 +81,6 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
           </Typography>
         </Grid>
 
-        {/* <Grid item xs={12}>
-          <Link to={frontPagePath}>Back to front page</Link>
-        </Grid> */}
-
         <HowToPlayItem header="Connecting to a room">
           <Grid container spacing={3}>
             <Grid item xs={12}>

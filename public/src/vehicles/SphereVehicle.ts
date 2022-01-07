@@ -72,7 +72,7 @@ export class SphereVehicle implements IVehicle {
 
     staticCameraPos: { x: number, y: number, z: number }
 
-
+    prevPosition: Vector3
 
     constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         this.oldPos = new Vector3(0, 0, 0)
@@ -118,7 +118,7 @@ export class SphereVehicle implements IVehicle {
         this.vector = new Ammo.btVector3(0, 0, 0)
 
         this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
-
+        this.prevPosition = new Vector3(0, 0, 0)
     }
 
 
@@ -378,10 +378,22 @@ export class SphereVehicle implements IVehicle {
         this.scene.physics.add.existing(this.vehicleBody, this.physicsConfig)
     }
 
-    getCurrentSpeedKmHour(): number {
+    getCurrentSpeedKmHour(delta: number): number {
         const { x, z } = this.vehicleBody.body.velocity
 
         const num = Math.sqrt(x * x + z * z)
+
+        const currPos = this.vehicleBody.position
+
+        console.log("delta", delta)
+        const meterPerSec = (currPos.distanceTo(this.prevPosition) / delta)
+        const kmh = meterPerSec * (3.6) * 1000
+        console.log("speed", kmh)
+        console.log("numb", num)
+
+        this.prevPosition = currPos.clone()
+
+
         return num
     }
 

@@ -104,8 +104,6 @@ export const createTestVehicleInputs = (testScene: LowPolyTestScene, vehicleInpu
         vehicleInputsContainer.removeChild(vehicleInputsContainer.children[0])
     }
 
-    console.log("testScene.vehicle instanceof LowPolyTestVehicle", testScene.vehicle instanceof LowPolyTestVehicle)
-    console.log("this vehice", testScene.vehicle)
     if (testScene.vehicle instanceof LowPolyTestVehicle) {
 
         let key: keyof IVehicleConfig = "engineForce"

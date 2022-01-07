@@ -46,11 +46,6 @@ const GameInfoRow = (props: IGameInfoRow) => {
           {props.gameData.gameSettings?.numberOfLaps ?? "-"}
         </TableCell>
         <TableCell>
-          {props.gameData.playersInfo?.length > 0
-            ? props.gameData.playersInfo[0].name
-            : "No leader"}
-        </TableCell>
-        <TableCell>
           {props.gameData.avgPing ? props.gameData.avgPing.toFixed(2) : "-"}
         </TableCell>
         <TableCell>
@@ -123,7 +118,6 @@ const AdminGameDataTable = (props: IGameDataTable) => {
             <TableCell>Game Ticks</TableCell>
             <TableCell>Track name</TableCell>
             <TableCell>Number of laps</TableCell>
-            <TableCell>Leader</TableCell>
             <TableCell>Average ping</TableCell>
             <TableCell>Average fps</TableCell>
           </TableRow>

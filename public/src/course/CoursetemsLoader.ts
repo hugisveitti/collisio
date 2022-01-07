@@ -93,6 +93,7 @@ export class CourseItemsLoader {
     }
 
     handleCreateBreakable(eObject: ExtendedObject3D, key: string) {
+        console.warn("Creating breakable objects not supported yet")
         eObject.breakable = true
         let snum = eObject.name.split("_")[0]
         let num = gameItems[key].fractureImpulse ?? 5
@@ -100,14 +101,10 @@ export class CourseItemsLoader {
             num = +snum
         }
         eObject.body.on.collision((o, e) => {
-            console.log("o", o)
-            console.log("event", e)
         })
-        console.log("num", num)
         eObject.fractureImpulse = num
         eObject.body.setCollisionFlags(3)
         eObject.body.breakable = true
-        console.log("breakable", eObject)
     }
 
     handleCreatePhysicsObject(child: Object3D, key: string) {
@@ -157,7 +154,6 @@ export class CourseItemsLoader {
 
     loadGameItemsToCourse(gltf: GLTF) {
         const itemKeys = Object.keys(gameItems)
-        console.log("gltf", gltf.scene.children)
 
         /* items named hidden-X in blender, will have physics but will be invisible
         *  items named ghost-X in blender won't have physics but will be visible

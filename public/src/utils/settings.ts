@@ -32,7 +32,7 @@ export const isIphone = () => {
 }
 
 // this will only work on my network
-export const inDevelopment = false// window.location.href.includes("localhost") || window.location.href.includes("192.168")
+export const inDevelopment = false // window.location.href.includes("localhost") || window.location.href.includes("192.168")
 
 /** test mode means:
  * Not being redirected from pages

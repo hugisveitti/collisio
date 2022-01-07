@@ -1,7 +1,5 @@
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import Slider from "@mui/material/Slider";
-import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
@@ -9,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
+import Slider from "@mui/material/Slider";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
@@ -25,6 +24,7 @@ import {
 } from "../../classes/localGameSettings";
 import { inputBackgroundColor } from "../../providers/theme";
 import { inTestMode } from "../../utils/settings";
+import CollabsibleCard from "../inputs/CollapsibleCard";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
 
@@ -39,6 +39,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const [drawDistanceDefaultVal, setDrawDistanceDefaultVal] = useState(
     props.gameSettings.drawDistance
   );
+
+  const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
 
   const updateGameSettings = (key: keyof IGameSettings, value: any) => {
     const newGameSettings = { ...props.gameSettings };
@@ -174,68 +176,99 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           showMapPreview
         />
       </Grid>
-      <Grid item xs={6} sm={4}>
-        <IconButton
-          onClick={() => {
-            updateGameSettings("useSound", !gameSettings.useSound);
-          }}
-        >
-          {gameSettings.useSound ? <VolumeUpIcon /> : <VolumeOffIcon />}
-        </IconButton>
-      </Grid>
-      <Grid item xs={6} sm={4}>
-        <Button
-          variant="contained"
-          onClick={() => {
-            updateGameSettings("useShadows", !gameSettings.useShadows);
-          }}
-        >
-          Shadows {gameSettings.useShadows ? "On" : "Off"}
-        </Button>
-      </Grid>
-      <Grid item xs={12} sm={4}>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">Graphics</FormLabel>
-          <RadioGroup row aria-label="graphics" name="row-radio-buttons-group">
-            <FormControlLabel
-              value="low"
-              control={
-                <Radio
-                  onChange={() => updateGameSettings("graphics", "low")}
-                  checked={gameSettings.graphics === "low"}
-                />
-              }
-              label="Low"
-            />
-            <FormControlLabel
-              value="high"
-              control={
-                <Radio
-                  onChange={() => updateGameSettings("graphics", "high")}
-                  checked={gameSettings.graphics === "high"}
-                />
-              }
-              label="High"
-            />
-          </RadioGroup>
-        </FormControl>
-      </Grid>
       <Grid item xs={12}>
-        <Typography>Draw distance</Typography>
-        <Slider
-          style={{
-            width: "90%",
-          }}
-          min={50}
-          max={5000}
-          valueLabelDisplay="auto"
-          step={50}
-          defaultValue={drawDistanceDefaultVal}
-          onChange={(e, value) => {}}
-          onChangeCommitted={(e, value) => {
-            updateGameSettings("drawDistance", value);
-          }}
-        />
+        <CollabsibleCard header="More settings">
+          <Grid container spacing={3}>
+            <Grid item xs={6} sm={4}>
+              <IconButton
+                onClick={() => {
+                  updateGameSettings("useSound", !gameSettings.useSound);
+                }}
+              >
+                {gameSettings.useSound ? <VolumeUpIcon /> : <VolumeOffIcon />}
+              </IconButton>
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Shadows</FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="shadows"
+                  name="row-radio-buttons-group"
+                >
+                  <FormControlLabel
+                    value={false}
+                    control={
+                      <Radio
+                        onChange={() => updateGameSettings("useShadows", false)}
+                        checked={!gameSettings.useShadows}
+                      />
+                    }
+                    label="Off"
+                  />
+                  <FormControlLabel
+                    value={true}
+                    control={
+                      <Radio
+                        onChange={() => updateGameSettings("useShadows", true)}
+                        checked={gameSettings.useShadows}
+                      />
+                    }
+                    label="On"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Graphics</FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="graphics"
+                  name="row-radio-buttons-group"
+                >
+                  <FormControlLabel
+                    value="low"
+                    control={
+                      <Radio
+                        onChange={() => updateGameSettings("graphics", "low")}
+                        checked={gameSettings.graphics === "low"}
+                      />
+                    }
+                    label="Low"
+                  />
+                  <FormControlLabel
+                    value="high"
+                    control={
+                      <Radio
+                        onChange={() => updateGameSettings("graphics", "high")}
+                        checked={gameSettings.graphics === "high"}
+                      />
+                    }
+                    label="High"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>Draw distance</Typography>
+              <Slider
+                style={{
+                  width: "90%",
+                }}
+                min={50}
+                max={7500}
+                valueLabelDisplay="auto"
+                step={50}
+                defaultValue={drawDistanceDefaultVal}
+                onChange={(e, value) => {}}
+                onChangeCommitted={(e, value) => {
+                  updateGameSettings("drawDistance", value);
+                }}
+              />
+            </Grid>
+          </Grid>
+        </CollabsibleCard>
       </Grid>
     </Grid>
   );

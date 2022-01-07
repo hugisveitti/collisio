@@ -315,7 +315,6 @@ export class GameScene extends Scene3D implements IGameScene {
     async loadAssets() { }
 
     async init(data: any) {
-        console.log("data in init", data)
         // need to do some test with performance and the draw distance
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.gameSettings.drawDistance)
         this.renderer.setPixelRatio(1)
@@ -325,7 +324,6 @@ export class GameScene extends Scene3D implements IGameScene {
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
 
-        console.log("cache,", this.cache)
     }
 
 
@@ -335,7 +333,6 @@ export class GameScene extends Scene3D implements IGameScene {
         await this.preload()
         await this.create()
 
-        // console.log('start')
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -356,6 +353,7 @@ export class GameScene extends Scene3D implements IGameScene {
             this.deltaFPS = this.deltaFPS % this.targetFPS
             const time = this.clock.getElapsedTime()
 
+            // update physics, then update models, opposite to enabled3d
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
@@ -378,13 +376,11 @@ export class GameScene extends Scene3D implements IGameScene {
 
     createWagons(wagonTypes: WagonType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
         const batch: Promise<Wagon>[] = []
-        console.log("wagon types", wagonTypes)
         for (let i = 0; i < wagonTypes.length; i++) {
             batch.push(this.createWagon(wagonTypes[i], i))
         }
 
         Promise.all(batch).then(wagons => {
-            console.log("wagons created", wagons)
             for (let i = 0; i < wagons.length; i++) {
                 if (positions && positions.length === wagons.length && rotations && rotations.length === wagons.length) {
                     wagons[i].setPositionRotation(positions[i], rotations[i])
@@ -463,7 +459,7 @@ export class GameScene extends Scene3D implements IGameScene {
             for (let i = 0; i < this.players.length; i++) {
                 const color = possibleVehicleColors[chassisColOffset + i]
                 let newVehicle: IVehicle
-                const vehicleType = this.gameSceneConfig.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
+                const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
                     newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, vehicleType, this.useSound)
                 } else {
@@ -492,7 +488,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
     getTrackName() {
-        return this.gameSceneConfig.tournament?.trackName ?? this.gameSettings.trackName
+        return this.gameSceneConfig?.tournament?.trackName ?? this.gameSettings.trackName
     }
 
     /**
@@ -707,6 +703,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     pauseGame() {
+
         if (this.isGamePaused()) return
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -733,6 +730,8 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     togglePauseGame() {
+
+        if (!this.everythingReady()) return
         let isPaused = this.isGamePaused()
         if (isPaused) {
             this.unpauseGame()
@@ -1055,7 +1054,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     }
 
-    updateVehicles() {
+    updateVehicles(delta: number) {
         for (let i = 0; i < this.views.length; i++) {
 
             /**
@@ -1082,7 +1081,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
             this.checkVehicleOutOfBounds(i)
 
-            this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour().toFixed(0)} km/h`
+            this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
         }
     }
 
@@ -1099,18 +1098,19 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     update(_time: number, _delta: number): void {
-        this._updateChild(_time)
-        for (let vehicle of this.extraVehicles) {
-            vehicle.update()
+        if (this.everythingReady()) {
+            this._updateChild(_time, _delta)
+            for (let vehicle of this.extraVehicles) {
+                vehicle.update()
+            }
+            for (let wagon of this.wagons) {
+                wagon.update()
+            }
         }
-        for (let wagon of this.wagons) {
-            wagon.update()
-        }
-
     }
 
 
-    public _updateChild(time: number) {
+    public _updateChild(time: number, delta: number) {
 
     }
 

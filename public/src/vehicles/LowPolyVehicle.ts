@@ -25,8 +25,6 @@ export const getVehicleNumber = (vehicleName: string) => {
 }
 
 
-
-
 const soundScaler = numberScaler(1, 5, 0, 330)
 const speedScaler = logScaler(300, 0.1, 1)
 
@@ -336,20 +334,20 @@ export class LowPolyVehicle implements IVehicle {
     goForward(moreSpeed: boolean) {
 
         if (!this.canDrive) return
-
+        const kmh = this.getCurrentSpeedKmHour(0)
 
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
-        if (this.getCurrentSpeedKmHour() > vehicleConfigs[this.vehicleType].maxSpeed + (this.maxSpeedTicks / 10)) {
+        if (kmh > vehicleConfigs[this.vehicleType].maxSpeed + (this.maxSpeedTicks / 10)) {
 
             eF = 0
             this.maxSpeedTicks += 1
-        } else if (this.getCurrentSpeedKmHour() < vehicleConfigs[this.vehicleType].maxSpeed) {
+        } else if (kmh < vehicleConfigs[this.vehicleType].maxSpeed) {
             this.maxSpeedTicks = 0
         } else {
             this.maxSpeedTicks -= 1
         }
 
-        if (this.getCurrentSpeedKmHour() < 2) {
+        if (kmh < 2) {
             this.break(true)
 
         }
@@ -366,7 +364,7 @@ export class LowPolyVehicle implements IVehicle {
 
     goBackward() {
         if (!this.canDrive) return
-        if (this.getCurrentSpeedKmHour() > 10) {
+        if (this.getCurrentSpeedKmHour(0) > 10) {
             this.break()
             return
         }
@@ -383,8 +381,9 @@ export class LowPolyVehicle implements IVehicle {
     noForce() {
         this.break(true)
         let slowBreakForce = 2000
-        slowBreakForce *= -Math.sign(this.getCurrentSpeedKmHour())
-        if (Math.abs(this.getCurrentSpeedKmHour()) < 5) slowBreakForce = 0
+        const kmh = this.getCurrentSpeedKmHour(0)
+        slowBreakForce *= -Math.sign(kmh)
+        if (Math.abs(kmh) < 5) slowBreakForce = 0
 
 
         if (this.is4x4) {
@@ -443,6 +442,7 @@ export class LowPolyVehicle implements IVehicle {
     }
 
     stop() {
+        if (!this.vehicleBody.body) return
         this.zeroEngineForce()
         this.vehicleBody.body.setCollisionFlags(1)
         this.vehicleBody.body.setVelocity(0, 0, 0)
@@ -634,21 +634,27 @@ export class LowPolyVehicle implements IVehicle {
     checkIfSpinning() {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
         if (Math.abs(vel.x()) > 3) {
+            console.warn("angular vel danger, X:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+
             this.vector.setValue(vel.x() / 2, vel.y(), vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.y()) > 5) {
+            console.warn("angular vel danger, Y:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+
             this.vector.setValue(vel.x(), vel.y() / 2, vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.z()) > 6) {
+            console.warn("angular vel danger, Z:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+
             this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
 
         const v = this.vehicle.getRigidBody().getLinearVelocity()
         // if you are going slow and pop up in the air, that fuggin bugg
-        if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour()) < 150) {
+        if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour(0)) < 150) {
             console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
             this.vector.setValue(v.x(), v.y() / 4, v.z())
             this.vehicle.getRigidBody().setLinearVelocity(this.vector)
@@ -661,7 +667,7 @@ export class LowPolyVehicle implements IVehicle {
         this.checkIfSpinning()
 
         if (!!this.engineSound && this.useEngineSound) {
-            this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
+            this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour(0))))
         }
 
         this.tm = this.vehicle.getChassisWorldTransform()
@@ -691,7 +697,7 @@ export class LowPolyVehicle implements IVehicle {
 
             }
         }
-        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour()) < 20 && this.useBadRotationTicks) {
+        if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour(0)) < 20 && this.useBadRotationTicks) {
             // make this flip smoother ??
             this.stop()
             this.start()
@@ -755,7 +761,7 @@ export class LowPolyVehicle implements IVehicle {
         }
     };
 
-    getCurrentSpeedKmHour() {
+    getCurrentSpeedKmHour(delta: number) {
         return this.vehicle.getCurrentSpeedKmHour()
     };
 
@@ -841,7 +847,6 @@ export class LowPolyVehicle implements IVehicle {
         this.stopEngineSound()
 
         if (this.scene && this.vehicleBody) {
-
             this.scene.destroy(this.vehicleBody)
         }
         for (let tire of this.tires) {
@@ -859,9 +864,8 @@ export class LowPolyVehicle implements IVehicle {
         if (this.vector2) {
             Ammo.destroy(this.vector2)
         }
-        if (this.p) {
-
-            //  Ammo.destroy(this.p)
+        if (this.tuning) {
+            Ammo.destroy(this.tuning)
         }
     }
 }

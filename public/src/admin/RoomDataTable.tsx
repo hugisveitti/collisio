@@ -37,11 +37,6 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         <TableCell>{props.roomInfo.roomId}</TableCell>
         <TableCell>{getDateFromNumber(props.roomInfo.date)}</TableCell>
         <TableCell>{props.roomInfo.players?.length ?? "-"}</TableCell>
-        <TableCell>
-          {props.roomInfo.players?.length > 0
-            ? props.roomInfo.players[0].playerName
-            : "No leader"}
-        </TableCell>
         <TableCell>{props.roomInfo.canceledGame ? "Yes" : "No"}</TableCell>
         <TableCell>{props.roomInfo.gameSettings.trackName}</TableCell>
         <TableCell>{props.roomInfo.gameSettings.numberOfLaps}</TableCell>
@@ -92,7 +87,6 @@ const RoomDataTable = (props: IRoomDataTable) => {
             <TableCell>RoomId</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Number of players</TableCell>
-            <TableCell>Leader</TableCell>
             <TableCell>Game cancelled</TableCell>
             <TableCell>Trackname</TableCell>
             <TableCell>Number of laps</TableCell>

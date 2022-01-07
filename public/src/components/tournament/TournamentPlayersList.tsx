@@ -1,10 +1,11 @@
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemButton from "@mui/material/ListItemButton";
-import List from "@mui/material/List";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import {
@@ -20,7 +21,6 @@ import {
 import { cardBackgroundColor, red1 } from "../../providers/theme";
 import NumberSelect from "../inputs/NumberSelect";
 import { getUserPagePath } from "../Routes";
-import { ListItem } from "@mui/material";
 
 interface IPlayerListItem {
   player: ITournamentUser;

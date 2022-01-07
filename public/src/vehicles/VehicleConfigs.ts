@@ -1,4 +1,5 @@
 import { Vector3 } from "three";
+import { green4, red1, red2 } from "../providers/theme";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { itemInArray } from "../utils/utilFunctions";
 import { SimpleVector } from "./IVehicle";
@@ -8,7 +9,7 @@ import { SimpleVector } from "./IVehicle";
 // #FF8000 is orange
 // #08B0000 is red
 //  0x1d8a47 is green
-export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", "black", "white"]
+export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", green4]
 
 type VehicleClass = "LowPoly" | "Sphere"
 

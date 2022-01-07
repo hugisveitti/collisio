@@ -23,6 +23,7 @@ import {
   mts_user_settings_changed,
 } from "../shared-backend/shared-stuff";
 import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
+import CollabsibleCard from "../components/inputs/CollapsibleCard";
 
 export const invertedControllerKey = "invertedController";
 
@@ -127,75 +128,87 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       <Grid item xs={12}>
         <Divider variant="middle" />
       </Grid>
-      <Grid item xs={6} sm={4}>
-        <Button fullWidth variant="outlined" onClick={props.resetOrientation}>
-          Reset orientation
-        </Button>
-      </Grid>
-      <Grid item xs={6} sm={4}>
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={() => {
-            updateVehicleSettings(
-              "useChaseCamera",
-              !props.store.userSettings.vehicleSettings.useChaseCamera
-            );
-          }}
-        >
-          Camera chaser{" "}
-          {props.store.userSettings.vehicleSettings.useChaseCamera
-            ? "On"
-            : "Off"}
-        </Button>
-      </Grid>
+      <Grid item xs={12}>
+        <CollabsibleCard header="Vehicle settings">
+          <Grid container spacing={3}>
+            <Grid item xs={6} sm={4}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={props.resetOrientation}
+              >
+                Reset orientation
+              </Button>
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => {
+                  updateVehicleSettings(
+                    "useChaseCamera",
+                    !props.store.userSettings.vehicleSettings.useChaseCamera
+                  );
+                }}
+              >
+                Camera chaser{" "}
+                {props.store.userSettings.vehicleSettings.useChaseCamera
+                  ? "On"
+                  : "Off"}
+              </Button>
+            </Grid>
 
-      <Grid item xs={12}>
-        <Collapse in={props.store.userSettings.vehicleSettings.useChaseCamera}>
-          <Typography>Chase camera speed</Typography>
-          <Slider
-            min={0.01}
-            max={1}
-            valueLabelDisplay="auto"
-            step={0.01}
-            defaultValue={chaseSpeedDefaultVal}
-            onChange={(e, value) => {}}
-            onChangeCommitted={(e, value) => {
-              updateVehicleSettings("chaseCameraSpeed", value);
-            }}
-          />
-        </Collapse>
-      </Grid>
+            <Grid item xs={12}>
+              <Collapse
+                in={props.store.userSettings.vehicleSettings.useChaseCamera}
+              >
+                <Typography>Chase camera speed</Typography>
+                <Slider
+                  min={0.01}
+                  max={1}
+                  valueLabelDisplay="auto"
+                  step={0.01}
+                  defaultValue={chaseSpeedDefaultVal}
+                  onChange={(e, value) => {}}
+                  onChangeCommitted={(e, value) => {
+                    updateVehicleSettings("chaseCameraSpeed", value);
+                  }}
+                />
+              </Collapse>
+            </Grid>
 
-      <Grid item xs={12}>
-        <Typography>Steering sensitivity</Typography>
-        <Slider
-          min={0.01}
-          max={1}
-          valueLabelDisplay="auto"
-          step={0.01}
-          defaultValue={steerSenceDefaultVal}
-          onChange={(e, value) => {}}
-          onChangeCommitted={(e, value) => {
-            updateVehicleSettings("steeringSensitivity", value);
-          }}
-        />
+            <Grid item xs={12}>
+              <Typography>Steering sensitivity</Typography>
+              <Slider
+                min={0.01}
+                max={1}
+                valueLabelDisplay="auto"
+                step={0.01}
+                defaultValue={steerSenceDefaultVal}
+                onChange={(e, value) => {}}
+                onChangeCommitted={(e, value) => {
+                  updateVehicleSettings("steeringSensitivity", value);
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>
+                For the vehicle type to update, the leader must restart the
+                game.
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <VehicleSelect
+                value={props.store.userSettings.vehicleSettings.vehicleType}
+                excludedVehicles={nonactiveVehcileTypes}
+                onChange={(value) => {
+                  updateVehicleSettings("vehicleType", value);
+                }}
+              />
+            </Grid>
+          </Grid>
+        </CollabsibleCard>
       </Grid>
-      <Grid item xs={12}>
-        <Typography>
-          For the vehicle type to update, the leader must restart the game.
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <VehicleSelect
-          value={props.store.userSettings.vehicleSettings.vehicleType}
-          excludedVehicles={nonactiveVehcileTypes}
-          onChange={(value) => {
-            updateVehicleSettings("vehicleType", value);
-          }}
-        />
-      </Grid>
-
       <Grid item xs={12}></Grid>
 
       <Grid item xs={12} style={{ textAlign: "center" }}>

@@ -259,7 +259,7 @@ export class TagGameScene extends GameScene {
     }
 
 
-    _updateChild(time: number) {
+    _updateChild(time: number, delta: number) {
         this.ticks += 1
         this.updateFps(time)
 
@@ -269,7 +269,7 @@ export class TagGameScene extends GameScene {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
             this.updateScoreTable()
-            this.updateVehicles()
+            this.updateVehicles(delta)
             this.updateClock()
             this.course.updateCourse()
 

@@ -1,8 +1,7 @@
-import { Color, Scene, MeshStandardMaterial, PointLight, AmbientLight, WebGLRenderer, sRGBEncoding, PerspectiveCamera } from "three"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { loadLowPolyVehicleModels, } from "../../vehicles/LowPolyVehicle"
-import { getDeviceType } from "../../utils/settings"
+import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
 import { VehicleType } from "../../shared-backend/shared-stuff"
+import { getDeviceType } from "../../utils/settings"
+import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
 import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene) => {

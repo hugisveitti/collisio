@@ -142,8 +142,7 @@ export class LowPolyTestScene extends GameScene {
             //    this.physics.debug?.mode(2048 + 4096)
         }
         await this.warpSpeed('-ground', "-light", "-sky")
-        console.log("this physics config", this.physics.config)
-        console.log("this", this)
+
 
         // this could do something for the jitter of the vehicle
         // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
@@ -307,7 +306,6 @@ export class LowPolyTestScene extends GameScene {
 
             this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
                 if (isVehicle(otherObject)) {
-                    console.log("collide with vehicle", otherObject)
                     const vehicleNumber = getVehicleNumber(otherObject.name)
                     this.vehicle.setColor(notItColor)
                     this.otherVehicles[vehicleNumber - 1].setColor(itColor)
@@ -523,10 +521,9 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
-    _updateChild(time: number) {
+    _updateChild(time: number, delta: number) {
         //      this.physics.physicsWorld.stepSimulation(1)
 
-        // console.log("this phy", this.physics.physicsWorld.getWorldInfo())
         if (this.canStartUpdate && this.everythingReady()) {
 
 
@@ -550,7 +547,7 @@ export class LowPolyTestScene extends GameScene {
                 <br />
                 rot x:${rot.x.toFixed(2)}, y:${rot.y.toFixed(2)}, z:${rot.z.toFixed(2)}, w:${rot.w.toFixed(2)}
                 <br />
-                km/h: ${this.vehicle.getCurrentSpeedKmHour().toFixed(0)}
+                km/h: ${this.vehicle.getCurrentSpeedKmHour(delta).toFixed(0)}
                 `
 
             }
@@ -597,7 +594,8 @@ export class LowPolyTestScene extends GameScene {
     }
 
     togglePauseGame() {
-        if (!this.vehicle.isReady) return
+
+        if (!this.vehicle.isReady || !this.everythingReady()) return
         if (this.isPaused) {
             this.gameTime.stop()
             this.vehicle.unpause()

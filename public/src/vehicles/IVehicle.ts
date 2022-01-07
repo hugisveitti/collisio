@@ -70,7 +70,7 @@ export interface IVehicle {
     getPosition: () => SimpleVector
     getRotation: () => Quaternion
     setRotation: (x: number | Quaternion, y?: number, z?: number) => void
-    getCurrentSpeedKmHour: () => number
+    getCurrentSpeedKmHour: (delta?: number) => number
     setFont: (font: Font) => void
 
     lookForwardsBackwards: (lookBackwards: boolean) => void

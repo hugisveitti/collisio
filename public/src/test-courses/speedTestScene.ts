@@ -21,7 +21,7 @@ class SpeedTestScene extends GameScene {
         super()
 
         this.players = []
-        const vehicleTypes: VehicleType[] = ["normal2", "f1"]
+        const vehicleTypes: VehicleType[] = ["normal2", "f1", "simpleSphere", "offRoader", "sportsCar", "tractor", "normal"]
         for (let i = 0; i < vehicleTypes.length; i++) {
             this.players.push({
                 playerName: `name-${vehicleTypes[i]}`,
