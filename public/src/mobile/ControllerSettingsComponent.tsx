@@ -1,17 +1,17 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { IUser, IUserSettings, IVehicleSettings } from "../classes/User";
+import CollabsibleCard from "../components/inputs/CollapsibleCard";
 import FullscreenButton from "../components/inputs/FullscreenButton";
 import VehicleSelect from "../components/inputs/VehicleSelect";
 import { frontPagePath } from "../components/Routes";
@@ -23,7 +23,6 @@ import {
   mts_user_settings_changed,
 } from "../shared-backend/shared-stuff";
 import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
-import CollabsibleCard from "../components/inputs/CollapsibleCard";
 
 export const invertedControllerKey = "invertedController";
 
@@ -46,6 +45,10 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
 
   const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(
     props.store.userSettings.vehicleSettings.steeringSensitivity
+  );
+
+  const [cameraZoomDefaultVal, setCameraZoomDefaultVal] = useState(
+    props.store.userSettings.vehicleSettings.cameraZoom
   );
 
   const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
@@ -188,6 +191,20 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
                 onChange={(e, value) => {}}
                 onChangeCommitted={(e, value) => {
                   updateVehicleSettings("steeringSensitivity", value);
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>Camera zoom</Typography>
+              <Slider
+                min={1}
+                max={10}
+                valueLabelDisplay="auto"
+                step={1}
+                defaultValue={cameraZoomDefaultVal}
+                onChange={(e, value) => {}}
+                onChangeCommitted={(e, value) => {
+                  updateVehicleSettings("cameraZoom", value);
                 }}
               />
             </Grid>

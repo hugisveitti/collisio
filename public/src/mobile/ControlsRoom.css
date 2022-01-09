@@ -25,17 +25,23 @@
   text-align: center;
   vertical-align: middle;
   position: absolute;
+  z-index: 99;
   touch-action: none;
   -ms-touch-action: none;
-  z-index: 99;
   -webkit-touch-callout: none;
   /* pointer-events: none; */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 .controller-btn__text {
   touch-action: none;
   -ms-touch-action: none;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 /* @media only screen and (max-width: 350px) {

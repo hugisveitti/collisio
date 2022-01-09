@@ -224,7 +224,7 @@ export class RaceGameScene extends GameScene {
                 for (let i = 0; i < this.vehicles.length; i++) {
 
                     if (!this.vehicles[i].useChaseCamera) {
-                        const { x, y, z } = getStaticCameraPos(this.gameSceneConfig.onlyMobile)
+                        const { x, y, z } = getStaticCameraPos(this.gameSceneConfig.onlyMobile ? 2 : this.vehicles[i].vehicleSettings.cameraZoom)
                         this.camera.position.set(x, y, z)
                         this.vehicles[i].addCamera(this.views[i].camera)
                     }

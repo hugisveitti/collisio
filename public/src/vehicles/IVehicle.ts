@@ -2,6 +2,7 @@ import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
 import { Font, Vector3, Quaternion } from "three"
 import { IVehicleSettings } from '../classes/User';
 import { VehicleType } from '../shared-backend/shared-stuff';
+import { numberScaler } from '../utils/utilFunctions';
 
 export interface SimpleVector {
     x: number
@@ -93,12 +94,14 @@ export interface ITestVehicle extends IVehicle {
     intelligentDrive: (log: boolean) => void
 }
 
-export const getStaticCameraPos = (onlyMobile: boolean) => {
-    if (onlyMobile) {
-        return { x: 0, y: 5, z: -15 }
-    }
+const zScaler = numberScaler(12, 30, 1, 10)
+const yScaler = numberScaler(3, 12, 1, 10)
 
-    return { x: 0, y: 10, z: -25 }
+// cameraZoom should be a number from 1 to 10
+export const getStaticCameraPos = (cameraZoom: number) => {
+    return { x: 0, y: yScaler(cameraZoom), z: -zScaler(cameraZoom) }
 }
+
+
 
 

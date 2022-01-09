@@ -165,7 +165,7 @@ export class LowPolyVehicle implements IVehicle {
         this.transformCam = new Ammo.btTransform()
 
         this.chassisWorldTransfrom = new Ammo.btTransform()
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.cameraRay = new ClosestRaycaster(this.scene.physics)
     }
 
@@ -196,14 +196,15 @@ export class LowPolyVehicle implements IVehicle {
 
 
     createVehicle() {
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.scene.add.existing(this.vehicleBody)
         console.log("vehicleConfigs[this.vehicleType].shape", vehicleConfigs[this.vehicleType].shape)
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: vehicleConfigs[this.vehicleType].shape ?? "convex", autoCenter: false, })
 
 
         this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
-        this.vehicleBody.body.setBounciness(.3)
+        this.vehicleBody.body.setBounciness(0)
+        this.vehicleBody.body.setRestitution(0)
 
         // how to lower center of mass
 
@@ -654,13 +655,13 @@ export class LowPolyVehicle implements IVehicle {
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
 
-        const v = this.vehicle.getRigidBody().getLinearVelocity()
-        // if you are going slow and pop up in the air, that fuggin bugg
-        if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour(0)) < 150) {
-            console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
-            this.vector.setValue(v.x(), v.y() / 4, v.z())
-            this.vehicle.getRigidBody().setLinearVelocity(this.vector)
-        }
+        // const v = this.vehicle.getRigidBody().getLinearVelocity()
+        // // if you are going slow and pop up in the air, that fuggin bugg
+        // if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour(0)) < 150) {
+        //     console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
+        //     this.vector.setValue(v.x(), v.y() / 4, v.z())
+        //     this.vehicle.getRigidBody().setLinearVelocity(this.vector)
+        // }
     }
 
     detectJitter(delta: number) {
@@ -881,6 +882,8 @@ export class LowPolyVehicle implements IVehicle {
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
         }
+
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
     };
 
     async destroy() {

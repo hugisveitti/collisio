@@ -26,13 +26,17 @@ export interface IVehicleSettings {
 
     /** last selected vehicleType selected by user */
     vehicleType: VehicleType
+
+
+    cameraZoom: number
 }
 
 export const defaultVehicleSettings = {
     steeringSensitivity: 0.2,
     chaseCameraSpeed: .3,
     useChaseCamera: false,
-    vehicleType: defaultVehicleType
+    vehicleType: defaultVehicleType,
+    cameraZoom: 6
 } as IVehicleSettings
 
 

@@ -21,6 +21,7 @@ const CollabsibleCard = (props: ICollabsibleCard) => {
       style={{ backgroundColor: "inherit", maxWidth: 600, margin: "auto" }}
     >
       <CardHeader
+        onClick={() => setOpen(!open)}
         subheader={props.header}
         action={
           <IconButton onClick={() => setOpen(!open)}>

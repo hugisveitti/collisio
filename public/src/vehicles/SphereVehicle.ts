@@ -1,12 +1,11 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Euler, Quaternion, Audio, AudioListener, Color, Font, MeshStandardMaterial, PerspectiveCamera, Vector3, TextGeometry, MeshLambertMaterial, Mesh } from "three";
+import { Color, Euler, Font, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
-import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
+import { degToRad } from "../utils/utilFunctions";
 import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -117,7 +116,7 @@ export class SphereVehicle implements IVehicle {
 
         this.vector = new Ammo.btVector3(0, 0, 0)
 
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.prevPosition = new Vector3(0, 0, 0)
     }
 
@@ -125,7 +124,7 @@ export class SphereVehicle implements IVehicle {
 
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D): void {
 
-        this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
 
         this.isReady = false
@@ -441,7 +440,7 @@ export class SphereVehicle implements IVehicle {
                 this[key] = vehicleSettings[key]
             }
         }
-
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
         // this.vehicleBody.remove(this.camera)
         // if (!this.useChaseCamera && this.camera) {

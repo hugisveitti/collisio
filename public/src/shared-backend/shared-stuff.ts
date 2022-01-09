@@ -30,6 +30,7 @@ export type VehicleType = "normal"
     | "sportsCar"
     | "normal2"
     | "simpleSphere"
+    | "gokart"
 
 export type GameType = "ball" | "race" | "tag" | "story"
 

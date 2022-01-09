@@ -22,6 +22,7 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "test", type: "test" },
     { name: "Big girl Sally", type: "offRoader" },
     { name: "Thunderparrot", type: "sportsCar" },
+    { name: "Goonie", type: "gokart" },
     { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" }
 ]
 
@@ -295,12 +296,12 @@ export const vehicleConfigs = {
     test: {
         ...defaultVehicleConfig,
         path: "test-vehicle.glb",
-        wheelAxisBackPosition: -3.5 + 5,
+        wheelAxisBackPosition: -3.5,
         wheelRadiusBack: 2 / 2,
         wheelHalfTrackBack: 3,
         wheelAxisHeightBack: -.5,
 
-        wheelAxisFrontPosition: 2.5 + 5,
+        wheelAxisFrontPosition: 2.5,
         wheelRadiusFront: 2 / 2,
         wheelHalfTrackFront: 3,
         wheelAxisHeightFront: -.5,
@@ -311,6 +312,31 @@ export const vehicleConfigs = {
         is4x4: false,
         //   shape: "convex"
     },
+    gokart: {
+        ...defaultVehicleConfig,
+
+        wheelRadiusBack: 0.63 / 2,
+        wheelRadiusFront: 0.63 / 2,
+
+        wheelAxisBackPosition: -1.3,
+        wheelHalfTrackBack: 1.2,
+        wheelAxisHeightBack: 0,
+
+        wheelAxisFrontPosition: 1.3,
+        wheelHalfTrackFront: 1,
+        wheelAxisHeightFront: 0,
+
+        suspensionRestLength: .35,
+        suspensionStiffness: 150,
+
+        suspensionDamping: 20,
+
+
+        mass: 200,
+        engineForce: 2200,
+        frictionSlip: 27.5,
+        path: "gokart.glb",
+    },
     simpleSphere: {
         ...defaultVehicleConfig,
         path: "simple-sphere.gltf",
@@ -318,7 +344,6 @@ export const vehicleConfigs = {
         // this isnt engineforece but the rate angular velocity
         engineForce: 30,
         //  inertia: { x: 100000, y: 100000, z: 100000 }
-
 
     }
 

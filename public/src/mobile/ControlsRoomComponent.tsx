@@ -110,6 +110,18 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     }, 150);
   }, [props.resetOrientation]);
 
+  // useEffect(() => {
+  //   const fBtn = document.getElementById("fBtn");
+  //   console.log("fBtn", fBtn);
+
+  //   if (fBtn) {
+  //     fBtn.addEventListener("touchforcechange", (e) => {
+  //       e.preventDefault();
+  //       return false;
+  //     });
+  //   }
+  // }, []);
+
   const screenHeight =
     document.fullscreenElement === null
       ? screen.availHeight
@@ -194,6 +206,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
         }}
       >
         <div
+          id="fBtn"
           className="controller-btn"
           onTouchStart={(e) => {
             e.preventDefault();
