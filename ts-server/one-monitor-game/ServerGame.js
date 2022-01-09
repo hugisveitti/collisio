@@ -77,14 +77,31 @@ var RoomMaster = /** @class */ (function () {
             }
         });
     };
+    RoomMaster.prototype.socketHasRoom = function (socket) {
+        for (var _i = 0, _a = Object.keys(this.rooms); _i < _a.length; _i++) {
+            var roomId = _a[_i];
+            if (socket === this.rooms[roomId].socket) {
+                return true;
+            }
+        }
+        return false;
+    };
     RoomMaster.prototype.createRoom = function (socket, roomId, data) {
         var _this = this;
+        if (this.socketHasRoom(socket)) {
+            console.warn("Socket already has room");
+            socket.emit(shared_stuff_1.std_room_created_callback, {
+                status: errorStatus,
+                message: "Socket alread has room."
+            });
+            return;
+        }
         this.rooms[roomId] = new Room(roomId, this.io, socket, data, function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
         // console.log("creating room, all rooms", Object.keys(this.rooms))
-        console.log(this.getStats());
+        console.log(this.getStatsString());
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };

@@ -200,6 +200,10 @@ io.on("connection", (socket: Socket) => {
     socket.once(mdts_number_connected, () => {
         socket.emit(stmd_number_connected, { data: roomMaster.getStats() })
     })
+
+    socket.on("error", (err) => {
+        console.warn("Error occured in socket:", err)
+    })
 })
 
 app.get("*", (_: Request, res: Response) => {

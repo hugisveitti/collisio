@@ -167,6 +167,9 @@ io.on("connection", function (socket) {
     socket.once(shared_stuff_1.mdts_number_connected, function () {
         socket.emit(shared_stuff_1.stmd_number_connected, { data: roomMaster.getStats() });
     });
+    socket.on("error", function (err) {
+        console.warn("Error occured in socket:", err);
+    });
 });
 app.get("*", function (_, res) {
     res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
