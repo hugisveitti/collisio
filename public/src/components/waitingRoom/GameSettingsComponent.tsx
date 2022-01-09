@@ -12,6 +12,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
+  activeGameTypes,
   defaultRaceTrack,
   defaultStoryTrack,
   defaultTagTrack,
@@ -24,6 +25,7 @@ import {
 } from "../../classes/localGameSettings";
 import { inputBackgroundColor } from "../../providers/theme";
 import { inTestMode } from "../../utils/settings";
+import { itemInArray } from "../../utils/utilFunctions";
 import CollabsibleCard from "../inputs/CollapsibleCard";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
@@ -146,18 +148,20 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               }
               label="Tag"
             />
-            <FormControlLabel
-              value="story"
-              control={
-                <Radio
-                  onChange={() => {
-                    updateGameSettings("gameType", "story");
-                  }}
-                  checked={gameSettings.gameType === "story"}
-                />
-              }
-              label="Story"
-            />
+            {itemInArray("story", activeGameTypes) && (
+              <FormControlLabel
+                value="story"
+                control={
+                  <Radio
+                    onChange={() => {
+                      updateGameSettings("gameType", "story");
+                    }}
+                    checked={gameSettings.gameType === "story"}
+                  />
+                }
+                label="Story"
+              />
+            )}
           </RadioGroup>
         </FormControl>
       </Grid>
@@ -231,7 +235,10 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                     value="low"
                     control={
                       <Radio
-                        onChange={() => updateGameSettings("graphics", "low")}
+                        onChange={() => {
+                          updateGameSettings("graphics", "low");
+                          updateGameSettings("useShadows", false);
+                        }}
                         checked={gameSettings.graphics === "low"}
                       />
                     }

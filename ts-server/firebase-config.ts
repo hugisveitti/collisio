@@ -36,7 +36,7 @@ export const database = getDatabase(firebaseApp)
 export const firestore = getFirestore(firebaseApp)
 
 /** only works on my PC */
-// if ( os.hostname().includes("Lisa")) {
-//     console.log("On localhost")
-//     connectFirestoreEmulator(firestore, "localhost", 8000)
-// }
+if (os.hostname().includes("Lisa")) {
+    console.log("On localhost")
+    connectFirestoreEmulator(firestore, "localhost", 8000)
+}

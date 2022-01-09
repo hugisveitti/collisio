@@ -233,6 +233,8 @@ export const mts_connected_to_waiting_room = "mts_connected_to_waiting_room"
 export const stmd_waiting_room_alert = "stmd_waiting_room_alert"
 export const dts_back_to_waiting_room = "dts_back_to_waiting_room"
 export const stm_player_info = "stm_player_info"
+export const mdts_number_connected = "mdts_number_connected"
+export const stmd_number_connected = "stmd_number_connected"
 
 // not implmented yet
 export const stm_back_to_waiting_room = "stm_back_to_waiting_room"

@@ -8,6 +8,7 @@ import { useHistory, useParams } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
 import { createTournamentPagePath } from "../Routes";
+import { IStore } from "../store";
 import ActiveTournamentsComponent from "./ActiveTournamentsComponent";
 import AvailableTournamentsComponent from "./AvailableTournamentsComponent";
 import PreviousTournamentsComponent from "./PreviousTournamentsComponent";
@@ -17,7 +18,9 @@ interface TournamentPageParamType {
   tournamentId: string;
 }
 
-interface ITournamentOverviewContainer {}
+interface ITournamentOverviewContainer {
+  store: IStore;
+}
 
 const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
   const params = useParams<TournamentPageParamType>();
@@ -27,7 +30,13 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
   const user = useContext(UserContext);
 
   if (tournamentId) {
-    return <TournamentContainer tournamentId={tournamentId} user={user} />;
+    return (
+      <TournamentContainer
+        tournamentId={tournamentId}
+        user={user}
+        store={props.store}
+      />
+    );
   }
 
   return (

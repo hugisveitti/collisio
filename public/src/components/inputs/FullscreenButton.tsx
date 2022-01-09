@@ -16,7 +16,7 @@ const FullscreenButton = () => {
     <IconButton
       onClick={() => {
         if (!document.body.requestFullscreen) {
-          toast.error("Connot enter fullscreen");
+          toast.error("Cannot enter fullscreen.");
         }
 
         if (document.fullscreenElement === null) {

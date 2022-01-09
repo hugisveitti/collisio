@@ -231,7 +231,9 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             backgroundColor: getBackgroundColor(backward), // backward ? downColor : upColor,
           }}
         >
-          <span style={rotateText}>B</span>
+          <span style={rotateText} className="controller-btn__text">
+            B
+          </span>
         </div>
 
         <div

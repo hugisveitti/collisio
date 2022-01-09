@@ -141,7 +141,6 @@ const ConnectToWaitingRoomComponent = (
 
   useEffect(() => {
     const roomId = getLocalStorageItem<string>("roomId");
-    console.log("getting room id ", roomId);
     if (roomId) {
       props.store.setRoomId(roomId);
     }

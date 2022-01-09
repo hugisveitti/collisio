@@ -74,6 +74,7 @@ export interface IVehicleConfig {
     maxSpeed: number
 
     towPosition: Vector3
+    shape?: "box" | "sphere" | "convex"
 }
 
 export const defaultVehicleConfig: IVehicleConfig = {
@@ -238,23 +239,29 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -2.55,
         wheelRadiusBack: 1.2 / 2,
         wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: 0.5,
 
         wheelAxisFrontPosition: 2.85,
         wheelRadiusFront: 1.2 / 2,
         wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: 0.5,
 
-        suspensionRestLength: 1.4,
+        // wheelAxisHeightFront: 0.5,
+        // wheelAxisHeightBack: 0.5,
+        // suspensionRestLength: 1.4,
+
+        wheelAxisHeightFront: 0,
+        wheelAxisHeightBack: 0,
+        suspensionRestLength: 0.9,
 
 
         mass: 600,
         engineForce: 12000,
         breakingForce: 300,
         is4x4: false,
-        maxSpeed: 320,
+        maxSpeed: 330,
+        frictionSlip: 8.5, //3.5
+        suspensionStiffness: 50,
 
-        inertia: { x: 3000, y: 2000, z: 4000 },
+        inertia: { x: 3000, y: 5000, z: 4000 },
         towPosition: new Vector3(0, -.5, -4),
         path: "sports-car.gltf"
     },
@@ -287,20 +294,22 @@ export const vehicleConfigs = {
     },
     test: {
         ...defaultVehicleConfig,
-        path: "low-poly-test-vehicle.gltf",
-        wheelAxisBackPosition: -2.5,
-        wheelRadiusBack: 0.85 / 2,
-        wheelHalfTrackBack: 3.75,
-        wheelAxisHeightBack: -1.25,
+        path: "test-vehicle.glb",
+        wheelAxisBackPosition: -3.5,
+        wheelRadiusBack: 2 / 2,
+        wheelHalfTrackBack: 3,
+        wheelAxisHeightBack: -.5,
 
-        wheelAxisFrontPosition: 2,
-        wheelRadiusFront: 0.85 / 2,
-        wheelHalfTrackFront: 2.75,
-        wheelAxisHeightFront: -1.25,
+        wheelAxisFrontPosition: 2.5,
+        wheelRadiusFront: 2 / 2,
+        wheelHalfTrackFront: 3,
+        wheelAxisHeightFront: -.5,
         mass: 800,
-        engineForce: 5000,
+        engineForce: 12000,
         breakingForce: 100,
+        suspensionRestLength: .2,
         is4x4: false,
+        shape: "box"
     },
     simpleSphere: {
         ...defaultVehicleConfig,

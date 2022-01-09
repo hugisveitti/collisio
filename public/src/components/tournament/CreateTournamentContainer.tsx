@@ -40,7 +40,7 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
                 <FormLabel component="legend">Type of tournament</FormLabel>
                 <RadioGroup
                   row
-                  aria-label="type of game"
+                  aria-label="type of tournament"
                   name="row-radio-buttons-group"
                 >
                   <FormControlLabel

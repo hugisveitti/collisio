@@ -30,8 +30,9 @@ import CopyTextButton from "../inputs/CopyTextButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
-import { gameRoomPath } from "../Routes";
+import { gameRoomPath, tournamentPagePath } from "../Routes";
 import { IStore } from "../store";
+import FindActiveTournamentsComponent from "../tournament/inputs/FindActiveTournamentsComponent";
 import GameSettingsComponent from "./GameSettingsContainer";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
 
@@ -48,6 +49,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const history = useHistory();
 
   const onMobile = getDeviceType() === "mobile";
+  const activeTournamentObvious =
+    props.store.previousPage === tournamentPagePath;
   const user = props.user;
 
   const roomId = props.roomId;
@@ -171,6 +174,17 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Grid>
         </>
       )}
+      {activeTournamentObvious && (
+        <>
+          <Grid item xs={12}>
+            <FindActiveTournamentsComponent standOut store={props.store} />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Divider variant="middle" />
+          </Grid>
+        </>
+      )}
 
       <Grid item xs={12}>
         <Typography variant="h6" component="div">
@@ -241,6 +255,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           />
         </Grid>
       )}
+      {!activeTournamentObvious && (
+        <Grid item xs={12}>
+          <FindActiveTournamentsComponent store={props.store} />
+        </Grid>
+      )}
 
       {onMobile && isIphone() && (
         <React.Fragment>
@@ -255,7 +274,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               onClick={() =>
                 requestDeviceOrientation((permissionGranted, message) => {
                   if (permissionGranted) {
-                    toast.success(message);
+                    //   toast.success(message);
                   } else {
                     toast.error(message);
                   }

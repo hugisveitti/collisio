@@ -97,7 +97,7 @@ const Routes = () => {
 
   // not sure how to implement tournaments
   const [tournament, setTournament] = useState(undefined);
-
+  const [previousPage, setPreviousPage] = useState("");
   const deviceType = getDeviceType();
 
   useEffect(() => {
@@ -144,6 +144,8 @@ const Routes = () => {
     setTournament,
     activeBracketNode,
     setActiveBracketNode,
+    previousPage,
+    setPreviousPage,
   };
 
   const user = useContext(UserContext);
@@ -230,7 +232,9 @@ const Routes = () => {
         <Route
           /** the order matters */
           path={[tournamentIdPagePath, tournamentPagePath]}
-          render={(props) => <TournamentPageContainer {...props} />}
+          render={(props) => (
+            <TournamentPageContainer {...props} store={store} />
+          )}
         />
         <Route
           path={connectPagePath}

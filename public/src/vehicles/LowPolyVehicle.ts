@@ -198,8 +198,8 @@ export class LowPolyVehicle implements IVehicle {
     createVehicle() {
         this.staticCameraPos = getStaticCameraPos(this.scene.gameSceneConfig?.onlyMobile)
         this.scene.add.existing(this.vehicleBody)
-
-        this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: "convex", autoCenter: false, })
+        console.log("vehicleConfigs[this.vehicleType].shape", vehicleConfigs[this.vehicleType].shape)
+        this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: vehicleConfigs[this.vehicleType].shape ?? "convex", autoCenter: false, })
 
 
         this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)

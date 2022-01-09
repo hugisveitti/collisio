@@ -22,6 +22,7 @@ import { calculateGamesDataStats } from "./statisticsFunctions";
 
 interface IAdminComponent {
   userTokenId: string;
+  connectionData: { [key: string]: any };
 }
 
 const AdminComponent = (props: IAdminComponent) => {
@@ -113,6 +114,17 @@ const AdminComponent = (props: IAdminComponent) => {
         >
           Logout
         </Button>
+      </Grid>
+      <Grid item xs={12}>
+        <ul>
+          {Object.keys(props.connectionData).map((key) => {
+            return (
+              <ul key={key}>
+                <span>{key}:</span> <span>{props.connectionData[key]}</span>
+              </ul>
+            );
+          })}
+        </ul>
       </Grid>
 
       <Grid item xs={12}>

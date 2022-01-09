@@ -8,6 +8,7 @@ import {
   ITournament,
   LocalTournament,
 } from "../../classes/Tournament";
+import QRCode from "qrcode";
 import { IUser } from "../../classes/User";
 import AppContainer from "../../containers/AppContainer";
 import {
@@ -23,20 +24,40 @@ import GlobalTournamentWaitingRoomComponent from "./globalTournament/GlobalTourn
 import LocalTournamentComponent from "./localTournament/LocalTournamentComponent";
 import LocalTournamentWaitingRoomComponent from "./localTournament/LocalTournamentWaitingRoomComponent";
 import HowToPlayTournamentComponent from "./HowToPlayTournamentComponent";
+import { Button } from "@mui/material";
+import { IStore } from "../store";
+import { useHistory } from "react-router";
+import { connectPagePath, tournamentPagePath } from "../Routes";
+import { getDeviceType } from "../../utils/settings";
 
 interface ITournamentContainer {
   tournamentId: string;
   user: IUser;
+  store: IStore;
 }
 
 const TournamentContainer = (props: ITournamentContainer) => {
+  const [tournamentQrCode, setTournamentQrCode] = useState("");
+
+  const onMobile = getDeviceType() === "mobile";
   const [tournament, setTournament] = useState(
     null as null | undefined | ITournament
   );
 
+  const history = useHistory();
   const user = useContext(UserContext);
 
   useEffect(() => {
+    if (!onMobile) {
+      QRCode.toDataURL(window.location.href)
+        .then((url) => {
+          setTournamentQrCode(url);
+        })
+        .catch((err) => {
+          console.log("error generating qr code", err);
+        });
+    }
+
     const unsub = createGetTournametListener(
       props.tournamentId,
       (_t: ITournament | undefined) => {
@@ -110,12 +131,40 @@ const TournamentContainer = (props: ITournamentContainer) => {
           </>
         ) : (
           <>
-            <Grid item xs={12}>
+            <Grid item xs={12} lg={9}>
               <CopyTextButton
                 infoText={`Link to tournament: ${window.location.href}`}
                 copyText={window.location.href}
               />
             </Grid>
+            {tournamentQrCode && (
+              <Grid item xs={12} lg={3}>
+                <img src={tournamentQrCode} alt="" />
+              </Grid>
+            )}
+            {tournament.hasStarted && (
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    if (onMobile) {
+                      toast.error("You can only create games on desktop.");
+                    } else {
+                      props.store.setTournament(tournament);
+                      // const newGameSettings = {
+                      //   ...props.store.gameSettings,
+                      //   torunamentId: tournament.id,
+                      // };
+                      // props.store.setGameSettings(newGameSettings);
+                      props.store.setPreviousPage(tournamentPagePath);
+                      history.push(connectPagePath);
+                    }
+                  }}
+                >
+                  Create tournament game
+                </Button>
+              </Grid>
+            )}
             {renderTournament()}
           </>
         )}

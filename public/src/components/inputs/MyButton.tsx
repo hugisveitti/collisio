@@ -14,7 +14,7 @@ const MyButton = (props: IMyButton) => {
       onClick={props.onClick}
       style={{
         backgroundColor: blue4,
-        color: "white",
+        color: "wheat",
       }}
     >
       <span className="my-button-text">{props.children}</span>

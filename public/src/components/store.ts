@@ -24,4 +24,6 @@ export interface IStore {
     setTournament: React.Dispatch<React.SetStateAction<ITournament | undefined>>
     activeBracketNode: IFlattendBracketNode | undefined
     setActiveBracketNode: React.Dispatch<React.SetStateAction<IFlattendBracketNode | undefined>>
+    previousPage: string
+    setPreviousPage: React.Dispatch<React.SetStateAction<string>>
 }

@@ -44,7 +44,12 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import LoginComponent from "../LoginComponent";
-import { frontPagePath, gameRoomPath, getControlsRoomPath } from "../Routes";
+import {
+  frontPagePath,
+  gameRoomPath,
+  getControlsRoomPath,
+  waitingRoomPath,
+} from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
@@ -147,7 +152,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           props.store.setGameSettings(response.data.gameSettings);
           props.store.setPlayers(response.data.players);
           setConnectingGuest(false);
-          toast.success(response.message);
+          //  toast.success(response.message);
           setDisplayNameModalOpen(false);
         } else {
           toast.error(response.message);
@@ -197,6 +202,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
         handleSaveRoomInfo();
       }
+      console.log("waiting room container closing");
+      props.store.setPreviousPage(waitingRoomPath);
     };
   }, []);
 

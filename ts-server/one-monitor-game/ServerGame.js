@@ -29,6 +29,38 @@ var RoomMaster = /** @class */ (function () {
         this.testRoom = new TestRoom_1.default();
         this.allSocketIds = [];
     }
+    RoomMaster.prototype.getStatsString = function () {
+        var _a = this.getStats(), numberOfRooms = _a.numberOfRooms, numberOfPlayers = _a.numberOfPlayers, numberOfRoomsNotSendingControls = _a.numberOfRoomsNotSendingControls, numberOfRoomsSendingControls = _a.numberOfRoomsSendingControls;
+        var stats = [];
+        stats.push("Stats begin: " + new Date().toISOString());
+        stats.push("Number of rooms " + numberOfRooms);
+        stats.push("Number of players in game " + numberOfPlayers);
+        stats.push("Number rooms not sending controlls " + numberOfRoomsNotSendingControls);
+        stats.push("Number rooms sending controlls " + numberOfRoomsSendingControls);
+        stats.push("--------------");
+        return stats.join("\n");
+    };
+    RoomMaster.prototype.getStats = function () {
+        var numNotSendingControls = 0;
+        var numSendingControls = 0;
+        var numPlayers = 0;
+        for (var _i = 0, _a = Object.keys(this.rooms); _i < _a.length; _i++) {
+            var roomId = _a[_i];
+            if (!this.rooms[roomId].sendingControls) {
+                numNotSendingControls += 1;
+            }
+            else {
+                numSendingControls += 1;
+                numPlayers += this.rooms[roomId].players.length;
+            }
+        }
+        return {
+            numberOfRooms: numSendingControls + numNotSendingControls,
+            numberOfPlayers: numPlayers,
+            numberOfRoomsNotSendingControls: numNotSendingControls,
+            numberOfRoomsSendingControls: numSendingControls
+        };
+    };
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
@@ -36,7 +68,7 @@ var RoomMaster = /** @class */ (function () {
             if (!_this.roomExists(roomId)) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
-            else if (!isStressTest && _this.rooms[roomId].isFull()) {
+            else if (!isStressTest && _this.rooms[roomId].isFull() && !_this.rooms[roomId].gameStarted) {
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room is full.", status: errorStatus });
             }
             else {
@@ -51,7 +83,8 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
-        console.log("creating room, all rooms", Object.keys(this.rooms));
+        // console.log("creating room, all rooms", Object.keys(this.rooms))
+        console.log(this.getStats());
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };

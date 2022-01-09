@@ -173,6 +173,7 @@ app.get("/show-room", (_: Request, res: Response) => {
 
 const adminHTMLPath = `../public/${buildFolder}/admin.html`
 app.get("/admin", (req: Request, res: Response) => {
+
     res.sendFile(path.join(__dirname, adminHTMLPath));
 })
 
@@ -185,6 +186,7 @@ const server = app.listen(port, () => {
 
 
 import RoomMaster from "./one-monitor-game/ServerGame"
+import { mdts_number_connected, stmd_number_connected } from "../public/src/shared-backend/shared-stuff";
 
 const { Worker } = require('worker_threads')
 
@@ -194,6 +196,10 @@ const roomMaster = new RoomMaster(io)
 io.on("connection", (socket: Socket) => {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket)
+
+    socket.once(mdts_number_connected, () => {
+        socket.emit(stmd_number_connected, { data: roomMaster.getStats() })
+    })
 })
 
 app.get("*", (_: Request, res: Response) => {

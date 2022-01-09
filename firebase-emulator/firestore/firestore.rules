@@ -55,27 +55,79 @@ service cloud.firestore {
       allow read;
     }
     match /admins/{userId} {
-    	allow read;//: if request.auth.uid == userId;
+    	allow read;
     }
     match /tournaments/{tournamentId} {
     	// only followers can read?
     	allow read;
+      allow write;
       allow create: if !exists(/databases/$(database)/documents/tournaments/$(request.resource.id));
-      allow update: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId || request.auth.uid in get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.playerIds;
+      allow update: if 
+      	request.auth.uid == resource.data.leaderId
+        ||
+        request.auth.uid in resource.data.playerIds;
       allow delete: if request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
       match /players/{playerId} {
         allow read;
+        allow write;
       	allow create: if !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.hasStarted;
       	allow delete: if request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
         allow update: if 
-        (request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId)
-         && (!get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer || get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer > get(/databases/$(database)/documents/tournaments/$(tournamentId)/players/$(playerId)).raceData.size());
+        	request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId
+          || 
+          (
+           request.auth.uid == playerId 
+           &&
+           (
+             get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.tournmentType == "local"
+              ||
+              (
+                !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer 
+                || 
+                get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.runsPerPlayer > get(/databases/$(database)/documents/tournaments/$(tournamentId)/players/$(playerId)).data.raceData.size()
+              )
+            )
+        );
       }
-      match /raceData/{playerId} {
-        allow read;
-       
-        allow write: if request.auth.uid == playerId;
+    }
+    match /customers/{uid} {
+      allow read: if request.auth.uid == uid;
+
+      match /checkout_sessions/{id} {
+        allow read, write: if request.auth.uid == uid;
       }
+      match /subscriptions/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+      match /payments/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+    }
+
+    match /products/{id} {
+      allow read: if true;
+
+      match /prices/{id} {
+        allow read: if true;
+      }
+
+      match /tax_rates/{id} {
+        allow read: if true;
+      }
+    }
+        function hasBasicSubs() {
+      return request.auth.token.stripeRole == "basic";
+    }
+
+    function hasPremiumSubs() {
+      return request.auth.token.stripeRole == "premium";
+    }
+
+    match /content-basic/{doc} {
+      allow read: if hasBasicSubs() || hasPremiumSubs();
+    }
+    match /content-premium/{doc} {
+      allow read: if hasPremiumSubs();
     }
   }
 }

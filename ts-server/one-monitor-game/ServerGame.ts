@@ -52,8 +52,47 @@ export default class RoomMaster {
         this.rooms = {}
         /** only one test room */
         this.testRoom = new TestRoom()
-
         this.allSocketIds = []
+    }
+
+    getStatsString() {
+        const {
+            numberOfRooms,
+            numberOfPlayers,
+            numberOfRoomsNotSendingControls,
+            numberOfRoomsSendingControls
+        } = this.getStats()
+
+        const stats: string[] = []
+        stats.push(`Stats begin: ${new Date().toISOString()}`)
+        stats.push(`Number of rooms ${numberOfRooms}`)
+        stats.push(`Number of players in game ${numberOfPlayers}`)
+        stats.push(`Number rooms not sending controlls ${numberOfRoomsNotSendingControls}`)
+        stats.push(`Number rooms sending controlls ${numberOfRoomsSendingControls}`)
+        stats.push("--------------")
+        return stats.join("\n")
+    }
+
+    getStats() {
+        let numNotSendingControls = 0
+        let numSendingControls = 0
+
+        let numPlayers = 0
+        for (let roomId of Object.keys(this.rooms)) {
+            if (!this.rooms[roomId].sendingControls) {
+                numNotSendingControls += 1
+            } else {
+                numSendingControls += 1
+                numPlayers += this.rooms[roomId].players.length
+            }
+        }
+
+        return {
+            numberOfRooms: numSendingControls + numNotSendingControls,
+            numberOfPlayers: numPlayers,
+            numberOfRoomsNotSendingControls: numNotSendingControls,
+            numberOfRoomsSendingControls: numSendingControls
+        }
     }
 
     roomExists = (roomId: string) => {
@@ -81,7 +120,7 @@ export default class RoomMaster {
 
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
-            } else if (!isStressTest && this.rooms[roomId].isFull()) {
+            } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
             } else {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
@@ -96,7 +135,8 @@ export default class RoomMaster {
             /** delete room callback */
             delete this.rooms[roomId]
         })
-        console.log("creating room, all rooms", Object.keys(this.rooms))
+        // console.log("creating room, all rooms", Object.keys(this.rooms))
+        console.log(this.getStats())
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
     }

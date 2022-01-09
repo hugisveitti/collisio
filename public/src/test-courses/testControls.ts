@@ -69,7 +69,19 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
             vehicle.noForce()
         }
 
-        vehicle.turn(mobileControls.beta)
+        //vehicle.turn(mobileControls.beta)
+        if (mobileControls.beta > 0) {
+            angle += dAngle
+
+        } else if (mobileControls.beta < 0) {
+            angle -= dAngle
+        } else {
+            angle += ((Math.sign(angle) * -1) * dAngle)
+        }
+        if (Math.abs(angle) > maxAngle) {
+            angle = Math.min(Math.abs(angle), maxAngle) * Math.sign(angle)
+        }
+        vehicle.turn(angle)
     }
 
 
@@ -80,21 +92,29 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
 
 
     const keyAction = (e: KeyboardEvent, isDown: boolean) => {
-
         switch (e.key) {
             case "w":
                 mobileControls.f = isDown
                 break;
             case "a":
                 mobileControls.beta = isDown ? 40 : 0
-                //   mobileControls.beta += 2
-                // mobileControls.beta = Math.min(mobileControls.beta, maxAngle)
+                // if (isDown) {
+                //     mobileControls.beta += dAngle
+                //     mobileControls.beta = Math.min(mobileControls.beta, maxAngle)
+                // } else if (mobileControls.beta > 0) {
+                //     mobileControls.beta -= dAngle
+                // }
                 break;
             case "d":
                 mobileControls.beta = isDown ? -40 : 0
 
-                //  mobileControls.beta -= 2
-                mobileControls.beta = Math.max(mobileControls.beta, - maxAngle)
+                // if (isDown) {
+
+                //     mobileControls.beta -= dAngle
+                //     mobileControls.beta = Math.max(mobileControls.beta, - maxAngle)
+                // } else if (mobileControls.beta < 0) {
+                //     mobileControls.beta += dAngle
+                // }
                 break;
             case "s":
                 mobileControls.b = isDown

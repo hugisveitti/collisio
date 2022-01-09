@@ -2,10 +2,10 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
-import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import HelpIcon from "@mui/icons-material/Help";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import StarsIcon from "@mui/icons-material/Stars";
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
@@ -179,6 +179,17 @@ const AppContainer = (props: IAppContainer) => {
               </ListItemIcon>
               <ListItemText primary="Go Premium" />
             </ListItem>
+            {user && (
+              <ListItem
+                button
+                onClick={() => history.push(privateProfilePagePath)}
+              >
+                <ListItemIcon>
+                  <AccountCircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Profile" />
+              </ListItem>
+            )}
             <ListItem button onClick={() => history.push(aboutPagePath)}>
               <ListItemIcon>
                 <EmojiPeopleIcon />

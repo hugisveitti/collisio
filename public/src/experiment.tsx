@@ -40,7 +40,7 @@ const TestApp = () => {
 
   // not sure how to implement tournaments
   const [tournament, setTournament] = useState(undefined);
-
+  const [previousPage, setPreviousPage] = useState("");
   const deviceType = getDeviceType();
   const onMobile = deviceType === "mobile";
 
@@ -84,6 +84,8 @@ const TestApp = () => {
     setTournament,
     activeBracketNode,
     setActiveBracketNode,
+    previousPage,
+    setPreviousPage,
   } as IStore;
 
   return (

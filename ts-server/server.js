@@ -157,12 +157,16 @@ var server = app.listen(port, function () {
     console.log("listening on port " + port);
 });
 var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
+var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
 var Worker = require('worker_threads').Worker;
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
 var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket);
+    socket.once(shared_stuff_1.mdts_number_connected, function () {
+        socket.emit(shared_stuff_1.stmd_number_connected, { data: roomMaster.getStats() });
+    });
 });
 app.get("*", function (_, res) {
     res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
