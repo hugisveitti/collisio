@@ -203,6 +203,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             e.preventDefault();
             handleButtonAction(false, "f", setForward);
           }}
+          draggable={false}
           style={{
             ...btnSizeStyle,
             ...fButtonStyles,
@@ -223,6 +224,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             e.preventDefault();
             handleButtonAction(false, "b", setBackward);
           }}
+          draggable={false}
           style={{
             ...btnSizeStyle,
             ...bButtonStyles,

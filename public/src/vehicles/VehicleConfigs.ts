@@ -295,21 +295,21 @@ export const vehicleConfigs = {
     test: {
         ...defaultVehicleConfig,
         path: "test-vehicle.glb",
-        wheelAxisBackPosition: -3.5,
+        wheelAxisBackPosition: -3.5 + 5,
         wheelRadiusBack: 2 / 2,
         wheelHalfTrackBack: 3,
         wheelAxisHeightBack: -.5,
 
-        wheelAxisFrontPosition: 2.5,
+        wheelAxisFrontPosition: 2.5 + 5,
         wheelRadiusFront: 2 / 2,
         wheelHalfTrackFront: 3,
         wheelAxisHeightFront: -.5,
-        mass: 800,
-        engineForce: 12000,
+        mass: 200,
+        engineForce: 5000,
         breakingForce: 100,
         suspensionRestLength: .2,
         is4x4: false,
-        shape: "box"
+        //   shape: "convex"
     },
     simpleSphere: {
         ...defaultVehicleConfig,

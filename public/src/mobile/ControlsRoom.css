@@ -28,13 +28,14 @@
   touch-action: none;
   -ms-touch-action: none;
   z-index: 99;
-  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* pointer-events: none; */
 }
 
 .controller-btn__text {
   touch-action: none;
   -ms-touch-action: none;
-  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* @media only screen and (max-width: 350px) {
