@@ -700,7 +700,7 @@ export class LowPolyVehicle implements IVehicle {
         this.checkIfSpinning()
 
         if (!!this.engineSound && this.useEngineSound) {
-            this.engineSound.setPlaybackRate(soundScaler(Math.abs(this.getCurrentSpeedKmHour(0))))
+            this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())).toFixed(0))
         }
 
 
@@ -863,7 +863,11 @@ export class LowPolyVehicle implements IVehicle {
     };
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
-        this.vehicleSettings = vehicleSettings
+        this.vehicleSettings =
+        {
+            ...defaultVehicleSettings,
+            ...vehicleSettings
+        }
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
             this.scene.setNeedsReload(true)
