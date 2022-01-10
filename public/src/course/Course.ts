@@ -5,6 +5,7 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
+import { shuffleArray } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import "./course.css";
@@ -212,14 +213,16 @@ export class Course implements ICourse {
             //     const idx = +spawn.name.slice(5, 6)
             //     sortedSpawns[idx - 1] = spawn
             // }
-            const sortedSpawns = usableSpawns
+            let sortedSpawns = usableSpawns
             sortedSpawns.sort((a, b) => a.name < b.name ? -1 : 1)
             /**
              * Make the spawns be in order (spawn1, spawn2, etc.)
              * and remove unwanted spawns
              * since if there are 2 players, they could start one in front of the other instead of side by side
              */
-            //  shuffleArray(sortedSpawns)
+
+            sortedSpawns = sortedSpawns.slice(0, vehicles.length)
+            shuffleArray(sortedSpawns)
 
             // use predefined spawns
 

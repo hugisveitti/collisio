@@ -21,7 +21,7 @@ export class CourseItemsLoader {
 
     handleCreateLight(child: Object3D) {
         child.visible = false
-
+        if (this.course.gameScene.gameSettings.graphics === "low") return
         if (!child.name.includes("ghost")) {
             let sDistance = child.name.split("_")[0]
             let distance = 100

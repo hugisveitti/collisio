@@ -2,6 +2,7 @@ import { Socket } from "socket.io-client"
 import { IVehicle } from "../vehicles/IVehicle"
 import { toast } from "react-toastify"
 import { MobileControls, MTS_SENDINTERVAL_MS, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
+import { vehicleColors } from "../vehicles/VehicleConfigs"
 
 
 let speed = 40
@@ -161,13 +162,5 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
 
 
 
-export const getDriveInstruction = (time: number, controller: MobileControls) => {
-    return `${time} ${controller.beta} ${controller.f} ${controller.b}`
-}
 
-export const setControllerFromInstruction = (str: string, controller: MobileControls) => {
-    const instr = str.split(" ")
-    controller.beta = +instr[1]
-    controller.f = eval(instr[2])
-    controller.b = eval(instr[3])
-}
+

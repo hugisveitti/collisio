@@ -237,7 +237,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                       <Radio
                         onChange={() => {
                           updateGameSettings("graphics", "low");
-                          updateGameSettings("useShadows", false);
+                          //   updateGameSettings("useShadows", false);
                         }}
                         checked={gameSettings.graphics === "low"}
                       />

@@ -354,8 +354,10 @@ export class LowPolyVehicle extends Vehicle {
 
     turn(angle: number) {
         if (this.canDrive) {
-            this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_LEFT)
-            this.vehicle.setSteeringValue(angle * degToRad * this.steeringSensitivity, FRONT_RIGHT)
+            const steer = Math.min(Math.abs(angle), this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
+
+            this.vehicle.setSteeringValue(steer * degToRad * this.steeringSensitivity, FRONT_LEFT)
+            this.vehicle.setSteeringValue(steer * degToRad * this.steeringSensitivity, FRONT_RIGHT)
         } else {
             this.vehicle.setSteeringValue(0, FRONT_LEFT)
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)

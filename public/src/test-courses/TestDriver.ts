@@ -1,13 +1,18 @@
+import { Quaternion, Vector3 } from "three";
 import { MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { IGhostVehicle } from "../vehicles/GhostVehicle";
 import { ITestVehicle, IVehicle } from "../vehicles/IVehicle";
-import { setControllerFromInstruction } from "./testControls";
-
 
 export class TestDriver {
 
     vehicle: ITestVehicle
     controller: MobileControls
 
+    pos: Vector3
+    rotation: Quaternion
+
+    nextPos: Vector3
+    nextRotation: Quaternion
 
     // not sure of the best way to store these
     // but I think a (key, value)
@@ -15,12 +20,27 @@ export class TestDriver {
     driveInstructions: { [key: number]: string }
     di: string[]
     timeIndex = 0
+    filename: string
 
-    constructor(vehicleType: VehicleType) {
-        //    this.loadVechileConfig("f1VehicleConfig.json")
-        //  this.loadDriveInstructions("recording_farm-track_1_f1.txt")
+    numNotUpdates = 0
+
+    nextPointSet: boolean = false
+
+    betweenPos: Vector3
+    betweenRot: Quaternion
+
+    constructor(vehicleType: VehicleType, trackName: TrackName, numberOfLaps: number) {
+        this.filename = `recording_${trackName}_${numberOfLaps}_${vehicleType}.txt`
+        this.loadVechileConfig("f1VehicleConfig.json")
+        this.loadDriveInstructions(this.filename)
         this.controller = new MobileControls()
         this.di = []
+        this.pos = new Vector3(0, 0, 0)
+        this.rotation = new Quaternion(0, 0, 0, 0)
+        this.nextPos = new Vector3(0, 0, 0)
+        this.nextRotation = new Quaternion(0, 0, 0, 0)
+        this.betweenPos = new Vector3(0, 0, 0)
+        this.betweenRot = new Quaternion(0, 0, 0, 0)
     }
 
 
@@ -37,6 +57,8 @@ export class TestDriver {
         fetch(`driveinstructions/${filename}`).then(res => res.text()).then(val => {
             //    console.log("drive instructval", val)
             this.di = val.split("\n")
+        }).catch((err) => {
+            console.warn("Error loading file:", this.filename, err)
         })
     }
 
@@ -45,42 +67,108 @@ export class TestDriver {
         return +this.di[i].split(" ")[0]
     }
 
-    // this doesnt work very well
-    setMobileController(time: number) {
-        // let time = 
-        //  console.log("length of di", this.di.length)
-        if (this.timeIndex < this.di.length - 1) {
-            setControllerFromInstruction(this.di[this.timeIndex], this.controller)
-            this.timeIndex += 1
-        } else {
-            this.controller = new MobileControls()
+    setPositionRotationFromInstruction(item: string, pos: Vector3, rotation: Quaternion) {
+        const values = item.split(" ")
+        pos.set(+values[1], + values[2], +values[3])
+        rotation.set(+values[4], +values[5], +values[6], +values[7])
+    }
+
+    getPointBetween() {
+        if (!this.nextPointSet && this.timeIndex + 1 < this.di.length) {
+            this.setPositionRotationFromInstruction(this.di[this.timeIndex + 1], this.nextPos, this.nextRotation)
+            this.nextPointSet = true
         }
 
-        return
-        for (let i = 0; i < this.di.length - 1; i++) {
+        //  this.betweenPos = this.nextPos.sub(this.pos)
+        this.betweenPos = this.pos.clone().lerp(this.nextPos, this.numNotUpdates / (60 * epsTime))
+        this.betweenRot = this.rotation.clone().rotateTowards(this.nextRotation, this.numNotUpdates / (60 * epsTime))
 
-            if (this.getTime(i) < time && time < this.getTime(i + 1)) {
-                setControllerFromInstruction(this.di[i], this.controller)
-                this.di.splice(i, i - 1)
-            }
+    }
+
+    setPlace(vehicle: IGhostVehicle, time: number, delta: number) {
+        const cTime = this.getTime(this.timeIndex)
+        if (this.timeIndex < this.di.length - 1 && cTime < time) {
+            this.timeIndex += 1
+            this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
+            vehicle.setPosition(this.pos)
+            vehicle.setRotation(this.rotation)
+            this.numNotUpdates = 0
+            this.nextPointSet = false
+        } else if (cTime > time) {
+            this.numNotUpdates += 1
+            this.getPointBetween()
+            vehicle.setPosition(this.betweenPos)
+            vehicle.setRotation(this.betweenRot)
+        }
+    }
+}
+
+// how often save should occure
+let epsTime = .1
+
+interface DriveRecorderConfig {
+    active: boolean
+    trackName: TrackName
+    numberOfLaps: number
+    vehicleType: VehicleType
+}
+
+export class DriveRecorder {
+    instructions: string[]
+
+    prevTime: number
+    config: DriveRecorderConfig
+    finishedLaps = 0
+
+    constructor(config: DriveRecorderConfig) {
+        this.config = config
+        this.instructions = []
+        this.prevTime = -1
+    }
+
+    record(vehicle: IVehicle, time: number) {
+        if (!this.config.active) return
+        if (time - this.prevTime > epsTime) {
+
+            this.instructions.push(
+                this.getDriveInstruction(time, vehicle)
+            )
+            this.prevTime = time
         }
     }
 
-}
+    getDriveInstruction = (time: number, vehicle: IVehicle) => {
+        const p = vehicle.getPosition()
+        const r = vehicle.getRotation()
+        return `${time} ${p.x} ${p.y} ${p.z} ${r.x} ${r.y} ${r.z} ${r.w}`
+    }
 
+    goalCrossed() {
+        if (!this.config.active) return
+        this.finishedLaps += 1
+        console.log("goal crossed", this.config)
+        console.log("fin laps", this.finishedLaps)
+        if (this.config.numberOfLaps === this.finishedLaps) {
+            console.log("saving lap")
+            this.saveRecordedInstructionsToServer()
+        }
+    }
 
-export const saveRecordedInstructionsToServer = (recording: string[], trackName: TrackName, numberOfLaps: number, vehicleType: VehicleType) => {
-    const data = { "instructions": recording.join("\n"), trackName, numberOfLaps, vehicleType }
+    saveRecordedInstructionsToServer = () => {
+        const data = {
+            "instructions": this.instructions.join("\n"), trackName: this.config.trackName, numberOfLaps: this.config.numberOfLaps, vehicleType: this.config.vehicleType
+        }
 
-    fetch("/saverecording", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then(res =>
-        res.text()
-    ).then(val => {
-        console.log("value,", val)
-    })
+        fetch("/saverecording", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res =>
+            res.text()
+        ).then(val => {
+            console.log("value,", val)
+        })
+    }
 }

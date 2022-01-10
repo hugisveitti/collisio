@@ -80,7 +80,7 @@ app.get("/vehicleconfig/:filename", function (req, res) {
     res.sendFile(path.join(__dirname, "./testDriving/" + filename));
 });
 var bodyParser = require("body-parser");
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "20mb" }));
 app.post("/saverecording", function (req, res) {
     var data = req.body;
     var date = new Date().toISOString().slice(0, 10);

@@ -144,7 +144,7 @@ export const defaultVehicleConfig: IVehicleConfig = {
     maxSpeed: 300,
     towPosition: new Vector3(0, -.5, -4),
 
-    maxSteeringAngle: 50
+    maxSteeringAngle: 35
 }
 
 
@@ -390,3 +390,8 @@ export const vehicleConfigs = {
 // deep copy
 /** TODO: not this */
 export const initialVehicleConfigs = JSON.parse(JSON.stringify(vehicleConfigs)) as { [key: string]: IVehicleConfig }
+
+
+
+
+

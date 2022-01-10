@@ -204,7 +204,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async addLights() {
 
-        this.timeOfDay = getTimeOfDay(this.getTrackName())
+        this.timeOfDay = this.getTimeOfDay()
 
         const { ambientLightColor,
             hemisphereTopColor,
@@ -778,6 +778,8 @@ export class GameScene extends Scene3D implements IGameScene {
             if (!vehicle.isReady) return false
         }
 
+
+
         this._everythingReady = true
         return true
     }
@@ -785,6 +787,10 @@ export class GameScene extends Scene3D implements IGameScene {
 
     setGameRoomActions(gameRoomActions: IGameRoomActions) {
         this.gameRoomActions = gameRoomActions
+    }
+
+    getTimeOfDay() {
+        return this.gameSettings.graphics === "low" ? "day" : getTimeOfDay(this.getTrackName())
     }
 
     setGameSettings(gameSettings: IGameSettings) {
@@ -802,7 +808,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
         }
 
-        this.timeOfDay = getTimeOfDay(this.getTrackName())
+        this.timeOfDay = this.getTimeOfDay()
         if (this.pLight && this.course) {
             this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
             this.pLight.shadow.bias = 0.1

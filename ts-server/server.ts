@@ -75,7 +75,7 @@ app.get("/vehicleconfig/:filename", (req: Request, res: Response) => {
 
 var bodyParser = require("body-parser");
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "20mb" }));
 
 
 

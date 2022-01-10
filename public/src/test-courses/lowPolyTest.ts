@@ -10,18 +10,17 @@ import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
 import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
-import { driveVehicle } from "../utils/controls"
+import { GhostVehicle, IGhostVehicle } from "../vehicles/GhostVehicle"
 import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
 import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
 import { allVehicleTypes, defaultVehicleType, getVehicleClassFromType, possibleVehicleColors } from "../vehicles/VehicleConfigs"
-import { getWagonNumber, isWagon, Wagon } from "../vehicles/Wagon"
-import { WagonType } from "../vehicles/WagonConfigs"
+import { getWagonNumber, isWagon } from "../vehicles/Wagon"
 import "./lowPolyTest.css"
-import { addTestControls, getDriveInstruction } from "./testControls"
-import { saveRecordedInstructionsToServer, TestDriver } from "./TestDriver"
+import { addTestControls } from "./testControls"
+import { DriveRecorder, TestDriver } from "./TestDriver"
 import { createTestVehicleInputs } from "./testVehicleInputs"
 
 const vechicleFov = 60
@@ -35,8 +34,8 @@ const bestLapTimeDiv = document.createElement("div")
 const vehicleInputsContainer = document.createElement("div")
 document.body.appendChild(vehicleInputsContainer)
 
-let recording = false
-let playRecording = false
+let recording = true
+let playRecording = true
 
 export class LowPolyTestScene extends GameScene {
 
@@ -79,12 +78,14 @@ export class LowPolyTestScene extends GameScene {
 
     driveVehicle: () => MobileControls
     controls: MobileControls
-    recordingInstructions: string[]
+
 
 
     testDriver: TestDriver
+    driverRecorder: DriveRecorder
 
     otherDrivers: TestDriver[]
+    ghostVechicle: IGhostVehicle
 
     constructor() {
         super()
@@ -127,14 +128,19 @@ export class LowPolyTestScene extends GameScene {
 
         this.otherVehicles = []
         this.otherDrivers = []
-        this.recordingInstructions = []
+
 
         // in tag game
         this.isIt = 0
-        this.testDriver = new TestDriver(this.vehicleType)
+        this.testDriver = new TestDriver(this.vehicleType, this.trackName, this.getNumberOfLaps())
+        this.ghostVechicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
+        this.driverRecorder = new DriveRecorder({ active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps() })
+
     }
 
-
+    getNumberOfLaps() {
+        return 3
+    }
 
     async preload() {
         if (this.usingDebug) {
@@ -253,7 +259,7 @@ export class LowPolyTestScene extends GameScene {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
             )
-            this.otherDrivers.push(new TestDriver(vehicleType))
+            this.otherDrivers.push(new TestDriver(vehicleType, this.getTrackName(), 1))
         }
     }
 
@@ -315,6 +321,10 @@ export class LowPolyTestScene extends GameScene {
         }
         this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
 
+
+        this.ghostVechicle.loadModel().then(() => {
+            this.scene.add(this.ghostVechicle.vehicle)
+        })
     }
 
 
@@ -408,14 +418,12 @@ export class LowPolyTestScene extends GameScene {
 
 
                     const createVehicleInputButtons = () => {
-
                         createTestVehicleInputs(this, vehicleInputsContainer)
-
                     }
+
                     createVehicleInputButtons()
 
-                    // const ball = this.physics.add.sphere({ radius: 1, mass: 10, x: 10, y: 4, z: 40 })
-                    // ball.body.setBounciness(1)
+
                     resolve()
 
                 })
@@ -431,9 +439,8 @@ export class LowPolyTestScene extends GameScene {
 
     handleGoalCrossed(o: ExtendedObject3D) {
         if (!this.goalCrossed) {
-            if (getVehicleNumber(o.name) === 0 && recording) {
-
-                saveRecordedInstructionsToServer(this.recordingInstructions, this.trackName, 1, this.vehicleType)
+            if (getVehicleNumber(o.name) === 0 && recording && this.checkpointCrossed) {
+                this.driverRecorder.goalCrossed()
             }
             const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
             this.vehicle.setCheckpointPositionRotation({ position, rotation })
@@ -524,17 +531,16 @@ export class LowPolyTestScene extends GameScene {
     _updateChild(time: number, delta: number) {
         //      this.physics.physicsWorld.stepSimulation(1)
 
-        if (this.canStartUpdate && this.everythingReady()) {
+        if (this.canStartUpdate && this.everythingReady() && this.ghostVechicle.isReady) {
 
 
             if (this.vehicle) {
                 this.updateVehicles(delta)
                 this.mobileControls = this.driveVehicle?.()
-                if (recording) {
-                    this.recordingInstructions.push(getDriveInstruction(time, this.mobileControls))
-                } else if (playRecording) {
-                    this.testDriver.setMobileController(time)
-                    driveVehicle(this.testDriver.controller, this.vehicle)
+                this.driverRecorder.record(this.vehicle, time)
+
+                if (playRecording) {
+                    this.testDriver.setPlace(this.ghostVechicle, time, delta)
                 }
 
                 //    this.vehicle.intelligentDrive(true)

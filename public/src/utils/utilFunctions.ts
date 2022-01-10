@@ -15,7 +15,7 @@ export function itemInArray<Type>(st: Type, arr: Type[]) {
  * Shuffles the array in place, so it doesn't return anythin
  */
 export const shuffleArray = (arr: any[]) => {
-    const n = 10;
+    const n = 4 * arr.length;
     let j = 0;
     while (j < n) {
         for (let i = 0; i < arr.length; i++) {

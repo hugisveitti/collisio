@@ -57,7 +57,7 @@ class SpeedTestScene extends GameScene {
         this.resetVehicles()
         this.restartGame()
 
-        const driver = new TestDriver("normal2")
+        const driver = new TestDriver("normal2", "speed-test-track", 1)
     }
 
 
