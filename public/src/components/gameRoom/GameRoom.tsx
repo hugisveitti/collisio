@@ -11,8 +11,8 @@ import {
   setAllLocalGameSettings,
 } from "../../classes/localGameSettings";
 import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
-import { IEndOfGameData, startGame } from "../../game/GameScene";
-import { IGameScene } from "../../game/IGameScene";
+import { startGame } from "../../game/GameScene";
+import { IEndOfGameData, IGameScene } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_back_to_waiting_room,

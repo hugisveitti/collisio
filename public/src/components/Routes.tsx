@@ -206,7 +206,7 @@ const Routes = () => {
         />
         <Route
           path={privateProfilePagePath}
-          render={(props) => <PrivateProfilePage {...props} />}
+          render={(props) => <PrivateProfilePage {...props} store={store} />}
         />
         <Route
           path={showRoomPagePath}

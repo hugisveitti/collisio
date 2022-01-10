@@ -51,8 +51,7 @@ export interface IVehicle {
     goForward: (moreSpeed?: boolean) => void
     goBackward: (speed?: number) => void
     noForce: () => void
-    turnLeft: (angle: number) => void
-    turnRight: (angle: number) => void
+
     noTurn: () => void
     turn: (angle: number) => void
     break: (notBreak?: boolean) => void
@@ -99,6 +98,8 @@ const yScaler = numberScaler(3, 12, 1, 10)
 
 // cameraZoom should be a number from 1 to 10
 export const getStaticCameraPos = (cameraZoom: number) => {
+    console.log("camerazoom", cameraZoom)
+    console.log("y: yScaler(cameraZoom), z: -zScaler(cameraZoom)", yScaler(cameraZoom), -zScaler(cameraZoom))
     return { x: 0, y: yScaler(cameraZoom), z: -zScaler(cameraZoom) }
 }
 

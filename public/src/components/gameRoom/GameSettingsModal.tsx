@@ -11,7 +11,7 @@ import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { IStore } from "../store";
-import GameSettingsComponent from "../waitingRoom/GameSettingsComponent";
+import GameSettingsComponent from "../settings/GameSettingsComponent";
 
 interface IGameSettingsModal {
   open: boolean;

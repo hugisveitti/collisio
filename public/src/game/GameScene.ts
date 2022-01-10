@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { v4 as uuid } from "uuid";
-import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo, TimeOfDay } from "../classes/Game";
+import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
@@ -18,7 +18,7 @@ import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/Vehi
 import { getWagonNumber, Wagon } from "../vehicles/Wagon";
 import { WagonType } from "../vehicles/WagonConfigs";
 import "./game-styles.css";
-import { IGameScene, IGameSceneConfig } from "./IGameScene";
+import { IGameRoomActions, IGameScene, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 
@@ -32,9 +32,7 @@ const vechicleFov = 60
 const fadeSecs = 2
 
 
-export interface IEndOfGameData {
-    endOfRaceInfo?: IEndOfRaceInfoGame
-}
+
 
 interface IUserSettingsMessage {
     playerNumber: number
@@ -52,14 +50,7 @@ interface IView {
 }
 
 
-export interface IGameRoomActions {
-    escPressed?: () => void
-    /** have the possibity to expand this interface to include other game types */
-    gameFinished?: (data: IEndOfGameData) => void
-    updateScoreTable?: (data: IScoreInfo) => void
-    playerFinished?: (data: IEndOfRaceInfoPlayer) => void
-    closeModals?: () => void
-}
+
 
 
 export class GameScene extends Scene3D implements IGameScene {
@@ -428,13 +419,13 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
 
-    async createVehicle(vehicleType: VehicleType, color: string | number, name: string, vehicleNumber: number): Promise<IVehicle> {
+    async createVehicle(vehicleType: VehicleType, vehicleColor: string | number, name: string, vehicleNumber: number): Promise<IVehicle> {
         return new Promise<IVehicle>(async (resolve, reject) => {
             let newVehicle: IVehicle
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                newVehicle = new LowPolyVehicle(this, color, name, vehicleNumber, vehicleType, this.useSound)
+                newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useEngineSound: this.useSound })
             } else {
-                newVehicle = new SphereVehicle(this, color, name, vehicleNumber, vehicleType, this.useSound)
+                newVehicle = new SphereVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useEngineSound: this.useSound })
             }
             this.vehicles.push(newVehicle)
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
@@ -458,13 +449,15 @@ export class GameScene extends Scene3D implements IGameScene {
 
             const batches = []
             for (let i = 0; i < this.players.length; i++) {
-                const color = possibleVehicleColors[chassisColOffset + i]
+                const vehicleColor = possibleVehicleColors[chassisColOffset + i]
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                    newVehicle = new LowPolyVehicle(this, color, this.players[i].playerName, i, vehicleType, this.useSound)
+                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useEngineSound: this.useSound })
                 } else {
-                    newVehicle = new SphereVehicle(this, color, this.players[i].playerName, i, vehicleType, this.useSound)
+                    newVehicle = new SphereVehicle(
+                        { scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useEngineSound: this.useSound }
+                    )
                 }
                 this.vehicles.push(newVehicle)
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {

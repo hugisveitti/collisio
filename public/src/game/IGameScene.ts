@@ -1,11 +1,24 @@
 
 import { Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
+import { IScoreInfo, IEndOfRaceInfoPlayer, IEndOfRaceInfoGame } from "../classes/Game";
 import { IGameSettings } from "../classes/localGameSettings";
 import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
-import { IGameRoomActions } from "./GameScene";
+
+export interface IEndOfGameData {
+    endOfRaceInfo?: IEndOfRaceInfoGame
+}
+
+export interface IGameRoomActions {
+    escPressed?: () => void
+    /** have the possibity to expand this interface to include other game types */
+    gameFinished?: (data: IEndOfGameData) => void
+    updateScoreTable?: (data: IScoreInfo) => void
+    playerFinished?: (data: IEndOfRaceInfoPlayer) => void
+    closeModals?: () => void
+}
 
 export interface IGameSceneConfig {
     socket?: Socket
@@ -30,7 +43,6 @@ export interface IGameScene extends Scene3D {
     setNeedsReload: (needsReload: boolean) => void
     destroyGame: () => void
     setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
-    //  getClosestGround: (pos: Vector3) => Vector3
 
     gameSceneConfig: IGameSceneConfig
 }

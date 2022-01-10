@@ -1,58 +1,25 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Color, Euler, Font, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
-import { IGameScene } from "../game/IGameScene";
+import { IVehicleSettings } from "../classes/User";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { degToRad } from "../utils/utilFunctions";
-import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
+import { getStaticCameraPos, IPositionRotation } from "./IVehicle";
+import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
 
 
 
-export class SphereVehicle implements IVehicle {
+export class SphereVehicle extends Vehicle { //implements IVehicle {
 
-    vehicleBody: ExtendedObject3D
-    canDrive: boolean;
-    isPaused: boolean;
-    mass: number;
-    scene: IGameScene
-    color: string | number | undefined
-    name: string
-    steeringSensitivity = 0.5
-    vehicleSteering = 0
-    breakingForce: number
-    engineForce: number
-    zeroVec = new Ammo.btVector3(0, 0, 0)
-    checkpointPositionRotation: IPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
 
     vector: Ammo.btVector3
-    badRotationTicks = 0
-    useBadRotationTicks = true
-    modelsLoaded = false
 
-    cameraDir = new Vector3()
-    cameraLookAtPos = new Vector3()
-    cameraDiff = new Vector3()
-    cameraTarget = new Vector3()
 
     quaternion = new Quaternion()
     euler = new Euler()
-
-    chaseCameraSpeed: number
-    useChaseCamera: boolean
-    chaseCameraTicks: number
-    prevCahseCameraPos: Vector3 = new Vector3(0, 0, 0)
-    vehicleSettings: IVehicleSettings
-    camera: PerspectiveCamera
-    isReady: boolean
-    vehicleNumber: number;
-    oldPos: Vector3
-
-    maxSpeedTicks: number
-    useEngineSound: boolean
 
     xVel: number
     yVel: number
@@ -63,43 +30,21 @@ export class SphereVehicle implements IVehicle {
     dzVel: number
 
     yRot: number
-
     spinCameraAroundVehicle: boolean;
-    vehicleType: VehicleType;
 
     physicsConfig: {}
 
-    staticCameraPos: { x: number, y: number, z: number }
-
     prevPosition: Vector3
 
-    constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
-        this.oldPos = new Vector3(0, 0, 0)
-        this.scene = scene
-        this.color = color
-        this.name = name
-        this.canDrive = false
-        this.isPaused = false
-        this.vehicleNumber = vehicleNumber
-        this.useChaseCamera = false
-        this.chaseCameraSpeed = 0.3
-        this.chaseCameraTicks = 0
-        this.vehicleSettings = defaultVehicleSettings
-        this.isReady = false
-        this.vehicleType = vehicleType
+    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
+        super(config)
 
 
-        //this.maxEngineFoce = 1000
-        this.maxSpeedTicks = 0
-        this.useEngineSound = useEngineSound
+        //   this.vehicleBody = this.scene.physics.add.sphere({ mass: 100, radius: 2 }, { lambert: { color: this.color } })
 
 
-        this.vehicleBody = this.scene.physics.add.sphere({ mass: 100, radius: 2 }, { lambert: { color: this.color } })
+        //   this.vehicleBody.castShadow = true
 
-
-        this.vehicleBody.castShadow = true
-        this.isReady = true
-        this.canDrive = true
 
         this.xVel = 0
         this.zVel = 0
@@ -109,14 +54,13 @@ export class SphereVehicle implements IVehicle {
         this.physicsConfig = { mass: vehicleConfigs[this.vehicleType].mass, shape: "convex", autoCenter: false, collisionFlags: 0 }
 
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
-        this.engineForce = 300
+
         this.breakingForce = -1
         this.dVel = 3
         this.dzVel = -1
 
         this.vector = new Ammo.btVector3(0, 0, 0)
 
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.prevPosition = new Vector3(0, 0, 0)
     }
 
@@ -151,7 +95,7 @@ export class SphereVehicle implements IVehicle {
         const material = (this.vehicleBody.material as MeshStandardMaterial).clone();
         this.vehicleBody.material = material;
 
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
 
         // const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
         // this.vector.setValue(x, y, z)
@@ -317,11 +261,11 @@ export class SphereVehicle implements IVehicle {
         //    this.cameraLookAtPos.set(0, 0, 0)
         const cs = 0.5
 
-        this.cameraLookAtPos.x = (this.prevCahseCameraPos.x + ((pos.x - this.prevCahseCameraPos.x) * cs))
-        this.cameraLookAtPos.z = (this.prevCahseCameraPos.z + ((pos.z - this.prevCahseCameraPos.z) * cs))
-        this.cameraLookAtPos.y = (this.prevCahseCameraPos.y + ((pos.y - this.prevCahseCameraPos.y) * cs))
+        this.cameraLookAtPos.x = (this.prevChaseCameraPos.x + ((pos.x - this.prevChaseCameraPos.x) * cs))
+        this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z - this.prevChaseCameraPos.z) * cs))
+        this.cameraLookAtPos.y = (this.prevChaseCameraPos.y + ((pos.y - this.prevChaseCameraPos.y) * cs))
 
-        this.prevCahseCameraPos = this.cameraLookAtPos.clone()
+        this.prevChaseCameraPos = this.cameraLookAtPos.clone()
 
 
         // camera.position.set(
@@ -353,7 +297,6 @@ export class SphereVehicle implements IVehicle {
     }
 
     getPosition(): Vector3 {
-
         return this.vehicleBody.position
     }
 
@@ -378,22 +321,21 @@ export class SphereVehicle implements IVehicle {
     }
 
     getCurrentSpeedKmHour(delta: number): number {
-        const { x, z } = this.vehicleBody.body.velocity
+        // const { x, z } = this.vehicleBody.body.velocity
 
-        const num = Math.sqrt(x * x + z * z)
+        // const num = Math.sqrt(x * x + z * z)
 
         const currPos = this.vehicleBody.position
 
-        console.log("delta", delta)
+
         const meterPerSec = (currPos.distanceTo(this.prevPosition) / delta)
         const kmh = meterPerSec * (3.6) * 1000
-        console.log("speed", kmh)
-        console.log("numb", num)
+
 
         this.prevPosition = currPos.clone()
 
 
-        return num
+        return kmh
     }
 
     setFont(font: Font): void {
@@ -448,18 +390,20 @@ export class SphereVehicle implements IVehicle {
         //     this.camera.position.set(x, y, z)
         //     this.vehicleBody.add(this.camera)
         // }
+        // if (this.scene instanceof RaceGameScene) {
+        if (this.scene.gameSceneConfig.gameSettings.gameType === "race") {
+            this.setColor(this.vehicleColor)
+        }
+        //}
 
     }
 
 
     setColor(color: string | number) {
-        this.color = color;
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
+        this.vehicleColor = color;
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
     }
 
-    toggleSound(useSound: boolean): void {
-
-    }
 
     destroy(): void {
         this.scene.destroy(this.vehicleBody)
@@ -481,15 +425,10 @@ export class SphereVehicle implements IVehicle {
 
     }
 
-    randomDrive(): void { }
-
 }
 
 export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boolean): Promise<ExtendedObject3D> => {
     const promise = new Promise<ExtendedObject3D>((resolve, reject) => {
-
-
-
 
         const loader = new GLTFLoader()
 

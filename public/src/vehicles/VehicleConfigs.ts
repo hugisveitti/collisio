@@ -11,6 +11,39 @@ import { SimpleVector } from "./IVehicle";
 //  0x1d8a47 is green
 export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", green4]
 
+interface VehicleColor {
+    name: string, value: string
+}
+export const vehicleColors: VehicleColor[] = [
+    {
+        name: "Green", value: "#1d8a47",
+    },
+    {
+        name: "Red", value: "#8b0000"
+    },
+    {
+        name: "Blue", value: "#185676",
+    },
+    {
+        name: "Orange", value: "#fda000"
+    },
+    {
+        name: "Light green", value: "#61f72a"
+    },
+    {
+        name: "Gray", value: "#97b0ba"
+    }
+]
+
+export const getVehicleColorOption = (value: string): VehicleColor => {
+    for (let option of vehicleColors) {
+        if (option.value === value) return option
+    }
+    return {
+        name: "Unknown color", value
+    }
+}
+
 type VehicleClass = "LowPoly" | "Sphere"
 
 export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: VehicleClass }[] = [
@@ -70,6 +103,8 @@ export interface IVehicleConfig {
     frictionSlip: number
     rollInfluence: number
 
+    maxSteeringAngle: number
+
     inertia: SimpleVector
 
     maxSpeed: number
@@ -107,7 +142,9 @@ export const defaultVehicleConfig: IVehicleConfig = {
     inertia: { x: 4000, y: 2000, z: 4000 },
 
     maxSpeed: 300,
-    towPosition: new Vector3(0, -.5, -4)
+    towPosition: new Vector3(0, -.5, -4),
+
+    maxSteeringAngle: 50
 }
 
 
@@ -161,15 +198,16 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.8,
         wheelRadiusBack: 2.4 / 2,
         wheelHalfTrackBack: 1.6,
-        wheelAxisHeightBack: -.2,
+        wheelAxisHeightBack: -.2 - .6,
 
         wheelAxisFrontPosition: 2.1,
         wheelRadiusFront: 1.6 / 2,
         wheelHalfTrackFront: 1.36,
-        wheelAxisHeightFront: -.5,
+        wheelAxisHeightFront: -.5 - .6,
 
-        suspensionStiffness: 40,
-        suspensionRestLength: 1.6,
+        suspensionDamping: 12,
+        suspensionStiffness: 120,
+        suspensionRestLength: 1,
         mass: 1600,
         engineForce: 7500,
         breakingForce: 200,
@@ -184,12 +222,12 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.9,
         wheelRadiusBack: 1.5 / 2,
         wheelHalfTrackBack: 1.2,
-        wheelAxisHeightBack: 0,
+        wheelAxisHeightBack: 0 - .5,
 
         wheelAxisFrontPosition: 1.55,
         wheelRadiusFront: 1.5 / 2,
         wheelHalfTrackFront: 1.2,
-        wheelAxisHeightFront: 0,
+        wheelAxisHeightFront: 0 - .5,
 
         mass: 1000,
         engineForce: 9000,
@@ -199,8 +237,8 @@ export const vehicleConfigs = {
         suspensionRestLength: 1.5,
 
         maxSuspensionTravelCm: 1500,
-        suspensionStiffness: 65,
-        suspensionDamping: 10,
+        suspensionStiffness: 120,
+        suspensionDamping: 15,
 
 
 
@@ -211,12 +249,12 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -1.85,
         wheelRadiusBack: 1.8 / 2,
         wheelHalfTrackBack: 1.25,
-        wheelAxisHeightBack: -.2,
+        wheelAxisHeightBack: -.2 - .5,
 
         wheelAxisFrontPosition: 1.95,
         wheelRadiusFront: 1.8 / 2,
         wheelHalfTrackFront: 1.25,
-        wheelAxisHeightFront: -0.2,
+        wheelAxisHeightFront: -0.2 - .5,
 
 
         mass: 1200,
@@ -224,11 +262,11 @@ export const vehicleConfigs = {
         breakingForce: 200,
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },
-        suspensionRestLength: 1.6,
+        suspensionRestLength: 1.6 - .5,
         frictionSlip: 27.5,
         maxSuspensionTravelCm: 100,
-        suspensionStiffness: 50,
-        suspensionDamping: 10,
+        suspensionStiffness: 120,
+        suspensionDamping: 12,
         suspensionCompression: 20,
 
         path: "off-roader.gltf",
@@ -342,7 +380,7 @@ export const vehicleConfigs = {
         path: "simple-sphere.gltf",
         mass: 400,
         // this isnt engineforece but the rate angular velocity
-        engineForce: 30,
+        engineForce: 300,
         //  inertia: { x: 100000, y: 100000, z: 100000 }
 
     }

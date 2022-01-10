@@ -1,5 +1,5 @@
 import { ClosestRaycaster } from "@enable3d/ammo-physics";
-import { LineBasicMaterial, Line, BufferGeometry, Vector3, Euler } from "three"
+import { BufferGeometry, Line, LineBasicMaterial, Vector3 } from "three";
 import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "./IVehicle";
@@ -25,7 +25,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
 
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
-        super(scene, color, name, vehicleNumber, vehicleType, useEngineSound)
+        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useEngineSound })
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
         //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
         this.inertia = new Ammo.btVector3(0, 0, 0)

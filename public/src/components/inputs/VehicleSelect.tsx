@@ -21,6 +21,7 @@ interface IVehicleSelect {
   excludedVehicles?: VehicleType[];
   fullWidth?: boolean;
   disabled?: boolean;
+  vehicleColor?: string;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
@@ -58,7 +59,7 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
       {props.previewVehicle && (
         <React.Fragment>
           <Button
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 10, marginLeft: 5 }}
             variant="outlined"
             onClick={() => setShowPreview(!showPreview)}
             startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
@@ -72,6 +73,7 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
                 excludedVehicles={props.excludedVehicles}
                 isPremiumUser={false}
                 vehcileType={props.value}
+                vehicleColor={props.vehicleColor}
               />
             )}
           </Collapse>

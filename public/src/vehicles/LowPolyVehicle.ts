@@ -1,20 +1,18 @@
 import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
+import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
-import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { loadEngineSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
-import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
+import { getStaticCameraPos, IPositionRotation } from "./IVehicle";
+import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
 
 export const isVehicle = (object: ExtendedObject3D) => {
     return object.name.slice(0, 7) === "vehicle"
 }
-
 
 export const getVehicleNumber = (vehicleName: string) => {
     const num = +vehicleName.slice(8, 9)
@@ -24,70 +22,33 @@ export const getVehicleNumber = (vehicleName: string) => {
     return num
 }
 
-
 const soundScaler = numberScaler(1, 5, 0, 330)
 const speedScaler = logScaler(300, 0.1, 1)
-
 
 const FRONT_LEFT = 0
 const FRONT_RIGHT = 1
 const BACK_LEFT = 2
 const BACK_RIGHT = 3
 
-
-
-
-
 const DISABLE_DEACTIVATION = 4;
 
 
-let useBad = false
 
+export class LowPolyVehicle extends Vehicle {
 
-export class LowPolyVehicle implements IVehicle {
-    canDrive: boolean;
-    isPaused: boolean;
-    mass: number;
     tires: ExtendedObject3D[]
-    vehicleBody!: ExtendedObject3D
 
-    scene: IGameScene
-    color: string | number | undefined
-    name: string
     vehicle: Ammo.btRaycastVehicle
     wheelMeshes: ExtendedObject3D[] = []
 
-    steeringSensitivity = 0.5
-    vehicleSteering = 0
-    breakingForce: number
-    engineForce: number
     chassis: Ammo.btRigidBody
-    zeroVec = new Ammo.btVector3(0, 0, 0)
-    checkpointPositionRotation: IPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
-
     tuning: Ammo.btVehicleTuning
     raycaster: Ammo.btDefaultVehicleRaycaster
-    vehicleNumber: number
+
     font: Font
-    badRotationTicks = 0
-    useBadRotationTicks = true
-    modelsLoaded = false
 
-
-    cameraDir = new Vector3()
-    cameraLookAtPos = new Vector3()
-    cameraDiff = new Vector3()
-    cameraTarget = new Vector3()
-
-    chaseCameraSpeed: number
-    useChaseCamera: boolean
-    chaseCameraTicks: number
-    prevChaseCameraPos: Vector3 = new Vector3(0, 0, 0)
-    vehicleSettings: IVehicleSettings
-    camera: PerspectiveCamera
-    vehicleType: VehicleType
     is4x4: boolean
-    isReady: boolean
+
     transformCam: Ammo.btTransform
     chassisWorldTransfrom: Ammo.btTransform
     forwardTicks = 0
@@ -97,15 +58,9 @@ export class LowPolyVehicle implements IVehicle {
      * and then the maxSpeedTicks can help the vehicle gain more speed gradually
      */
     maxSpeedTicks: number
-    useEngineSound: boolean
-    engineSound: Audio | undefined
 
     /** only for the engine sound */
     currentEngineForce: number
-
-    /** for startup animation */
-    spinCameraAroundVehicle: boolean
-
 
     /** 
      * multi purpos vector
@@ -121,36 +76,19 @@ export class LowPolyVehicle implements IVehicle {
     p: Ammo.btVector3
     q: Ammo.btQuaternion
 
-    oldPos: Vector3
 
-    engineSoundLoaded = false
-
-    staticCameraPos: { x: number, y: number, z: number }
     // too see if camera is inside wall
     cameraRay: ClosestRaycaster
     rayer: Ammo.ClosestRayResultCallback
 
     prevPosition = new Vector3(0, 0, 0)
 
-    constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
-        this.oldPos = new Vector3(0, 0, 0)
-        this.scene = scene
-        this.color = color
-        this.name = name
-        this.canDrive = false
-        this.isPaused = false
-        this.vehicleNumber = vehicleNumber
-        this.useChaseCamera = false
-        this.chaseCameraSpeed = 0.3
-        this.chaseCameraTicks = 0
-        this.vehicleSettings = defaultVehicleSettings
-        this.isReady = false
+    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
+        super(config)
 
         this.maxSpeedTicks = 0
-        this.useEngineSound = useEngineSound
 
 
-        this.vehicleType = vehicleType
         this.mass = vehicleConfigs[this.vehicleType].mass
         this.engineForce = vehicleConfigs[this.vehicleType].engineForce
         this.breakingForce = vehicleConfigs[this.vehicleType].breakingForce
@@ -184,14 +122,14 @@ export class LowPolyVehicle implements IVehicle {
         const material = (this.vehicleBody.material as MeshStandardMaterial).clone();
         this.vehicleBody.material = material;
 
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
 
         this.createVehicle()
     }
 
     setColor(color: string | number) {
-        this.color = color;
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.color);
+        this.vehicleColor = color;
+        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
     }
 
 
@@ -408,9 +346,6 @@ export class LowPolyVehicle implements IVehicle {
         this.vehicle.applyEngineForce(ef, BACK_RIGHT)
     }
 
-    turnLeft(angle: number) { };
-
-    turnRight(angle: number) { };
 
     noTurn() {
         this.vehicle.setSteeringValue(0, FRONT_LEFT)
@@ -497,55 +432,6 @@ export class LowPolyVehicle implements IVehicle {
                 this.vehicleBody.remove(this.vehicleBody.children[i])
             }
         }
-    }
-
-    // this could be configured in blender, using a connection-point object3d
-    getTowPivot() {
-        return vehicleConfigs[this.vehicleType].towPosition
-    }
-
-    toggleSound(useSound: boolean) {
-        this.useEngineSound = useSound
-        if (!this.engineSound) {
-            console.warn("Engine sound not loaded")
-            return
-        }
-    }
-
-    stopEngineSound() {
-        if (this.engineSound && this.engineSound.source) {
-            this.engineSound.stop()
-        }
-    }
-
-    startEngineSound() {
-        if (this.isPaused) return
-
-        if (!this.engineSound?.isPlaying && this.useEngineSound) {
-            this.engineSound.play()
-        }
-    }
-
-    createCarSounds() {
-        const listener = new AudioListener()
-        this.camera.add(listener)
-        let volume = 0.3
-        this.engineSound = new Audio(listener)
-
-
-        loadEngineSoundBuffer((engineSoundBuffer: AudioBuffer) => {
-            this.engineSound.setBuffer(engineSoundBuffer)
-            this.engineSound.setLoop(true)
-            this.engineSound.setVolume(volume)
-            this.engineSound.setLoopEnd(2.5)
-            this.engineSoundLoaded = true
-
-            /**
-             * some bug here
-             * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
-             */
-            this.stopEngineSound()
-        })
     }
 
 
@@ -888,6 +774,12 @@ export class LowPolyVehicle implements IVehicle {
         }
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
+        console.log("change settings", vehicleSettings)
+        console.log("color", this.vehicleColor)
+        console.log("this.scene.gameSceneConfig.gameSettings.gameType", this.scene.gameSceneConfig.gameSettings.gameType)
+        if (this.scene.gameSceneConfig.gameSettings.gameType === "race") {
+            this.setColor(this.vehicleColor)
+        }
     };
 
     async destroy() {

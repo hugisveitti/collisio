@@ -17,15 +17,14 @@ import {
   saveBestRaceData,
   saveRaceDataGame,
 } from "../firebase/firestoreGameFunctions";
-import { IEndOfGameData, startGame } from "../game/GameScene";
-import { IGameScene } from "../game/IGameScene";
+import { startGame } from "../game/GameScene";
+import { IEndOfGameData, IGameScene } from "../game/IGameScene";
 import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
 import ControlsRoomComponent from "../mobile/ControlsRoomComponent";
 import { UserContext } from "../providers/UserProvider";
 import {
   GameActions,
   IPlayerInfo,
-  IPreGamePlayerInfo,
   MobileControls,
 } from "../shared-backend/shared-stuff";
 import { isIphone } from "../utils/settings";

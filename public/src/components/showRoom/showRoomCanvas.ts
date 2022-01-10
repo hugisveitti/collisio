@@ -4,10 +4,14 @@ import { getDeviceType } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
 import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
 
-const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene) => {
+const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
     loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
+        if (vehicleColor) {
+            (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
-        (chassis.material as MeshStandardMaterial).color = new Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
+        } else {
+            (chassis.material as MeshStandardMaterial).color = new Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
+        }
         scene.add(chassis)
 
         for (let tire of tires) {
@@ -38,10 +42,10 @@ const addLights = (scene: Scene) => {
 let renderer: WebGLRenderer | undefined, scene: Scene | undefined
 
 
-export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number) => {
+export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: string) => {
     if (scene && renderer) {
         scene.clear()
-        addVehicle(vehicleType, chassisNum, scene)
+        addVehicle(vehicleType, chassisNum, scene, vehicleColor)
         addLights(scene)
         return undefined
     }
@@ -75,7 +79,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     camera.lookAt(0, 0, 0)
 
 
-    addVehicle(vehicleType, chassisNum, scene)
+    addVehicle(vehicleType, chassisNum, scene, vehicleColor)
 
 
 

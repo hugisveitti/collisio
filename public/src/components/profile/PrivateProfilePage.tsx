@@ -28,6 +28,7 @@ import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { getDateNow } from "../../utils/utilFunctions";
 import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
+import { IStore } from "../store";
 
 const useStyles = makeStyles({
   container: {
@@ -37,7 +38,9 @@ const useStyles = makeStyles({
   input: {},
 });
 
-interface IPrivateProfilePage {}
+interface IPrivateProfilePage {
+  store: IStore;
+}
 
 const PrivateProfilePage = (props: IPrivateProfilePage) => {
   const classes = useStyles();
@@ -201,7 +204,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
 
             {user && (
               <Grid item xs={12}>
-                <UserSettingsComponent userId={user.uid} />
+                <UserSettingsComponent user={user} store={props.store} />
               </Grid>
             )}
           </Grid>

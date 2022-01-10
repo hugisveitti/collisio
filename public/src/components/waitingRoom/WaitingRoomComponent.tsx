@@ -33,8 +33,9 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import { gameRoomPath, tournamentPagePath } from "../Routes";
 import { IStore } from "../store";
 import FindActiveTournamentsComponent from "../tournament/inputs/FindActiveTournamentsComponent";
-import GameSettingsComponent from "./GameSettingsContainer";
+import GameSettingsComponent from "../settings/GameSettingsContainer";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
+import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -224,7 +225,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           <GameSettingsComponent store={props.store} />
         </React.Fragment>
       )}
-      {onMobile && (
+      {/* {onMobile && (
         <Grid item xs={12}>
           <VehicleSelect
             disabled={!!props.store.tournament?.vehicleType}
@@ -254,7 +255,29 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             excludedVehicles={nonactiveVehcileTypes}
           />
         </Grid>
+      )} */}
+
+      {onMobile && (
+        <Grid item xs={12}>
+          <VehicleSettingsComponent
+            store={props.store}
+            user={user}
+            notInGame
+            previewVehicle
+            resetOrientation={() => {
+              requestDeviceOrientation((permissionGranted, message) => {
+                if (permissionGranted) {
+                  //   toast.success(message);
+                } else {
+                  toast.error(message);
+                }
+              });
+            }}
+          />
+        </Grid>
       )}
+
+      <Grid item xs={12}></Grid>
       {!activeTournamentObvious && (
         <Grid item xs={12}>
           <FindActiveTournamentsComponent store={props.store} />

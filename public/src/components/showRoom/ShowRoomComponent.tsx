@@ -26,6 +26,7 @@ interface IShowRoom {
   excludedVehicles?: VehicleType[];
   isPremiumUser: boolean;
   vehcileType?: VehicleType;
+  vehicleColor?: string;
 }
 
 const ShowRoomComponent = (props: IShowRoom) => {
@@ -43,7 +44,6 @@ const ShowRoomComponent = (props: IShowRoom) => {
 
   useEffect(() => {
     return () => {
-      console.log("component unmounted");
       removeShowRoomCanvas();
     };
   }, []);
@@ -55,7 +55,8 @@ const ShowRoomComponent = (props: IShowRoom) => {
         possibleVehcileTypes[
           Math.abs(vehicleTypeNum % possibleVehcileTypes.length)
         ].type,
-      chassisNum
+      chassisNum,
+      props.vehicleColor
     );
     if (canvasWrapperRef.current && renderer) {
       // @ts-ignore
@@ -80,7 +81,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
     } else {
       setShowBuyPremium(true);
     }
-  }, [chassisNum, vehicleTypeNum, props.vehcileType]);
+  }, [chassisNum, vehicleTypeNum, props.vehcileType, props.vehicleColor]);
 
   return (
     <React.Fragment>

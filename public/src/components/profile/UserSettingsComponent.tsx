@@ -10,93 +10,48 @@ import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import { IUserSettings, IVehicleSettings } from "../../classes/User";
+import { IUser, IUserSettings, IVehicleSettings } from "../../classes/User";
 import {
   getDBUserSettings,
   setDBUserSettings,
 } from "../../firebase/firestoreFunctions";
 
 import { cardBackgroundColor } from "../../providers/theme";
+import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
+import { IStore } from "../store";
 
 interface IUserSettingsComponent {
-  userId: string;
+  user: IUser;
+  store: IStore;
 }
 
 const UserSettingsComponent = (props: IUserSettingsComponent) => {
   const [inEditMode, setInEditMode] = useState(false);
-  const [userSettings, setUserSettings] = useState({} as IUserSettings);
-  const [vehicleSettings, setVehicleSettings] = useState(
-    {} as IVehicleSettings
-  );
-  const [vehicleOpen, setVehicleOpen] = useState(false);
-
-  const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(0.3);
 
   useEffect(() => {
-    getDBUserSettings(props.userId).then((settings) => {
-      setUserSettings(settings);
-
-      setVehicleSettings(settings.vehicleSettings);
-      setSteerSenceDefaultVal(settings.vehicleSettings.steeringSensitivity);
+    getDBUserSettings(props.user?.uid).then((settings) => {
+      props.store.setUserSettings(settings);
     });
   }, []);
 
-  const updateVehicleSettings = (key: keyof IVehicleSettings, value: any) => {
-    const newVehicleSettings = vehicleSettings;
-    // @ts-ignore
-    newVehicleSettings[key] = value;
-    setVehicleSettings(newVehicleSettings);
-    const newUserSettings = {
-      ...userSettings,
-      vehicleSettings: newVehicleSettings,
-    };
-    setUserSettings(newUserSettings);
-    setDBUserSettings(props.userId, newUserSettings);
-  };
-
   const renderStaticInfo = () => {
-    if (!vehicleSettings?.vehicleType) return null;
+    if (!props.store.userSettings?.vehicleSettings?.vehicleType) return null;
     return (
       <>
         <CardHeader
           title="User settings"
           subheader="Most of these are also editable in-game"
         />
-        <CardActions>
-          <IconButton onClick={() => setVehicleOpen(!vehicleOpen)}>
-            {vehicleOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        </CardActions>
-        <Collapse in={vehicleOpen}>
-          <CardContent>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography>Steering sensitivity</Typography>
-                <Slider
-                  min={0.01}
-                  max={2}
-                  valueLabelDisplay="auto"
-                  step={0.01}
-                  value={steerSenceDefaultVal}
-                  onChange={(e, value) => {
-                    setSteerSenceDefaultVal(value as number);
-                  }}
-                  onChangeCommitted={(e, value) => {
-                    updateVehicleSettings(
-                      "steeringSensitivity",
-                      steerSenceDefaultVal
-                    );
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Collapse>
+        <VehicleSettingsComponent
+          store={props.store}
+          user={props.user}
+          previewVehicle
+        />
       </>
     );
   };
 
-  if (!userSettings) return null;
+  if (!props.store.userSettings) return null;
 
   return (
     <Card

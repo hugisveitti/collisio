@@ -1,5 +1,5 @@
 import { VehicleType } from "../shared-backend/shared-stuff"
-import { defaultVehicleType } from "../vehicles/VehicleConfigs"
+import { defaultVehicleType, possibleVehicleColors, vehicleColors } from "../vehicles/VehicleConfigs"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3
@@ -29,6 +29,8 @@ export interface IVehicleSettings {
 
 
     cameraZoom: number
+
+    vehicleColor: string
 }
 
 export const defaultVehicleSettings = {
@@ -36,16 +38,13 @@ export const defaultVehicleSettings = {
     chaseCameraSpeed: .3,
     useChaseCamera: false,
     vehicleType: defaultVehicleType,
-    cameraZoom: 6
+    cameraZoom: 6,
+    vehicleColor: vehicleColors[0].value
 } as IVehicleSettings
-
-
 
 export interface IUserSettings {
     vehicleSettings: IVehicleSettings,
 }
-
-
 
 export const defaultUserSettings = {
     vehicleSettings: defaultVehicleSettings,
