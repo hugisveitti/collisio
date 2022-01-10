@@ -38,7 +38,7 @@ export const inDevelopment = window.location.href.includes("localhost") || windo
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = true
+export const inTestMode = false
 
 
 export const testGameSettings: IGameSettings = {
