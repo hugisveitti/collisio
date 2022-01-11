@@ -94,10 +94,7 @@ export class RaceGameScene extends GameScene {
         this.startGameSong()
         if (this.raceCountdownTime < 3) this.raceCountdownTime = 3
         // makes vehicle fall
-        for (let vehicle of this.vehicles) {
-            vehicle.canDrive = false
-            vehicle.stop()
-        }
+        this.stopAllVehicles()
 
         if (this.raceCountdownTime > 3) {
             this.showImportantInfo(`Race starting in ${this.raceCountdownTime} seconds`, true)

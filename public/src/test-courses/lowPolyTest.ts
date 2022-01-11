@@ -139,7 +139,7 @@ export class LowPolyTestScene extends GameScene {
     }
 
     getNumberOfLaps() {
-        return 3
+        return 1
     }
 
     async preload() {
@@ -323,8 +323,11 @@ export class LowPolyTestScene extends GameScene {
 
 
         this.ghostVechicle.loadModel().then(() => {
-            this.scene.add(this.ghostVechicle.vehicle)
-        })
+            //  this.scene.add(this.ghostVechicle.vehicle)
+            this.ghostVechicle.addToScene(this)
+        });
+
+        console.log("camera", this.camera)
     }
 
 
@@ -344,7 +347,6 @@ export class LowPolyTestScene extends GameScene {
 
     async createOtherVehicles() {
         return new Promise<void>((resolve, reject) => {
-
             if (this.numberOfOtherVehicles === 0) {
                 resolve()
             }
@@ -370,20 +372,13 @@ export class LowPolyTestScene extends GameScene {
         window.localStorage.setItem("trackName", trackName)
         this.canStartUpdate = false
         this.course.clearCourse()
-
         this.scene.clear()
         this.addLights()
-
         this.create()
-
     }
-
-
 
     async createTestVehicle() {
         const promise = new Promise<void>((resolve, reject) => {
-
-
             const vehicleClass = getVehicleClassFromType(this.vehicleType)
             if (vehicleClass === "Sphere") {
                 loadSphereModel(this.vehicleType, false).then((sphere) => {
@@ -522,7 +517,7 @@ export class LowPolyTestScene extends GameScene {
         this.vehicle.update(delta)
     }
 
-    async _upd() {
+    _upd() {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
         }

@@ -79,10 +79,13 @@ export class TestDriver {
             this.nextPointSet = true
         }
 
-        //  this.betweenPos = this.nextPos.sub(this.pos)
-        this.betweenPos = this.pos.clone().lerp(this.nextPos, this.numNotUpdates / (60 * epsTime))
-        this.betweenRot = this.rotation.clone().rotateTowards(this.nextRotation, this.numNotUpdates / (60 * epsTime))
+        const alpha = this.numNotUpdates / (60 * epsTime)
+        if (alpha < 1) {
 
+            this.betweenPos = this.pos.clone().lerp(this.nextPos, alpha)
+            this.betweenRot = this.rotation.clone().slerp(this.nextRotation, alpha)
+
+        }
     }
 
     setPlace(vehicle: IGhostVehicle, time: number, delta: number) {
@@ -90,15 +93,17 @@ export class TestDriver {
         if (this.timeIndex < this.di.length - 1 && cTime < time) {
             this.timeIndex += 1
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
-            vehicle.setPosition(this.pos)
-            vehicle.setRotation(this.rotation)
+            // console.log("set pos", this.pos.x.toFixed(1), this.pos.z.toFixed(2))
+            vehicle.setPosition(this.pos.clone())
+            vehicle.setRotation(this.rotation.clone())
             this.numNotUpdates = 0
             this.nextPointSet = false
         } else if (cTime > time) {
             this.numNotUpdates += 1
             this.getPointBetween()
-            vehicle.setPosition(this.betweenPos)
-            vehicle.setRotation(this.betweenRot)
+            //   console.log("set pos between", this.betweenPos.x.toFixed(1), this.betweenPos.z.toFixed(2))
+            vehicle.setPosition(this.betweenPos.clone())
+            vehicle.setRotation(this.betweenRot.clone())
         }
     }
 }

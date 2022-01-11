@@ -84,6 +84,9 @@ export class LowPolyVehicle extends Vehicle {
 
     prevPosition = new Vector3(0, 0, 0)
 
+    chaseSpeedX = 0
+    chaseSpeedZ = 0
+
     constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         super(config)
 
@@ -356,11 +359,13 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     turn(angle: number) {
-        if (this.canDrive) {
-            const steer = Math.min(Math.abs(angle), this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
 
-            this.vehicle.setSteeringValue(steer * degToRad * this.steeringSensitivity, FRONT_LEFT)
-            this.vehicle.setSteeringValue(steer * degToRad * this.steeringSensitivity, FRONT_RIGHT)
+        if (this.canDrive) {
+
+            const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
+            const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
+            this.vehicle.setSteeringValue(steer, FRONT_LEFT)
+            this.vehicle.setSteeringValue(steer, FRONT_RIGHT)
         } else {
             this.vehicle.setSteeringValue(0, FRONT_LEFT)
             this.vehicle.setSteeringValue(0, FRONT_RIGHT)
@@ -458,10 +463,10 @@ export class LowPolyVehicle extends Vehicle {
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.vehicleBody.position.clone())
-            camera.updateProjectionMatrix()
             camera.updateMatrix()
             camera.updateWorldMatrix(false, false)
             camera.updateMatrixWorld()
+            camera.updateProjectionMatrix()
 
         } else if (this.useChaseCamera) {
             this.tm = this.vehicle.getChassisWorldTransform()
@@ -476,7 +481,7 @@ export class LowPolyVehicle extends Vehicle {
             const pos = this.getPosition() // vec
 
             const chaseSpeedY = 0.5
-            let chaseSpeed = this.chaseCameraSpeed
+
 
             // this.oldPos = pos.clone()
 
@@ -489,15 +494,24 @@ export class LowPolyVehicle extends Vehicle {
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
-            let chaseSpeedX = Math.abs((Math.sin(rot.y)) * this.chaseCameraSpeed) + .1
-            let chaseSpeedZ = Math.abs((Math.cos(rot.y)) * this.chaseCameraSpeed) + .1
-            chaseSpeedX = Math.min(chaseSpeedX, 1)
-            chaseSpeedZ = Math.min(chaseSpeedZ, 1)
+            let dchaseSpeedX = Math.abs((Math.sin(rot.y)))// this.chaseCameraSpeed)
+            let dchaseSpeedZ = Math.abs((Math.cos(rot.y))) // this.chaseCameraSpeed)
+
+            const diffX = dchaseSpeedX - this.chaseSpeedX
+            const diffZ = dchaseSpeedZ - this.chaseSpeedZ
+
+            let scalerX = 0.05 * this.chaseCameraSpeed
+            let scalerZ = 0.05 * this.chaseCameraSpeed
 
 
+            let changeX = (scalerX * Math.abs(diffX)) * Math.sign(diffX)
+            let changeZ = (scalerZ * Math.abs(diffZ)) * Math.sign(diffZ)
+            this.chaseSpeedX += changeX
+            this.chaseSpeedZ += changeZ
 
-            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * chaseSpeedX))
-            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * chaseSpeedZ))
+
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseSpeedX))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseSpeedZ))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
 
             const cs = 0.5
@@ -507,9 +521,9 @@ export class LowPolyVehicle extends Vehicle {
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
-            camera.updateProjectionMatrix()
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
             this.seeVehicle(this.cameraDir)
+            camera.updateProjectionMatrix()
         } else {
             const pos = this.vehicleBody.position
             const rot = this.vehicleBody.rotation
@@ -520,7 +534,6 @@ export class LowPolyVehicle extends Vehicle {
             )
             camera.lookAt(this.vehicleBody.position.clone())
             this.seeVehicle(this.cameraTarget)
-
         }
     };
 
@@ -771,15 +784,15 @@ export class LowPolyVehicle extends Vehicle {
                 this[key] = vehicleSettings[key]
             }
         }
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
         this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
             const { x, y, z } = this.staticCameraPos
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
+            this.camera.updateProjectionMatrix()
         }
-
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
         if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
             this.setColor(this.vehicleColor)

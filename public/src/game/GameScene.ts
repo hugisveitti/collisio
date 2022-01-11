@@ -348,15 +348,17 @@ export class GameScene extends Scene3D implements IGameScene {
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
-            this.update?.(parseFloat(time.toFixed(3)), delta)
+            this.update?.(parseFloat(time.toFixed(8)), delta)
 
             this.animationMixers.update(delta)
 
             this.preRender()
+
             if (this.composer) {
                 this.composer.render()
             }
             else {
+
                 this.renderer.render(this.scene, this.camera)
             }
             this.postRender()
@@ -1038,9 +1040,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     resetVehicles() {
         this.course.setStartPositions(this.vehicles)
-        for (let vehicle of this.vehicles) {
-            vehicle.canDrive = false
-        }
+        this.stopAllVehicles()
         this._resetVehicles()
     }
 

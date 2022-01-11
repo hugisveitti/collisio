@@ -1,4 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
+import { Scene3D } from "enable3d";
 import { MeshStandardMaterial, Quaternion, Vector3, Object3D, Color } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -9,8 +10,9 @@ export interface IGhostVehicle {
     setPosition: (position: Vector3) => void
     setRotation: (rotation: Quaternion) => void
     isReady: boolean
-    vehicle: ExtendedObject3D
+    //  vehicle: ExtendedObject3D
     loadModel: () => Promise<void>
+    addToScene: (scene: Scene3D) => void
 }
 
 interface GhostVehicleConfig {
@@ -34,9 +36,11 @@ export class GhostVehicle implements IGhostVehicle {
         this.isReady = false
 
         this.vehicle = new ExtendedObject3D()
-        // this.loadModel().then(() => {
-        //     this.isReady = true
-        // })
+
+    }
+
+    addToScene(scene: Scene3D) {
+        scene.scene.add(this.vehicle)
     }
 
     setRotation(rotation: Quaternion) {
@@ -48,7 +52,9 @@ export class GhostVehicle implements IGhostVehicle {
     setPosition(position: Vector3) {
         if (!this.isReady) return
         this.position = position
-
+        // the ghost vehicle seems to be going back and forth
+        // but according to this the vehicle just goes forth
+        //  console.log("set ghost pos", position.x.toFixed(2), position.z.toFixed(2))
         this.vehicle.position.set(position.x, position.y, position.z)
     };
 
@@ -85,24 +91,20 @@ export class GhostVehicle implements IGhostVehicle {
 
                             tires.push(tire)
                         } else {
-                            //for (let tireConfig of tiresConfig) {
+
                             if (child.name.includes("tire")) {
                                 tires.push(child as ExtendedObject3D);
                                 ((child as ExtendedObject3D).material as MeshStandardMaterial).opacity = opacity;
                                 ((child as ExtendedObject3D).material as MeshStandardMaterial).transparent = true
-                                // if (!onlyLoad) {
-                                //     tires[tireConfig.number].geometry.center()
-                                // }
+
                             }
-                            //  }
+
                         }
                     }
                 }
 
 
-                // if (extraCarStuff) {
-                //     chassis.add(extraCarStuff)
-                // }
+
 
                 if (chassis) {
                     this.vehicle.add(chassis)
@@ -122,26 +124,3 @@ export class GhostVehicle implements IGhostVehicle {
     }
 
 }
-// const FRONT_LEFT = 0
-// const FRONT_RIGHT = 1
-// const BACK_LEFT = 2
-// const BACK_RIGHT = 3
-
-// const tiresConfig = [
-//     {
-//         name: "back-right-tire",
-//         number: BACK_RIGHT
-//     },
-//     {
-//         name: "back-left-tire",
-//         number: BACK_LEFT
-//     },
-//     {
-//         name: "front-left-tire",
-//         number: FRONT_LEFT
-//     },
-//     {
-//         name: "front-right-tire",
-//         number: FRONT_RIGHT
-//     },
-// ]

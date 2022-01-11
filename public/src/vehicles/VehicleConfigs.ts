@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 import { green4, red1, red2 } from "../providers/theme";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { itemInArray } from "../utils/utilFunctions";
+import { degToRad, itemInArray } from "../utils/utilFunctions";
 import { SimpleVector } from "./IVehicle";
 
 
@@ -103,6 +103,7 @@ export interface IVehicleConfig {
     frictionSlip: number
     rollInfluence: number
 
+    // in radians
     maxSteeringAngle: number
 
     inertia: SimpleVector
@@ -144,7 +145,7 @@ export const defaultVehicleConfig: IVehicleConfig = {
     maxSpeed: 300,
     towPosition: new Vector3(0, -.5, -4),
 
-    maxSteeringAngle: 35
+    maxSteeringAngle: 35 * degToRad
 }
 
 
