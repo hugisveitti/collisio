@@ -98,7 +98,6 @@ const yScaler = numberScaler(3, 12, 1, 10)
 
 // cameraZoom should be a number from 1 to 10
 export const getStaticCameraPos = (cameraZoom: number) => {
-    cameraZoom = 3
     console.log("camerazoom", cameraZoom)
     console.log("y: yScaler(cameraZoom), z: -zScaler(cameraZoom)", yScaler(cameraZoom), -zScaler(cameraZoom))
     return { x: 0, y: yScaler(cameraZoom), z: -zScaler(cameraZoom) }
