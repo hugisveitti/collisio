@@ -262,7 +262,6 @@ export class GameScene extends Scene3D implements IGameScene {
         const sky = new Mesh(skyGeo, skyMat);
 
         this.scene.add(sky);
-
     }
 
     async preload() {

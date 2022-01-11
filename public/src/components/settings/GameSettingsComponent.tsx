@@ -1,5 +1,7 @@
+import { PlayLessonRounded } from "@mui/icons-material";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import { Checkbox, Collapse } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
@@ -273,6 +275,47 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                   updateGameSettings("drawDistance", value);
                 }}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                label="Record session?"
+                control={
+                  <Checkbox
+                    value={props.gameSettings.record}
+                    onChange={() => {
+                      updateGameSettings("record", !props.gameSettings.record);
+                    }}
+                  />
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                label="Use ghost?"
+                control={
+                  <Checkbox
+                    value={props.gameSettings.useGhost}
+                    onChange={() => {
+                      updateGameSettings(
+                        "useGhost",
+                        !props.gameSettings.useGhost
+                      );
+                    }}
+                  />
+                }
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Collapse in={props.gameSettings.useGhost}>
+                <TextField
+                  value={props.gameSettings.ghostFilename}
+                  label="Ghost filename"
+                  onChange={(e) =>
+                    updateGameSettings("ghostFilename", e.target.value)
+                  }
+                />
+              </Collapse>
             </Grid>
           </Grid>
         </CollabsibleCard>

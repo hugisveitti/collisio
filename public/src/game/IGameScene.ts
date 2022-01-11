@@ -1,10 +1,11 @@
 
 import { Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
-import { IScoreInfo, IEndOfRaceInfoPlayer, IEndOfRaceInfoGame } from "../classes/Game";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
 import { IGameSettings } from "../classes/localGameSettings";
 import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
+import { ICourse } from "../course/ICourse";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
 
 export interface IEndOfGameData {
@@ -44,5 +45,6 @@ export interface IGameScene extends Scene3D {
     destroyGame: () => void
     setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
 
+    course: ICourse
     gameSceneConfig: IGameSceneConfig
 }

@@ -202,7 +202,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
         handleSaveRoomInfo();
       }
-      console.log("waiting room container closing");
       props.store.setPreviousPage(waitingRoomPath);
     };
   }, []);

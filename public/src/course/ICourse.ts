@@ -1,6 +1,5 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Euler, Vector3 } from "three";
-import { TimeOfDay } from "../classes/Game";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 
 
@@ -16,6 +15,9 @@ export interface ICourse {
     startRotation: Euler
     // Maybe this is not a tag course thing
     getCheckpointPositionRotation: (checkpointNumber: number) => IPositionRotation
+
+    // make intersections transparent
+    seeObject: (cameraPos: Vector3, objectPos: Vector3) => void
 }
 
 export interface IRaceCourse extends ICourse {

@@ -1,5 +1,5 @@
 import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
+import { Object3D, Color, Vector2, Euler, Font, Mesh, Raycaster, MeshLambertMaterial, Ray, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -76,6 +76,7 @@ export class LowPolyVehicle extends Vehicle {
     p: Ammo.btVector3
     q: Ammo.btQuaternion
 
+    euler = new Euler(0, 0, 0)
 
     // too see if camera is inside wall
     cameraRay: ClosestRaycaster
@@ -105,6 +106,9 @@ export class LowPolyVehicle extends Vehicle {
         this.chassisWorldTransfrom = new Ammo.btTransform()
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.cameraRay = new ClosestRaycaster(this.scene.physics)
+
+
+        console.log("max turn", vehicleConfigs[this.vehicleType].maxSteeringAngle)
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -136,7 +140,6 @@ export class LowPolyVehicle extends Vehicle {
     createVehicle() {
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.scene.add.existing(this.vehicleBody)
-        console.log("vehicleConfigs[this.vehicleType].shape", vehicleConfigs[this.vehicleType].shape)
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: vehicleConfigs[this.vehicleType].shape ?? "convex", autoCenter: false, })
 
 
@@ -465,14 +468,14 @@ export class LowPolyVehicle extends Vehicle {
             this.p = this.tm.getOrigin()
             this.q = this.tm.getRotation()
 
-            const rot = new Euler().setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
+            const rot = this.euler.setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
 
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
 
             const pos = this.getPosition() // vec
 
-            let chaseSpeedY = 0.5
+            const chaseSpeedY = 0.5
             let chaseSpeed = this.chaseCameraSpeed
 
             // this.oldPos = pos.clone()
@@ -486,8 +489,15 @@ export class LowPolyVehicle extends Vehicle {
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
-            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * chaseSpeed))
-            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * chaseSpeed))
+            let chaseSpeedX = Math.abs((Math.sin(rot.y)) * this.chaseCameraSpeed) + .1
+            let chaseSpeedZ = Math.abs((Math.cos(rot.y)) * this.chaseCameraSpeed) + .1
+            chaseSpeedX = Math.min(chaseSpeedX, 1)
+            chaseSpeedZ = Math.min(chaseSpeedZ, 1)
+
+
+
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * chaseSpeedX))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * chaseSpeedZ))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
 
             const cs = 0.5
@@ -499,27 +509,27 @@ export class LowPolyVehicle extends Vehicle {
             camera.lookAt(this.cameraLookAtPos)
             camera.updateProjectionMatrix()
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
+            this.seeVehicle(this.cameraDir)
         } else {
+            const pos = this.vehicleBody.position
+            const rot = this.vehicleBody.rotation
+            this.cameraTarget.set(
+                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+                pos.y + this.staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+            )
             camera.lookAt(this.vehicleBody.position.clone())
+            this.seeVehicle(this.cameraTarget)
+
         }
     };
 
-
-    cameraSeesVehicle(cameraPos: Vector3) {
-        const pos = this.getPosition()
-        this.cameraRay.setRayToWorld(pos.x, pos.y + 2, pos.z)
-        this.cameraRay.setRayFromWorld(cameraPos.x, cameraPos.y, cameraPos.z)
-        this.cameraRay.rayTest()
-        if (this.cameraRay.hasHit()) {
-            //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
-            const obj = this.cameraRay.getCollisionObject()
-            if (obj.name.includes("house")) {
-                return false
-            }
-            const normal = this.cameraRay.getHitNormalWorld()
-            return true
-        }
-        return true
+    /**
+     * make items between camera and vehicle see through
+     * @param cameraPos position of camera relative to the world
+     */
+    seeVehicle(cameraPos: Vector3) {
+        this.scene.course.seeObject(cameraPos, this.vehicleBody.position.clone())
     }
 
     checkIfSpinning() {
@@ -588,12 +598,8 @@ export class LowPolyVehicle extends Vehicle {
         this.checkIfSpinning()
 
         if (!!this.engineSound && this.useEngineSound) {
-            this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())).toFixed(0))
+            this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
         }
-
-
-
-
         for (let i = 0; i < 5; i++) {
             // this.vehicle.updateWheelTransform(i, true)
             this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
@@ -604,10 +610,8 @@ export class LowPolyVehicle extends Vehicle {
                 this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
                 this.vehicle.updateWheelTransform(i, false)
             } else {
-
             }
         }
-
 
         //  this.detectJitter(delta)
 
@@ -776,10 +780,8 @@ export class LowPolyVehicle extends Vehicle {
         }
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        console.log("change settings", vehicleSettings)
-        console.log("color", this.vehicleColor)
-        console.log("this.scene.gameSceneConfig.gameSettings.gameType", this.scene.gameSceneConfig.gameSettings.gameType)
-        if (this.scene.gameSceneConfig.gameSettings.gameType === "race") {
+
+        if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
             this.setColor(this.vehicleColor)
         }
     };
@@ -811,6 +813,9 @@ export class LowPolyVehicle extends Vehicle {
         // }
     }
 }
+
+
+// window.addEventListener('mousemove', onMouseMove, false);
 
 const tiresConfig = [
     {

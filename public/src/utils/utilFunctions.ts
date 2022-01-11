@@ -166,3 +166,18 @@ export const get2DAngleBetweenPoints = (p1: Vector3, p2: Vector3) => {
 
     return Math.atan2((p2.z - p1.z), (p2.x - p1.x))
 }
+
+
+/**
+ * @param str 
+ * @param arr: array of substring
+ * returns true if content of str is included in any string in arr
+ */
+export const substrArrayInString = (str: string, arr: string[]) => {
+    for (let item of arr) {
+        if (str.includes(item)) {
+            return true
+        }
+    }
+    return false
+}

@@ -1,18 +1,20 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Euler, Group, Object3D, PointLight, Quaternion, Vector3 } from "three";
+import { Euler, Group, MeshStandardMaterial, Object3D, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { shuffleArray } from "../utils/utilFunctions";
+import { shuffleArray, substrArrayInString } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import "./course.css";
-import { CourseItemsLoader } from "./CoursetemsLoader";
+import { CourseItemsLoader, notSeeThroughObjects } from "./CoursetemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
 import { ICourse } from "./ICourse";
 import { courseManager } from "./loadingManager";
+
+
 
 
 export class Course implements ICourse {
@@ -48,6 +50,13 @@ export class Course implements ICourse {
 
     vehicles: ExtendedObject3D[]
     wagons: ExtendedObject3D[]
+
+    // objects that are currently see through
+    seeThroughObjects: ExtendedObject3D[] = []
+
+    // objects which we need to check for intersection and can become see through
+    // if they are between the camera and the player
+    possibleIntersectObjects: Object3D[] = []
 
     constructor(gameScene: GameScene, trackName: TrackName) {
         this.gameScene = gameScene
@@ -105,6 +114,9 @@ export class Course implements ICourse {
                 this.filterAndOrderCheckpoints()
                 await this._createCourse()
 
+
+                this.createPossibleIntersectObjectArray()
+
                 resolve()
             })
         })
@@ -112,6 +124,21 @@ export class Course implements ICourse {
         return promise
     }
 
+    createPossibleIntersectObjectArray() {
+
+        const createArray = (group: Group) => {
+            for (let child of group.children) {
+                if (child.type === "Group") {
+                    createArray(child as Group)
+                }
+                else if (child.type === "Mesh" && !child.name.includes("hidden") && !substrArrayInString(child.name, notSeeThroughObjects)) {
+                    this.possibleIntersectObjects.push(child)
+                }
+            }
+        }
+        createArray(this.courseScene)
+
+    }
 
     // for this parent class
     addParentCollision() {
@@ -169,6 +196,7 @@ export class Course implements ICourse {
     }
 
     clearCourse() {
+        this.possibleIntersectObjects = []
         this.gameScene.scene.remove(this.courseScene)
         for (let obj of this.gamePhysicsObjects) {
             this.gameScene.destroy(obj)
@@ -301,6 +329,39 @@ export class Course implements ICourse {
         return { position: p, rotation: r }
     }
 
+    removeTransparentObjects() {
+        for (let obj of this.seeThroughObjects) {
+            (obj.material as MeshStandardMaterial).transparent = false;
+        }
+        this.seeThroughObjects = [];
+    }
+
+    makeObjectTransparent(object: ExtendedObject3D) {
+
+        const material = object.material as MeshStandardMaterial
+        if (material.transparent) return
+
+
+        (object.material) = (object.material as MeshStandardMaterial).clone();
+        (object.material as MeshStandardMaterial).transparent = true;
+        (object.material as MeshStandardMaterial).opacity = 0.5;
+        this.seeThroughObjects.push(object)
+    }
+
+    /**
+     * make items between object and camera transparent
+     */
+    seeObject(cameraPos: Vector3, objectPos: Vector3) {
+        this.removeTransparentObjects()
+        ray.far = cameraPos.distanceTo(objectPos)
+        ray.set(cameraPos, objectPos.clone())
+        ray.ray.lookAt(objectPos.clone())
+
+        const intersects = ray.intersectObjects(this.possibleIntersectObjects)
+        for (let i = 0; i < intersects.length; i++) {
+            this.makeObjectTransparent(intersects[i].object as ExtendedObject3D)
+        }
+    }
 
 
     updateCourse() {
@@ -317,3 +378,16 @@ export class Course implements ICourse {
 
     }
 }
+
+const mouse = new Vector2(0, 0);
+
+function onMouseMove(event) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+}
+const ray = new Raycaster()

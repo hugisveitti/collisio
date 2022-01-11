@@ -369,9 +369,9 @@ export const vehicleConfigs = {
 
         suspensionDamping: 20,
 
-
+        maxSpeed: 250,
         mass: 200,
-        engineForce: 2200,
+        engineForce: 2500,
         frictionSlip: 27.5,
         path: "gokart.glb",
     },

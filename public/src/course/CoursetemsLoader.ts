@@ -177,6 +177,8 @@ export class CourseItemsLoader {
                 else {
                     for (let key of itemKeys) {
                         if (keyNameMatch(key, child.name)) {
+                            child.layers.enable(1)
+
                             child.visible = !Boolean(gameItems[key].notVisible);
                             if (!Boolean(gameItems[key].notAddPhysics)) {
                                 this.handleCreatePhysicsObject(child, key)
@@ -198,3 +200,13 @@ export class CourseItemsLoader {
         }
     }
 }
+
+
+export const notSeeThroughObjects = [
+    "spawn",
+    "align",
+    "crops",
+    "scarecrow",
+    "field",
+    "sheep"
+]

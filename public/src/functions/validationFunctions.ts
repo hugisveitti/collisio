@@ -27,5 +27,19 @@ export const checkIfCanStartGame = (store: IStore): { canStartGame: boolean, mes
         }
 
     }
+
+    if (store.gameSettings.record) {
+        return {
+            canStartGame: false,
+            message: `Recording not supported yet.`
+        }
+    }
+
+    if (store.gameSettings.useGhost) {
+        return {
+            canStartGame: false,
+            message: `Using ghosts not supported yet.`
+        }
+    }
     return { canStartGame: true, message: "" }
 }

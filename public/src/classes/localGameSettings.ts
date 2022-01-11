@@ -18,6 +18,9 @@ export interface IGameSettings {
     graphics: GraphicsType
     tournamentId?: string
     drawDistance: number
+    record: boolean
+    useGhost: boolean
+    ghostFilename?: string
 }
 
 export const defaultGameSettings: IGameSettings = {
@@ -28,7 +31,9 @@ export const defaultGameSettings: IGameSettings = {
     gameType: "race",
     tagGameLength: 2,
     graphics: "high",
-    drawDistance: 2000
+    drawDistance: 7500,
+    record: false,
+    useGhost: false,
 }
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {

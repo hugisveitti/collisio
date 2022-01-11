@@ -10,7 +10,7 @@ export const getDeviceType = (): DeviceType => {
     }
     const ua = navigator.userAgent;
     if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
-        if (window.confirm("Press OK, to use as mobile and cancel to use as desktop")) {
+        if (window.confirm("Tablet detected! Press OK, to use as mobile and cancel to use as desktop.")) {
             deviceType = "mobile"
             return "mobile"
         }
@@ -49,7 +49,9 @@ export const testGameSettings: IGameSettings = {
     useShadows: true,
     useSound: true,
     graphics: "high",
-    drawDistance: 5000
+    drawDistance: 5000,
+    record: false,
+    useGhost: false,
 }
 
 
