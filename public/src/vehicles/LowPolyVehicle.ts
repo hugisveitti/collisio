@@ -25,6 +25,8 @@ export const getVehicleNumber = (vehicleName: string) => {
 const soundScaler = numberScaler(1, 5, 0, 330)
 const speedScaler = logScaler(300, 0.1, 1)
 
+
+
 const FRONT_LEFT = 0
 const FRONT_RIGHT = 1
 const BACK_LEFT = 2
@@ -86,6 +88,8 @@ export class LowPolyVehicle extends Vehicle {
 
     chaseSpeedX = 0
     chaseSpeedZ = 0
+    chaseX = 0
+    chaseZ = 0
 
     constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
         super(config)
@@ -500,18 +504,25 @@ export class LowPolyVehicle extends Vehicle {
             const diffX = dchaseSpeedX - this.chaseSpeedX
             const diffZ = dchaseSpeedZ - this.chaseSpeedZ
 
-            let scalerX = 0.05 * this.chaseCameraSpeed
-            let scalerZ = 0.05 * this.chaseCameraSpeed
+            let scalerX = this.chaseCameraSpeed * .0051
+            let scalerZ = this.chaseCameraSpeed * .0051
 
 
             let changeX = (scalerX * Math.abs(diffX)) * Math.sign(diffX)
             let changeZ = (scalerZ * Math.abs(diffZ)) * Math.sign(diffZ)
-            this.chaseSpeedX += changeX
+
+
             this.chaseSpeedZ += changeZ
+            this.chaseSpeedX += changeX
 
+            const chaseXTarget = (1 / (1 + Math.abs(diffX)) ** 2)
+            const chaseZTarget = (1 / (1 + Math.abs(diffZ)) ** 2)
 
-            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseSpeedX))
-            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseSpeedZ))
+            this.chaseX += (chaseXTarget - this.chaseX) * .01 // (1 / (1 + Math.abs(diffX)) ** 2)
+            this.chaseZ += (chaseZTarget - this.chaseZ) * .01
+
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseX)) //* this.chaseSpeedX))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseZ)) //* this.chaseSpeedZ))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
 
             const cs = 0.5
