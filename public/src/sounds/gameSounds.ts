@@ -7,15 +7,29 @@ const audioLoader = new AudioLoader();
 
 let engineBuffer: AudioBuffer
 
-export const loadEngineSoundBuffer = (callback: (_eb: AudioBuffer) => void) => {
+export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
+    return new Promise((resolve, reject) => {
 
-    audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
-
-        engineBuffer = buffer
-        callback(engineBuffer)
-
+        audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
+            engineBuffer = buffer
+            resolve(engineBuffer)
+        }, () => { }, (err) => {
+            console.warn("Error loading engine sound.")
+            reject()
+        })
     })
+}
 
+export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
+    return new Promise<AudioBuffer>((resolve, reject) => {
+        audioLoader.load(getStaticPath("sound/skid2.ogg"), (buffer: AudioBuffer) => {
+            engineBuffer = buffer
+            resolve(engineBuffer)
+        }, () => { }, (err) => {
+            console.warn("Error loading skid sound.")
+            reject()
+        })
+    })
 }
 
 export const getBeep = async (path: string, listener: AudioListener, callback: (beep: Audio) => void) => {

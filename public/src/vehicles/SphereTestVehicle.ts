@@ -4,8 +4,8 @@ import { ITestVehicle } from "./IVehicle";
 import { SphereVehicle } from "./SphereVehicle";
 
 export class SphereTestVehicle extends SphereVehicle implements ITestVehicle {
-    constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
-        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useEngineSound, })
+    constructor(scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
+        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useSoundEffects, })
     }
 
     randomDrive(): void {

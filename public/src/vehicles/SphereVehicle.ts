@@ -36,7 +36,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     prevPosition: Vector3
 
-    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
+    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
         super(config)
 
 

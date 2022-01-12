@@ -24,8 +24,8 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     inertia: Ammo.btVector3
 
 
-    constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound: boolean) {
-        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useEngineSound })
+    constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects: boolean) {
+        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useSoundEffects })
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
         //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
         this.inertia = new Ammo.btVector3(0, 0, 0)

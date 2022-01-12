@@ -424,9 +424,9 @@ export class GameScene extends Scene3D implements IGameScene {
         return new Promise<IVehicle>(async (resolve, reject) => {
             let newVehicle: IVehicle
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useEngineSound: this.useSound })
+                newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useSoundEffects: this.useSound })
             } else {
-                newVehicle = new SphereVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useEngineSound: this.useSound })
+                newVehicle = new SphereVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useSoundEffects: this.useSound })
             }
             this.vehicles.push(newVehicle)
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
@@ -454,10 +454,10 @@ export class GameScene extends Scene3D implements IGameScene {
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useEngineSound: this.useSound })
+                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound })
                 } else {
                     newVehicle = new SphereVehicle(
-                        { scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useEngineSound: this.useSound }
+                        { scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound }
                     )
                 }
                 this.vehicles.push(newVehicle)

@@ -1,5 +1,5 @@
 import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Object3D, Color, Vector2, Euler, Font, Mesh, Raycaster, MeshLambertMaterial, Ray, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
+import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -91,7 +91,7 @@ export class LowPolyVehicle extends Vehicle {
     chaseX = 0
     chaseZ = 0
 
-    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useEngineSound?: boolean) {
+    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
         super(config)
 
         this.maxSpeedTicks = 0
@@ -189,16 +189,8 @@ export class LowPolyVehicle extends Vehicle {
         const wheelHalfTrackFront = vehicleConfigs[this.vehicleType].wheelHalfTrackFront
         const wheelAxisHeightFront = vehicleConfigs[this.vehicleType].wheelAxisHeightFront
 
-        this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
-
-        this.addWheel(
-            true,
-            this.vector,
-            wheelRadiusFront,
-            FRONT_LEFT
-        )
-
         this.vector.setValue(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
+
         this.addWheel(
             true,
             this.vector,
@@ -206,13 +198,12 @@ export class LowPolyVehicle extends Vehicle {
             FRONT_RIGHT
         )
 
-
-        this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
+        this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
         this.addWheel(
-            false,
+            true,
             this.vector,
-            wheelRadiusBack,
-            BACK_LEFT
+            wheelRadiusFront,
+            FRONT_LEFT
         )
 
         this.vector.setValue(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
@@ -221,6 +212,14 @@ export class LowPolyVehicle extends Vehicle {
             this.vector,
             wheelRadiusBack,
             BACK_RIGHT
+        )
+
+        this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
+        this.addWheel(
+            false,
+            this.vector,
+            wheelRadiusBack,
+            BACK_LEFT
         )
 
         // not sure what to have the gravity, the auto is -20
@@ -240,8 +239,8 @@ export class LowPolyVehicle extends Vehicle {
         this.stop()
         window.addEventListener("keydown", (e) => {
             if (e.key === "z") {
-                this.useEngineSound = !this.useEngineSound
-                this.toggleSound(this.useEngineSound)
+                this.useSoundEffects = !this.useSoundEffects
+                this.toggleSound(this.useSoundEffects)
             }
         })
 
@@ -290,10 +289,10 @@ export class LowPolyVehicle extends Vehicle {
         let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
         if (kmh > vehicleConfigs[this.vehicleType].maxSpeed + (this.maxSpeedTicks / 10)) {
 
-            eF = 0
+            eF = 0 // -500
             this.maxSpeedTicks += 1
         } else if (kmh < vehicleConfigs[this.vehicleType].maxSpeed) {
-            this.maxSpeedTicks = 0
+            this.maxSpeedTicks = this.maxSpeedTicks * .1
         } else {
             this.maxSpeedTicks -= 1
         }
@@ -419,7 +418,7 @@ export class LowPolyVehicle extends Vehicle {
     unpause() {
         this.isPaused = false
         this.canDrive = true
-        if (this.useEngineSound) {
+        if (this.useSoundEffects) {
             this.startEngineSound()
         }
         if (this.vehicleBody?.body) {
@@ -478,7 +477,7 @@ export class LowPolyVehicle extends Vehicle {
             this.q = this.tm.getRotation()
 
             const rot = this.euler.setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
-
+            //  const rot = this.vehicleBody.rotation
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
 
@@ -495,6 +494,9 @@ export class LowPolyVehicle extends Vehicle {
                 pos.y + this.staticCameraPos.y,
                 pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             )
+
+
+
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
@@ -556,6 +558,10 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.course.seeObject(cameraPos, this.vehicleBody.position.clone())
     }
 
+
+
+
+
     checkIfSpinning() {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
         if (Math.abs(vel.x()) > 3) {
@@ -576,14 +582,65 @@ export class LowPolyVehicle extends Vehicle {
             this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
+    }
 
-        // const v = this.vehicle.getRigidBody().getLinearVelocity()
-        // // if you are going slow and pop up in the air, that fuggin bugg
-        // if (Math.abs(v.y()) > 20 && Math.abs(this.getCurrentSpeedKmHour(0)) < 150) {
-        //     console.warn("linear vel danger, Y:", v.x().toFixed(2), v.y().toFixed(2), v.z().toFixed(2))
-        //     this.vector.setValue(v.x(), v.y() / 4, v.z())
-        //     this.vehicle.getRigidBody().setLinearVelocity(this.vector)
-        // }
+
+
+    vehicleAssist() {
+        const { isOnGround: fl, pos: flPos } = this.isWheelOffGround(FRONT_LEFT)
+        const { isOnGround: fr, pos: frPos } = this.isWheelOffGround(FRONT_RIGHT)
+        const { isOnGround: br, pos: brPos } = this.isWheelOffGround(BACK_RIGHT)
+        const { isOnGround: bl, pos: blPos } = this.isWheelOffGround(BACK_LEFT)
+
+        /**
+         * Flying assist:
+         * Works by seeing if left tires are above right or front tires above back
+         * and tries to even them out
+         * dirX and dirZ are key
+         * the * Math.sign(Math.cos(r.z)) is because there is some error when converting
+         * from quaternions and euler
+         */
+        if (!fr || !fl || !br || !br) {
+            const r = this.vehicleBody.rotation
+
+            const dirX = -(Math.sin(r.y))
+            const dirZ = -(Math.cos(r.y)) * Math.sign(Math.cos(r.z))
+
+            const eps = 0.1
+            let turningRight = Math.abs(frPos.y() - flPos.y()) < eps ? 0 : (frPos.y() - flPos.y())
+            let turningFront = Math.abs(frPos.y() - brPos.y()) < eps ? 0 : (frPos.y() - brPos.y())
+
+            if (turningFront === 0 && turningRight === 0) return
+            // these parameters can be optimized
+            const maxTurning = 0.5
+            const changeFactor = .1
+            turningFront = Math.min(Math.abs(turningFront), maxTurning) * Math.sign(turningFront)
+            turningRight = Math.min(Math.abs(turningRight), maxTurning) * Math.sign(turningRight)
+
+            console.warn("Vehicle assist, Turning right:", turningRight, ", TurningFront:", turningFront)
+
+
+            let targetChangeX = - ((dirZ * turningFront)) * changeFactor
+            targetChangeX += -((dirX * turningRight)) * changeFactor
+
+            let targetChangeZ = ((dirX * turningFront)) * changeFactor
+            targetChangeZ += -((dirZ * turningRight)) * changeFactor
+
+            const aVel = this.vehicle.getRigidBody().getAngularVelocity()
+
+            let newX = aVel.x() + targetChangeX
+            let newZ = aVel.z() + targetChangeZ
+
+            this.vector.setValue(newX, aVel.y() * .5, newZ)
+            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
+        }
+    }
+
+    isWheelOffGround(wheelNumber: number) {
+        this.tm = this.vehicle.getWheelInfo(wheelNumber).get_m_worldTransform()
+        const p = this.tm.getOrigin()
+        const touchingGroung = this.isTouchingGround(this.tm.getOrigin())
+        return { isOnGround: touchingGroung, pos: p }
     }
 
     detectJitter(delta: number) {
@@ -620,8 +677,12 @@ export class LowPolyVehicle extends Vehicle {
 
     update(delta: number) {
         this.checkIfSpinning()
+        this.vehicleAssist()
 
-        if (!!this.engineSound && this.useEngineSound) {
+
+        this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
+
+        if (!!this.engineSound && this.useSoundEffects) {
             this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
         }
         for (let i = 0; i < 5; i++) {
@@ -671,7 +732,6 @@ export class LowPolyVehicle extends Vehicle {
         this.vector.setValue(pos.x, pos.y + 4, pos.z);
 
 
-
         this.rayer.set_m_rayFromWorld(this.vector)
         this.rayer.set_m_rayToWorld(this.vector2)
         this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
@@ -682,6 +742,35 @@ export class LowPolyVehicle extends Vehicle {
         }
         return groundY
     }
+
+
+
+    isTouchingGround(pos: Ammo.btVector3): boolean {
+
+        //     console.log("pos.x(), pos.y() - this.getVehicleYOffset(), pos.z()", pos.x(), pos.y() - this.getVehicleYOffset(), pos.z())
+        this.vector2.setValue(pos.x(), pos.y() + .1, pos.z());
+        this.vector.setValue(pos.x(), pos.y() - 2, pos.z());
+
+        this.rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2)
+        // this.rayer.set_m_rayFromWorld(this.vector)
+        // this.rayer.set_m_rayToWorld(this.vector2)
+        this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
+
+        if (this.rayer.hasHit()) {
+
+
+            const groundY = this.rayer.get_m_hitPointWorld().y()
+            //uu  console.log("groundY", groundY)
+            // console.log("hit", this.rayer.get_m_collisionObject().)
+            // console.log("pos.y(), groundY", pos.y().toFixed(2), groundY.toFixed(2), vehicleConfigs[this.vehicleType].wheelRadiusBack.toFixed(2))
+            // console.log("Math.abs(groundY - pos.y())", Math.abs(groundY - pos.y()), vehicleConfigs[this.vehicleType].wheelRadiusBack + .3)
+            return Math.abs(groundY - pos.y()) < vehicleConfigs[this.vehicleType].wheelRadiusBack + .3
+        } else {
+            return false
+        }
+    }
+
+
 
     setPosition(x: number | undefined, y: number | undefined, z: number | undefined) {
         const tm = this.vehicle.getChassisWorldTransform()

@@ -3,11 +3,11 @@
  */
 
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, Font, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Audio, AudioListener, Font, PerspectiveCamera, Quaternion, Vector3, PositionalAudio } from "three";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { loadEngineSoundBuffer } from "../sounds/gameSounds";
+import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
 import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
@@ -18,7 +18,7 @@ export interface IVehicleClassConfig {
     vehicleNumber: number
     vehicleType: VehicleType
     scene: IGameScene
-    useEngineSound?: boolean
+    useSoundEffects?: boolean
 }
 
 export class Vehicle implements IVehicle {
@@ -26,9 +26,12 @@ export class Vehicle implements IVehicle {
     name: string
     mass: number
     vehicleColor: number | string
-    useEngineSound: boolean
+    useSoundEffects: boolean
     engineSoundLoaded = false
     engineSound: Audio | undefined
+    skidSound: Audio | undefined
+    skidVolume: number
+
     camera: PerspectiveCamera
 
     badRotationTicks = 0
@@ -69,6 +72,7 @@ export class Vehicle implements IVehicle {
     isReady: boolean;
     vehicleNumber: number;
     vehicleType: VehicleType;
+
 
     goForward(moreSpeed?: boolean) { };
     goBackward(speed?: number) { };
@@ -114,7 +118,7 @@ export class Vehicle implements IVehicle {
         this.vehicleType = config.vehicleType
         this.vehicleNumber = config.vehicleNumber
         this.name = config.name
-        this.useEngineSound = config.useEngineSound
+        this.useSoundEffects = config.useSoundEffects
         this.scene = config.scene
         this.vehicleColor = config.vehicleColor
 
@@ -141,7 +145,7 @@ export class Vehicle implements IVehicle {
     }
 
     toggleSound(useSound: boolean) {
-        this.useEngineSound = useSound
+        this.useSoundEffects = useSound
         if (!this.engineSound) {
             console.warn("Engine sound not loaded")
             return
@@ -157,7 +161,7 @@ export class Vehicle implements IVehicle {
     startEngineSound() {
         if (this.isPaused) return
 
-        if (!this.engineSound?.isPlaying && this.useEngineSound) {
+        if (!this.engineSound?.isPlaying && this.useSoundEffects) {
             this.engineSound.play()
         }
     }
@@ -167,22 +171,61 @@ export class Vehicle implements IVehicle {
         this.camera.add(listener)
         let volume = 0.3
         this.engineSound = new Audio(listener)
+        const batch = []
+
+        batch.push(
+
+            loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
+                this.engineSound.setBuffer(engineSoundBuffer)
+                this.engineSound.setLoop(true)
+                this.engineSound.setVolume(volume)
+                this.engineSound.setLoopEnd(2.5)
 
 
-        loadEngineSoundBuffer((engineSoundBuffer: AudioBuffer) => {
-            this.engineSound.setBuffer(engineSoundBuffer)
-            this.engineSound.setLoop(true)
-            this.engineSound.setVolume(volume)
-            this.engineSound.setLoopEnd(2.5)
+                /**
+                 * some bug here
+                 * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
+                 */
+                this.stopEngineSound()
+            })
+        )
+
+        this.skidSound = new Audio(listener)
+        batch.push(
+
+            loadSkidSoundBuffer().then(buffer => {
+                this.skidSound.setBuffer(buffer)
+                //   this.skidSound.setRefDistance(3)
+                this.skidSound.setLoop(false)
+                this.skidSound.setVolume(1)
+                //   this.skidSound.duration = .2
+
+                this.skidVolume = 0
+            })
+        )
+
+        Promise.all(batch).then(() => {
+            console.log("all sounds loaded")
             this.engineSoundLoaded = true
-
-            /**
-             * some bug here
-             * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
-             */
-            this.stopEngineSound()
         })
     }
 
+    playSkidSound(skid: number) {
+        if (!this.skidSound || !this.useSoundEffects || this.isPaused) return
+        if (skid < 0.8) {
+
+            this.skidVolume += 0.01
+            this.skidVolume = Math.min(1, this.skidVolume)
+            this.skidSound.setVolume(this.skidVolume)
+            if (!this.skidSound.isPlaying) {
+                this.skidSound.play()
+            } else {
+                this.skidSound.isPlaying
+            }
+        } else if (this.skidSound.isPlaying) {
+            this.skidVolume = 0
+            this.skidSound?.stop()
+        }
+    }
 
 }
