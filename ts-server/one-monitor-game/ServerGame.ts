@@ -163,7 +163,6 @@ export default class RoomMaster {
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
             if (isTestMode) {
-
                 if (onMobile) {
                     this.testRoom.setMobileSocket(socket)
                 } else {
@@ -347,13 +346,13 @@ export class Room {
             }
         }
 
-
         if (this.gameStarted) {
             if (!playerExists) {
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
             } else {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)
+                console.log("Player reconnected", player.playerName)
                 this.playerReconnected()
                 player.onReconnection()
             }
@@ -506,6 +505,7 @@ export class Room {
     }
 
     playerReconnected() {
+
 
         if (this.players.length === 1) {
             this.players[0].setLeader()

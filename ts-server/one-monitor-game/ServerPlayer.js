@@ -4,10 +4,10 @@ exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var Player = /** @class */ (function () {
     function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings) {
-        var _a;
+        var _a, _b;
         this.playerName = playerName;
         this.teamNumber = 1;
-        this.vehicleType = (_a = userSettings.vehicleSettings.vehicleType) !== null && _a !== void 0 ? _a : "normal2";
+        this.vehicleType = (_b = (_a = userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings) === null || _a === void 0 ? void 0 : _a.vehicleType) !== null && _b !== void 0 ? _b : "normal2";
         this.id = id;
         this.isAuthenticated = isAuthenticated;
         this.isLeader = false;
@@ -117,6 +117,7 @@ var Player = /** @class */ (function () {
     Player.prototype.setupDisconnectListener = function () {
         var _this = this;
         this.socket.on("disconnect", function () {
+            console.log("Player Socket disconnected", _this.playerName);
             _this.isConnected = false;
             if (_this.game) {
                 _this.game.playerDisconnected(_this.playerName, _this.id);

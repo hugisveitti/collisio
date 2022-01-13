@@ -276,6 +276,7 @@ var Room = /** @class */ (function () {
             else {
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
                 player.socket.emit(shared_stuff_1.stmd_game_starting);
+                console.log("Player reconnected", player.playerName);
                 this.playerReconnected();
                 player.onReconnection();
             }

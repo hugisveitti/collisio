@@ -115,7 +115,6 @@ const GameRoom = (props: IGameRoom) => {
   };
 
   if (!props.store.socket && !inTestMode) {
-    toast.error("No room connected");
     history.push(frontPagePath);
     return null;
   }
@@ -140,7 +139,6 @@ const GameRoom = (props: IGameRoom) => {
 
     if (!props.store.roomId && !inTestMode) {
       history.push(frontPagePath);
-      toast.warn("No room connection found.");
       return null;
     }
 

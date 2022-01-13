@@ -27,7 +27,7 @@ exports.vehicleColors = [
     },
     {
         name: "Gray", value: "#97b0ba"
-    }
+    },
 ];
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {

@@ -64,7 +64,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   if (!props.store?.roomId && !inTestMode) {
     history.push(frontPagePath);
-    toast.warn("No room connection found.");
     return null;
   }
 
@@ -95,6 +94,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
     props.store.socket.on(stm_desktop_disconnected, () => {
       toast.error("Game disconnected");
+      props.store.socket.disconnect();
+      props.store.setSocket(undefined);
       history.push(frontPagePath);
       /** go to front page? */
     });

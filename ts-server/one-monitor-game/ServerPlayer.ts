@@ -31,7 +31,7 @@ export class Player {
 
         this.playerName = playerName
         this.teamNumber = 1
-        this.vehicleType = userSettings.vehicleSettings.vehicleType ?? "normal2"
+        this.vehicleType = userSettings?.vehicleSettings?.vehicleType ?? "normal2"
         this.id = id
         this.isAuthenticated = isAuthenticated
         this.isLeader = false
@@ -146,6 +146,7 @@ export class Player {
 
     setupDisconnectListener() {
         this.socket.on("disconnect", () => {
+            console.log("Player Socket disconnected", this.playerName)
             this.isConnected = false
             if (this.game) {
                 this.game.playerDisconnected(this.playerName, this.id)

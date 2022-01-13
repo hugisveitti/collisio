@@ -27,7 +27,6 @@ var express = require("express");
 var path = __importStar(require("path"));
 var si = __importStar(require("systeminformation"));
 var fs = __importStar(require("fs"));
-var socket_io_1 = require("socket.io");
 var app = express();
 // promises style - new since version 3
 si.cpu()
@@ -40,15 +39,16 @@ si.cpu()
 var byteToGig = function (byte) {
     return byte / (Math.pow(1024, 3));
 };
-si.mem()
-    .then(function (data) {
-    console.log("####Memory Info#####");
-    console.log("Total", byteToGig(data.total).toFixed(2));
-    console.log("Free", byteToGig(data.free).toFixed(2));
-    console.log("#####END Memory INFO#####");
-})
-    .catch(function (error) { return console.error(error); });
-console.log("Max event listeners", socket_io_1.Socket.EventEmitter.defaultMaxListeners);
+var printMemoryInfo = function () {
+    si.mem()
+        .then(function (data) {
+        console.log("#### Memory Info #####");
+        console.log("Total", byteToGig(data.total).toFixed(2), ", Free:", byteToGig(data.free).toFixed(2));
+        console.log("##### END Memory INFO #####");
+    })
+        .catch(function (error) { return console.error(error); });
+};
+printMemoryInfo();
 var port = process.env.PORT || 80;
 var os = __importStar(require("os"));
 /** only works on my PC */
@@ -164,6 +164,7 @@ var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket);
+    printMemoryInfo();
     socket.once(shared_stuff_1.mdts_number_connected, function () {
         socket.emit(shared_stuff_1.stmd_number_connected, { data: roomMaster.getStats() });
     });

@@ -9,6 +9,7 @@ import { Socket } from "socket.io";
 
 const app = express()
 // promises style - new since version 3
+
 si.cpu()
     .then(data => {
         console.log("####CPU Info#####")
@@ -21,16 +22,18 @@ const byteToGig = (byte: number) => {
     return byte / (1024 ** 3)
 }
 
-si.mem()
-    .then(data => {
-        console.log("####Memory Info#####")
-        console.log("Total", byteToGig(data.total).toFixed(2))
-        console.log("Free", byteToGig(data.free).toFixed(2))
-        console.log("#####END Memory INFO#####")
-    })
-    .catch(error => console.error(error));
+const printMemoryInfo = () => {
 
-console.log("Max event listeners", Socket.EventEmitter.defaultMaxListeners)
+    si.mem()
+        .then(data => {
+            console.log("#### Memory Info #####")
+            console.log("Total", byteToGig(data.total).toFixed(2), ", Free:", byteToGig(data.free).toFixed(2))
+            console.log("##### END Memory INFO #####")
+        })
+        .catch(error => console.error(error));
+}
+
+printMemoryInfo()
 
 let port = process.env.PORT || 80
 import * as os from "os"
@@ -196,7 +199,7 @@ const roomMaster = new RoomMaster(io)
 io.on("connection", (socket: Socket) => {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket)
-
+    printMemoryInfo()
     socket.once(mdts_number_connected, () => {
         socket.emit(stmd_number_connected, { data: roomMaster.getStats() })
     })
