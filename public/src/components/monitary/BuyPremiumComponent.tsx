@@ -23,9 +23,9 @@ import {
 } from "../../classes/Game";
 import AppContainer from "../../containers/AppContainer";
 import { basicColor, premiumColor, standardColor } from "../../providers/theme";
+import { defaultVehicleType } from "../../shared-backend/shared-stuff";
 import {
   activeVehicleTypes,
-  defaultVehicleType,
   getVehicleNameFromType,
 } from "../../vehicles/VehicleConfigs";
 import { frontPagePath } from "../Routes";

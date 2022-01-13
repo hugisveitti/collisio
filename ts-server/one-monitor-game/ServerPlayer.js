@@ -3,10 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var Player = /** @class */ (function () {
-    function Player(socket, playerName, id, isAuthenticated, photoURL) {
+    function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings) {
+        var _a;
         this.playerName = playerName;
         this.teamNumber = 1;
-        this.vehicleType = "normal2";
+        this.vehicleType = (_a = userSettings.vehicleSettings.vehicleType) !== null && _a !== void 0 ? _a : "normal2";
         this.id = id;
         this.isAuthenticated = isAuthenticated;
         this.isLeader = false;
@@ -14,7 +15,7 @@ var Player = /** @class */ (function () {
         this.VehicleControls = new shared_stuff_1.VehicleControls();
         this.isConnected = true;
         this.photoURL = photoURL;
-        this.userSettings = undefined;
+        this.userSettings = userSettings;
         this.setSocket(socket);
     }
     /**
@@ -132,9 +133,9 @@ var Player = /** @class */ (function () {
         this.game = game;
     };
     Player.prototype.setupReconnectListener = function () {
-        this.socket.on("player-reconnect", function () {
-            console.log("player reconnected not implemented");
-        });
+        // this.socket.on("player-reconnect", () => {
+        //  //   console.log("player reconnected not implemented")
+        // })
     };
     Player.prototype.setupControler = function () {
         var _this = this;
@@ -159,6 +160,11 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.getPlayerControls = function () {
         return { mobileControls: this.mobileControls, playerNumber: this.playerNumber };
+    };
+    Player.prototype.onReconnection = function () {
+        if (this.game) {
+            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber });
+        }
     };
     Player.prototype.setupUserSettingsListener = function () {
         var _this = this;

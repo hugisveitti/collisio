@@ -105,7 +105,7 @@ const TestApp = () => {
           </Switch>
         </Router>
       </UserProvider>
-      <ToastContainer />
+      <ToastContainer limit={3} pauseOnFocusLoss={false} />
     </React.Fragment>
   );
 };

@@ -9,15 +9,12 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
-import { IPlayerConnection } from "../../classes/Game";
-import {
-  getLocalStorageItem,
-  saveLocalStorageItem,
-} from "../../classes/localStorage";
+import { getLocalStorageItem } from "../../classes/localStorage";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_create_room,
+  IPlayerConnectedData,
   mts_player_connected,
   std_room_created_callback,
   stm_player_connected_callback,
@@ -110,13 +107,15 @@ const ConnectToWaitingRoomComponent = (
   ) => {
     setConnectingToRoom(true);
 
+    console.log("connect to room mobile, store", props.store);
     socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
       photoURL: user?.photoURL,
-    } as IPlayerConnection);
+      userSettings: props.store.userSettings,
+    } as IPlayerConnectedData);
 
     socket.once(stm_player_connected_callback, (response: ISocketCallback) => {
       if (response.status === "error") {

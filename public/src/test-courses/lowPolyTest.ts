@@ -9,14 +9,14 @@ import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { GameType, MobileControls, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { GhostVehicle, IGhostVehicle } from "../vehicles/GhostVehicle"
 import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
 import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
-import { allVehicleTypes, defaultVehicleType, getVehicleClassFromType, possibleVehicleColors } from "../vehicles/VehicleConfigs"
+import { allVehicleTypes, getVehicleClassFromType } from "../vehicles/VehicleConfigs"
 import { getWagonNumber, isWagon } from "../vehicles/Wagon"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
@@ -629,7 +629,7 @@ export class LowPolyTestScene extends GameScene {
 
         this.vehicleColorNumber += 1
 
-        this.vehicle = new LowPolyTestVehicle(this, possibleVehicleColors[this.vehicleColorNumber], "test hugi", 0, this.vehicleType, true)
+        this.vehicle = new LowPolyTestVehicle(this, vehicleColors[this.vehicleColorNumber].value, "test hugi", 0, this.vehicleType, true)
         this.createTestVehicle()
 
     }

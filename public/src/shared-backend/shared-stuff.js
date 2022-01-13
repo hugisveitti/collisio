@@ -1,6 +1,34 @@
 "use strict";
+/**
+ * Here is stuff the backend also uses
+ * I put this in one file since the backend will generate a .js file which
+ * is useless to the front end.
+ * So this limits the .js to one file.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MTS_SENDINTERVAL_MS = exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = void 0;
+exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = exports.vehicleColors = exports.defaultVehicleType = void 0;
+exports.MTS_SENDINTERVAL_MS = void 0;
+exports.defaultVehicleType = "normal2";
+exports.vehicleColors = [
+    {
+        name: "Green", value: "#1d8a47",
+    },
+    {
+        name: "Red", value: "#8b0000"
+    },
+    {
+        name: "Blue", value: "#185676",
+    },
+    {
+        name: "Orange", value: "#fda000"
+    },
+    {
+        name: "Light green", value: "#61f72a"
+    },
+    {
+        name: "Gray", value: "#97b0ba"
+    }
+];
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
         this.beta = 0;
@@ -47,17 +75,9 @@ var playerInfoToPreGamePlayerInfo = function (playerInfo) {
 };
 exports.playerInfoToPreGamePlayerInfo = playerInfoToPreGamePlayerInfo;
 var GameActions = /** @class */ (function () {
-    // changeTrack: TrackName | undefined
-    // toggleSound: boolean
-    // toggleShadows: boolean
-    // numberOfLaps: number | undefined
     function GameActions() {
         this.pause = false;
         this.restart = false;
-        // this.changeTrack = undefined
-        // this.toggleShadows = false
-        // this.toggleSound = false
-        // this.numberOfLaps = undefined
     }
     return GameActions;
 }());

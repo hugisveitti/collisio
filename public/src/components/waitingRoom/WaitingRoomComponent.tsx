@@ -13,29 +13,20 @@ import { IUser, IVehicleSettings } from "../../classes/User";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { checkIfCanStartGame } from "../../functions/validationFunctions";
 import { green4 } from "../../providers/theme";
-import {
-  IPlayerInfo,
-  std_start_game_callback,
-  VehicleType,
-} from "../../shared-backend/shared-stuff";
+import { std_start_game_callback } from "../../shared-backend/shared-stuff";
 import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
-import {
-  sendPlayerInfoChanged,
-  socketHandleStartGame,
-} from "../../utils/socketFunctions";
-import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import { socketHandleStartGame } from "../../utils/socketFunctions";
 import CopyTextButton from "../inputs/CopyTextButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import VehicleSelect from "../inputs/VehicleSelect";
 import { gameRoomPath, tournamentPagePath } from "../Routes";
+import GameSettingsComponent from "../settings/GameSettingsContainer";
+import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
 import FindActiveTournamentsComponent from "../tournament/inputs/FindActiveTournamentsComponent";
-import GameSettingsComponent from "../settings/GameSettingsContainer";
 import WaitingRoomPlayerList from "./WaitingRoomPlayerList";
-import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 
 interface IWaitingRoomProps {
   socket: Socket;
@@ -82,26 +73,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       props.store.socket.off(std_start_game_callback);
     };
   }, []);
-
-  const updateUserVehicleSettings = (
-    key: keyof IVehicleSettings,
-    value: any
-  ) => {
-    const newVehcileSettings = props.store.userSettings.vehicleSettings;
-    // @ts-ignore
-    newVehcileSettings[key] = value;
-
-    const newUserSettings = {
-      ...props.store.userSettings,
-      vehicleSettings: newVehcileSettings,
-    };
-
-    props.store.setUserSettings(newUserSettings);
-
-    if (user?.uid) {
-      setDBUserSettings(user.uid, newUserSettings);
-    }
-  };
 
   const { canStartGame, message: startGameMessage } = checkIfCanStartGame(
     props.store

@@ -2,15 +2,14 @@ import { ExtendedObject3D, Scene3D } from "enable3d";
 import { Euler, Object3D, Vector3 } from "three";
 import { GameScene } from '../game/GameScene';
 import { TrackName } from "../shared-backend/shared-stuff";
-import { possibleVehicleColors } from '../vehicles/VehicleConfigs';
 import { Course } from "./Course";
 import { ITagCourse } from "./ICourse";
 
-export const itColor = possibleVehicleColors[2]
-export const notItColor = possibleVehicleColors[1]
-export const freezeColor = possibleVehicleColors[0]
+export const itColor = "#FF8000"
+export const notItColor = "#8B0000"
+export const freezeColor = 0x1d8a47
 /** a chocolate cannot be it */
-export const chocolateColor = possibleVehicleColors[3]
+export const chocolateColor = 0x61f72a
 
 export class Coin {
 

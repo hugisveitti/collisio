@@ -1,4 +1,5 @@
 import { Socket } from "socket.io"
+import { IUserSettings } from "../../public/src/classes/User"
 import {
     IPlayerInfo, mdts_game_settings_changed, mdts_left_waiting_room, mdts_start_game, MobileControls, mts_connected_to_waiting_room, mts_controls, mts_game_data_info, mts_ping_test, mts_send_game_actions, mts_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stm_desktop_disconnected, stm_game_finished, stm_game_settings_changed_callback, stm_ping_test_callback, stm_player_finished, stm_player_info, VehicleControls
 } from "../../public/src/shared-backend/shared-stuff"
@@ -26,11 +27,11 @@ export class Player {
     photoURL
     userSettings: any
 
-    constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string) {
+    constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string, userSettings: IUserSettings) {
 
         this.playerName = playerName
         this.teamNumber = 1
-        this.vehicleType = "normal2"
+        this.vehicleType = userSettings.vehicleSettings.vehicleType ?? "normal2"
         this.id = id
         this.isAuthenticated = isAuthenticated
         this.isLeader = false
@@ -39,7 +40,7 @@ export class Player {
         this.VehicleControls = new VehicleControls()
         this.isConnected = true
         this.photoURL = photoURL
-        this.userSettings = undefined
+        this.userSettings = userSettings
 
         this.setSocket(socket)
     }
@@ -165,9 +166,9 @@ export class Player {
     }
 
     setupReconnectListener() {
-        this.socket.on("player-reconnect", () => {
-            console.log("player reconnected not implemented")
-        })
+        // this.socket.on("player-reconnect", () => {
+        //  //   console.log("player reconnected not implemented")
+        // })
     }
 
     setupControler() {
@@ -195,6 +196,12 @@ export class Player {
     getPlayerControls() {
         return { mobileControls: this.mobileControls, playerNumber: this.playerNumber }
 
+    }
+
+    onReconnection() {
+        if (this.game) {
+            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber })
+        }
     }
 
     setupUserSettingsListener() {

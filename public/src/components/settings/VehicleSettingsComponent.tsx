@@ -9,11 +9,13 @@ import CollabsibleCard from "../../components/inputs/CollapsibleCard";
 import VehicleSelect from "../../components/inputs/VehicleSelect";
 import { IStore } from "../../components/store";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
-import { mts_user_settings_changed } from "../../shared-backend/shared-stuff";
+import {
+  mts_user_settings_changed,
+  vehicleColors,
+} from "../../shared-backend/shared-stuff";
 import {
   getVehicleColorOption,
   nonactiveVehcileTypes,
-  vehicleColors,
 } from "../../vehicles/VehicleConfigs";
 import AnySelect from "../inputs/AnySelect";
 

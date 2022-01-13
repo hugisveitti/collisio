@@ -1,8 +1,7 @@
 import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
-import { VehicleType } from "../../shared-backend/shared-stuff"
+import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
 import { getDeviceType } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
-import { possibleVehicleColors } from "../../vehicles/VehicleConfigs"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
     loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
@@ -10,7 +9,7 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
             (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
         } else {
-            (chassis.material as MeshStandardMaterial).color = new Color(possibleVehicleColors[chassisNum % possibleVehicleColors.length]);
+            (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
         }
         scene.add(chassis)
 

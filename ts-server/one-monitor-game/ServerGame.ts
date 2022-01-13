@@ -30,7 +30,8 @@ import {
     dts_game_settings_changed_callback,
     stm_game_settings_changed_callback,
     dts_back_to_waiting_room,
-    STD_SENDINTERVAL_MS
+    STD_SENDINTERVAL_MS,
+    IPlayerConnectedData
 } from "../../public/src/shared-backend/shared-stuff";
 import { removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
@@ -107,23 +108,15 @@ export default class RoomMaster {
 
 
     setupPlayerConnectedListener(mobileSocket: Socket) {
-        interface IPlayerConnectedData {
-            roomId: string
-            playerName: string
-            playerId: string
-            isAuthenticated: boolean
-            photoURL: string
-            isStressTest?: boolean
-        }
 
-        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest }: IPlayerConnectedData) => {
+        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings }: IPlayerConnectedData) => {
 
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
-            } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted) {
+            } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted && !this.rooms[roomId].playerIsInRoom(playerId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
             } else {
-                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL)
+                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings)
                 this.rooms[roomId].addPlayer(player)
             }
         })
@@ -335,6 +328,13 @@ export class Room {
         })
     }
 
+    playerIsInRoom(playerId: string) {
+        for (let p of this.players) {
+            if (p.id === playerId) return true
+        }
+        return false
+    }
+
     addPlayer(player: Player) {
         let playerExists = false
 
@@ -355,6 +355,7 @@ export class Room {
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } })
                 player.socket.emit(stmd_game_starting)
                 this.playerReconnected()
+                player.onReconnection()
             }
             return
         }
@@ -513,6 +514,7 @@ export class Room {
         if (!this.sendingControls) {
             this.setupControlsListener()
         }
+
     }
 
     everyoneDisconnected() {

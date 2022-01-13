@@ -9,14 +9,14 @@ import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
-import { VehicleType } from "../../shared-backend/shared-stuff";
+import {
+  defaultVehicleType,
+  vehicleColors,
+  VehicleType,
+} from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { itemInArray } from "../../utils/utilFunctions";
-import {
-  allVehicleTypes,
-  defaultVehicleType,
-  possibleVehicleColors,
-} from "../../vehicles/VehicleConfigs";
+import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
 import { buyPremiumPagePath } from "../Routes";
 import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
 
@@ -48,7 +48,6 @@ const ShowRoomComponent = (props: IShowRoom) => {
     };
   }, []);
 
-  possibleVehicleColors;
   useEffect(() => {
     const renderer = createShowRoomCanvas(
       props.vehcileType ??
@@ -155,7 +154,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
               <IconButton
                 onClick={() => {
                   if (chassisNum === 0) {
-                    setChassisNum(possibleVehicleColors.length - 1);
+                    setChassisNum(vehicleColors.length - 1);
                   } else {
                     setChassisNum(chassisNum - 1);
                   }

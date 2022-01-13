@@ -4,6 +4,9 @@
  * is useless to the front end.
  * So this limits the .js to one file.
  */
+
+import { IUserSettings } from "../classes/User"
+
 /** trackName.gltf */
 export type TrackName =
     "farm-track"
@@ -32,8 +35,43 @@ export type VehicleType = "normal"
     | "simpleSphere"
     | "gokart"
 
+export const defaultVehicleType: VehicleType = "normal2"
+
 export type GameType = "ball" | "race" | "tag" | "story"
 
+export interface VehicleColor {
+    name: string, value: string
+}
+export const vehicleColors: VehicleColor[] = [
+    {
+        name: "Green", value: "#1d8a47",
+    },
+    {
+        name: "Red", value: "#8b0000"
+    },
+    {
+        name: "Blue", value: "#185676",
+    },
+    {
+        name: "Orange", value: "#fda000"
+    },
+    {
+        name: "Light green", value: "#61f72a"
+    },
+    {
+        name: "Gray", value: "#97b0ba"
+    }
+]
+
+export interface IPlayerConnectedData {
+    roomId: string
+    playerName: string
+    playerId: string
+    isAuthenticated: boolean
+    photoURL: string
+    isStressTest?: boolean
+    userSettings: IUserSettings
+}
 
 
 export class MobileControls {
@@ -100,7 +138,6 @@ export interface IPreGamePlayerInfo {
     isAuthenticated: boolean
     vehicleType: VehicleType
     photoURL: string
-
 }
 
 
@@ -133,6 +170,8 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
     }
 }
 
+
+
 /**
  * these actions are sent from mobile to server to desktop
  * to e.g. pause the game from mobile or restart the game
@@ -149,18 +188,10 @@ interface IGameActions {
 export class GameActions implements IGameActions {
     pause: boolean
     restart: boolean
-    // changeTrack: TrackName | undefined
-    // toggleSound: boolean
-    // toggleShadows: boolean
-    // numberOfLaps: number | undefined
 
     constructor() {
         this.pause = false
         this.restart = false
-        // this.changeTrack = undefined
-        // this.toggleShadows = false
-        // this.toggleSound = false
-        // this.numberOfLaps = undefined
     }
 }
 

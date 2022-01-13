@@ -16,7 +16,7 @@ ReactDOM.render(
     <ThemeProvider theme={themeOptions}>
       <Routes />
       <CookiePrompt />
-      <ToastContainer />
+      <ToastContainer limit={3} pauseOnFocusLoss={false} />
     </ThemeProvider>
   </UserProvider>,
   document.getElementById("root")

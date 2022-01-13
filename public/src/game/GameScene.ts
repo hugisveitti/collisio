@@ -7,14 +7,14 @@ import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../cl
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
 import { getBeep } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
-import { getVehicleClassFromType, possibleVehicleColors } from '../vehicles/VehicleConfigs';
+import { getVehicleClassFromType } from '../vehicles/VehicleConfigs';
 import { getWagonNumber, Wagon } from "../vehicles/Wagon";
 import { WagonType } from "../vehicles/WagonConfigs";
 import "./game-styles.css";
@@ -400,7 +400,7 @@ export class GameScene extends Scene3D implements IGameScene {
     async createExtraVehicles(vehicleTypes: VehicleType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
         const batch: Promise<IVehicle>[] = []
         for (let i = 0; i < vehicleTypes.length; i++) {
-            batch.push(this.createVehicle(vehicleTypes[i], possibleVehicleColors[0], `extra-vehicle-${i}`, i + this.players.length))
+            batch.push(this.createVehicle(vehicleTypes[i], vehicleColors[0].value, `extra-vehicle-${i}`, i + this.players.length))
         }
 
         Promise.all(batch).then(vehicles => {
@@ -450,7 +450,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
             const batches = []
             for (let i = 0; i < this.players.length; i++) {
-                const vehicleColor = possibleVehicleColors[chassisColOffset + i]
+                const vehicleColor = vehicleColors[chassisColOffset + i].value
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {

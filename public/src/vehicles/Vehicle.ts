@@ -108,8 +108,38 @@ export class Vehicle implements IVehicle {
     setFont(font: Font) { };
     lookForwardsBackwards(lookBackwards: boolean) { };
     resetPosition() { };
-    setCheckpointPositionRotation(positionRotation: IPositionRotation) { };
-    updateVehicleSettings(vehicleSettings: IVehicleSettings) { };
+    setCheckpointPositionRotation(positionRotation: IPositionRotation) {
+        this.checkpointPositionRotation = positionRotation
+    };
+
+    updateVehicleSettings(vehicleSettings: IVehicleSettings) {
+        console.log("vehicle settings updated", vehicleSettings)
+        this.vehicleSettings =
+        {
+            ...defaultVehicleSettings,
+            ...vehicleSettings
+        }
+
+        if (this.vehicleSettings.vehicleType !== this.vehicleType) {
+            this.scene.setNeedsReload(true)
+        }
+
+        const keys = Object.keys(vehicleSettings)
+        for (let key of keys) {
+            if (vehicleSettings[key] !== undefined) {
+                this[key] = vehicleSettings[key]
+            }
+        }
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
+
+        if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
+            this.setColor(this.vehicleColor)
+        }
+        this._updateVehicleSettings()
+    };
+
+    _updateVehicleSettings() { }
+
     setColor(color: string | number) { };
     destroy() { };
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) { };
@@ -211,7 +241,7 @@ export class Vehicle implements IVehicle {
     }
 
     playSkidSound(skid: number) {
-        if (!this.skidSound || !this.useSoundEffects || this.isPaused) return
+        if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this.canDrive) return
         if (skid < 0.8) {
 
             this.skidVolume += 0.01

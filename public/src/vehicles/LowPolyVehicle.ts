@@ -863,28 +863,9 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.resetVehicleCallback(this.vehicleNumber)
     };
 
-    setCheckpointPositionRotation(positionRotation: IPositionRotation) {
-        this.checkpointPositionRotation = positionRotation
-    };
 
-    updateVehicleSettings(vehicleSettings: IVehicleSettings) {
-        this.vehicleSettings =
-        {
-            ...defaultVehicleSettings,
-            ...vehicleSettings
-        }
+    _updateVehicleSettings() {
 
-        if (this.vehicleSettings.vehicleType !== this.vehicleType) {
-            this.scene.setNeedsReload(true)
-        }
-
-        const keys = Object.keys(vehicleSettings)
-        for (let key of keys) {
-            if (vehicleSettings[key] !== undefined) {
-                this[key] = vehicleSettings[key]
-            }
-        }
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
         this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
@@ -894,9 +875,6 @@ export class LowPolyVehicle extends Vehicle {
             this.camera.updateProjectionMatrix()
         }
 
-        if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
-            this.setColor(this.vehicleColor)
-        }
     };
 
     async destroy() {

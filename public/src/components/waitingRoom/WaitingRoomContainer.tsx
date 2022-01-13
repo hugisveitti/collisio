@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { v4 as uuid } from "uuid";
-import { IPlayerConnection, IRoomInfo } from "../../classes/Game";
+import { IRoomInfo } from "../../classes/Game";
 import {
   IGameSettings,
   setLocalGameSetting,
@@ -17,12 +17,14 @@ import { saveLocalStorageItem } from "../../classes/localStorage";
 import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
+  getDBUserSettings,
   removeFromAvailableRooms,
   saveRoom,
 } from "../../firebase/firestoreFunctions";
 import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
+  IPlayerConnectedData,
   IPlayerInfo,
   mdts_left_waiting_room,
   mdts_players_in_room,
@@ -69,15 +71,6 @@ let toSavePlayers = [];
 let toSaveRoomId = "";
 let toSaveGameSettings = {};
 
-// window.addEventListener(
-//   "beforeunload",
-//   () => {
-//     console.log("unload");
-//     alert("unload");
-//   },
-//   true
-// );
-
 const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const [userLoading, setUserLoading] = useState(true);
   const [displayNameModalOpen, setDisplayNameModalOpen] = useState(false);
@@ -90,20 +83,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
-
-  /**
-   * this suddenly doesnt work...
-   */
-  // window.addEventListener("beforeunload", (ev) => {
-  //   ev.preventDefault();
-  //   console.log("unload");
-  //   alert("unload");
-  //   if (user && !onMobile) {
-  //     removeFromAvailableRooms(user.uid);
-  //   }
-  //   //ev.returnValue = null;
-  //   return ""; //((ev.returnValue = null));
-  // });
 
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
@@ -134,15 +113,31 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     );
   };
 
-  const connectToRoom = (_displayName: string) => {
+  const connectToRoom = async (
+    _displayName: string,
+    gottenFromURL?: boolean
+  ) => {
+    console.log("user", user);
     setConnectingGuest(true);
+    let userSettings = props.store.userSettings;
+    console.log("gotten from url", gottenFromURL);
+    if (gottenFromURL && user) {
+      // need to get user setting
+      userSettings = await getDBUserSettings(user.uid);
+      props.store.setUserSettings(userSettings);
+      console.log("userset", userSettings);
+    }
+
+    console.log("store", props.store);
+    // send user settings
     props.store.socket.emit(mts_player_connected, {
       roomId,
       playerName: _displayName,
       playerId: user?.uid ?? uuid(),
       isAuthenticated: Boolean(user),
       photoURL: user?.photoURL,
-    } as IPlayerConnection);
+      userSettings,
+    } as IPlayerConnectedData);
     props.store.socket.once(
       stm_player_connected_callback,
       (response: ISocketCallback) => {
@@ -176,7 +171,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         /** if gotten here through url */
         /** shouldnt we catch this in the connect to room container */
         connectToRoom(
-          user?.displayName ?? "Guest" + Math.floor(Math.random() * 20)
+          user?.displayName ?? "Guest" + Math.floor(Math.random() * 20),
+          true
         );
       }
 

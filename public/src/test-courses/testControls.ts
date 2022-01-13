@@ -2,7 +2,6 @@ import { Socket } from "socket.io-client"
 import { IVehicle } from "../vehicles/IVehicle"
 import { toast } from "react-toastify"
 import { MobileControls, MTS_SENDINTERVAL_MS, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
-import { vehicleColors } from "../vehicles/VehicleConfigs"
 
 
 let speed = 40

@@ -69,12 +69,8 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D): void {
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-
-
         this.isReady = false
 
-        this.scene.physics.destroy(this.vehicleBody)
-        this.scene.scene.remove(this.vehicleBody)
 
         this.vehicleBody = body.clone()
 
@@ -365,37 +361,8 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.scene.resetVehicleCallback(this.vehicleNumber)
     }
 
-    setCheckpointPositionRotation(positionRotation: IPositionRotation): void {
-        this.checkpointPositionRotation = positionRotation
-    }
 
-    updateVehicleSettings(vehicleSettings: IVehicleSettings): void {
-        this.vehicleSettings = vehicleSettings
-
-        if (this.vehicleSettings.vehicleType !== this.vehicleType) {
-            this.scene.setNeedsReload(true)
-        }
-
-        const keys = Object.keys(vehicleSettings)
-        for (let key of keys) {
-            if (vehicleSettings[key] !== undefined) {
-                this[key] = vehicleSettings[key]
-            }
-        }
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-
-        // this.vehicleBody.remove(this.camera)
-        // if (!this.useChaseCamera && this.camera) {
-        //     const { x, y, z } = staticCameraPos
-        //     this.camera.position.set(x, y, z)
-        //     this.vehicleBody.add(this.camera)
-        // }
-        // if (this.scene instanceof RaceGameScene) {
-        if (this.scene.gameSceneConfig.gameSettings.gameType === "race") {
-            this.setColor(this.vehicleColor)
-        }
-        //}
-
+    _updateVehicleSettings(): void {
     }
 
 

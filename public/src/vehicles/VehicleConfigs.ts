@@ -1,39 +1,7 @@
 import { Vector3 } from "three";
-import { green4, red1, red2 } from "../providers/theme";
-import { VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleColor, vehicleColors, VehicleType } from "../shared-backend/shared-stuff";
 import { degToRad, itemInArray } from "../utils/utilFunctions";
 import { SimpleVector } from "./IVehicle";
-
-
-
-// #FF8000 is orange
-// #08B0000 is red
-//  0x1d8a47 is green
-export const possibleVehicleColors = [0x1d8a47, "#8B0000", "#FF8000", 0x61f72a, "#FF8000", green4]
-
-interface VehicleColor {
-    name: string, value: string
-}
-export const vehicleColors: VehicleColor[] = [
-    {
-        name: "Green", value: "#1d8a47",
-    },
-    {
-        name: "Red", value: "#8b0000"
-    },
-    {
-        name: "Blue", value: "#185676",
-    },
-    {
-        name: "Orange", value: "#fda000"
-    },
-    {
-        name: "Light green", value: "#61f72a"
-    },
-    {
-        name: "Gray", value: "#97b0ba"
-    }
-]
 
 export const getVehicleColorOption = (value: string): VehicleColor => {
     for (let option of vehicleColors) {
@@ -67,8 +35,6 @@ export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass 
     }
     return "LowPoly"
 }
-
-export const defaultVehicleType: VehicleType = "normal2"
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
 
@@ -307,7 +273,7 @@ export const vehicleConfigs = {
     },
     f1: {
         ...defaultVehicleConfig,
-        path: "F1-car.gltf",
+        path: "F1-car.glb",
 
         wheelAxisBackPosition: -2.65,
         wheelRadiusBack: 0.95 / 2,
@@ -375,6 +341,7 @@ export const vehicleConfigs = {
         engineForce: 2500,
         frictionSlip: 27.5,
         path: "gokart.glb",
+        maxSteeringAngle: 20 * degToRad
     },
     simpleSphere: {
         ...defaultVehicleConfig,

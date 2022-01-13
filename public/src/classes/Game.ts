@@ -5,6 +5,7 @@ import { TagGameScene } from "../game/TagGameScene";
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
+import { IUserSettings } from "./User";
 
 export const numberOfLapsPossibilities = [1, 2, 3, 5, 7, 13]
 
@@ -208,17 +209,6 @@ export const getDefaultTrackFromGameType = (gameType: GameType) => {
             return defaultRaceTrack
     }
 }
-
-export interface IPlayerConnection {
-    playerName: string
-    playerId: string
-    roomId: string
-    /** auth */
-    isAuthenticated: boolean
-}
-
-
-
 
 // info about individual players
 export interface IEndOfRaceInfoPlayer {
