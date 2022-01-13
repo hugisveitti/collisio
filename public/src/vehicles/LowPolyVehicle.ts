@@ -694,7 +694,7 @@ export class LowPolyVehicle extends Vehicle {
             // this.tm.setOrigin(this.p)
             // this.vehicle.getRigidBody().setWorldTransform
 
-            this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
+            //  this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
             //    this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
 

@@ -347,6 +347,7 @@ export const vehicleConfigs = {
         suspensionStiffness: 75,
         suspensionDamping: 5,
         maxSuspensionTravelCm: 500,
+        maxSpeed: 270,
 
 
         mass: 200,
