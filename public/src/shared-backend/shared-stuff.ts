@@ -34,6 +34,7 @@ export type VehicleType = "normal"
     | "normal2"
     | "simpleSphere"
     | "gokart"
+    | "future"
 
 export const defaultVehicleType: VehicleType = "normal2"
 
@@ -60,7 +61,8 @@ export const vehicleColors: VehicleColor[] = [
     },
     {
         name: "Gray", value: "#97b0ba"
-    }
+    },
+
 ]
 
 export interface IPlayerConnectedData {

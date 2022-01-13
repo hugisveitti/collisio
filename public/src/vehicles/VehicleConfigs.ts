@@ -21,6 +21,7 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "Phil the Phast", type: "f1" },
     // { name: "Monster truck", type: "monsterTruck" },
     { name: "test", type: "test" },
+    { name: "Jackie", type: "future" },
     { name: "Big girl Sally", type: "offRoader" },
     { name: "Thunderparrot", type: "sportsCar" },
     { name: "Goonie", type: "gokart" },
@@ -78,6 +79,7 @@ export interface IVehicleConfig {
 
     towPosition: Vector3
     shape?: "box" | "sphere" | "convex"
+    centerOfMassOffset: number
 }
 
 export const defaultVehicleConfig: IVehicleConfig = {
@@ -112,6 +114,9 @@ export const defaultVehicleConfig: IVehicleConfig = {
     towPosition: new Vector3(0, -.5, -4),
 
     maxSteeringAngle: 35 * degToRad
+    ,
+    centerOfMassOffset: 0
+
 }
 
 
@@ -163,12 +168,12 @@ export const vehicleConfigs = {
     tractor: {
         ...defaultVehicleConfig,
         wheelAxisBackPosition: -1.8,
-        wheelRadiusBack: 2.4 / 2,
+        wheelRadiusBack: 2.5 / 2,
         wheelHalfTrackBack: 1.6,
         wheelAxisHeightBack: -.2 - .6,
 
         wheelAxisFrontPosition: 2.1,
-        wheelRadiusFront: 1.6 / 2,
+        wheelRadiusFront: 1.7 / 2,
         wheelHalfTrackFront: 1.36,
         wheelAxisHeightFront: -.5 - .6,
 
@@ -176,13 +181,14 @@ export const vehicleConfigs = {
         suspensionStiffness: 120,
         suspensionRestLength: 1,
         mass: 1600,
-        engineForce: 7500,
+        engineForce: 12500,
         breakingForce: 200,
         is4x4: false,
 
         path: "tractor.gltf",
 
-        towPosition: new Vector3(0, -1.9, -3.2)
+        towPosition: new Vector3(0, -1.9, -3.2),
+        centerOfMassOffset: 2
     },
     monsterTruck: {
         ...defaultVehicleConfig,
@@ -260,16 +266,19 @@ export const vehicleConfigs = {
 
 
         mass: 600,
-        engineForce: 12000,
+        engineForce: 12500,
         breakingForce: 300,
         is4x4: false,
         maxSpeed: 330,
         frictionSlip: 8.5, //3.5
         suspensionStiffness: 50,
+        suspensionDamping: 12,
 
         inertia: { x: 3000, y: 5000, z: 4000 },
         towPosition: new Vector3(0, -.5, -4),
-        path: "sports-car.gltf"
+        path: "sports-car.gltf",
+
+        centerOfMassOffset: 1
     },
     f1: {
         ...defaultVehicleConfig,
@@ -290,12 +299,15 @@ export const vehicleConfigs = {
 
         //   frictionSlip: 27.5,
 
-
+        maxSuspensionTravelCm: 500,
+        suspensionStiffness: 120,
+        suspensionDamping: 12,
         mass: 500,
         engineForce: 5500,
         breakingForce: 250,
         is4x4: false,
-        towPosition: new Vector3(0, 0.5, -3.7)
+        towPosition: new Vector3(0, 0.5, -3.7),
+        centerOfMassOffset: .5
 
     },
     test: {
@@ -304,18 +316,46 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -3.5,
         wheelRadiusBack: 2 / 2,
         wheelHalfTrackBack: 3,
-        wheelAxisHeightBack: -.5,
+        wheelAxisHeightBack: -.25,
 
         wheelAxisFrontPosition: 2.5,
         wheelRadiusFront: 2 / 2,
         wheelHalfTrackFront: 3,
-        wheelAxisHeightFront: -.5,
+        wheelAxisHeightFront: -.25,
         mass: 200,
         engineForce: 5000,
         breakingForce: 100,
-        suspensionRestLength: .2,
+        suspensionRestLength: .7,
         is4x4: false,
+        centerOfMassOffset: 1
         //   shape: "convex"
+    },
+    future: {
+        ...defaultVehicleConfig,
+        path: "future-vehicle.glb",
+        wheelAxisBackPosition: -2.5,
+        wheelRadiusBack: 2 / 2,
+        wheelHalfTrackBack: 2.35,
+        wheelAxisHeightBack: .55,
+
+        wheelAxisFrontPosition: 3.75,
+        wheelRadiusFront: 2 / 2,
+        wheelHalfTrackFront: 2.35,
+        wheelAxisHeightFront: .55,
+
+        suspensionCompression: 1,
+        suspensionStiffness: 75,
+        suspensionDamping: 5,
+        maxSuspensionTravelCm: 500,
+
+
+        mass: 200,
+        engineForce: 6000,
+        breakingForce: 100,
+        suspensionRestLength: .87,
+        is4x4: false,
+        centerOfMassOffset: .45
+
     },
     gokart: {
         ...defaultVehicleConfig,
@@ -341,7 +381,8 @@ export const vehicleConfigs = {
         engineForce: 2500,
         frictionSlip: 27.5,
         path: "gokart.glb",
-        maxSteeringAngle: 20 * degToRad
+        maxSteeringAngle: 20 * degToRad,
+        centerOfMassOffset: .5
     },
     simpleSphere: {
         ...defaultVehicleConfig,
