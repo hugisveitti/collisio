@@ -351,11 +351,11 @@ export const vehicleConfigs = {
         suspensionStiffness: 75,
         suspensionDamping: 5,
         maxSuspensionTravelCm: 500,
-        maxSpeed: 270,
+        maxSpeed: 300,//270,
 
 
         mass: 200,
-        engineForce: 6000,
+        engineForce: 5000,
         breakingForce: 100,
         suspensionRestLength: .87,
         is4x4: false,
