@@ -384,7 +384,7 @@ export class RaceGameScene extends GameScene {
         }
 
         if (this.ghostVehicle) {
-            this.testDriver.setPlace(this.ghostVehicle, time, delta)
+            this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
         }
         if (this.driverRecorder) {
             this.driverRecorder.record(this.vehicles[0], time)

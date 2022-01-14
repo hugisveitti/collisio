@@ -355,7 +355,7 @@ export const vehicleConfigs = {
 
 
         mass: 200,
-        engineForce: 5000,
+        engineForce: 4500,
         breakingForce: 100,
         suspensionRestLength: .87,
         is4x4: false,
