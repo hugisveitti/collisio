@@ -354,7 +354,7 @@ export class Course implements ICourse {
     seeObject(cameraPos: Vector3, objectPos: Vector3) {
         this.removeTransparentObjects()
         ray.far = cameraPos.distanceTo(objectPos)
-        ray.set(cameraPos, objectPos.clone())
+        ray.set(cameraPos.clone(), objectPos.clone())
         ray.ray.lookAt(objectPos.clone())
 
         const intersects = ray.intersectObjects(this.possibleIntersectObjects)

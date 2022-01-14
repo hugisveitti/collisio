@@ -520,9 +520,6 @@ export class LowPolyVehicle extends Vehicle {
                 pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             )
 
-
-
-
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
             let dchaseSpeedX = Math.abs((Math.sin(rot.y)))// this.chaseCameraSpeed)
@@ -563,16 +560,16 @@ export class LowPolyVehicle extends Vehicle {
             this.seeVehicle(this.cameraDir)
             camera.updateProjectionMatrix()
         } else {
-            const pos = this.vehicleBody.position
-            const rot = this.vehicleBody.rotation
-            this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
-                pos.y + this.staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            )
+            // const pos = this.vehicleBody.position
+            // const rot = this.vehicleBody.rotation
+            // this.cameraTarget.set(
+            //     pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+            //     pos.y + this.staticCameraPos.y,
+            //     pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+            // )
             //   camera.lookAt(this.vehicleBody.position.clone())
             camera.lookAt(this.getPosition().clone())
-            this.seeVehicle(this.cameraTarget)
+            //   this.seeVehicle(this.cameraTarget)
         }
     };
 
@@ -583,10 +580,6 @@ export class LowPolyVehicle extends Vehicle {
     seeVehicle(cameraPos: Vector3) {
         this.scene.course.seeObject(cameraPos, this.getPosition())// this.vehicleBody.position.clone())
     }
-
-
-
-
 
     checkIfSpinning() {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
