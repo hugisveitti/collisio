@@ -721,7 +721,7 @@ export class LowPolyVehicle extends Vehicle {
 
     update(delta: number) {
         this.checkIfSpinning()
-        this.vehicleAssist(true)
+        //     this.vehicleAssist(true)
         // this.detectJitter(delta)
 
         this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
