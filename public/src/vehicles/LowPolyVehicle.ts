@@ -688,7 +688,7 @@ export class LowPolyVehicle extends Vehicle {
         //this.vehicle.getChassisWorldTransform().setOrigin(this.p)
         if (Math.abs(expDist - dist) > .3 && Math.abs(expDist - dist) < 2) {
             //const expDX = Math.sin(e.y) * expDist
-            const correctNewPos = (newPos.lerp(this.prevPosition, 1 / 2))
+            const correctNewPos = newPos //- (this.prevPosition, 1 / 2))
 
             // this.p.setValue(correctNewPos.x, newPos.y, correctNewPos.z)
             // this.tm.setOrigin(this.p)
@@ -721,7 +721,7 @@ export class LowPolyVehicle extends Vehicle {
     update(delta: number) {
         this.checkIfSpinning()
         this.vehicleAssist()
-        this.detectJitter(delta)
+        // this.detectJitter(delta)
 
         this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 
