@@ -132,9 +132,9 @@ export class LowPolyTestScene extends GameScene {
 
         // in tag game
         this.isIt = 0
-        this.testDriver = new TestDriver(this.vehicleType, this.trackName, this.getNumberOfLaps())
+        this.testDriver = new TestDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
         this.ghostVechicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
-        this.driverRecorder = new DriveRecorder({ active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps() })
+        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps() })
 
     }
 
@@ -259,7 +259,7 @@ export class LowPolyTestScene extends GameScene {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
             )
-            this.otherDrivers.push(new TestDriver(vehicleType, this.getTrackName(), 1))
+            this.otherDrivers.push(new TestDriver(this.getTrackName(), 1, vehicleType))
         }
     }
 

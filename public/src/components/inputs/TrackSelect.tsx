@@ -13,6 +13,7 @@ import f1TrackImage from "../../images/tracks/f1-track.PNG";
 import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
 import russiaTrackImage from "../../images/tracks/russia-top.png";
 import ferrariTrackImage from "../../images/tracks/ferrari-top.png";
+import spaTrackImage from "../../images/tracks/spa-top.png";
 
 import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
@@ -32,6 +33,7 @@ const trackImagePair: ITrackImagePair[] = [
   { trackName: "sea-side-track", image: seaSideTrackImage },
   { trackName: "russia-track", image: russiaTrackImage },
   { trackName: "ferrari-track", image: ferrariTrackImage },
+  { trackName: "spa-track", image: spaTrackImage },
 ];
 
 const getTrackImage = (trackName: TrackName) => {

@@ -37,6 +37,11 @@ export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass 
     return "LowPoly"
 }
 
+export const isVehicleType = (str: string): boolean => {
+    const arr = allVehicleTypes.map(v => v.type)
+    return (itemInArray(str, arr))
+}
+
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
 
 export const nonactiveVehcileTypes: VehicleType[] = ["test", "normal"]

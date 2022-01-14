@@ -825,7 +825,10 @@ export class GameScene extends Scene3D implements IGameScene {
 
         // if gameSettings change and needs reload then restart without user say?
         this.socket?.emit(dts_game_settings_changed_callback, {})
+        this._setGameSettings()
     }
+
+    _setGameSettings() { }
 
     toggleUseSound() {
         if (!this.useSound) {

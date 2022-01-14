@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { getFirebaseConfig } from "./firebaseConfig";
 import { inDevelopment } from "../utils/settings";
+import { getStorage } from "@firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,7 +19,7 @@ const app = initializeApp(getFirebaseConfig())
 // const analytics = getAnalytics(app);
 
 export const database = getDatabase(app)
-
+export const storage = getStorage(app)
 
 
 const getMyFirestore = () => {

@@ -4,9 +4,11 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInf
 import { IRaceCourse } from "../course/ICourse";
 import { RaceCourse } from "../course/RaceCourse";
 import { VehicleControls } from '../shared-backend/shared-stuff';
+import { DriveRecorder, TestDriver } from "../test-courses/TestDriver";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
+import { GhostVehicle } from "../vehicles/GhostVehicle";
 import { getStaticCameraPos } from "../vehicles/IVehicle";
 import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
@@ -37,6 +39,10 @@ export class RaceGameScene extends GameScene {
 
     totalTimeDiv: HTMLDivElement
 
+    testDriver: TestDriver
+    ghostVehicle: GhostVehicle
+    driverRecorder: DriveRecorder
+
     constructor() {
         super()
 
@@ -44,7 +50,6 @@ export class RaceGameScene extends GameScene {
 
         this.gameInfoDiv.appendChild(this.totalTimeDiv)
         this.totalTimeDiv.setAttribute("id", "totalTime")
-
 
         this.winner = ""
         this.winTime = -1
@@ -56,7 +61,6 @@ export class RaceGameScene extends GameScene {
         this.raceFinished = false
 
         this.raceCountdownTime = 7
-
     }
 
 
@@ -82,6 +86,32 @@ export class RaceGameScene extends GameScene {
     }
 
     async create(): Promise<void> {
+
+        this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
+        console.log("this config", this.gameSceneConfig)
+        if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
+            if (this.gameSettings.useGhost) {
+
+                await this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id)
+                const vt = this.testDriver.getVehicleType()
+                if (vt) {
+                    console.log("vt ", vt)
+                    this.ghostVehicle = new GhostVehicle({
+                        vehicleType: vt, color: "#10eedd"
+                    })
+                } else {
+                    console.warn("no vt", vt)
+                }
+            }
+            console.log("creating drive recorder")
+            this.driverRecorder = new DriveRecorder({
+                tournamentId: this.gameSceneConfig.tournament.id,
+                active: true,
+                numberOfLaps: this.currentNumberOfLaps,
+                vehicleType: this.players[0].vehicleType,
+                trackName: this.getTrackName()
+            })
+        }
         this.createViews()
         this.createController()
         this.resetVehicles()
@@ -186,7 +216,8 @@ export class RaceGameScene extends GameScene {
         this.winner = ""
         this.winTime = -1
 
-
+        this.driverRecorder?.reset()
+        this.testDriver?.reset()
 
         this.hasShowStartAnimation = true
         /**
@@ -237,6 +268,16 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    _setGameSettings() {
+        if (this.ghostVehicle) {
+            if (!this.gameSettings.useGhost) {
+                this.ghostVehicle.hide()
+            } else {
+                this.ghostVehicle.show()
+            }
+        }
+    }
+
     /** function called if vehicle position is reset */
     resetVehicleCallback(vehicleNumber: number) {
         if (this.raceFinished) {
@@ -252,9 +293,6 @@ export class RaceGameScene extends GameScene {
         if (this.gameTimers[vehicleNumber].allCheckpointsCrossed()) {
             const cLapTime = this.gameTimers[vehicleNumber].getCurrentLapTime()
             this.gameTimers[vehicleNumber].lapDone()
-
-
-
             const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
 
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position, rotation })
@@ -312,7 +350,7 @@ export class RaceGameScene extends GameScene {
     }
 
 
-    updateScoreTable() {
+    updateScoreTable(time: number, delta: number) {
         const timeInfos: IRaceTimeInfo[] = []
         let maxTotalTime = 0
         for (let i = 0; i < this.gameTimers.length; i++) {
@@ -341,6 +379,13 @@ export class RaceGameScene extends GameScene {
         if (this.gameSceneConfig.onlyMobile) {
             this.viewsNameInfo[0].innerHTML = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
         }
+
+        if (this.ghostVehicle) {
+            this.testDriver.setPlace(this.ghostVehicle, time, delta)
+        }
+        if (this.driverRecorder) {
+            this.driverRecorder.record(this.vehicles[0], time)
+        }
     }
 
 
@@ -356,7 +401,7 @@ export class RaceGameScene extends GameScene {
             if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
-            this.updateScoreTable()
+            this.updateScoreTable(time, delta)
             this.updateVehicles(delta)
 
             if (!this.isGameSongPlaying()) {
@@ -407,6 +452,11 @@ export class RaceGameScene extends GameScene {
         if (this.gameRoomActions.playerFinished) {
             this.gameRoomActions.playerFinished(playerData)
         }
+
+        if (i === 0 && this.driverRecorder) {
+            this.driverRecorder.saveTournamentRecording(this.gameTimers[i].getTotalTime(), this.players[i].playerName, this.players[i].id,)
+        }
+
     }
 
 

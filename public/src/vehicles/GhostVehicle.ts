@@ -13,6 +13,8 @@ export interface IGhostVehicle {
     //  vehicle: ExtendedObject3D
     loadModel: () => Promise<void>
     addToScene: (scene: Scene3D) => void
+    show: () => void
+    hide: () => void
 }
 
 interface GhostVehicleConfig {
@@ -58,6 +60,16 @@ export class GhostVehicle implements IGhostVehicle {
         this.vehicle.position.set(position.x, position.y, position.z)
     };
 
+    hide() {
+        if (!this.vehicle) return
+        this.vehicle.visible = false
+    }
+
+    show() {
+        if (!this.vehicle) return
+        this.vehicle.visible = true
+    }
+
     async loadModel() {
         const promise = new Promise<void>((resolve, reject) => {
 
@@ -102,9 +114,6 @@ export class GhostVehicle implements IGhostVehicle {
                         }
                     }
                 }
-
-
-
 
                 if (chassis) {
                     this.vehicle.add(chassis)

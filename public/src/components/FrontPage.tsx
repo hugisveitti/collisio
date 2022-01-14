@@ -4,9 +4,10 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AppContainer from "../containers/AppContainer";
+import { getTournamentGhost } from "../firebase/firebaseStorageFunctions";
 import logo from "../images/collisio-logo.png";
 import "../styles/main.css";
 import { highscorePagePath, howToPlayPagePath } from "./Routes";
@@ -18,6 +19,19 @@ interface FrontPageProps {
 }
 
 const FrontPage = (props: FrontPageProps) => {
+  useEffect(() => {
+    const id = "test";
+    getTournamentGhost(id)
+      .then((val) => {
+        console.log("val");
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+
+    // uploadTournamentGhost(id, ["1 1 1 1 2 2 2", "2 2 2 2 3 2 1"]);
+  }, []);
+
   return (
     <AppContainer>
       <Grid container spacing={5}>

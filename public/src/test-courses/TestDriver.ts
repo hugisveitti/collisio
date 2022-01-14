@@ -1,12 +1,12 @@
 import { Quaternion, Vector3 } from "three";
-import { MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { getTournamentGhost, uploadTournamentGhost } from "../firebase/firebaseStorageFunctions";
+import { TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { IGhostVehicle } from "../vehicles/GhostVehicle";
-import { ITestVehicle, IVehicle } from "../vehicles/IVehicle";
+import { IVehicle } from "../vehicles/IVehicle";
+import { isVehicleType } from "../vehicles/VehicleConfigs";
 
 export class TestDriver {
 
-    vehicle: ITestVehicle
-    controller: MobileControls
 
     pos: Vector3
     rotation: Quaternion
@@ -19,21 +19,21 @@ export class TestDriver {
     // where key is time and value is 
     driveInstructions: { [key: number]: string }
     di: string[]
-    timeIndex = 0
+    // first line is metadata
+    timeIndex = 1
     filename: string
-
     numNotUpdates = 0
-
     nextPointSet: boolean = false
-
     betweenPos: Vector3
     betweenRot: Quaternion
+    isReady: boolean
+    hasInstructions: boolean
+    vehicleType: VehicleType | undefined
 
-    constructor(vehicleType: VehicleType, trackName: TrackName, numberOfLaps: number) {
+    constructor(trackName: TrackName, numberOfLaps: number, vehicleType?: VehicleType) {
         this.filename = `recording_${trackName}_${numberOfLaps}_${vehicleType}.txt`
-        this.loadVechileConfig("f1VehicleConfig.json")
-        this.loadDriveInstructions(this.filename)
-        this.controller = new MobileControls()
+        // this.loadVechileConfig("f1VehicleConfig.json")
+        // this.loadDriveInstructions(this.filename)
         this.di = []
         this.pos = new Vector3(0, 0, 0)
         this.rotation = new Quaternion(0, 0, 0, 0)
@@ -41,6 +41,8 @@ export class TestDriver {
         this.nextRotation = new Quaternion(0, 0, 0, 0)
         this.betweenPos = new Vector3(0, 0, 0)
         this.betweenRot = new Quaternion(0, 0, 0, 0)
+        this.isReady = false
+        this.hasInstructions = false
     }
 
 
@@ -60,6 +62,43 @@ export class TestDriver {
         }).catch((err) => {
             console.warn("Error loading file:", this.filename, err)
         })
+    }
+
+    async loadTournamentInstructions(tournamentId: string) {
+        return new Promise<void>((resolve, reject) => {
+
+            getTournamentGhost(tournamentId).then(instructions => {
+                this.isReady = true
+                if (instructions?.length) {
+                    this.di = instructions
+                    this.hasInstructions = true
+                } else {
+                    this.hasInstructions = false
+                }
+                resolve()
+            }).catch(err => {
+                console.warn("err:", err)
+                reject()
+            })
+        })
+    }
+
+    getVehicleType(): VehicleType | undefined {
+        if (!this.di || this.di.length < 1) {
+            return undefined
+        }
+        const str = this.di[0].split(" ")[0]
+        console.log("str", str)
+        if (isVehicleType(str)) {
+            this.vehicleType = str as VehicleType
+            return str as VehicleType
+        }
+
+        return undefined
+    }
+
+    reset() {
+        this.timeIndex = 1
     }
 
     getTime(i: number) {
@@ -89,6 +128,7 @@ export class TestDriver {
     }
 
     setPlace(vehicle: IGhostVehicle, time: number, delta: number) {
+        if (!this.hasInstructions) return
         const cTime = this.getTime(this.timeIndex)
         if (this.timeIndex < this.di.length - 1 && cTime < time) {
             this.timeIndex += 1
@@ -116,6 +156,7 @@ interface DriveRecorderConfig {
     trackName: TrackName
     numberOfLaps: number
     vehicleType: VehicleType
+    tournamentId: string
 }
 
 export class DriveRecorder {
@@ -142,10 +183,14 @@ export class DriveRecorder {
         }
     }
 
+    reset() {
+        this.finishedLaps = 0
+    }
+
     getDriveInstruction = (time: number, vehicle: IVehicle) => {
         const p = vehicle.getPosition()
         const r = vehicle.getRotation()
-        return `${time} ${p.x} ${p.y} ${p.z} ${r.x} ${r.y} ${r.z} ${r.w}`
+        return `${time.toFixed(2)} ${p.x.toFixed(1)} ${p.y.toFixed(1)} ${p.z.toFixed(1)} ${r.x.toFixed(3)} ${r.y.toFixed(3)} ${r.z.toFixed(2)} ${r.w.toFixed(2)}`
     }
 
     goalCrossed() {
@@ -155,25 +200,41 @@ export class DriveRecorder {
         console.log("fin laps", this.finishedLaps)
         if (this.config.numberOfLaps === this.finishedLaps) {
             console.log("saving lap")
-            this.saveRecordedInstructionsToServer()
+            if (this.config.tournamentId) {
+                this.saveRecordedInstructionsToServer()
+            }
         }
     }
 
-    saveRecordedInstructionsToServer = () => {
-        const data = {
-            "instructions": this.instructions.join("\n"), trackName: this.config.trackName, numberOfLaps: this.config.numberOfLaps, vehicleType: this.config.vehicleType
-        }
+    saveTournamentRecording = (totalTime: number, playerName?: string, playerId?: string) => {
+        const metaData = [`${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId} ${playerName} ${playerId}`]
+        console.log("meta data", metaData)
+        uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions), totalTime)
 
-        fetch("/saverecording", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(res =>
-            res.text()
-        ).then(val => {
-            console.log("value,", val)
-        })
+
+    }
+
+    saveRecordedInstructionsToServer = (playerName?: string, playerId?: string) => {
+        const metaData = [`${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId} ${playerName} ${playerId}`]
+        console.log("meta data", metaData)
+        //  uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions))
+
+
+        //     const data = {
+        //         "instructions": this.instructions.join("\n"), trackName: this.config.trackName, numberOfLaps: this.config.numberOfLaps, vehicleType: this.config.vehicleType
+        //     }
+
+        //     fetch("/saverecording", {
+        //         method: "POST",
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(data)
+        //     }).then(res =>
+        //         res.text()
+        //     ).then(val => {
+        //         console.log("value,", val)
+        //     })
+        // }
     }
 }

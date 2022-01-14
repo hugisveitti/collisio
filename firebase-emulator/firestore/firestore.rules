@@ -89,6 +89,10 @@ service cloud.firestore {
             )
         );
       }
+       match /metaData/{metaData} {
+          allow read;
+          allow write;
+       }
     }
     match /customers/{uid} {
       allow read: if request.auth.uid == uid;

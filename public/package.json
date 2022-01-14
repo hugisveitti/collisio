@@ -22,6 +22,7 @@
     "@emotion/styled": "11.3.0",
     "@enable3d/ammo-physics": "^0.23.0",
     "@enable3d/three-graphics": "^0.23.0",
+    "@firebase/storage": "^0.9.1",
     "@fontsource/roboto": "4.5.1",
     "@mui/icons-material": "5.0.3",
     "@mui/lab": "5.0.0-alpha.51",

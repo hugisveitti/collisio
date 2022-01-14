@@ -341,6 +341,8 @@ export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBrack
     }
 }
 
+
+
 const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeBracketNode: IFlattendBracketNode | undefined, callback: (res: TournamentFinishedResponse) => void) => {
 
     if (gameInfo.playersInfo.length !== 2) {
@@ -454,4 +456,38 @@ export const getTournamentWithId = async (tournamentId: string) => {
             reject()
         })
     })
+}
+
+export const getTorunamentBestTime = (tournamentId: string) => {
+    return new Promise<number>((resolve, reject) => {
+        const ref = doc(firestore, tournamentPath, tournamentId, "metaData", "metaData")
+        getDoc(ref).then(val => {
+            if (val.exists()) {
+                console.log("val", val)
+                resolve(val.data().bestTime)
+            } else {
+                reject()
+            }
+        })
+    })
+}
+
+export const setTorunamentBestTime = (tournamentId: string, totalTime) => {
+
+    const ref = doc(firestore, tournamentPath, tournamentId, "metaData", "metaData")
+    try {
+
+        setDoc(ref, { bestTime: totalTime })
+    } catch (err) {
+        console.warn("Error setting tournament best time", err)
+    }
+    // getDoc(ref).then(val => {
+    //     if (val.exists()) {
+    //         console.log("val", val)
+    //         resolve(val.data().bestTime)
+    //     } else {
+    //         reject()
+    //     }
+    // })
+
 }
