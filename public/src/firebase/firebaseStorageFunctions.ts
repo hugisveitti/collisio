@@ -24,6 +24,8 @@ export const uploadTournamentGhost = (tournamentId: string, ghostRecording: stri
             setTorunamentBestTime(tournamentId, totalTime)
         }
         console.log("Did not beat the best time:", bestTime, "total time:", totalTime)
+    }).catch((err) => {
+        console.warn("Error getting best time:", err)
     })
 }
 

@@ -459,15 +459,18 @@ export const getTournamentWithId = async (tournamentId: string) => {
 }
 
 export const getTorunamentBestTime = (tournamentId: string) => {
-    return new Promise<number>((resolve, reject) => {
+    return new Promise<number | undefined>((resolve, reject) => {
         const ref = doc(firestore, tournamentPath, tournamentId, "metaData", "metaData")
         getDoc(ref).then(val => {
             if (val.exists()) {
                 console.log("val", val)
                 resolve(val.data().bestTime)
             } else {
-                reject()
+                resolve(undefined)
             }
+        }).catch(err => {
+            console.warn("Error getting best time in torunament:", err)
+            reject()
         })
     })
 }
