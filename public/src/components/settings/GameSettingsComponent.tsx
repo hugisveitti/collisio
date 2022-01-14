@@ -306,7 +306,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <Collapse in={props.gameSettings.useGhost}>
                 <TextField
                   value={props.gameSettings.ghostFilename}
@@ -316,7 +316,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                   }
                 />
               </Collapse>
-            </Grid>
+            </Grid> */}
           </Grid>
         </CollabsibleCard>
       </Grid>

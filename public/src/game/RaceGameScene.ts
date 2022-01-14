@@ -92,16 +92,20 @@ export class RaceGameScene extends GameScene {
         if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
             if (this.gameSettings.useGhost) {
 
-                await this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id)
-                const vt = this.testDriver.getVehicleType()
-                if (vt) {
-                    console.log("vt ", vt)
-                    this.ghostVehicle = new GhostVehicle({
-                        vehicleType: vt, color: "#10eedd"
-                    })
-                } else {
-                    console.warn("no vt", vt)
-                }
+                this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(() => {
+
+                    const vt = this.testDriver.getVehicleType()
+                    if (vt) {
+                        console.log("vt ", vt)
+                        this.ghostVehicle = new GhostVehicle({
+                            vehicleType: vt, color: "#10eedd"
+                        })
+                    } else {
+                        console.warn("no vt", vt)
+                    }
+                }).catch(() => {
+                    console.log("No ghost since there is no recording")
+                })
             }
             console.log("creating drive recorder")
             this.driverRecorder = new DriveRecorder({
