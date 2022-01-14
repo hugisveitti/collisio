@@ -150,20 +150,18 @@ export class LowPolyVehicle extends Vehicle {
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.scene.add.existing(this.vehicleBody)
 
-        // set center of mass
-        const mw = this.vehicleBody.matrixWorld
-        mw.elements[13] = mw.elements[13] + this.vehicleConfig.centerOfMassOffset
-        this.vehicleBody.geometry.applyMatrix4(mw)
-        if (this.vehicleBody.children.length > 0) {
-            const p = this.vehicleBody.children[0].position
-            this.vehicleBody.children[0].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
-            this.vehicleBody.children[0].updateWorldMatrix(true, true)
-        }
-        this.vehicleBody.updateWorldMatrix(true, true)
-
-
-        this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
-        this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
+        // // set center of mass
+        // const mw = this.vehicleBody.matrixWorld
+        // mw.elements[13] = mw.elements[13] + this.vehicleConfig.centerOfMassOffset
+        // this.vehicleBody.geometry.applyMatrix4(mw)
+        // if (this.vehicleBody.children.length > 0) {
+        //     const p = this.vehicleBody.children[0].position
+        //     this.vehicleBody.children[0].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
+        //     this.vehicleBody.children[0].updateWorldMatrix(true, true)
+        // }
+        // this.vehicleBody.updateWorldMatrix(true, true)
+        // this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
+        // this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
 
 
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
