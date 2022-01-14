@@ -69,6 +69,7 @@ export class TestDriver {
 
             getTournamentGhost(tournamentId).then(instructions => {
                 this.isReady = true
+                console.log("instructions", instructions)
                 if (instructions?.length) {
                     this.di = instructions
                     this.hasInstructions = true
@@ -84,6 +85,7 @@ export class TestDriver {
     }
 
     getVehicleType(): VehicleType | undefined {
+        console.log("getting vehicletype, this.di", this.di)
         if (!this.di || this.di.length < 1) {
             return undefined
         }

@@ -88,6 +88,7 @@ export class RaceGameScene extends GameScene {
         this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
         console.log("this config", this.gameSceneConfig)
         if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
+            console.log("gamesettings", this.gameSettings)
             if (this.gameSettings.useGhost) {
 
                 this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
@@ -248,9 +249,6 @@ export class RaceGameScene extends GameScene {
                     pos.y + 75,
                     pos.z - ((Math.cos(rot.y) * 50) * Math.sign(Math.cos(rot.z)))
                 )
-
-
-
             }
             this.gameStartingTimeOut = setTimeout(() => {
 

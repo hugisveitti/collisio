@@ -42,6 +42,7 @@ export class GhostVehicle implements IGhostVehicle {
     }
 
     addToScene(scene: Scene3D) {
+        console.log("adding ghost to scene")
         scene.scene.add(this.vehicle)
     }
 

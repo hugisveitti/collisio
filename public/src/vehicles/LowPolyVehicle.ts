@@ -632,7 +632,7 @@ export class LowPolyVehicle extends Vehicle {
             const dirX = -(Math.sin(r.y))
             const dirZ = -(Math.cos(r.y)) * Math.sign(Math.cos(r.z))
 
-            const eps = 0.1
+            const eps = 0.2
             let turningRight = Math.abs(frPos.y() - flPos.y()) < eps ? 0 : (frPos.y() - flPos.y())
             let turningFront = Math.abs(frPos.y() - brPos.y()) < eps ? 0 : (frPos.y() - brPos.y())
 
@@ -647,7 +647,6 @@ export class LowPolyVehicle extends Vehicle {
                 console.warn("Vehicle assist, Turning right:", turningRight, ", TurningFront:", turningFront)
             }
 
-
             let targetChangeX = - ((dirZ * turningFront)) * changeFactor
             targetChangeX += -((dirX * turningRight)) * changeFactor
 
@@ -659,8 +658,10 @@ export class LowPolyVehicle extends Vehicle {
             let newX = aVel.x() + targetChangeX
             let newZ = aVel.z() + targetChangeZ
 
-            this.vector.setValue(newX, aVel.y() * .5, newZ)
-            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
+
+            // this.vector.setValue(newX, aVel.y() * .5, newZ)
+            //     this.vehicle.getRigidBody().setAngularVelocity(this.vector)
+            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(newX, aVel.y(), newZ))
         }
     }
 
@@ -720,7 +721,7 @@ export class LowPolyVehicle extends Vehicle {
 
     update(delta: number) {
         this.checkIfSpinning()
-        this.vehicleAssist()
+        this.vehicleAssist(true)
         // this.detectJitter(delta)
 
         this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
@@ -741,7 +742,6 @@ export class LowPolyVehicle extends Vehicle {
             }
         }
 
-        //  this.detectJitter(delta)
 
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
@@ -886,8 +886,8 @@ export class LowPolyVehicle extends Vehicle {
      * return the height vehicle needs to offset from its relative origin to reach to bottom of the wheels 
      */
     getVehicleYOffset() {
-        const frontHeight = - this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusFront
-        const backHeight = - this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusBack
+        const frontHeight = - this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusFront + this.vehicleConfig.centerOfMassOffset
+        const backHeight = - this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusBack + this.vehicleConfig.centerOfMassOffset
         const y = Math.max(backHeight, frontHeight) ?? 2
         return y
     }
@@ -911,8 +911,6 @@ export class LowPolyVehicle extends Vehicle {
 
 
     _updateVehicleSettings() {
-
-
         this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
             const { x, y, z } = this.staticCameraPos
