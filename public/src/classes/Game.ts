@@ -5,7 +5,7 @@ import { TagGameScene } from "../game/TagGameScene";
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
-import { IUserSettings } from "./User";
+
 
 export const numberOfLapsPossibilities = [1, 2, 3, 5, 7, 13]
 
@@ -82,6 +82,9 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Small jump track", type: "small-jump-track", gameType: "race"
+    },
+    {
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
     }
 ]
 
@@ -146,6 +149,7 @@ export const activeTrackNames: TrackName[] = [
     "russia-track",
     "ferrari-track",
     "farmers-little-helper-map",
+    "spa-track",
     "small-track",
     "small-jump-track"
 ]

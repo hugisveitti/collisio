@@ -24,6 +24,7 @@ export type TrackName =
     | "speed-test-track"
     | "small-track"
     | "small-jump-track"
+    | "spa-track"
 
 export type VehicleType = "normal"
     | "tractor"
@@ -54,7 +55,7 @@ export const vehicleColors: VehicleColor[] = [
         name: "Blue", value: "#185676",
     },
     {
-        name: "Orange", value: "#fda000"
+        name: "Orange", value: "#f07900", //"#fda000"
     },
     {
         name: "Light green", value: "#61f72a"

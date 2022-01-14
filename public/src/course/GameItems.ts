@@ -87,6 +87,12 @@ export const gameItems = {
         castsShadow: false,
         bounciness: treeBounciness,
     },
+    "cactus": {
+        collisionFlags: 1,
+        shape: "concave",
+        castsShadow: false,
+        bounciness: treeBounciness,
+    },
     "pine": {
         collisionFlags: 1,
         shape: "concave",
@@ -129,7 +135,7 @@ export const gameItems = {
         collisionFlags: 1,
         shape: "concave",
         castsShadow: false,
-        bounciness: structureBounciness,
+        bounciness: 1,
         fractureImpulse: 5
     },
     "wall": {
