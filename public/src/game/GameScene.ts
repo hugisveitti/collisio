@@ -446,11 +446,11 @@ export class GameScene extends Scene3D implements IGameScene {
         const promise = new Promise<void>((topresolve, reject) => {
             this.vehicles = []
             // get random color of chassis
-            let chassisColOffset = Math.floor(Math.random() * 4)
+            let chassisColOffset = Math.floor(Math.random() * vehicleColors.length)
 
             const batches = []
             for (let i = 0; i < this.players.length; i++) {
-                const vehicleColor = vehicleColors[chassisColOffset + i].value
+                const vehicleColor = vehicleColors[(chassisColOffset + i) % vehicleColors.length]?.value ?? "red"
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
