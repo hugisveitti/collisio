@@ -219,7 +219,6 @@ export const vehicleConfigs = {
         suspensionDamping: 15,
 
 
-
         path: "low-poly-monster-truck.gltf"
     },
     offRoader: {

@@ -567,8 +567,8 @@ export class LowPolyVehicle extends Vehicle {
             //     pos.y + this.staticCameraPos.y,
             //     pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             // )
-            //   camera.lookAt(this.vehicleBody.position.clone())
-            camera.lookAt(this.getPosition().clone())
+            camera.lookAt(this.vehicleBody.position.clone())
+            // camera.lookAt(this.getPosition().clone())
             //   this.seeVehicle(this.cameraTarget)
         }
     };
