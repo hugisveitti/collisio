@@ -81,8 +81,6 @@ export class RaceGameScene extends GameScene {
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
-
-
     }
 
     async create(): Promise<void> {
@@ -92,7 +90,7 @@ export class RaceGameScene extends GameScene {
         if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
             if (this.gameSettings.useGhost) {
 
-                this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(() => {
+                this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
 
                     const vt = this.testDriver.getVehicleType()
                     if (vt) {
@@ -100,6 +98,9 @@ export class RaceGameScene extends GameScene {
                         this.ghostVehicle = new GhostVehicle({
                             vehicleType: vt, color: "#10eedd"
                         })
+                        await this.ghostVehicle.loadModel()
+                        this.ghostVehicle.addToScene(this)
+
                     } else {
                         console.warn("no vt", vt)
                     }
