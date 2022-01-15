@@ -101,6 +101,13 @@ export class TestDriver {
 
     reset() {
         console.log("resetting test driver", this)
+        this.pos = new Vector3(0, 0, 0)
+        this.rotation = new Quaternion(0, 0, 0, 0)
+        this.nextPos = new Vector3(0, 0, 0)
+        this.nextRotation = new Quaternion(0, 0, 0, 0)
+        this.betweenPos = new Vector3(0, 0, 0)
+        this.betweenRot = new Quaternion(0, 0, 0, 0)
+        this.isReady = true
         this.timeIndex = 1
     }
 

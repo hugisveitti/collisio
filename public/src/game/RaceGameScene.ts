@@ -86,7 +86,7 @@ export class RaceGameScene extends GameScene {
     async createGhostVehicle() {
         return new Promise<void>((resolve, reject) => {
 
-            this.ghostVehicle.removeFromScene(this)
+            this.ghostVehicle?.removeFromScene(this)
 
             this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
 
