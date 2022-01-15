@@ -1,0 +1,5 @@
+User-agent: googlebot
+Disallow: /private-profile
+Disallow: /test
+Disallow: /admin
+Disallow: /speedtest

@@ -119,9 +119,9 @@ const sendIndexHTML = (req: Request, res: Response) => {
     const host = req.get("host")
     console.log("host", host)
     if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
-        res.sendFile(path.join(__dirname, indexHTMLPath));
+        res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     } else {
-        res.send("ERROR")
+        res.status(500).send("ERROR")
     }
 }
 app.get("/", sendIndexHTML);
@@ -197,6 +197,10 @@ io.on("connection", (socket: Socket) => {
     socket.on("error", (err) => {
         console.warn("Error occured in socket:", err)
     })
+})
+
+app.get("/robot.txt", (req: Request, res: Response) => {
+    res.status(200).sendFile(path.join(__dirname, "../robot.txt"))
 })
 
 app.get("*", (req: Request, res: Response) => {

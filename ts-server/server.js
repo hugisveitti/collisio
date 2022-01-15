@@ -111,10 +111,10 @@ var sendIndexHTML = function (req, res) {
     var host = req.get("host");
     console.log("host", host);
     if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
-        res.sendFile(path.join(__dirname, indexHTMLPath));
+        res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     }
     else {
-        res.send("ERROR");
+        res.status(500).send("ERROR");
     }
 };
 app.get("/", sendIndexHTML);
@@ -162,6 +162,9 @@ io.on("connection", function (socket) {
     socket.on("error", function (err) {
         console.warn("Error occured in socket:", err);
     });
+});
+app.get("/robot.txt", function (req, res) {
+    res.status(200).sendFile(path.join(__dirname, "../robot.txt"));
 });
 app.get("*", function (req, res) {
     console.log("not found");
