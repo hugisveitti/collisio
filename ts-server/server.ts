@@ -47,22 +47,26 @@ if (os.hostname().includes("Lisa")) {
 
 const buildFolder = "dist"
 
-app.use(express.static(path.join(__dirname, `../public/${buildFolder}`)));
-app.use(express.static(path.join(__dirname, `../public/src`)));
+app.use(express.static(path.join(__dirname, `../public/${buildFolder}`), { index: false }));
+app.use(express.static(path.join(__dirname, `../public/src`), { index: false }));
 
 const indexHTMLPath = `../public/${buildFolder}/index.html`
 
-app.get("/test", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
-});
+const sendTestHTML = (req: Request, res: Response) => {
+    const host = req.get("host")
+    console.log("host", host)
+    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+        res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
+    } else {
+        res.send("ERROR")
+    }
+}
 
-app.get("/mobileonly", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
-});
+app.get("/test", sendTestHTML);
 
-app.get("/speedtest", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
-});
+app.get("/mobileonly", sendTestHTML);
+
+app.get("/speedtest", sendTestHTML);
 
 app.get("/driveinstructions/:filename", (req: Request, res: Response) => {
     const filename = req.params.filename
@@ -111,13 +115,17 @@ app.get("/ammo.wasm.js", (_: Request, res: Response) => {
 })
 
 
-app.get("/", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-
-const sendIndexHTML = (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
+const sendIndexHTML = (req: Request, res: Response) => {
+    const host = req.get("host")
+    console.log("host", host)
+    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+        res.sendFile(path.join(__dirname, indexHTMLPath));
+    } else {
+        res.send("ERROR")
+    }
 }
+app.get("/", sendIndexHTML);
+
 
 app.get("/trophy", sendIndexHTML)
 app.get("/trophy/:id", sendIndexHTML)
@@ -127,17 +135,11 @@ app.get("/tournament/:id", sendIndexHTML)
 
 
 // There must be some better way to do this shit
-app.get("/wait", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/wait", sendIndexHTML);
 
-app.get("/wait/:gameId", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/wait/:gameId", sendIndexHTML);
 
-app.get("/game", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/game", sendIndexHTML);
 
 // app.get("/game/:id", (_: Request, res: Response) => {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
@@ -149,34 +151,21 @@ app.get("/connect", sendIndexHTML)
 
 
 
-app.get("/controls", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/controls", sendIndexHTML);
 
-app.get("/how-to-play", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/how-to-play", sendIndexHTML);
 
-app.get("/highscores", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/highscores", sendIndexHTML);
 
-app.get("/private-profile", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/private-profile", sendIndexHTML);
 
-app.get("/user/:id", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/user/:id", sendIndexHTML);
 
-app.get("/show-room", (_: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/show-room", sendIndexHTML);
 
 
 const adminHTMLPath = `../public/${buildFolder}/admin.html`
 app.get("/admin", (req: Request, res: Response) => {
-
     res.sendFile(path.join(__dirname, adminHTMLPath));
 })
 
@@ -197,6 +186,7 @@ const { Worker } = require('worker_threads')
 const io = require("socket.io")(server,) // { cors: { origin: "*" } })
 const roomMaster = new RoomMaster(io)
 io.on("connection", (socket: Socket) => {
+
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket)
     printMemoryInfo()
@@ -209,6 +199,13 @@ io.on("connection", (socket: Socket) => {
     })
 })
 
-app.get("*", (_: Request, res: Response) => {
-    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+app.get("*", (req: Request, res: Response) => {
+    console.log("not found")
+    const host = req.get("host")
+    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+        // res.sendFile(path.join(__dirname, indexHTMLPath));
+        res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+    } else {
+        res.send("ERROR")
+    }
 });

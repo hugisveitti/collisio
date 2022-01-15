@@ -57,18 +57,22 @@ if (os.hostname().includes("Lisa")) {
     port = 5000;
 }
 var buildFolder = "dist";
-app.use(express.static(path.join(__dirname, "../public/" + buildFolder)));
-app.use(express.static(path.join(__dirname, "../public/src")));
+app.use(express.static(path.join(__dirname, "../public/" + buildFolder), { index: false }));
+app.use(express.static(path.join(__dirname, "../public/src"), { index: false }));
 var indexHTMLPath = "../public/" + buildFolder + "/index.html";
-app.get("/test", function (_, res) {
-    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
-});
-app.get("/mobileonly", function (_, res) {
-    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
-});
-app.get("/speedtest", function (_, res) {
-    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
-});
+var sendTestHTML = function (req, res) {
+    var host = req.get("host");
+    console.log("host", host);
+    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+        res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
+    }
+    else {
+        res.send("ERROR");
+    }
+};
+app.get("/test", sendTestHTML);
+app.get("/mobileonly", sendTestHTML);
+app.get("/speedtest", sendTestHTML);
 app.get("/driveinstructions/:filename", function (req, res) {
     var filename = req.params.filename;
     console.log("filename", filename);
@@ -103,50 +107,37 @@ app.post("/saverecording", function (req, res) {
 app.get("/ammo.wasm.js", function (_, res) {
     res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
 });
-app.get("/", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-var sendIndexHTML = function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
+var sendIndexHTML = function (req, res) {
+    var host = req.get("host");
+    console.log("host", host);
+    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+        res.sendFile(path.join(__dirname, indexHTMLPath));
+    }
+    else {
+        res.send("ERROR");
+    }
 };
+app.get("/", sendIndexHTML);
 app.get("/trophy", sendIndexHTML);
 app.get("/trophy/:id", sendIndexHTML);
 app.get("/tournament", sendIndexHTML);
 app.get("/tournament/:id", sendIndexHTML);
 // There must be some better way to do this shit
-app.get("/wait", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/wait/:gameId", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/game", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/wait", sendIndexHTML);
+app.get("/wait/:gameId", sendIndexHTML);
+app.get("/game", sendIndexHTML);
 // app.get("/game/:id", (_: Request, res: Response) => {
 //     res.sendFile(path.join(__dirname, indexHTMLPath));
 // });
 app.get("/premium", sendIndexHTML);
 app.get("/about", sendIndexHTML);
 app.get("/connect", sendIndexHTML);
-app.get("/controls", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/how-to-play", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/highscores", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/private-profile", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/user/:id", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
-app.get("/show-room", function (_, res) {
-    res.sendFile(path.join(__dirname, indexHTMLPath));
-});
+app.get("/controls", sendIndexHTML);
+app.get("/how-to-play", sendIndexHTML);
+app.get("/highscores", sendIndexHTML);
+app.get("/private-profile", sendIndexHTML);
+app.get("/user/:id", sendIndexHTML);
+app.get("/show-room", sendIndexHTML);
 var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
 app.get("/admin", function (req, res) {
     res.sendFile(path.join(__dirname, adminHTMLPath));
@@ -172,6 +163,14 @@ io.on("connection", function (socket) {
         console.warn("Error occured in socket:", err);
     });
 });
-app.get("*", function (_, res) {
-    res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+app.get("*", function (req, res) {
+    console.log("not found");
+    var host = req.get("host");
+    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+        // res.sendFile(path.join(__dirname, indexHTMLPath));
+        res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
+    }
+    else {
+        res.send("ERROR");
+    }
 });
