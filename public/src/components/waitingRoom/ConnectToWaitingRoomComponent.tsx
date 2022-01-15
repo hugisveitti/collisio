@@ -120,7 +120,8 @@ const ConnectToWaitingRoomComponent = (
     socket.once(stm_player_connected_callback, (response: ISocketCallback) => {
       if (response.status === "error") {
         const { message } = response;
-        toast.error(message);
+        // was spamming people
+        // toast.error(message);
         setConnectingToRoom(false);
       } else {
         // toast.success(response.message);

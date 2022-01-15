@@ -150,7 +150,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           //  toast.success(response.message);
           setDisplayNameModalOpen(false);
         } else {
-          toast.error(response.message);
+          // this was spamming pleaople
+          //   toast.error(response.message);
           setConnectingGuest(false);
           history.push(frontPagePath);
         }

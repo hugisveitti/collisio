@@ -100,6 +100,7 @@ export class TestDriver {
     }
 
     reset() {
+        console.log("resetting test driver", this)
         this.timeIndex = 1
     }
 

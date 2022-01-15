@@ -83,23 +83,30 @@ export class RaceGameScene extends GameScene {
         }
     }
 
-    createGhostVehicle() {
-        this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
+    async createGhostVehicle() {
+        return new Promise<void>((resolve, reject) => {
 
-            const vt = this.testDriver.getVehicleType()
-            if (vt) {
-                console.log("vt ", vt)
-                this.ghostVehicle = new GhostVehicle({
-                    vehicleType: vt, color: "#10eedd"
-                })
-                await this.ghostVehicle.loadModel()
-                this.ghostVehicle.addToScene(this)
+            this.ghostVehicle.removeFromScene(this)
 
-            } else {
-                console.warn("no vt", vt)
-            }
-        }).catch(() => {
-            console.log("No ghost since there is no recording")
+            this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
+
+                const vt = this.testDriver.getVehicleType()
+                if (vt) {
+                    console.log("vt ", vt)
+                    this.ghostVehicle = new GhostVehicle({
+                        vehicleType: vt, color: "#10eedd"
+                    })
+                    await this.ghostVehicle.loadModel()
+                    this.ghostVehicle.addToScene(this)
+
+                } else {
+                    console.warn("no vt", vt)
+                }
+                resolve()
+            }).catch(() => {
+                console.log("No ghost since there is no recording")
+                resolve()
+            })
         })
     }
 
@@ -110,7 +117,7 @@ export class RaceGameScene extends GameScene {
         if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
             console.log("gamesettings", this.gameSettings)
             if (this.gameSettings.useGhost) {
-                this.createGhostVehicle()
+                await this.createGhostVehicle()
             }
             console.log("creating drive recorder")
             this.driverRecorder = new DriveRecorder({
@@ -227,9 +234,9 @@ export class RaceGameScene extends GameScene {
 
         this.driverRecorder?.reset()
         this.testDriver?.reset()
-        if (this.gameSettings.useGhost) {
-            this.createGhostVehicle()
-        }
+        // if (this.gameSettings.useGhost) {
+        //     this.createGhostVehicle()
+        // }
 
         this.hasShowStartAnimation = true
         /**

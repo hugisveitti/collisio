@@ -13,6 +13,7 @@ export interface IGhostVehicle {
     //  vehicle: ExtendedObject3D
     loadModel: () => Promise<void>
     addToScene: (scene: Scene3D) => void
+    removeFromScene: (scene: Scene3D) => void
     show: () => void
     hide: () => void
 }
@@ -50,6 +51,10 @@ export class GhostVehicle implements IGhostVehicle {
     addToScene(scene: Scene3D) {
         console.log("adding ghost to scene")
         scene.scene.add(this.vehicle)
+    }
+
+    removeFromScene(scene: Scene3D) {
+        scene.scene.remove(this.vehicle)
     }
 
     setRotation(rotation: Quaternion) {
