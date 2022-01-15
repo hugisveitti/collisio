@@ -25,9 +25,9 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
   const [joinButtonLoading, setJoinButtonLoading] = useState(false);
   const [isEditingRank, setIsEditingRank] = useState(false);
 
-  const handlePlayerClickedJoinLeave = () => {
+  const handlePlayerClickedJoinLeave = (_playerInTournament: boolean) => {
     setJoinButtonLoading(true);
-    if (playerInTournament) {
+    if (_playerInTournament) {
       leaveTournament(props.user, props.tournament.id)
         .then(() => {
           setJoinButtonLoading(false);
@@ -49,10 +49,16 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
   };
 
   useEffect(() => {
+    let playerIn = false;
     for (let i = 0; i < props.players.length; i++) {
       if (props.players[i].uid === props.user?.uid) {
         setPlayerInTournament(true);
+        playerIn = true;
       }
+    }
+
+    if (!playerIn) {
+      handlePlayerClickedJoinLeave(false);
     }
   }, [props.players]);
 
@@ -62,6 +68,8 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
     //   addFakesToTournament(props.tournament.id, 6);
     // }, 2000);
   }, []);
+
+  if (!props.tournament) return null;
 
   return (
     <React.Fragment>
@@ -78,7 +86,7 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
                   toast.error("Only logged in players can join tournaments");
                   return;
                 }
-                handlePlayerClickedJoinLeave();
+                handlePlayerClickedJoinLeave(playerInTournament);
               }}
             >
               {playerInTournament ? "Leave tournament" : "Join tournament"}
