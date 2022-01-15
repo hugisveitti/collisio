@@ -396,11 +396,14 @@ export class RaceGameScene extends GameScene {
             this.viewsNameInfo[0].innerHTML = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
         }
 
-        if (this.ghostVehicle && maxTotalTime > 0) {
-            this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
-        }
-        if (this.driverRecorder && maxTotalTime > 0) {
-            this.driverRecorder.record(this.vehicles[0], maxTotalTime)
+
+        if (this.gameStarted && !this.isGamePaused()) {
+            if (this.ghostVehicle && maxTotalTime > 0) {
+                this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
+            }
+            if (this.driverRecorder && maxTotalTime > 0) {
+                this.driverRecorder.record(this.vehicles[0], maxTotalTime)
+            }
         }
     }
 
