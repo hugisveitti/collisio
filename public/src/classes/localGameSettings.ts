@@ -48,6 +48,7 @@ export const getLocalGameSetting = (key: keyof IGameSettings, type: "string" | "
         if (type === "number") {
             return +value
         } else if (type === "boolean") {
+            console.log("key", key, "value", value)
             return eval(value)
         }
         return value

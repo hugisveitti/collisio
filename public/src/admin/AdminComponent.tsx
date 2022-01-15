@@ -238,7 +238,7 @@ const AdminComponent = (props: IAdminComponent) => {
                     label="Only last 24 hours?"
                     control={
                       <Checkbox
-                        value={only24HourData}
+                        checked={only24HourData}
                         onChange={() => {
                           setOnly24HourData(!only24HourData);
                           setGamesDataStats(

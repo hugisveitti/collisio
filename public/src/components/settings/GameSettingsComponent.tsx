@@ -281,7 +281,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 label="Record session?"
                 control={
                   <Checkbox
-                    value={props.gameSettings.record}
+                    checked={props.gameSettings.record}
                     onChange={() => {
                       updateGameSettings("record", !props.gameSettings.record);
                     }}
@@ -294,7 +294,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 label="Use ghost?"
                 control={
                   <Checkbox
-                    value={props.gameSettings.useGhost}
+                    checked={props.gameSettings.useGhost}
                     onChange={() => {
                       updateGameSettings(
                         "useGhost",

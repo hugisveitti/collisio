@@ -76,7 +76,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
           label="Only allow specific vehicle"
           control={
             <Checkbox
-              value={onlyAllowSpecificVechileType}
+              checked={onlyAllowSpecificVechileType}
               onChange={() => {
                 setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
                 if (!onlyAllowSpecificVechileType) {

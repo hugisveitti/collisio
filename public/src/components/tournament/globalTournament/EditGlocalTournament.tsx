@@ -38,7 +38,7 @@ const EditGlobalTournamentComponent = (
           label="Limit number of runs per player"
           control={
             <Checkbox
-              value={useRunsPerPlayer}
+              checked={useRunsPerPlayer}
               onChange={() => {
                 setUseRunsPerPlayer(!useRunsPerPlayer);
                 if (!useRunsPerPlayer) {
