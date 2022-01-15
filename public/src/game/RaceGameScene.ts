@@ -83,6 +83,26 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    createGhostVehicle() {
+        this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
+
+            const vt = this.testDriver.getVehicleType()
+            if (vt) {
+                console.log("vt ", vt)
+                this.ghostVehicle = new GhostVehicle({
+                    vehicleType: vt, color: "#10eedd"
+                })
+                await this.ghostVehicle.loadModel()
+                this.ghostVehicle.addToScene(this)
+
+            } else {
+                console.warn("no vt", vt)
+            }
+        }).catch(() => {
+            console.log("No ghost since there is no recording")
+        })
+    }
+
     async create(): Promise<void> {
 
         this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
@@ -90,24 +110,7 @@ export class RaceGameScene extends GameScene {
         if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
             console.log("gamesettings", this.gameSettings)
             if (this.gameSettings.useGhost) {
-
-                this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
-
-                    const vt = this.testDriver.getVehicleType()
-                    if (vt) {
-                        console.log("vt ", vt)
-                        this.ghostVehicle = new GhostVehicle({
-                            vehicleType: vt, color: "#10eedd"
-                        })
-                        await this.ghostVehicle.loadModel()
-                        this.ghostVehicle.addToScene(this)
-
-                    } else {
-                        console.warn("no vt", vt)
-                    }
-                }).catch(() => {
-                    console.log("No ghost since there is no recording")
-                })
+                this.createGhostVehicle()
             }
             console.log("creating drive recorder")
             this.driverRecorder = new DriveRecorder({
@@ -224,6 +227,9 @@ export class RaceGameScene extends GameScene {
 
         this.driverRecorder?.reset()
         this.testDriver?.reset()
+        if (this.gameSettings.useGhost) {
+            this.createGhostVehicle()
+        }
 
         this.hasShowStartAnimation = true
         /**
@@ -383,11 +389,11 @@ export class RaceGameScene extends GameScene {
             this.viewsNameInfo[0].innerHTML = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
         }
 
-        if (this.ghostVehicle) {
+        if (this.ghostVehicle && maxTotalTime > 0) {
             this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
         }
-        if (this.driverRecorder) {
-            this.driverRecorder.record(this.vehicles[0], time)
+        if (this.driverRecorder && maxTotalTime > 0) {
+            this.driverRecorder.record(this.vehicles[0], maxTotalTime)
         }
     }
 

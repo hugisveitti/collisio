@@ -39,6 +39,12 @@ export class GhostVehicle implements IGhostVehicle {
 
         this.vehicle = new ExtendedObject3D()
 
+        if (this.config.vehicleType === "simpleSphere") {
+            // TODO
+            console.warn("Round betty not suported as ghost!")
+            this.config.vehicleType = "normal"
+        }
+
     }
 
     addToScene(scene: Scene3D) {

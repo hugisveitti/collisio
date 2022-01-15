@@ -273,10 +273,10 @@ export const vehicleConfigs = {
         engineForce: 12500,
         breakingForce: 300,
         is4x4: false,
-        maxSpeed: 330,
+        maxSpeed: 320,
         frictionSlip: 8.5, //3.5
         suspensionStiffness: 50,
-        suspensionDamping: 12,
+        //  suspensionDamping: // 12,
 
         inertia: { x: 3000, y: 5000, z: 4000 },
         towPosition: new Vector3(0, -.5, -4),
@@ -303,11 +303,11 @@ export const vehicleConfigs = {
 
         //   frictionSlip: 27.5,
 
-        maxSuspensionTravelCm: 500,
-        suspensionStiffness: 120,
-        suspensionDamping: 12,
+        // maxSuspensionTravelCm: 500,
+        // suspensionStiffness: 120,
+        // suspensionDamping: 12,
         mass: 500,
-        engineForce: 5500,
+        engineForce: 5750,
         breakingForce: 250,
         is4x4: false,
         towPosition: new Vector3(0, 0.5, -3.7),
@@ -355,7 +355,7 @@ export const vehicleConfigs = {
 
 
         mass: 200,
-        engineForce: 4500,
+        engineForce: 4000,
         breakingForce: 100,
         suspensionRestLength: .87,
         is4x4: false,
