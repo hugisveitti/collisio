@@ -2,6 +2,7 @@ import { ClosestRaycaster } from "@enable3d/ammo-physics";
 import { BufferGeometry, Line, LineBasicMaterial, Vector3 } from "three";
 import { IGameScene } from '../game/IGameScene';
 import { VehicleType } from "../shared-backend/shared-stuff";
+import { numberScaler } from "../utils/utilFunctions";
 import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "./IVehicle";
 import { LowPolyVehicle } from "./LowPolyVehicle";
 import { initialVehicleConfigs, IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
@@ -27,7 +28,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects: boolean) {
         super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useSoundEffects })
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
-        //  vehicleConfigs[this.vehicleType].maxSpeed = 1000
+        //  this.vehicleConfig.maxSpeed = 1000
         this.inertia = new Ammo.btVector3(0, 0, 0)
         if (intelligentDriveLine) {
 
@@ -88,7 +89,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         }
         // this is for engineForce
         // @ts-ignore
-        vehicleConfigs[this.vehicleType][key] = value
+        this.vehicleConfig[key] = value
         if (this[key] !== undefined) {
             this[key] = value
         }
@@ -96,12 +97,12 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     }
 
     getVehicleConfigKey(key: keyof IVehicleConfig) {
-        if (instanceOfSimpleVector(vehicleConfigs[this.vehicleType][key])) {
-            const val = this.getLocalStorageVec(key) ?? vehicleConfigs[this.vehicleType][key]
+        if (instanceOfSimpleVector(this.vehicleConfig[key])) {
+            const val = this.getLocalStorageVec(key) ?? this.vehicleConfig[key]
             this.setVehicleConfigKey(key, val)
             return val
         } else {
-            const val = this.getLocalStorage(key) ?? vehicleConfigs[this.vehicleType][key]
+            const val = this.getLocalStorage(key) ?? this.vehicleConfig[key]
             this.setVehicleConfigKey(key, val)
             return val
         }
@@ -111,7 +112,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
     setInertia(inertia: SimpleVector) {
 
-        vehicleConfigs[this.vehicleType].inertia = inertia
+        this.vehicleConfig.inertia = inertia
         const { x, y, z } = inertia
         this.setLocalStorageVec("inertia", inertia)
 
@@ -120,7 +121,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     }
 
     getInertia(): SimpleVector {
-        let i = this.getLocalStorageVec("inertia") ?? vehicleConfigs[this.vehicleType].inertia
+        let i = this.getLocalStorageVec("inertia") ?? this.vehicleConfig.inertia
         this.setInertia(i)
 
         return i
@@ -128,7 +129,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
     /** Maybe better to have one vector we set values to, instead of always new */
     getAmmoInertia(): Ammo.btVector3 {
-        const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
+        const { x, y, z } = this.vehicleConfig.inertia
         this.inertia.setValue(x, y, z)
         return this.inertia
     }
@@ -167,26 +168,26 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
     updateWheelsSuspension() {
 
-        this.tuning.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness);
-        this.tuning.set_m_suspensionCompression(vehicleConfigs[this.vehicleType].suspensionCompression);
-        this.tuning.set_m_suspensionDamping(vehicleConfigs[this.vehicleType].suspensionDamping);
+        this.tuning.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness);
+        this.tuning.set_m_suspensionCompression(this.vehicleConfig.suspensionCompression);
+        this.tuning.set_m_suspensionDamping(this.vehicleConfig.suspensionDamping);
 
-        this.tuning.set_m_maxSuspensionTravelCm(vehicleConfigs[this.vehicleType].maxSuspensionTravelCm);
-        this.tuning.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip);
-        this.tuning.set_m_maxSuspensionForce(vehicleConfigs[this.vehicleType].maxSuspensionForce);
+        this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
+        this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
+        this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
 
 
         for (let i = 0; i < this.vehicle.getNumWheels(); i++) {
             const wheelInfo = this.vehicle.getWheelInfo(i)
 
-            wheelInfo.set_m_suspensionRestLength1(vehicleConfigs[this.vehicleType].suspensionRestLength)
-            wheelInfo.set_m_suspensionStiffness(vehicleConfigs[this.vehicleType].suspensionStiffness)
+            wheelInfo.set_m_suspensionRestLength1(this.vehicleConfig.suspensionRestLength)
+            wheelInfo.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness)
 
-            wheelInfo.set_m_wheelsDampingRelaxation(vehicleConfigs[this.vehicleType].suspensionDamping)
-            wheelInfo.set_m_wheelsDampingCompression(vehicleConfigs[this.vehicleType].suspensionDamping)
+            wheelInfo.set_m_wheelsDampingRelaxation(this.vehicleConfig.suspensionDamping)
+            wheelInfo.set_m_wheelsDampingCompression(this.vehicleConfig.suspensionDamping)
 
-            wheelInfo.set_m_frictionSlip(vehicleConfigs[this.vehicleType].frictionSlip)
-            wheelInfo.set_m_rollInfluence(vehicleConfigs[this.vehicleType].rollInfluence)
+            wheelInfo.set_m_frictionSlip(this.vehicleConfig.frictionSlip)
+            wheelInfo.set_m_rollInfluence(this.vehicleConfig.rollInfluence)
             //    wheelInfo.updateWheel(this.vehicle.getRigidBody(), this.vehicle.getRigidBody().)
             this.vehicle.updateSuspension(0)
         }
@@ -206,8 +207,11 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     updateMaxSpeed(speed: number) {
         this.setLocalStorage("maxSpeed", speed)
 
-        vehicleConfigs[this.vehicleType].maxSpeed = speed
+        this.vehicleConfig.maxSpeed = speed
+        this.vehicleConfig.maxSpeed = speed
         this.setVehicleConfigKey("maxSpeed", speed)
+
+        this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
 
     }
 
@@ -218,7 +222,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
 
     randomDrive() {
         if (Math.random() < .3) {
-            this.goForward(false)
+            this.goForward()
         } else if (Math.random() < .05) {
             this.goBackward()
         }

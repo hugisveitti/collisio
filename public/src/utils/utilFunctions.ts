@@ -65,9 +65,9 @@ export const removeUndefinedFromObject = (object: Object) => {
  * https://en.wikipedia.org/wiki/Feature_scaling
  * goes from  range min - max to range [a-b]
  */
-export const numberScaler = (a: number, b: number, min: number, max: number) => {
+export const numberScaler = (a: number, b: number, min: number, max: number, precision: number) => {
     return (num: number) => {
-        return +(a + (((num - min) * (b - a)) / (max - min))).toPrecision(2)
+        return +(a + (((num - min) * (b - a)) / (max - min))).toPrecision(precision)
     }
 }
 

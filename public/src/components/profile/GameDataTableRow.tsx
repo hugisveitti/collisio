@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import React, { useState } from "react";
-import { IEndOfRaceInfoPlayer } from "../../classes/Game";
+import { getTrackNameFromType, IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { deletePlayerGameData } from "../../firebase/firestoreGameFunctions";
 import { getDateFromNumber } from "../../utils/utilFunctions";
 
@@ -41,7 +41,7 @@ const GameDataTableRow = (props: IProps) => {
           </IconButton>
         </TableCell>
         <TableCell>{raceDate}</TableCell>
-        <TableCell>{playerData.trackName}</TableCell>
+        <TableCell>{getTrackNameFromType(playerData.trackName)}</TableCell>
         <TableCell>{playerData.numberOfLaps}</TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
         <TableCell>{playerData.bestLapTime}</TableCell>

@@ -9,7 +9,7 @@ export interface ICourse {
     createCourse: () => Promise<void>
     clearCourse: () => void
     updateCourse: () => void
-    setStartPositions: (vehicle: IVehicle[]) => void
+    setStartPositions: (vehicle: IVehicle[]) => Promise<void>
     ground: ExtendedObject3D
     startPosition: Vector3
     startRotation: Euler

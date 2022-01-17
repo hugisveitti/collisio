@@ -100,7 +100,6 @@ export class TestDriver {
     }
 
     reset() {
-        console.log("resetting test driver", this)
         this.pos = new Vector3(0, 0, 0)
         this.rotation = new Quaternion(0, 0, 0, 0)
         this.nextPos = new Vector3(0, 0, 0)
@@ -143,7 +142,6 @@ export class TestDriver {
         if (this.timeIndex < this.di.length - 1 && cTime < time) {
             this.timeIndex += 1
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
-            // console.log("set pos", this.pos.x.toFixed(1), this.pos.z.toFixed(2))
             vehicle.setPosition(this.pos.clone())
             vehicle.setRotation(this.rotation.clone())
             this.numNotUpdates = 0
@@ -151,7 +149,6 @@ export class TestDriver {
         } else if (cTime > time) {
             this.numNotUpdates += 1
             this.getPointBetween()
-            //   console.log("set pos between", this.betweenPos.x.toFixed(1), this.betweenPos.z.toFixed(2))
             vehicle.setPosition(this.betweenPos.clone())
             vehicle.setRotation(this.betweenRot.clone())
         }
@@ -206,10 +203,7 @@ export class DriveRecorder {
     goalCrossed() {
         if (!this.config.active) return
         this.finishedLaps += 1
-        console.log("goal crossed", this.config)
-        console.log("fin laps", this.finishedLaps)
         if (this.config.numberOfLaps === this.finishedLaps) {
-            console.log("saving lap")
             if (this.config.tournamentId) {
                 this.saveRecordedInstructionsToServer()
             }
@@ -218,10 +212,8 @@ export class DriveRecorder {
 
     saveTournamentRecording = (totalTime: number, playerName?: string, playerId?: string) => {
         const metaData = [`${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId} ${playerName} ${playerId}`]
-        console.log("meta data", metaData)
+        console.log("saving tournament rec, meta data:", metaData)
         uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions), totalTime)
-
-
     }
 
     saveRecordedInstructionsToServer = (playerName?: string, playerId?: string) => {

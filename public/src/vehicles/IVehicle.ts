@@ -48,7 +48,7 @@ export interface IVehicle {
     useChaseCamera: boolean
     vehicleType: VehicleType
 
-    goForward: (moreSpeed?: boolean) => void
+    goForward: () => void
     goBackward: (speed?: number) => void
     noForce: () => void
 
@@ -64,7 +64,7 @@ export interface IVehicle {
 
     addCamera: (camera: any) => void
     removeCamera: () => void
-    cameraLookAt: (camera: any) => void
+    cameraLookAt: (camera: any, delta: number) => void
     update: (delta: number) => void
     setPosition: (x: number, y: number, z: number) => void
     getPosition: () => SimpleVector
@@ -85,6 +85,8 @@ export interface IVehicle {
     addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
 
     getTowPivot: () => Vector3
+
+    setToGround: () => void
 }
 
 
@@ -93,11 +95,13 @@ export interface ITestVehicle extends IVehicle {
     intelligentDrive: (log: boolean) => void
 }
 
-const zScaler = numberScaler(12, 30, 1, 10)
-const yScaler = numberScaler(3, 12, 1, 10)
+const zScaler = numberScaler(12, 30, 1, 10, 2)
+// const yScaler = numberScaler(3, 12, 1, 10, 2)
+const yScaler = numberScaler(4, 12, 1, 10, 2)
 
 // cameraZoom should be a number from 1 to 10
 export const getStaticCameraPos = (cameraZoom: number) => {
+    // cameraZoom = 2
     return { x: 0, y: yScaler(cameraZoom), z: -zScaler(cameraZoom) }
 }
 

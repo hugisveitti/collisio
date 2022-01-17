@@ -2,6 +2,7 @@ import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
@@ -267,6 +268,8 @@ export class GameScene extends Scene3D implements IGameScene {
     async preload() {
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
         this.addLights()
+        const controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.physics.debug.enable()
 
         const listener = new AudioListener()
         this.camera.add(listener)
@@ -1041,8 +1044,8 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-    resetVehicles() {
-        this.course.setStartPositions(this.vehicles)
+    async resetVehicles() {
+        await this.course.setStartPositions(this.vehicles)
         this.stopAllVehicles()
         this._resetVehicles()
     }
@@ -1063,7 +1066,7 @@ export class GameScene extends Scene3D implements IGameScene {
              * For the chase cam, we have to look at the vehicle and then update the position
              * Maybe that is wrong but I think it shakes less
              */
-            this.vehicles[i].cameraLookAt(this.views[i].camera)
+            this.vehicles[i].cameraLookAt(this.views[i].camera, delta)
             this.vehicles[i].update(delta)
 
             const left = Math.floor(window.innerWidth * this.views[i].left);
@@ -1081,9 +1084,11 @@ export class GameScene extends Scene3D implements IGameScene {
             this.views[i].camera.updateProjectionMatrix();
             this.renderer.render(this.scene, this.views[i].camera);
 
-            this.checkVehicleOutOfBounds(i)
+            if (this.gameStarted) {
+                this.checkVehicleOutOfBounds(i)
 
-            this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
+                this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
+            }
         }
     }
 

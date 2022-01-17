@@ -40,15 +40,12 @@ export const setLocalGameSetting = (key: keyof IGameSettings, value: string | nu
     window.localStorage.setItem(key, value.toString())
 }
 
-
-
 export const getLocalGameSetting = (key: keyof IGameSettings, type: "string" | "number" | "boolean") => {
     let value = window.localStorage.getItem(key)
     if (value !== undefined && value !== null) {
         if (type === "number") {
             return +value
         } else if (type === "boolean") {
-            console.log("key", key, "value", value)
             return eval(value)
         }
         return value
@@ -75,5 +72,20 @@ export const setAllLocalGameSettings = (gameSettings: IGameSettings) => {
     for (let key of keys) {
         // @ts-ignore
         setLocalGameSetting(key, gameSettings[key])
+    }
+}
+
+
+interface IRecommendedGraphicsSettings {
+    useShadow: boolean
+    graphics: GraphicsType
+}
+
+export const getRecommendedGraphicSettings = (): IRecommendedGraphicsSettings => {
+
+    // not finished
+    return {
+        useShadow: true,
+        graphics: "high"
     }
 }

@@ -8,8 +8,13 @@ import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
+import { numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
+
+const maxFov = 80
+const minFov = 55
+const fovScaler = numberScaler(minFov, maxFov, 1, 400, 8)
 
 
 export interface IVehicleClassConfig {
@@ -73,8 +78,10 @@ export class Vehicle implements IVehicle {
     vehicleNumber: number;
     vehicleType: VehicleType;
 
+    currentFov: number
 
-    goForward(moreSpeed?: boolean) { };
+
+    goForward() { };
     goBackward(speed?: number) { };
     noForce() { };
 
@@ -89,7 +96,7 @@ export class Vehicle implements IVehicle {
     unpause() { };
     addCamera(camera: any) { };
     removeCamera() { };
-    cameraLookAt(camera: any) { };
+    cameraLookAt(camera: any, detla: number) { };
     update(delta: number) { };
     setPosition(x: number, y: number, z: number) { };
     getPosition(): SimpleVector {
@@ -111,6 +118,8 @@ export class Vehicle implements IVehicle {
     setCheckpointPositionRotation(positionRotation: IPositionRotation) {
         this.checkpointPositionRotation = positionRotation
     };
+
+    setToGround() { }
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
         console.log("vehicle settings updated", vehicleSettings)
@@ -152,7 +161,7 @@ export class Vehicle implements IVehicle {
         this.scene = config.scene
         this.vehicleColor = config.vehicleColor
 
-        this.vehicleConfig = vehicleConfigs[this.vehicleType]
+        this.vehicleConfig = JSON.parse(JSON.stringify(vehicleConfigs[this.vehicleType]))
         this.isReady = false
         this.isPaused = false
         this.canDrive = false
@@ -168,6 +177,7 @@ export class Vehicle implements IVehicle {
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
         this.oldPos = new Vector3(0, 0, 0)
+        this.currentFov = 55
     }
 
     getTowPivot() {
@@ -222,14 +232,10 @@ export class Vehicle implements IVehicle {
 
         this.skidSound = new Audio(listener)
         batch.push(
-
             loadSkidSoundBuffer().then(buffer => {
                 this.skidSound.setBuffer(buffer)
-                //   this.skidSound.setRefDistance(3)
                 this.skidSound.setLoop(false)
                 this.skidSound.setVolume(1)
-                //   this.skidSound.duration = .2
-
                 this.skidVolume = 0
             })
         )
@@ -238,6 +244,34 @@ export class Vehicle implements IVehicle {
             console.log("all sounds loaded")
             this.engineSoundLoaded = true
         })
+    }
+
+    addDownForce() {
+        // const downforceCoeff = .4
+        // const frontalArea = 2
+        // const airDence = 1.2041
+
+        // const v = this.getCurrentSpeedKmHour()
+        // const force = 0.5 * downforceCoeff * frontalArea * airDence * (v * v)
+
+        // this.vehicleBody.body.applyForceY(-force)
+    }
+
+    updateFov() {
+        if (this.camera) {
+            if (this.getCurrentSpeedKmHour() > 10) {
+                this.currentFov = Math.min(fovScaler(this.getCurrentSpeedKmHour()), maxFov)
+                this.camera.fov = this.currentFov
+                this.camera.updateProjectionMatrix()
+            } else {
+                this.currentFov -= 1
+                this.currentFov = Math.max(this.currentFov, minFov)
+
+                this.camera.fov = this.currentFov
+                this.camera.updateProjectionMatrix()
+
+            }
+        }
     }
 
     playSkidSound(skid: number) {

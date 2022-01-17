@@ -323,7 +323,7 @@ export class LowPolyTestScene extends GameScene {
 
 
         this.ghostVechicle.loadModel().then(() => {
-            //  this.scene.add(this.ghostVechicle.vehicle)
+
             this.ghostVechicle.addToScene(this)
         });
 
@@ -517,9 +517,9 @@ export class LowPolyTestScene extends GameScene {
         this.vehicle.update(delta)
     }
 
-    _upd() {
+    _upd(delta: number) {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
-            this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera)
+            this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
         }
     }
 
@@ -570,7 +570,7 @@ export class LowPolyTestScene extends GameScene {
             }
         }
 
-        this._upd()
+        this._upd(delta)
     }
 
     resetPlayer(idx: number, y?: number) {

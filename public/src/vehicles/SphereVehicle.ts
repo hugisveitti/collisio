@@ -108,7 +108,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     };
 
 
-    goForward(moreSpeed?: boolean): void {
+    goForward(): void {
         // if (this.zVel > -this.engineForce) {
         //     this.zVel -= this.dzVel
         // }
@@ -228,7 +228,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     }
 
     // look at vehicle
-    cameraLookAt(camera: PerspectiveCamera): void {
+    cameraLookAt(camera: PerspectiveCamera, delta: number): void {
 
 
         const pos = this.vehicleBody.position.clone()

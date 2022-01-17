@@ -1,5 +1,6 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
+import { sort } from "d3";
 import { Euler, Group, MeshStandardMaterial, Object3D, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
@@ -29,7 +30,6 @@ export class Course implements ICourse {
     /** all of the objects with physics */
     gamePhysicsObjects: ExtendedObject3D[]
 
-
     courseScene: Group
     spawns: Object3D[]
     sAlign: Object3D
@@ -58,6 +58,8 @@ export class Course implements ICourse {
     // if they are between the camera and the player
     possibleIntersectObjects: Object3D[] = []
 
+    isReady: boolean
+
     constructor(gameScene: GameScene, trackName: TrackName) {
         this.gameScene = gameScene
         this.trackName = trackName
@@ -73,6 +75,7 @@ export class Course implements ICourse {
         this.vehicles = []
         this.wagons = []
         this.courseItemsLoader = new CourseItemsLoader(this)
+        this.isReady = false
     }
 
 
@@ -94,7 +97,10 @@ export class Course implements ICourse {
         }
     }
 
-    checkIfObjectOutOfBounds(pos: SimpleVector) {
+    checkIfObjectOutOfBounds(pos: Vector3) {
+        // no map yet goes so deep
+        //  if (pos.y < 10) return true
+
         return false
     }
 
@@ -172,7 +178,6 @@ export class Course implements ICourse {
             if (!p.name.includes("spawn") && !p.name.includes("align")) {
                 tempCheckpoints.push(p)
             }
-
             this.checkpoints = tempCheckpoints
 
             /**
@@ -211,21 +216,24 @@ export class Course implements ICourse {
 
     }
 
-
-
     calcSpawnAngle(_p2: Vector3, _p1: Vector3) {
         const p1 = _p1.clone()
         const p2 = _p2.clone()
-
         const angle = Math.atan2(p2.x - p1.x, p2.z - p1.z)
-
         const q = new Quaternion().setFromEuler((new Euler(0, angle, 0, "XYZ")))
-
         return q
     }
 
-    setStartPositions(vehicles: IVehicle[]) {
+    async timeout(sec: number = 5) {
+        return new Promise<void>((res, rej) => {
 
+            setTimeout(() => {
+                res()
+            }, sec * 1000)
+        })
+    }
+
+    async setStartPositions(vehicles: IVehicle[]) {
         // align position
         let aPos: Vector3
         if (this.sAlign) {
@@ -235,39 +243,57 @@ export class Course implements ICourse {
         }
 
         let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn" && !s.name.includes("align"))
+        console.log("usable spawns", usableSpawns)
+        console.log("spawn aligners", this.spawnAligners)
         if (usableSpawns.length >= vehicles.length) {
             // const sortedSpawns = new Array(usableSpawns.length)
             // for (let spawn of usableSpawns) {
             //     const idx = +spawn.name.slice(5, 6)
             //     sortedSpawns[idx - 1] = spawn
             // }
+
+
+
             let sortedSpawns = usableSpawns
             sortedSpawns.sort((a, b) => a.name < b.name ? -1 : 1)
+            let spawnAligns: { spawn: Vector3, align: Vector3 }[] = []
+            for (let i = 0; i < sortedSpawns.length; i++) {
+                const alignKey = `align${i + 1}`
+                if (alignKey in this.spawnAligners) {
+                    aPos = this.spawnAligners[alignKey].position
+                }
+                spawnAligns.push({
+                    spawn: sortedSpawns[i].position,
+                    align: aPos
+                })
+            }
             /**
              * Make the spawns be in order (spawn1, spawn2, etc.)
              * and remove unwanted spawns
              * since if there are 2 players, they could start one in front of the other instead of side by side
              */
 
-            sortedSpawns = sortedSpawns.slice(0, vehicles.length)
-            shuffleArray(sortedSpawns)
+            spawnAligns = spawnAligns.slice(0, vehicles.length)
+            shuffleArray(spawnAligns)
 
             // use predefined spawns
 
 
             for (let i = 0; i < vehicles.length; i++) {
-                const p = sortedSpawns[i].position
-                const r = sortedSpawns[i].rotation
+                const p = spawnAligns[i].spawn
+                const r = spawnAligns[i].spawn
 
                 // this wont work if i randomize the spawns
                 // need to create objects which have their own aligns
-                const alignKey = `align${i + 1}`
-                if (alignKey in this.spawnAligners) {
-                    aPos = this.spawnAligners[alignKey].position
-                }
+                // const alignKey = `align${i + 1}`
+                // if (alignKey in this.spawnAligners) {
+                //     aPos = this.spawnAligners[alignKey].position
+                // }
+
+                let aligner = spawnAligns[i].align ?? aPos
 
                 if (aPos) {
-                    vehicles[i].setCheckpointPositionRotation({ position: p, rotation: this.calcSpawnAngle(aPos, p) })
+                    vehicles[i].setCheckpointPositionRotation({ position: p, rotation: this.calcSpawnAngle(aligner, p) })
                 } else {
                     vehicles[i].setCheckpointPositionRotation({ position: p, rotation: { x: 0, z: 0, y: r.y } })
                 }

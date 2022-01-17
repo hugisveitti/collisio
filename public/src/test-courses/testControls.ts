@@ -15,7 +15,7 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
     let btnDown = false
     if (mobileControls.f) {
-        vehicle.goForward(false)
+        vehicle.goForward()
         btnDown = true
     }
     if (mobileControls.b) {
@@ -62,7 +62,7 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
 
     const testDriveVehicleWithKeyboard = () => {
         if (mobileControls.f) {
-            vehicle.goForward(false)
+            vehicle.goForward()
         } else if (mobileControls.b) {
             vehicle.goBackward(speed)
         } else {

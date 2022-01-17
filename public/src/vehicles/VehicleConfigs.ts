@@ -280,7 +280,7 @@ export const vehicleConfigs = {
 
         inertia: { x: 3000, y: 5000, z: 4000 },
         towPosition: new Vector3(0, -.5, -4),
-        path: "sports-car.gltf",
+        path: "sports-car.glb",
 
         centerOfMassOffset: 1
     },
@@ -288,15 +288,15 @@ export const vehicleConfigs = {
         ...defaultVehicleConfig,
         path: "F1-car.glb",
 
-        wheelAxisBackPosition: -2.65,
+        wheelAxisBackPosition: -2.7,
         wheelRadiusBack: 0.95 / 2,
         wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: 0,
+        wheelAxisHeightBack: .1,
 
-        wheelAxisFrontPosition: 2.85,
+        wheelAxisFrontPosition: 2.95,
         wheelRadiusFront: 0.95 / 2,
         wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: 0,
+        wheelAxisHeightFront: 0.1,
 
         suspensionRestLength: .4,
         //  inertia: { x: 4000, y: 1000, z: 4000 },
@@ -306,8 +306,8 @@ export const vehicleConfigs = {
         // maxSuspensionTravelCm: 500,
         // suspensionStiffness: 120,
         // suspensionDamping: 12,
-        mass: 500,
-        engineForce: 5750,
+        mass: 300,
+        engineForce: 6500,
         breakingForce: 250,
         is4x4: false,
         towPosition: new Vector3(0, 0.5, -3.7),
@@ -337,29 +337,29 @@ export const vehicleConfigs = {
     future: {
         ...defaultVehicleConfig,
         path: "future-vehicle.glb",
-        wheelAxisBackPosition: -2.5,
-        wheelRadiusBack: 2 / 2,
-        wheelHalfTrackBack: 2.35,
-        wheelAxisHeightBack: .55,
+        wheelAxisBackPosition: -1.9, // -2.5 * .5,
+        wheelRadiusBack: 1.5 / 2, // 2 / 2,
+        wheelHalfTrackBack: 1.76, // 2.35,
+        wheelAxisHeightBack: .41,// .55,
 
-        wheelAxisFrontPosition: 3.75,
-        wheelRadiusFront: 2 / 2,
-        wheelHalfTrackFront: 2.35,
-        wheelAxisHeightFront: .55,
+        wheelAxisFrontPosition: 2.75,  // 3.75,
+        wheelRadiusFront: 1.5 / 2, // 2 / 2,
+        wheelHalfTrackFront: 1.76, // 2.35,
+        wheelAxisHeightFront: .41,// .55,
 
         suspensionCompression: 1,
         suspensionStiffness: 75,
         suspensionDamping: 5,
         maxSuspensionTravelCm: 500,
-        maxSpeed: 300,//270,
+        maxSpeed: 270,
 
 
-        mass: 200,
-        engineForce: 4000,
+        mass: 150,
+        engineForce: 4500,
         breakingForce: 100,
         suspensionRestLength: .87,
         is4x4: false,
-        centerOfMassOffset: .45
+        centerOfMassOffset: .75
 
     },
     gokart: {

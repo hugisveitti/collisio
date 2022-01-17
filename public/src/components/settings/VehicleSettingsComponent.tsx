@@ -71,6 +71,29 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   return (
     <CollabsibleCard header="Vehicle settings">
       <Grid container spacing={3}>
+        <Grid item xs={12} lg={12}>
+          <VehicleSelect
+            previewVehicle={props.previewVehicle}
+            value={props.store.userSettings.vehicleSettings.vehicleType}
+            excludedVehicles={nonactiveVehcileTypes}
+            vehicleColor={props.store.userSettings.vehicleSettings.vehicleColor}
+            onChange={(value) => {
+              updateVehicleSettings("vehicleType", value);
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <AnySelect
+            selectedValue={getVehicleColorOption(
+              props.store.userSettings.vehicleSettings.vehicleColor
+            )}
+            options={vehicleColors}
+            title="Vehicle color"
+            onChange={(selected) => {
+              updateVehicleSettings("vehicleColor", selected);
+            }}
+          />
+        </Grid>
         <Grid item xs={6} sm={4}>
           {props.resetOrientation && (
             <Button
@@ -154,29 +177,6 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
             </Typography>
           </Grid>
         )}
-        <Grid item xs={12} lg={12}>
-          <VehicleSelect
-            previewVehicle={props.previewVehicle}
-            value={props.store.userSettings.vehicleSettings.vehicleType}
-            excludedVehicles={nonactiveVehcileTypes}
-            vehicleColor={props.store.userSettings.vehicleSettings.vehicleColor}
-            onChange={(value) => {
-              updateVehicleSettings("vehicleType", value);
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <AnySelect
-            selectedValue={getVehicleColorOption(
-              props.store.userSettings.vehicleSettings.vehicleColor
-            )}
-            options={vehicleColors}
-            title="Vehicle color"
-            onChange={(selected) => {
-              updateVehicleSettings("vehicleColor", selected);
-            }}
-          />
-        </Grid>
       </Grid>
     </CollabsibleCard>
   );

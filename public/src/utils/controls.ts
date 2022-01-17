@@ -11,7 +11,7 @@ let gameIsPaused = false
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, callback?: any) => {
     let btnDown = false
     if (mobileControls.f) {
-        vehicle.goForward(false)
+        vehicle.goForward()
         btnDown = true
     }
     if (mobileControls.b) {
@@ -86,7 +86,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket, ve
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
 
     if (vehicleControls.f) {
-        vehicle.goForward(true)
+        vehicle.goForward()
     } else if (vehicleControls.b) {
         vehicle.goBackward(speed)
     } else {

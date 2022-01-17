@@ -76,7 +76,7 @@ class SpeedTestScene extends GameScene {
             this.vehicles[i].goForward()
             this.vehicles[i].update(delta)
             if (i === 0) {
-                this.vehicles[i].cameraLookAt(this.camera)
+                this.vehicles[i].cameraLookAt(this.camera, delta)
             }
         }
     }

@@ -130,7 +130,7 @@ export class RaceGameScene extends GameScene {
         }
         this.createViews()
         this.createController()
-        this.resetVehicles()
+        await this.resetVehicles()
 
         this.restartGame()
     }
@@ -151,9 +151,11 @@ export class RaceGameScene extends GameScene {
          */
         setTimeout(() => {
             for (let vehicle of this.vehicles) {
+                vehicle.setToGround()
                 vehicle.start()
+                vehicle.break()
             }
-        }, (2) * 1000)
+        }, (.5) * 1000)
 
         const timer = () => {
             if (this.raceCountdownTime < 4) {

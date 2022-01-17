@@ -1,12 +1,10 @@
 import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
-import { ThirteenMp } from "@mui/icons-material";
 import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { degToRad, logScaler, numberScaler } from "../utils/utilFunctions";
-import { getStaticCameraPos, IPositionRotation } from "./IVehicle";
+import { degToRad, numberScaler } from "../utils/utilFunctions";
+import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -23,8 +21,9 @@ export const getVehicleNumber = (vehicleName: string) => {
     return num
 }
 
-const soundScaler = numberScaler(1, 5, 0, 330)
-const speedScaler = logScaler(300, 0.1, 1)
+const soundScaler = numberScaler(1, 5, 0, 330, 2)
+//const extraSpeedScaler = numberScaler(0, 100, Math.log2(1), Math.log2(1000), 2)
+
 
 
 
@@ -60,7 +59,7 @@ export class LowPolyVehicle extends Vehicle {
      * if player is holding down forward then the vehicle gets to the maxspeed (300km/h)
      * and then the maxSpeedTicks can help the vehicle gain more speed gradually
      */
-    maxSpeedTicks: number
+    maxSpeedTime: number
 
     /** only for the engine sound */
     currentEngineForce: number
@@ -78,6 +77,7 @@ export class LowPolyVehicle extends Vehicle {
     tm: Ammo.btTransform
     p: Ammo.btVector3
     q: Ammo.btQuaternion
+    p0: Ammo.btVector3[]
 
     euler = new Euler(0, 0, 0)
 
@@ -91,13 +91,21 @@ export class LowPolyVehicle extends Vehicle {
     chaseSpeedZ = 0
     chaseX = 0
     chaseZ = 0
+
     vehicleBodyPosition = new Vector3(0, 0, 0)
+    delta: number
+
+    jitterX: number = 0
+    jitterZ: number = 0
+
+    extraSpeedScaler: (time: number) => number
+
+
 
     constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
         super(config)
 
-        this.maxSpeedTicks = 0
-
+        this.maxSpeedTime = 0
 
         this.mass = this.vehicleConfig.mass
         this.engineForce = this.vehicleConfig.engineForce
@@ -106,6 +114,14 @@ export class LowPolyVehicle extends Vehicle {
 
         this.currentEngineForce = 0
         this.spinCameraAroundVehicle = false
+        this.p0 = [
+            new Ammo.btVector3(0, 0, 0),
+            new Ammo.btVector3(0, 0, 0),
+            new Ammo.btVector3(0, 0, 0),
+            new Ammo.btVector3(0, 0, 0),
+        ]
+
+
         this.vector = new Ammo.btVector3(0, 0, 0)
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2);
@@ -115,13 +131,13 @@ export class LowPolyVehicle extends Vehicle {
         this.chassisWorldTransfrom = new Ammo.btTransform()
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.cameraRay = new ClosestRaycaster(this.scene.physics)
+        this.delta = 0
 
+        this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
 
-        console.log("max turn", this.vehicleConfig.maxSteeringAngle)
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
-
         this.tires = []
         for (let tire of tires) {
             tire.receiveShadow = tire.castShadow = true
@@ -145,24 +161,81 @@ export class LowPolyVehicle extends Vehicle {
         (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
     }
 
+    changeCenterOfMass() {
+
+
+        // set center of mass
+        const mw = this.vehicleBody.matrixWorld.clone()
+        mw.elements[13] = mw.elements[13] + this.vehicleConfig.centerOfMassOffset
+
+        this.vehicleBody.geometry = this.vehicleBody.geometry.clone()
+        this.vehicleBody.geometry.applyMatrix4(mw)
+        if (this.vehicleBody.children.length > 0) {
+            const p = this.vehicleBody.children[0].position
+            this.vehicleBody.children[0].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
+            this.vehicleBody.children[0].updateWorldMatrix(true, true)
+        }
+
+        //  this.vehicleBody.updateWorldMatrix(true, true)
+        this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
+        this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
+
+    }
+
+    getWheelInfos(): { [number: string]: { wheelHalfTrack: number, wheelAxisHeight: number, wheelAxisPosition: number } } {
+        const wheelAxisBackPosition = this.vehicleConfig.wheelAxisBackPosition
+        const wheelHalfTrackBack = this.vehicleConfig.wheelHalfTrackBack
+        const wheelAxisHeightBack = this.vehicleConfig.wheelAxisHeightBack
+
+        const wheelAxisFrontPosition = this.vehicleConfig.wheelAxisFrontPosition
+        const wheelHalfTrackFront = this.vehicleConfig.wheelHalfTrackFront
+        const wheelAxisHeightFront = this.vehicleConfig.wheelAxisHeightFront
+
+        const obj = {}
+
+        obj[FRONT_RIGHT] =
+        {
+            wheelHalfTrack: wheelHalfTrackFront,
+            wheelAxisHeight: wheelAxisHeightFront,
+            wheelAxisPosition: wheelAxisFrontPosition
+        }
+        obj[FRONT_LEFT] =
+        {
+            wheelHalfTrack: -wheelHalfTrackFront,
+            wheelAxisHeight: wheelAxisHeightFront,
+            wheelAxisPosition: wheelAxisFrontPosition
+        }
+        obj[BACK_RIGHT] =
+        {
+            wheelHalfTrack: wheelHalfTrackBack,
+            wheelAxisHeight: wheelAxisHeightBack,
+            wheelAxisPosition: wheelAxisBackPosition
+        }
+        obj[BACK_LEFT] =
+        {
+            wheelHalfTrack: -wheelHalfTrackBack,
+            wheelAxisHeight: wheelAxisHeightBack,
+            wheelAxisPosition: wheelAxisBackPosition
+        }
+
+
+        return obj
+    }
 
     createVehicle() {
+        console.log("this.vehicleSettings", this.vehicleSettings)
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.scene.add.existing(this.vehicleBody)
 
-        // // set center of mass
-        // const mw = this.vehicleBody.matrixWorld
-        // mw.elements[13] = mw.elements[13] + this.vehicleConfig.centerOfMassOffset
-        // this.vehicleBody.geometry.applyMatrix4(mw)
-        // if (this.vehicleBody.children.length > 0) {
-        //     const p = this.vehicleBody.children[0].position
-        //     this.vehicleBody.children[0].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
-        //     this.vehicleBody.children[0].updateWorldMatrix(true, true)
-        // }
-        // this.vehicleBody.updateWorldMatrix(true, true)
-        // this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
-        // this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
+        this.changeCenterOfMass()
 
+        if (this.vehicleNumber === 0) {
+
+            console.log("this.vehicle", this.vehicleBody.position.clone(), this.tires[BACK_LEFT].position.clone())
+            const diff = this.vehicleBody.position.clone().sub(this.tires[BACK_LEFT].position.clone())
+
+            console.log("diff", diff)
+        }
 
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
 
@@ -220,6 +293,8 @@ export class LowPolyVehicle extends Vehicle {
             wheelRadiusFront,
             FRONT_RIGHT
         )
+
+
 
         this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
         this.addWheel(
@@ -304,20 +379,27 @@ export class LowPolyVehicle extends Vehicle {
         return t
     }
 
-    goForward(moreSpeed: boolean) {
+    decreaseMaxSpeedTicks() {
+        if (this.maxSpeedTime > 1) {
+            this.maxSpeedTime = (this.maxSpeedTime * .95)
+        }
+    }
+
+    goForward() {
 
         if (!this.canDrive) return
         const kmh = this.getCurrentSpeedKmHour(0)
-
-        let eF = moreSpeed ? this.engineForce * 1.5 : this.engineForce
-        if (kmh > this.vehicleConfig.maxSpeed + (this.maxSpeedTicks / 10)) {
+        let eF = this.engineForce
+        // if (kmh > this.vehicleConfig.maxSpeed + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
+        if (kmh > 10 + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
+            //  if (kmh > this.vehicleConfig.maxSpeed + (this.maxSpeedTime / (16 * 10))) {
 
             eF = 0 // -500
-            this.maxSpeedTicks += 1
+            this.maxSpeedTime += (this.delta / 2)
         } else if (kmh < this.vehicleConfig.maxSpeed) {
-            this.maxSpeedTicks = this.maxSpeedTicks * .1
+
         } else {
-            this.maxSpeedTicks -= 1
+            this.decreaseMaxSpeedTicks()
         }
 
         if (kmh < 2) {
@@ -337,21 +419,30 @@ export class LowPolyVehicle extends Vehicle {
 
     goBackward() {
         if (!this.canDrive) return
+        let eF = -this.engineForce
         if (this.getCurrentSpeedKmHour(0) > 10) {
+            this.decreaseMaxSpeedTicks()
             this.break()
             return
         }
-        this.break(true)
-        if (this.is4x4) {
-            this.vehicle.applyEngineForce(-this.engineForce, FRONT_LEFT)
-            this.vehicle.applyEngineForce(-this.engineForce, FRONT_RIGHT)
+
+        if (this.getCurrentSpeedKmHour() < -100) {
+            eF = 0
         }
 
-        this.vehicle.applyEngineForce(-this.engineForce, BACK_LEFT)
-        this.vehicle.applyEngineForce(-this.engineForce, BACK_RIGHT)
+        this.break(true)
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(eF, FRONT_LEFT)
+            this.vehicle.applyEngineForce(eF, FRONT_RIGHT)
+        }
+
+        this.vehicle.applyEngineForce(eF, BACK_LEFT)
+        this.vehicle.applyEngineForce(eF, BACK_RIGHT)
     };
 
     noForce() {
+        this.decreaseMaxSpeedTicks()
+
         this.break(true)
         let slowBreakForce = 2000
         const kmh = this.getCurrentSpeedKmHour(0)
@@ -418,12 +509,14 @@ export class LowPolyVehicle extends Vehicle {
     stop() {
         if (!this.vehicleBody.body) return
         this.zeroEngineForce()
+        this.break()
         this.vehicleBody.body.setCollisionFlags(1)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
     };
 
     start() {
+        this.break(true)
         this.vehicleBody.body.setCollisionFlags(0)
     };
 
@@ -452,11 +545,17 @@ export class LowPolyVehicle extends Vehicle {
     addCamera(camera: PerspectiveCamera) {
         if (!this.vehicleBody) return
         const c = this.vehicleBody.getObjectByName(camera.name)
+        this.camera = camera
         if (!this.useChaseCamera && !c) {
             camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
             this.vehicleBody.add(camera)
+        } else if (this.useChaseCamera) {
+            const p = this.getPosition()
+            const r = this.vehicleBody.rotation
+
+            this.camera.position.set(p.x - (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(Math.cos(r.z))))
+            //   this.camera.position.set(p.x + (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(r.z)))
         }
-        this.camera = camera
         if (!this.engineSound) {
             this.createCarSounds()
         }
@@ -471,7 +570,7 @@ export class LowPolyVehicle extends Vehicle {
     }
 
 
-    cameraLookAt(camera: PerspectiveCamera) {
+    cameraLookAt(camera: PerspectiveCamera, delta: number) {
         if (this.spinCameraAroundVehicle) {
             const rot = this.vehicleBody.rotation
             this.vehicle.updateVehicle(1 / 60)
@@ -495,16 +594,16 @@ export class LowPolyVehicle extends Vehicle {
             camera.updateProjectionMatrix()
 
         } else if (this.useChaseCamera) {
-            this.tm = this.vehicle.getChassisWorldTransform()
-            this.p = this.tm.getOrigin()
-            this.q = this.tm.getRotation()
+            // this.tm = this.vehicle.getChassisWorldTransform()
+            // this.p = this.tm.getOrigin()
+            // this.q = this.tm.getRotation()
 
             const rot = this.vehicleBody.rotation // this.euler.setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
             //  const rot = this.vehicleBody.rotation
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
 
-            const pos = this.getPosition() //this.vehicleBody.position //this.getPosition() // vec
+            const pos = this.vehicleBody.position// this.getPosition() //this.vehicleBody.position //this.getPosition() // vec
 
             const chaseSpeedY = 0.5
 
@@ -520,8 +619,8 @@ export class LowPolyVehicle extends Vehicle {
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
-            let dchaseSpeedX = Math.abs((Math.sin(rot.y)))// this.chaseCameraSpeed)
-            let dchaseSpeedZ = Math.abs((Math.cos(rot.y))) // this.chaseCameraSpeed)
+            let dchaseSpeedX = Math.abs((Math.sin(rot.y))) * 16 / +delta.toFixed(0)  // this.chaseCameraSpeed)
+            let dchaseSpeedZ = Math.abs((Math.cos(rot.y))) * 16 / +delta.toFixed(0) // this.chaseCameraSpeed)
 
             const diffX = dchaseSpeedX - this.chaseSpeedX
             const diffZ = dchaseSpeedZ - this.chaseSpeedZ
@@ -555,19 +654,21 @@ export class LowPolyVehicle extends Vehicle {
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
-            this.seeVehicle(this.cameraDir)
+            this.seeVehicle(this.cameraDir.clone())
             camera.updateProjectionMatrix()
         } else {
-            // const pos = this.vehicleBody.position
-            // const rot = this.vehicleBody.rotation
-            // this.cameraTarget.set(
-            //     pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
-            //     pos.y + this.staticCameraPos.y,
-            //     pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            // )
-            camera.lookAt(this.vehicleBody.position.clone())
-            // camera.lookAt(this.getPosition().clone())
-            //   this.seeVehicle(this.cameraTarget)
+            // camera.lookAt(this.vehicleBody.position.clone())
+
+            const pos = this.vehicleBody.position
+            const rot = this.vehicleBody.rotation
+            this.cameraTarget.set(
+                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+                pos.y + this.staticCameraPos.y,
+                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+            )
+            camera.lookAt(this.getPosition().clone())
+            this.seeVehicle(this.cameraTarget)
+            //     camera.updateProjectionMatrix()
         }
     };
 
@@ -635,7 +736,7 @@ export class LowPolyVehicle extends Vehicle {
             turningRight = Math.min(Math.abs(turningRight), maxTurning) * Math.sign(turningRight)
 
             if (log) {
-                console.warn("Vehicle assist, Turning right:", turningRight, ", TurningFront:", turningFront)
+                console.warn("Vehicle assist, Turning right:", turningRight.toFixed(2), ", TurningFront:", turningFront.toFixed(2))
             }
 
             let targetChangeX = - ((dirZ * turningFront)) * changeFactor
@@ -664,6 +765,8 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     detectJitter(delta: number) {
+        // only check if going forward for now
+        if (this.getCurrentSpeedKmHour() < 0) return false
         // this is somehow wrong
         // the expected DX and expDZ are not correct
         this.tm = this.vehicle.getChassisWorldTransform()
@@ -672,74 +775,94 @@ export class LowPolyVehicle extends Vehicle {
 
         const newPos = new Vector3(this.p.x(), this.p.y(), this.p.z())
         // sometime
-        const dist = newPos.distanceTo(this.prevPosition)
-        const mps = Math.abs(this.getCurrentSpeedKmHour()) / 3.6
+        const dist = newPos.clone().distanceTo(this.prevPosition)
+        const mps = (this.getCurrentSpeedKmHour()) / 3.6
         const expDist = mps * (delta / 1000)
 
-        //this.p.setY(this.p.y() - 1)
-        //this.vehicle.getChassisWorldTransform().setOrigin(this.p)
         if (Math.abs(expDist - dist) > .3 && Math.abs(expDist - dist) < 2) {
             //const expDX = Math.sin(e.y) * expDist
-            const correctNewPos = newPos //- (this.prevPosition, 1 / 2))
+            const diff = (dist - expDist)
+            const r = this.vehicleBody.rotation
+            this.jitterX = (expDist) * Math.sin(r.y)
+            this.jitterZ = (expDist) * Math.cos(r.y) * Math.sign(Math.cos(r.z))
+            let correctNewPos = new Vector3(
+                this.prevPosition.x + (this.jitterX),
+                this.prevPosition.y, //+ expDist,
+                this.prevPosition.z + (this.jitterZ)
+            )
 
-            // this.p.setValue(correctNewPos.x, newPos.y, correctNewPos.z)
+
+            const newDist = correctNewPos.clone().distanceTo(this.prevPosition)
+            if (Math.abs(newDist - expDist) > 0.1) {
+                console.log("DIST AND EXP DIS NOT SAMEEEE")
+            }
+
+
+            this.p.setValue(correctNewPos.x, newPos.y, correctNewPos.z)
             // this.tm.setOrigin(this.p)
-            // this.vehicle.getRigidBody().setWorldTransform
+            // this.vehicle.getRigidBody().setWorldTransform(this.tm)
 
-            //  this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
-            //    this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
-
-
-            // const r = this.getRotation()
-            // const expDZ = Math.cos(e.y) * expDist
-            // const DZ = (newPos.z - this.prevPosition.z)
+            this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
+            this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
 
 
+            console.warn("JITTER", ", dist:", dist.toFixed(2), ", exp dist:", expDist.toFixed(2), ", diff:", diff.toFixed(2))
 
-            console.warn("JITTER", ", dist:", dist.toFixed(2), ", exp dist:", expDist.toFixed(2), ", diff:", (dist - expDist).toFixed(2))
-
-            this.prevPosition = correctNewPos // newPos.clone()
-
+            this.prevPosition = correctNewPos.clone() // newPos.clone()
+            return true
 
         } else {
-
             this.prevPosition = newPos.clone()
+            return false
         }
+        return false
+    }
 
+    setToGround() {
+        // first set to above ground
+        const tempY = this.scene.course.ground.position.y
+        this.setPosition(undefined, tempY + 1, undefined)
+
+        const groundY = this.findClosesGround()
+        this.setPosition(undefined, groundY + .1, undefined)
     }
 
 
 
     update(delta: number) {
-        this.checkIfSpinning()
-        //     this.vehicleAssist(true)
-        // this.detectJitter(delta)
+        const usingJitter = this.useChaseCamera && this.detectJitter(delta)
+        //    console.log("ussing jitter", usingJitter)
 
-        this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
+        for (let i = 0; i < 4; i++) {
 
-        if (!!this.engineSound && this.useSoundEffects) {
-            this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
-        }
-        for (let i = 0; i < 5; i++) {
-            // this.vehicle.updateWheelTransform(i, true)
+
+
             this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
-            this.p = this.tm.getOrigin()
+            this.p0[i] = this.tm.getOrigin()
             this.q = this.tm.getRotation()
+
+
             if (i < 4) {
-                this.wheelMeshes[i].position.set(this.p.x(), this.p.y(), this.p.z())
+
+                this.wheelMeshes[i].position.set(this.p0[i].x(), this.p0[i].y(), this.p0[i].z())
                 this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
-                this.vehicle.updateWheelTransform(i, false)
+                this.vehicle.updateWheelTransform(i, usingJitter)
             } else {
             }
         }
 
+        if (!usingJitter) {
+            this.tm = this.vehicle.getChassisWorldTransform()
+            this.p = this.tm.getOrigin()
 
-        this.tm = this.vehicle.getChassisWorldTransform()
-        this.p = this.tm.getOrigin()
-        this.q = this.tm.getRotation()
+            this.q = this.tm.getRotation()
 
-        this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
-        this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+            this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
+            this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+
+        } else {
+
+        }
 
 
         // maybe this 0.2 value could use more thought
@@ -758,16 +881,34 @@ export class LowPolyVehicle extends Vehicle {
             const groundY = this.findClosesGround() + 1
             this.setPosition(undefined, groundY, undefined)
         }
+
+        if (!this.isPaused && this.isReady) {
+
+            this.delta = delta
+            this.checkIfSpinning()
+            this.vehicleAssist(false)
+
+
+
+            this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
+
+            if (!!this.engineSound && this.useSoundEffects) {
+                this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
+            }
+        }
+
+        this.updateFov()
     };
 
     findClosesGround(): number {
         const pos = this.getPosition()// this.vehicleBody.position
-        this.vector2.setValue(pos.x, pos.y, pos.z);
-        this.vector.setValue(pos.x, pos.y + 4, pos.z);
+        this.vector2.setValue(pos.x, pos.y + .1, pos.z);
+        this.vector.setValue(pos.x, pos.y - 4, pos.z);
 
+        this.rayer = new Ammo.ClosestRayResultCallback(this.vector2, this.vector)
 
-        this.rayer.set_m_rayFromWorld(this.vector)
-        this.rayer.set_m_rayToWorld(this.vector2)
+        // this.rayer.set_m_rayFromWorld(this.vector)
+        // this.rayer.set_m_rayToWorld(this.vector2)
         this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
 
         let groundY = 3
@@ -781,7 +922,6 @@ export class LowPolyVehicle extends Vehicle {
 
     isTouchingGround(pos: Ammo.btVector3): boolean {
 
-        //     console.log("pos.x(), pos.y() - this.getVehicleYOffset(), pos.z()", pos.x(), pos.y() - this.getVehicleYOffset(), pos.z())
         this.vector2.setValue(pos.x(), pos.y() + .1, pos.z());
         this.vector.setValue(pos.x(), pos.y() - 2, pos.z());
 
@@ -791,13 +931,8 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
 
         if (this.rayer.hasHit()) {
-
-
             const groundY = this.rayer.get_m_hitPointWorld().y()
-            //uu  console.log("groundY", groundY)
-            // console.log("hit", this.rayer.get_m_collisionObject().)
-            // console.log("pos.y(), groundY", pos.y().toFixed(2), groundY.toFixed(2), this.vehicleConfig.wheelRadiusBack.toFixed(2))
-            // console.log("Math.abs(groundY - pos.y())", Math.abs(groundY - pos.y()), this.vehicleConfig.wheelRadiusBack + .3)
+
             return Math.abs(groundY - pos.y()) < this.vehicleConfig.wheelRadiusBack + .3
         } else {
             return false
@@ -810,10 +945,10 @@ export class LowPolyVehicle extends Vehicle {
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
         const wheelY = this.getVehicleYOffset()
-
+        console.log("settign vehicle to ", (y ?? this.p.y()) + wheelY, y, this.p.y())
         this.vehicleBodyPosition.set(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
-        this.vector.setValue(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
-        this.tm.setOrigin(this.vector)
+        this.p.setValue(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
+        this.tm.setOrigin(this.p)
     };
 
     getPosition() {
@@ -877,8 +1012,8 @@ export class LowPolyVehicle extends Vehicle {
      * return the height vehicle needs to offset from its relative origin to reach to bottom of the wheels 
      */
     getVehicleYOffset() {
-        const frontHeight = - this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusFront + this.vehicleConfig.centerOfMassOffset
-        const backHeight = - this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength + this.vehicleConfig.wheelRadiusBack + this.vehicleConfig.centerOfMassOffset
+        const frontHeight = -this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.wheelRadiusFront + this.vehicleConfig.suspensionRestLength  //+ this.vehicleConfig.centerOfMassOffset
+        const backHeight = -this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.wheelRadiusBack + this.vehicleConfig.suspensionRestLength //+ this.vehicleConfig.centerOfMassOffset
         const y = Math.max(backHeight, frontHeight) ?? 2
         return y
     }
