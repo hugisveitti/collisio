@@ -657,17 +657,17 @@ export class LowPolyVehicle extends Vehicle {
             this.seeVehicle(this.cameraDir.clone())
             camera.updateProjectionMatrix()
         } else {
-            // camera.lookAt(this.vehicleBody.position.clone())
+            camera.lookAt(this.vehicleBody.position.clone())
 
-            const pos = this.vehicleBody.position
-            const rot = this.vehicleBody.rotation
-            this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
-                pos.y + this.staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            )
-            camera.lookAt(this.getPosition().clone())
-            this.seeVehicle(this.cameraTarget)
+            // const pos = this.vehicleBody.position
+            // const rot = this.vehicleBody.rotation
+            // this.cameraTarget.set(
+            //     pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
+            //     pos.y + this.staticCameraPos.y,
+            //     pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+            // )
+            // camera.lookAt(this.getPosition().clone())
+            // this.seeVehicle(this.cameraTarget)
             //     camera.updateProjectionMatrix()
         }
     };
@@ -677,7 +677,7 @@ export class LowPolyVehicle extends Vehicle {
      * @param cameraPos position of camera relative to the world
      */
     seeVehicle(cameraPos: Vector3) {
-        this.scene.course.seeObject(cameraPos, this.getPosition())// this.vehicleBody.position.clone())
+        this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
     }
 
     checkIfSpinning() {

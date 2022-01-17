@@ -274,7 +274,7 @@ export const vehicleConfigs = {
         breakingForce: 300,
         is4x4: false,
         maxSpeed: 320,
-        frictionSlip: 8.5, //3.5
+        frictionSlip: 2, //3.5
         suspensionStiffness: 50,
         //  suspensionDamping: // 12,
 
