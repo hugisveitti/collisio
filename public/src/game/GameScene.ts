@@ -269,7 +269,7 @@ export class GameScene extends Scene3D implements IGameScene {
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
         this.addLights()
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.physics.debug.enable()
+        // this.physics.debug.enable()
 
         const listener = new AudioListener()
         this.camera.add(listener)
