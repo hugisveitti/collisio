@@ -151,7 +151,7 @@ export class RaceGameScene extends GameScene {
          */
         setTimeout(() => {
             for (let vehicle of this.vehicles) {
-                vehicle.setToGround()
+                //      vehicle.setToGround()
                 vehicle.start()
                 vehicle.setCanDrive(false)
                 vehicle.break()
