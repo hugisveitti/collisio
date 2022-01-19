@@ -19,9 +19,6 @@ interface IBestTime {
 
 type IBestTimeD = { [userId: string]: IBestTime }
 
-
-
-
 export const getPlayerBestScoreOnTrackAndLap = async (playerId: string, trackName: TrackName, numberOfLaps: number, callback: (pb: IBestTime | undefined) => void) => {
 
     //  const highscoresRef = collection(firestore, highscoresRefPath, playerId, bestHighscoresRefPath)
@@ -232,3 +229,18 @@ export const deletePlayerGameData = (userId: string, gameId: string) => {
         console.warn("Error deleting game", e)
     })
 }
+
+// export const moveHighscores = () => {
+//     const ref = collection(firestore, bestHighscoresRefPath)
+
+//     const scores = {}
+
+//     getDocs(ref).then(docs => {
+//         docs.forEach(d => {
+//             scores[d.id] = d.data()
+//             const newRef = doc(firestore, bestHighscoresRefPath + "19012021", d.id)
+//             setDoc(newRef, d.data())
+//         })
+//         console.log("moved", Object.keys(scores).length)
+//     })
+// }

@@ -1,6 +1,5 @@
 import { CircularProgress, Grid } from "@mui/material";
 import React, { useContext, useEffect } from "react";
-import { mobileOnlyPath } from "../../experiment";
 import { UserContext } from "../../providers/UserProvider";
 import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
@@ -17,7 +16,6 @@ import {
   privateProfilePagePath,
   showRoomPagePath,
   tournamentPagePath,
-  waitingRoomPath,
 } from "../Routes";
 import { IStore } from "../store";
 

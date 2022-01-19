@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
-import { waitingRoomPath } from "../Routes";
+import { connectPagePath, waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import ConnectToWaitingRoomComponent from "./ConnectToWaitingRoomComponent";
 
@@ -22,6 +22,8 @@ const ConnectToWaitingRoomContainer = (
     if (props.store.previousPage === waitingRoomPath) {
       console.log("go bacl");
       history.goBack();
+    } else {
+      props.store.setPreviousPage(connectPagePath);
     }
   }, []);
 
