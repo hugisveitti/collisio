@@ -223,19 +223,11 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     createVehicle() {
-        console.log("this.vehicleSettings", this.vehicleSettings)
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.scene.add.existing(this.vehicleBody)
 
         this.changeCenterOfMass()
 
-        if (this.vehicleNumber === 0) {
-
-            console.log("this.vehicle", this.vehicleBody.position.clone(), this.tires[BACK_LEFT].position.clone())
-            const diff = this.vehicleBody.position.clone().sub(this.tires[BACK_LEFT].position.clone())
-
-            console.log("diff", diff)
-        }
 
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
 
@@ -254,10 +246,7 @@ export class LowPolyVehicle extends Vehicle {
         this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
         this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
         this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
-
         this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
-
-
 
         this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
         // this.vehicle = new Ammo.btRaycastVehicle(this.tuning, body, this.raycaster)
@@ -386,7 +375,6 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     goForward() {
-        //  console.log("can drive", this._canDrive)
 
         if (!this._canDrive) return
         const kmh = this.getCurrentSpeedKmHour(0)
@@ -492,7 +480,8 @@ export class LowPolyVehicle extends Vehicle {
 
     break(notBreak?: boolean) {
 
-        const breakForce = !!notBreak ? 0 : this.breakingForce
+        let breakForce = !!notBreak ? 0 : this.breakingForce
+        if (!this._canDrive) breakForce = 500
 
         this.zeroEngineForce()
         this.vehicle.setBrake(breakForce, BACK_RIGHT)
@@ -823,11 +812,10 @@ export class LowPolyVehicle extends Vehicle {
     setToGround() {
         // first set to above ground
         const tempY = this.scene.course.ground.position.y
-        this.setPosition(undefined, tempY + 4, undefined)
+        this.setPosition(undefined, tempY + 2, undefined)
 
         const groundY = this.findClosesGround()
-        console.log("Ground Y in set to ground", groundY)
-        this.setPosition(undefined, groundY + .5, undefined)
+        this.setPosition(undefined, groundY, undefined)
     }
 
 
@@ -890,9 +878,6 @@ export class LowPolyVehicle extends Vehicle {
             this.delta = delta
             this.checkIfSpinning()
             this.vehicleAssist(false)
-
-
-
             this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 
             if (!!this.engineSound && this.useSoundEffects) {
@@ -904,7 +889,7 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     findClosesGround(): number {
-        const pos = this.getPosition()// this.vehicleBody.position
+        const pos = this.vehicleBody.position// this.getPosition() // this.vehicleBody.position
         this.vector2.setValue(pos.x, pos.y + .1, pos.z);
         this.vector.setValue(pos.x, pos.y - 4, pos.z);
 
@@ -948,7 +933,6 @@ export class LowPolyVehicle extends Vehicle {
         this.tm = this.vehicle.getChassisWorldTransform()
         this.p = this.tm.getOrigin()
         const wheelY = this.getVehicleYOffset()
-        console.log("settign vehicle to ", (y ?? this.p.y()) + wheelY, y, this.p.y())
         this.vehicleBodyPosition.set(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
         this.p.setValue(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
         this.tm.setOrigin(this.p)
@@ -1015,8 +999,8 @@ export class LowPolyVehicle extends Vehicle {
      * return the height vehicle needs to offset from its relative origin to reach to bottom of the wheels 
      */
     getVehicleYOffset() {
-        const frontHeight = -this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.wheelRadiusFront + this.vehicleConfig.suspensionRestLength  //+ this.vehicleConfig.centerOfMassOffset
-        const backHeight = -this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.wheelRadiusBack + this.vehicleConfig.suspensionRestLength //+ this.vehicleConfig.centerOfMassOffset
+        const frontHeight = this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength - this.vehicleConfig.wheelRadiusFront //+ this.vehicleConfig.centerOfMassOffset
+        const backHeight = this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength - this.vehicleConfig.wheelRadiusBack //+ this.vehicleConfig.centerOfMassOffset
         const y = Math.max(backHeight, frontHeight) ?? 2
         return y
     }

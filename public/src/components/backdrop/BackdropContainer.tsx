@@ -21,7 +21,6 @@ interface IBackdropContainer {
 
 const BackdropContainer = (props: IBackdropContainer) => {
   const history = useHistory();
-  console.log("hist", history);
 
   const canvasWrapperRef = useRef();
 
@@ -34,7 +33,6 @@ const BackdropContainer = (props: IBackdropContainer) => {
     const { renderer, alreadyExisted } = createBackdropRenderer((compl) => {
       setRatioLoaded(compl);
     });
-    console.log("already exists", alreadyExisted);
 
     if (alreadyExisted) {
       setPressedStartGame(alreadyExisted);

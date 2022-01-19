@@ -22,7 +22,7 @@ export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
 
 export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
     return new Promise<AudioBuffer>((resolve, reject) => {
-        audioLoader.load(getStaticPath("sound/skid3.ogg"), (buffer: AudioBuffer) => {
+        audioLoader.load(getStaticPath("sound/skid5.ogg"), (buffer: AudioBuffer) => {
             engineBuffer = buffer
             resolve(engineBuffer)
         }, () => { }, (err) => {

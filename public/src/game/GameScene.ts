@@ -868,7 +868,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
     startAllVehicles() {
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].setCanDrive(true)
             this.vehicles[i].unpause()
 
         }

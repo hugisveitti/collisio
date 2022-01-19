@@ -7,7 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import React from "react";
 import { IRaceTimeInfo } from "../../classes/Game";
-import { inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
 
 const sortRaceTimeInfo = (raceTimeInfo: IRaceTimeInfo[]) => {
   return raceTimeInfo.sort((a, b) => a.totalTime - b.totalTime);
@@ -24,15 +24,18 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
   const cellStyle = !props.isEndOfGame ? { width: 50 } : {};
   const containerStyle = !props.isEndOfGame ? { width: 250 } : {};
 
+  const { color, backgroundColor } = getStyledColors("white");
+
   const raceTimeInfo = props.isEndOfGame
     ? sortRaceTimeInfo(props.raceTimeInfo)
     : props.raceTimeInfo;
   return (
     <TableContainer
-      component={Paper}
       style={{
         ...containerStyle,
-        backgroundColor: inputBackgroundColor,
+        color,
+        backgroundColor,
+        borderRadius: 0,
         boxShadow: "none",
       }}
     >

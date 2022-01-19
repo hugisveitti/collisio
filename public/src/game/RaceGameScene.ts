@@ -130,7 +130,7 @@ export class RaceGameScene extends GameScene {
         }
         this.createViews()
         this.createController()
-        await this.resetVehicles()
+        this.resetVehicles()
 
         this.restartGame()
     }

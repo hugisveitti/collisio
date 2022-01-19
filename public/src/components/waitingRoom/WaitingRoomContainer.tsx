@@ -20,7 +20,7 @@ import {
   removeFromAvailableRooms,
   saveRoom,
 } from "../../firebase/firestoreFunctions";
-import { inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
   IPlayerConnectedData,
@@ -45,6 +45,7 @@ import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
 import LoginComponent from "../LoginComponent";
 import {
   frontPagePath,
@@ -83,6 +84,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
+
+  const { color, backgroundColor } = getStyledColors("black");
 
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
@@ -326,7 +329,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         <Grid item xs={12}>
           <TextField
             style={{
-              backgroundColor: inputBackgroundColor,
+              backgroundColor,
+              color,
             }}
             label="Enter your name"
             value={displayName}
@@ -334,10 +338,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           />
         </Grid>
         <Grid item xs={6}>
-          <LoadingButton
-            disableElevation
-            loading={connectingGuest}
-            variant="outlined"
+          <BackdropButton
+            disabled={connectingGuest}
             onClick={() => {
               let _displayName = displayName;
               if (displayName === "") {
@@ -350,7 +352,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
             }}
           >
             Submit
-          </LoadingButton>
+          </BackdropButton>
         </Grid>
         {showLoginInComponent ? (
           <Grid item xs={12}>
@@ -361,15 +363,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </Grid>
         ) : (
           <Grid item xs={6}>
-            <Button
-              disableElevation
-              variant="contained"
+            <BackdropButton
               onClick={() => {
                 setShowLoginInComponent(true);
               }}
             >
               Login
-            </Button>
+            </BackdropButton>
           </Grid>
         )}
       </Grid>
