@@ -103,8 +103,8 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.vehicleBody.body.setCollisionFlags(0)
         this.vehicleBody.body.setBounciness(0.4)
         this.isReady = true
-        this.canDrive = true
-        this.isPaused = false
+        this._canDrive = true
+        // this.isPaused = false
     };
 
 
@@ -112,13 +112,13 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         // if (this.zVel > -this.engineForce) {
         //     this.zVel -= this.dzVel
         // }
-        if (!this.canDrive) return
+        if (!this._canDrive) return
 
 
         this.zVel = -this.engineForce
     }
     goBackward(speed?: number): void {
-        if (!this.canDrive) return
+        if (!this._canDrive) return
 
         if (this.zVel < 10) {
             this.zVel += 10
@@ -204,7 +204,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     pause(): void {
         this.isPaused = true
-        this.canDrive = false
+        this._canDrive = false
         this.zVel = 0
         this.xVel = 0
         this.yVel = 0
@@ -213,7 +213,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     unpause(): void {
         this.isPaused = false
-        this.canDrive = true
+        this._canDrive = true
         this.vehicleBody?.body?.setCollisionFlags(0)
     }
 

@@ -1,16 +1,12 @@
 import { PhysicsLoader, Project } from "enable3d";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { ICourse } from "../course/ICourse";
-import { IVehicle } from "../vehicles/IVehicle";
-import { GameScene } from "../game/GameScene"
-import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Course } from "../course/Course";
-import { TestDriver } from "./TestDriver";
-
+import { ICourse } from "../course/ICourse";
+import { GameScene } from "../game/GameScene";
+import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { IVehicle } from "../vehicles/IVehicle";
 
 class SpeedTestScene extends GameScene {
-
-
 
     course: ICourse
     vehicles: IVehicle[]
@@ -21,7 +17,7 @@ class SpeedTestScene extends GameScene {
         super()
 
         this.players = []
-        const vehicleTypes: VehicleType[] = ["normal2", "f1", "simpleSphere", "offRoader", "sportsCar", "tractor", "normal"]
+        const vehicleTypes: VehicleType[] = ["gokart", "future", "f1", "simpleSphere", "offRoader", "sportsCar", "tractor", "normal"]
         for (let i = 0; i < vehicleTypes.length; i++) {
             this.players.push({
                 playerName: `name-${vehicleTypes[i]}`,
@@ -41,11 +37,8 @@ class SpeedTestScene extends GameScene {
     }
 
 
-
     async loadAssets(): Promise<void> {
-
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
-
 
         await this.course.createCourse()
         this.courseLoaded = true
@@ -56,20 +49,17 @@ class SpeedTestScene extends GameScene {
 
         this.resetVehicles()
         this.restartGame()
-
-        const driver = new TestDriver("speed-test-track", 1, "normal2",)
     }
-
 
     _restartGame(): void {
         this.gameStarted = true
         for (let vehicle of this.vehicles) {
-            vehicle.canDrive = true
             vehicle.unpause()
             vehicle.start()
+            vehicle.break(true)
+            vehicle.setCanDrive(true)
         }
     }
-
 
     updateVehicles(delta: number) {
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -80,7 +70,6 @@ class SpeedTestScene extends GameScene {
             }
         }
     }
-
 
     update(time: number, delta: number) {
         this.updateFps(time)

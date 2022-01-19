@@ -61,15 +61,18 @@ export const themeOptions = createTheme({
 
     palette: {
         primary: {
-            main: green3,// blue2 //'#2E604A',
-            light: green1,
-            dark: green4,
+            main: "#fff", //green3,// blue2 //'#2E604A',
+            light: "#eee", // green1,
+            dark: "#ccc", //green4,
 
         },
         secondary: {
-            main: yellow3, // '#D1362F',
-            light: yellow2, //"wheat",
-            dark: yellow4,//  "#dbb165"
+            main: "#fff", //green3,// blue2 //'#2E604A',
+            light: "#eee", // green1,
+            dark: "#ccc", //green4,
+            // main: yellow3, // '#D1362F',
+            // light: yellow2, //"wheat",
+            // dark: yellow4,//  "#dbb165"
         },
     },
 

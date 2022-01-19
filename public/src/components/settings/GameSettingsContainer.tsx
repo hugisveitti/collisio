@@ -36,11 +36,15 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
         style={{
           backgroundColor: "inherit",
           width: "100%",
+          color: "#fff",
         }}
       >
         <CardHeader
           title="Game Settings"
           subheader="The leader can also change game settings in game"
+          subheaderTypographyProps={{
+            color: "#eee",
+          }}
         />
         <CardContent>
           <GameSettingsComponent

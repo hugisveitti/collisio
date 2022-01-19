@@ -3,6 +3,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
 import LoginIcon from "@mui/icons-material/Login";
+import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -19,6 +20,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import {
   createAccountWithEmail,
@@ -27,6 +29,7 @@ import {
 } from "../firebase/firebaseInit";
 import { basicColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
+import { frontPagePath, privacyPolicyPage } from "./Routes";
 
 interface ILoginComponent {
   setPlayerName?: Dispatch<SetStateAction<string>>;
@@ -36,6 +39,7 @@ interface ILoginComponent {
 }
 
 const LoginComponent = (props: ILoginComponent) => {
+  const history = useHistory();
   const user = useContext(UserContext);
 
   const [creatingAccountWithEmail, setCreatingAccountWithEmail] =
@@ -52,14 +56,20 @@ const LoginComponent = (props: ILoginComponent) => {
     if (user !== null) {
       setIsSigningIn(false);
     }
+    if (!!user) {
+      history.push(frontPagePath);
+    }
   }, [user]);
 
   if (isSigningIn) {
     return (
       <Card
         variant="outlined"
+        className="card"
         style={{
-          backgroundColor: props.backgroundColor,
+          backgroundColor: "inherit",
+          width: "100%",
+          color: "#fff",
         }}
       >
         <CardContent style={{ textAlign: "center" }}>
@@ -71,16 +81,25 @@ const LoginComponent = (props: ILoginComponent) => {
 
   return (
     <Card
+      className="card"
       variant="outlined"
       style={{
-        backgroundColor: props.backgroundColor,
+        background: "none",
+        width: "100%",
+        color: "#fff",
       }}
     >
       <CardHeader
         title="Login"
         subheader="Login or signup with one of the methods below."
+        subheaderTypographyProps={{
+          color: "#eee",
+        }}
         action={
-          <IconButton onClick={() => props.onClose()}>
+          <IconButton
+            style={{ color: "white" }}
+            onClick={() => props.onClose()}
+          >
             <CloseIcon />
           </IconButton>
         }
@@ -203,6 +222,12 @@ const LoginComponent = (props: ILoginComponent) => {
               </Button>
             </Grid>
           )}
+          <Grid item xs>
+            <Typography>
+              By signing up you are accepting our{" "}
+              <a href={privacyPolicyPage}>Privacy policy</a>
+            </Typography>
+          </Grid>
         </Grid>
       </CardContent>
     </Card>

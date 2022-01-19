@@ -47,9 +47,7 @@ export class TagGameScene extends GameScene {
 
         this.gameInfoDiv.appendChild(totalTimeDiv)
         totalTimeDiv.setAttribute("id", "totalTime")
-
         this.tagObjects = []
-
 
         this.isItTimeout = false
         this.gameClock = new Clock(false)
@@ -71,15 +69,12 @@ export class TagGameScene extends GameScene {
             vehicle.useBadRotationTicks = false
         }
 
-
         this.createViews()
         this.createController()
         this.resetVehicles()
         this.resetTagObjects()
         this.createColliderListeners()
         this.startGameCountdown()
-
-
     }
 
 

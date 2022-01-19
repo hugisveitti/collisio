@@ -18,6 +18,7 @@ import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
 import { socketHandleStartGame } from "../../utils/socketFunctions";
+import BackdropButton from "../backdrop/button/BackdropButton";
 import CopyTextButton from "../inputs/CopyTextButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
@@ -124,7 +125,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Grid>
 
           <Grid item xs={12} lg={3}>
-            <Typography color="textSecondary">
+            <Typography color="#eee">
               You can press 'esc' to pause the game and open the settings.
             </Typography>
           </Grid>
@@ -178,14 +179,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       {(!onMobile || props.store.player?.isLeader) && (
         <React.Fragment>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              onClick={handleStartGame}
-              disableElevation
-              disabled={!canStartGame}
-            >
+            <BackdropButton onClick={handleStartGame} disabled={!canStartGame}>
               Start game
-            </Button>
+            </BackdropButton>
           </Grid>
           {!canStartGame && (
             <Grid item xs={12}>

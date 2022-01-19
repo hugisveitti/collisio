@@ -187,6 +187,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           <Grid container spacing={3}>
             <Grid item xs={6} sm={4}>
               <IconButton
+                style={{ color: "white" }}
                 onClick={() => {
                   updateGameSettings("useSound", !gameSettings.useSound);
                 }}

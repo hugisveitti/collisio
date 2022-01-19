@@ -29,6 +29,8 @@ import UserSettingsComponent from "./UserSettingsComponent";
 import { getDateNow } from "../../utils/utilFunctions";
 import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
 import { IStore } from "../store";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../backdrop/button/BackdropButton";
 
 const useStyles = makeStyles({
   container: {
@@ -162,7 +164,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
   };
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer store={props.store}>
       <Grid
         container
         spacing={3}
@@ -222,32 +224,27 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
               <GameDataComponent userId={user.uid} />
             </Grid>
             <Grid item xs={3} style={{ textAlign: "left" }}>
-              <Button
-                color="inherit"
+              <BackdropButton
                 onClick={() =>
                   signOut(() => {
                     window.location.href = frontPagePath;
                   })
                 }
-                variant="contained"
-                disableElevation
               >
                 Logout
-              </Button>
+              </BackdropButton>
             </Grid>
             <Grid item xs={3} style={{ textAlign: "left" }}>
-              <Button
+              <BackdropButton
                 onClick={() => history.push(privateProfileTournamentsPagePath)}
-                variant="contained"
-                disableElevation
               >
                 Your Tournaments
-              </Button>
+              </BackdropButton>
             </Grid>
           </React.Fragment>
         )}
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

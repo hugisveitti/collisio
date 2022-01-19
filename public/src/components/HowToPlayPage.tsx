@@ -34,6 +34,8 @@ import resetOrientation from "../images/resetorient.jpg";
 import { inputBackgroundColor } from "../providers/theme";
 import "../styles/main.css";
 import { buyPremiumPagePath, highscorePagePath } from "./Routes";
+import BackdropContainer from "./backdrop/BackdropContainer";
+import ToFrontPageButton from "./inputs/ToFrontPageButton";
 
 interface IHowToPlayItem {
   header: string;
@@ -45,7 +47,7 @@ const HowToPlayItem = (props: IHowToPlayItem) => {
   return (
     <Grid item xs={12}>
       <Card
-        style={{ backgroundColor: inputBackgroundColor }}
+        style={{ backgroundColor: "rgba(255,255,255,.82)" }}
         variant="outlined"
       >
         <CardHeader
@@ -69,7 +71,7 @@ interface IHowToPlayProps {}
 const HowToPlayPage = (props: IHowToPlayProps) => {
   const history = useHistory();
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid
         container
         spacing={1}
@@ -79,6 +81,10 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
           <Typography variant="h4" component="div">
             How to play
           </Typography>
+        </Grid>
+
+        <Grid item xs={12}>
+          <ToFrontPageButton />
         </Grid>
 
         <HowToPlayItem header="Connecting to a room">
@@ -477,7 +483,7 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
           ></iframe>
         </Grid>
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

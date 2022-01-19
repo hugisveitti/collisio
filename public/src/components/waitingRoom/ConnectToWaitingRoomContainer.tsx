@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import AppContainer from "../../containers/AppContainer";
 import { getDeviceType } from "../../utils/settings";
+import BackdropContainer from "../backdrop/BackdropContainer";
 import { waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import ConnectToWaitingRoomComponent from "./ConnectToWaitingRoomComponent";
@@ -29,14 +30,14 @@ const ConnectToWaitingRoomContainer = (
     !onMobile && props.store.previousPage !== waitingRoomPath;
   console.log("quick conn", quickConnection);
   return (
-    <AppContainer>
+    <BackdropContainer store={props.store}>
       <Grid container spacing={3}>
         <ConnectToWaitingRoomComponent
           store={props.store}
           quickConnection={quickConnection}
         />
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

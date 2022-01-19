@@ -1,6 +1,5 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { sort } from "d3";
 import { Euler, Group, MeshStandardMaterial, Object3D, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
@@ -10,7 +9,7 @@ import { shuffleArray, substrArrayInString } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import "./course.css";
-import { CourseItemsLoader, notSeeThroughObjects } from "./CoursetemsLoader";
+import { CourseItemsLoader, notSeeThroughObjects } from "./CourseItemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
 import { ICourse } from "./ICourse";
 import { courseManager } from "./loadingManager";
@@ -107,9 +106,9 @@ export class Course implements ICourse {
     async createCourse(): Promise<void> {
 
         const loader = new GLTFLoader(courseManager)
-        const promise = new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
 
-            await loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`)).then(async (gltf: GLTF) => {
+            loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`)).then(async (gltf: GLTF) => {
                 this.gameScene.scene.add(gltf.scene)
                 this.courseScene = gltf.scene
 
@@ -127,7 +126,7 @@ export class Course implements ICourse {
             })
         })
 
-        return promise
+
     }
 
     createPossibleIntersectObjectArray() {
@@ -152,7 +151,7 @@ export class Course implements ICourse {
             engineOffObject.body.on.collision((otherObject, e) => {
                 if (isVehicle(otherObject)) {
                     const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.gameScene.vehicles[vehicleNumber].canDrive = false
+                    this.gameScene.vehicles[vehicleNumber].setCanDrive(false)
                     this.gameScene.vehicles[vehicleNumber].zeroEngineForce()
 
                 }
@@ -163,7 +162,7 @@ export class Course implements ICourse {
             breakBlock.body.on.collision((otherObject, e) => {
                 if (isVehicle(otherObject)) {
                     const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.gameScene.vehicles[vehicleNumber].canDrive = false
+                    this.gameScene.vehicles[vehicleNumber].setCanDrive(false)
                     this.gameScene.vehicles[vehicleNumber].zeroEngineForce()
                     this.gameScene.vehicles[vehicleNumber].break()
                 }
@@ -233,7 +232,7 @@ export class Course implements ICourse {
         })
     }
 
-    async setStartPositions(vehicles: IVehicle[]) {
+    setStartPositions(vehicles: IVehicle[]) {
         // align position
         let aPos: Vector3
         if (this.sAlign) {
@@ -246,13 +245,6 @@ export class Course implements ICourse {
         console.log("usable spawns", usableSpawns)
         console.log("spawn aligners", this.spawnAligners)
         if (usableSpawns.length >= vehicles.length) {
-            // const sortedSpawns = new Array(usableSpawns.length)
-            // for (let spawn of usableSpawns) {
-            //     const idx = +spawn.name.slice(5, 6)
-            //     sortedSpawns[idx - 1] = spawn
-            // }
-
-
 
             let sortedSpawns = usableSpawns
             sortedSpawns.sort((a, b) => a.name < b.name ? -1 : 1)
@@ -323,7 +315,7 @@ export class Course implements ICourse {
 
             for (let i = 0; i < vehicles.length; i++) {
 
-                vehicles[i].canDrive = false
+                // vehicles[i].canDrive = false
 
                 const sI = Math.floor(Math.random() * possibleStartingPos.length)
                 const sPos = possibleStartingPos[sI]

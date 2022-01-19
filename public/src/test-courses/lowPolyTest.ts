@@ -294,7 +294,7 @@ export class LowPolyTestScene extends GameScene {
             if (v.isReady) {
                 v.unpause()
             }
-            v.canDrive = true
+            v.setCanDrive(true)
             v.start()
         }
 

@@ -71,7 +71,7 @@ export class Vehicle implements IVehicle {
     staticCameraPos: { x: number, y: number, z: number }
 
     vehicleBody: ExtendedObject3D;
-    canDrive: boolean;
+    _canDrive: boolean;
     isPaused: boolean;
     vehicleSettings: IVehicleSettings;
     isReady: boolean;
@@ -80,6 +80,13 @@ export class Vehicle implements IVehicle {
 
     currentFov: number
 
+    getCanDrive() {
+        return this._canDrive
+    }
+
+    setCanDrive(_canDrive: boolean) {
+        this._canDrive = _canDrive
+    }
 
     goForward() { };
     goBackward(speed?: number) { };
@@ -164,7 +171,7 @@ export class Vehicle implements IVehicle {
         this.vehicleConfig = JSON.parse(JSON.stringify(vehicleConfigs[this.vehicleType]))
         this.isReady = false
         this.isPaused = false
-        this.canDrive = false
+        this._canDrive = false
 
         this.vehicleSettings = defaultVehicleSettings
 
@@ -275,7 +282,7 @@ export class Vehicle implements IVehicle {
     }
 
     playSkidSound(skid: number) {
-        if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this.canDrive) return
+        if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this._canDrive) return
         if (skid < 0.8) {
 
             this.skidVolume += 0.01

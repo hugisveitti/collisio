@@ -387,7 +387,7 @@ export class LowPolyVehicle extends Vehicle {
 
     goForward() {
 
-        if (!this.canDrive) return
+        if (!this._canDrive) return
         const kmh = this.getCurrentSpeedKmHour(0)
         let eF = this.engineForce
         // if (kmh > this.vehicleConfig.maxSpeed + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
@@ -418,7 +418,7 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     goBackward() {
-        if (!this.canDrive) return
+        if (!this._canDrive) return
         let eF = -this.engineForce
         if (this.getCurrentSpeedKmHour(0) > 10) {
             this.decreaseMaxSpeedTicks()
@@ -477,7 +477,7 @@ export class LowPolyVehicle extends Vehicle {
 
     turn(angle: number) {
 
-        if (this.canDrive) {
+        if (this._canDrive) {
 
             const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
             const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
@@ -521,9 +521,10 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     pause() {
+
         this.break()
         this.isPaused = true
-        this.canDrive = false
+        this._canDrive = false
         this.zeroEngineForce()
         this.stopEngineSound()
         if (this.vehicleBody?.body) {
@@ -533,7 +534,7 @@ export class LowPolyVehicle extends Vehicle {
 
     unpause() {
         this.isPaused = false
-        this.canDrive = true
+        this._canDrive = true
         if (this.useSoundEffects) {
             this.startEngineSound()
         }
@@ -821,10 +822,11 @@ export class LowPolyVehicle extends Vehicle {
     setToGround() {
         // first set to above ground
         const tempY = this.scene.course.ground.position.y
-        this.setPosition(undefined, tempY + 1, undefined)
+        this.setPosition(undefined, tempY + 4, undefined)
 
         const groundY = this.findClosesGround()
-        this.setPosition(undefined, groundY + .1, undefined)
+        console.log("Ground Y in set to ground", groundY)
+        this.setPosition(undefined, groundY + .5, undefined)
     }
 
 
@@ -1050,6 +1052,7 @@ export class LowPolyVehicle extends Vehicle {
     async destroy() {
         this.isReady = false
         this.stopEngineSound()
+        this.scene.scene.remove(this.engineSound)
 
         if (this.scene && this.vehicleBody) {
             this.scene.destroy(this.vehicleBody)

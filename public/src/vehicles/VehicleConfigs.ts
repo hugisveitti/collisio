@@ -187,7 +187,7 @@ export const vehicleConfigs = {
         suspensionRestLength: 1,
         mass: 1600,
         engineForce: 12500,
-        breakingForce: 200,
+        breakingForce: 400,
         is4x4: false,
 
         path: "tractor.gltf",
@@ -235,8 +235,8 @@ export const vehicleConfigs = {
 
 
         mass: 1200,
-        engineForce: 6000,
-        breakingForce: 200,
+        engineForce: 9000,
+        breakingForce: 400,
         is4x4: true,
         inertia: { x: 3000, y: 2000, z: 3000 },
         suspensionRestLength: 1.6 - .5,
@@ -247,6 +247,7 @@ export const vehicleConfigs = {
         suspensionCompression: 20,
 
         path: "off-roader.gltf",
+        centerOfMassOffset: 1.5,
 
         towPosition: new Vector3(0, -1.35, -3.3)
     },
@@ -273,8 +274,8 @@ export const vehicleConfigs = {
         engineForce: 12500,
         breakingForce: 300,
         is4x4: false,
-        maxSpeed: 320,
-        frictionSlip: 2, //3.5
+        maxSpeed: 350,
+        frictionSlip: 4.3, //3.5
         suspensionStiffness: 50,
         //  suspensionDamping: // 12,
 

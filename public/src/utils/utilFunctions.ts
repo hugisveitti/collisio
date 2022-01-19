@@ -181,3 +181,7 @@ export const substrArrayInString = (str: string, arr: string[]) => {
     }
     return false
 }
+
+export const createClassNames = (...str: string[]) => {
+    return str.join(" ")
+}

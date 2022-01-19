@@ -153,6 +153,7 @@ export class RaceGameScene extends GameScene {
             for (let vehicle of this.vehicles) {
                 vehicle.setToGround()
                 vehicle.start()
+                vehicle.setCanDrive(false)
                 vehicle.break()
             }
         }, (.5) * 1000)

@@ -30,9 +30,6 @@ let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 const setLoadingDivText = async (text: string) => {
     window.clearTimeout(dotTimeout)
     loadImage.classList.remove("hide")
-
-
-
     const createText = () => {
 
         let dotText = text + "<br>" + `Pro tip: ${loadingScreenTips[tipIndex]}` + "<br>"
@@ -73,3 +70,4 @@ courseManager.onProgress = (url: string, loaded: number, itemsTotal: number) => 
 courseManager.onLoad = () => {
     clearLoadingDivText()
 }
+

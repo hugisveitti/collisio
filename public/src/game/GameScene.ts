@@ -868,7 +868,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     startAllVehicles() {
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].canDrive = true
+            this.vehicles[i].setCanDrive(true)
             this.vehicles[i].unpause()
 
         }
@@ -878,15 +878,16 @@ export class GameScene extends Scene3D implements IGameScene {
     _startAllVehicles() { }
 
     stopAllVehicles() {
+        console.log("stopping all vehicles")
         for (let i = 0; i < this.vehicles.length; i++) {
-            this.vehicles[i].canDrive = false
+            this.vehicles[i].setCanDrive(false)
             this.vehicles[i].stop()
         }
     }
 
     async create() { }
 
-    restartGame() {
+    async restartGame() {
         this.oldTime = 0
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -1044,8 +1045,9 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-    async resetVehicles() {
-        await this.course.setStartPositions(this.vehicles)
+    resetVehicles() {
+
+        this.course.setStartPositions(this.vehicles)
         this.stopAllVehicles()
         this._resetVehicles()
     }
@@ -1099,9 +1101,6 @@ export class GameScene extends Scene3D implements IGameScene {
         this.setPlayers(config.players)
         this.roomId = config.roomId
         this.setGameRoomActions(config.gameRoomActions)
-        // if (config.onlyMobile) {
-        //   this.createController()
-        //}
     }
 
     update(_time: number, _delta: number): void {

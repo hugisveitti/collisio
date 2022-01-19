@@ -45,6 +45,7 @@ import { createSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
+import BackdropContainer from "../backdrop/BackdropContainer";
 import LoginComponent from "../LoginComponent";
 import {
   frontPagePath,
@@ -383,7 +384,12 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }
 
   return (
-    <AppContainer loading={!props.store.socket}>
+    // <AppContainer loading={!props.store.socket}>
+    <BackdropContainer
+      store={props.store}
+      backgroundContainer
+      loading={!props.store.socket}
+    >
       <React.Fragment>
         {displayNameModalOpen ? (
           renderDisplayNameModal()
@@ -408,12 +414,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
             )}
           </>
         )}
+        <DeviceOrientationPermissionComponent
+          onMobile={onMobile}
+          onIphone={isIphone()}
+        />
       </React.Fragment>
-      <DeviceOrientationPermissionComponent
-        onMobile={onMobile}
-        onIphone={isIphone()}
-      />
-    </AppContainer>
+    </BackdropContainer>
+    //  </AppContainer>
   );
 };
 

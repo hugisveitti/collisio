@@ -18,13 +18,19 @@ const CollabsibleCard = (props: ICollabsibleCard) => {
   return (
     <Card
       variant="outlined"
-      style={{ backgroundColor: "inherit", maxWidth: 600, margin: "auto" }}
+      style={{
+        backgroundColor: "inherit",
+        maxWidth: 600,
+        margin: "auto",
+        cursor: "pointer",
+        color: "#fff",
+      }}
     >
       <CardHeader
         onClick={() => setOpen(!open)}
         subheader={props.header}
         action={
-          <IconButton onClick={() => setOpen(!open)}>
+          <IconButton style={{ color: "white" }} onClick={() => setOpen(!open)}>
             {open ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
         }

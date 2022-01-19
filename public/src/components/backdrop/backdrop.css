@@ -1,0 +1,30 @@
+.root {
+  font-family: monospace;
+}
+
+#back-drop-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -999;
+}
+
+.container {
+  width: 90%;
+  margin: auto;
+  margin-top: 15px;
+  padding: 15px;
+  color: #fff;
+  overflow-y: auto;
+  max-width: 1440px;
+}
+
+.background {
+  background: rgba(0, 0, 0, 0.82);
+  padding: 15px;
+}
+
+.card {
+  background-color: none;
+  color: #fff;
+}

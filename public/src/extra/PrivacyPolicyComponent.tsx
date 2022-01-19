@@ -144,13 +144,6 @@ const PrivayPolicyComponent = () => {
         <li>
           <p>Anything the user posts.</p>
         </li>
-        <li>
-          <p>
-            Við megum nota myndirnar sem þú póstar á síðunni og í að auglýsa
-            síðuna. Við munum reyna hafa samband við þig ef við viljum nota hana
-            í auglýsingum. Við munum ekki selja myndirnar þínar.
-          </p>
-        </li>
       </ul>
       <h3>Usage Data</h3>
       <p>Usage Data is collected automatically when using the Service.</p>

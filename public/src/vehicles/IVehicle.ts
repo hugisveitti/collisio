@@ -26,7 +26,9 @@ export interface IVehicle {
      */
     vehicleBody: ExtendedObject3D
 
-    canDrive: boolean
+    getCanDrive: () => boolean
+    setCanDrive: (canDrive: boolean) => void
+
     isPaused: boolean
 
     engineForce: number
@@ -95,9 +97,10 @@ export interface ITestVehicle extends IVehicle {
     intelligentDrive: (log: boolean) => void
 }
 
-const zScaler = numberScaler(12, 30, 1, 10, 2)
-// const yScaler = numberScaler(3, 12, 1, 10, 2)
-const yScaler = numberScaler(4, 12, 1, 10, 2)
+//const zScaler = numberScaler(12, 30, 1, 10, 2)
+// const yScaler = numberScaler(4, 12, 1, 10, 2)
+const zScaler = numberScaler(12, 21, 1, 10, 2)
+const yScaler = numberScaler(4, 8, 1, 10, 2)
 
 // cameraZoom should be a number from 1 to 10
 export const getStaticCameraPos = (cameraZoom: number) => {

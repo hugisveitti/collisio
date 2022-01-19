@@ -10,6 +10,7 @@ import {
   getAllLocalGameSettings,
 } from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
+import PrivayPolicyComponent from "../extra/PrivacyPolicyComponent";
 import {
   getDBUserSettings,
   setDBUserSettings,
@@ -27,9 +28,11 @@ import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
+import FrontPageContainer from "./frontpage/FrontPageContainer";
 import GameRoom from "./gameRoom/GameRoom";
 import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
+import LoginPageContainer from "./login/LoginPageContainer";
 import MobileOnlyWaitingRoom from "./mobileOnly/MobileOnlyWaitingRoom";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";
@@ -67,6 +70,8 @@ export const tournamentIdPagePath = "/tournament/:tournamentId";
 export const trophyRoomPath = "/trophy";
 export const trophyRoomIdPath = "/trophy/:id";
 export const mobileOnlyWaitingRoomPath = "/mobile-only-wait";
+export const privacyPolicyPage = "/privacy-policy";
+export const loginPagePath = "/login";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -174,7 +179,8 @@ const Routes = () => {
         <Route
           exact
           path={frontPagePath}
-          render={(props) => <OneMonitorFrontPage {...props} store={store} />}
+          //  render={(props) => <OneMonitorFrontPage {...props} store={store} />}
+          render={(props) => <FrontPageContainer {...props} store={store} />}
         />
         <Route
           // the order matters, the :Id must be first
@@ -249,6 +255,14 @@ const Routes = () => {
         <Route
           path={mobileOnlyWaitingRoomPath}
           render={(props) => <MobileOnlyWaitingRoom {...props} />}
+        />
+        <Route
+          path={privacyPolicyPage}
+          render={(props) => <PrivayPolicyComponent />}
+        />
+        <Route
+          path={loginPagePath}
+          render={(props) => <LoginPageContainer />}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>
