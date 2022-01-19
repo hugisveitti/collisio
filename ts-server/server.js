@@ -109,7 +109,7 @@ app.get("/ammo.wasm.js", function (_, res) {
 });
 var sendIndexHTML = function (req, res) {
     var host = req.get("host");
-    console.log("host", host, ", ip", req.socket.remoteAddress);
+    console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
     if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
         res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     }
@@ -168,7 +168,7 @@ app.get("/robot.txt", function (req, res) {
 });
 app.get("*", function (req, res) {
     var host = req.get("host");
-    console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url);
+    console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
     if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
         // res.sendFile(path.join(__dirname, indexHTMLPath));
         res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
