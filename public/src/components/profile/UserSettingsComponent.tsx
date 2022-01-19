@@ -17,6 +17,7 @@ import {
 } from "../../firebase/firestoreFunctions";
 
 import { cardBackgroundColor } from "../../providers/theme";
+import MyCard from "../card/MyCard";
 import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
 
@@ -53,16 +54,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
 
   if (!props.store.userSettings) return null;
 
-  return (
-    <Card
-      variant="outlined"
-      style={{
-        backgroundColor: cardBackgroundColor,
-      }}
-    >
-      {renderStaticInfo()}
-    </Card>
-  );
+  return <MyCard>{renderStaticInfo()}</MyCard>;
 };
 
 export default UserSettingsComponent;

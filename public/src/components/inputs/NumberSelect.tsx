@@ -3,6 +3,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import React from "react";
+import { getStyledColors } from "../../providers/theme";
+import "./select.css";
 
 interface INumberSelect {
   value: number;
@@ -13,32 +15,38 @@ interface INumberSelect {
   minWidth?: number;
   style?: React.CSSProperties;
   disabled?: boolean;
+  color?: "white" | "black";
 }
 
 const NumberSelect = (props: INumberSelect) => {
+  const { color, backgroundColor } = getStyledColors(props.color ?? "white");
   return (
-    <FormControl
-      disabled={props.disabled}
-      fullWidth={props.fullWidth}
-      style={{ minWidth: props.minWidth ?? 200, textAlign: "left" }}
-    >
-      <InputLabel id="vehicle-select">{props.title}</InputLabel>
-      <Select
-        style={props.style}
-        label={props.title}
-        name={props.title}
-        value={props.value}
-        onChange={(e) => {
-          props.onChange(+e.target.value);
-        }}
+    <React.Fragment>
+      <span className="select__label" style={{ color: backgroundColor }}>
+        {props.title}
+      </span>
+      <FormControl
+        disabled={props.disabled}
+        fullWidth={props.fullWidth}
+        style={{ minWidth: props.minWidth ?? 200, textAlign: "left" }}
       >
-        {props.numbers.map((num) => (
-          <MenuItem key={num} value={num}>
-            {num}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+        <Select
+          className="select"
+          style={{ ...props.style, color, backgroundColor }}
+          name={props.title}
+          value={props.value}
+          onChange={(e) => {
+            props.onChange(+e.target.value);
+          }}
+        >
+          {props.numbers.map((num) => (
+            <MenuItem key={num} value={num}>
+              {num}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </React.Fragment>
   );
 };
 

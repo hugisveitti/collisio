@@ -1,0 +1,8 @@
+.select {
+  border-radius: 0 !important;
+}
+
+.select__label {
+  display: block;
+  margin-bottom: 2px;
+}

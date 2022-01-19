@@ -1,0 +1,13 @@
+.text-field {
+  border-radius: 0 !important;
+}
+
+.text-field__label {
+  display: block;
+  margin-bottom: 2px;
+  width: fit-content;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 0 !important;
+}

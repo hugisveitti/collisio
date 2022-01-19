@@ -1,22 +1,42 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import { LoadingManager } from "three";
-import "./course.css";
+import { getDeviceType } from "../utils/settings";
+import "./loadingManager.css"
 
 
-const loadImage = document.createElement("img")
-
-loadImage.src = "https://imgur.com/rpPch3m.jpg"
-loadImage.setAttribute("id", "load-image")
-loadImage.classList.add("hide")
-
-document.body.appendChild(loadImage)
-
+// const loadImage = document.createElement("img")
 const loadDiv = document.createElement("div")
-loadDiv.setAttribute("id", "load-screen")
-loadDiv.setAttribute("class", "game-text")
-loadDiv.setAttribute("style", "z-index:999;")
-document.body.appendChild(loadDiv)
+const loadDivText = document.createElement("div")
+const loadingBarContainer = document.createElement("div")
+const loadingBarInner = document.createElement("div")
+if (getDeviceType() === "desktop") {
 
+
+    // loadImage.src = "https://imgur.com/rpPch3m.jpg"
+    // loadImage.setAttribute("id", "load-image")
+    loadDiv.classList.add("hide")
+
+
+
+    document.body.appendChild(loadDiv)
+    // loadDivText.appendChild(loadImage)
+
+    loadDiv.setAttribute("id", "loading-screen")
+    loadDiv.setAttribute("class", "game-text")
+    loadDiv.setAttribute("style", "z-index:999; ")
+    loadDiv.appendChild(loadDivText)
+
+    loadDivText.classList.add("loading-screen__text")
+
+
+    loadingBarContainer.classList.add("loading-bar__container")
+
+    loadingBarInner.classList.add("loading-bar__inner")
+
+    loadingBarContainer.appendChild(loadingBarInner)
+    loadDiv.appendChild(loadingBarContainer)
+
+}
 export const courseManager = new LoadingManager()
 
 let dotTimeout: NodeJS.Timeout
@@ -28,18 +48,18 @@ const loadingScreenTips = ["Lock the orientation of your mobile phone.", "The le
 let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
 const setLoadingDivText = async (text: string) => {
+    return
     window.clearTimeout(dotTimeout)
-    loadImage.classList.remove("hide")
+    // loadImage.classList.remove("hide")
     const createText = () => {
 
         let dotText = text + "<br>" + `Pro tip: ${loadingScreenTips[tipIndex]}` + "<br>"
 
         for (let i = 0; i < numDots; i++) {
             dotText += "."
-
         }
 
-        loadDiv.innerHTML = dotText
+        //    loadDivText.innerHTML = dotText
 
         dotTimeout = setTimeout(async () => {
             numDots += 1
@@ -53,21 +73,37 @@ const setLoadingDivText = async (text: string) => {
 }
 
 const clearLoadingDivText = () => {
-    loadImage.classList.add("hide")
-    loadDiv.innerHTML = ""
+    return
+    // loadDiv.classList.add("hide")
+    //  loadDivText.innerHTML = ""
     window.clearTimeout(dotTimeout)
 }
 
 courseManager.onStart = (url: string, loaded: number, itemsTotal: number) => {
+    return
     setLoadingDivText("Started loading files " + loaded + " / " + itemsTotal)
 }
 
+let progressRatio = 0
+export const setLoaderProgress = (ratio: number) => {
+    progressRatio = ratio
+    if (ratio > 0 && ratio < 1) {
+        loadDivText.innerHTML = "Loading game files"
+        loadDiv.classList.add("show")
+        loadingBarInner.setAttribute("style", `width:${progressRatio * 200}px`)
+    }
+    if (ratio >= 1) {
+        loadDiv.classList.remove("show")
+    }
+}
 
 courseManager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
+    return
     setLoadingDivText("Loading files " + loaded + " / " + itemsTotal)
 }
 
 courseManager.onLoad = () => {
+    return
     clearLoadingDivText()
 }
 

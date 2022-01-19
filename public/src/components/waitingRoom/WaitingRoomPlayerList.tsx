@@ -16,6 +16,7 @@ import {
 } from "../../shared-backend/shared-stuff";
 import { getDeviceType } from "../../utils/settings";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
+import MyCard from "../card/MyCard";
 import FollowButton from "../profile/FollowButton";
 
 interface IWaitingRoomPlayerItem {
@@ -39,7 +40,7 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
     return (
       <CardContent>
         <>
-          {props.player.isAuthenticated ? (
+          {/* {props.player.isAuthenticated ? (
             <>
               {personalBest !== -1 ? (
                 <Typography>
@@ -55,7 +56,7 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
             <Typography>
               Only logged in players can record their personal best time.
             </Typography>
-          )}
+          )} */}
           {props.player.isLeader && (
             <Typography>
               <i>Leader</i>
@@ -77,33 +78,31 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
     photoURL: props.player.photoURL,
   };
 
-  const playerName = onDesktop
-    ? props.player.playerName
-    : props.player.playerName.split(" ")[0].slice(0, 5);
+  const playerName = props.player.playerName;
 
-  useEffect(() => {
-    if (props.gameType === "race" && showPB) {
-      getPlayerBestScoreOnTrackAndLap(
-        props.player.id,
-        props.trackName,
-        props.numberOfLaps,
-        (personalBest) => {
-          if (personalBest?.totalTime) {
-            setPersonalBest(personalBest.totalTime);
-          } else {
-            setPersonalBest(-1);
-          }
-        }
-      );
-    }
-  }, [props.trackName, props.numberOfLaps]);
+  // useEffect(() => {
+  //   if (props.gameType === "race" && showPB) {
+  //     getPlayerBestScoreOnTrackAndLap(
+  //       props.player.id,
+  //       props.trackName,
+  //       props.numberOfLaps,
+  //       (personalBest) => {
+  //         if (personalBest?.totalTime) {
+  //           setPersonalBest(personalBest.totalTime);
+  //         } else {
+  //           setPersonalBest(-1);
+  //         }
+  //       }
+  //     );
+  //   }
+  // }, [props.trackName, props.numberOfLaps]);
 
   return (
-    <Card
-      style={{ height: "100%", backgroundColor: cardBackgroundColor }}
-      variant="outlined"
-    >
+    <MyCard style={{ height: "100%" }}>
       <CardHeader
+        titleTypographyProps={{
+          fontSize: onDesktop ? "inherit" : 12,
+        }}
         header={props.player.playerName}
         title={
           <span style={{ overflowWrap: "anywhere" }}>
@@ -135,7 +134,7 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
           <Typography>No image</Typography>
         </CardContent>
       )}
-    </Card>
+    </MyCard>
   );
 };
 

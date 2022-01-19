@@ -1,31 +1,37 @@
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import AppContainer from "../../containers/AppContainer";
 import settingsImage from "../../images/mobile-settings.PNG";
+import { getDeviceType } from "../../utils/settings";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
 import FullscreenButton from "../inputs/FullscreenButton";
-import MyButton from "../inputs/MyButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 
 interface IMobileOnlyWaitingRoom {}
 
 const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
-  const onMobile = true; // getDeviceType() === "mobile";
+  const onMobile = getDeviceType() === "mobile";
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} md={4} xl={1}>
+          <ToFrontPageButton />
+        </Grid>
+        <Grid item xs={12} md={8} xl={11}>
           <Typography>Play only using your mobile.</Typography>
         </Grid>
         <Grid item xs={12}>
           {onMobile ? (
-            <MyButton
+            <BackdropButton
+              color="white"
               onClick={() => {
                 window.location.href = "/mobileonly";
               }}
             >
               Play only mobile
-            </MyButton>
+            </BackdropButton>
           ) : (
             <Typography>
               We have detected that you are not on a mobile and thus you cannot
@@ -65,7 +71,7 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
           <img style={{ maxWidth: "80%", width: 400 }} src={settingsImage} />
         </Grid>
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

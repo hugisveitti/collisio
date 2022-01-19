@@ -11,6 +11,7 @@ import {
 } from "../../../classes/Tournament";
 import { IUser } from "../../../classes/User";
 import { setTournament } from "../../../firebase/firestoreTournamentFunctions";
+import BackdropButton from "../../button/BackdropButton";
 import { getTournamentPagePath } from "../../Routes";
 import EditTournamentComponent from "../EditTournamentComponent";
 
@@ -58,9 +59,7 @@ const CreateGlobalTournamentComponent = (
         updateTournament={updateTournament}
       />
       <Grid item xs={12}>
-        <Button
-          variant="contained"
-          disableElevation
+        <BackdropButton
           onClick={() => {
             const { status, message } =
               validateCreateTournament(editTournament);
@@ -79,7 +78,7 @@ const CreateGlobalTournamentComponent = (
           }}
         >
           Create global tournament!
-        </Button>
+        </BackdropButton>
       </Grid>
     </Grid>
   );

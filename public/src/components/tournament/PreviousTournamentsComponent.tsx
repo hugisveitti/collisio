@@ -7,6 +7,7 @@ import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { IUser } from "../../classes/User";
 import { getPreviousTournaments } from "../../firebase/firestoreTournamentFunctions";
+import BackdropButton from "../button/BackdropButton";
 import TournamentsTable from "./TournamentsTable";
 
 interface IPreviousTournamentsComponent {
@@ -63,7 +64,7 @@ const PreviousTournamentsComponent = (props: IPreviousTournamentsComponent) => {
     if (tournaments.length === 0) {
       return (
         <Grid item xs={12}>
-          <Typography>No previous tournaments</Typography>
+          <Typography>No completed tournaments</Typography>
         </Grid>
       );
     }
@@ -89,13 +90,9 @@ const PreviousTournamentsComponent = (props: IPreviousTournamentsComponent) => {
         renderTournamentComponent()
       ) : (
         <Grid item xs={12}>
-          <Button
-            disableElevation
-            variant="contained"
-            onClick={handleGetTournaments}
-          >
-            Get Previous tournaments
-          </Button>
+          <BackdropButton center onClick={handleGetTournaments}>
+            Get Completed tournaments
+          </BackdropButton>
         </Grid>
       )}
     </>

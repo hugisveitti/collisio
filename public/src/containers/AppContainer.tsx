@@ -137,7 +137,7 @@ const AppContainer = (props: IAppContainer) => {
                 <VideogameAssetIcon />
               </ListItemIcon>
               <ListItemText
-                primary={!onMobile ? "Create a Game" : "Join a Game"}
+                primary={!onMobile ? "Create a Game" : "Join Game"}
               />
             </ListItem>
             <ListItem

@@ -2,9 +2,9 @@ import Grid from "@mui/material/Grid";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Tournament } from "../../classes/Tournament";
-import AppContainer from "../../containers/AppContainer";
 import { getAllUserTournaments } from "../../firebase/firestoreTournamentFunctions";
 import { UserContext } from "../../providers/UserProvider";
+import BackdropContainer from "../backdrop/BackdropContainer";
 import TournamentsTable from "../tournament/TournamentsTable";
 
 interface IPrivateProfileAllTournamentsList {}
@@ -32,7 +32,7 @@ const PrivateProfileAllTournamentsList = (
   }
 
   return (
-    <AppContainer loading={user === null}>
+    <BackdropContainer loading={user === null}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           All tournements
@@ -41,7 +41,7 @@ const PrivateProfileAllTournamentsList = (
           <TournamentsTable tournaments={tournaments} />
         </Grid>
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

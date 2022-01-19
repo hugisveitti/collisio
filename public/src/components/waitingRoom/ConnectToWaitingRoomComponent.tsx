@@ -1,8 +1,6 @@
 import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -10,7 +8,6 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { v4 as uuid } from "uuid";
 import { getLocalStorageItem } from "../../classes/localStorage";
-import { inputBackgroundColor } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_create_room,
@@ -22,8 +19,11 @@ import {
 import { createSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import AvailableRoomsComponent from "../AvailableRoomsComponent";
+import BackdropButton from "../button/BackdropButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
+import MyTextField from "../textField/MyTextField";
 
 interface IConnectToWaitingRoomComponent {
   store: IStore;
@@ -163,10 +163,10 @@ const ConnectToWaitingRoomComponent = (
   if (connectingToRoom) {
     return (
       <React.Fragment>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ textAlign: "center" }}>
           <CircularProgress />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ textAlign: "center" }}>
           <Typography>Connecting to room...</Typography>
         </Grid>
       </React.Fragment>
@@ -175,6 +175,9 @@ const ConnectToWaitingRoomComponent = (
 
   return (
     <React.Fragment>
+      <Grid item xs={12}>
+        <ToFrontPageButton />
+      </Grid>
       {onMobile && (
         <>
           {user && (
@@ -187,10 +190,7 @@ const ConnectToWaitingRoomComponent = (
             </Grid>
           )}
           <Grid item xs={12} sm={6}>
-            <TextField
-              style={{
-                backgroundColor: inputBackgroundColor,
-              }}
+            <MyTextField
               label="Player Name"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
@@ -200,10 +200,7 @@ const ConnectToWaitingRoomComponent = (
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              style={{
-                backgroundColor: inputBackgroundColor,
-              }}
+            <MyTextField
               fullWidth
               label="Room id"
               value={props.store.roomId}
@@ -214,14 +211,12 @@ const ConnectToWaitingRoomComponent = (
       )}
 
       <Grid item xs={12}>
-        <Button
+        <BackdropButton
           onClick={() => connectButtonClicked(props.store.roomId)}
-          variant="contained"
-          size="large"
           startIcon={<VideogameAssetIcon />}
         >
-          {!onMobile ? "Create a Game" : "Join a Game"}
-        </Button>
+          {!onMobile ? "Create a Game" : "Join Game"}
+        </BackdropButton>
       </Grid>
     </React.Fragment>
   );

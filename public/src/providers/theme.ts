@@ -59,22 +59,41 @@ export const themeOptions = createTheme({
         fontFamily: "monospace" // "Roboto"
     },
 
+
     palette: {
+
         primary: {
-            main: "#fff", //green3,// blue2 //'#2E604A',
-            light: "#eee", // green1,
-            dark: "#ccc", //green4,
+
+            // main: "#fff", //green3,// blue2 //'#2E604A',
+            // light: "#eee", // green1,
+            // dark: "#ccc", //green4,
+            main: "#777", //green3,// blue2 //'#2E604A',
+            light: "#777", // green1,
+            dark: "#777", //green4,
 
         },
         secondary: {
-            main: "#fff", //green3,// blue2 //'#2E604A',
-            light: "#eee", // green1,
-            dark: "#ccc", //green4,
-            // main: yellow3, // '#D1362F',
-            // light: yellow2, //"wheat",
-            // dark: yellow4,//  "#dbb165"
+            // main: "#000", //green3,// blue2 //'#2E604A',
+            // light: "#111", // green1,
+            // dark: "#222", //green4,
+            main: "#777", //green3,// blue2 //'#2E604A',
+            light: "#777", // green1,
+            dark: "#777", //green4,
         },
     },
+})
+
+/**
+ * 
+ * @param _backgroundColor if you want the color to be black or white
+ * will send the colors with alpha
+ * @returns 
+ */
+export const getStyledColors = (_backgroundColor: "black" | "white") => {
+    const color = _backgroundColor === "black" ? "white" : "black";
+    const backgroundColor =
+        _backgroundColor === "black" ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.83)";
+
+    return { color, backgroundColor }
 
 }
-)

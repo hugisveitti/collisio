@@ -1,8 +1,10 @@
 import { CircularProgress, Grid } from "@mui/material";
 import React, { useContext, useEffect } from "react";
+import { mobileOnlyPath } from "../../experiment";
 import { UserContext } from "../../providers/UserProvider";
+import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
-import BackdropButton from "../backdrop/button/BackdropButton";
+import BackdropButton from "../button/BackdropButton";
 import {
   aboutPagePath,
   buyPremiumPagePath,
@@ -11,6 +13,7 @@ import {
   highscorePagePath,
   howToPlayPagePath,
   loginPagePath,
+  mobileOnlyWaitingRoomPath,
   privateProfilePagePath,
   showRoomPagePath,
   tournamentPagePath,
@@ -27,31 +30,53 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   }, []);
 
   const user = useContext(UserContext);
+  const onMobile = getDeviceType() === "mobile";
 
   const renderUserInfo = () => {
     return user ? (
       <div className="background" style={{ fontSize: 32 }}>
-        Welcome <i>{user.displayName}</i>
+        <i>{user.displayName}</i> logged in
       </div>
     ) : (
       <BackdropButton link={loginPagePath}>Login</BackdropButton>
     );
   };
-
+  const btnWidth = 180;
   return (
     <BackdropContainer store={props.store}>
       <Grid container spacing={3}>
         <Grid item xs={12} lg={6}>
-          <BackdropButton link={connectPagePath}>Create a game</BackdropButton>
-          <BackdropButton disabled={!user} link={privateProfilePagePath}>
+          <BackdropButton link={connectPagePath} width={btnWidth}>
+            {onMobile ? "Join a game" : "Create a game"}
+          </BackdropButton>
+          <BackdropButton
+            disabled={!user}
+            link={privateProfilePagePath}
+            width={btnWidth}
+          >
             Settings
           </BackdropButton>
-          <BackdropButton link={highscorePagePath}>Highscores</BackdropButton>
-          <BackdropButton link={tournamentPagePath}>Tournaments</BackdropButton>
-          <BackdropButton link={showRoomPagePath}>Cars</BackdropButton>
-          <BackdropButton link={howToPlayPagePath}>How to play</BackdropButton>
-          <BackdropButton link={buyPremiumPagePath}>Go Premium</BackdropButton>
-          <BackdropButton link={aboutPagePath}>About</BackdropButton>
+          <BackdropButton link={highscorePagePath} width={btnWidth}>
+            Highscores
+          </BackdropButton>
+          <BackdropButton link={tournamentPagePath} width={btnWidth}>
+            Tournaments
+          </BackdropButton>
+          <BackdropButton link={showRoomPagePath} width={btnWidth}>
+            Cars
+          </BackdropButton>
+          <BackdropButton link={howToPlayPagePath} width={btnWidth}>
+            How to play
+          </BackdropButton>
+          <BackdropButton link={buyPremiumPagePath} width={btnWidth}>
+            Go Premium
+          </BackdropButton>
+          <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
+            Play mobile only
+          </BackdropButton>
+          <BackdropButton link={aboutPagePath} width={btnWidth}>
+            About
+          </BackdropButton>
         </Grid>
         <Grid item xs={12} lg={6} style={{}}>
           {user === null ? (

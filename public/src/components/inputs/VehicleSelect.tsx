@@ -8,11 +8,13 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import { inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
 import { VehicleType } from "../../shared-backend/shared-stuff";
 import { itemInArray } from "../../utils/utilFunctions";
 import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
+import BackdropButton from "../button/BackdropButton";
 import ShowRoomComponent from "../showRoom/ShowRoomComponent";
+import "./select.css";
 
 interface IVehicleSelect {
   value: VehicleType;
@@ -26,7 +28,7 @@ interface IVehicleSelect {
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
   const [showPreview, setShowPreview] = useState(false);
-
+  const { color, backgroundColor } = getStyledColors("white");
   const vehicleOptions = props.excludedVehicles
     ? allVehicleTypes.filter(
         (vehicle) => !itemInArray(vehicle.type, props.excludedVehicles)
@@ -35,19 +37,19 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
 
   return (
     <React.Fragment>
+      <span className="select__label" style={{ color: backgroundColor }}>
+        Vehicle
+      </span>
       <FormControl fullWidth={props.fullWidth}>
-        <InputLabel id="vehicle-select">Vehicle</InputLabel>
         <Select
+          className="select"
           disabled={props.disabled}
-          style={{
-            backgroundColor: inputBackgroundColor,
-          }}
-          label="Vehicle"
           name="vehicle"
           onChange={(e) => {
             props.onChange(e.target.value as VehicleType);
           }}
           value={props.value}
+          style={{ color, backgroundColor }}
         >
           {vehicleOptions.map((vehicle) => (
             <MenuItem key={vehicle.type} value={vehicle.type}>
@@ -58,15 +60,13 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
       </FormControl>
       {props.previewVehicle && (
         <React.Fragment>
-          <Button
+          <BackdropButton
             style={{ marginTop: 10, marginLeft: 5 }}
-            variant="outlined"
             onClick={() => setShowPreview(!showPreview)}
             startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
           >
             Vehicle preview
-          </Button>
-
+          </BackdropButton>
           <Collapse in={showPreview} style={{ marginTop: 10 }}>
             {showPreview && (
               <ShowRoomComponent

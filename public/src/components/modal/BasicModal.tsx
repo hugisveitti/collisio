@@ -1,6 +1,7 @@
 import Modal from "@mui/material/Modal";
+import { color } from "@mui/system";
 import React from "react";
-import { modalBackgroundColor } from "../../providers/theme";
+import { getStyledColors, modalBackgroundColor } from "../../providers/theme";
 
 interface IBasicModal {
   open: boolean;
@@ -9,6 +10,8 @@ interface IBasicModal {
 }
 
 const BasicModal = (props: IBasicModal) => {
+  const { color, backgroundColor } = getStyledColors("black");
+
   return (
     <Modal open={props.open} onClose={props.onClose} style={{ border: 0 }}>
       <div
@@ -17,7 +20,8 @@ const BasicModal = (props: IBasicModal) => {
           position: "absolute",
           top: "25%",
           left: "8%",
-          backgroundColor: modalBackgroundColor,
+          backgroundColor,
+          color,
           // border: "2px solid #000",
           padding: 10,
           outline: 0,

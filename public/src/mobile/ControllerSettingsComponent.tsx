@@ -1,29 +1,21 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React from "react";
+import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";
-import { IUser, IUserSettings, IVehicleSettings } from "../classes/User";
-import CollabsibleCard from "../components/inputs/CollapsibleCard";
+import { IUser } from "../classes/User";
+import BackdropButton from "../components/button/BackdropButton";
 import FullscreenButton from "../components/inputs/FullscreenButton";
-import VehicleSelect from "../components/inputs/VehicleSelect";
 import { frontPagePath } from "../components/Routes";
-import { IStore } from "../components/store";
 import GameSettingsComponent from "../components/settings/GameSettingsComponent";
-import { setDBUserSettings } from "../firebase/firestoreFunctions";
-import {
-  GameActions,
-  mts_user_settings_changed,
-} from "../shared-backend/shared-stuff";
-import { nonactiveVehcileTypes } from "../vehicles/VehicleConfigs";
 import VehicleSettingsComponent from "../components/settings/VehicleSettingsComponent";
+import { IStore } from "../components/store";
+import { GameActions } from "../shared-backend/shared-stuff";
 
 export const invertedControllerKey = "invertedController";
 
@@ -39,6 +31,7 @@ interface IControllerSettingsComponent {
 
 const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   const user = props.user;
+  const history = useHistory();
 
   if (!props.store.userSettings) {
     return (
@@ -54,7 +47,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
         <FullscreenButton />
       </Grid>
       <Grid item xs={6} style={{ textAlign: "right" }}>
-        <IconButton onClick={() => props.onClose()}>
+        <IconButton onClick={() => props.onClose()} style={{ color: "white" }}>
           <CloseIcon />
         </IconButton>
       </Grid>
@@ -66,9 +59,8 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
             </Typography>
           </Grid>
           <Grid item xs={6} sm={4}>
-            <Button
-              fullWidth
-              variant="contained"
+            <BackdropButton
+              color="white"
               onClick={() => {
                 props.gameActions.restart = true;
                 props.onClose();
@@ -79,7 +71,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               }}
             >
               Restart Game
-            </Button>
+            </BackdropButton>
           </Grid>
           <Grid item xs={12}>
             <GameSettingsComponent
@@ -104,14 +96,16 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       <Grid item xs={12}></Grid>
 
       <Grid item xs={12} style={{ textAlign: "center" }}>
-        <Button
+        <BackdropButton
+          color="white"
           onClick={() => {
-            window.location.href = frontPagePath;
+            props.socket.disconnect();
+            history.push(frontPagePath);
           }}
           startIcon={<ExitToAppIcon />}
         >
           Quit game
-        </Button>
+        </BackdropButton>
       </Grid>
     </Grid>
   );

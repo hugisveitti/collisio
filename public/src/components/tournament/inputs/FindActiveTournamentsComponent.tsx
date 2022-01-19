@@ -14,6 +14,7 @@ import {
 } from "../../../firebase/firestoreTournamentFunctions";
 import { yellow3 } from "../../../providers/theme";
 import { mdts_game_settings_changed } from "../../../shared-backend/shared-stuff";
+import BackdropButton from "../../button/BackdropButton";
 import TournamentSelect from "../../inputs/TournamentSelect";
 import { IStore } from "../../store";
 
@@ -103,10 +104,8 @@ const FindActiveTournamentComponent = (
 
   return (
     <div style={styles}>
-      <Button
+      <BackdropButton
         style={{ marginRight: 10 }}
-        variant="contained"
-        disableElevation
         onClick={() => {
           if (props.store.players.length === 0) {
             toast.error(
@@ -129,7 +128,7 @@ const FindActiveTournamentComponent = (
         }}
       >
         Find active tournaments
-      </Button>
+      </BackdropButton>
 
       <TournamentSelect
         tournaments={activeTournaments}

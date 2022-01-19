@@ -1,20 +1,22 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
+import "react-toastify/dist/ReactToastify.css";
 import { createClassNames } from "../../utils/utilFunctions";
+import BackdropButton from "../button/BackdropButton";
 import { IStore } from "../store";
 import { changeCameraPosition, createBackdropRenderer } from "./backdropCanvas";
 import BlackLoadingPage from "./BlackLoadingPage";
-import BackdropButton from "./button/BackdropButton";
 
 interface IBackdropContainer {
-  children: JSX.Element;
+  children: React.ReactNode;
 
   /** have the background color over the container */
   backgroundContainer?: boolean;
 
   store?: IStore;
   loading?: boolean;
+  center?: boolean;
 }
 
 const BackdropContainer = (props: IBackdropContainer) => {
@@ -45,7 +47,9 @@ const BackdropContainer = (props: IBackdropContainer) => {
       setCamPosNum(num);
     }
     if (canvasWrapperRef?.current) {
-      renderer.domElement.setAttribute("style", "max-width:100%;");
+      if (!alreadyExisted) {
+        renderer.domElement.setAttribute("style", "max-width:100%;");
+      }
 
       // @ts-ignore
       canvasWrapperRef.current.appendChild(renderer.domElement);
@@ -75,6 +79,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
             handleChangeCameraPos();
             setPressedStartGame(true);
           }}
+          color="black"
         >
           Enter Game
         </BackdropButton>
@@ -86,6 +91,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
     <div
       style={{
         fontFamily: "monospace",
+        textAlign: props.center ? "center" : "left",
       }}
     >
       {!pressedStartGame ? (

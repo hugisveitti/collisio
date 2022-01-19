@@ -9,6 +9,7 @@ import CollabsibleCard from "../../components/inputs/CollapsibleCard";
 import VehicleSelect from "../../components/inputs/VehicleSelect";
 import { IStore } from "../../components/store";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
+import { getStyledColors } from "../../providers/theme";
 import {
   mts_user_settings_changed,
   vehicleColors,
@@ -17,6 +18,7 @@ import {
   getVehicleColorOption,
   nonactiveVehcileTypes,
 } from "../../vehicles/VehicleConfigs";
+import BackdropButton from "../button/BackdropButton";
 import AnySelect from "../inputs/AnySelect";
 
 interface IVehicleSettingsComponent {
@@ -68,6 +70,8 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     saveUserSettingsToBD(newUserSettings);
   };
 
+  const { color, backgroundColor } = getStyledColors("white");
+
   return (
     <CollabsibleCard header="Vehicle settings">
       <Grid container spacing={3}>
@@ -96,19 +100,13 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
         </Grid>
         <Grid item xs={6} sm={4}>
           {props.resetOrientation && (
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={props.resetOrientation}
-            >
+            <BackdropButton onClick={props.resetOrientation}>
               Reset orientation
-            </Button>
+            </BackdropButton>
           )}
         </Grid>
         <Grid item xs={6} sm={4}>
-          <Button
-            fullWidth
-            variant="outlined"
+          <BackdropButton
             onClick={() => {
               updateVehicleSettings(
                 "useChaseCamera",
@@ -116,11 +114,13 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               );
             }}
           >
-            Camera chaser{" "}
-            {props.store.userSettings.vehicleSettings.useChaseCamera
-              ? "On"
-              : "Off"}
-          </Button>
+            <>
+              Camera chaser{" "}
+              {props.store.userSettings.vehicleSettings.useChaseCamera
+                ? "On"
+                : "Off"}
+            </>
+          </BackdropButton>
         </Grid>
 
         <Grid item xs={12}>
@@ -129,6 +129,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
           >
             <Typography>Chase camera speed</Typography>
             <Slider
+              style={{ color }}
               min={0.01}
               max={1}
               valueLabelDisplay="auto"
@@ -145,6 +146,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
         <Grid item xs={12}>
           <Typography>Steering sensitivity</Typography>
           <Slider
+            style={{
+              color: "black",
+            }}
             min={0.01}
             max={1}
             valueLabelDisplay="auto"
@@ -159,6 +163,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
         <Grid item xs={12}>
           <Typography>Camera zoom</Typography>
           <Slider
+            style={{ color }}
             min={1}
             max={10}
             valueLabelDisplay="auto"

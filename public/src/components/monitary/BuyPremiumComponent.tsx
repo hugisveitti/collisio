@@ -1,7 +1,5 @@
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
@@ -21,13 +19,16 @@ import {
   getGameTypeNameFromType,
   getTrackNameFromType,
 } from "../../classes/Game";
-import AppContainer from "../../containers/AppContainer";
 import { basicColor, premiumColor, standardColor } from "../../providers/theme";
 import { defaultVehicleType } from "../../shared-backend/shared-stuff";
 import {
   activeVehicleTypes,
   getVehicleNameFromType,
 } from "../../vehicles/VehicleConfigs";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
+import MyCard from "../card/MyCard";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { frontPagePath } from "../Routes";
 
 interface IPremiumOptionListItem {
@@ -67,22 +68,29 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
   const allGameModes = ["Race", "Tag"];
 
   return (
-    <AppContainer>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+    <BackdropContainer>
+      <Grid container spacing={3} style={{ color: "black" }}>
+        <Grid item xs={12} md={4} xl={1}>
+          <ToFrontPageButton />
+        </Grid>
+        <Grid item xs={12} md={8} xl={11}>
           <Typography variant="h2" component="div">
             Choose plan
           </Typography>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h5" component="div">
-            You can either buy a premium account or continue using a free
-            account.
+            <MyCard>
+              <CardContent>
+                You can either buy a premium account or continue using a free
+                account.
+              </CardContent>
+            </MyCard>
           </Typography>
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Card variant="outlined" style={{ backgroundColor: premiumColor }}>
+          <MyCard style={{ backgroundColor: premiumColor }}>
             <CardHeader
               title="Full game"
               header="Full game"
@@ -114,20 +122,17 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
               </List>
             </CardContent>
             <CardActions>
-              <Button
-                disableElevation
-                style={{}}
-                variant="contained"
+              <BackdropButton
                 onClick={() => toast("Premium not available yet")}
               >
                 Buy Premium
-              </Button>
+              </BackdropButton>
             </CardActions>
-          </Card>
+          </MyCard>
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Card variant="outlined" style={{ backgroundColor: standardColor }}>
+          <MyCard style={{ backgroundColor: standardColor }}>
             <CardHeader
               title="Standard"
               header="Standard"
@@ -147,22 +152,25 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
                   title="Access to one game mode"
                   listText={["Race"]}
                 />
+                <PremiumOptionListItem
+                  title="More info"
+                  extraText="The standard plan includes the option of participating in a tournament but not creating one."
+                  listText={[]}
+                />
               </List>
             </CardContent>
             <CardActions>
-              <Button
-                disableElevation
-                variant="contained"
+              <BackdropButton
                 onClick={() => toast("Standard not available yet")}
               >
                 Buy Standard
-              </Button>
+              </BackdropButton>
             </CardActions>
-          </Card>
+          </MyCard>
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Card variant="outlined" style={{ backgroundColor: basicColor }}>
+          <MyCard style={{ backgroundColor: basicColor }}>
             <CardHeader title="Basic" header="Basic" subheader="Free" />
             <CardContent>
               <List>
@@ -181,14 +189,14 @@ const BuyPremiumComponent = (props: IBuyPremiumComponent) => {
               </List>
             </CardContent>
             <CardActions>
-              <Button onClick={() => history.push(frontPagePath)}>
+              <BackdropButton onClick={() => history.push(frontPagePath)}>
                 Continue with basic
-              </Button>
+              </BackdropButton>
             </CardActions>
-          </Card>
+          </MyCard>
         </Grid>
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

@@ -16,7 +16,6 @@ import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
-import AppContainer from "../containers/AppContainer";
 import alphaGIF from "../images/alpha.gif";
 import betaGIF from "../images/beta.gif";
 import connectWithLogin from "../images/connect-with-login.PNG";
@@ -27,15 +26,14 @@ import mobileGUI from "../images/mobile-gui.PNG";
 import leftTurnImage from "../images/phone-orientation-leftTurn.PNG";
 import noTurnImage from "../images/phone-orientation-noTurn.PNG";
 import rightTurnImage from "../images/phone-orientation-rightTurn.PNG";
+import resetOrientation from "../images/resetorient.jpg";
 import splitScreenImage from "../images/split-screen.PNG";
 import vehicleSelect1 from "../images/vehicle-select-1.PNG";
 import vehicleSelect2 from "../images/vehicle-select-2.PNG";
-import resetOrientation from "../images/resetorient.jpg";
-import { inputBackgroundColor } from "../providers/theme";
 import "../styles/main.css";
-import { buyPremiumPagePath, highscorePagePath } from "./Routes";
 import BackdropContainer from "./backdrop/BackdropContainer";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
+import { buyPremiumPagePath, highscorePagePath } from "./Routes";
 
 interface IHowToPlayItem {
   header: string;

@@ -17,9 +17,11 @@ import spaTrackImage from "../../images/tracks/spa-top.png";
 
 import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
-import { inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
 import { GameType, TrackName } from "../../shared-backend/shared-stuff";
 import { itemInArray } from "../../utils/utilFunctions";
+import BackdropButton from "../button/BackdropButton";
+import "./select.css";
 
 interface ITrackImagePair {
   image: any;
@@ -68,17 +70,21 @@ const TrackSelect = (props: ITrackSelect) => {
     }
   }
 
+  const { color, backgroundColor } = getStyledColors("white");
   const trackImage = getTrackImage(props.value);
   return (
     <React.Fragment>
+      <span className="select__label" style={{ color: backgroundColor }}>
+        Track
+      </span>
       <FormControl fullWidth={props.fullWidth} disabled={props.disabled}>
-        <InputLabel id="vehicle-select">Track</InputLabel>
         <Select
+          className="select"
           style={{
-            backgroundColor: inputBackgroundColor,
+            backgroundColor,
+            color,
             minWidth: 200,
           }}
-          label="Track"
           name="vehicle"
           onChange={(e) => {
             props.onChange(e.target.value as TrackName);
@@ -95,14 +101,14 @@ const TrackSelect = (props: ITrackSelect) => {
       {props.showMapPreview && (
         <>
           <br />
-          <Button
+          <BackdropButton
+            color="white"
             style={{ marginTop: 10 }}
-            variant="outlined"
             onClick={() => setShowPreview(!showPreview)}
             startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
           >
             Map preview
-          </Button>
+          </BackdropButton>
 
           <Collapse in={showPreview} style={{ marginTop: 10 }}>
             {trackImage ? (

@@ -12,7 +12,7 @@ import "./course.css";
 import { CourseItemsLoader, notSeeThroughObjects } from "./CourseItemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
 import { ICourse } from "./ICourse";
-import { courseManager } from "./loadingManager";
+import { courseManager, setLoaderProgress } from "./loadingManager";
 
 
 
@@ -108,7 +108,12 @@ export class Course implements ICourse {
         const loader = new GLTFLoader(courseManager)
         return new Promise<void>(async (resolve, reject) => {
 
-            loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`)).then(async (gltf: GLTF) => {
+            loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`), (e => {
+                if (e.lengthComputable) {
+                    const completed = e.loaded / e.total
+                    setLoaderProgress(completed)
+                }
+            })).then(async (gltf: GLTF) => {
                 this.gameScene.scene.add(gltf.scene)
                 this.courseScene = gltf.scene
 

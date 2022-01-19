@@ -1,23 +1,24 @@
-import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import React from "react";
-import AppContainer from "../containers/AppContainer";
-import hugi from "../images/hugi.jpg";
 import collisioPic from "../images/collisio-fb.png";
-import { useHistory } from "react-router";
-import { buyPremiumPagePath } from "./Routes";
+import hugi from "../images/hugi.jpg";
+import BackdropContainer from "./backdrop/BackdropContainer";
+import BackdropButton from "./button/BackdropButton";
+import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import DonateButton from "./monitary/DonateButton";
+import { buyPremiumPagePath } from "./Routes";
 
 interface IAboutPageComponent {}
 
 const AboutPageComponent = (props: IAboutPageComponent) => {
-  const history = useHistory();
-
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} lg={2}>
+          <ToFrontPageButton color="white" />
+        </Grid>
+        <Grid item xs={12} lg={10}>
           <Typography variant="h3">About Collisio</Typography>
         </Grid>
         <Grid item xs={12}>
@@ -63,18 +64,13 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Button
-            variant="contained"
-            onClick={() => history.push(buyPremiumPagePath)}
-          >
-            Go Premium
-          </Button>
+          <BackdropButton link={buyPremiumPagePath}>Go Premium</BackdropButton>
         </Grid>
         <Grid item xs={12}>
           <DonateButton />
         </Grid>
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

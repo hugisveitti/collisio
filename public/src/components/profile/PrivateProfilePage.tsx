@@ -1,51 +1,39 @@
 import { updateProfile } from "@firebase/auth";
 import EditIcon from "@mui/icons-material/Edit";
 import EditOffIcon from "@mui/icons-material/EditOff";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
-import CardActions from "@mui/material/CardActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import makeStyles from "@mui/styles/makeStyles";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import AppContainer from "../../containers/AppContainer";
 import { auth, signOut } from "../../firebase/firebaseInit";
-import { cardBackgroundColor } from "../../providers/theme";
+import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
 import { UserContext } from "../../providers/UserProvider";
+import { getDateNow } from "../../utils/utilFunctions";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
+import MyCard from "../card/MyCard";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import {
   frontPagePath,
   getUserPagePath,
   privateProfileTournamentsPagePath,
 } from "../Routes";
+import { IStore } from "../store";
+import MyTextField from "../textField/MyTextField";
 import GameDataComponent from "./GameDataComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
-import { getDateNow } from "../../utils/utilFunctions";
-import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
-import { IStore } from "../store";
-import BackdropContainer from "../backdrop/BackdropContainer";
-import BackdropButton from "../backdrop/button/BackdropButton";
-
-const useStyles = makeStyles({
-  container: {
-    padding: 25,
-    marginTop: 0,
-  },
-  input: {},
-});
 
 interface IPrivateProfilePage {
   store: IStore;
 }
 
 const PrivateProfilePage = (props: IPrivateProfilePage) => {
-  const classes = useStyles();
   const history = useHistory();
   const user = useContext(UserContext);
   const [inEditMode, setInEditMode] = useState(false);
@@ -86,13 +74,9 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button
-            disableElevation
-            variant="contained"
-            onClick={() => history.push(getUserPagePath(user.uid))}
-          >
+          <BackdropButton link={getUserPagePath(user.uid)}>
             See public profile
-          </Button>
+          </BackdropButton>
         </CardActions>
       </>
     );
@@ -134,27 +118,21 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
         <CardContent>
           <Grid container rowSpacing={3}>
             <Grid item xs={12}>
-              <TextField
-                autoComplete="false"
-                className={classes.input}
+              <MyTextField
                 label="Photo URL"
-                variant="outlined"
                 id="photo-url"
                 value={editUser.photoURL ?? ""}
                 onChange={(e) => updateEditUser(e.target.value, "photoURL")}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                autoComplete="false"
+              <MyTextField
                 id="display-name"
-                variant="outlined"
                 label="Display name"
                 value={editUser.displayName ?? ""}
                 onChange={(e) => {
                   updateEditUser(e.target.value, "displayName");
                 }}
-                className={classes.input}
               />
             </Grid>
           </Grid>
@@ -164,13 +142,11 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
   };
 
   return (
-    <BackdropContainer backgroundContainer store={props.store}>
-      <Grid
-        container
-        spacing={3}
-        className={classes.container}
-        style={{ marginTop: 0 }}
-      >
+    <BackdropContainer store={props.store}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <ToFrontPageButton />
+        </Grid>
         <Grid item xs={12} sm={12} md={3}>
           <Grid spacing={3} container>
             <Grid item xs={12}>
@@ -192,14 +168,9 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 </div>
               ) : (
                 <>
-                  <Card
-                    variant="outlined"
-                    style={{
-                      backgroundColor: cardBackgroundColor,
-                    }}
-                  >
+                  <MyCard>
                     {inEditMode ? renderEditInfo() : renderStaticInfo()}
-                  </Card>
+                  </MyCard>
                 </>
               )}
             </Grid>

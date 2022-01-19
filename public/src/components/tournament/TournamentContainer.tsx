@@ -1,34 +1,34 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import QRCode from "qrcode";
 import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import {
   GlobalTournament,
   ITournament,
   LocalTournament,
 } from "../../classes/Tournament";
-import QRCode from "qrcode";
 import { IUser } from "../../classes/User";
-import AppContainer from "../../containers/AppContainer";
 import {
   createGetTournametListener,
   deleteTournament,
 } from "../../firebase/firestoreTournamentFunctions";
 import { UserContext } from "../../providers/UserProvider";
+import { getDeviceType } from "../../utils/settings";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
 import CopyTextButton from "../inputs/CopyTextButton";
 import DeleteButton from "../inputs/DeleteButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import { connectPagePath, tournamentPagePath } from "../Routes";
+import { IStore } from "../store";
 import GlobalTournamentComponent from "./globalTournament/GlobalTournamentComponent";
 import GlobalTournamentWaitingRoomComponent from "./globalTournament/GlobalTournamentWaitingRoomComponent";
+import HowToPlayTournamentComponent from "./HowToPlayTournamentComponent";
 import LocalTournamentComponent from "./localTournament/LocalTournamentComponent";
 import LocalTournamentWaitingRoomComponent from "./localTournament/LocalTournamentWaitingRoomComponent";
-import HowToPlayTournamentComponent from "./HowToPlayTournamentComponent";
-import { Button } from "@mui/material";
-import { IStore } from "../store";
-import { useHistory } from "react-router";
-import { connectPagePath, tournamentPagePath } from "../Routes";
-import { getDeviceType } from "../../utils/settings";
 
 interface ITournamentContainer {
   tournamentId: string;
@@ -118,7 +118,7 @@ const TournamentContainer = (props: ITournamentContainer) => {
   };
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
         {tournament === null ? (
           <>
@@ -144,8 +144,8 @@ const TournamentContainer = (props: ITournamentContainer) => {
             )}
             {tournament.hasStarted && (
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
+                <BackdropButton
+                  center
                   onClick={() => {
                     if (onMobile) {
                       toast.error("You can only create games on desktop.");
@@ -162,7 +162,7 @@ const TournamentContainer = (props: ITournamentContainer) => {
                   }}
                 >
                   Create tournament game
-                </Button>
+                </BackdropButton>
               </Grid>
             )}
             {renderTournament()}
@@ -187,7 +187,7 @@ const TournamentContainer = (props: ITournamentContainer) => {
           </Grid>
         )}
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

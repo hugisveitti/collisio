@@ -1,19 +1,14 @@
-import { AmbientLight, Fog, Vector3, BackSide, Mesh, Color, SphereGeometry, ShaderMaterial, HemisphereLight, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
-import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
-import { getDeviceType, getStaticPath } from "../../utils/settings"
-/** class that TrafficSchoolCourse and RaceCourse extend */
-import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { courseManager } from "../../course/loadingManager";
+import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, Scene, ShaderMaterial, SphereGeometry, sRGBEncoding, Vector3, WebGLRenderer } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { getTimeOfDayColors } from "../../classes/Game";
 import { skydomeFragmentShader, skydomeVertexShader } from "../../game/shaders";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import "./backdrop.css"
+import { getStaticPath } from "../../utils/settings";
+import "./backdrop.css";
 
 
 let renderer: WebGLRenderer | undefined, scene: Scene | undefined, camera: PerspectiveCamera | undefined
 let posX = 0, posZ = 0, posY = 0
-const cameraMoveSpeed = 0.2
+const cameraMoveSpeed = 0.4
 const addLights = (scene: Scene) => {
     const timeOfDay = "day"
 
@@ -105,16 +100,18 @@ const setPosXZ = () => {
     posY = camera.position.y
 }
 
+let animateTimeout: NodeJS.Timeout
+
+let width = window.innerWidth
+let height = window.innerHeight
 export const createBackdropRenderer = (loaderProgressCallback: (completed: number) => void) => {
 
     if (renderer) {
-        renderer.setSize(window.innerWidth, window.innerHeight);
+
         return { renderer, alreadyExisted: true }
     }
 
 
-    let width = window.innerWidth
-    let height = window.innerHeight
 
     renderer = new WebGLRenderer({ antialias: true });
 
@@ -157,6 +154,7 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
 
 
+
     window.onresize = function () {
         width = window.innerWidth
         height = window.innerHeight
@@ -164,46 +162,77 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     };
+    window.setTimeout(() => {
+
+        width = window.innerWidth
+        height = window.innerHeight
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }, 500)
 
 
-    let offset = 15
-    let yOff = 0
-    let dy = 0.005
-    const yOffMax = Math.PI / 5
+
+    let sinOff = 0
+    let dSin = 0.005
+    let dCos = 0.003
+    let cosOff = Math.PI / 2
+    const sinOffMax = Math.PI / 4
+    const cosOffMax = Math.PI / 4
     //  camera.rotateY(ry)
-    camera.fov = 30
+    let fov = width < 600 ? 60 : 30
+    camera.fov = fov
+
     camera.updateProjectionMatrix()
 
-    console.log("posx", posX, posZ)
+
+    let time = Date.now()
+    const targetFPS = 20
 
     const animate = () => {
 
-        requestAnimationFrame(animate);
+        animateTimeout = setTimeout(() => {
 
+
+            requestAnimationFrame(animate);
+
+        }, 1000 / targetFPS)
 
         // controls.update();
         if (renderer) {
+            const now = Date.now()
+            const delta = now - time
+
+
             renderer.render(scene, camera);
+            time = now
+
         }
 
         // camera.rotateY(ry)
         if (reachedTarget) {
-            yOff += dy
-            if (Math.abs(yOff) > yOffMax) {
-                dy = - dy
+            sinOff += dSin
+            if (Math.abs(sinOff) > sinOffMax) {
+                dSin = -dSin
             }
 
-            camera.position.setX(posX + Math.sin(yOff))
-            camera.position.setZ(posZ + Math.sin(yOff))
-            camera.position.setY(posY + Math.sin(yOff))
+            cosOff += dCos
+            if (Math.abs(cosOff) > cosOffMax) {
+                dCos = -dCos
+            }
+
+
+            camera.position.setX(posX + Math.sin(sinOff) + Math.cos(cosOff))
+            camera.position.setZ(posZ + Math.sin(sinOff) + Math.cos(cosOff))
+            camera.position.setY(posY + Math.sin(sinOff) + Math.cos(cosOff))
         } else {
             const newPos = camera.position.clone().sub(camera.position.clone().sub(cameraTargetPos).multiplyScalar(cameraMoveSpeed))
             camera.position.set(newPos.x, newPos.y, newPos.z)
 
             if (newPos.distanceTo(cameraTargetPos) < 0.1) {
                 reachedTarget = true
-                yOff = 0
-
+                sinOff = 0
+                cosOff = Math.PI / 2
                 //   camera.position.set(cameraTargetPos.x + Math.cos(yOff), cameraTargetPos.y, cameraTargetPos.z + Math.sin(yOff))
                 setPosXZ()
             }
@@ -227,19 +256,15 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
         loader.loadAsync(getStaticPath("models/front-page.glb"), (e) => {
             if (e.lengthComputable) {
                 const completed = e.loaded / e.total
-                console.log("completed", completed)
-
                 loaderProgressCallback(completed)
             }
         }).then(gltf => {
             scene.add(gltf.scene)
             for (let child of gltf.scene.children) {
                 if (child.name === "f1-car") {
-                    console.log("f1 car", child)
                     lookAtPos = child.position
                 } else if (child.name.includes("position")) {
                     const posNum = +child.name.slice(8)
-                    console.log("pos nUm", posNum)
                     positions[posNum] = child.position
                     cameraPos = child.position
                     child.visible = false
@@ -250,9 +275,12 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
     })
 }
 
-export const removeShowRoomCanvas = () => {
-    renderer.clear()
-    scene.clear()
+export const clearBackdropCanvas = () => {
+    if (animateTimeout) {
+        clearTimeout(animateTimeout)
+    }
+    renderer?.clear()
+    scene?.clear()
     scene = undefined
     renderer = undefined
 }

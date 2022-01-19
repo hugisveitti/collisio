@@ -8,23 +8,24 @@ import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { cardBackgroundColor } from "../../providers/theme";
+import MyCard from "../card/MyCard";
 
 const TagRulesComponent = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Card
+    <MyCard
       style={{
-        backgroundColor: cardBackgroundColor,
         textAlign: "left",
         maxWidth: 500,
         margin: "auto",
       }}
     >
       <CardHeader
+        onClick={() => setOpen(!open)}
         subheader="Rules of tag"
         action={
-          <IconButton onClick={() => setOpen(!open)}>
+          <IconButton>
             {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         }
@@ -57,7 +58,7 @@ const TagRulesComponent = () => {
           <Typography>The person who collected the most coins wins!</Typography>
         </CardContent>
       </Collapse>
-    </Card>
+    </MyCard>
   );
 };
 

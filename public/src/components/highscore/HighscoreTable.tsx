@@ -6,7 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
-import { cardBackgroundColor } from "../../providers/theme";
+import { cardBackgroundColor, getStyledColors } from "../../providers/theme";
 import { itemInArray } from "../../utils/utilFunctions";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 
@@ -17,11 +17,13 @@ interface IHighscoreTable {
 }
 
 const HighscoreTable = (props: IHighscoreTable) => {
+  const { color, backgroundColor } = getStyledColors("white");
   return (
     <TableContainer>
       <Table
         style={{
-          backgroundColor: cardBackgroundColor,
+          color,
+          backgroundColor,
         }}
       >
         <TableHead>

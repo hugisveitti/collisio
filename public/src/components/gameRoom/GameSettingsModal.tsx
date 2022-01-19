@@ -12,6 +12,7 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { IStore } from "../store";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
+import BackdropButton from "../button/BackdropButton";
 
 interface IGameSettingsModal {
   open: boolean;
@@ -37,7 +38,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           </Typography>
         </Grid>
         <Grid item xs={3} style={{ textAlign: "right" }}>
-          <IconButton onClick={props.onClose}>
+          <IconButton onClick={props.onClose} style={{ color: "white" }}>
             <CloseIcon />
           </IconButton>
         </Grid>
@@ -51,7 +52,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         )}
 
         <Grid item xs={12}>
-          <ToFrontPageButton />
+          <ToFrontPageButton color="white" />
         </Grid>
         <Grid item xs={12}>
           <GameSettingsComponent
@@ -62,16 +63,15 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         </Grid>
 
         <Grid item xs={4}>
-          <Button
-            disableElevation
-            variant="contained"
+          <BackdropButton
+            color="white"
             onClick={() => {
               props.gameObject.restartGame();
               props.onClose();
             }}
           >
             Reset game
-          </Button>
+          </BackdropButton>
         </Grid>
         <Grid item xs={8} />
         {props.isTestMode && props.store.player && (

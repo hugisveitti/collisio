@@ -18,7 +18,7 @@ import { ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
 import { socketHandleStartGame } from "../../utils/socketFunctions";
-import BackdropButton from "../backdrop/button/BackdropButton";
+import BackdropButton from "../button/BackdropButton";
 import CopyTextButton from "../inputs/CopyTextButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
@@ -81,15 +81,29 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={1} lg={2} style={{ textAlign: "left" }}>
-        <FullscreenButton />
+      <Grid item xs={3} md={3} style={{ textAlign: "left" }}>
+        <ToFrontPageButton color="white" />
       </Grid>
-      <Grid item xs={10} lg={4}>
+      <Grid item xs={9} md={6}>
         <Typography variant="h3" className="center">
           Waiting room
         </Typography>
       </Grid>
-      <Grid item xs={1} lg={false}></Grid>
+
+      <Grid item xs={12} md={3}>
+        <Typography variant="h4">
+          <span
+            style={{
+              backgroundColor: green4,
+              color: "white",
+              position: onMobile ? "relative" : "absolute",
+            }}
+          >
+            {roomId}
+          </span>
+        </Typography>
+      </Grid>
+
       {props.store.tournament?.id && (
         <Grid item xs={12}>
           <Typography>
@@ -99,16 +113,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Typography>
         </Grid>
       )}
-      <Grid item xs={12} lg={4}>
-        <Typography variant="h4">
-          <span style={{ backgroundColor: green4, color: "white" }}>
-            {roomId}
-          </span>
-        </Typography>
-      </Grid>
-      <Grid item xs={12} lg={2}>
-        <ToFrontPageButton />
-      </Grid>
 
       <Grid item xs={12}>
         <Divider variant="middle" />
@@ -179,7 +183,13 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       {(!onMobile || props.store.player?.isLeader) && (
         <React.Fragment>
           <Grid item xs={12}>
-            <BackdropButton onClick={handleStartGame} disabled={!canStartGame}>
+            <BackdropButton
+              onClick={handleStartGame}
+              disabled={!canStartGame}
+              color="white"
+              center
+              width={200}
+            >
               Start game
             </BackdropButton>
           </Grid>
@@ -192,37 +202,6 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           <GameSettingsComponent store={props.store} />
         </React.Fragment>
       )}
-      {/* {onMobile && (
-        <Grid item xs={12}>
-          <VehicleSelect
-            disabled={!!props.store.tournament?.vehicleType}
-            onChange={(vehicleType) => {
-              if (!user) {
-                toast.error("You have to log in to change vehicles");
-              } else {
-                const newPayerInfo = {
-                  ...props.store.player,
-                  vehicleType,
-                } as IPlayerInfo;
-                props.store.setPlayer(newPayerInfo);
-                sendPlayerInfoChanged(props.store.socket, newPayerInfo);
-
-                updateUserVehicleSettings(
-                  "vehicleType",
-                  vehicleType as VehicleType
-                );
-              }
-            }}
-            value={
-              !!props.store.tournament?.vehicleType
-                ? props.store.tournament?.vehicleType
-                : props.store.player.vehicleType
-            }
-            previewVehicle
-            excludedVehicles={nonactiveVehcileTypes}
-          />
-        </Grid>
-      )} */}
 
       {onMobile && (
         <Grid item xs={12}>

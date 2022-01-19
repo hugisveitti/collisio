@@ -21,6 +21,7 @@ import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
 import EditLocalTournamentComponent from "./localTournament/EditLocalTournamentComponent";
+import MyTextField from "../textField/MyTextField";
 
 interface IEditTournamentComponent<V> {
   user: IUser;
@@ -60,7 +61,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
   return (
     <React.Fragment>
       <Grid item xs={12}>
-        <TextField
+        <MyTextField
           label="Tournament name"
           value={props.tournament.name}
           onChange={(e) => {

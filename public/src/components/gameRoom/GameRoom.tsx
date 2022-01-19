@@ -25,6 +25,7 @@ import {
 } from "../../shared-backend/shared-stuff";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import { inTestMode } from "../../utils/settings";
+import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import { frontPagePath } from "../Routes";
 import { IStore } from "../store";
 import EndOfGameModal from "./EndOfGameModal";
@@ -59,6 +60,10 @@ const GameRoom = (props: IGameRoom) => {
     // basically have to create a modal in the game class and show it there...
     setSettingsModalOpen(!settingsModalOpen);
   };
+
+  useEffect(() => {
+    clearBackdropCanvas();
+  }, []);
 
   const handelGameFinished = (data: IEndOfGameData) => {
     setEndOfGameModalOpen(true);

@@ -7,11 +7,13 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router";
-import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
-import { frontPagePath } from "../Routes";
+import BackdropContainer from "../backdrop/BackdropContainer";
 import CreateGlobalTournamentComponent from "./globalTournament/CreateGlobalTournamentComponent";
 import CreateLocalTournamentComponent from "./localTournament/CreateLocalTournamentComponent";
+import "../textField/my-text-field.css";
+import MyRadio from "../radio/MyRadio";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 
 interface ICreateTournamentContainer {}
 
@@ -22,51 +24,30 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
   const [tournamentType, setTournamentType] = useState("local");
 
   return (
-    <AppContainer loading={user === null}>
+    <BackdropContainer loading={user === null} backgroundContainer>
       <Grid container spacing={3}>
+        <Grid item xs={12} lg={2}>
+          <ToFrontPageButton color="white" />
+        </Grid>
         {!user?.uid ? (
-          <Grid item xs={12}>
+          <Grid item xs={12} lg={10}>
             <Typography>
               Only logged in users can create a tournament.
             </Typography>
           </Grid>
         ) : (
           <>
-            <Grid item xs={12}>
+            <Grid item xs={12} lg={10}>
               <Typography variant="h3">Create a tournament</Typography>
             </Grid>
             <Grid item xs={12}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Type of tournament</FormLabel>
-                <RadioGroup
-                  row
-                  aria-label="type of tournament"
-                  name="row-radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="local"
-                    control={
-                      <Radio
-                        onChange={() => setTournamentType("local")}
-                        checked={tournamentType === "local"}
-                      />
-                    }
-                    label="Local"
-                  />
-                  <FormControlLabel
-                    value="global"
-                    control={
-                      <Radio
-                        onChange={() => {
-                          setTournamentType("global");
-                        }}
-                        checked={tournamentType === "global"}
-                      />
-                    }
-                    label="Global"
-                  />
-                </RadioGroup>
-              </FormControl>
+              <MyRadio
+                center
+                checked={tournamentType}
+                options={["local", "global"]}
+                label="Type of tournament"
+                onChange={(newType) => setTournamentType(newType)}
+              />
             </Grid>
             <br />
 
@@ -82,7 +63,7 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
           </>
         )}
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

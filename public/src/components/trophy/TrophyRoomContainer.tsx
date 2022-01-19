@@ -1,10 +1,10 @@
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router";
-import AppContainer from "../../containers/AppContainer";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
 import { getTrophyRoomPath } from "../Routes";
+import MyTextField from "../textField/MyTextField";
 import TrophyRoomComponent from "./TrophyRoomComponent";
 
 interface TrophyRoomParams {
@@ -20,7 +20,7 @@ const TrophyRoomContainer = (props: ITrophyRoomContainer) => {
   const [searchId, setSearchId] = useState("");
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
         {id ? (
           <Grid item xs={12}>
@@ -29,24 +29,23 @@ const TrophyRoomContainer = (props: ITrophyRoomContainer) => {
         ) : (
           <>
             <Grid item xs={12}>
-              <TextField
+              <MyTextField
                 label="Trophy id"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
-              <Button
-                variant="outlined"
+              <BackdropButton
                 onClick={() => history.push(getTrophyRoomPath(searchId))}
               >
                 Go
-              </Button>
+              </BackdropButton>
             </Grid>
           </>
         )}
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

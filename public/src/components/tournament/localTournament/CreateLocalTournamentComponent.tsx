@@ -11,6 +11,7 @@ import {
 } from "../../../classes/Tournament";
 import { IUser } from "../../../classes/User";
 import { setTournament } from "../../../firebase/firestoreTournamentFunctions";
+import BackdropButton from "../../button/BackdropButton";
 import { getTournamentPagePath } from "../../Routes";
 import EditTournamentComponent from "../EditTournamentComponent";
 
@@ -62,9 +63,7 @@ const CreateLocalTournamentComponent = (
         <Divider variant="middle" />
       </Grid>
       <Grid item xs={12}>
-        <Button
-          variant="contained"
-          disableElevation
+        <BackdropButton
           onClick={() => {
             const { status, message } =
               validateCreateTournament(editTournament);
@@ -83,7 +82,7 @@ const CreateLocalTournamentComponent = (
           }}
         >
           Create local tournament!
-        </Button>
+        </BackdropButton>
       </Grid>
     </Grid>
   );

@@ -1,7 +1,6 @@
-import { PlayLessonRounded } from "@mui/icons-material";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { Checkbox, Collapse } from "@mui/material";
+import { Checkbox } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
@@ -10,7 +9,6 @@ import IconButton from "@mui/material/IconButton";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Slider from "@mui/material/Slider";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,12 +23,13 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
-import { inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors } from "../../providers/theme";
 import { inTestMode } from "../../utils/settings";
 import { itemInArray } from "../../utils/utilFunctions";
 import CollabsibleCard from "../inputs/CollapsibleCard";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
+import MyTextField from "../textField/MyTextField";
 
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;
@@ -43,6 +42,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const [drawDistanceDefaultVal, setDrawDistanceDefaultVal] = useState(
     props.gameSettings.drawDistance
   );
+
+  const { color, backgroundColor } = getStyledColors("black");
 
   const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
 
@@ -87,7 +88,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 updateGameSettings("numberOfLaps", val);
               }}
               style={{
-                backgroundColor: inputBackgroundColor,
+                backgroundColor,
               }}
             />
           </Grid>
@@ -98,14 +99,13 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       return (
         <React.Fragment>
           <Grid item xs={12} lg={4} xl={4}>
-            <TextField
+            <MyTextField
               disabled={disableInputs}
               type="number"
               label="Tag game length in minutes"
               value={
                 gameSettings.tagGameLength ? gameSettings.tagGameLength : ""
               }
-              style={{ backgroundColor: inputBackgroundColor }}
               onChange={(ev) => {
                 updateGameSettings("tagGameLength", +ev.target.value);
               }}
@@ -121,8 +121,16 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} lg={4}>
-        <FormControl component="fieldset" disabled={disableInputs}>
-          <FormLabel component="legend">Type of game</FormLabel>
+        <FormControl
+          component="fieldset"
+          disabled={disableInputs}
+          style={{
+            color,
+          }}
+        >
+          <FormLabel component="legend" style={{ color: "inherit" }}>
+            Type of game
+          </FormLabel>
           <RadioGroup
             row
             aria-label="type of game"
@@ -187,7 +195,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           <Grid container spacing={3}>
             <Grid item xs={6} sm={4}>
               <IconButton
-                style={{ color: "white" }}
+                style={{ color: backgroundColor }}
                 onClick={() => {
                   updateGameSettings("useSound", !gameSettings.useSound);
                 }}
@@ -263,6 +271,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             <Grid item xs={12}>
               <Typography>Draw distance</Typography>
               <Slider
+                color="secondary"
                 style={{
                   width: "90%",
                 }}

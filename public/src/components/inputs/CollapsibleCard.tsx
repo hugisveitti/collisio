@@ -10,27 +10,37 @@ import React, { useState } from "react";
 interface ICollabsibleCard {
   header: string;
   children: JSX.Element;
+  color?: "black" | "white";
 }
 
 const CollabsibleCard = (props: ICollabsibleCard) => {
   const [open, setOpen] = useState(false);
 
+  const color = props.color ?? "white";
+  const oppositeColor = color === "black" ? "white" : "black";
+  const alphaColor =
+    color === "black" ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.83)";
+
   return (
     <Card
       variant="outlined"
       style={{
-        backgroundColor: "inherit",
         maxWidth: 600,
         margin: "auto",
         cursor: "pointer",
-        color: "#fff",
+        backgroundColor: alphaColor,
+        color: oppositeColor,
+        borderRadius: 0,
       }}
     >
       <CardHeader
         onClick={() => setOpen(!open)}
         subheader={props.header}
         action={
-          <IconButton style={{ color: "white" }} onClick={() => setOpen(!open)}>
+          <IconButton
+            style={{ color: oppositeColor }}
+            onClick={() => setOpen(!open)}
+          >
             {open ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
         }

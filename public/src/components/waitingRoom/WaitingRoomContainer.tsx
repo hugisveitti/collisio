@@ -14,7 +14,6 @@ import {
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import { saveLocalStorageItem } from "../../classes/localStorage";
-import AppContainer from "../../containers/AppContainer";
 import {
   addToAvailableRooms,
   getDBUserSettings,

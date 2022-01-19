@@ -1,0 +1,9 @@
+.radio__label {
+  display: block;
+  margin-bottom: 2px;
+  width: fit-content;
+}
+
+.MuiRadio-root {
+  color: #999 !important;
+}

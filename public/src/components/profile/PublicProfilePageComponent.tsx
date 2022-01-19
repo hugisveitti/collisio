@@ -1,18 +1,17 @@
-import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
 import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { IFollower, IPublicUser, IUser } from "../../classes/User";
-import { cardBackgroundColor } from "../../providers/theme";
+import BackdropButton from "../button/BackdropButton";
+import MyCard from "../card/MyCard";
 import HighscoreTable from "../highscore/HighscoreTable";
 import { getUserPagePath } from "../Routes";
 import FollowButton from "./FollowButton";
@@ -48,12 +47,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
   return (
     <>
       <Grid item xs={12} lg={6}>
-        <Card
-          variant="outlined"
-          style={{
-            backgroundColor: cardBackgroundColor,
-          }}
-        >
+        <MyCard>
           <CardHeader
             header={props.profile.displayName}
             title={props.profile.displayName}
@@ -63,9 +57,9 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
             }
           />
           <CardContent>
-            <Button onClick={() => setFollowersOpen(!followersOpen)}>
+            <BackdropButton onClick={() => setFollowersOpen(!followersOpen)}>
               {props.followers.length} followers
-            </Button>
+            </BackdropButton>
             <Collapse in={followersOpen}>
               <List>
                 {props.followers.map((f) => (
@@ -80,9 +74,9 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
             </Collapse>
           </CardContent>
           <CardContent>
-            <Button onClick={() => setFollowingsOpen(!followingsOpen)}>
+            <BackdropButton onClick={() => setFollowingsOpen(!followingsOpen)}>
               {props.followings.length} following
-            </Button>
+            </BackdropButton>
 
             <Collapse in={followingsOpen}>
               <List>
@@ -110,7 +104,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
           ) : (
             <Typography>No profile image</Typography>
           )}
-        </Card>
+        </MyCard>
       </Grid>
 
       <Grid item xs={12} lg={6}>

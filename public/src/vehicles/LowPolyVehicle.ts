@@ -386,6 +386,7 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     goForward() {
+        //  console.log("can drive", this._canDrive)
 
         if (!this._canDrive) return
         const kmh = this.getCurrentSpeedKmHour(0)
@@ -1072,9 +1073,9 @@ export class LowPolyVehicle extends Vehicle {
         if (this.vector2) {
             Ammo.destroy(this.vector2)
         }
-        // if (this.tuning) {
-        //     Ammo.destroy(this.tuning)
-        // }
+        if (this.tuning) {
+            Ammo.destroy(this.tuning)
+        }
     }
 }
 

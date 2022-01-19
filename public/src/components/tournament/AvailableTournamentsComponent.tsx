@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { IUser } from "../../classes/User";
 import { getAvailableTournaments } from "../../firebase/firestoreTournamentFunctions";
 import TournamentsTable from "./TournamentsTable";
+import BackdropButton from "../button/BackdropButton";
 
 interface IAvailableTournamentsComponent {
   user: IUser;
@@ -39,21 +40,6 @@ const AvailableTournamentsComponent = (
   useEffect(() => {
     if (!props.user?.uid) return;
     handleGetAllAvailableTournaments();
-
-    // cannot use subscriber since "in" only supports 10 items in firestore
-    // let unsub: Unsubscribe;
-    // getAvailableTournamentsListener(props.user.uid, (_tournaments) => {
-    //   console.log("tournaments", _tournaments);
-    //   setTournements(_tournaments);
-    // }).then((_unsub) => {
-    //   unsub = _unsub;
-    // });
-
-    // return () => {
-    //   if (unsub) {
-    //     unsub();
-    //   }
-    // };
   }, [props.user]);
 
   if (!props.user) {
@@ -80,15 +66,14 @@ const AvailableTournamentsComponent = (
   return (
     <React.Fragment>
       <Grid item xs={12}>
-        <Button
+        <BackdropButton
           onClick={() => handleGetAllAvailableTournaments()}
           startIcon={<Refresh />}
-          variant="contained"
-          disableElevation
           disabled={gettingTournaments}
+          center
         >
           Get available tournaments
-        </Button>
+        </BackdropButton>
       </Grid>
       {gettingTournaments ? (
         <Grid item xs={12}>

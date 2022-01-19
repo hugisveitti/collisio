@@ -14,6 +14,7 @@ const FullscreenButton = () => {
 
   return (
     <IconButton
+      style={{ color: "white" }}
       onClick={() => {
         if (!document.body.requestFullscreen) {
           toast.error("Cannot enter fullscreen.");

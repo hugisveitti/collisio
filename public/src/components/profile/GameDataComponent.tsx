@@ -1,4 +1,3 @@
-import { off } from "@firebase/database";
 import CircularProgress from "@mui/material/CircularProgress";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { getPlayerGameDataListener } from "../../firebase/firestoreGameFunctions";
-import { cardBackgroundColor } from "../../providers/theme";
+import { getStyledColors } from "../../providers/theme";
 import GameDataTableRow from "./GameDataTableRow";
 
 interface IGameDataComponent {
@@ -63,9 +62,16 @@ const GameDataComponent = (props: IGameDataComponent) => {
     );
   }
 
+  const { color, backgroundColor } = getStyledColors("white");
+
   return (
     <React.Fragment>
-      <div style={{ backgroundColor: cardBackgroundColor }}>
+      <div
+        style={{
+          color,
+          backgroundColor,
+        }}
+      >
         <TablePagination
           page={page}
           count={gamesData.length}

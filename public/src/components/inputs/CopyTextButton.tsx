@@ -26,6 +26,7 @@ const CopyTextButton = (props: ICopyTextButton) => {
         onClose={() => setCopyTooltipOpen(false)}
       >
         <IconButton
+          style={{ color: "white" }}
           onClick={() => {
             navigator.clipboard.writeText(props.copyText);
             setCopyTooltipOpen(true);

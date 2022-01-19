@@ -10,6 +10,7 @@ import {
 } from "../../firebase/firestoreFunctions";
 import IconButton from "@mui/material/IconButton";
 import { Unsubscribe } from "firebase/firestore";
+import BackdropButton from "../button/BackdropButton";
 
 interface IFollowButton {
   userData: IFollower;
@@ -67,14 +68,12 @@ const FollowButton = (props: IFollowButton) => {
   }
 
   return (
-    <Button
-      disableElevation
-      variant="contained"
+    <BackdropButton
       startIcon={!isFollowing ? <PersonAddIcon /> : <PersonRemoveIcon />}
       onClick={handleButtonClick}
     >
       {!isFollowing ? "Follow" : "Unfollow"}
-    </Button>
+    </BackdropButton>
   );
 };
 

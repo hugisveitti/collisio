@@ -9,7 +9,9 @@ import React from "react";
 import { useHistory } from "react-router";
 import { getTrackNameFromType } from "../../classes/Game";
 import { Tournament } from "../../classes/Tournament";
+import { getStyledColors } from "../../providers/theme";
 import { getDateString } from "../../utils/utilFunctions";
+import BackdropButton from "../button/BackdropButton";
 import { getTournamentPagePath } from "../Routes";
 
 interface ITournamentsTable {
@@ -19,9 +21,16 @@ interface ITournamentsTable {
 const TournamentsTable = (props: ITournamentsTable) => {
   const history = useHistory();
 
+  const { color, backgroundColor } = getStyledColors("white");
+
   return (
     <TableContainer>
-      <Table>
+      <Table
+        style={{
+          color,
+          backgroundColor,
+        }}
+      >
         <TableHead>
           <TableRow>
             <TableCell />
@@ -37,14 +46,13 @@ const TournamentsTable = (props: ITournamentsTable) => {
             return (
               <TableRow key={tournament.id}>
                 <TableCell>
-                  <Button
-                    variant="outlined"
+                  <BackdropButton
                     onClick={() =>
                       history.push(getTournamentPagePath(tournament.id))
                     }
                   >
                     View
-                  </Button>
+                  </BackdropButton>
                 </TableCell>
                 <TableCell>{tournament.name}</TableCell>
                 <TableCell>{tournament.leaderName}</TableCell>

@@ -1,12 +1,13 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useContext } from "react";
 import { useHistory, useParams } from "react-router";
-import AppContainer from "../../containers/AppContainer";
 import { UserContext } from "../../providers/UserProvider";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import BackdropButton from "../button/BackdropButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { createTournamentPagePath } from "../Routes";
 import { IStore } from "../store";
 import ActiveTournamentsComponent from "./ActiveTournamentsComponent";
@@ -40,27 +41,34 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
   }
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} md={3}>
+          <ToFrontPageButton color="white" />
+        </Grid>
+        <Grid item xs={12} md={6}>
           <Typography component="div" variant="h4">
             Tournaments
           </Typography>
         </Grid>
+        <Grid item xs={false} md={3}></Grid>
         <Grid item xs={12}>
           <Typography>Here you can join or start a tournament.</Typography>
         </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
+        <Grid item xs={12} xl={2}>
+          <ToFrontPageButton color="white" />
+        </Grid>
+        <Grid item xs={12} xl={10}>
+          <BackdropButton
+            color="white"
+            center
             startIcon={<EmojiEventsIcon />}
-            disableElevation
             onClick={() => {
               history.push(createTournamentPagePath);
             }}
           >
             Create a tournament
-          </Button>
+          </BackdropButton>
         </Grid>
         <Grid item xs={12}>
           <Divider style={{ margin: "auto", width: 100 }} />
@@ -80,7 +88,7 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
 
         <PreviousTournamentsComponent user={user} />
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

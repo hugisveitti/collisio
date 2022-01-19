@@ -2,25 +2,41 @@ import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLigh
 import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
 import { getDeviceType } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
+import { loadSphereModel } from "../../vehicles/SphereVehicle"
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
-    loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
-        if (vehicleColor) {
-            (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+    if (vehicleType === "simpleSphere") {
+        loadSphereModel(vehicleType, true).then((chassis) => {
+            if (vehicleColor) {
+                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
-        } else {
-            (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
-        }
-        scene.add(chassis)
+            } else {
+                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
+            }
+            scene.add(chassis)
 
-        for (let tire of tires) {
 
-            scene.add(tire)
+        })
+    } else {
 
-            tire.castShadow = tire.receiveShadow = true
-        }
-        scene.add(tires[0])
-    })
+        loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
+            if (vehicleColor) {
+                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+
+            } else {
+                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
+            }
+            scene.add(chassis)
+
+            for (let tire of tires) {
+
+                scene.add(tire)
+
+                tire.castShadow = tire.receiveShadow = true
+            }
+            //scene.add(tires[0])
+        })
+    }
 }
 
 const addLights = (scene: Scene) => {
@@ -82,6 +98,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
 
 
+
     window.onresize = function () {
         return
 
@@ -91,6 +108,8 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
         renderer.setSize(window.innerWidth, window.innerHeight);
 
     };
+
+    camera.fov = 25
 
     let ry = 0
     let offset = 15

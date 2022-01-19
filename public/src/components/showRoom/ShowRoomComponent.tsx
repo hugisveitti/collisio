@@ -19,6 +19,9 @@ import { itemInArray } from "../../utils/utilFunctions";
 import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
 import { buyPremiumPagePath } from "../Routes";
 import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
+import { getStyledColors } from "../../providers/theme";
+import BackdropButton from "../button/BackdropButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 
 // const allPossibleVehcileTypes: VehicleType[] = ["f1", "tractor", "normal", "truck", ];
 
@@ -82,9 +85,13 @@ const ShowRoomComponent = (props: IShowRoom) => {
     }
   }, [chassisNum, vehicleTypeNum, props.vehcileType, props.vehicleColor]);
 
+  const { color, backgroundColor } = getStyledColors("black");
   return (
     <React.Fragment>
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <ToFrontPageButton color="white" />
+        </Grid>
         <Grid item xs={12}>
           <div ref={canvasWrapperRef}></div>
         </Grid>
@@ -105,19 +112,19 @@ const ShowRoomComponent = (props: IShowRoom) => {
                   <Grid item xs={12}>
                     <Typography
                       color="InfoText"
-                      style={{ textAlign: "center" }}
+                      style={{ textAlign: "center", color }}
                     >
                       This is a Premium vehicle available only to Premium users.
                     </Typography>
                   </Grid>
                   <Grid item xs={12} style={{ textAlign: "center" }}>
-                    <Button
-                      disableElevation
-                      variant="contained"
-                      onClick={() => history.push(buyPremiumPagePath)}
+                    <BackdropButton
+                      center
+                      color="white"
+                      link={buyPremiumPagePath}
                     >
                       Go Premium
-                    </Button>
+                    </BackdropButton>
                   </Grid>
                 </Grid>
               </Collapse>
@@ -126,6 +133,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
             <Grid item xs={3} />
             <Grid item xs={3} style={{ textAlign: "center" }}>
               <IconButton
+                style={{ color }}
                 onClick={() => {
                   if (vehicleTypeNum === 0) {
                     setVehicleTypeNum(possibleVehcileTypes.length - 1);
@@ -139,6 +147,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
             </Grid>
             <Grid item xs={3} style={{ textAlign: "center" }}>
               <IconButton
+                style={{ color }}
                 onClick={() => {
                   setVehicleTypeNum(vehicleTypeNum + 1);
                 }}
@@ -152,6 +161,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
 
             <Grid item xs={3} style={{ textAlign: "center" }}>
               <IconButton
+                style={{ color }}
                 onClick={() => {
                   if (chassisNum === 0) {
                     setChassisNum(vehicleColors.length - 1);
@@ -165,6 +175,7 @@ const ShowRoomComponent = (props: IShowRoom) => {
             </Grid>
             <Grid item xs={3} style={{ textAlign: "center" }}>
               <IconButton
+                style={{ color }}
                 onClick={() => {
                   setChassisNum(chassisNum + 1);
                 }}

@@ -13,6 +13,8 @@ import {
 } from "../../firebase/firestoreFunctions";
 import { getPlayerBestScores } from "../../firebase/firestoreGameFunctions";
 import { UserContext } from "../../providers/UserProvider";
+import BackdropContainer from "../backdrop/BackdropContainer";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { frontPagePath } from "../Routes";
 import PublicProfilePageComponent from "./PublicProfilePageComponent";
 
@@ -64,8 +66,11 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
   }, [profile]);
 
   return (
-    <AppContainer>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <ToFrontPageButton color="white" />
+        </Grid>
         {!profile ? (
           <>
             <Grid item xs={12}>
@@ -85,7 +90,7 @@ const PublicProfilePageContainer = (props: IPublicProfilePageContainer) => {
           />
         )}
       </Grid>
-    </AppContainer>
+    </BackdropContainer>
   );
 };
 

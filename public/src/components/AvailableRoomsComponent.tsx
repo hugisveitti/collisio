@@ -1,7 +1,8 @@
 import Refresh from "@mui/icons-material/Refresh";
+import { CardContent } from "@mui/material";
+import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -14,6 +15,8 @@ import {
   AvailableRoomsFirebaseObject,
   getAllAvailableRooms,
 } from "../firebase/firestoreFunctions";
+import BackdropButton from "./button/BackdropButton";
+import MyCard from "./card/MyCard";
 import { IStore } from "./store";
 
 interface IAvailableRoomsComponent {
@@ -23,7 +26,6 @@ interface IAvailableRoomsComponent {
 }
 
 const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
-  const history = useHistory();
   const [availRoomIds, setAvailRoomIds] = useState(
     [] as AvailableRoomsFirebaseObject[]
   );
@@ -49,65 +51,67 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
   }, [props.userId]);
 
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={12}>
-        <Button
-          onClick={() => handleGetAllAvailableRooms()}
-          startIcon={<Refresh />}
-          variant="contained"
-          disableElevation
-          disabled={gettingRooms}
-        >
-          Get available rooms
-        </Button>
-      </Grid>
-      {gettingRooms ? (
-        <>
+    <MyCard>
+      <CardContent>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
-            <CircularProgress />
+            <BackdropButton
+              onClick={() => handleGetAllAvailableRooms()}
+              startIcon={<Refresh />}
+              disabled={gettingRooms}
+            >
+              Get available rooms
+            </BackdropButton>
           </Grid>
-        </>
-      ) : (
-        <>
-          {availRoomIds.length > 0 ? (
-            <Grid item xs={12}>
-              <Typography color="textInfo">Available rooms</Typography>
-            </Grid>
+          {gettingRooms ? (
+            <>
+              <Grid item xs={12}>
+                <CircularProgress />
+              </Grid>
+            </>
           ) : (
-            <Grid item xs={12}>
-              <Typography color="textInfo">No rooms available</Typography>
-            </Grid>
+            <>
+              {availRoomIds.length > 0 ? (
+                <Grid item xs={12}>
+                  <Typography color="textInfo">Available rooms</Typography>
+                </Grid>
+              ) : (
+                <Grid item xs={12}>
+                  <Typography color="textInfo">No rooms available</Typography>
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <List>
+                  {availRoomIds.map((availRoom) => {
+                    return (
+                      <ListItem key={availRoom.roomId}>
+                        <ListItemText
+                          style={{ textAlign: "center" }}
+                          primary={availRoom.displayName}
+                        />
+                        <ListItemText
+                          style={{ textAlign: "center" }}
+                          primary={availRoom.roomId}
+                        />
+                        <ListItemButton
+                          style={{ textAlign: "center" }}
+                          onClick={() => {
+                            props.store.setRoomId(availRoom.roomId);
+                            props.connectButtonClicked(availRoom.roomId);
+                          }}
+                        >
+                          <BackdropButton>Join</BackdropButton>
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </Grid>
+            </>
           )}
-          <Grid item xs={12}>
-            <List>
-              {availRoomIds.map((availRoom) => {
-                return (
-                  <ListItem key={availRoom.roomId}>
-                    <ListItemText
-                      style={{ textAlign: "center" }}
-                      primary={availRoom.displayName}
-                    />
-                    <ListItemText
-                      style={{ textAlign: "center" }}
-                      primary={availRoom.roomId}
-                    />
-                    <ListItemButton
-                      style={{ textAlign: "center" }}
-                      onClick={() => {
-                        props.store.setRoomId(availRoom.roomId);
-                        props.connectButtonClicked(availRoom.roomId);
-                      }}
-                    >
-                      <Button variant="outlined">Join</Button>
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Grid>
-        </>
-      )}
-    </Grid>
+        </Grid>
+      </CardContent>
+    </MyCard>
   );
 };
 

@@ -1,0 +1,62 @@
+.btn {
+  height: fit-content;
+  /* height: 30px; */
+  line-height: 30px;
+  font-size: 18px;
+  width: fit-content;
+  /* background: rgba(0, 0, 0, 0.82);
+  color: white; */
+  padding: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  box-shadow: 5px 5px rgba(119, 118, 118, 0.82);
+  transition: 0.2s;
+
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.btn:hover:not(.disabled) {
+  box-shadow: 1px 1px rgba(119, 118, 118, 0.82);
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  .btn {
+    width: 90%;
+  }
+}
+
+.disabled {
+  background: rgba(85, 85, 85, 0.82);
+  box-shadow: 1px 1px rgba(119, 118, 118, 0.82);
+  color: #ccc;
+}
+
+.btn__icon {
+  margin-right: 15px;
+  margin-top: 3px;
+  line-height: 100%;
+  vertical-align: middle;
+}
+
+.btn--white {
+  background: rgba(255, 255, 255, 0.82);
+  color: black;
+}
+
+.btn--black {
+  background: rgba(0, 0, 0, 0.82);
+  color: white;
+}
+
+/* .btn--black:hover :not(.disabled) {
+  background: rgba(0, 0, 0, 0.99);
+}
+
+.btn--white:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.99);
+} */

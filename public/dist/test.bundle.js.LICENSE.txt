@@ -223,14 +223,6 @@ version 0.6.9
  * @description  Inspired by tapjs (https://www.npmjs.com/package/tapjs)
  */
 
-/**
- * A better abstraction over CSS.
- *
- * @copyright Oleg Isonen (Slobodskoi) / Isonen 2014-present
- * @website https://github.com/cssinjs/jss
- * @license MIT
- */
-
 /** @license MUI v5.0.1
  *
  * This source code is licensed under the MIT license found in the

@@ -30,8 +30,8 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   const [reset, setReset] = useState(false);
 
   // change these colors!
-  const downColor = blue4; // "#005c46";
-  const upColor = orange2; // "#fcba03";
+  const downColor = "#ddd"; // blue4; // "#005c46";
+  const upColor = "#111"; // orange2; // "#fcba03";
   const [isPortrait, setIsPortrait] = useState(false);
 
   const [steeringDirection, setSteeringDirection] = useState("");
@@ -223,6 +223,8 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             right: 0,
             color: forward ? upColor : downColor,
             backgroundColor: getBackgroundColor(forward), // forward ? downColor : upColor,
+            boxShadow: !forward ? "0px 25px #555" : "0px 5px #555",
+            transition: ".1s",
           }}
         >
           <span style={rotateText}>F</span>
@@ -244,6 +246,8 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             bottom: 0,
             color: backward ? upColor : downColor,
             backgroundColor: getBackgroundColor(backward), // backward ? downColor : upColor,
+            boxShadow: !backward ? "0px -25px #555" : "0px -5px #555",
+            transition: ".1s",
           }}
         >
           <span style={rotateText} className="controller-btn__text">
@@ -289,10 +293,11 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
           </span>
         </div>
 
-        <div
+        {/* <div
           id="orientation-info"
           style={{
             ...infoStyles,
+            display: "none",
             transform: isPortrait ? "rotate(-90deg)" : "",
             top: 0,
           }}
@@ -304,7 +309,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
           Alpha:{orientation.alpha.toFixed(0)}
           <br />
           {getSteeringDirection()}
-        </div>
+        </div> */}
       </div>
     </React.Fragment>
   );

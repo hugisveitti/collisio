@@ -1,4 +1,5 @@
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
+import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { getGameTypeFromTrackName } from "../classes/Game"
@@ -644,20 +645,26 @@ export class LowPolyTestScene extends GameScene {
 
 
 export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
-    const config = { scenes: [LowPolyTestScene], antialias: true }
-    PhysicsLoader("./ammo", () => {
-        const project = new Project(config)
+    try {
 
-        const key = project.scenes.keys().next().value;
+        const config = { scenes: [LowPolyTestScene], antialias: true }
+        PhysicsLoader("./ammo", () => {
+            const project = new Project(config)
 
-        const gameObject = (project.scenes.get(key) as LowPolyTestScene)
-        // hacky way to get the project's scene
-        gameObject.setSocket(socket);
-        // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
-        gameObject.setTestGameSettings(gameSettings, escPress);
-        callback(gameObject)
+            const key = project.scenes.keys().next().value;
 
-        return project
-    })
+            const gameObject = (project.scenes.get(key) as LowPolyTestScene)
+            // hacky way to get the project's scene
+            gameObject.setSocket(socket);
+            // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
+            gameObject.setTestGameSettings(gameSettings, escPress);
+            callback(gameObject)
+
+            return project
+        })
+    } catch (err) {
+        console.warn("Low poly test failed", err)
+        toast("Game failed")
+    }
 
 }

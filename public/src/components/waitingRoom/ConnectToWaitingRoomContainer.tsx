@@ -1,7 +1,6 @@
 import Grid from "@mui/material/Grid";
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
-import AppContainer from "../../containers/AppContainer";
 import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import { waitingRoomPath } from "../Routes";
