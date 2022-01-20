@@ -307,6 +307,7 @@ export const vehicleConfigs = {
         // maxSuspensionTravelCm: 500,
         // suspensionStiffness: 120,
         // suspensionDamping: 12,
+        frictionSlip: 5.5,
         mass: 300,
         engineForce: 6500,
         breakingForce: 250,

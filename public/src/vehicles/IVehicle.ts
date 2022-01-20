@@ -82,13 +82,13 @@ export interface IVehicle {
     updateVehicleSettings: (vehicleSettings: IVehicleSettings) => void
     setColor: (color: string | number) => void
     toggleSound: (useSound: boolean) => void
-    destroy: () => void
 
     addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
 
     getTowPivot: () => Vector3
 
     setToGround: () => void
+    destroy: () => Promise<void>
 }
 
 

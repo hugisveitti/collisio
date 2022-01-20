@@ -902,9 +902,15 @@ export class GameScene extends Scene3D implements IGameScene {
             this.needsReload = false
             /** I think I need to delete ammo vecs */
             for (let vehicle of this.vehicles) {
-                vehicle.destroy()
+                try {
+                    await vehicle.destroy()
+                } catch (err) {
+                    console.warn("Error destroying vehicle:", err)
+                }
             }
-
+            for (let i = 0; i < this.vehicles.length; i++) {
+                delete this.vehicles[0]
+            }
             this.vehicles = []
 
             for (let vehicle of this.extraVehicles) {

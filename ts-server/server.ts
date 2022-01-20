@@ -117,7 +117,7 @@ app.get("/ammo.wasm.js", (_: Request, res: Response) => {
 
 const sendIndexHTML = (req: Request, res: Response) => {
     const host = req.get("host")
-    console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
+    console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
     if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
         res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     } else {

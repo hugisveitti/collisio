@@ -372,8 +372,12 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     }
 
 
-    destroy(): void {
-        this.scene.destroy(this.vehicleBody)
+    destroy() {
+        return new Promise<void>((resolve, reject) => {
+
+            this.scene.destroy(this.vehicleBody)
+            resolve()
+        })
     }
 
     rotateY(num: number) {

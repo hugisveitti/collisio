@@ -9,16 +9,14 @@ import {
 } from "./classes/localGameSettings";
 import {
   defaultUserSettings,
-  IVehicleSettings,
   IUserSettings,
+  IVehicleSettings,
 } from "./classes/User";
 import { IStore } from "./components/store";
-import { getDBUserSettings } from "./firebase/firestoreFunctions";
 import UserProvider, { UserContext } from "./providers/UserProvider";
 import { IPlayerInfo, VehicleType } from "./shared-backend/shared-stuff";
 import MobileGameExperiment from "./testMode/MobileGameExperiment";
 import SpeedTestContainer from "./testMode/SpeedTestContainer";
-
 import TestContainer from "./testMode/TestContainer";
 import { createSocket } from "./utils/connectSocket";
 import { getDeviceType } from "./utils/settings";
@@ -45,6 +43,7 @@ const TestApp = () => {
   const onMobile = deviceType === "mobile";
 
   useEffect(() => {
+    console.log("gong to create socket");
     createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);

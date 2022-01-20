@@ -157,7 +157,11 @@ export class Vehicle implements IVehicle {
     _updateVehicleSettings() { }
 
     setColor(color: string | number) { };
-    destroy() { };
+    destroy() {
+        return new Promise<void>((resolve, reject) => {
+            resolve()
+        })
+    };
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) { };
 
     constructor(config: IVehicleClassConfig) {

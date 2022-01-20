@@ -1,8 +1,9 @@
-import { ClosestRaycaster, ExtendedObject3D } from "@enable3d/ammo-physics";
+import { ExtendedObject3D } from "@enable3d/ammo-physics";
+import { resolve } from "path/posix";
 import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { getStaticPath } from "../utils/settings";
+import { getStaticPath, inTestMode } from "../utils/settings";
 import { degToRad, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
@@ -82,7 +83,6 @@ export class LowPolyVehicle extends Vehicle {
     euler = new Euler(0, 0, 0)
 
     // too see if camera is inside wall
-    cameraRay: ClosestRaycaster
     rayer: Ammo.ClosestRayResultCallback
 
     prevPosition = new Vector3(0, 0, 0)
@@ -130,10 +130,9 @@ export class LowPolyVehicle extends Vehicle {
 
         this.chassisWorldTransfrom = new Ammo.btTransform()
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        this.cameraRay = new ClosestRaycaster(this.scene.physics)
         this.delta = 0
 
-        this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
+        this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(600), 2)
 
     }
 
@@ -249,7 +248,7 @@ export class LowPolyVehicle extends Vehicle {
         this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
 
         this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
-        // this.vehicle = new Ammo.btRaycastVehicle(this.tuning, body, this.raycaster)
+
 
 
         this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
@@ -360,6 +359,9 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.updateSuspension(0)
 
         this.wheelMeshes.push(this.createWheelMesh(index))
+
+        Ammo.destroy(wheelDirectionCS0)
+        Ammo.destroy(wheelAxelCS)
     }
 
     createWheelMesh(index: number) {
@@ -699,7 +701,7 @@ export class LowPolyVehicle extends Vehicle {
         const { isOnGround: fl, pos: flPos } = this.isWheelOffGround(FRONT_LEFT)
         const { isOnGround: fr, pos: frPos } = this.isWheelOffGround(FRONT_RIGHT)
         const { isOnGround: br, pos: brPos } = this.isWheelOffGround(BACK_RIGHT)
-        const { isOnGround: bl, pos: blPos } = this.isWheelOffGround(BACK_LEFT)
+        //   const { isOnGround: bl, pos: blPos } = this.isWheelOffGround(BACK_LEFT)
 
         /**
          * Flying assist:
@@ -719,7 +721,10 @@ export class LowPolyVehicle extends Vehicle {
             let turningRight = Math.abs(frPos.y() - flPos.y()) < eps ? 0 : (frPos.y() - flPos.y())
             let turningFront = Math.abs(frPos.y() - brPos.y()) < eps ? 0 : (frPos.y() - brPos.y())
 
-            if (turningFront === 0 && turningRight === 0) return
+            if (turningFront === 0 && turningRight === 0) {
+
+                return
+            }
             // these parameters can be optimized
             const maxTurning = 0.5
             const changeFactor = .1
@@ -743,8 +748,9 @@ export class LowPolyVehicle extends Vehicle {
 
 
             // this.vector.setValue(newX, aVel.y() * .5, newZ)
-            //     this.vehicle.getRigidBody().setAngularVelocity(this.vector)
-            this.vehicle.getRigidBody().setAngularVelocity(new Ammo.btVector3(newX, aVel.y(), newZ))
+            // this.vehicle.getRigidBody().setAngularVelocity(this.vector)
+            this.vector.setValue(newX, aVel.y(), newZ)
+            this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
     }
 
@@ -890,10 +896,12 @@ export class LowPolyVehicle extends Vehicle {
 
     findClosesGround(): number {
         const pos = this.vehicleBody.position// this.getPosition() // this.vehicleBody.position
-        this.vector2.setValue(pos.x, pos.y + .1, pos.z);
+        this.vector2.setValue(pos.x, pos.y - .1, pos.z);
         this.vector.setValue(pos.x, pos.y - 4, pos.z);
 
-        this.rayer = new Ammo.ClosestRayResultCallback(this.vector2, this.vector)
+        // this.rayer = new Ammo.ClosestRayResultCallback(this.vector2, this.vector)
+        this.rayer.set_m_rayFromWorld(this.vector2)
+        this.rayer.set_m_rayToWorld(this.vector)
 
         // this.rayer.set_m_rayFromWorld(this.vector)
         // this.rayer.set_m_rayToWorld(this.vector2)
@@ -910,17 +918,17 @@ export class LowPolyVehicle extends Vehicle {
 
     isTouchingGround(pos: Ammo.btVector3): boolean {
 
-        this.vector2.setValue(pos.x(), pos.y() + .1, pos.z());
+        this.vector2.setValue(pos.x(), pos.y() - .1, pos.z());
         this.vector.setValue(pos.x(), pos.y() - 2, pos.z());
 
-        this.rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2)
-        // this.rayer.set_m_rayFromWorld(this.vector)
-        // this.rayer.set_m_rayToWorld(this.vector2)
+        //   this.rayer = new Ammo.ClosestRayResultCallback(this.vector2, this.vector)
+        this.rayer.set_m_rayFromWorld(this.vector2)
+        this.rayer.set_m_rayToWorld(this.vector)
+
         this.scene.physics.physicsWorld.rayTest(this.vector, this.vector2, this.rayer)
 
         if (this.rayer.hasHit()) {
             const groundY = this.rayer.get_m_hitPointWorld().y()
-
             return Math.abs(groundY - pos.y()) < this.vehicleConfig.wheelRadiusBack + .3
         } else {
             return false
@@ -1034,32 +1042,52 @@ export class LowPolyVehicle extends Vehicle {
 
     };
 
-    async destroy() {
-        this.isReady = false
-        this.stopEngineSound()
-        this.scene.scene.remove(this.engineSound)
+    destroyAmmo(obj: any, name?: string) {
+        try {
+            Ammo.destroy(obj)
+        } catch (err) {
+            console.warn("Error destorying:", name)
+        }
 
-        if (this.scene && this.vehicleBody) {
-            this.scene.destroy(this.vehicleBody)
-        }
-        for (let tire of this.tires) {
-            if (this.scene?.scene && tire) {
-                this.scene.scene.remove(tire)
+    }
+
+    async destroy() {
+        new Promise<void>(async (resolve, reject) => {
+
+
+            this.destroyAmmo(this.zeroVec, "this.zeroVec")
+            /** dont know if I need to check */
+            this.destroyAmmo(this.vector, "this.vector")
+            this.destroyAmmo(this.vector2, "this.vector2")
+            // await this.destroyAmmo(this.tuning)
+
+            for (let p of this.p0) {
+                this.destroyAmmo(p, "p")
             }
-        }
-        if (this.zeroVec) {
-            Ammo.destroy(this.zeroVec)
-        }
-        /** dont know if I need to check */
-        if (this.vector) {
-            Ammo.destroy(this.vector)
-        }
-        if (this.vector2) {
-            Ammo.destroy(this.vector2)
-        }
-        if (this.tuning) {
-            Ammo.destroy(this.tuning)
-        }
+            this.p0 = []
+
+            this.destroyAmmo(this.rayer, "this.rayer")
+            this.destroyAmmo(this.quaternion, "this.quaternion")
+            this.destroyAmmo(this.transformCam, "this.transformCam")
+            this.destroyAmmo(this.chassisWorldTransfrom, "this.chassisWorldTransfrom")
+
+
+
+            this.isReady = false
+            this._canDrive = false
+            this.stopEngineSound()
+            this.scene.scene.remove(this.engineSound)
+            console.log("this.vehicleBody.body", this.vehicleBody.body)
+            if (this.scene && this.vehicleBody?.body) {
+                this.scene.destroy(this.vehicleBody)
+            }
+            for (let tire of this.tires) {
+                if (this.scene?.scene && tire) {
+                    this.scene.scene.remove(tire)
+                }
+            }
+            resolve()
+        })
     }
 }
 
