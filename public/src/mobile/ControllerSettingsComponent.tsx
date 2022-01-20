@@ -15,7 +15,7 @@ import { frontPagePath } from "../components/Routes";
 import GameSettingsComponent from "../components/settings/GameSettingsComponent";
 import VehicleSettingsComponent from "../components/settings/VehicleSettingsComponent";
 import { IStore } from "../components/store";
-import { GameActions } from "../shared-backend/shared-stuff";
+import { GameActions, mts_quit_game } from "../shared-backend/shared-stuff";
 
 export const invertedControllerKey = "invertedController";
 
@@ -99,7 +99,10 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
         <BackdropButton
           color="white"
           onClick={() => {
+            console.log("quit game button");
+            props.socket.emit(mts_quit_game, {});
             props.socket.disconnect();
+            props.store.setSocket(undefined);
             history.push(frontPagePath);
           }}
           startIcon={<ExitToAppIcon />}

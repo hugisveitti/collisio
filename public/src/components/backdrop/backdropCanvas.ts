@@ -23,10 +23,6 @@ const addLights = (scene: Scene) => {
     // maybe if evening then dont show shadows?
     const pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
     pLight.position.set(100, 150, 100);
-    // if (this.useShadows && this.timeOfDay === "day") {
-    //     this.pLight.castShadow = true
-    //     this.pLight.shadow.bias = 0.01
-    // }
 
     scene.add(pLight)
 
@@ -155,20 +151,22 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
 
 
-    window.onresize = function () {
-        width = window.innerWidth
-        height = window.innerHeight
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-    };
+    // window.onresize = function () {
+    //     // remove func
+    //     width = window.innerWidth
+    //     height = window.innerHeight
+    //     camera.aspect = width / height;
+    //     camera.updateProjectionMatrix();
+    //     renderer.setSize(width, height);
+    // };
+    window.addEventListener("resize", handleWindowResize)
     window.setTimeout(() => {
-
         width = window.innerWidth
         height = window.innerHeight
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
+        //  handleWindowResize()
     }, 500)
 
 
@@ -178,7 +176,7 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
     let dCos = 0.003
     let cosOff = Math.PI / 2
     const sinOffMax = Math.PI / 4
-    const cosOffMax = Math.PI / 4
+    const cosOffMax = Math.PI
     //  camera.rotateY(ry)
     let fov = width < 600 ? 60 : 30
     camera.fov = fov
@@ -191,18 +189,12 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
     const animate = () => {
 
-        animateTimeout = setTimeout(() => {
 
-
-            requestAnimationFrame(animate);
-
-        }, 1000 / targetFPS)
 
         // controls.update();
         if (renderer) {
             const now = Date.now()
             const delta = now - time
-
 
             renderer.render(scene, camera);
             time = now
@@ -221,7 +213,6 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
                 dCos = -dCos
             }
 
-
             camera.position.setX(posX + Math.sin(sinOff) + Math.cos(cosOff))
             camera.position.setZ(posZ + Math.sin(sinOff) + Math.cos(cosOff))
             camera.position.setY(posY + Math.sin(sinOff) + Math.cos(cosOff))
@@ -239,9 +230,23 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
         }
         camera.lookAt(cameraLookAtPos.clone())
+
+        animateTimeout = setTimeout(() => {
+
+            requestAnimationFrame(animate);
+
+        }, 1000 / targetFPS)
     }
 
-    animate()
+    if (
+        sinOff === 0 &&
+
+        cosOff === Math.PI / 2) {
+        console.log("Calling animate")
+        animate()
+    } else {
+        console.warn("!!! Trying to animate backdrop canvas twice")
+    }
     return { renderer, alreadyExisted: false }
 }
 
@@ -275,10 +280,16 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
     })
 }
 
+const handleWindowResize = () => {
+
+}
+
 export const clearBackdropCanvas = () => {
+    console.log("#########clearing backdrop canvas#####")
     if (animateTimeout) {
         clearTimeout(animateTimeout)
     }
+    window.removeEventListener("resize", handleWindowResize)
     renderer?.clear()
     scene?.clear()
     scene = undefined

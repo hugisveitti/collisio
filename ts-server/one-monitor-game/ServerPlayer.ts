@@ -1,7 +1,27 @@
 import { Socket } from "socket.io"
 import { IUserSettings } from "../../public/src/classes/User"
 import {
-    IPlayerInfo, mdts_game_settings_changed, mdts_left_waiting_room, mdts_start_game, MobileControls, mts_connected_to_waiting_room, mts_controls, mts_game_data_info, mts_ping_test, mts_send_game_actions, mts_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stm_desktop_disconnected, stm_game_finished, stm_game_settings_changed_callback, stm_ping_test_callback, stm_player_finished, stm_player_info, VehicleControls
+    IPlayerInfo,
+    mdts_game_settings_changed,
+    mdts_left_waiting_room,
+    mdts_start_game,
+    MobileControls,
+    mts_quit_game,
+    mts_connected_to_waiting_room,
+    mts_controls,
+    mts_game_data_info,
+    mts_ping_test,
+    mts_send_game_actions,
+    mts_user_settings_changed,
+    stmd_game_settings_changed,
+    stmd_game_starting,
+    stm_desktop_disconnected,
+    stm_game_finished,
+    stm_game_settings_changed_callback,
+    stm_ping_test_callback,
+    stm_player_finished,
+    stm_player_info,
+    VehicleControls
 } from "../../public/src/shared-backend/shared-stuff"
 import { Room } from "./ServerGame"
 
@@ -65,6 +85,7 @@ export class Player {
         this.setupGameActionsListener()
         this.setupPingListener()
         this.setupLeftWaitingRoomListener()
+        this.setupQuitGameListener()
     }
 
     /**
@@ -82,10 +103,17 @@ export class Player {
         })
     }
 
+    setupQuitGameListener() {
+        this.socket.once(mts_quit_game, () => {
+            this.game?.quitGame()
+        })
+    }
+
     /**
      * use e.g. is one player quits being leader
      */
     sendPlayerInfo() {
+        // only allow leader?
         this.socket.emit(stm_player_info, { player: this.getPlayerInfo() })
     }
 

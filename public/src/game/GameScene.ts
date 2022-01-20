@@ -34,7 +34,6 @@ const fadeSecs = 2
 
 
 
-
 interface IUserSettingsMessage {
     playerNumber: number
     userSettings: IUserSettings
@@ -49,9 +48,6 @@ interface IView {
     fov: number,
     camera: PerspectiveCamera
 }
-
-
-
 
 
 export class GameScene extends Scene3D implements IGameScene {
@@ -82,6 +78,7 @@ export class GameScene extends Scene3D implements IGameScene {
     gameRoomActions: IGameRoomActions
 
     viewsKmhInfo: HTMLSpanElement[]
+    viewsLapsInfo: HTMLSpanElement[]
     viewsImpornantInfo: HTMLSpanElement[]
     viewsNameInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
@@ -132,6 +129,9 @@ export class GameScene extends Scene3D implements IGameScene {
     deltaFPS = 0
     updateDelta = 0
 
+    mobileOnlyControllerInterval: NodeJS.Timer
+    isPaused: boolean
+
 
     constructor() {
         super()
@@ -146,6 +146,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.songIsPlaying = false
         this._everythingReady = false
         this.gameStarted = false
+        this.isPaused = true
         this.gameId = uuid()
         this.gameSettings = defaultGameSettings
         this.gameInfoDiv = document.createElement("div")
@@ -159,6 +160,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameRoomActions = {}
 
         this.viewsKmhInfo = []
+        this.viewsLapsInfo = []
         this.viewsImpornantInfo = []
         this.viewsImpornantInfoClearTimeout = [] as NodeJS.Timeout[]
 
@@ -529,6 +531,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.viewsImpornantInfo = []
         this.viewsNameInfo = []
         this.viewsKmhInfo = []
+        this.viewsLapsInfo = []
 
 
         const n = this.players.length
@@ -582,6 +585,11 @@ export class GameScene extends Scene3D implements IGameScene {
             /** to be updated */
             this.viewsKmhInfo.push(kmInfo)
 
+            const lapsInfo = document.createElement("span")
+            lapsInfo.innerHTML = ""
+            viewDiv.appendChild(lapsInfo)
+            this.viewsLapsInfo.push(lapsInfo)
+
             const imporantViewInfo = document.createElement("span")
             viewDiv.appendChild(imporantViewInfo)
             this.viewsImpornantInfo.push(imporantViewInfo)
@@ -600,12 +608,21 @@ export class GameScene extends Scene3D implements IGameScene {
                 height:${viewDivHeight}px;
             `)
 
+            const fontSize = window.innerWidth < 1500 ? 32 : 82
 
             kmInfo.setAttribute("style", `
                 position:absolute;
                 left:50%;
                 bottom:0;
                 transform:translate(-50%,0px);
+                font-size:${fontSize}px;
+            `)
+
+            lapsInfo.setAttribute("style", `
+                position:absolute;
+                right:0;
+                bottom:0;
+                font-size:${fontSize}px;
             `)
 
             imporantViewInfo.setAttribute("style", `
@@ -687,7 +704,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     startGameSong() {
         // not use game song right now...
-        if (!!false && this.useSound && (!this.songIsPlaying) && !this.isGamePaused()) {
+        if (!!false && this.useSound && (!this.songIsPlaying) && !this.isPaused) {
             this.songIsPlaying = true
         }
     }
@@ -696,13 +713,15 @@ export class GameScene extends Scene3D implements IGameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    isGamePaused() {
-        return this.gameStarted && this.vehicles[0].isPaused
-    }
+    // isGamePaused() {
+    //     console.log("is paused", this.vehicles[0]?.isPaused, this.roomId)
+    //     return this.gameStarted && this.vehicles[0].isPaused
+    // }
 
     pauseGame() {
 
-        if (this.isGamePaused()) return
+        if (this.isPaused) return
+        this.isPaused = true
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicles[i].isReady) {
@@ -713,8 +732,8 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     unpauseGame() {
-        if (!this.isGamePaused()) return
-
+        if (!this.isPaused) return
+        this.isPaused = false
 
         this.startGameSong()
         this.songIsPlaying = false
@@ -730,8 +749,8 @@ export class GameScene extends Scene3D implements IGameScene {
     togglePauseGame() {
 
         if (!this.everythingReady()) return
-        let isPaused = this.isGamePaused()
-        if (isPaused) {
+
+        if (this.isPaused) {
             this.unpauseGame()
         } else {
             this.pauseGame()
@@ -886,21 +905,8 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async create() { }
 
-    async restartGame() {
-        this.oldTime = 0
-        this.totalPing = 0
-        this.totalPingsGotten = 0
-        this.totalNumberOfFpsTicks = 0
-        this.totalFpsTicks = 0
-        if (this.gameRoomActions?.closeModals) {
-            this.gameRoomActions.closeModals()
-        }
-        if (this.needsReload) {
-            this._everythingReady = false
-            this.gameStarted = false
-            this.courseLoaded = false
-            this.needsReload = false
-            /** I think I need to delete ammo vecs */
+    async destroyVehicles() {
+        return new Promise<void>(async (resolve, reject) => {
             for (let vehicle of this.vehicles) {
                 try {
                     await vehicle.destroy()
@@ -924,7 +930,28 @@ export class GameScene extends Scene3D implements IGameScene {
             }
 
             this.wagons = []
+            resolve()
+        })
+    }
 
+    async restartGame() {
+        this.oldTime = 0
+        this.totalPing = 0
+        this.totalPingsGotten = 0
+        this.totalNumberOfFpsTicks = 0
+        this.totalFpsTicks = 0
+        if (this.gameRoomActions?.closeModals) {
+            this.gameRoomActions.closeModals()
+        }
+        if (this.needsReload) {
+            this.socket?.off(std_controls)
+            this._everythingReady = false
+            this.gameStarted = false
+            this.courseLoaded = false
+            this.needsReload = false
+            /** I think I need to delete ammo vecs */
+
+            await this.destroyVehicles()
             this.restart().then(() => {
             })
         } else {
@@ -963,7 +990,8 @@ export class GameScene extends Scene3D implements IGameScene {
         if (this.gameSceneConfig?.onlyMobile) {
             if (this.gameSceneConfig.mobileController && this.vehicles.length > 0) {
 
-                const controllerInterval = setInterval(() => {
+
+                this.mobileOnlyControllerInterval = setInterval(() => {
                     driveVehicle(this.gameSceneConfig.mobileController, this.vehicles[0])
                 }, 1000 / 60)
             } else {
@@ -1126,12 +1154,23 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async destroyGame() {
-        document.body.removeChild(this.gameInfoDiv)
-        document.body.removeChild(this.canvas)
-        for (let vehicle of this.vehicles) {
-            vehicle.destroy()
-        }
-        this.stop()
+        return new Promise<void>(async (resolve, reject) => {
+
+            console.log("destorying game")
+            if (this.mobileOnlyControllerInterval) {
+                clearInterval(this.mobileOnlyControllerInterval)
+            }
+            this.socket?.off(std_controls)
+            this.socket?.off(std_user_settings_changed)
+
+            document.body.removeChild(this.gameInfoDiv)
+            document.body.removeChild(this.canvas)
+
+            await this.destroyVehicles()
+
+            this.stop()
+            resolve()
+        })
     }
 }
 

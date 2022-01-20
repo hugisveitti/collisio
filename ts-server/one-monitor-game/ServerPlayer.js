@@ -37,6 +37,7 @@ var Player = /** @class */ (function () {
         this.setupGameActionsListener();
         this.setupPingListener();
         this.setupLeftWaitingRoomListener();
+        this.setupQuitGameListener();
     };
     /**
      * actions like reset game
@@ -55,10 +56,18 @@ var Player = /** @class */ (function () {
             }
         });
     };
+    Player.prototype.setupQuitGameListener = function () {
+        var _this = this;
+        this.socket.once(shared_stuff_1.mts_quit_game, function () {
+            var _a;
+            (_a = _this.game) === null || _a === void 0 ? void 0 : _a.quitGame();
+        });
+    };
     /**
      * use e.g. is one player quits being leader
      */
     Player.prototype.sendPlayerInfo = function () {
+        // only allow leader?
         this.socket.emit(shared_stuff_1.stm_player_info, { player: this.getPlayerInfo() });
     };
     Player.prototype.gameSettingsChangedCallback = function () {

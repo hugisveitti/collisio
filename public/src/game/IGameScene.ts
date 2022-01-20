@@ -42,7 +42,7 @@ export interface IGameScene extends Scene3D {
     changeTrack?: (trackName: TrackName) => void
     resetVehicleCallback: (vehicleNumber: number) => void
     setNeedsReload: (needsReload: boolean) => void
-    destroyGame: () => void
+    destroyGame: () => Promise<void>
     setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
 
     course: ICourse

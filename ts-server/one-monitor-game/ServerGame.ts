@@ -31,7 +31,8 @@ import {
     stm_game_settings_changed_callback,
     dts_back_to_waiting_room,
     STD_SENDINTERVAL_MS,
-    IPlayerConnectedData
+    IPlayerConnectedData,
+    std_quit_game
 } from "../../public/src/shared-backend/shared-stuff";
 import { removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
@@ -554,6 +555,11 @@ export class Room {
 
     sendGameDataInfo(data: any) {
         this.socket.emit(std_game_data_info, data)
+    }
+
+    quitGame() {
+        console.log("Quit game with mobile")
+        this.socket.emit(std_quit_game, {})
     }
 
     isFull() {

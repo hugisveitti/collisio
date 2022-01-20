@@ -20,13 +20,14 @@ import {
   GameActions,
   std_game_data_info,
   std_player_disconnected,
+  std_quit_game,
   std_send_game_actions,
   stmd_game_settings_changed,
 } from "../../shared-backend/shared-stuff";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import { inTestMode } from "../../utils/settings";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
-import { frontPagePath } from "../Routes";
+import { connectPagePath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import EndOfGameModal from "./EndOfGameModal";
 import GameSettingsModal from "./GameSettingsModal";
@@ -62,6 +63,7 @@ const GameRoom = (props: IGameRoom) => {
   };
 
   useEffect(() => {
+    console.log("clearing canvas in game room");
     clearBackdropCanvas();
   }, []);
 
@@ -147,9 +149,7 @@ const GameRoom = (props: IGameRoom) => {
       return null;
     }
 
-    if (props.store.gameSettings.gameType === "ball") {
-      console.warn("ball game not supported");
-    }
+    props.store.setPreviousPage(gameRoomPath);
 
     const CurrGameScene = getGameSceneClass(props.store.gameSettings.gameType);
 
@@ -188,6 +188,22 @@ const GameRoom = (props: IGameRoom) => {
         setGameActions(_gameActions);
       }
     );
+
+    props.store.socket.once(std_quit_game, () => {
+      props.store.socket.disconnect();
+      //     props.store.setSocket(undefined);
+      setGameObject(undefined);
+
+      console.log("going to /connect");
+      history.push(connectPagePath);
+    });
+
+    return () => {
+      props.store.socket.off(std_send_game_actions);
+      props.store.socket.off(std_game_data_info);
+      props.store.socket.off(std_player_disconnected);
+      props.store.socket.off(std_quit_game);
+    };
   }, []);
 
   useEffect(() => {
@@ -203,9 +219,13 @@ const GameRoom = (props: IGameRoom) => {
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
       if (gameObject) {
-        gameObject.destroyGame();
-        /** do some kind of back to waiting room? */
-        props.store.socket.emit(dts_back_to_waiting_room, {});
+        console.log("destroying game");
+        gameObject.destroyGame().then(() => {
+          console.log("game destoryd ");
+
+          /** do some kind of back to waiting room? */
+          props.store.socket.emit(dts_back_to_waiting_room, {});
+        });
       }
     };
   }, [gameObject]);
@@ -241,6 +261,16 @@ const GameRoom = (props: IGameRoom) => {
         userId={user?.uid}
         isTestMode={props.isTestMode}
         updateGameSettings={updateGameSettings}
+        quitGame={() => {
+          gameObject.destroyGame().then(() => {
+            props.store.socket.disconnect();
+            //     props.store.setSocket(undefined);
+            setGameObject(undefined);
+
+            console.log("going to /connect");
+            history.push(connectPagePath);
+          });
+        }}
       />
       <EndOfGameModal
         open={endOfGameModalOpen}

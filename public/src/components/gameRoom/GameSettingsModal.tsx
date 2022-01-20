@@ -13,6 +13,7 @@ import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { IStore } from "../store";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
 import BackdropButton from "../button/BackdropButton";
+import { connectPagePath } from "../Routes";
 
 interface IGameSettingsModal {
   open: boolean;
@@ -22,6 +23,7 @@ interface IGameSettingsModal {
   userId: string | undefined;
   isTestMode?: boolean;
   updateGameSettings: (gameSettings: IGameSettings) => void;
+  quitGame: () => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -52,7 +54,14 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         )}
 
         <Grid item xs={12}>
-          <ToFrontPageButton color="white" />
+          <BackdropButton
+            color="white"
+            onClick={() => {
+              props.quitGame();
+            }}
+          >
+            To waiting room
+          </BackdropButton>
         </Grid>
         <Grid item xs={12}>
           <GameSettingsComponent

@@ -378,7 +378,10 @@ export class LowPolyVehicle extends Vehicle {
 
     goForward() {
 
-        if (!this._canDrive) return
+        if (!this._canDrive) {
+            this.break()
+            return
+        }
         const kmh = this.getCurrentSpeedKmHour(0)
         let eF = this.engineForce
         // if (kmh > this.vehicleConfig.maxSpeed + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
@@ -409,7 +412,10 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     goBackward() {
-        if (!this._canDrive) return
+        if (!this._canDrive) {
+            this.break()
+            return
+        }
         let eF = -this.engineForce
         if (this.getCurrentSpeedKmHour(0) > 10) {
             this.decreaseMaxSpeedTicks()
@@ -513,7 +519,6 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     pause() {
-
         this.break()
         this.isPaused = true
         this._canDrive = false
@@ -546,7 +551,8 @@ export class LowPolyVehicle extends Vehicle {
             const p = this.getPosition()
             const r = this.vehicleBody.rotation
 
-            this.camera.position.set(p.x - (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(Math.cos(r.z))))
+
+            this.camera.position.set(p.x - (20 * Math.sin(r.y)), p.y, p.z + (20 * Math.cos(r.y) * Math.sign(Math.cos(r.z))))
             //   this.camera.position.set(p.x + (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(r.z)))
         }
         if (!this.engineSound) {

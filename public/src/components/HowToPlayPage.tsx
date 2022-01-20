@@ -32,6 +32,7 @@ import vehicleSelect1 from "../images/vehicle-select-1.PNG";
 import vehicleSelect2 from "../images/vehicle-select-2.PNG";
 import "../styles/main.css";
 import BackdropContainer from "./backdrop/BackdropContainer";
+import MyCard from "./card/MyCard";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import { buyPremiumPagePath, highscorePagePath } from "./Routes";
 
@@ -44,14 +45,16 @@ const HowToPlayItem = (props: IHowToPlayItem) => {
 
   return (
     <Grid item xs={12}>
-      <Card
-        style={{ backgroundColor: "rgba(255,255,255,.82)" }}
-        variant="outlined"
+      <MyCard
+        style={{ cursor: "pointer" }}
+        //  style={{ backgroundColor: "rgba(255,255,255,.82)" }}
+        // variant="outlined"
       >
         <CardHeader
+          onClick={() => setOpen(!open)}
           subheader={props.header}
           action={
-            <IconButton onClick={() => setOpen(!open)}>
+            <IconButton>
               {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
           }
@@ -59,7 +62,7 @@ const HowToPlayItem = (props: IHowToPlayItem) => {
         <Collapse in={open}>
           <CardContent>{props.children}</CardContent>
         </Collapse>
-      </Card>
+      </MyCard>
     </Grid>
   );
 };

@@ -5,7 +5,7 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { shuffleArray, substrArrayInString } from "../utils/utilFunctions";
+import { itemInArray, shuffleArray, substrArrayInString } from "../utils/utilFunctions";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
 import "./course.css";
@@ -22,7 +22,6 @@ export class Course implements ICourse {
     trackName: TrackName
     ground: ExtendedObject3D
 
-
     startRotation: Euler
     startPosition: Vector3
 
@@ -38,6 +37,8 @@ export class Course implements ICourse {
 
     lights: PointLight[]
     rotatingObjects: { speed: number, object: Object3D }[]
+    clouds: Object3D[]
+    originalCloudPos: Vector3[]
 
     /** if vehicle drives over this, its engine will turn off. */
     engineOffObjects: ExtendedObject3D[]
@@ -58,6 +59,9 @@ export class Course implements ICourse {
     possibleIntersectObjects: Object3D[] = []
 
     isReady: boolean
+    cloudSpeed: number[]
+
+    ray = new Raycaster()
 
     constructor(gameScene: GameScene, trackName: TrackName) {
         this.gameScene = gameScene
@@ -75,6 +79,7 @@ export class Course implements ICourse {
         this.wagons = []
         this.courseItemsLoader = new CourseItemsLoader(this)
         this.isReady = false
+        this.clouds = []
     }
 
 
@@ -126,7 +131,11 @@ export class Course implements ICourse {
 
 
                 this.createPossibleIntersectObjectArray()
-
+                console.log("clouds", this.clouds)
+                this.cloudSpeed = []
+                for (let c of this.clouds) {
+                    this.cloudSpeed.push((Math.random() * .5) + .2)
+                }
                 resolve()
             })
         })
@@ -376,11 +385,11 @@ export class Course implements ICourse {
      */
     seeObject(cameraPos: Vector3, objectPos: Vector3) {
         this.removeTransparentObjects()
-        ray.far = cameraPos.distanceTo(objectPos)
-        ray.set(cameraPos.clone(), objectPos.clone())
-        ray.ray.lookAt(objectPos.clone())
+        this.ray.far = cameraPos.distanceTo(objectPos)
+        this.ray.set(cameraPos.clone(), objectPos.clone())
+        this.ray.ray.lookAt(objectPos.clone())
 
-        const intersects = ray.intersectObjects(this.possibleIntersectObjects)
+        const intersects = this.ray.intersectObjects(this.possibleIntersectObjects)
         for (let i = 0; i < intersects.length; i++) {
             this.makeObjectTransparent(intersects[i].object as ExtendedObject3D)
         }
@@ -393,24 +402,22 @@ export class Course implements ICourse {
             for (let item of this.rotatingObjects) {
                 item.object.rotateX(item.speed)
             }
+
+            for (let i = 0; i < this.clouds.length; i++) {
+                const cloud = this.clouds[i]
+                cloud.position.setX(cloud.position.x + this.cloudSpeed[i])
+                if (cloud.position.x > this.ground.position.x + this.ground.scale.x + 100) {
+                    cloud.position.setX(-(this.ground.position.x + this.ground.scale.x + 100))
+                    const sizeZ = this.ground.position.z + this.ground.scale.z
+                    cloud.position.setZ((Math.random() * sizeZ * 2) - sizeZ)
+                    cloud.rotateY(Math.random() * 180)
+                }
+            }
         }
         this._updateCourse()
     }
-
     _updateCourse() {
 
     }
 }
 
-const mouse = new Vector2(0, 0);
-
-function onMouseMove(event) {
-
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-}
-const ray = new Raycaster()

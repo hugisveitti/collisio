@@ -139,6 +139,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   useEffect(() => {
     if (props.store.socket) {
       console.log("disconnecting socket");
+      props.store.setSocket(undefined);
       props.store.socket.disconnect();
     }
   }, [props.store.socket]);

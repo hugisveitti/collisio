@@ -455,6 +455,10 @@ var Room = /** @class */ (function () {
     Room.prototype.sendGameDataInfo = function (data) {
         this.socket.emit(shared_stuff_1.std_game_data_info, data);
     };
+    Room.prototype.quitGame = function () {
+        console.log("Quit game with mobile");
+        this.socket.emit(shared_stuff_1.std_quit_game, {});
+    };
     Room.prototype.isFull = function () {
         // max number of players
         return this.players.length >= 4;

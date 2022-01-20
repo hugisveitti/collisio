@@ -4,8 +4,13 @@ import { useHistory } from "react-router";
 import "react-toastify/dist/ReactToastify.css";
 import { createClassNames } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
+import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import { changeCameraPosition, createBackdropRenderer } from "./backdropCanvas";
+import {
+  changeCameraPosition,
+  clearBackdropCanvas,
+  createBackdropRenderer,
+} from "./backdropCanvas";
 import BlackLoadingPage from "./BlackLoadingPage";
 
 interface IBackdropContainer {
@@ -43,6 +48,9 @@ const BackdropContainer = (props: IBackdropContainer) => {
       }
       changeCameraPosition(num);
       setCamPosNum(num);
+    } else if (props.store.previousPage === gameRoomPath) {
+      // if comming from game then someone pressed back to waiting room
+      setPressedStartGame(true);
     }
     if (canvasWrapperRef?.current) {
       if (!alreadyExisted) {

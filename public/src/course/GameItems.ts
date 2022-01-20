@@ -204,11 +204,17 @@ export const gameItems = {
         isCourseObjectArray: true,
         objectName: "coinPoints"
     },
+    "cloud": {
+        collisionFlags: 6,
+        shape: "concave",
+        notAddPhysics: true,
+        isCourseObjectArray: true,
+        objectName: "clouds"
+    },
     "stadium": {
         collisionFlags: 1,
         shape: "concave"
     },
-
     "ramp": {
         collisionFlags: 1,
         shape: "concave",

@@ -389,6 +389,8 @@ export class RaceGameScene extends GameScene {
                 numberOfLaps: this.currentNumberOfLaps
             }
             timeInfos.push(timeInfoObject)
+
+            this.viewsLapsInfo[i].innerHTML = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
         }
 
         if (this.gameRoomActions.updateScoreTable) {
@@ -400,7 +402,8 @@ export class RaceGameScene extends GameScene {
         }
 
 
-        if (this.gameStarted && !this.isGamePaused()) {
+
+        if (this.gameStarted && !this.isPaused) {
             if (this.ghostVehicle && maxTotalTime > 0) {
                 this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
             }

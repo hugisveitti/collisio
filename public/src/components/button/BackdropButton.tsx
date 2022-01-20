@@ -31,7 +31,7 @@ const BackdropButton = (props: IBackdropButton) => {
         if (props.disabled) return;
         if (props.link) {
           history.push(props.link);
-        } else {
+        } else if (props.onClick) {
           props.onClick();
         }
       }}
