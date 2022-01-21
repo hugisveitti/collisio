@@ -1,5 +1,4 @@
 import Modal from "@mui/material/Modal";
-import { color } from "@mui/system";
 import React from "react";
 import { getStyledColors, modalBackgroundColor } from "../../providers/theme";
 

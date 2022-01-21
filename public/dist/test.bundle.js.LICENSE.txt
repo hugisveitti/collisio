@@ -71,6 +71,12 @@ version 0.6.9
  */
 
 /**
+ * @author       Kevin Lee (https://github.com/InfiniteLee)
+ * @copyright    Copyright (c) 2020 Kevin Lee; Project Url: https://github.com/InfiniteLee/three-to-ammo
+ * @license      {@link https://github.com/InfiniteLee/three-to-ammo/blob/master/LICENSE|MPL-2.0}
+ */
+
+/**
  * @author       Yannick Deubel (https://github.com/yandeu)
  * @copyright    Copyright (c) 2020 Yannick Deubel; Project Url: https://github.com/enable3d/enable3d
  * @license      {@link https://github.com/enable3d/enable3d/blob/master/LICENSE|GNU GPLv3}
@@ -223,7 +229,7 @@ version 0.6.9
  * @description  Inspired by tapjs (https://www.npmjs.com/package/tapjs)
  */
 
-/** @license MUI v5.0.1
+/** @license MUI v5.3.0
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.

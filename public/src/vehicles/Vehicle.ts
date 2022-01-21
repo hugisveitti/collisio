@@ -3,7 +3,7 @@
  */
 
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, Font, PerspectiveCamera, Quaternion, Vector3, PositionalAudio } from "three";
+import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3, PositionalAudio } from "three";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
@@ -72,7 +72,7 @@ export class Vehicle implements IVehicle {
     staticCameraPos: { x: number, y: number, z: number }
 
     vehicleBody: ExtendedObject3D;
-    _canDrive: boolean;
+    protected _canDrive: boolean;
     isPaused: boolean;
     vehicleSettings: IVehicleSettings;
     isReady: boolean;
@@ -120,7 +120,7 @@ export class Vehicle implements IVehicle {
         console.warn("This function should not be called, getCurrentSpeedKmHour of vehicle class")
         return 0
     };
-    setFont(font: Font) { };
+
     lookForwardsBackwards(lookBackwards: boolean) { };
     resetPosition() { };
     setCheckpointPositionRotation(positionRotation: IPositionRotation) {
@@ -205,7 +205,7 @@ export class Vehicle implements IVehicle {
     }
 
     stopEngineSound() {
-        if (this.engineSound && this.engineSound.source) {
+        if (this.engineSound && this.engineSound.source && this.engineSound.isPlaying) {
             this.engineSound.stop()
         }
     }
@@ -285,13 +285,13 @@ export class Vehicle implements IVehicle {
             if (this.getCurrentSpeedKmHour() > 10) {
                 this.currentFov = Math.min(fovScaler(this.getCurrentSpeedKmHour()), maxFov)
                 this.camera.fov = this.currentFov
-                this.camera.updateProjectionMatrix()
+                //     this.camera.updateProjectionMatrix()
             } else {
                 this.currentFov -= 1
                 this.currentFov = Math.max(this.currentFov, minFov)
 
                 this.camera.fov = this.currentFov
-                this.camera.updateProjectionMatrix()
+                //   this.camera.updateProjectionMatrix()
 
             }
         }
@@ -305,6 +305,7 @@ export class Vehicle implements IVehicle {
             this.skidVolume = Math.min(1, this.skidVolume)
             if (!isFinite(this.skidVolume)) {
                 console.warn("Skid volume non finite", this.skidVolume)
+                this.skidVolume = 0
                 return
             }
             this.skidSound.setVolume(this.skidVolume)

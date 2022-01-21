@@ -37,19 +37,18 @@ export class RaceGameScene extends GameScene {
     hasShowStartAnimation: boolean
     raceFinished: boolean
 
-    totalTimeDiv: HTMLDivElement
+
 
     testDriver: TestDriver
     ghostVehicle: GhostVehicle
     driverRecorder: DriveRecorder
 
+
+
     constructor() {
         super()
 
-        this.totalTimeDiv = document.createElement("div")
 
-        this.gameInfoDiv.appendChild(this.totalTimeDiv)
-        this.totalTimeDiv.setAttribute("id", "totalTime")
 
         this.winner = ""
         this.winTime = -1
@@ -111,28 +110,31 @@ export class RaceGameScene extends GameScene {
     }
 
     async create(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
 
-        this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
-        console.log("this config", this.gameSceneConfig)
-        if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
-            console.log("gamesettings", this.gameSettings)
-            if (this.gameSettings.useGhost) {
-                await this.createGhostVehicle()
+            this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
+            console.log("this config", this.gameSceneConfig)
+            if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
+                console.log("gamesettings", this.gameSettings)
+                if (this.gameSettings.useGhost) {
+                    await this.createGhostVehicle()
+                }
+                console.log("creating drive recorder")
+                this.driverRecorder = new DriveRecorder({
+                    tournamentId: this.gameSceneConfig.tournament.id,
+                    active: true,
+                    numberOfLaps: this.currentNumberOfLaps,
+                    vehicleType: this.players[0].vehicleType,
+                    trackName: this.getTrackName()
+                })
             }
-            console.log("creating drive recorder")
-            this.driverRecorder = new DriveRecorder({
-                tournamentId: this.gameSceneConfig.tournament.id,
-                active: true,
-                numberOfLaps: this.currentNumberOfLaps,
-                vehicleType: this.players[0].vehicleType,
-                trackName: this.getTrackName()
-            })
-        }
-        this.createViews()
-        this.createController()
-        this.resetVehicles()
+            this.createViews()
+            this.createController()
+            this.resetVehicles()
 
-        this.restartGame()
+            await this.restartGame()
+            resolve()
+        })
     }
 
     startRaceCountdown() {
@@ -162,6 +164,17 @@ export class RaceGameScene extends GameScene {
             if (this.raceCountdownTime < 4) {
                 // dont always play beep
                 this.playCountdownBeep()
+            }
+
+            if (this.raceCountdownTime === 2) {
+                console.log("spin camera off")
+                for (let i = 0; i < this.vehicles.length; i++) {
+                    this.vehicles[i].spinCameraAroundVehicle = false
+                    if (!this.vehicles[i].useChaseCamera) {
+
+                        this.vehicles[i].addCamera(this.views[i].camera)
+                    }
+                }
             }
             // this.showImportantInfo(countdown + "")
             this.showViewsImportantInfo(this.raceCountdownTime + "")
@@ -241,7 +254,7 @@ export class RaceGameScene extends GameScene {
         //     this.createGhostVehicle()
         // }
 
-        this.hasShowStartAnimation = true
+
         /**
          * There is a bug here, I dont know what
          * this works in inTestMode, but not otherwise
@@ -256,29 +269,18 @@ export class RaceGameScene extends GameScene {
                 // this.vehicles[i].chassisMesh.remove(this.views[i].camera)
                 this.vehicles[i].removeCamera()
                 this.vehicles[i].spinCameraAroundVehicle = true
-
+                this.vehicles[i].resetPosition()
                 const pos = this.vehicles[i].getPosition()
 
                 const rot = this.vehicles[i].getRotation()
                 this.views[i].camera.position.set(
                     pos.x + ((Math.sin(rot.y) * 100)),
                     pos.y + 75,
-                    pos.z - ((Math.cos(rot.y) * 50) * Math.sign(Math.cos(rot.z)))
+                    pos.z + ((Math.cos(rot.y) * 100) * Math.sign(Math.cos(rot.z)))
                 )
             }
             this.gameStartingTimeOut = setTimeout(() => {
-
-                for (let i = 0; i < this.vehicles.length; i++) {
-
-                    if (!this.vehicles[i].useChaseCamera) {
-                        const { x, y, z } = getStaticCameraPos(this.gameSceneConfig.onlyMobile ? 2 : this.vehicles[i].vehicleSettings.cameraZoom)
-                        this.camera.position.set(x, y, z)
-                        this.vehicles[i].addCamera(this.views[i].camera)
-                    }
-                    this.vehicles[i].spinCameraAroundVehicle = false
-                }
                 this.startRaceCountdown()
-
             }, sec * 1000)
         }
         else {
@@ -390,16 +392,17 @@ export class RaceGameScene extends GameScene {
             }
             timeInfos.push(timeInfoObject)
 
-            this.viewsLapsInfo[i].innerHTML = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
+            this.viewsLapsInfo[i].textContent = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
         }
 
-        if (this.gameRoomActions.updateScoreTable) {
-            this.gameRoomActions.updateScoreTable({ timeInfos })
-        }
-        this.totalTimeDiv.innerHTML = maxTotalTime.toFixed(2)
-        if (this.gameSceneConfig.onlyMobile) {
-            this.viewsNameInfo[0].innerHTML = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
-        }
+        // if (this.gameRoomActions.updateScoreTable) {
+        //     this.gameRoomActions.updateScoreTable({ timeInfos })
+        // }
+
+        this.totalTimeDiv.textContent = maxTotalTime.toFixed(2)
+        // if (this.gameSceneConfig.onlyMobile) {
+        //     this.viewsNameInfo[0].textContent = `${this.gameTimers[0].lapNumber} / ${this.currentNumberOfLaps}`
+        // }
 
 
 
@@ -427,7 +430,9 @@ export class RaceGameScene extends GameScene {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
             }
             this.updateScoreTable(time, delta)
+
             this.updateVehicles(delta)
+
 
             if (!this.isGameSongPlaying()) {
                 this.startGameSong()

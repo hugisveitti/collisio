@@ -87,7 +87,7 @@ const ConnectToWaitingRoomComponent = (
   // need the roomId for the mobile
   const connectButtonClicked = (roomId?: string) => {
     if (!props.store.socket || !props.store.socket.connected) {
-      createSocket(getDeviceType(), (socket) => {
+      createSocket(getDeviceType()).then((socket) => {
         props.store.setSocket(socket);
         handleConnection(socket, roomId);
       });

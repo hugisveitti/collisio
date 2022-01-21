@@ -1,12 +1,12 @@
 // Import the functions you need from the SDKs you need
+import { getStorage } from "@firebase/storage";
 import { initializeApp } from "firebase/app";
 import { createUserWithEmailAndPassword, FacebookAuthProvider, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-import { toast } from "react-toastify";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { getFirebaseConfig } from "./firebaseConfig";
+import "firebase/storage";
+import { toast } from "react-toastify";
 import { inDevelopment } from "../utils/settings";
-import { getStorage } from "@firebase/storage";
+import { getFirebaseConfig } from "./firebaseConfig";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,18 +18,18 @@ const app = initializeApp(getFirebaseConfig())
 
 // const analytics = getAnalytics(app);
 
-export const database = getDatabase(app)
 export const storage = getStorage(app)
 
 
 const getMyFirestore = () => {
     if (inDevelopment) {
-        return getFirestore()
+        return getFirestore(app)
     }
     return getFirestore(app)
 }
 
 export const firestore = getMyFirestore()
+
 if (inDevelopment) {
 
     connectFirestoreEmulator(firestore, "localhost", 8000)

@@ -128,7 +128,7 @@ const Routes = () => {
       // setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
 
-      createSocket(getDeviceType(), (_s) => setSocket(_s));
+      createSocket(getDeviceType()).then((_s) => setSocket(_s));
     }
   }, []);
 

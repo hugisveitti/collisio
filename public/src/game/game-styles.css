@@ -57,6 +57,9 @@
   font-family: monospace;
   font-size: 64px;
   text-shadow: 1px 1px white;
+  background-color: white;
+  opacity: 0.9;
+  z-index: 9;
 }
 
 @media only screen and (max-width: 1000px) {

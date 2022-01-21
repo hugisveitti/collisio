@@ -131,7 +131,6 @@ export class Course implements ICourse {
 
 
                 this.createPossibleIntersectObjectArray()
-                console.log("clouds", this.clouds)
                 this.cloudSpeed = []
                 for (let c of this.clouds) {
                     this.cloudSpeed.push((Math.random() * .5) + .2)
@@ -256,8 +255,6 @@ export class Course implements ICourse {
         }
 
         let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn" && !s.name.includes("align"))
-        console.log("usable spawns", usableSpawns)
-        console.log("spawn aligners", this.spawnAligners)
         if (usableSpawns.length >= vehicles.length) {
 
             let sortedSpawns = usableSpawns

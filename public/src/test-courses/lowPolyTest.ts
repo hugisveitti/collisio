@@ -44,7 +44,7 @@ export class LowPolyTestScene extends GameScene {
     vehicle: ITestVehicle
     vehicles: ITestVehicle[]
 
-    font: THREE.Font
+
     textMesh?: any
     socket!: Socket
     vehicleControls!: VehicleControls
@@ -265,70 +265,74 @@ export class LowPolyTestScene extends GameScene {
     }
 
     async create() {
+        return new Promise<void>(async (resolve, reject) => {
 
-        if (this.getGameType() === "race") {
 
-            this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
-        } else if (this.getGameType() === "tag") {
-            this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
-        } else if (this.getGameType() === "story") {
-            this.course = new StoryCourse(this, this.trackName)
-        } else {
-            console.warn("Unknown game type when creating course", this.getGameType())
-        }
+            if (this.getGameType() === "race") {
 
-        await this.course.createCourse()
-        if (this.course instanceof RaceCourse) {
-            this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
-        }
-
-        this.courseLoaded = true
-        await this.createOtherVehicles()
-        await this.createTestVehicle()
-        this.vehicle.useBadRotationTicks = true
-
-        const allVehicles = this.otherVehicles.concat(this.vehicle)
-        this.vehicles = allVehicles
-
-        this.course.setStartPositions(allVehicles)
-        for (let v of allVehicles) {
-            if (v.isReady) {
-                v.unpause()
+                this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
+            } else if (this.getGameType() === "tag") {
+                this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
+            } else if (this.getGameType() === "story") {
+                this.course = new StoryCourse(this, this.trackName)
+            } else {
+                console.warn("Unknown game type when creating course", this.getGameType())
             }
-            v.setCanDrive(true)
-            v.start()
-        }
 
-        //this.vehicle.setPosition(5, 2, 5)
-        // this.vehicle.setRotation(0, 0, 0)
-        if (this.getGameType() === "tag") {
+            await this.course.createCourse()
+            if (this.course instanceof RaceCourse) {
+                this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
+            }
 
-            this.vehicle.setPosition(0, 2, 0)
-        }
+            this.courseLoaded = true
+            await this.createOtherVehicles()
+            await this.createTestVehicle()
+            this.vehicle.useBadRotationTicks = true
 
-        this.createController()
+            const allVehicles = this.otherVehicles.concat(this.vehicle)
+            this.vehicles = allVehicles
 
-        this.canStartUpdate = true
-        if (this.gameSettings.gameType === "tag") {
-
-            this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
-                if (isVehicle(otherObject)) {
-                    const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.vehicle.setColor(notItColor)
-                    this.otherVehicles[vehicleNumber - 1].setColor(itColor)
-                    this.isIt = vehicleNumber
+            this.course.setStartPositions(allVehicles)
+            for (let v of allVehicles) {
+                if (v.isReady) {
+                    v.unpause()
                 }
-            })
-        }
-        this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+                v.setCanDrive(true)
+                v.start()
+            }
+
+            //this.vehicle.setPosition(5, 2, 5)
+            // this.vehicle.setRotation(0, 0, 0)
+            if (this.getGameType() === "tag") {
+
+                this.vehicle.setPosition(0, 2, 0)
+            }
+
+            this.createController()
+
+            this.canStartUpdate = true
+            if (this.gameSettings.gameType === "tag") {
+
+                this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
+                    if (isVehicle(otherObject)) {
+                        const vehicleNumber = getVehicleNumber(otherObject.name)
+                        this.vehicle.setColor(notItColor)
+                        this.otherVehicles[vehicleNumber - 1].setColor(itColor)
+                        this.isIt = vehicleNumber
+                    }
+                })
+            }
+            this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
 
 
-        this.ghostVechicle.loadModel().then(() => {
+            await this.ghostVechicle.loadModel()
 
             this.ghostVechicle.addToScene(this)
-        });
 
-        console.log("camera", this.camera)
+
+            console.log("camera", this.camera)
+            resolve()
+        })
     }
 
 
@@ -391,7 +395,7 @@ export class LowPolyTestScene extends GameScene {
                     this.vehicle.resetPosition()
                     // this.dirLight.target = this.vehicle.chassisMesh
                     this.camera.position.set(0, 10, -25)
-                    this.loadFont()
+                    // this.loadFont()
                     this.vehicle.unpause()
                     resolve()
                 })
@@ -410,7 +414,7 @@ export class LowPolyTestScene extends GameScene {
                     this.vehicle.resetPosition()
                     // this.dirLight.target = this.vehicle.chassisMesh
                     this.camera.position.set(0, 10, -25)
-                    this.loadFont()
+
 
 
                     const createVehicleInputButtons = () => {
@@ -473,7 +477,7 @@ export class LowPolyTestScene extends GameScene {
     }
 
     updateScoreTable() {
-        scoreTable.innerHTML = `
+        scoreTable.textContent = `
         Leaderboard
         `
     }
@@ -522,6 +526,7 @@ export class LowPolyTestScene extends GameScene {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
         }
+        this.renderer.render(this.scene, this.camera)
     }
 
     _updateChild(time: number, delta: number) {
@@ -545,7 +550,7 @@ export class LowPolyTestScene extends GameScene {
                 // testDriveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
                 const pos = this.vehicle.getPosition()
                 const rot = this.vehicle.getRotation()
-                scoreTable.innerHTML = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
+                scoreTable.textContent = `x: ${pos.x.toFixed(2)}, z:${pos.z.toFixed(2)} 
                 <br />
                 rot x:${rot.x.toFixed(2)}, y:${rot.y.toFixed(2)}, z:${rot.z.toFixed(2)}, w:${rot.w.toFixed(2)}
                 <br />
@@ -566,8 +571,8 @@ export class LowPolyTestScene extends GameScene {
 
 
             if (this.raceStarted) {
-                lapTimeDiv.innerHTML = this.gameTime.getCurrentLapTime() + ""
-                bestLapTimeDiv.innerHTML = this.gameTime.getBestLapTime() + ""
+                lapTimeDiv.textContent = this.gameTime.getCurrentLapTime() + ""
+                bestLapTimeDiv.textContent = this.gameTime.getBestLapTime() + ""
             }
         }
 
@@ -581,19 +586,19 @@ export class LowPolyTestScene extends GameScene {
     }
 
 
-    loadFont() {
-        const fontName = "helvetiker"
-        const fontWeight = "regular"
-        const loader = new THREE.FontLoader();
-        loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
+    // loadFont() {
+    //     const fontName = "helvetiker"
+    //     const fontWeight = "regular"
+    //     const loader = new THREE.FontLoader();
+    //     loader.load('fonts/' + fontName + '_' + fontWeight + '.typeface.json', (response) => {
 
-            this.font = response;
-            if (this.font && this.vehicle) {
+    //         this.font = response;
+    //         if (this.font && this.vehicle) {
 
-                this.vehicle.setFont(this.font)
-            }
-        });
-    }
+    //             this.vehicle.setFont(this.font)
+    //         }
+    //     });
+    // }
 
     togglePauseGame() {
 

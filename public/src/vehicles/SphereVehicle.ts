@@ -1,11 +1,10 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Color, Euler, Font, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Color, Euler, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { IVehicleSettings } from "../classes/User";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { degToRad } from "../utils/utilFunctions";
-import { getStaticCameraPos, IPositionRotation } from "./IVehicle";
+import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
@@ -271,7 +270,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         // )
 
         camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
-        camera.updateProjectionMatrix()
+        //   camera.updateProjectionMatrix()
 
         camera.lookAt(this.cameraLookAtPos)
         this.cameraLookAtPos = pos.clone()
@@ -332,10 +331,6 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
 
         return kmh
-    }
-
-    setFont(font: Font): void {
-
     }
 
     lookForwardsBackwards(lookBackwards: boolean): void {

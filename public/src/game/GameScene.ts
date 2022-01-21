@@ -1,7 +1,7 @@
 import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, Font, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../classes/Game";
@@ -54,7 +54,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
     players: IPlayerInfo[]
     vehicles: IVehicle[]
-    font: Font
     gameSettings: IGameSettings
     timeOfDay: TimeOfDay
     useSound: boolean
@@ -77,6 +76,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     gameRoomActions: IGameRoomActions
 
+    viewDivs: HTMLDivElement[]
     viewsKmhInfo: HTMLSpanElement[]
     viewsLapsInfo: HTMLSpanElement[]
     viewsImpornantInfo: HTMLSpanElement[]
@@ -132,6 +132,8 @@ export class GameScene extends Scene3D implements IGameScene {
     mobileOnlyControllerInterval: NodeJS.Timer
     isPaused: boolean
 
+    totalTimeDiv: HTMLDivElement
+
 
     constructor() {
         super()
@@ -146,7 +148,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.songIsPlaying = false
         this._everythingReady = false
         this.gameStarted = false
-        this.isPaused = true
+        this.isPaused = false
         this.gameId = uuid()
         this.gameSettings = defaultGameSettings
         this.gameInfoDiv = document.createElement("div")
@@ -157,8 +159,14 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.importantInfoDiv.setAttribute("id", "important-info")
         this.gameInfoDiv.appendChild(this.importantInfoDiv)
+
+        this.totalTimeDiv = document.createElement("div")
+
+        this.gameInfoDiv.appendChild(this.totalTimeDiv)
+        this.totalTimeDiv.setAttribute("id", "totalTime")
         this.gameRoomActions = {}
 
+        this.viewDivs = []
         this.viewsKmhInfo = []
         this.viewsLapsInfo = []
         this.viewsImpornantInfo = []
@@ -302,18 +310,26 @@ export class GameScene extends Scene3D implements IGameScene {
             }
         })
 
-        window.addEventListener("resize", () => this.onWindowResize())
+        window.addEventListener("resize", () => this.handleResizeWindow())
         await this.loadAssets()
+
+        console.log("capabilities", this.renderer.capabilities)
+        this.renderer.clear()
+        this.renderer.info.autoReset = false
+        //  this.renderer.capabilities.precision = "lowp"
+        this.renderer.autoClear = false
+        this.renderer.shadowMap.autoUpdate = false
 
     }
 
     async loadAssets() { }
 
+
+
     async init(data: any) {
         // need to do some test with performance and the draw distance
-        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.gameSettings.drawDistance)
-        this.renderer.setPixelRatio(1)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
+        this.setPixelRatio()
 
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
@@ -341,7 +357,7 @@ export class GameScene extends Scene3D implements IGameScene {
         const currDelta = this.clock.getDelta()
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
-        if (this.deltaFPS > this.targetFPS) {
+        if (this.deltaFPS > this.targetFPS && !this.isPaused) {
             const delta = this.updateDelta * 1000
             //   console.log("delta", delta.toFixed(3), (this.deltaFPS * 1000).toFixed(3))
             this.updateDelta = 0
@@ -363,8 +379,8 @@ export class GameScene extends Scene3D implements IGameScene {
                 this.composer.render()
             }
             else {
-
-                this.renderer.render(this.scene, this.camera)
+                // am already rendering in updateVehicles
+                //  this.renderer.render(this.scene, this.camera)
             }
             this.postRender()
         } else {
@@ -491,6 +507,16 @@ export class GameScene extends Scene3D implements IGameScene {
         return this.gameSceneConfig?.tournament?.trackName ?? this.gameSettings.trackName
     }
 
+    setPixelRatio() {
+        console.log("this.gameSettings", this.gameSettings)
+        const lowGraphics = this.gameSettings.graphics === "low"
+        this.renderer.capabilities.precision = lowGraphics ? "lowp" : "highp"
+        const ratio = this.gameSettings.graphics === "low" ? 4 : 1
+        console.log("Pixel ratio", ratio)
+        this.renderer.setPixelRatio(ratio)
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+    }
+
     /**
      * 
      * @param info text to be displayed
@@ -499,7 +525,8 @@ export class GameScene extends Scene3D implements IGameScene {
      * 
      */
     setViewImportantInfo(info: string, i: number, clear?: boolean) {
-        this.viewsImpornantInfo[i].innerHTML = info
+        // this.viewsImpornantInfo[i].textContent = info
+        this.viewsImpornantInfo[i].textContent = info
 
 
         if (clear) {
@@ -510,7 +537,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     clearViewImportantInfo(i: number) {
-        this.viewsImpornantInfo[i].innerHTML = ""
+        this.viewsImpornantInfo[i].textContent = ""
     }
 
     clearTimeouts() {
@@ -524,17 +551,29 @@ export class GameScene extends Scene3D implements IGameScene {
         this.needsReload = needsReload
     }
 
+    getDrawDistance() {
+        return this.gameSettings.drawDistance
+    }
+
     createViews() {
         this.gameInfoDiv.appendChild(this.playerInfosContainer)
         this.views = []
-        this.playerInfosContainer.innerHTML = ""
+        this.playerInfosContainer.textContent = ""
         this.viewsImpornantInfo = []
         this.viewsNameInfo = []
         this.viewsKmhInfo = []
+        this.viewDivs = []
         this.viewsLapsInfo = []
 
 
         const n = this.players.length
+        if (n > 2) {
+            this.totalTimeDiv.setAttribute("style", `
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            `)
+        }
         for (let i = 0; i < this.players.length; i++) {
             const viewHeight = n > 2 ? .5 : 1.0
             let viewWidth: number
@@ -546,7 +585,8 @@ export class GameScene extends Scene3D implements IGameScene {
             const fov = vechicleFov
             // for some reason the last view needs to use the Scene's camera
             // maybe remove camera from warpSpeed ("-camera")
-            const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, this.gameSettings.drawDistance)
+
+            const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, this.getDrawDistance())
 
             const view = {
                 left: viewLefts[i % 2],
@@ -574,9 +614,10 @@ export class GameScene extends Scene3D implements IGameScene {
             const viewDivHeight = viewHeight * window.innerHeight
 
             const viewDiv = document.createElement("div")
+            this.viewDivs.push(viewDiv)
             const nameInfo = document.createElement("span")
 
-            nameInfo.innerHTML = this.players[i].playerName
+            nameInfo.textContent = this.players[i].playerName
             viewDiv.appendChild(nameInfo)
             this.viewsNameInfo.push(nameInfo)
 
@@ -586,7 +627,7 @@ export class GameScene extends Scene3D implements IGameScene {
             this.viewsKmhInfo.push(kmInfo)
 
             const lapsInfo = document.createElement("span")
-            lapsInfo.innerHTML = ""
+            lapsInfo.textContent = ""
             viewDiv.appendChild(lapsInfo)
             this.viewsLapsInfo.push(lapsInfo)
 
@@ -649,11 +690,26 @@ export class GameScene extends Scene3D implements IGameScene {
             top:${nameTop}%;
             font-size:${nameFontSize}px;
             transform:translate(${nameRight}%, -${nameTop}%);
+            transition:2s;
             `)
             const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
 
+
+            setTimeout(() => {
+                nameInfo.textContent = pName
+                nameInfo.setAttribute("style", `
+                    position:absolute;
+                    right:100px;
+                    top:0%;
+                    font-size:32px;
+                    transform:translate(0%, -0%);
+                `)
+            }, 1500)
+
             const callNameAnimate = () => {
-                nameInfo.innerHTML = pName
+                nameInfo.textContent = pName
+
+
 
                 setTimeout(() => {
                     if (nameRight > 0) {
@@ -675,19 +731,34 @@ export class GameScene extends Scene3D implements IGameScene {
 
             setTimeout(() => {
 
-                callNameAnimate()
+                //  callNameAnimate()
             }, 1500)
 
 
             this.playerInfosContainer.appendChild(viewDiv)
 
-            window.addEventListener("resize", () => {
-                const left = viewLefts[i % 2] * (window.innerWidth)
-                const bottom = viewBottoms[i] * window.innerHeight
-                const viewDivWidth = viewWidth * window.innerWidth
-                const viewDivHeight = viewHeight * window.innerHeight
 
-                viewDiv.setAttribute("style", `
+        }
+    }
+
+    handleResizeWindow() {
+
+        const n = this.viewDivs.length
+
+        for (let i = 0; i < this.viewDivs.length; i++) {
+            const viewHeight = n > 2 ? .5 : 1.0
+            let viewWidth: number
+            if (n === 3 || n === 1) {
+                viewWidth = i < n - 1 ? .5 : 1
+            } else {
+                viewWidth = .5
+            }
+            const left = viewLefts[i % 2] * (window.innerWidth)
+            const bottom = viewBottoms[i] * window.innerHeight
+            const viewDivWidth = viewWidth * window.innerWidth
+            const viewDivHeight = viewHeight * window.innerHeight
+
+            this.viewDivs[i].setAttribute("style", `
                 position:absolute;
                 font-family:monospace;
                 text-shadow:1px 1px white;
@@ -698,8 +769,9 @@ export class GameScene extends Scene3D implements IGameScene {
                 width:${viewDivWidth}px;
                 height:${viewDivHeight}px;
             `)
-            })
         }
+
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     startGameSong() {
@@ -778,7 +850,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     showImportantInfo(text: string, clear?: boolean) {
-        this.importantInfoDiv.innerHTML = text
+        this.importantInfoDiv.textContent = text
         if (clear) {
             this.importantInfoTimeout = setTimeout(() => {
                 this.clearImportantInfo()
@@ -787,7 +859,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     clearImportantInfo() {
-        this.importantInfoDiv.innerHTML = ""
+        this.importantInfoDiv.textContent = ""
     }
 
     everythingReady(): boolean {
@@ -841,9 +913,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.toggleUseSound()
 
         for (let i = 0; i < this.views.length; i++) {
-            this.views[i].camera.far = gameSettings.drawDistance
+            this.views[i].camera.far = this.getDrawDistance()
         }
-        this.camera.far = gameSettings.drawDistance
+        this.camera.far = this.getDrawDistance()
 
         // if gameSettings change and needs reload then restart without user say?
         this.socket?.emit(dts_game_settings_changed_callback, {})
@@ -1049,10 +1121,12 @@ export class GameScene extends Scene3D implements IGameScene {
     updatePing() {
         const start = Date.now()
 
+        this.socket?.off(std_ping_test_callback)
+
         this.socket?.emit(dts_ping_test)
         this.socket?.once(std_ping_test_callback, () => {
             const ping = Date.now() - start
-            this.pingInfo.innerHTML = `ping ${ping}ms`
+            this.pingInfo.textContent = `ping ${ping}ms`
             this.totalPing += ping
             this.totalPingsGotten += 1
         })
@@ -1061,7 +1135,7 @@ export class GameScene extends Scene3D implements IGameScene {
     updateFps(time: number) {
         this.fpsTick += 1
         if (Math.floor(time) > this.oldTime) {
-            this.fpsInfo.innerHTML = `fps ${this.fpsTick}`
+            this.fpsInfo.textContent = `fps ${this.fpsTick}`
             this.totalFpsTicks += this.fpsTick
             this.totalNumberOfFpsTicks += 1
             this.fpsTick = 0
@@ -1101,8 +1175,11 @@ export class GameScene extends Scene3D implements IGameScene {
              * For the chase cam, we have to look at the vehicle and then update the position
              * Maybe that is wrong but I think it shakes less
              */
-            this.vehicles[i].cameraLookAt(this.views[i].camera, delta)
+
+
             this.vehicles[i].update(delta)
+            this.vehicles[i].cameraLookAt(this.views[i].camera, delta)
+
 
             const left = Math.floor(window.innerWidth * this.views[i].left);
             const bottom = Math.floor(window.innerHeight * this.views[i].bottom);
@@ -1116,13 +1193,25 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
             this.views[i].camera.aspect = width / height;
+
             this.views[i].camera.updateProjectionMatrix();
+
+            if (i === this.views.length - 1) {
+                //     this.renderer.shadowMap.needsUpdate = true
+                this.renderer.info.reset()
+                this.renderer.clear()
+            } else {
+                this.renderer.shadowMap.needsUpdate = false
+                //       this.renderer.compile(this.scene, this.views[i].camera);
+            }
             this.renderer.render(this.scene, this.views[i].camera);
 
-            if (this.gameStarted) {
-                this.checkVehicleOutOfBounds(i)
 
-                this.viewsKmhInfo[i].innerHTML = `${this.vehicles[i].getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
+
+            if (this.gameStarted) {
+                //     this.checkVehicleOutOfBounds(i)
+
+                //     this.viewsKmhInfo[i].textContent = `${Math.ceil(this.vehicles[i].getCurrentSpeedKmHour(delta)).toFixed(0)} km/h`
             }
         }
     }
@@ -1155,6 +1244,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
+            window.removeEventListener("resize", () => this.handleResizeWindow())
 
             console.log("destorying game")
             if (this.mobileOnlyControllerInterval) {

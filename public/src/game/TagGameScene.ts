@@ -18,7 +18,7 @@ import { TagObject } from "./TagObjectClass";
 let importantTimes = ["60", "30", "10", "5", "4", "3", "2", "1"]
 
 
-const totalTimeDiv = document.createElement("div")
+
 
 export class TagGameScene extends GameScene {
 
@@ -40,13 +40,14 @@ export class TagGameScene extends GameScene {
 
     isItTimeoutObject: NodeJS.Timeout
 
+    totalTimeDiv: HTMLDivElement
 
 
     constructor() {
         super()
-
-        this.gameInfoDiv.appendChild(totalTimeDiv)
-        totalTimeDiv.setAttribute("id", "totalTime")
+        this.totalTimeDiv = document.createElement("div")
+        this.gameInfoDiv.appendChild(this.totalTimeDiv)
+        this.totalTimeDiv.setAttribute("id", "totalTime")
         this.tagObjects = []
 
         this.isItTimeout = false
@@ -248,8 +249,9 @@ export class TagGameScene extends GameScene {
                     score: this.tagObjects[i].coinCount
                 }
             )
+            this.viewsLapsInfo[i].textContent = this.tagObjects[i].coinCount.toString()
         }
-        this.gameRoomActions.updateScoreTable({ tagInfos })
+        //    this.gameRoomActions.updateScoreTable({ tagInfos })
 
     }
 

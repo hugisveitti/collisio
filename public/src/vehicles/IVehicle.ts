@@ -1,5 +1,5 @@
 import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
-import { Font, Vector3, Quaternion } from "three"
+import { Vector3, Quaternion } from "three"
 import { IVehicleSettings } from '../classes/User';
 import { VehicleType } from '../shared-backend/shared-stuff';
 import { numberScaler } from '../utils/utilFunctions';
@@ -73,7 +73,6 @@ export interface IVehicle {
     getRotation: () => Quaternion
     setRotation: (x: number | Quaternion, y?: number, z?: number) => void
     getCurrentSpeedKmHour: (delta?: number) => number
-    setFont: (font: Font) => void
 
     lookForwardsBackwards: (lookBackwards: boolean) => void
 

@@ -1,5 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
+import { Color, Euler, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -40,8 +40,6 @@ export class LowPolyVehicle extends Vehicle {
     chassis: Ammo.btRigidBody
     tuning: Ammo.btVehicleTuning
     raycaster: Ammo.btDefaultVehicleRaycaster
-
-    font: Font
 
     is4x4: boolean
 
@@ -521,7 +519,7 @@ export class LowPolyVehicle extends Vehicle {
     pause() {
         this.break()
         this.isPaused = true
-        this._canDrive = false
+        this.setCanDrive(false)
         this.zeroEngineForce()
         this.stopEngineSound()
         if (this.vehicleBody?.body) {
@@ -531,7 +529,7 @@ export class LowPolyVehicle extends Vehicle {
 
     unpause() {
         this.isPaused = false
-        this._canDrive = true
+        this.setCanDrive(true)
         if (this.useSoundEffects) {
             this.startEngineSound()
         }
@@ -572,13 +570,13 @@ export class LowPolyVehicle extends Vehicle {
     cameraLookAt(camera: PerspectiveCamera, delta: number) {
         if (this.spinCameraAroundVehicle) {
             const rot = this.vehicleBody.rotation
-            this.vehicle.updateVehicle(1 / 60)
-            const pos = this.getPosition()
+            //      this.vehicle.updateVehicle(1 / 60)
+            const pos = this.vehicleBody.position
 
             this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
+                pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
                 pos.y + this.staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+                pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
             )
 
             this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * 0.03))
@@ -587,10 +585,7 @@ export class LowPolyVehicle extends Vehicle {
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.vehicleBody.position.clone())
-            camera.updateMatrix()
-            camera.updateWorldMatrix(false, false)
-            camera.updateMatrixWorld()
-            camera.updateProjectionMatrix()
+
 
         } else if (this.useChaseCamera) {
             // this.tm = this.vehicle.getChassisWorldTransform()
@@ -654,7 +649,7 @@ export class LowPolyVehicle extends Vehicle {
             camera.lookAt(this.cameraLookAtPos)
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
             this.seeVehicle(this.cameraDir.clone())
-            camera.updateProjectionMatrix()
+            //    camera.updateProjectionMatrix()
         } else {
             camera.lookAt(this.vehicleBody.position.clone())
 
@@ -833,7 +828,8 @@ export class LowPolyVehicle extends Vehicle {
 
 
     update(delta: number) {
-        const usingJitter = this.useChaseCamera && this.detectJitter(delta)
+        this.delta = delta
+        const usingJitter = false //this.useChaseCamera && this.detectJitter(delta)
         //    console.log("ussing jitter", usingJitter)
 
         for (let i = 0; i < 4; i++) {
@@ -887,7 +883,7 @@ export class LowPolyVehicle extends Vehicle {
 
         if (!this.isPaused && this.isReady) {
 
-            this.delta = delta
+
             this.checkIfSpinning()
             this.vehicleAssist(false)
             this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
@@ -985,24 +981,20 @@ export class LowPolyVehicle extends Vehicle {
         return this.vehicle.getCurrentSpeedKmHour()
     };
 
-    setFont(font: Font) {
-        this.font = font
-
-    }
 
     createNameMesh() {
-        const textGeo = new TextGeometry(this.name.toUpperCase().slice(0, 3), {
-            font: this.font!,
-            size: 1,
-            height: 0.5,
+        // const textGeo = new TextGeometry(this.name.toUpperCase().slice(0, 3), {
+        //     font: this.font!,
+        //     size: 1,
+        //     height: 0.5,
 
-        })
+        // })
 
-        const textMesh = new Mesh(textGeo, new MeshLambertMaterial({ color: 0x667399, }))
-        textMesh.rotateY(Math.PI)
-        this.scene.add.existing(textMesh)
-        textMesh.position.set(1.2, 3, 0)
-        this.vehicleBody.add(textMesh)
+        // const textMesh = new Mesh(textGeo, new MeshLambertMaterial({ color: 0x667399, }))
+        // textMesh.rotateY(Math.PI)
+        // this.scene.add.existing(textMesh)
+        // textMesh.position.set(1.2, 3, 0)
+        // this.vehicleBody.add(textMesh)
     }
 
     lookForwardsBackwards(lookBackwards: boolean) {
@@ -1043,7 +1035,7 @@ export class LowPolyVehicle extends Vehicle {
             const { x, y, z } = this.staticCameraPos
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
-            this.camera.updateProjectionMatrix()
+            //    this.camera.updateProjectionMatrix()
         }
 
     };
@@ -1083,7 +1075,6 @@ export class LowPolyVehicle extends Vehicle {
             this._canDrive = false
             this.stopEngineSound()
             this.scene.scene.remove(this.engineSound)
-            console.log("this.vehicleBody.body", this.vehicleBody.body)
             if (this.scene && this.vehicleBody?.body) {
                 this.scene.destroy(this.vehicleBody)
             }

@@ -41,7 +41,7 @@ interface IGameRoom {
 
 let currentRaceInfo = [];
 
-const GameRoom = (props: IGameRoom) => {
+const GameRoom = React.memo((props: IGameRoom) => {
   // this breaks iphone
   // if (!props.store.roomId) {
   //   window.location.href = frontPagePath;
@@ -163,7 +163,7 @@ const GameRoom = (props: IGameRoom) => {
         gameRoomActions: {
           escPressed: handleEscPressed,
           gameFinished: handelGameFinished,
-          updateScoreTable: handleUpdateScoreTable,
+          //    updateScoreTable: handleUpdateScoreTable,
           playerFinished: handlePlayerFinished,
           closeModals: handleCloseModals,
         },
@@ -199,6 +199,7 @@ const GameRoom = (props: IGameRoom) => {
     });
 
     return () => {
+      props.store.socket?.disconnect();
       props.store.socket.off(std_send_game_actions);
       props.store.socket.off(std_game_data_info);
       props.store.socket.off(std_player_disconnected);
@@ -216,6 +217,8 @@ const GameRoom = (props: IGameRoom) => {
         gameObject.setGameSettings(data.gameSettings);
       }
     });
+
+    console.log("game obj changed", gameObject);
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
       if (gameObject) {
@@ -231,6 +234,7 @@ const GameRoom = (props: IGameRoom) => {
   }, [gameObject]);
 
   useEffect(() => {
+    console.log("game actions changed", gameActions);
     if (gameObject) {
       if (gameActions.pause) {
         setSettingsModalOpen(true);
@@ -285,9 +289,9 @@ const GameRoom = (props: IGameRoom) => {
         scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}
       />
-      <ScoreInfoContainer scoreInfo={scoreInfo} />
+      {/* <ScoreInfoContainer scoreInfo={scoreInfo} /> */}
     </React.Fragment>
   );
-};
+});
 
 export default GameRoom;

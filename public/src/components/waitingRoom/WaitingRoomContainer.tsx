@@ -166,7 +166,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     if (!onMobile) return;
 
     if (!user && !props.store.player && !props.store.socket) {
-      createSocket(getDeviceType(), (_socket) => {
+      createSocket(getDeviceType()).then((_socket) => {
         props.store.setSocket(_socket);
         setDisplayNameModalOpen(true);
       });

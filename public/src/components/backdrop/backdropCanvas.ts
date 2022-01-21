@@ -275,7 +275,11 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
 }
 
 const handleWindowResize = () => {
-
+    width = window.innerWidth
+    height = window.innerHeight
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
 }
 
 export const clearBackdropCanvas = () => {
@@ -290,4 +294,5 @@ export const clearBackdropCanvas = () => {
     renderer = undefined
     cosOff = Math.PI / 2
     sinOff = 0
+
 }

@@ -361,9 +361,10 @@ export const vehicleConfigs = {
         maxSpeed: 270,
 
 
-        mass: 150,
-        engineForce: 4500,
-        breakingForce: 100,
+        mass: 300,
+        engineForce: 9000,
+        breakingForce: 200,
+        maxSteeringAngle: 25,
         suspensionRestLength: .87,
         is4x4: false,
         centerOfMassOffset: .75

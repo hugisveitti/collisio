@@ -44,7 +44,7 @@ const TestApp = () => {
 
   useEffect(() => {
     console.log("gong to create socket");
-    createSocket(deviceType, (newSocket) => setSocket(newSocket), "test");
+    createSocket(deviceType, "test").then((newSocket) => setSocket(newSocket));
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
   }, []);

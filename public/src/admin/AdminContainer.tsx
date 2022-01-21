@@ -32,7 +32,7 @@ const AdminContainer = () => {
           .then((data: any) => {
             if (data.status === "success") {
               setIsAdmin(true);
-              createSocket(getDeviceType(), (_s) => {
+              createSocket(getDeviceType()).then((_s) => {
                 setSocket(_s);
               });
             } else {

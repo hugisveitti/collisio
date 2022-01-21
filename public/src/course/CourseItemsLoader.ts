@@ -52,19 +52,28 @@ export class CourseItemsLoader {
                     this.course.gameScene.load.texture('/textures/Water_2_M_Normal.jpg')
                 ])
                 texturesPromise.then(textures => {
-                    textures[0].needsUpdate = true
-                    textures[1].needsUpdate = true
+                    textures[0].needsUpdate = false // true
+                    textures[1].needsUpdate = false // true
                     waterTextures = textures
+                    textures[0].matrixAutoUpdate = false
+                    textures[1].matrixAutoUpdate = false
 
                     waterObject.visible = false
+
+                    let size = Math.max(waterObject.scale.x * 2, waterObject.scale.z * 2)
+                    size = Math.ceil(Math.log2(size))
+                    size = 2 ** size
+                    console.log("water size", size)
+                    // WebGL: INVALID_OPERATION: generateMipmap: level 0 not power of 2 or not all the same size
                     this.course.gameScene.misc.water({
                         y: waterObject.position.y + .1,
                         x: waterObject.position.x,
                         z: waterObject.position.z,
 
-
-                        width: waterObject.scale.x * 2,
-                        height: waterObject.scale.z * 2,
+                        width: size,
+                        height: size,
+                        // width: waterObject.scale.x * 2,
+                        // height: waterObject.scale.z * 2,
                         normalMap0: textures[0],
                         normalMap1: textures[1]
                     })

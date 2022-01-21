@@ -47,6 +47,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={connectPagePath} width={btnWidth}>
             {onMobile ? "Join a game" : "Create a game"}
           </BackdropButton>
+          <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
+            Play mobile version
+          </BackdropButton>
           <BackdropButton
             disabled={!user}
             link={privateProfilePagePath}
@@ -69,9 +72,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={buyPremiumPagePath} width={btnWidth}>
             Go Premium
           </BackdropButton>
-          <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
-            Play mobile only
-          </BackdropButton>
+
           <BackdropButton link={aboutPagePath} width={btnWidth}>
             About
           </BackdropButton>
