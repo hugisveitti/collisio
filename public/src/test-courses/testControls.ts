@@ -86,11 +86,6 @@ export const addTestControls = (socket: Socket, vehicle: IVehicle) => {
 
 
 
-
-
-
-
-
     const keyAction = (e: KeyboardEvent, isDown: boolean) => {
         switch (e.key) {
             case "w":

@@ -185,3 +185,12 @@ export const substrArrayInString = (str: string, arr: string[]) => {
 export const createClassNames = (...str: string[]) => {
     return str.join(" ")
 }
+
+
+export const getSteerAngleFromBeta = (beta: number) => {
+    let angle = 0
+    if (Math.abs(beta) >= 4) {
+        angle = beta - (4 * Math.sign(beta))
+    }
+    return angle
+}

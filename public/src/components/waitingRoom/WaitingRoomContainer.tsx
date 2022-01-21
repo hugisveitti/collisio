@@ -54,6 +54,7 @@ import {
   waitingRoomPath,
 } from "../Routes";
 import { IStore } from "../store";
+import MyTextField from "../textField/MyTextField";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 
@@ -327,11 +328,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            style={{
-              backgroundColor,
-              color,
-            }}
+          <MyTextField
             label="Enter your name"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}

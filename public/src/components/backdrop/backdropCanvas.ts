@@ -256,6 +256,9 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
             if (e.lengthComputable) {
                 const completed = e.loaded / e.total
                 loaderProgressCallback(completed)
+                // if(completed === 1){
+                //     delete loaderProgressCallback
+                // }
             }
         }).then(gltf => {
             scene.add(gltf.scene)

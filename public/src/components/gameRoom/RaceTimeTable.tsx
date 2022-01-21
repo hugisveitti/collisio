@@ -19,7 +19,8 @@ interface IRaceTimeTable {
 }
 
 const RaceTimeTable = (props: IRaceTimeTable) => {
-  if (props.raceTimeInfo.length === 0) return null;
+  console.log("props.raceTimeInfo", props.raceTimeInfo);
+  if (!props.raceTimeInfo || props.raceTimeInfo?.length === 0) return null;
 
   const cellStyle = !props.isEndOfGame ? { width: 50 } : {};
   const containerStyle = !props.isEndOfGame ? { width: 250 } : {};

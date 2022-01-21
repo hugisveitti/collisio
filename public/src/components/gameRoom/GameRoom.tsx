@@ -31,7 +31,6 @@ import { connectPagePath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
 import EndOfGameModal from "./EndOfGameModal";
 import GameSettingsModal from "./GameSettingsModal";
-import ScoreInfoContainer from "./ScoreInfoContainer";
 
 interface IGameRoom {
   store: IStore;
@@ -90,7 +89,8 @@ const GameRoom = React.memo((props: IGameRoom) => {
     setEndOfGameData(data);
   };
 
-  const handleUpdateScoreTable = (data: IScoreInfo) => {
+  const handleUpdateScoreInfo = (data: IScoreInfo) => {
+    console.log("handle update score info", data);
     if (data) {
       setScoreInfo(data);
     }
@@ -163,7 +163,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         gameRoomActions: {
           escPressed: handleEscPressed,
           gameFinished: handelGameFinished,
-          //    updateScoreTable: handleUpdateScoreTable,
+          updateScoreInfo: handleUpdateScoreInfo,
           playerFinished: handlePlayerFinished,
           closeModals: handleCloseModals,
         },

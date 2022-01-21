@@ -156,7 +156,7 @@ export class RaceGameScene extends GameScene {
                 //      vehicle.setToGround()
                 vehicle.start()
                 vehicle.setCanDrive(false)
-                vehicle.break()
+
             }
         }, (.5) * 1000)
 
@@ -170,10 +170,10 @@ export class RaceGameScene extends GameScene {
                 console.log("spin camera off")
                 for (let i = 0; i < this.vehicles.length; i++) {
                     this.vehicles[i].spinCameraAroundVehicle = false
-                    if (!this.vehicles[i].useChaseCamera) {
+                    //  if (!this.vehicles[i].useChaseCamera) {
 
-                        this.vehicles[i].addCamera(this.views[i].camera)
-                    }
+                    this.vehicles[i].addCamera(this.views[i].camera)
+                    // }
                 }
             }
             // this.showImportantInfo(countdown + "")
@@ -259,6 +259,7 @@ export class RaceGameScene extends GameScene {
          * There is a bug here, I dont know what
          * this works in inTestMode, but not otherwise
          */
+        this.hasShowStartAnimation = true
 
         if (!this.hasShowStartAnimation) {
             const sec = 3
@@ -370,6 +371,32 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    sendScoreInfo() {
+        if (this.gameRoomActions.updateScoreInfo) {
+            const timeInfos: IRaceTimeInfo[] = []
+            let maxTotalTime = 0
+            for (let i = 0; i < this.gameTimers.length; i++) {
+                let cLapTime = this.gameTimers[i].getCurrentLapTime()
+                const bLT = this.gameTimers[i].getBestLapTime()
+                let totalTime = this.gameTimers[i].getTotalTime()
+                maxTotalTime = Math.max(totalTime, maxTotalTime)
+                if (this.gameTimers[i].finished()) {
+                    cLapTime = -1
+                }
+                const timeInfoObject: IRaceTimeInfo = {
+                    playerName: this.players[i].playerName,
+                    bestLapTime: bLT,
+                    currentLapTime: cLapTime,
+                    totalTime,
+                    lapNumber: this.gameTimers[i].lapNumber,
+                    numberOfLaps: this.currentNumberOfLaps
+                }
+                timeInfos.push(timeInfoObject)
+
+            }
+            this.gameRoomActions.updateScoreInfo({ timeInfos })
+        }
+    }
 
     updateScoreTable(time: number, delta: number) {
         const timeInfos: IRaceTimeInfo[] = []
@@ -382,15 +409,7 @@ export class RaceGameScene extends GameScene {
             if (this.gameTimers[i].finished()) {
                 cLapTime = -1
             }
-            const timeInfoObject: IRaceTimeInfo = {
-                playerName: this.players[i].playerName,
-                bestLapTime: bLT,
-                currentLapTime: cLapTime,
-                totalTime,
-                lapNumber: this.gameTimers[i].lapNumber,
-                numberOfLaps: this.currentNumberOfLaps
-            }
-            timeInfos.push(timeInfoObject)
+
 
             this.viewsLapsInfo[i].textContent = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
         }
@@ -492,6 +511,7 @@ export class RaceGameScene extends GameScene {
 
     prepareEndOfGameData() {
         const playerGameInfos: IPlayerGameInfo[] = []
+        this.sendScoreInfo()
 
         for (let i = 0; i < this.vehicles.length; i++) {
 

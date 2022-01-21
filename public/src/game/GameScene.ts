@@ -508,12 +508,20 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setPixelRatio() {
-        console.log("this.gameSettings", this.gameSettings)
+        // console.log("this.gameSettings", this.gameSettings)
         const lowGraphics = this.gameSettings.graphics === "low"
         this.renderer.capabilities.precision = lowGraphics ? "lowp" : "highp"
-        const ratio = this.gameSettings.graphics === "low" ? 4 : 1
-        console.log("Pixel ratio", ratio)
-        this.renderer.setPixelRatio(ratio)
+        // let ratio = lowGraphics ? 4 : 1
+        // console.log("Pixel ratio", ratio)
+        // console.log("window pixel ratio", window.devicePixelRatio)
+        // if (window.devicePixelRatio < ratio && lowGraphics) {
+        //     ratio = Math.floor(window.devicePixelRatio)
+        // }
+
+
+
+
+        this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
@@ -1061,7 +1069,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.socket?.off(std_controls)
         if (this.gameSceneConfig?.onlyMobile) {
             if (this.gameSceneConfig.mobileController && this.vehicles.length > 0) {
-
+                console.log("creating controller intverval")
 
                 this.mobileOnlyControllerInterval = setInterval(() => {
                     driveVehicle(this.gameSceneConfig.mobileController, this.vehicles[0])

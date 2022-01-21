@@ -44,9 +44,14 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             </Grid>
           );
         })}
-        <Grid item xs={12}>
-          <RaceTimeTable isEndOfGame raceTimeInfo={props.scoreInfo.timeInfos} />
-        </Grid>
+        {props.scoreInfo && (
+          <Grid item xs={12}>
+            <RaceTimeTable
+              isEndOfGame
+              raceTimeInfo={props.scoreInfo.timeInfos}
+            />
+          </Grid>
+        )}
         <Grid item xs={6} xl={2}>
           <BackdropButton onClick={props.restartGame}>Restart</BackdropButton>
         </Grid>

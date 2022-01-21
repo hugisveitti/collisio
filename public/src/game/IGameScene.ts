@@ -16,7 +16,7 @@ export interface IGameRoomActions {
     escPressed?: () => void
     /** have the possibity to expand this interface to include other game types */
     gameFinished?: (data: IEndOfGameData) => void
-    updateScoreTable?: (data: IScoreInfo) => void
+    updateScoreInfo?: (data: IScoreInfo) => void
     playerFinished?: (data: IEndOfRaceInfoPlayer) => void
     closeModals?: () => void
 }

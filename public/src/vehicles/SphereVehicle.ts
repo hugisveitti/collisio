@@ -3,7 +3,7 @@ import { Color, Euler, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vect
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { degToRad } from "../utils/utilFunctions";
+import { degToRad, getSteerAngleFromBeta } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
@@ -170,9 +170,10 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.yVel = 0
     }
 
-    turn(angle: number): void {
+    turn(beta: number): void {
         //        this.vehicleBody.body.setAngularVelocity(0, 0, angle)
         //this.yVel = angle * degToRad * this.steeringSensitivity * 25
+        const angle = getSteerAngleFromBeta(beta)
         this.yVel = angle * degToRad
         this.yRot %= (Math.PI * 2)
         this.yRot -= (angle * degToRad * this.steeringSensitivity * .3)

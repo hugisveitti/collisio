@@ -28,6 +28,7 @@ import {
   MobileControls,
 } from "../shared-backend/shared-stuff";
 import { isIphone } from "../utils/settings";
+import { getSteerAngleFromBeta } from "../utils/utilFunctions";
 import "./MobileExperiment.css";
 
 interface IMobileGameExperiment {
@@ -76,7 +77,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       setInterval(() => {
         gameCanvas.setAttribute(
           "style",
-          `transform: rotateZ(${controller.beta}deg)`
+          `transform: rotateZ(${getSteerAngleFromBeta(controller.beta)}deg)`
         );
       }, 1000 / 90);
     }
@@ -212,7 +213,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         gameRoomActions: {
           escPressed: handleEscPressed,
           gameFinished: handelGameFinished,
-          updateScoreTable: handleUpdateScoreTable,
+          updateScoreInfo: handleUpdateScoreTable,
           playerFinished: handlePlayerFinished,
           closeModals: handleCloseModals,
         },

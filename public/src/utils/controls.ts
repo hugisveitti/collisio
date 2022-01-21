@@ -9,6 +9,7 @@ let angle = 25
 let gameIsPaused = false
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle, callback?: any) => {
+
     let btnDown = false
     if (mobileControls.f) {
         vehicle.goForward()

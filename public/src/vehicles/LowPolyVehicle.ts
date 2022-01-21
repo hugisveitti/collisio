@@ -3,7 +3,7 @@ import { Color, Euler, Mesh, MeshLambertMaterial, MeshStandardMaterial, Perspect
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { degToRad, numberScaler } from "../utils/utilFunctions";
+import { degToRad, getSteerAngleFromBeta, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
@@ -463,13 +463,9 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
     };
 
-    turn(steerAngle: number) {
-        let angle = steerAngle
-        if (Math.abs(steerAngle) < 4) {
-            angle = 0
-        } else {
-            angle = steerAngle - (4 * Math.sign(steerAngle))
-        }
+    turn(beta: number) {
+
+        const angle = getSteerAngleFromBeta(beta)
 
 
         if (this._canDrive) {
