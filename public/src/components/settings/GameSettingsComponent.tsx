@@ -1,18 +1,11 @@
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { Checkbox } from "@mui/material";
-import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
-  activeGameTypes,
   defaultRaceTrack,
   defaultStoryTrack,
   defaultTagTrack,
@@ -20,15 +13,18 @@ import {
   numberOfLapsPossibilities,
 } from "../../classes/Game";
 import {
+  GraphicsType,
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import { getStyledColors } from "../../providers/theme";
+import { GameType } from "../../shared-backend/shared-stuff";
 import { inTestMode } from "../../utils/settings";
-import { itemInArray } from "../../utils/utilFunctions";
+import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import CollabsibleCard from "../inputs/CollapsibleCard";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
+import MyRadio from "../radio/MyRadio";
 import MyTextField from "../textField/MyTextField";
 
 interface IGameSettingsComponent {
@@ -121,59 +117,16 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} lg={4}>
-        <FormControl
-          component="fieldset"
+        <MyRadio<GameType>
+          label="Type of game"
+          checked={gameSettings.gameType}
+          onChange={(newType) => updateGameSettings("gameType", newType)}
+          options={[
+            { label: "Race", value: "race" },
+            { label: "Tag", value: "tag" },
+          ]}
           disabled={disableInputs}
-          style={{
-            color,
-          }}
-        >
-          <FormLabel component="legend" style={{ color: "inherit" }}>
-            Type of game
-          </FormLabel>
-          <RadioGroup
-            row
-            aria-label="type of game"
-            name="row-radio-buttons-group"
-          >
-            <FormControlLabel
-              value="race"
-              control={
-                <Radio
-                  onChange={() => updateGameSettings("gameType", "race")}
-                  checked={gameSettings.gameType === "race"}
-                />
-              }
-              label="Race"
-            />
-            <FormControlLabel
-              value="tag"
-              control={
-                <Radio
-                  onChange={() => {
-                    updateGameSettings("gameType", "tag");
-                  }}
-                  checked={gameSettings.gameType === "tag"}
-                />
-              }
-              label="Tag"
-            />
-            {itemInArray("story", activeGameTypes) && (
-              <FormControlLabel
-                value="story"
-                control={
-                  <Radio
-                    onChange={() => {
-                      updateGameSettings("gameType", "story");
-                    }}
-                    checked={gameSettings.gameType === "story"}
-                  />
-                }
-                label="Story"
-              />
-            )}
-          </RadioGroup>
-        </FormControl>
+        />
       </Grid>
       {renderGameTypeInputs()}
       <Grid item xs={12} lg={4}>
@@ -204,69 +157,26 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               </IconButton>
             </Grid>
             <Grid item xs={6} sm={4}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Shadows</FormLabel>
-                <RadioGroup
-                  row
-                  aria-label="shadows"
-                  name="row-radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value={false}
-                    control={
-                      <Radio
-                        onChange={() => updateGameSettings("useShadows", false)}
-                        checked={!gameSettings.useShadows}
-                      />
-                    }
-                    label="Off"
-                  />
-                  <FormControlLabel
-                    value={true}
-                    control={
-                      <Radio
-                        onChange={() => updateGameSettings("useShadows", true)}
-                        checked={gameSettings.useShadows}
-                      />
-                    }
-                    label="On"
-                  />
-                </RadioGroup>
-              </FormControl>
+              <MyRadio<boolean>
+                label="Shadows"
+                options={[
+                  { label: "Off", value: false },
+                  { label: "On", value: true },
+                ]}
+                checked={gameSettings.useShadows}
+                onChange={(newVal) => updateGameSettings("useShadows", newVal)}
+              />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Graphics</FormLabel>
-                <RadioGroup
-                  row
-                  aria-label="graphics"
-                  name="row-radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="low"
-                    control={
-                      <Radio
-                        onChange={() => {
-                          updateGameSettings("graphics", "low");
-                          //   updateGameSettings("useShadows", false);
-                        }}
-                        checked={gameSettings.graphics === "low"}
-                      />
-                    }
-                    label="Low"
-                  />
-                  <FormControlLabel
-                    value="high"
-                    control={
-                      <Radio
-                        onChange={() => updateGameSettings("graphics", "high")}
-                        checked={gameSettings.graphics === "high"}
-                      />
-                    }
-                    label="High"
-                  />
-                </RadioGroup>
-              </FormControl>
+              <MyRadio<GraphicsType>
+                label="Graphics"
+                checked={gameSettings.graphics}
+                options={[
+                  { label: "Low", value: "low" },
+                  { label: "High", value: "high" },
+                ]}
+                onChange={(newVal) => updateGameSettings("graphics", newVal)}
+              />
             </Grid>
             <Grid item xs={12}>
               <Typography>Draw distance</Typography>
@@ -287,32 +197,21 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
+              <MyCheckbox
                 label="Record session?"
-                control={
-                  <Checkbox
-                    checked={props.gameSettings.record}
-                    onChange={() => {
-                      updateGameSettings("record", !props.gameSettings.record);
-                    }}
-                  />
-                }
+                checked={props.gameSettings.record}
+                onChange={() => {
+                  updateGameSettings("record", !props.gameSettings.record);
+                }}
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
+              <MyCheckbox
                 label="Use ghost?"
-                control={
-                  <Checkbox
-                    checked={props.gameSettings.useGhost}
-                    onChange={() => {
-                      updateGameSettings(
-                        "useGhost",
-                        !props.gameSettings.useGhost
-                      );
-                    }}
-                  />
-                }
+                checked={props.gameSettings.useGhost}
+                onChange={() => {
+                  updateGameSettings("useGhost", !props.gameSettings.useGhost);
+                }}
               />
             </Grid>
 

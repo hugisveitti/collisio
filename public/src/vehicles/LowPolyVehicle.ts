@@ -1,9 +1,8 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { resolve } from "path/posix";
 import { Color, Euler, Font, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, TextGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
-import { getStaticPath, inTestMode } from "../utils/settings";
+import { getStaticPath } from "../utils/settings";
 import { degToRad, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
@@ -21,12 +20,6 @@ export const getVehicleNumber = (vehicleName: string) => {
     }
     return num
 }
-
-const soundScaler = numberScaler(1, 5, 0, 330, 2)
-//const extraSpeedScaler = numberScaler(0, 100, Math.log2(1), Math.log2(1000), 2)
-
-
-
 
 const FRONT_LEFT = 0
 const FRONT_RIGHT = 1
@@ -472,7 +465,14 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
     };
 
-    turn(angle: number) {
+    turn(steerAngle: number) {
+        let angle = steerAngle
+        if (Math.abs(steerAngle) < 4) {
+            angle = 0
+        } else {
+            angle = steerAngle - (4 * Math.sign(steerAngle))
+        }
+
 
         if (this._canDrive) {
 
@@ -892,13 +892,13 @@ export class LowPolyVehicle extends Vehicle {
             this.vehicleAssist(false)
             this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 
-            if (!!this.engineSound && this.useSoundEffects) {
-                this.engineSound.setPlaybackRate(+soundScaler(Math.abs(this.getCurrentSpeedKmHour())))
-            }
-        }
+            this.updateEngineSound()
 
-        this.updateFov()
+            this.updateFov()
+        }
     };
+
+
 
     findClosesGround(): number {
         const pos = this.vehicleBody.position// this.getPosition() // this.vehicleBody.position

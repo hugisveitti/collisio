@@ -38,12 +38,17 @@ printMemoryInfo()
 let port = process.env.PORT || 80
 import * as os from "os"
 /** only works on my PC */
+let onLocalhost = false
 if (os.hostname().includes("Lisa")) {
     console.log("On localhost")
     port = 5000
+    onLocalhost = true
 }
 
+const isValidHost = (host: string | undefined) => {
 
+    return onLocalhost || host?.includes("collisio.club") || host?.includes("collisia.club")
+}
 
 const buildFolder = "dist"
 
@@ -55,7 +60,7 @@ const indexHTMLPath = `../public/${buildFolder}/index.html`
 const sendTestHTML = (req: Request, res: Response) => {
     const host = req.get("host")
     console.log("host", host)
-    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+    if (isValidHost(host)) {
         res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
     } else {
         res.send("ERROR")
@@ -118,7 +123,7 @@ app.get("/ammo.wasm.js", (_: Request, res: Response) => {
 const sendIndexHTML = (req: Request, res: Response) => {
     const host = req.get("host")
     console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
-    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+    if (isValidHost(host)) {
         res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     } else {
         res.status(500).send("ERROR")
@@ -202,11 +207,14 @@ io.on("connection", (socket: Socket) => {
 app.get("/robot.txt", (req: Request, res: Response) => {
     res.status(200).sendFile(path.join(__dirname, "../robot.txt"))
 })
+app.get("/humans.txt", (req: Request, res: Response) => {
+    res.status(200).sendFile(path.join(__dirname, "../humans.txt"))
+})
 
 app.get("*", (req: Request, res: Response) => {
     const host = req.get("host")
     console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
-    if (host?.includes("localhost") || host?.includes("collisio.club") || host?.includes("collisia.club")) {
+    if (isValidHost(host)) {
         // res.sendFile(path.join(__dirname, indexHTMLPath));
         res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
     } else {

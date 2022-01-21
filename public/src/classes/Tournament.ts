@@ -640,6 +640,7 @@ export class GlobalTournament extends Tournament implements IGlobalTournament {
     tournamentStart: Date
     tournamentEnd: Date
     runsPerPlayer: number | false
+    allowLateJoin: boolean
 
     constructor(leaderId: string, leaderName: string) {
         super(leaderId, leaderName)
@@ -647,6 +648,7 @@ export class GlobalTournament extends Tournament implements IGlobalTournament {
         this.tournamentStart = new Date()
         this.tournamentEnd = new Date(Date.now() + 1000 * 60 * 60 * 2)
         this.runsPerPlayer = false
+        this.allowLateJoin = false
     }
 }
 

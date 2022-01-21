@@ -52,10 +52,15 @@ printMemoryInfo();
 var port = process.env.PORT || 80;
 var os = __importStar(require("os"));
 /** only works on my PC */
+var onLocalhost = false;
 if (os.hostname().includes("Lisa")) {
     console.log("On localhost");
     port = 5000;
+    onLocalhost = true;
 }
+var isValidHost = function (host) {
+    return onLocalhost || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"));
+};
 var buildFolder = "dist";
 app.use(express.static(path.join(__dirname, "../public/" + buildFolder), { index: false }));
 app.use(express.static(path.join(__dirname, "../public/src"), { index: false }));
@@ -63,7 +68,7 @@ var indexHTMLPath = "../public/" + buildFolder + "/index.html";
 var sendTestHTML = function (req, res) {
     var host = req.get("host");
     console.log("host", host);
-    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+    if (isValidHost(host)) {
         res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
     }
     else {
@@ -110,7 +115,7 @@ app.get("/ammo.wasm.js", function (_, res) {
 var sendIndexHTML = function (req, res) {
     var host = req.get("host");
     console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
-    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+    if (isValidHost(host)) {
         res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
     }
     else {
@@ -166,10 +171,13 @@ io.on("connection", function (socket) {
 app.get("/robot.txt", function (req, res) {
     res.status(200).sendFile(path.join(__dirname, "../robot.txt"));
 });
+app.get("/humans.txt", function (req, res) {
+    res.status(200).sendFile(path.join(__dirname, "../humans.txt"));
+});
 app.get("*", function (req, res) {
     var host = req.get("host");
     console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
-    if ((host === null || host === void 0 ? void 0 : host.includes("localhost")) || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"))) {
+    if (isValidHost(host)) {
         // res.sendFile(path.join(__dirname, indexHTMLPath));
         res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
     }

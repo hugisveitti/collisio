@@ -55,10 +55,10 @@ const TournamentOverviewContainer = (props: ITournamentOverviewContainer) => {
         <Grid item xs={12}>
           <Typography>Here you can join or start a tournament.</Typography>
         </Grid>
-        <Grid item xs={12} xl={2}>
+        {/* <Grid item xs={12} xl={2}>
           <ToFrontPageButton color="white" />
-        </Grid>
-        <Grid item xs={12} xl={10}>
+        </Grid> */}
+        <Grid item xs={12} xl={12}>
           <BackdropButton
             color="white"
             center

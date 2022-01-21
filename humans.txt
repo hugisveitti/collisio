@@ -1,0 +1,1 @@
+Collisio Club is a browser based racing game. You create a game instance from your desktop or tablet and steer a car from your phone. You can play alone, follow a ghost or play splitscreen with your friends (or enemies).

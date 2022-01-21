@@ -162,6 +162,26 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           </Grid>
         </>
       )}
+      {(!onMobile || props.store.player?.isLeader) && (
+        <React.Fragment>
+          <Grid item xs={12}>
+            <BackdropButton
+              onClick={handleStartGame}
+              disabled={!canStartGame}
+              color="white"
+              center
+              width={200}
+            >
+              Start game
+            </BackdropButton>
+          </Grid>
+          {!canStartGame && (
+            <Grid item xs={12}>
+              <Typography color="error">{startGameMessage}</Typography>
+            </Grid>
+          )}
+        </React.Fragment>
+      )}
 
       <Grid item xs={12}>
         <Typography variant="h6" component="div">
@@ -181,26 +201,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       </Grid>
 
       {(!onMobile || props.store.player?.isLeader) && (
-        <React.Fragment>
-          <Grid item xs={12}>
-            <BackdropButton
-              onClick={handleStartGame}
-              disabled={!canStartGame}
-              color="white"
-              center
-              width={200}
-            >
-              Start game
-            </BackdropButton>
-          </Grid>
-          {!canStartGame && (
-            <Grid item xs={12}>
-              <Typography color="error">{startGameMessage}</Typography>
-            </Grid>
-          )}
-
-          <GameSettingsComponent store={props.store} />
-        </React.Fragment>
+        <GameSettingsComponent store={props.store} />
       )}
 
       {onMobile && (

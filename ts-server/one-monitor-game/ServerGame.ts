@@ -560,6 +560,7 @@ export class Room {
     quitGame() {
         console.log("Quit game with mobile")
         this.socket.emit(std_quit_game, {})
+        
     }
 
     isFull() {

@@ -8,6 +8,8 @@ import "./backdrop.css";
 
 let renderer: WebGLRenderer | undefined, scene: Scene | undefined, camera: PerspectiveCamera | undefined
 let posX = 0, posZ = 0, posY = 0
+let cosOff = Math.PI / 2
+let sinOff = 0
 const cameraMoveSpeed = 0.4
 const addLights = (scene: Scene) => {
     const timeOfDay = "day"
@@ -72,17 +74,11 @@ let cameraTargetPos = new Vector3(0, 0, 0);
 let reachedTarget = true;
 
 export const changeCameraPosition = (posNum: number) => {
-    console.log("change cam pos", posNum)
-    // if (cameraPositions.length < posNum + 1) {
-    //     console.warn("Invalid camera position number")
-    //     return
-    // }
+
 
     if (camera) {
 
         const pos = cameraPositions[posNum % cameraPositions.length]
-        console.log("new pos", pos)
-        //  camera.position.set(pos.x, pos.y, pos.z)
         cameraTargetPos = pos
         reachedTarget = false
         setPosXZ()
@@ -126,7 +122,6 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
         cameraLookAtPos = lookAtPos
         cameraPositions = _cameraPositions
         cameraPos = cameraPositions[0]
-        console.log("cameraPositions", cameraPositions)
         camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z)
         camera.lookAt(cameraLookAtPos)
         setPosXZ()
@@ -171,10 +166,9 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
 
 
-    let sinOff = 0
     let dSin = 0.005
     let dCos = 0.003
-    let cosOff = Math.PI / 2
+
     const sinOffMax = Math.PI / 4
     const cosOffMax = Math.PI
     //  camera.rotateY(ry)
@@ -294,4 +288,6 @@ export const clearBackdropCanvas = () => {
     scene?.clear()
     scene = undefined
     renderer = undefined
+    cosOff = Math.PI / 2
+    sinOff = 0
 }

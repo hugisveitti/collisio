@@ -22,6 +22,7 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
 import EditLocalTournamentComponent from "./localTournament/EditLocalTournamentComponent";
 import MyTextField from "../textField/MyTextField";
+import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 
 interface IEditTournamentComponent<V> {
   user: IUser;
@@ -60,7 +61,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
 
   return (
     <React.Fragment>
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={4}>
         <MyTextField
           label="Tournament name"
           value={props.tournament.name}
@@ -69,26 +70,6 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
               updateTournament("name", e.target.value);
             }
           }}
-        />
-      </Grid>
-
-      <Grid item xs={12}>
-        <FormControlLabel
-          label="Only allow specific vehicle"
-          control={
-            <Checkbox
-              checked={onlyAllowSpecificVechileType}
-              onChange={() => {
-                setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
-                if (!onlyAllowSpecificVechileType) {
-                  updateTournament("vehicleType", "normal2");
-                } else {
-                  // will give bug
-                  updateTournament("vehicleType", false);
-                }
-              }}
-            />
-          }
         />
       </Grid>
 
@@ -107,7 +88,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
           />
         </Collapse>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={4}>
         <NumberSelect
           title="No. of laps"
           value={props.tournament.numberOfLaps}
@@ -121,7 +102,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={4}>
         <TrackSelect
           gameType="race"
           value={props.tournament.trackName}
@@ -130,6 +111,22 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
             updateTournament("trackName", trackName);
           }}
           showMapPreview
+        />
+      </Grid>
+
+      <Grid item xs={12} lg={4}>
+        <MyCheckbox
+          label="Only allow specific vehicle"
+          checked={onlyAllowSpecificVechileType}
+          onChange={() => {
+            setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
+            if (!onlyAllowSpecificVechileType) {
+              updateTournament("vehicleType", "normal2");
+            } else {
+              // will give bug
+              updateTournament("vehicleType", false);
+            }
+          }}
         />
       </Grid>
 

@@ -15,6 +15,7 @@ import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 const maxFov = 80
 const minFov = 55
 const fovScaler = numberScaler(minFov, maxFov, 1, 400, 8)
+const soundScaler = numberScaler(1, 5, 0, 330, 2)
 
 
 export interface IVehicleClassConfig {
@@ -217,6 +218,17 @@ export class Vehicle implements IVehicle {
         }
     }
 
+    updateEngineSound() {
+        if (!!this.engineSound && this.useSoundEffects) {
+            const playbackRate = +soundScaler(Math.abs(this.getCurrentSpeedKmHour()))
+            if (!isFinite(playbackRate)) {
+                console.warn("Playback rate is non fitite", playbackRate)
+                return
+            }
+            this.engineSound.setPlaybackRate(playbackRate)
+        }
+    }
+
     createCarSounds() {
         const listener = new AudioListener()
         this.camera.add(listener)
@@ -246,7 +258,7 @@ export class Vehicle implements IVehicle {
             loadSkidSoundBuffer().then(buffer => {
                 this.skidSound.setBuffer(buffer)
                 this.skidSound.setLoop(false)
-                this.skidSound.setVolume(1)
+                this.skidSound.setVolume(0)
                 this.skidVolume = 0
             })
         )
@@ -291,6 +303,10 @@ export class Vehicle implements IVehicle {
 
             this.skidVolume += 0.01
             this.skidVolume = Math.min(1, this.skidVolume)
+            if (!isFinite(this.skidVolume)) {
+                console.warn("Skid volume non finite", this.skidVolume)
+                return
+            }
             this.skidSound.setVolume(this.skidVolume)
             if (!this.skidSound.isPlaying) {
                 this.skidSound.play()

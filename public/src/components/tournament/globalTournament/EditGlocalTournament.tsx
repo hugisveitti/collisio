@@ -1,11 +1,10 @@
 import Divider from "@mui/material/Divider";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { GlobalTournament } from "../../../classes/Tournament";
+import MyCheckbox from "../../inputs/checkbox/MyCheckbox";
+import MyDateInput from "../../inputs/date-input/MyDateInput";
+import MyTextField from "../../textField/MyTextField";
 
 interface IEditGlobalTournamentComponent {
   editTournament: GlobalTournament;
@@ -33,28 +32,25 @@ const EditGlobalTournamentComponent = (
   console.log("start string", startString);
   return (
     <React.Fragment>
-      <Grid item xs={12}>
-        <FormControlLabel
+      <Grid item xs={12} lg={3}>
+        <MyCheckbox
           label="Limit number of runs per player"
-          control={
-            <Checkbox
-              checked={useRunsPerPlayer}
-              onChange={() => {
-                setUseRunsPerPlayer(!useRunsPerPlayer);
-                if (!useRunsPerPlayer) {
-                  props.updateTournament("runsPerPlayer", 1);
-                } else {
-                  // will give bug
-                  props.updateTournament("runsPerPlayer", false);
-                }
-              }}
-            />
-          }
+          checked={useRunsPerPlayer}
+          onChange={() => {
+            setUseRunsPerPlayer(!useRunsPerPlayer);
+            if (!useRunsPerPlayer) {
+              props.updateTournament("runsPerPlayer", 1);
+            } else {
+              // will give bug
+              props.updateTournament("runsPerPlayer", false);
+            }
+          }}
         />
       </Grid>
+
       {useRunsPerPlayer && (
-        <Grid item xs={12}>
-          <TextField
+        <Grid item xs={12} lg={3}>
+          <MyTextField
             type="number"
             label="Runs per player"
             value={
@@ -69,6 +65,19 @@ const EditGlobalTournamentComponent = (
         </Grid>
       )}
 
+      <Grid item xs={12} lg={3}>
+        <MyCheckbox
+          label="Allow joining after game starts"
+          checked={props.editTournament.allowLateJoin}
+          onChange={() =>
+            props.updateTournament(
+              "allowLateJoin",
+              !props.editTournament.allowLateJoin
+            )
+          }
+        />
+      </Grid>
+
       <Grid item xs={12}>
         <Divider
           style={{
@@ -78,27 +87,19 @@ const EditGlobalTournamentComponent = (
           variant="middle"
         />
       </Grid>
-      <Grid item xs={12}>
-        <Typography>Tournament start</Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <input
-          type="datetime-local"
-          id="tournament-start-time"
-          name="tournament-start-time"
+
+      <Grid item xs={12} lg={6}>
+        <MyDateInput
+          label="Tournament start"
           value={startString}
-          onChange={(e) => {
-            console.log("change", e);
-            console.log("val", e.target.value);
-            const newStart = new Date(e.target.value);
-            console.log("new start", newStart);
+          onChange={(newStart) => {
             props.updateTournament("tournamentStart", newStart);
           }}
           min={nowString}
           max={endString}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={false}>
         <Divider
           style={{
             margin: "auto",
@@ -107,20 +108,12 @@ const EditGlobalTournamentComponent = (
           variant="middle"
         />
       </Grid>
-      <Grid item xs={12}>
-        <Typography>Tournament End</Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <input
-          type="datetime-local"
-          id="tournament-end-time"
-          name="tournament-end-time"
+
+      <Grid item xs={12} lg={5}>
+        <MyDateInput
+          label="Tournament End"
           value={endString}
-          onChange={(e) => {
-            console.log("change", e);
-            console.log("val", e.target.value);
-            const newEnd = new Date(e.target.value);
-            console.log("new end", newEnd);
+          onChange={(newEnd) => {
             props.updateTournament("tournamentEnd", newEnd);
           }}
           min={startString}

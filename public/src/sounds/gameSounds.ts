@@ -9,7 +9,6 @@ let engineBuffer: AudioBuffer
 
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
     return new Promise((resolve, reject) => {
-
         audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
             engineBuffer = buffer
             resolve(engineBuffer)

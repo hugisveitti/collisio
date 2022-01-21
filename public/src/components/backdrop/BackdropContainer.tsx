@@ -48,7 +48,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
       }
       changeCameraPosition(num);
       setCamPosNum(num);
-    } else if (props.store.previousPage === gameRoomPath) {
+    } else if (props.store?.previousPage === gameRoomPath) {
       // if comming from game then someone pressed back to waiting room
       setPressedStartGame(true);
     }

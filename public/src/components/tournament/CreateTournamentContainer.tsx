@@ -41,10 +41,12 @@ const CreateTournamentContainer = (props: ICreateTournamentContainer) => {
               <Typography variant="h3">Create a tournament</Typography>
             </Grid>
             <Grid item xs={12}>
-              <MyRadio
-                center
+              <MyRadio<string>
                 checked={tournamentType}
-                options={["local", "global"]}
+                options={[
+                  { value: "local", label: "Local" },
+                  { value: "global", label: "Global" },
+                ]}
                 label="Type of tournament"
                 onChange={(newType) => setTournamentType(newType)}
               />

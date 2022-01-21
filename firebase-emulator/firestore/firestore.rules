@@ -70,7 +70,7 @@ service cloud.firestore {
       match /players/{playerId} {
         allow read;
         allow write;
-      	allow create: if !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.hasStarted;
+      	allow create: if !get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.hasStarted || get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.allowLateJoin;
       	allow delete: if request.auth.uid == playerId || request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId;
         allow update: if 
         	request.auth.uid == get(/databases/$(database)/documents/tournaments/$(tournamentId)).data.leaderId

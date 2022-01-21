@@ -7,15 +7,18 @@ import {
 import React from "react";
 import "./radio.css";
 
-interface IMyRadio {
+interface IMyRadio<T extends string | boolean> {
   label: string;
-  options: string[];
-  checked: string;
-  onChange: (newVal: string) => void;
+  options: { label: string; value: T }[];
+  checked: T;
+  onChange: (newVal: T) => void;
   center?: boolean;
+  disabled?: boolean;
 }
 
-const MyRadio = (props: IMyRadio) => {
+const MyRadio: <T extends string | boolean>(
+  p: IMyRadio<T>
+) => React.ReactElement<IMyRadio<T>> = (props) => {
   return (
     <>
       <span
@@ -24,7 +27,7 @@ const MyRadio = (props: IMyRadio) => {
       >
         {props.label}
       </span>
-      <FormControl component="fieldset">
+      <FormControl component="fieldset" disabled={props.disabled}>
         <RadioGroup
           className="radio"
           row
@@ -34,15 +37,15 @@ const MyRadio = (props: IMyRadio) => {
           {props.options.map((option) => {
             return (
               <FormControlLabel
-                key={option}
-                value="local"
+                key={option.label}
+                value={option.value}
                 control={
                   <Radio
-                    onChange={() => props.onChange(option)}
-                    checked={props.checked === option}
+                    onChange={() => props.onChange(option.value)}
+                    checked={props.checked === option.value}
                   />
                 }
-                label="Local"
+                label={option.label}
               />
             );
           })}

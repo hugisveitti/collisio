@@ -1168,7 +1168,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
             await this.destroyVehicles()
 
-            this.stop()
+            await this.stop()
             resolve()
         })
     }
