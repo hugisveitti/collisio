@@ -1,5 +1,5 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Object3D, PointLight, MeshStandardMaterial } from "three";
+import { Object3D, PointLight, MeshStandardMaterial, Matrix3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { yellow2 } from "../providers/theme";
 import { Course } from "./Course";
@@ -58,7 +58,18 @@ export class CourseItemsLoader {
                     textures[0].matrixAutoUpdate = false
                     textures[1].matrixAutoUpdate = false
 
-                    waterObject.visible = false
+                    waterObject.visible = true
+                    textures[0].rotation = Math.PI / 2
+                    textures[1].rotation = Math.PI / 2
+                    textures[1].flipY = false
+                    textures[0].flipY = false
+                    const ma = new Matrix3()
+                    ma.set(1, 1, 1, 1, 1, 1, 1, 1, 1)
+                    textures[0].matrix = ma
+                    textures[0].updateMatrix()
+                    textures[1].matrix = ma
+                    textures[1].updateMatrix()
+                    console.log("water text", textures)
 
                     let size = Math.max(waterObject.scale.x * 2, waterObject.scale.z * 2)
                     size = Math.ceil(Math.log2(size))
@@ -75,8 +86,11 @@ export class CourseItemsLoader {
                         // width: waterObject.scale.x * 2,
                         // height: waterObject.scale.z * 2,
                         normalMap0: textures[0],
-                        normalMap1: textures[1]
+                        normalMap1: textures[1],
+
                     })
+
+                    //    this.course.gameScene.misc.textureCube(textures)
 
 
                 }).catch(err => {

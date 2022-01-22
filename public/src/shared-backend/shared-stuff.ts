@@ -25,6 +25,7 @@ export type TrackName =
     | "small-track"
     | "small-jump-track"
     | "spa-track"
+    | "nurn-track"
 
 export type VehicleType = "normal"
     | "tractor"

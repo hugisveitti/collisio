@@ -48,6 +48,9 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Farm track", type: "farm-track", gameType: "race"
     },
     {
+        name: "German track", type: "nurn-track", gameType: "race"
+    },
+    {
         name: "F1 track", type: "f1-track", gameType: "race"
     },
     {
@@ -69,7 +72,10 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Mountain track", type: "russia-track", gameType: "race"
     },
     {
-        name: "Snow track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
+    },
+    {
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
     },
     {
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
@@ -77,15 +83,13 @@ export const allTrackNames: ITrackInfo[] = [
     {
         name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
     },
+
     {
         name: "Small track", type: "small-track", gameType: "race"
     },
-    {
-        name: "Small jump track", type: "small-jump-track", gameType: "race"
-    },
-    {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
-    }
+    // {
+    //     name: "Small jump track", type: "small-jump-track", gameType: "race"
+    // },
 ]
 
 export const getTrackInfo = (trackName: TrackName) => {

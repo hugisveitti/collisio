@@ -367,8 +367,7 @@ export const vehicleConfigs = {
         maxSteeringAngle: 25,
         suspensionRestLength: .87,
         is4x4: false,
-        centerOfMassOffset: .75
-
+        centerOfMassOffset: 1
     },
     gokart: {
         ...defaultVehicleConfig,
