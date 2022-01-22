@@ -146,6 +146,7 @@ export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDay
 
 export const activeTrackNames: TrackName[] = [
     "farm-track",
+    "nurn-track",
     "sea-side-track",
     "simple-tag-course",
     "f1-track",
