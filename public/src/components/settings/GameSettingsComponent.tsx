@@ -1,14 +1,17 @@
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   defaultRaceTrack,
   defaultStoryTrack,
   defaultTagTrack,
+  getTrackNameFromType,
   nonActiveTrackNames,
   numberOfLapsPossibilities,
 } from "../../classes/Game";
@@ -17,11 +20,15 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
+import { getFastestGhostFilename } from "../../firebase/firebaseStorageFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { GameType } from "../../shared-backend/shared-stuff";
+import { DriveRecorder } from "../../test-courses/TestDriver";
 import { inTestMode } from "../../utils/settings";
+import BackdropButton from "../button/BackdropButton";
 import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import CollabsibleCard from "../inputs/CollapsibleCard";
+import InfoButton from "../inputs/info-button/InfoButton";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
 import MyRadio from "../radio/MyRadio";
@@ -41,10 +48,36 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
   const { color, backgroundColor } = getStyledColors("black");
 
-  const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
+  const [gettingGhost, setGettingGhost] = useState(false);
 
-  const updateGameSettings = (key: keyof IGameSettings, value: any) => {
+  const updateGameSettingsBatch = (
+    keys: (keyof IGameSettings)[],
+    values: any[]
+  ) => {
     const newGameSettings = { ...props.gameSettings };
+    for (let i = 0; i < keys.length; i++) {
+      // @ts-ignore
+      newGameSettings[keys[i]] = values[i];
+
+      setLocalGameSetting(keys[i], values[i]);
+    }
+
+    setGameSettings(newGameSettings);
+    props.onChange(newGameSettings);
+  };
+
+  const updateGameSettings = (
+    key: keyof IGameSettings,
+    value: any,
+    _gameSettings?: IGameSettings
+  ) => {
+    const newGameSettings = _gameSettings
+      ? {
+          ..._gameSettings,
+        }
+      : {
+          ...props.gameSettings,
+        };
     // @ts-ignore
     newGameSettings[key] = value;
 
@@ -62,6 +95,30 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
     setGameSettings(newGameSettings);
     props.onChange(newGameSettings);
+
+    if (
+      (key === "numberOfLaps" || key === "trackName") &&
+      gameSettings.useGhost
+    ) {
+      handleGetFastestGhost(newGameSettings);
+    }
+  };
+  const handleGetFastestGhost = (_gameSettings: IGameSettings) => {
+    getFastestGhostFilename(
+      _gameSettings.trackName,
+      _gameSettings.numberOfLaps
+    ).then((filename) => {
+      setGettingGhost(false);
+
+      console.log("got filename", filename);
+      if (!filename) {
+        toast.warn("No ghost found.");
+        updateGameSettings("ghostFilename", "", _gameSettings);
+      } else {
+        _gameSettings.ghostFilename = filename;
+        updateGameSettings("ghostFilename", filename, _gameSettings);
+      }
+    });
   };
 
   useEffect(() => {
@@ -215,17 +272,54 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               />
             </Grid>
 
-            {/* <Grid item xs={12}>
+            <Grid item xs={12}>
               <Collapse in={props.gameSettings.useGhost}>
-                <TextField
+                <MyTextField
                   value={props.gameSettings.ghostFilename}
                   label="Ghost filename"
+                  disabled={!!props.gameSettings.tournamentId}
                   onChange={(e) =>
                     updateGameSettings("ghostFilename", e.target.value)
                   }
+                  onBlur={() => {
+                    const { trackName, numberOfLaps } =
+                      DriveRecorder.GetTrackNameNumberOfLapsFromFilename(
+                        props.gameSettings.ghostFilename
+                      );
+                    console.log(
+                      "updating number of laps and track name",
+                      props.gameSettings.ghostFilename,
+                      trackName,
+                      numberOfLaps
+                    );
+                    if (trackName && numberOfLaps) {
+                      updateGameSettingsBatch(
+                        ["trackName", "numberOfLaps"],
+                        [trackName, numberOfLaps]
+                      );
+                      //   updateGameSettings("numberOfLaps", numberOfLaps, true);
+                    }
+                  }}
+                />
+                <br />
+                <BackdropButton
+                  onClick={async () => {
+                    // updateGameSettings("useGhost", true);
+                    setGettingGhost(true);
+                    handleGetFastestGhost(gameSettings);
+                  }}
+                  disabled={gettingGhost}
+                  loading={gettingGhost}
+                >
+                  Find quickest ghost
+                </BackdropButton>
+                <InfoButton
+                  infoText={`Click the button to play against the fastest player that recorded their try playing ${getTrackNameFromType(
+                    props.gameSettings.trackName
+                  )} for ${props.gameSettings.numberOfLaps} laps.`}
                 />
               </Collapse>
-            </Grid> */}
+            </Grid>
           </Grid>
         </CollabsibleCard>
       </Grid>

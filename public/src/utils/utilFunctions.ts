@@ -194,3 +194,28 @@ export const getSteerAngleFromBeta = (beta: number) => {
     }
     return angle
 }
+
+/**
+ * 
+ * @param q Quaterniton, Threejs
+ * @returns Yaw is rotation around the z axis. Pitch is the rotation around the y axis. Roll is the rotation around the x axis.
+ */
+export const getPitchRollYawFromQuaternion = (q: Quaternion) => {
+    // Z
+    let t3 = 2 * ((q.w * q.z) + (q.x * q.y))
+    let t4 = (1 - (2 * ((q.y * q.y) + (q.z + q.z))))
+    const yaw = Math.atan2(t3, t4)
+
+    // Y
+    let t2 = 2 * ((q.w * q.y) - (q.z * q.x))
+    t2 = t2 > 1 ? 1 : t2
+    t2 = t2 < -1 ? -1 : t2
+    const pitch = Math.asin(t2)
+
+    // Roll
+    let t0 = 2 * ((q.w * q.x) + (q.y * q.z))
+    let t1 = (1 - (2 * ((q.x * q.x) + (q.y * q.y))))
+    const roll = Math.atan2(t0, t1)
+
+    return { yaw, pitch, roll }
+}

@@ -137,9 +137,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
     props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       if (data.isAuthenticated) {
-        saveRaceData(data.playerId, data, (gameDataInfo) => {
-          props.store.socket.emit(mts_game_data_info, gameDataInfo);
-        });
+        saveRaceData(data.playerId, data).then(
+          ([setPersonalBest, gameDataInfo]) => {
+            props.store.socket.emit(mts_game_data_info, {
+              playerId: data.playerId,
+              gameDataInfo,
+              setPersonalBest,
+            });
+          }
+        );
       } else {
         toast.warning(
           "Your highscore won't be saved since you are not logged in."

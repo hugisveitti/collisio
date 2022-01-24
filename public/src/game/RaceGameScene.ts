@@ -87,7 +87,15 @@ export class RaceGameScene extends GameScene {
 
             this.ghostVehicle?.removeFromScene(this)
 
-            this.testDriver.loadTournamentInstructions(this.gameSceneConfig.tournament.id).then(async () => {
+            const { trackName, numberOfLaps } = DriveRecorder.GetTrackNameNumberOfLapsFromFilename(this.gameSettings.ghostFilename)
+
+            if (trackName !== this.getTrackName() || numberOfLaps !== this.getNumberOfLaps()) {
+                console.warn("Track name or number of laps of ghost don't match game settings, gamesettings::", this.gameSettings)
+                resolve()
+                return
+            }
+
+            this.testDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.gameSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
 
                 const vt = this.testDriver.getVehicleType()
                 if (vt) {
@@ -114,18 +122,20 @@ export class RaceGameScene extends GameScene {
 
             this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
             console.log("this config", this.gameSceneConfig)
-            if (this.gameSceneConfig?.tournament?.tournamentType === "global") {
+            if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
                 console.log("gamesettings", this.gameSettings)
                 if (this.gameSettings.useGhost) {
                     await this.createGhostVehicle()
                 }
                 console.log("creating drive recorder")
                 this.driverRecorder = new DriveRecorder({
-                    tournamentId: this.gameSceneConfig.tournament.id,
+                    tournamentId: this.gameSceneConfig?.tournament?.id,
                     active: true,
                     numberOfLaps: this.currentNumberOfLaps,
                     vehicleType: this.players[0].vehicleType,
-                    trackName: this.getTrackName()
+                    trackName: this.getTrackName(),
+                    playerId: this.players[0].id,
+                    playerName: this.players[0].playerName,
                 })
             }
             this.createViews()
@@ -361,14 +371,41 @@ export class RaceGameScene extends GameScene {
         // If player restarts game while inside the checkpoint it will register as a the checkpoint crossed in the new game
         if (!this.gameTimers[vehicleNumber].crossedCheckpoint(checkpointNumber) && this.gameStarted) {
 
-            this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
             this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
+            if (this.vehicles.length === 1) {
+
+                this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
+            } else {
+                const info = this.getCheckpointDiff(vehicleNumber, checkpointNumber)
+                this.setViewImportantInfo(`Checkpoint ${info}`, vehicleNumber, true)
+            }
 
             const { position, rotation } = this.course.getCheckpointPositionRotation(checkpointNumber)
 
 
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: position.x, y: position.y + 1, z: position.z }, rotation: rotation })
         }
+    }
+
+
+    // get difference betwee first and this
+    // if this is first just retun the current lap time
+    getCheckpointDiff(vehicleNumber: number, checkpointNumber: number): number {
+        let bestTime = Infinity
+        const lapNumber = this.gameTimers[vehicleNumber].getCurrentLapNumber()
+        for (let i = 0; i < this.gameTimers.length; i++) {
+            if (i !== vehicleNumber) {
+
+                const checkpTime = this.gameTimers[i].getCheckpointTime(checkpointNumber, lapNumber)
+                if (checkpTime) {
+                    bestTime = checkpTime
+                }
+            }
+        }
+
+        const currCheckpTime = this.gameTimers[vehicleNumber].getCheckpointTime(checkpointNumber, lapNumber)
+        if (!currCheckpTime || currCheckpTime < bestTime) return this.gameTimers[vehicleNumber].getCurrentLapTime()
+        return bestTime - currCheckpTime
     }
 
     sendScoreInfo() {
@@ -491,6 +528,10 @@ export class RaceGameScene extends GameScene {
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
+
+        }
+        if (this.gameSettings.record && this.driverRecorder) {
+            playerData.recordingFilename = this.driverRecorder.getRecordingFilename()
         }
 
         // need to do it this way because firestore cannot have undefined
@@ -502,7 +543,7 @@ export class RaceGameScene extends GameScene {
             this.gameRoomActions.playerFinished(playerData)
         }
 
-        if (i === 0 && this.driverRecorder) {
+        if (i === 0 && this.driverRecorder && this.gameSettings?.tournamentId) {
             this.driverRecorder.saveTournamentRecording(this.gameTimers[i].getTotalTime(), this.players[i].playerName, this.players[i].id,)
         }
 
@@ -546,6 +587,14 @@ export class RaceGameScene extends GameScene {
         // wa
         // if save then update gameId
         this.gameId = uuid()
+    }
+
+    saveDriveRecording(playerId: string): void {
+        console.log("saving player recording for playerid", this.gameSettings)
+        console.log("drive recorder", this.driverRecorder)
+        if (this.gameSettings.record && this.driverRecorder?.instructions) {
+            this.driverRecorder.saveRecordedInstructions()
+        }
     }
 }
 

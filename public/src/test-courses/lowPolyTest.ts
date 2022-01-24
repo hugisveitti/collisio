@@ -86,7 +86,7 @@ export class LowPolyTestScene extends GameScene {
     driverRecorder: DriveRecorder
 
     otherDrivers: TestDriver[]
-    ghostVechicle: IGhostVehicle
+    ghostVehicle: IGhostVehicle
 
     constructor() {
         super()
@@ -110,6 +110,8 @@ export class LowPolyTestScene extends GameScene {
 
 
         this.gameSettings = defaultGameSettings
+        this.gameSettings.ghostFilename = "ef74239e"
+        this.gameSettings.useGhost = true
 
         this.currentLaptime = 0
         this.timeStarted = 0
@@ -134,8 +136,8 @@ export class LowPolyTestScene extends GameScene {
         // in tag game
         this.isIt = 0
         this.testDriver = new TestDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
-        this.ghostVechicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
-        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps() })
+        this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
+        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test" })
 
     }
 
@@ -153,8 +155,10 @@ export class LowPolyTestScene extends GameScene {
 
         // this could do something for the jitter of the vehicle
         // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
-        //this.physics.config.maxSubSteps = 10
-        // this.physics.config.fixedTimeStep = 1 / 120
+        //  this.physics.config.maxSubSteps = 10
+        // downsides to this?
+        // The downside is that if we are under 60 fps then the game is slower 
+        //  this.physics.config.fixedTimeStep = 1 / 120
         // this.__config.fixedTimeStep =  1 / 120
 
         this.addLights()
@@ -233,6 +237,11 @@ export class LowPolyTestScene extends GameScene {
                     }
                 }
             }
+            this.renderer.clear()
+            this.renderer.info.autoReset = false
+            //  this.renderer.capabilities.precision = "lowp"
+            this.renderer.autoClear = false
+            this.renderer.shadowMap.autoUpdate = false
         })
 
         window.addEventListener("keydown", (e) => {
@@ -264,6 +273,33 @@ export class LowPolyTestScene extends GameScene {
         }
     }
 
+    async createGhostVehicle() {
+        return new Promise<void>((resolve, reject) => {
+
+            this.ghostVehicle?.removeFromScene(this)
+
+            this.testDriver.loadTournamentInstructions(this.gameSettings.ghostFilename).then(async () => {
+
+                const vt = this.testDriver.getVehicleType()
+                if (vt) {
+                    console.log("vt ", vt)
+                    this.ghostVehicle = new GhostVehicle({
+                        vehicleType: vt, color: "#10eedd"
+                    })
+                    await this.ghostVehicle.loadModel()
+                    this.ghostVehicle.addToScene(this)
+
+                } else {
+                    console.warn("no vt", vt)
+                }
+                resolve()
+            }).catch(() => {
+                console.log("No ghost since there is no recording")
+                resolve()
+            })
+        })
+    }
+
     async create() {
         return new Promise<void>(async (resolve, reject) => {
 
@@ -284,6 +320,7 @@ export class LowPolyTestScene extends GameScene {
                 this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
             }
 
+
             this.courseLoaded = true
             await this.createOtherVehicles()
             await this.createTestVehicle()
@@ -291,6 +328,7 @@ export class LowPolyTestScene extends GameScene {
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
             this.vehicles = allVehicles
+            await this.createGhostVehicle()
 
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {
@@ -325,9 +363,9 @@ export class LowPolyTestScene extends GameScene {
             this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
 
 
-            await this.ghostVechicle.loadModel()
+            await this.ghostVehicle.loadModel()
 
-            this.ghostVechicle.addToScene(this)
+            this.ghostVehicle.addToScene(this)
 
 
             console.log("camera", this.camera)
@@ -525,14 +563,18 @@ export class LowPolyTestScene extends GameScene {
     _upd(delta: number) {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
+            this.camera.updateProjectionMatrix()
         }
+        this.renderer.info.reset()
+        this.renderer.clear()
+        this.renderer.shadowMap.needsUpdate = true
         this.renderer.render(this.scene, this.camera)
     }
 
     _updateChild(time: number, delta: number) {
         //      this.physics.physicsWorld.stepSimulation(1)
 
-        if (this.canStartUpdate && this.everythingReady() && this.ghostVechicle.isReady) {
+        if (this.canStartUpdate && this.everythingReady() && this.ghostVehicle.isReady) {
 
 
             if (this.vehicle) {
@@ -540,9 +582,7 @@ export class LowPolyTestScene extends GameScene {
                 this.mobileControls = this.driveVehicle?.()
                 this.driverRecorder.record(this.vehicle, time)
 
-                if (playRecording) {
-                    this.testDriver.setPlace(this.ghostVechicle, time, delta)
-                }
+
 
                 //    this.vehicle.intelligentDrive(true)
                 this.updateFps(time)
@@ -571,6 +611,9 @@ export class LowPolyTestScene extends GameScene {
 
 
             if (this.raceStarted) {
+
+                this.testDriver.setPlace(this.ghostVehicle, this.gameTime.getTotalTime(), delta)
+
                 lapTimeDiv.textContent = this.gameTime.getCurrentLapTime() + ""
                 bestLapTimeDiv.textContent = this.gameTime.getBestLapTime() + ""
             }

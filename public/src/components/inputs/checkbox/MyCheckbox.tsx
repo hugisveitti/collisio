@@ -13,7 +13,19 @@ const MyCheckbox = (props: IMyCheckbox) => {
   return (
     <FormControlLabel
       label={props.label}
-      control={<Checkbox checked={props.checked} onChange={props.onChange} />}
+      control={
+        // <input
+        //   type="checkbox"
+        //   checked={props.checked}
+        //   onChange={props.onChange}
+        //   className="checkbox__input"
+        // />
+        <Checkbox
+          checked={props.checked}
+          value={props.checked}
+          onChange={props.onChange}
+        />
+      }
     />
   );
 };

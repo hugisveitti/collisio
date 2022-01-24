@@ -15,12 +15,10 @@ const ConnectToWaitingRoomContainer = (
   props: IConnectToWaitingRoomContainer
 ) => {
   const onMobile = getDeviceType() !== "desktop";
-  console.log("Store in connect to wait room", props.store);
   const history = useHistory();
 
   useEffect(() => {
     if (props.store.previousPage === waitingRoomPath) {
-      console.log("go bacl");
       history.goBack();
     } else {
       props.store.setPreviousPage(connectPagePath);

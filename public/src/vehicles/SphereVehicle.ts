@@ -305,9 +305,10 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     setRotation(x: number | Quaternion, y?: number, z?: number): void {
         this.scene.physics.destroy(this.vehicleBody)
         if (x instanceof Quaternion) {
-            this.euler.setFromQuaternion(x)
+            const xNorm = x.normalize()
+            this.euler.setFromQuaternion(x.normalize())
             this.yRot = this.euler.y
-            this.vehicleBody.setRotationFromQuaternion(x)
+            this.vehicleBody.quaternion.set(x.x, x.y, x.z, x.w) //.setRotationFromQuaternion(x)
         } else {
             this.yRot = y
             this.vehicleBody.rotation.set(x, y, z)

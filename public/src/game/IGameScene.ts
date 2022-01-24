@@ -2,7 +2,7 @@
 import { Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
-import { IGameSettings } from "../classes/localGameSettings";
+import { GraphicsType, IGameSettings } from "../classes/localGameSettings";
 import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
@@ -44,6 +44,8 @@ export interface IGameScene extends Scene3D {
     setNeedsReload: (needsReload: boolean) => void
     destroyGame: () => Promise<void>
     setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
+    getGraphicsType: () => GraphicsType
+    saveDriveRecording: (playerId: string) => void
 
     course: ICourse
     gameSceneConfig: IGameSceneConfig

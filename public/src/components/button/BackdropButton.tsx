@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router";
 import { createClassNames } from "../../utils/utilFunctions";
@@ -13,6 +14,7 @@ interface IBackdropButton {
   color?: "white" | "black";
   center?: boolean;
   width?: number;
+  loading?: boolean;
 }
 
 const BackdropButton = (props: IBackdropButton) => {
@@ -40,8 +42,16 @@ const BackdropButton = (props: IBackdropButton) => {
         width: props.width,
       }}
     >
-      {props.startIcon && <span className="btn__icon">{props.startIcon}</span>}
-      <span>{props.children}</span>
+      {props.loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          {props.startIcon && (
+            <span className="btn__icon">{props.startIcon}</span>
+          )}
+          <span>{props.children}</span>
+        </>
+      )}
     </div>
   );
 };

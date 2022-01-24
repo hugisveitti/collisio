@@ -113,7 +113,7 @@ export const defaultVehicleConfig: IVehicleConfig = {
     maxSuspensionForce: 50000,
     frictionSlip: 8.5,
     rollInfluence: .01,
-    inertia: { x: 4000, y: 2000, z: 4000 },
+    inertia: { x: 3000, y: 2000, z: 1000 },
 
     maxSpeed: 300,
     towPosition: new Vector3(0, -.5, -4),
@@ -243,7 +243,7 @@ export const vehicleConfigs = {
         engineForce: 9000,
         breakingForce: 400,
         is4x4: true,
-        inertia: { x: 3000, y: 2000, z: 3000 },
+
         suspensionRestLength: 1.6 - .5,
         frictionSlip: 27.5,
         maxSuspensionTravelCm: 100,
@@ -284,7 +284,7 @@ export const vehicleConfigs = {
         suspensionStiffness: 50,
         //  suspensionDamping: // 12,
 
-        inertia: { x: 3000, y: 5000, z: 4000 },
+        //  inertia: { x: 3000, y: 5000, z: 4000 },
         towPosition: new Vector3(0, -.5, -4),
         path: "sports-car.glb",
 
@@ -362,12 +362,12 @@ export const vehicleConfigs = {
 
 
         mass: 300,
-        engineForce: 9000,
+        engineForce: 8500,
         breakingForce: 200,
         maxSteeringAngle: 25,
         suspensionRestLength: .87,
         is4x4: false,
-        centerOfMassOffset: 1
+        centerOfMassOffset: .75
     },
     gokart: {
         ...defaultVehicleConfig,

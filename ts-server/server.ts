@@ -26,7 +26,7 @@ const printMemoryInfo = () => {
 
     si.mem()
         .then(data => {
-            console.log("#### Memory Info #####")
+            console.log("#### Memory Info #####", new Date().toISOString())
             console.log("Total", byteToGig(data.total).toFixed(2), ", Free:", byteToGig(data.free).toFixed(2))
             console.log("##### END Memory INFO #####")
         })

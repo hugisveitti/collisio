@@ -31,7 +31,6 @@ const HighscoreTable = (props: IHighscoreTable) => {
             <TableCell />
 
             <TableCell component="th">Player name</TableCell>
-
             <TableCell component="th">Total time</TableCell>
             <TableCell component="th">Best lap time</TableCell>
             {props.includeTrackAndNumLaps && (
@@ -41,6 +40,7 @@ const HighscoreTable = (props: IHighscoreTable) => {
               </>
             )}
             <TableCell>Vehicle type</TableCell>
+            <TableCell>Ghost</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

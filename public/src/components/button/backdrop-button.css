@@ -31,9 +31,9 @@
 }
 
 .disabled {
-  background: rgba(85, 85, 85, 0.82);
-  box-shadow: 1px 1px rgba(119, 118, 118, 0.82);
-  color: #ccc;
+  background: #ccc !important;
+  box-shadow: none;
+  color: #999 !important;
 }
 
 .btn__icon {

@@ -7,6 +7,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 interface ICopyTextButton {
   infoText: string;
   copyText: string;
+  onClick?: () => void;
 }
 
 const CopyTextButton = (props: ICopyTextButton) => {
@@ -14,9 +15,9 @@ const CopyTextButton = (props: ICopyTextButton) => {
 
   return (
     <>
-      <Typography component="span">{props.infoText}</Typography>{" "}
+      <Typography>{props.infoText}</Typography>{" "}
       <Tooltip
-        title="Link copied!"
+        title="Copied!"
         arrow
         placement="top"
         open={copyTooltipOpen}
@@ -24,6 +25,7 @@ const CopyTextButton = (props: ICopyTextButton) => {
         disableHoverListener
         disableTouchListener
         onClose={() => setCopyTooltipOpen(false)}
+        onClick={props.onClick}
       >
         <IconButton
           style={{ color: "white" }}

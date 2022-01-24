@@ -86,7 +86,6 @@ export const changeCameraPosition = (posNum: number) => {
 }
 
 const setPosXZ = () => {
-    console.log("cam", camera)
     posX = camera.position.x
     posZ = camera.position.z
     posY = camera.position.y

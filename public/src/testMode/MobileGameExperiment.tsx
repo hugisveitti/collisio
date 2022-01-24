@@ -105,11 +105,13 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
     console.log("player finished", data);
     if (data.isAuthenticated) {
-      saveBestRaceData(data.playerId, data, (gameInfo) => {
-        setGameDataInfo(gameInfo);
-        console.log("game info", gameInfo);
-        setEndOfGameModalOpen(true);
-      });
+      saveBestRaceData(data.playerId, data).then(
+        ([setPersonalBest, gameInfo]) => {
+          setGameDataInfo(gameInfo);
+          console.log("game info", gameInfo);
+          setEndOfGameModalOpen(true);
+        }
+      );
     }
   };
 

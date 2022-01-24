@@ -243,6 +243,7 @@ export interface IEndOfRaceInfoPlayer {
     totalPingsGotten: number
     avgFps: number
     tournamentId?: string
+    recordingFilename?: string
 }
 
 export interface IPlayerGameInfo {

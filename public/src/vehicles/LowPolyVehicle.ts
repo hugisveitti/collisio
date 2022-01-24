@@ -584,28 +584,38 @@ export class LowPolyVehicle extends Vehicle {
 
 
         } else if (this.useChaseCamera) {
-            // this.tm = this.vehicle.getChassisWorldTransform()
-            // this.p = this.tm.getOrigin()
-            // this.q = this.tm.getRotation()
 
-            const rot = this.vehicleBody.rotation // this.euler.setFromQuaternion(new Quaternion(this.q.x(), this.q.y(), this.q.z(), this.q.w())) //  this.vehicleBody.rotation
-            //  const rot = this.vehicleBody.rotation
+
+            const rot = this.vehicleBody.rotation
+
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
 
-            const pos = this.vehicleBody.position// this.getPosition() //this.vehicleBody.position //this.getPosition() // vec
+            const pos = this.vehicleBody.position
 
             const chaseSpeedY = 0.5
 
 
-            // this.oldPos = pos.clone()
+
+            const q = this.vehicleBody.quaternion
+
+            const alpha = 2 * Math.asin(q.y)
+
+            const a = 2 * Math.acos(q.w)
+
+
+            this.cameraTarget.set(
+                pos.x + ((Math.sin(alpha) * this.staticCameraPos.z) * Math.sign(q.w)),
+                pos.y + this.staticCameraPos.y,
+                pos.z + ((Math.cos(alpha) * this.staticCameraPos.z))
+            )
 
             // this is for the follow camera effect
-            this.cameraTarget.set(
-                pos.x - ((Math.sin(rot.y) * -this.staticCameraPos.z)),
-                pos.y + this.staticCameraPos.y,
-                pos.z - ((Math.cos(rot.y) * -this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            )
+            // this.cameraTarget.set(
+            //     pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
+            //     pos.y + this.staticCameraPos.y,
+            //     pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+            // )
 
             this.cameraDiff.subVectors(this.cameraTarget, camera.position)
 
@@ -644,21 +654,29 @@ export class LowPolyVehicle extends Vehicle {
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
-            this.seeVehicle(this.cameraDir.clone())
-            //    camera.updateProjectionMatrix()
-        } else {
-            camera.lookAt(this.vehicleBody.position.clone())
 
-            // const pos = this.vehicleBody.position
-            // const rot = this.vehicleBody.rotation
-            // this.cameraTarget.set(
-            //     pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
-            //     pos.y + this.staticCameraPos.y,
-            //     pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            // )
-            // camera.lookAt(this.getPosition().clone())
-            // this.seeVehicle(this.cameraTarget)
-            //     camera.updateProjectionMatrix()
+            if (this.scene.getGraphicsType() === "high") {
+
+                this.seeVehicle(this.cameraDir.clone())
+            }
+
+        } else {
+            if (this.scene.getGraphicsType() !== "high") {
+                camera.lookAt(this.vehicleBody.position.clone())
+            } else {
+
+
+                const pos = this.vehicleBody.position
+                const rot = this.vehicleBody.rotation
+
+                this.cameraTarget.set(
+                    pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
+                    pos.y + this.staticCameraPos.y,
+                    pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+                )
+                camera.lookAt(this.getPosition().clone())
+                this.seeVehicle(this.cameraTarget)
+            }
         }
     };
 
@@ -667,6 +685,7 @@ export class LowPolyVehicle extends Vehicle {
      * @param cameraPos position of camera relative to the world
      */
     seeVehicle(cameraPos: Vector3) {
+
         this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
     }
 
@@ -773,6 +792,7 @@ export class LowPolyVehicle extends Vehicle {
         const mps = (this.getCurrentSpeedKmHour()) / 3.6
         const expDist = mps * (delta / 1000)
 
+
         if (Math.abs(expDist - dist) > .3 && Math.abs(expDist - dist) < 2) {
             //const expDX = Math.sin(e.y) * expDist
             const diff = (dist - expDist)
@@ -824,6 +844,7 @@ export class LowPolyVehicle extends Vehicle {
 
 
     update(delta: number) {
+        if (!this.isReady) return
         this.delta = delta
         const usingJitter = false //this.useChaseCamera && this.detectJitter(delta)
         //    console.log("ussing jitter", usingJitter)
@@ -880,8 +901,13 @@ export class LowPolyVehicle extends Vehicle {
         if (!this.isPaused && this.isReady) {
 
 
-            this.checkIfSpinning()
-            this.vehicleAssist(false)
+            // have these calls optional, since they are quite heavy for the machine, or maybe only perform every other tick?
+            // only use vehicle assist if more than 30 fps
+            if (delta < 33.5) {
+
+                this.checkIfSpinning()
+                this.vehicleAssist(true)
+            }
             this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 
             this.updateEngineSound()

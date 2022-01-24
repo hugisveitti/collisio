@@ -15,6 +15,7 @@ const allGamesRefPath = "allGames"
 interface IBestTime {
     playerId: string
     totalTime: number | undefined
+    recordingFilename?: string
 }
 
 type IBestTimeD = { [userId: string]: IBestTime }
@@ -44,65 +45,86 @@ export const getPlayerBestScoreOnTrackAndLap = async (playerId: string, trackNam
 
 }
 
-export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer, callback: (_gameDataInfo: string[]) => void) => {
+/**
+ * 
+ * @param playerId 
+ * @param data to save
+ * @returns a Promise: with a [boolean, string[]]
+ *      if boolean is true then the player set a PB
+ *      A list of strings which contains info about the run.
+ */
+export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer): Promise<[boolean, string[]]> => {
+    return new Promise<[boolean, string[]]>((resolve, reject) => {
 
-    const gameDataInfo: string[] = []
-    getPlayerBestScoreOnTrackAndLap(playerId, data.trackName, data.numberOfLaps, (pb) => {
-        const highscoresRef = doc(firestore, bestHighscoresRefPath, `${playerId}#${data.trackName}#${data.numberOfLaps}`)
+        let setPersonalBest = false
+        const gameDataInfo: string[] = []
+        getPlayerBestScoreOnTrackAndLap(playerId, data.trackName, data.numberOfLaps, (pb) => {
+            const highscoresRef = doc(firestore, bestHighscoresRefPath, `${playerId}#${data.trackName}#${data.numberOfLaps}`)
 
-        const overwriteData = () => {
+            const overwriteData = () => {
+                setDoc(highscoresRef, data).then(() => {
+                }).catch(e => {
+                    console.warn("Error saving best score", e)
+                    reject()
+                })
 
-            setDoc(highscoresRef, data).then(() => {
+            }
 
-            }).catch(e => {
-                console.warn("Error saving best score", e)
-            })
+            if (data.totalTime < pb?.totalTime) {
+                setPersonalBest = true
+                overwriteData()
+                gameDataInfo.push(
+                    `${data.playerName} set a personal best time.`
+                )
 
-        }
-
-        if (data.totalTime < pb?.totalTime) {
-
-            overwriteData()
-            gameDataInfo.push(
-                `${data.playerName} set a personal best time.`
-            )
-
-        } else if (pb?.totalTime) {
-
-            gameDataInfo.push(`${data.playerName} was ${(data.totalTime - pb.totalTime).toFixed(2)} sec from setting a PB.`)
-        } else {
-            overwriteData()
-
-            gameDataInfo.push(`${data.playerName} raced this track and number-of-laps combination for the first time.`)
-        }
-        callback(gameDataInfo)
+            } else if (pb?.totalTime) {
+                gameDataInfo.push(`${data.playerName} was ${(data.totalTime - pb.totalTime).toFixed(2)} sec from setting a PB.`)
+            } else {
+                overwriteData()
+                setPersonalBest = true
+                gameDataInfo.push(`${data.playerName} raced this track and number-of-laps combination for the first time.`)
+            }
+            resolve([setPersonalBest, gameDataInfo])
+        })
     })
 }
 
+
 const getAllHighscoreKey = (playerId: string, gameId: string) => `${playerId}#${gameId}`
 
-export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer, callback: (gameDataInfo: string[]) => void) => {
-    saveTournamentRaceDataPlayer(data)
+/**
+ * 
+ * @param playerId 
+ * @param data to save
+ * @returns a Promise: with a [boolean, string[]]
+ *      if boolean is true then the player set a PB
+ *      A list of strings which contains info about the run.
+ */
+export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer): Promise<[boolean, string[]]> => {
 
-    let gameDataInfo: string[] = []
-    // const highscoresRef = doc(firestore, highscoresRefPath, playerId, allHighscoresRefPath, data.gameId)
-    // const highscoresRef = doc(firestore, highscoresRefPath, allHighscoresRefPath, playerId, data.gameId)
-    const highscoresRef = doc(firestore, allHighscoresRefPath, getAllHighscoreKey(playerId, data.gameId))
 
-    setDoc(highscoresRef, data).then(() => {
+    return new Promise<[boolean, string[]]>(async (resolve, reject) => {
 
-    }).catch(e => {
-        console.warn("error saving race", e)
-    })
+        saveTournamentRaceDataPlayer(data)
 
-    getBestScoresOnTrackAndLap(data.trackName, data.numberOfLaps, 3, (bestScores) => {
+        let gameDataInfo: string[] = []
+        // const highscoresRef = doc(firestore, highscoresRefPath, playerId, allHighscoresRefPath, data.gameId)
+        // const highscoresRef = doc(firestore, highscoresRefPath, allHighscoresRefPath, playerId, data.gameId)
+        const highscoresRef = doc(firestore, allHighscoresRefPath, getAllHighscoreKey(playerId, data.gameId))
+
+        setDoc(highscoresRef, data).then(() => {
+
+        }).catch(e => {
+            console.warn("error saving race", e)
+        })
+
+        const bestScores = await getBestScoresOnTrackAndLap(data.trackName, data.numberOfLaps, 3)
 
         if (bestScores && bestScores.length > 0) {
             let place = -1
             for (let i = 0; i < bestScores.length; i++) {
                 if (data.totalTime < bestScores[i].totalTime) {
                     place = i + 1
-
                     break
                 }
             }
@@ -115,40 +137,48 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer,
         } else {
             gameDataInfo.push(`${data.playerName} set a all time best record!`)
         }
-        saveBestRaceData(playerId, data, (_gameInfo) => {
+        saveBestRaceData(playerId, data).then(([setPersonalBest, _gameInfo]) => {
             gameDataInfo = gameDataInfo.concat(_gameInfo)
-            callback(gameDataInfo)
-
+            console.log("Set personal best", setPersonalBest)
+            resolve([setPersonalBest, gameDataInfo])
+        }).catch((err) => {
+            console.warn("Error saving data", err)
+            reject()
         })
     })
+
 }
 
 /**
- * unique to each player
- * stored on highscores/userId/bestHighscoresRefPath
- */
-export const getBestScoresOnTrackAndLap = async (trackName: TrackName, numberOfLaps: number, limitToN: number | undefined, callback: (data: IBestTime[] | undefined) => void) => {
-    const highscoresRef = collection(firestore, bestHighscoresRefPath)
-    let q = query(highscoresRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"))
-    if (limitToN) {
-        q = query(q, limit(limitToN))
-    }
-    const data = await getDocs(q)
+* unique to each player
+* stored on highscores/userId/bestHighscoresRefPath
+*/
+export const getBestScoresOnTrackAndLap = async (trackName: TrackName, numberOfLaps: number, limitToN: number | undefined): Promise<IBestTime[] | undefined> => {
+    return new Promise<IBestTime[] | undefined>(async (resolve, reject) => {
 
-    if (data.empty) {
+        const highscoresRef = collection(firestore, bestHighscoresRefPath)
+        let q = query(highscoresRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"))
+        if (limitToN) {
+            q = query(q, limit(limitToN))
+        }
+        const data = await getDocs(q)
 
-        callback(undefined)
-    } else {
-        const arr: IBestTime[] = []
-        data.forEach(doc => {
-            const item = doc.data() as IEndOfRaceInfoPlayer
-            arr.push({
-                playerId: item.playerId,
-                totalTime: item.totalTime
+        if (data.empty) {
+
+            resolve(undefined)
+        } else {
+            const arr: IBestTime[] = []
+            data.forEach(doc => {
+                const item = doc.data() as IEndOfRaceInfoPlayer
+                arr.push({
+                    playerId: item.playerId,
+                    totalTime: item.totalTime,
+                    recordingFilename: item.recordingFilename
+                })
             })
-        })
-        callback(arr)
-    }
+            resolve(arr)
+        }
+    })
 }
 
 export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame, callback: (res: TournamentFinishedResponse) => void, activeBracketNode?: IFlattendBracketNode) => {

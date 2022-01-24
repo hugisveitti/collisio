@@ -18,6 +18,8 @@ export class GameTime {
     lapTimes: number[]
     totalTime: number
     hasSendRaceData: boolean
+    // for each checkpoint there are lap times
+    checkpointTimes: number[][]
 
     constructor(totalNumberOfLaps: number, numberOfCheckpoints: number) {
         this.totalNumberOfLaps = totalNumberOfLaps
@@ -27,8 +29,10 @@ export class GameTime {
         this.isPaused = true
         this.currentLapTime = 0
         this.isCheckpointCrossed = []
+        this.checkpointTimes = []
         for (let i = 0; i < numberOfCheckpoints; i++) {
             this.isCheckpointCrossed.push(false)
+            this.checkpointTimes.push([])
         }
         this.lapTimes = []
         this.totalTime = 0
@@ -75,7 +79,6 @@ export class GameTime {
     }
 
     allCheckpointsCrossed() {
-
         for (let p of this.isCheckpointCrossed) {
             if (!p) return false
         }
@@ -88,10 +91,35 @@ export class GameTime {
     }
 
     checkpointCrossed(checkpointNumber: number) {
+
+        console.log("checkpointNumber", checkpointNumber)
+        if (!this.isCheckpointCrossed[checkpointNumber - 1]) {
+            this.checkpointTimes[checkpointNumber - 1].push(this.getTotalTime())
+        }
         /**
          * checkpoints indexed at 1 in blender
          */
         this.isCheckpointCrossed[checkpointNumber - 1] = true
+    }
+
+    /**
+     * 
+     * @param checkpointNumber 
+     * @param lapNumber 
+     * @returns undefined if hasn't crossed the checkpoint that lap number 
+     */
+    getCheckpointTime(checkpointNumber: number, _lapNumber: number): number | undefined {
+        const lapNumberIndex = _lapNumber - 1
+        const checkpointIndex = checkpointNumber - 1
+        console.log("checkpoint times", this.checkpointTimes)
+        if (this.checkpointTimes.length > checkpointIndex && this.checkpointTimes[checkpointIndex].length > lapNumberIndex) {
+            return this.checkpointTimes[checkpointIndex][lapNumberIndex]
+        }
+        return undefined
+    }
+
+    getCurrentLapNumber() {
+        return this.lapNumber
     }
 
     crossedCheckpoint(checkpointNumber: number) {

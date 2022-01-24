@@ -1,9 +1,19 @@
-# Three.js & ammo.js
+# Client side of Collisio
 
-## Simple example of Three.js with ammo.js
+## Uses Three.js and ammo.js with enable3d
 
----
+```
+npm install
+```
 
-Run `npm install enable3d`
+```
+npm run start
+```
 
-Run `npm install` and `npm start`
+Or to test vehicle
+
+```
+npm run testMode
+```
+
+Rembember to start firebase emulator

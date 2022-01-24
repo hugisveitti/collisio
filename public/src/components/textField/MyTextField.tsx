@@ -8,6 +8,9 @@ interface IMyTextField {
   onChange: (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
+  onBlur?: (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => void;
   value: string | number;
   fullWidth?: boolean;
   disabled?: boolean;
@@ -36,11 +39,12 @@ const MyTextField = (props: IMyTextField) => {
           backgroundColor,
         }}
         autoComplete="false"
-        value={props.value}
+        value={props.value ?? ""}
         onChange={props.onChange}
         disabled={props.disabled}
         fullWidth={props.fullWidth}
         placeholder={props.label}
+        onBlur={props.onBlur}
       />
     </React.Fragment>
   );

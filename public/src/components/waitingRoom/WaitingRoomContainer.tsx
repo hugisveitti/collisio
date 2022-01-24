@@ -46,6 +46,7 @@ import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import LoginComponent from "../LoginComponent";
 import {
   frontPagePath,
@@ -183,7 +184,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
       setDisplayNameModalOpen(false);
     }
-  }, [user]);
+  }, [user, props.store.socket]);
 
   useEffect(() => {
     // TODO: create a function that verifies gameSettings
@@ -322,6 +323,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     if (userLoading) return null;
     return (
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <ToFrontPageButton color="white" />
+        </Grid>
         <Grid item xs={12}>
           <Typography>
             You are not logged in, please type in your name or log in.

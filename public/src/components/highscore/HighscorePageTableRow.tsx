@@ -9,6 +9,10 @@ import { getTrackNameFromType, IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import { getUserPagePath } from "../Routes";
 import { getDateFromNumber } from "../../utils/utilFunctions";
+import BackdropButton from "../button/BackdropButton";
+import CopyTextButton from "../inputs/CopyTextButton";
+import { IStore } from "../store";
+import { setLocalGameSetting } from "../../classes/localGameSettings";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
@@ -56,6 +60,23 @@ export default (props: IProps) => {
         )}
         <TableCell>
           {getVehicleNameFromType(playerData.vehicleType) ?? "-"}
+        </TableCell>
+        <TableCell>
+          {playerData.recordingFilename ? (
+            <CopyTextButton
+              infoText="Copy ghost filename"
+              copyText={playerData.recordingFilename}
+              onClick={() => {
+                setLocalGameSetting("useGhost", true);
+                setLocalGameSetting(
+                  "ghostFilename",
+                  playerData.recordingFilename
+                );
+              }}
+            />
+          ) : (
+            "No ghost"
+          )}
         </TableCell>
       </TableRow>
       <TableRow>

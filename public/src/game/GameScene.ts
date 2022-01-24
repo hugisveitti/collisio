@@ -5,7 +5,7 @@ import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLig
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../classes/Game";
-import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
+import { defaultGameSettings, GraphicsType, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
@@ -344,6 +344,9 @@ export class GameScene extends Scene3D implements IGameScene {
         await this.preload()
         await this.create()
 
+        // this.physics.config.maxSubSteps = 4
+        // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
+
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -380,7 +383,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
             else {
                 // am already rendering in updateVehicles
-                //  this.renderer.render(this.scene, this.camera)
+                //    this.renderer.render(this.scene, this.camera)
             }
             this.postRender()
         } else {
@@ -505,6 +508,10 @@ export class GameScene extends Scene3D implements IGameScene {
 
     getTrackName() {
         return this.gameSceneConfig?.tournament?.trackName ?? this.gameSettings.trackName
+    }
+
+    getGraphicsType() {
+        return this.gameSettings.graphics
     }
 
     setPixelRatio() {
@@ -887,6 +894,10 @@ export class GameScene extends Scene3D implements IGameScene {
         return true
     }
 
+    saveDriveRecording(playerId: string) {
+        console.warn("Save drive recording not implemented")
+    }
+
 
     setGameRoomActions(gameRoomActions: IGameRoomActions) {
         this.gameRoomActions = gameRoomActions
@@ -1219,7 +1230,7 @@ export class GameScene extends Scene3D implements IGameScene {
             if (this.gameStarted) {
                 //     this.checkVehicleOutOfBounds(i)
 
-                //     this.viewsKmhInfo[i].textContent = `${Math.ceil(this.vehicles[i].getCurrentSpeedKmHour(delta)).toFixed(0)} km/h`
+                this.viewsKmhInfo[i].textContent = `${Math.ceil(this.vehicles[i].getCurrentSpeedKmHour(delta)).toFixed(0)} km/h`
             }
         }
     }
@@ -1267,6 +1278,7 @@ export class GameScene extends Scene3D implements IGameScene {
             await this.destroyVehicles()
 
             await this.stop()
+
             resolve()
         })
     }

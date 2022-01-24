@@ -1,5 +1,7 @@
 import { getBlob, ref, uploadBytes } from "@firebase/storage"
+import { TrackName } from "../shared-backend/shared-stuff"
 import { storage } from "./firebaseInit"
+import { getBestScoresOnTrackAndLap } from "./firestoreGameFunctions"
 import { getTorunamentBestTime, setTorunamentBestTime } from "./firestoreTournamentFunctions"
 
 const ghostRef = "ghost"
@@ -75,5 +77,29 @@ export const getTournamentGhost = async (tournamentId: string) => {
             console.warn("error getting tournament ghost", err)
             reject(err)
         })
+    })
+}
+
+/**
+ * 
+ * @param trackName 
+ * @param numberOfLaps 
+ * @returns we only look in the top 3 for the ghost recording
+ */
+export const getFastestGhostFilename = (trackName: TrackName, numberOfLaps: number): Promise<string | undefined> => {
+    return new Promise<string | undefined>(async (resolve, reject) => {
+        const bestScores = await getBestScoresOnTrackAndLap(trackName, numberOfLaps, 3)
+        console.log("best scores", bestScores)
+        if (!bestScores) {
+            resolve(undefined)
+            return
+        }
+        for (let score of bestScores) {
+            if (score.recordingFilename) {
+                resolve(score.recordingFilename)
+                return
+            }
+        }
+        resolve(undefined)
     })
 }

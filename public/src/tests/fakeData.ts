@@ -117,7 +117,7 @@ export const createFakeHighscoreData = () => {
         })
 
         //  saveRaceData(playerData[1].playerId, playerData[1])
-        saveRaceData(playerData[0].playerId, playerData[0], (info) => console.log("info about race", info))
+        saveRaceData(playerData[0].playerId, playerData[0]).then(([setPersonalBest, gameDataInfo]) => console.log("info about race", gameDataInfo))
     }
 }
 

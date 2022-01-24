@@ -39,6 +39,7 @@ interface IGameRoom {
 }
 
 let currentRaceInfo = [];
+let gameObject: IGameScene | undefined;
 
 const GameRoom = React.memo((props: IGameRoom) => {
   // this breaks iphone
@@ -46,7 +47,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
   //   window.location.href = frontPagePath;
   // }
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [gameObject, setGameObject] = useState(undefined as IGameScene);
+  // const [gameObject, setGameObject] = useState(undefined as IGameScene);
   const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
   const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
   const [scoreInfo, setScoreInfo] = useState({} as IScoreInfo);
@@ -138,8 +139,9 @@ const GameRoom = React.memo((props: IGameRoom) => {
         props.store.socket,
         props.store.gameSettings,
         handleEscPressed,
-        (gameObject) => {
-          setGameObject(gameObject);
+        (_gameObject) => {
+          //    setGameObject(gameObject);
+          gameObject = _gameObject;
         }
       );
     }
@@ -170,17 +172,35 @@ const GameRoom = React.memo((props: IGameRoom) => {
         tournament: props.store.tournament,
       },
       (_gameObject) => {
-        setGameObject(_gameObject);
+        // setGameObject(_gameObject);
+        gameObject = _gameObject;
+        gameObjectCreated();
       }
     );
 
-    props.store.socket.on(std_game_data_info, (data: string[]) => {
-      console.log("old game data info", gameDataInfo);
-      console.log("new game data info", data);
-      currentRaceInfo = currentRaceInfo.concat(data);
-      console.log("current race info ", currentRaceInfo);
-      setGameDataInfo(currentRaceInfo);
-    });
+    props.store.socket.on(
+      std_game_data_info,
+      (data: {
+        playerId: string;
+        setPersonalBest: boolean;
+        gameDataInfo: string[];
+      }) => {
+        console.log("old game data info", gameDataInfo);
+        console.log("new game data info", data);
+        const {
+          setPersonalBest,
+          playerId,
+          gameDataInfo: newGameDataInfo,
+        } = data;
+        if (setPersonalBest) {
+          gameObject.saveDriveRecording(playerId);
+        }
+        console.log("set personalBest", setPersonalBest);
+        currentRaceInfo = currentRaceInfo.concat(newGameDataInfo);
+        console.log("current race info ", currentRaceInfo);
+        setGameDataInfo(currentRaceInfo);
+      }
+    );
 
     props.store.socket.on(
       std_send_game_actions,
@@ -189,13 +209,17 @@ const GameRoom = React.memo((props: IGameRoom) => {
       }
     );
 
-    props.store.socket.once(std_quit_game, () => {
+    props.store.socket.once(std_quit_game, async () => {
       props.store.socket.disconnect();
       //     props.store.setSocket(undefined);
-      setGameObject(undefined);
+      // setGameObject(undefined);
+      await gameObject.destroyGame();
+      gameObject = undefined;
 
       console.log("going to /connect");
       history.push(connectPagePath);
+      // dont want to do this, because of the "enter game" button and the music
+      //  window.location.href = connectPagePath;
     });
 
     return () => {
@@ -207,7 +231,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
     };
   }, []);
 
-  useEffect(() => {
+  const gameObjectCreated = () => {
     props.store.socket.on(stmd_game_settings_changed, (data) => {
       props.store.setGameSettings(data.gameSettings);
       if (data.gameSettings) {
@@ -231,7 +255,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         });
       }
     };
-  }, [gameObject]);
+  };
 
   useEffect(() => {
     console.log("game actions changed", gameActions);
@@ -269,9 +293,10 @@ const GameRoom = React.memo((props: IGameRoom) => {
           gameObject.destroyGame().then(() => {
             props.store.socket.disconnect();
             //     props.store.setSocket(undefined);
-            setGameObject(undefined);
-
+            //   setGameObject(undefined);
+            gameObject = undefined;
             console.log("going to /connect");
+            //   window.location.href = connectPagePath;
             history.push(connectPagePath);
           });
         }}

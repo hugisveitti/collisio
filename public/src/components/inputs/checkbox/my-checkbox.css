@@ -1,3 +1,9 @@
 .MuiCheckbox-root {
   color: #999 !important;
 }
+
+.checkbox__input {
+  color: #999;
+  height: 20px;
+  width: 20px;
+}

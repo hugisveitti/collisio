@@ -1,6 +1,6 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Euler, Group, MeshStandardMaterial, Object3D, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
+import { Euler, Group, MeshStandardMaterial, Object3D, RGBAFormat, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
 import { TrackName } from "../shared-backend/shared-stuff";
@@ -150,6 +150,8 @@ export class Course implements ICourse {
                     createArray(child as Group)
                 }
                 else if (child.type === "Mesh" && !child.name.includes("hidden") && !substrArrayInString(child.name, notSeeThroughObjects)) {
+                    ((child as ExtendedObject3D).material) = ((child as ExtendedObject3D).material as MeshStandardMaterial).clone();
+                    ((child as ExtendedObject3D).material as MeshStandardMaterial).format = RGBAFormat;
                     this.possibleIntersectObjects.push(child)
                 }
             }
@@ -370,8 +372,6 @@ export class Course implements ICourse {
         const material = object.material as MeshStandardMaterial
         if (material.transparent) return
 
-
-        (object.material) = (object.material as MeshStandardMaterial).clone();
         (object.material as MeshStandardMaterial).transparent = true;
         (object.material as MeshStandardMaterial).opacity = 0.5;
         this.seeThroughObjects.push(object)

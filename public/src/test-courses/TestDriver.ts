@@ -1,5 +1,5 @@
 import { Quaternion, Vector3 } from "three";
-import { getTournamentGhost, uploadTournamentGhost } from "../firebase/firebaseStorageFunctions";
+import { downloadGhost, getTournamentGhost, uploadGhost, uploadTournamentGhost } from "../firebase/firebaseStorageFunctions";
 import { TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { IGhostVehicle } from "../vehicles/GhostVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
@@ -55,12 +55,30 @@ export class TestDriver {
      * load into memory drive instructions that is written in a file
      * likly a text file
      */
-    async loadDriveInstructions(filename: string) {
-        fetch(`driveinstructions/${filename}`).then(res => res.text()).then(val => {
-            //    console.log("drive instructval", val)
-            this.di = val.split("\n")
-        }).catch((err) => {
-            console.warn("Error loading file:", this.filename, err)
+    async loadDriveInstructions(filename: string, isTournament: boolean): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+
+            if (isTournament) {
+                await this.loadTournamentInstructions(filename)
+                resolve()
+            } else {
+                downloadGhost(filename).then((instructions) => {
+                    this.isReady = true
+                    console.log("instructions", instructions)
+                    if (instructions?.length) {
+                        this.di = instructions
+                        this.hasInstructions = true
+                    } else {
+                        this.hasInstructions = false
+                    }
+                    resolve()
+                }).catch(err => {
+                    console.warn("Error getting ghost:", err)
+                    reject()
+                })
+
+            }
+
         })
     }
 
@@ -78,7 +96,7 @@ export class TestDriver {
                 }
                 resolve()
             }).catch(err => {
-                console.warn("err:", err)
+                console.warn("Error getting tournament ghost, err:", err)
                 reject()
             })
         })
@@ -156,14 +174,16 @@ export class TestDriver {
 }
 
 // how often save should occure
-let epsTime = .1
+let epsTime = .15
 
 interface DriveRecorderConfig {
     active: boolean
     trackName: TrackName
     numberOfLaps: number
     vehicleType: VehicleType
-    tournamentId: string
+    tournamentId: string | undefined
+    playerId: string
+    playerName: string
 }
 
 export class DriveRecorder {
@@ -197,7 +217,7 @@ export class DriveRecorder {
     getDriveInstruction = (time: number, vehicle: IVehicle) => {
         const p = vehicle.getPosition()
         const r = vehicle.getRotation()
-        return `${time.toFixed(2)} ${p.x.toFixed(1)} ${p.y.toFixed(1)} ${p.z.toFixed(1)} ${r.x.toFixed(3)} ${r.y.toFixed(3)} ${r.z.toFixed(2)} ${r.w.toFixed(2)}`
+        return `${time.toFixed(2)} ${p.x.toFixed(1)} ${p.y.toFixed(1)} ${p.z.toFixed(1)} ${r.x.toFixed(2)} ${r.y.toFixed(2)} ${r.z.toFixed(2)} ${r.w.toFixed(2)}`
     }
 
     goalCrossed() {
@@ -205,38 +225,43 @@ export class DriveRecorder {
         this.finishedLaps += 1
         if (this.config.numberOfLaps === this.finishedLaps) {
             if (this.config.tournamentId) {
-                this.saveRecordedInstructionsToServer()
+                //     this.saveTournamentRecording()
             }
         }
     }
 
+    getMetadata() {
+        return `${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId ?? "no-tournament"} ${this.config.playerName} ${this.config.playerId}`
+    }
+
     saveTournamentRecording = (totalTime: number, playerName?: string, playerId?: string) => {
-        const metaData = [`${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId} ${playerName} ${playerId}`]
+        const metaData = [this.getMetadata()]
         console.log("saving tournament rec, meta data:", metaData)
         uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions), totalTime)
     }
 
-    saveRecordedInstructionsToServer = (playerName?: string, playerId?: string) => {
-        const metaData = [`${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId} ${playerName} ${playerId}`]
+    getRecordingFilename() {
+        return `${this.config.playerId}/${this.config.trackName}/${this.config.numberOfLaps}`
+    }
+
+    static GetTrackNameNumberOfLapsFromFilename(filename: string): { trackName: TrackName, numberOfLaps: number } {
+        const items = filename.split("/")
+        // if tournament ghost
+        if (items.length < 3) {
+            return { trackName: undefined, numberOfLaps: undefined }
+        }
+        return { trackName: items[1] as TrackName, numberOfLaps: +items[2] }
+
+    }
+
+    /**
+     * Might need to save through player and set some firestore rules
+     */
+    saveRecordedInstructions = () => {
+        const metaData = [this.getMetadata()]
         console.log("meta data", metaData)
-        //  uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions))
-
-
-        //     const data = {
-        //         "instructions": this.instructions.join("\n"), trackName: this.config.trackName, numberOfLaps: this.config.numberOfLaps, vehicleType: this.config.vehicleType
-        //     }
-
-        //     fetch("/saverecording", {
-        //         method: "POST",
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(data)
-        //     }).then(res =>
-        //         res.text()
-        //     ).then(val => {
-        //         console.log("value,", val)
-        //     })
-        // }
+        const filename = this.getRecordingFilename()
+        console.log("saving instructions")
+        uploadGhost(filename, metaData.concat(this.instructions))
     }
 }
