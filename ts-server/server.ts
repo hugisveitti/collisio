@@ -52,6 +52,21 @@ const isValidHost = (host: string | undefined) => {
 
 const buildFolder = "dist"
 
+const encrypt = require("../public/src/shared-backend/encryption.json")
+
+console.log("enc", encrypt)
+for (let key of Object.keys(encrypt)) {
+    app.get(`/${key}`, (req: Request, res: Response) => {
+        console.log("getting model", key)
+        res.sendFile(path.join(__dirname, `../public/${buildFolder}/models/${encrypt[key]}`));
+    });
+}
+
+app.get("/models/front-page.glb", (req: Request, res: Response) => {
+    console.log("getting model")
+    res.sendFile(path.join(__dirname, `../public/${buildFolder}/models/front-page.glb`));
+});
+
 app.use(express.static(path.join(__dirname, `../public/${buildFolder}`), { index: false }));
 app.use(express.static(path.join(__dirname, `../public/src`), { index: false }));
 
@@ -66,6 +81,8 @@ const sendTestHTML = (req: Request, res: Response) => {
         res.send("ERROR")
     }
 }
+
+
 
 app.get("/test", sendTestHTML);
 

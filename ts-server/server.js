@@ -62,6 +62,22 @@ var isValidHost = function (host) {
     return onLocalhost || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"));
 };
 var buildFolder = "dist";
+var encrypt = require("../public/src/shared-backend/encryption.json");
+console.log("enc", encrypt);
+var _loop_1 = function (key) {
+    app.get("/" + key, function (req, res) {
+        console.log("getting model", key);
+        res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/models/" + encrypt[key]));
+    });
+};
+for (var _i = 0, _a = Object.keys(encrypt); _i < _a.length; _i++) {
+    var key = _a[_i];
+    _loop_1(key);
+}
+app.get("/models/front-page.glb", function (req, res) {
+    console.log("getting model");
+    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/models/front-page.glb"));
+});
 app.use(express.static(path.join(__dirname, "../public/" + buildFolder), { index: false }));
 app.use(express.static(path.join(__dirname, "../public/src"), { index: false }));
 var indexHTMLPath = "../public/" + buildFolder + "/index.html";
