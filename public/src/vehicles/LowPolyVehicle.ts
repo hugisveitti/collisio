@@ -1152,7 +1152,9 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoa
 
         const loader = new GLTFLoader()
 
-        loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
+        loader.load(getStaticPath(`${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
+            console.log("${vehicleConfigs[vehicleType].path}", vehicleConfigs[vehicleType].path)
+            console.log("gltf vehicle", gltf)
             let tires = [] as ExtendedObject3D[]
             let chassis: ExtendedObject3D
             let extraCarStuff: ExtendedObject3D

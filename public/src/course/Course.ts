@@ -113,7 +113,7 @@ export class Course implements ICourse {
         const loader = new GLTFLoader(courseManager)
         return new Promise<void>(async (resolve, reject) => {
 
-            loader.loadAsync(getStaticPath(`models/${this.trackName}.glb`), (e => {
+            loader.loadAsync(getStaticPath(`${this.trackName}.glb`), (e => {
                 if (e.lengthComputable) {
                     const completed = e.loaded / e.total
                     setLoaderProgress(completed)

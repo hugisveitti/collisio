@@ -94,7 +94,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
         // const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
         // this.vector.setValue(x, y, z)
-        // //this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
+        // // //this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
         // this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
 
         this.vehicleBody.body.setAngularFactor(0, 1, 0)
@@ -400,7 +400,7 @@ export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boole
 
         const loader = new GLTFLoader()
 
-        loader.load(getStaticPath(`models/${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
+        loader.load(getStaticPath(`${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
             let sphere: ExtendedObject3D
             let extraStuff: ExtendedObject3D
             for (let child of gltf.scene.children) {

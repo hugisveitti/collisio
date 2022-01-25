@@ -77,6 +77,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             About
           </BackdropButton>
         </Grid>
+
         <Grid item xs={12} lg={6} style={{}}>
           {user === null ? (
             <div style={{ marginTop: 15, margin: "auto", textAlign: "center" }}>
@@ -91,6 +92,11 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
               {renderUserInfo()}
             </div>
           )}
+        </Grid>
+        <Grid item xs={12}>
+          <p>
+            <i>Pre alpha</i>
+          </p>
         </Grid>
       </Grid>
     </BackdropContainer>

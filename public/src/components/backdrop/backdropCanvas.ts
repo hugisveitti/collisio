@@ -233,9 +233,7 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
     if (
         sinOff === 0 &&
-
         cosOff === Math.PI / 2) {
-        console.log("Calling animate")
         animate()
     } else {
         console.warn("!!! Trying to animate backdrop canvas twice")
@@ -251,13 +249,10 @@ const loadScene = async (scene: Scene, loaderProgressCallback: (completed: numbe
         let positions: Vector3[] = []
         let c = 0
 
-        loader.loadAsync(getStaticPath("models/front-page.glb"), (e) => {
+        loader.loadAsync(getStaticPath("front-page.glb"), (e) => {
             if (e.lengthComputable) {
                 const completed = e.loaded / e.total
                 loaderProgressCallback(completed)
-                // if(completed === 1){
-                //     delete loaderProgressCallback
-                // }
             }
         }).then(gltf => {
             scene.add(gltf.scene)
@@ -285,7 +280,6 @@ const handleWindowResize = () => {
 }
 
 export const clearBackdropCanvas = () => {
-    console.log("#########clearing backdrop canvas#####")
     if (animateTimeout) {
         clearTimeout(animateTimeout)
     }

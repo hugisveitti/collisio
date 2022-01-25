@@ -25,7 +25,8 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "Big girl Sally", type: "offRoader" },
     { name: "Thunderparrot", type: "sportsCar" },
     { name: "Goonie", type: "gokart" },
-    { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" }
+    { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" },
+    { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
 ]
 
 export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass => {
@@ -44,7 +45,7 @@ export const isVehicleType = (str: string): boolean => {
 
 export const getVehicleNameFromType = (vehicleType: VehicleType) => allVehicleTypes.find(v => v.type === vehicleType)?.name ?? "-"
 
-export const nonactiveVehcileTypes: VehicleType[] = ["test", "normal"]
+export const nonactiveVehcileTypes: VehicleType[] = ["test", "normal", "simpleCylindar"]
 
 export const activeVehicleTypes: { name: string, type: VehicleType }[] = allVehicleTypes.filter(vehicle => !itemInArray(vehicle.type, nonactiveVehcileTypes))
 
@@ -143,7 +144,7 @@ export const vehicleConfigs = {
         breakingForce: 200,
         is4x4: false,
         /// old car
-        path: "simple-car.gltf",
+        path: "simple-car.glb",
 
         // path: "123456.js"
         towPosition: new Vector3(0, -0.5, -4.7)
@@ -170,7 +171,7 @@ export const vehicleConfigs = {
         suspensionCompression: 5,
         centerOfMassOffset: .5,
 
-        path: "normal-car-2.gltf",
+        path: "normal-car-2.glb",
         towPosition: new Vector3(0, -0.9, -4.7)
 
         // path: "123456.js"
@@ -195,7 +196,7 @@ export const vehicleConfigs = {
         breakingForce: 400,
         is4x4: false,
 
-        path: "tractor.gltf",
+        path: "tractor.glb",
 
         towPosition: new Vector3(0, -1.9, -3.2),
         centerOfMassOffset: 2
@@ -224,7 +225,7 @@ export const vehicleConfigs = {
         suspensionDamping: 15,
 
 
-        path: "low-poly-monster-truck.gltf"
+        path: "low-poly-monster-truck.glb"
     },
     offRoader: {
         ...defaultVehicleConfig,
@@ -251,7 +252,7 @@ export const vehicleConfigs = {
         suspensionDamping: 12,
         suspensionCompression: 20,
 
-        path: "off-roader.gltf",
+        path: "off-roader.glb",
         centerOfMassOffset: 1.5,
 
         towPosition: new Vector3(0, -1.35, -3.3)
@@ -398,12 +399,20 @@ export const vehicleConfigs = {
     },
     simpleSphere: {
         ...defaultVehicleConfig,
-        path: "simple-sphere.gltf",
+        path: "simple-sphere.glb",
         mass: 400,
         // this isnt engineforece but the rate angular velocity
         engineForce: 300,
         //  inertia: { x: 100000, y: 100000, z: 100000 }
+    },
 
+    simpleCylindar: {
+        ...defaultVehicleConfig,
+        path: "simple-cylindar.glb",
+        mass: 400,
+        // this isnst engineforece but the rate angular velocity
+        engineForce: 300,
+        inertia: { x: 100, y: 100, z: 100 }
     }
 
 } as { [key: string]: IVehicleConfig }

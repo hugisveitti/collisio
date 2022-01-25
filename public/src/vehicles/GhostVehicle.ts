@@ -87,7 +87,7 @@ export class GhostVehicle implements IGhostVehicle {
 
             const loader = new GLTFLoader()
 
-            loader.load(getStaticPath(`models/${vehicleConfigs[this.config.vehicleType].path}`), (gltf: GLTF) => {
+            loader.load(getStaticPath(`${vehicleConfigs[this.config.vehicleType].path}`), (gltf: GLTF) => {
                 let tires = [] as ExtendedObject3D[]
                 let chassis: ExtendedObject3D
                 let extraCarStuff: ExtendedObject3D;

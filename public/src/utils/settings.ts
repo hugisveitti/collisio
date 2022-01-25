@@ -55,8 +55,16 @@ export const testGameSettings: IGameSettings = {
 }
 
 
+const encrypt = require("../shared-backend/encryption.json")
+
+
 
 export const getStaticPath = (path: string) => {
+    for (let key of Object.keys(encrypt)) {
+        if (encrypt[key] === path) {
+            return `/${key}`
+        }
+    }
     return `/${path}`
 }
 

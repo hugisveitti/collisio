@@ -269,7 +269,7 @@ export class Wagon {
         return new Promise<void>((resolve, reject) => {
             const loader = new GLTFLoader()
 
-            loader.load(getStaticPath(`models/${this.config.path}`), (gltf: GLTF) => {
+            loader.load(getStaticPath(`${this.config.path}`), (gltf: GLTF) => {
                 for (let child of gltf.scene.children) {
                     if (child.name.includes("wagon")) {
                         this.wagonBody = (child as ExtendedObject3D)

@@ -1,6 +1,6 @@
-const path = require('path')
+var path = require('path')
 
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+var NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 
 // if issue with images go to "import-png.d.ts"

@@ -27,7 +27,8 @@ export type TrackName =
     | "spa-track"
     | "nurn-track"
 
-export type VehicleType = "normal"
+export type VehicleType =
+    "normal"
     | "tractor"
     | "f1"
     | "test"
@@ -35,6 +36,7 @@ export type VehicleType = "normal"
     | "sportsCar"
     | "normal2"
     | "simpleSphere"
+    | "simpleCylindar"
     | "gokart"
     | "future"
 

@@ -107,6 +107,3 @@ export const getStaticCameraPos = (cameraZoom: number) => {
     return { x: 0, y: yScaler(cameraZoom), z: -zScaler(cameraZoom) }
 }
 
-
-
-
