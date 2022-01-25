@@ -23,6 +23,7 @@ interface IEndOfGameModal {
   restartGame: () => void;
   scoreInfo: IScoreInfo;
   gameDataInfo: string[];
+  quitGame: (newPath: string) => void;
 }
 
 const EndOfGameModal = (props: IEndOfGameModal) => {
@@ -59,7 +60,10 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
           <ToFrontPageButton />
         </Grid>
         <Grid item xs={6} xl={2}>
-          <BackdropButton color="white" link={highscorePagePath}>
+          <BackdropButton
+            color="white"
+            onClick={() => props.quitGame(highscorePagePath)}
+          >
             See highscores
           </BackdropButton>
         </Grid>

@@ -5,7 +5,7 @@ import { IGhostVehicle } from "../vehicles/GhostVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
 import { isVehicleType } from "../vehicles/VehicleConfigs";
 
-export class TestDriver {
+export class GhostDriver {
 
 
     pos: Vector3
@@ -154,6 +154,18 @@ export class TestDriver {
         }
     }
 
+    setToStart(vehicle: IGhostVehicle) {
+
+        if (!this.hasInstructions || this.di.length < 2) {
+            console.warn("Can't set ghost vehicle to start, since have not got instructions")
+            return
+        }
+
+        this.setPositionRotationFromInstruction(this.di[1], this.pos, this.rotation)
+        vehicle.setPosition(this.pos.clone())
+        vehicle.setRotation(this.rotation.clone())
+    }
+
     setPlace(vehicle: IGhostVehicle, time: number, delta: number) {
         if (!this.hasInstructions) return
         const cTime = this.getTime(this.timeIndex)
@@ -245,6 +257,9 @@ export class DriveRecorder {
     }
 
     static GetTrackNameNumberOfLapsFromFilename(filename: string): { trackName: TrackName, numberOfLaps: number } {
+        if (!filename) return { trackName: undefined, numberOfLaps: undefined }
+
+
         const items = filename.split("/")
         // if tournament ghost
         if (items.length < 3) {

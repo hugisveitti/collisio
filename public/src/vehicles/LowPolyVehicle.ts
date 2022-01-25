@@ -689,22 +689,28 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
     }
 
-    checkIfSpinning() {
+    checkIfSpinning(log?: boolean) {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
         if (Math.abs(vel.x()) > 3) {
-            console.warn("angular vel danger, X:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            if (log) {
+                console.warn("angular vel danger, X:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            }
 
             this.vector.setValue(vel.x() / 2, vel.y(), vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.y()) > 5) {
-            console.warn("angular vel danger, Y:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            if (log) {
+                console.warn("angular vel danger, Y:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            }
 
             this.vector.setValue(vel.x(), vel.y() / 2, vel.z())
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
         }
         if (Math.abs(vel.z()) > 6) {
-            console.warn("angular vel danger, Z:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            if (log) {
+                console.warn("angular vel danger, Z:", vel.x().toFixed(2), vel.y().toFixed(2), vel.z().toFixed(2))
+            }
 
             this.vector.setValue(vel.x(), vel.y(), vel.z() / 2)
             this.vehicle.getRigidBody().setAngularVelocity(this.vector)
@@ -906,7 +912,7 @@ export class LowPolyVehicle extends Vehicle {
             if (delta < 33.5) {
 
                 this.checkIfSpinning()
-                this.vehicleAssist(true)
+                this.vehicleAssist(false)
             }
             this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 

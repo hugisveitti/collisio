@@ -10,6 +10,7 @@ import {
   setAllLocalGameSettings,
 } from "../classes/localGameSettings";
 import EndOfGameModal from "../components/gameRoom/EndOfGameModal";
+import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
 import { getDBUserSettings } from "../firebase/firestoreFunctions";
@@ -303,6 +304,9 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         }}
         scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}
+        quitGame={() => {
+          window.location.href = frontPagePath;
+        }}
       />
 
       <DeviceOrientationPermissionComponent

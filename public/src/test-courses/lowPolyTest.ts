@@ -21,7 +21,7 @@ import { allVehicleTypes, getVehicleClassFromType } from "../vehicles/VehicleCon
 import { getWagonNumber, isWagon } from "../vehicles/Wagon"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
-import { DriveRecorder, TestDriver } from "./TestDriver"
+import { DriveRecorder, GhostDriver } from "./GhostDriver"
 import { createTestVehicleInputs } from "./testVehicleInputs"
 
 const vechicleFov = 60
@@ -82,10 +82,10 @@ export class LowPolyTestScene extends GameScene {
 
 
 
-    testDriver: TestDriver
+    ghostDriver: GhostDriver
     driverRecorder: DriveRecorder
 
-    otherDrivers: TestDriver[]
+    otherDrivers: GhostDriver[]
     ghostVehicle: IGhostVehicle
 
     constructor() {
@@ -135,7 +135,7 @@ export class LowPolyTestScene extends GameScene {
 
         // in tag game
         this.isIt = 0
-        this.testDriver = new TestDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
+        this.ghostDriver = new GhostDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
         this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
         this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test" })
 
@@ -269,7 +269,7 @@ export class LowPolyTestScene extends GameScene {
             this.otherVehicles.push(
                 new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
             )
-            this.otherDrivers.push(new TestDriver(this.getTrackName(), 1, vehicleType))
+            this.otherDrivers.push(new GhostDriver(this.getTrackName(), 1, vehicleType))
         }
     }
 
@@ -278,9 +278,9 @@ export class LowPolyTestScene extends GameScene {
 
             this.ghostVehicle?.removeFromScene(this)
 
-            this.testDriver.loadTournamentInstructions(this.gameSettings.ghostFilename).then(async () => {
+            this.ghostDriver.loadTournamentInstructions(this.gameSettings.ghostFilename).then(async () => {
 
-                const vt = this.testDriver.getVehicleType()
+                const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
                     console.log("vt ", vt)
                     this.ghostVehicle = new GhostVehicle({
@@ -612,7 +612,7 @@ export class LowPolyTestScene extends GameScene {
 
             if (this.raceStarted) {
 
-                this.testDriver.setPlace(this.ghostVehicle, this.gameTime.getTotalTime(), delta)
+                this.ghostDriver.setPlace(this.ghostVehicle, this.gameTime.getTotalTime(), delta)
 
                 lapTimeDiv.textContent = this.gameTime.getCurrentLapTime() + ""
                 bestLapTimeDiv.textContent = this.gameTime.getBestLapTime() + ""

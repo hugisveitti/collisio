@@ -112,6 +112,8 @@ export default class RoomMaster {
 
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings }: IPlayerConnectedData) => {
 
+
+
             if (!this.roomExists(roomId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted && !this.rooms[roomId].playerIsInRoom(playerId)) {
@@ -134,6 +136,16 @@ export default class RoomMaster {
 
 
     createRoom(socket: Socket, roomId: string, data: any) {
+
+        const { numberOfRoomsSendingControls } = this.getStats()
+        if (numberOfRoomsSendingControls > 15) {
+            socket.emit(std_room_created_callback, {
+                status: errorStatus,
+                message: "Number of active rooms is full. Consider donaiting to help support this project which will allow us to buy better servers."
+            })
+            return
+        }
+
         if (this.socketHasRoom(socket)) {
             console.warn("Socket already has room")
             socket.emit(std_room_created_callback, {
@@ -336,14 +348,23 @@ export class Room {
     }
 
     addPlayer(player: Player) {
+        console.log("player ", player.toString())
         let playerExists = false
 
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
-                this.players[i].setSocket(player.socket)
-                player = this.players[i]
+                // disconnect old socket always
+                console.log("disconnecting old socket", i)
+                if (this.gameStarted) {
 
-                playerExists = true
+                    this.players[i].setSocket(player.socket)
+                    player = this.players[i]
+
+                    playerExists = true
+                } else {
+                    this.players[i].desktopDisconnected()
+                    this.players[i].socket.disconnect()
+                }
             }
         }
 
@@ -560,7 +581,7 @@ export class Room {
     quitGame() {
         console.log("Quit game with mobile")
         this.socket.emit(std_quit_game, {})
-        
+
     }
 
     isFull() {

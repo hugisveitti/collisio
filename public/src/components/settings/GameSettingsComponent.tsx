@@ -23,7 +23,7 @@ import {
 import { getFastestGhostFilename } from "../../firebase/firebaseStorageFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { GameType } from "../../shared-backend/shared-stuff";
-import { DriveRecorder } from "../../test-courses/TestDriver";
+import { DriveRecorder } from "../../test-courses/GhostDriver";
 import { inTestMode } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
 import MyCheckbox from "../inputs/checkbox/MyCheckbox";

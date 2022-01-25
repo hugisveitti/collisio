@@ -4,7 +4,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInf
 import { IRaceCourse } from "../course/ICourse";
 import { RaceCourse } from "../course/RaceCourse";
 import { VehicleControls } from '../shared-backend/shared-stuff';
-import { DriveRecorder, TestDriver } from "../test-courses/TestDriver";
+import { DriveRecorder, GhostDriver } from "../test-courses/GhostDriver";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
@@ -38,8 +38,7 @@ export class RaceGameScene extends GameScene {
     raceFinished: boolean
 
 
-
-    testDriver: TestDriver
+    ghostDriver: GhostDriver
     ghostVehicle: GhostVehicle
     driverRecorder: DriveRecorder
 
@@ -95,9 +94,9 @@ export class RaceGameScene extends GameScene {
                 return
             }
 
-            this.testDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.gameSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
+            this.ghostDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.gameSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
 
-                const vt = this.testDriver.getVehicleType()
+                const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
                     console.log("vt ", vt)
                     this.ghostVehicle = new GhostVehicle({
@@ -105,6 +104,7 @@ export class RaceGameScene extends GameScene {
                     })
                     await this.ghostVehicle.loadModel()
                     this.ghostVehicle.addToScene(this)
+                    this.ghostDriver.setToStart(this.ghostVehicle)
 
                 } else {
                     console.warn("no vt", vt)
@@ -120,11 +120,11 @@ export class RaceGameScene extends GameScene {
     async create(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
 
-            this.testDriver = new TestDriver(this.getTrackName(), this.getNumberOfLaps())
+            this.ghostDriver = new GhostDriver(this.getTrackName(), this.getNumberOfLaps())
             console.log("this config", this.gameSceneConfig)
             if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
                 console.log("gamesettings", this.gameSettings)
-                if (this.gameSettings.useGhost) {
+                if (this.gameSettings.useGhost && (this.gameSettings.tournamentId || this.gameSettings.ghostFilename)) {
                     await this.createGhostVehicle()
                 }
                 console.log("creating drive recorder")
@@ -259,7 +259,7 @@ export class RaceGameScene extends GameScene {
         this.winTime = -1
 
         this.driverRecorder?.reset()
-        this.testDriver?.reset()
+        this.ghostDriver?.reset()
         // if (this.gameSettings.useGhost) {
         //     this.createGhostVehicle()
         // }
@@ -390,7 +390,7 @@ export class RaceGameScene extends GameScene {
 
     // get difference betwee first and this
     // if this is first just retun the current lap time
-    getCheckpointDiff(vehicleNumber: number, checkpointNumber: number): number {
+    getCheckpointDiff(vehicleNumber: number, checkpointNumber: number): string {
         let bestTime = Infinity
         const lapNumber = this.gameTimers[vehicleNumber].getCurrentLapNumber()
         for (let i = 0; i < this.gameTimers.length; i++) {
@@ -404,8 +404,8 @@ export class RaceGameScene extends GameScene {
         }
 
         const currCheckpTime = this.gameTimers[vehicleNumber].getCheckpointTime(checkpointNumber, lapNumber)
-        if (!currCheckpTime || currCheckpTime < bestTime) return this.gameTimers[vehicleNumber].getCurrentLapTime()
-        return bestTime - currCheckpTime
+        if (!currCheckpTime || currCheckpTime < bestTime) return this.gameTimers[vehicleNumber].getCurrentLapTime().toFixed(2)
+        return (bestTime - currCheckpTime).toFixed(2)
     }
 
     sendScoreInfo() {
@@ -464,7 +464,7 @@ export class RaceGameScene extends GameScene {
 
         if (this.gameStarted && !this.isPaused) {
             if (this.ghostVehicle && maxTotalTime > 0) {
-                this.testDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
+                this.ghostDriver.setPlace(this.ghostVehicle, maxTotalTime, delta)
             }
             if (this.driverRecorder && maxTotalTime > 0) {
                 this.driverRecorder.record(this.vehicles[0], maxTotalTime)

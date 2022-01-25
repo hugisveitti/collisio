@@ -23,7 +23,7 @@ interface IGameSettingsModal {
   userId: string | undefined;
   isTestMode?: boolean;
   updateGameSettings: (gameSettings: IGameSettings) => void;
-  quitGame: () => void;
+  quitGame: (newPath: string) => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -57,7 +57,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <BackdropButton
             color="white"
             onClick={() => {
-              props.quitGame();
+              props.quitGame(connectPagePath);
             }}
           >
             To waiting room

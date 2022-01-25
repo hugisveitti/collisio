@@ -71,7 +71,10 @@ export class Player {
      * @param newSocket Socket 
      */
     setSocket(newSocket: Socket) {
+
+        this.socket?.disconnect()
         this.socket = newSocket
+        this.isConnected = true
         this.setupControler()
         this.setupGameDataInfoListener()
         this.setupPlayerInfoListener()
@@ -287,7 +290,7 @@ export class Player {
 
 
     toString() {
-        return `${this.playerName} in team: ${this.teamNumber}`
+        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}`
     }
 }
 

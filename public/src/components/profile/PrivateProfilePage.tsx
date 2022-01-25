@@ -53,13 +53,14 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
           title="Profile information"
           subheader={editUser.displayName}
           action={
-            <IconButton
+            <BackdropButton
+              startIcon={<EditIcon />}
               onClick={() => {
                 setInEditMode(true);
               }}
             >
-              <EditIcon />
-            </IconButton>
+              Edit
+            </BackdropButton>
           }
         />
         <CardMedia component="img" image={editUser.photoURL} />
@@ -93,7 +94,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
       <React.Fragment>
         <CardHeader
           action={
-            <IconButton
+            <BackdropButton
               onClick={() => {
                 setInEditMode(false);
                 const { displayName, photoURL } = editUser;
@@ -110,9 +111,10 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                   window.location.reload();
                 }
               }}
+              startIcon={<EditOffIcon />}
             >
-              <EditOffIcon />
-            </IconButton>
+              Submit Edit
+            </BackdropButton>
           }
         />
         <CardContent>

@@ -24,7 +24,10 @@ var Player = /** @class */ (function () {
      * @param newSocket Socket
      */
     Player.prototype.setSocket = function (newSocket) {
+        var _a;
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.disconnect();
         this.socket = newSocket;
+        this.isConnected = true;
         this.setupControler();
         this.setupGameDataInfoListener();
         this.setupPlayerInfoListener();
@@ -225,7 +228,7 @@ var Player = /** @class */ (function () {
         });
     };
     Player.prototype.toString = function () {
-        return this.playerName + " in team: " + this.teamNumber;
+        return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType;
     };
     return Player;
 }());

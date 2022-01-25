@@ -324,8 +324,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async loadAssets() { }
 
-
-
     async init(data: any) {
         // need to do some test with performance and the draw distance
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
@@ -806,9 +804,9 @@ export class GameScene extends Scene3D implements IGameScene {
     // }
 
     pauseGame() {
-
-        if (this.isPaused) return
         this.isPaused = true
+        if (!this.gameStarted) return
+        if (this.isPaused) return
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicles[i].isReady) {
@@ -819,8 +817,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     unpauseGame() {
-        if (!this.isPaused) return
         this.isPaused = false
+        if (!this.gameStarted) return
+        if (!this.isPaused) return
 
         this.startGameSong()
         this.songIsPlaying = false

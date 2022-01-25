@@ -88,6 +88,14 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.createRoom = function (socket, roomId, data) {
         var _this = this;
+        var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
+        if (numberOfRoomsSendingControls > 15) {
+            socket.emit(shared_stuff_1.std_room_created_callback, {
+                status: errorStatus,
+                message: "Number of active rooms is full. Consider donaiting to help support this project which will allow us to buy better servers."
+            });
+            return;
+        }
         if (this.socketHasRoom(socket)) {
             console.warn("Socket already has room");
             socket.emit(shared_stuff_1.std_room_created_callback, {
@@ -261,12 +269,21 @@ var Room = /** @class */ (function () {
         return false;
     };
     Room.prototype.addPlayer = function (player) {
+        console.log("player ", player.toString());
         var playerExists = false;
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
-                this.players[i].setSocket(player.socket);
-                player = this.players[i];
-                playerExists = true;
+                // disconnect old socket always
+                console.log("disconnecting old socket", i);
+                if (this.gameStarted) {
+                    this.players[i].setSocket(player.socket);
+                    player = this.players[i];
+                    playerExists = true;
+                }
+                else {
+                    this.players[i].desktopDisconnected();
+                    this.players[i].socket.disconnect();
+                }
             }
         }
         if (this.gameStarted) {

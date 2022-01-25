@@ -109,7 +109,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
             props.backgroundContainer ? "background" : ""
           )}
           style={{
-            maxHeight: `${window.innerHeight * 0.9}px`,
+            maxHeight: `${(screen?.availHeight ?? window.innerHeight) * 0.9}px`,
           }}
         >
           {props.loading ? (

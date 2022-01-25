@@ -246,10 +246,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
       if (gameObject) {
-        console.log("destroying game");
         gameObject.destroyGame().then(() => {
-          console.log("game destoryd ");
-
           /** do some kind of back to waiting room? */
           props.store.socket.emit(dts_back_to_waiting_room, {});
         });
@@ -289,7 +286,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         userId={user?.uid}
         isTestMode={props.isTestMode}
         updateGameSettings={updateGameSettings}
-        quitGame={() => {
+        quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
             props.store.socket.disconnect();
             //     props.store.setSocket(undefined);
@@ -297,7 +294,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
             gameObject = undefined;
             console.log("going to /connect");
             //   window.location.href = connectPagePath;
-            history.push(connectPagePath);
+            history.push(newPath);
           });
         }}
       />
@@ -313,6 +310,17 @@ const GameRoom = React.memo((props: IGameRoom) => {
         }}
         scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}
+        quitGame={(newPath: string) => {
+          gameObject.destroyGame().then(() => {
+            props.store.socket.disconnect();
+            //     props.store.setSocket(undefined);
+            //   setGameObject(undefined);
+            gameObject = undefined;
+            console.log("going to /connect");
+            //   window.location.href = connectPagePath;
+            history.push(newPath);
+          });
+        }}
       />
       {/* <ScoreInfoContainer scoreInfo={scoreInfo} /> */}
     </React.Fragment>
