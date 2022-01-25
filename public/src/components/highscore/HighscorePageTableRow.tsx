@@ -13,10 +13,14 @@ import BackdropButton from "../button/BackdropButton";
 import CopyTextButton from "../inputs/CopyTextButton";
 import { IStore } from "../store";
 import { setLocalGameSetting } from "../../classes/localGameSettings";
+import { IUser } from "../../classes/User";
+import DeleteButton from "../inputs/DeleteButton";
+import { deleteBestScore } from "../../firebase/firestoreGameFunctions";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
   includeTrackAndNumLaps?: boolean;
+  user: IUser;
 }
 
 export default (props: IProps) => {
@@ -109,6 +113,22 @@ export default (props: IProps) => {
                 Type of vehicle:{" "}
                 {getVehicleNameFromType(playerData.vehicleType) ?? "-"}
               </div>
+              {playerData.playerId === props.user?.uid && (
+                <div style={{ marginTop: 10 }}>
+                  <DeleteButton
+                    onDelete={() =>
+                      deleteBestScore(
+                        playerData.playerId,
+                        playerData.trackName,
+                        playerData.numberOfLaps
+                      ).then(() => {
+                        // TODO fix this.
+                        window.location.reload();
+                      })
+                    }
+                  />
+                </div>
+              )}
             </div>
           </Collapse>
         </TableCell>

@@ -15,7 +15,7 @@ const CopyTextButton = (props: ICopyTextButton) => {
 
   return (
     <>
-      <Typography>{props.infoText}</Typography>{" "}
+      <span>{props.infoText}</span>{" "}
       <Tooltip
         title="Copied!"
         arrow
@@ -26,6 +26,7 @@ const CopyTextButton = (props: ICopyTextButton) => {
         disableTouchListener
         onClose={() => setCopyTooltipOpen(false)}
         onClick={props.onClick}
+        style={{ display: "inline" }}
       >
         <IconButton
           style={{ color: "white" }}

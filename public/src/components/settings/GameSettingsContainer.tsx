@@ -17,10 +17,8 @@ interface IGameSettingsContainer {
 }
 
 const GameSettingsContainer = (props: IGameSettingsContainer) => {
-  console.log("store", props.store);
   useEffect(() => {
     props.store.socket.on(stmd_game_settings_changed, (data) => {
-      console.log("dataa", data);
       props.store.setGameSettings(data.gameSettings);
       setAllLocalGameSettings(data.gameSettings);
     });

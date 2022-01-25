@@ -113,6 +113,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
           data={props.bestRaces}
           noDataText="User hasn't completed any races"
           includeTrackAndNumLaps
+          user={props.user}
         />
       </Grid>
     </>

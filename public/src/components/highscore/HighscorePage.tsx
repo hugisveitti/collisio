@@ -7,13 +7,14 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IEndOfRaceInfoPlayer, nonActiveTrackNames } from "../../classes/Game";
 import {
   BestTrackScore,
   getBestScoresOnTrack,
 } from "../../firebase/firestoreGameFunctions";
 import { getStyledColors } from "../../providers/theme";
+import { UserContext } from "../../providers/UserProvider";
 import { TrackName } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { itemInArray } from "../../utils/utilFunctions";
@@ -36,6 +37,8 @@ const HighscorePage = (props: IHighscorePage) => {
   const [highscoreList, setHighscoreList] = useState(
     [] as IEndOfRaceInfoPlayer[]
   );
+
+  const user = useContext(UserContext);
 
   useEffect(() => {
     if (bestTrackScores[numberOfLapsKey]) {
@@ -163,6 +166,7 @@ const HighscorePage = (props: IHighscorePage) => {
                 data={highscoreList}
                 noDataText="No one has recorded with the combination of this
                 track and these number of laps"
+                user={user}
               />
             </Grid>
           </>

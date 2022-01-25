@@ -16,9 +16,6 @@ export class StoryCourse extends Course {
     async _createCourse(): Promise<void> {
         return new Promise(async (resolve, reject) => {
 
-            console.log("this vehicles", this.vehicles)
-
-            console.log("this wagons", this.wagons)
             await this._createCourseObjects()
             resolve()
         })

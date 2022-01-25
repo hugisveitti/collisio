@@ -6,14 +6,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
-import { cardBackgroundColor, getStyledColors } from "../../providers/theme";
-import { itemInArray } from "../../utils/utilFunctions";
+import { IUser } from "../../classes/User";
+import { getStyledColors } from "../../providers/theme";
 import HighscorePageTableRow from "./HighscorePageTableRow";
 
 interface IHighscoreTable {
   data: IEndOfRaceInfoPlayer[];
   noDataText: string;
   includeTrackAndNumLaps?: boolean;
+  user: IUser;
 }
 
 const HighscoreTable = (props: IHighscoreTable) => {
@@ -57,6 +58,7 @@ const HighscoreTable = (props: IHighscoreTable) => {
                   key={`${playerData.gameId}-${playerData.playerName}-${i}`}
                   playerData={playerData}
                   includeTrackAndNumLaps={props.includeTrackAndNumLaps}
+                  user={props.user}
                 />
               );
             })

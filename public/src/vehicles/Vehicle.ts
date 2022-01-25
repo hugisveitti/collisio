@@ -130,7 +130,6 @@ export class Vehicle implements IVehicle {
     setToGround() { }
 
     updateVehicleSettings(vehicleSettings: IVehicleSettings) {
-        console.log("vehicle settings updated", vehicleSettings)
         this.vehicleSettings =
         {
             ...defaultVehicleSettings,

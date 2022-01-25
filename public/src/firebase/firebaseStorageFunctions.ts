@@ -39,7 +39,6 @@ export const downloadGhost = (filename: string) => {
         getBlob(storageRef).then(async (resBlob) => {
             console.log("Got ghost", resBlob)
             const text = await (new Response(resBlob)).text()
-            console.log("textGotten", text)
             resolve(text.split("\n"))
         }).catch((err) => {
             console.warn("Error getting ghost:", err)

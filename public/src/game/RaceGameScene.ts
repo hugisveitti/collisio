@@ -120,7 +120,6 @@ export class RaceGameScene extends GameScene {
     async create(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
 
-            this.ghostDriver = new GhostDriver(this.getTrackName(), this.getNumberOfLaps())
             console.log("this config", this.gameSceneConfig)
             if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
                 console.log("gamesettings", this.gameSettings)
@@ -210,7 +209,6 @@ export class RaceGameScene extends GameScene {
 
 
     _togglePauseGame(wasPaused: boolean) {
-
         if (!this.gameStarted) return
         for (let i = 0; i < this.vehicles.length; i++) {
             if (wasPaused) {
@@ -246,7 +244,7 @@ export class RaceGameScene extends GameScene {
     }
 
 
-    _restartGame() {
+    async _restartGame() {
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
 
@@ -258,11 +256,10 @@ export class RaceGameScene extends GameScene {
         this.winner = ""
         this.winTime = -1
 
-        this.driverRecorder?.reset()
-        this.ghostDriver?.reset()
-        // if (this.gameSettings.useGhost) {
-        //     this.createGhostVehicle()
-        // }
+        // this.driverRecorder?.reset()
+        // this.ghostDriver?.reset()
+
+        await this.createGhostVehicle()
 
 
         /**

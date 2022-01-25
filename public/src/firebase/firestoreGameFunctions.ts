@@ -274,3 +274,18 @@ export const deletePlayerGameData = (userId: string, gameId: string) => {
 //         console.log("moved", Object.keys(scores).length)
 //     })
 // }
+
+export const deleteBestScore = (playerId: string, trackName: TrackName, numberOfLaps: number) => {
+    console.log("`${playerId}#${trackName}#${numberOfLaps}`", `${playerId}#${trackName}#${numberOfLaps}`)
+    return new Promise<void>((resolve, reject) => {
+
+        const gameRef = doc(firestore, bestHighscoresRefPath, `${playerId}#${trackName}#${numberOfLaps}`)
+
+        deleteDoc(gameRef).then(() => {
+            resolve()
+        }).catch(e => {
+            console.warn("Error deleting game", e)
+            reject
+        })
+    })
+}

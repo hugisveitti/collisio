@@ -313,7 +313,6 @@ export class GameScene extends Scene3D implements IGameScene {
         window.addEventListener("resize", () => this.handleResizeWindow())
         await this.loadAssets()
 
-        console.log("capabilities", this.renderer.capabilities)
         this.renderer.clear()
         this.renderer.info.autoReset = false
         //  this.renderer.capabilities.precision = "lowp"
@@ -360,7 +359,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.updateDelta += currDelta
         if (this.deltaFPS > this.targetFPS && !this.isPaused) {
             const delta = this.updateDelta * 1000
-            //   console.log("delta", delta.toFixed(3), (this.deltaFPS * 1000).toFixed(3))
+
             this.updateDelta = 0
             this.deltaFPS = this.deltaFPS % this.targetFPS
             const time = this.clock.getElapsedTime()
@@ -385,7 +384,7 @@ export class GameScene extends Scene3D implements IGameScene {
             }
             this.postRender()
         } else {
-            // console.log("not rendering")
+
         }
     }
 
@@ -513,12 +512,10 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     setPixelRatio() {
-        // console.log("this.gameSettings", this.gameSettings)
         const lowGraphics = this.gameSettings.graphics === "low"
         this.renderer.capabilities.precision = lowGraphics ? "lowp" : "highp"
         // let ratio = lowGraphics ? 4 : 1
-        // console.log("Pixel ratio", ratio)
-        // console.log("window pixel ratio", window.devicePixelRatio)
+
         // if (window.devicePixelRatio < ratio && lowGraphics) {
         //     ratio = Math.floor(window.devicePixelRatio)
         // }
@@ -798,15 +795,12 @@ export class GameScene extends Scene3D implements IGameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // isGamePaused() {
-    //     console.log("is paused", this.vehicles[0]?.isPaused, this.roomId)
-    //     return this.gameStarted && this.vehicles[0].isPaused
-    // }
+
 
     pauseGame() {
         this.isPaused = true
         if (!this.gameStarted) return
-        if (this.isPaused) return
+
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicles[i].isReady) {
@@ -819,7 +813,6 @@ export class GameScene extends Scene3D implements IGameScene {
     unpauseGame() {
         this.isPaused = false
         if (!this.gameStarted) return
-        if (!this.isPaused) return
 
         this.startGameSong()
         this.songIsPlaying = false
@@ -827,7 +820,6 @@ export class GameScene extends Scene3D implements IGameScene {
             if (this.vehicles[i].isReady) {
                 this.vehicles[i].unpause()
             }
-
         }
         this._togglePauseGame(true)
     }
@@ -836,11 +828,13 @@ export class GameScene extends Scene3D implements IGameScene {
 
         if (!this.everythingReady()) return
 
+        if (!this.gameStarted) return
         if (this.isPaused) {
             this.unpauseGame()
         } else {
             this.pauseGame()
         }
+
     }
 
     /** to be overritten by child
@@ -986,7 +980,6 @@ export class GameScene extends Scene3D implements IGameScene {
     _startAllVehicles() { }
 
     stopAllVehicles() {
-        console.log("stopping all vehicles")
         for (let i = 0; i < this.vehicles.length; i++) {
             this.vehicles[i].setCanDrive(false)
             this.vehicles[i].stop()
@@ -1025,6 +1018,7 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async restartGame() {
+        this.isPaused = false
         this.oldTime = 0
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -1079,7 +1073,6 @@ export class GameScene extends Scene3D implements IGameScene {
         this.socket?.off(std_controls)
         if (this.gameSceneConfig?.onlyMobile) {
             if (this.gameSceneConfig.mobileController && this.vehicles.length > 0) {
-                console.log("creating controller intverval")
 
                 this.mobileOnlyControllerInterval = setInterval(() => {
                     driveVehicle(this.gameSceneConfig.mobileController, this.vehicles[0])
@@ -1264,7 +1257,6 @@ export class GameScene extends Scene3D implements IGameScene {
         return new Promise<void>(async (resolve, reject) => {
             window.removeEventListener("resize", () => this.handleResizeWindow())
 
-            console.log("destorying game")
             if (this.mobileOnlyControllerInterval) {
                 clearInterval(this.mobileOnlyControllerInterval)
             }

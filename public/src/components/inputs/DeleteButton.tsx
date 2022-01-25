@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import React, { useState } from "react";
 import { basicColor, cardBackgroundColor } from "../../providers/theme";
+import { CircularProgress } from "@mui/material";
 
 interface IDeleteButton {
   onDelete: () => void;
@@ -25,6 +26,7 @@ const style = {
 
 const DeleteButton = (props: IDeleteButton) => {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <React.Fragment>
@@ -36,27 +38,37 @@ const DeleteButton = (props: IDeleteButton) => {
                 Are sure you want to delete?
               </Typography>
             </Grid>
-            <Grid item xs={6}>
-              <Button
-                onClick={() => setOpen(false)}
-                variant="contained"
-                disableElevation
-                style={{ backgroundColor: basicColor, color: "black" }}
-              >
-                Cancel
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => {
-                  props.onDelete();
-                }}
-              >
-                Delete
-              </Button>
-            </Grid>
+            {isLoading ? (
+              <Grid item xs={12}>
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <>
+                <Grid item xs={6}>
+                  <Button
+                    onClick={() => setOpen(false)}
+                    variant="contained"
+                    disableElevation
+                    style={{ backgroundColor: basicColor, color: "black" }}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    disabled={isLoading}
+                    variant="contained"
+                    color="error"
+                    onClick={() => {
+                      setIsLoading(true);
+                      props.onDelete();
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Grid>
+              </>
+            )}
           </Grid>
         </Box>
       </Modal>
