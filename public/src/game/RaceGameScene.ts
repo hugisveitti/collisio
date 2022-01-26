@@ -94,6 +94,7 @@ export class RaceGameScene extends GameScene {
                 return
             }
 
+            this.ghostDriver = new GhostDriver(this.getTrackName(), this.getNumberOfLaps(), this.players[0].vehicleType)
             this.ghostDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.gameSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
 
                 const vt = this.ghostDriver.getVehicleType()
