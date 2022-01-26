@@ -158,7 +158,6 @@ export default class RoomMaster {
             /** delete room callback */
             delete this.rooms[roomId]
         })
-        // console.log("creating room, all rooms", Object.keys(this.rooms))
         console.log(this.getStatsString())
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })

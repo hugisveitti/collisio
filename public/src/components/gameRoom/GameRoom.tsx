@@ -63,7 +63,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
   };
 
   useEffect(() => {
-    console.log("clearing canvas in game room");
     clearBackdropCanvas();
   }, []);
 
@@ -72,8 +71,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
     saveRaceDataGame(
       data.endOfRaceInfo,
       (res) => {
-        console.log("res after saving game!", res);
-        console.log("pre game data info ", res.message);
         if (res.status === "success") {
           currentRaceInfo = [res.message].concat(currentRaceInfo);
           setGameDataInfo(currentRaceInfo);
@@ -91,14 +88,12 @@ const GameRoom = React.memo((props: IGameRoom) => {
   };
 
   const handleUpdateScoreInfo = (data: IScoreInfo) => {
-    console.log("handle update score info", data);
     if (data) {
       setScoreInfo(data);
     }
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    console.log("handle player finished", data);
     props.store.socket.emit(dts_player_finished, data);
   };
 
@@ -185,8 +180,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
         setPersonalBest: boolean;
         gameDataInfo: string[];
       }) => {
-        console.log("old game data info", gameDataInfo);
-        console.log("new game data info", data);
         const {
           setPersonalBest,
           playerId,
@@ -195,9 +188,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         if (setPersonalBest) {
           gameObject.saveDriveRecording(playerId);
         }
-        console.log("set personalBest", setPersonalBest);
         currentRaceInfo = currentRaceInfo.concat(newGameDataInfo);
-        console.log("current race info ", currentRaceInfo);
         setGameDataInfo(currentRaceInfo);
       }
     );
@@ -216,7 +207,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
       await gameObject.destroyGame();
       gameObject = undefined;
 
-      console.log("going to /connect");
       history.push(connectPagePath);
       // dont want to do this, because of the "enter game" button and the music
       //  window.location.href = connectPagePath;
@@ -242,7 +232,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
       }
     });
 
-    console.log("game obj changed", gameObject);
     return () => {
       props.store.socket.off(stmd_game_settings_changed);
       if (gameObject) {
@@ -255,7 +244,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
   };
 
   useEffect(() => {
-    console.log("game actions changed", gameActions);
     if (gameObject) {
       if (gameActions.pause) {
         setSettingsModalOpen(true);
@@ -292,7 +280,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
             //     props.store.setSocket(undefined);
             //   setGameObject(undefined);
             gameObject = undefined;
-            console.log("going to /connect");
             //   window.location.href = connectPagePath;
             history.push(newPath);
           });
@@ -316,7 +303,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
             //     props.store.setSocket(undefined);
             //   setGameObject(undefined);
             gameObject = undefined;
-            console.log("going to /connect");
             //   window.location.href = connectPagePath;
             history.push(newPath);
           });

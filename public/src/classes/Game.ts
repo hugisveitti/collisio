@@ -124,11 +124,11 @@ const dayColors: ITimeOfDayColors = {
 }
 
 const eveningColors: ITimeOfDayColors = {
-    ambientLightColor: 0x0077ff,
+    ambientLightColor: 0x3392FF,
     hemisphereBottomColor: 0x003168,
     hemisphereTopColor: 0x0077ff,
     pointLightIntesity: .1,
-    ambientLightIntesity: .01
+    ambientLightIntesity: .5
 }
 
 export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDayColors => {
@@ -238,7 +238,6 @@ export interface IEndOfRaceInfoPlayer {
     steeringSensitivity: number
     roomTicks: number
     gameTicks: number
-    userAgent: string
     totalPing: number
     totalPingsGotten: number
     avgFps: number

@@ -9,7 +9,6 @@ import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
 import { GhostVehicle } from "../vehicles/GhostVehicle";
-import { getStaticCameraPos } from "../vehicles/IVehicle";
 import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
@@ -99,7 +98,6 @@ export class RaceGameScene extends GameScene {
 
                 const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
-                    console.log("vt ", vt)
                     this.ghostVehicle = new GhostVehicle({
                         vehicleType: vt, color: "#10eedd"
                     })
@@ -112,7 +110,6 @@ export class RaceGameScene extends GameScene {
                 }
                 resolve()
             }).catch(() => {
-                console.log("No ghost since there is no recording")
                 resolve()
             })
         })
@@ -121,13 +118,10 @@ export class RaceGameScene extends GameScene {
     async create(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
 
-            console.log("this config", this.gameSceneConfig)
             if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
-                console.log("gamesettings", this.gameSettings)
                 if (this.gameSettings.useGhost && (this.gameSettings.tournamentId || this.gameSettings.ghostFilename)) {
                     await this.createGhostVehicle()
                 }
-                console.log("creating drive recorder")
                 this.driverRecorder = new DriveRecorder({
                     tournamentId: this.gameSceneConfig?.tournament?.id,
                     active: true,
@@ -177,7 +171,6 @@ export class RaceGameScene extends GameScene {
             }
 
             if (this.raceCountdownTime === 2) {
-                console.log("spin camera off")
                 for (let i = 0; i < this.vehicles.length; i++) {
                     this.vehicles[i].spinCameraAroundVehicle = false
                     //  if (!this.vehicles[i].useChaseCamera) {
@@ -503,7 +496,6 @@ export class RaceGameScene extends GameScene {
      * @i player number
      */
     prepareEndOfRacePlayer(i: number) {
-        console.log("prepare end of race player", i)
         const playerData: IEndOfRaceInfoPlayer = {
             totalTime: this.gameTimers[i].getTotalTime(),
             numberOfLaps: this.currentNumberOfLaps,
@@ -522,7 +514,6 @@ export class RaceGameScene extends GameScene {
             steeringSensitivity: this.vehicles[i].steeringSensitivity,
             roomTicks: this.roomTicks,
             gameTicks: this.gameTicks,
-            userAgent: navigator.userAgent,
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,

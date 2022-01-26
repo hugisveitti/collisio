@@ -64,7 +64,6 @@ export class GhostDriver {
             } else {
                 downloadGhost(filename).then((instructions) => {
                     this.isReady = true
-                    console.log("instructions", instructions)
                     if (instructions?.length) {
                         this.di = instructions
                         this.hasInstructions = true
@@ -87,7 +86,6 @@ export class GhostDriver {
 
             getTournamentGhost(tournamentId).then(instructions => {
                 this.isReady = true
-                console.log("instructions", instructions)
                 if (instructions?.length) {
                     this.di = instructions
                     this.hasInstructions = true
@@ -103,12 +101,10 @@ export class GhostDriver {
     }
 
     getVehicleType(): VehicleType | undefined {
-        console.log("getting vehicletype, this.di", this.di)
         if (!this.di || this.di.length < 1) {
             return undefined
         }
         const str = this.di[0].split(" ")[0]
-        console.log("str", str)
         if (isVehicleType(str)) {
             this.vehicleType = str as VehicleType
             return str as VehicleType
@@ -140,8 +136,8 @@ export class GhostDriver {
     }
 
     getPointBetween() {
-        if (!this.nextPointSet && this.timeIndex + 1 < this.di.length) {
-            this.setPositionRotationFromInstruction(this.di[this.timeIndex + 1], this.nextPos, this.nextRotation)
+        if (!this.nextPointSet && this.timeIndex < this.di.length) {
+            this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.nextPos, this.nextRotation)
             this.nextPointSet = true
         }
 
@@ -170,12 +166,12 @@ export class GhostDriver {
         if (!this.hasInstructions) return
         const cTime = this.getTime(this.timeIndex)
         if (this.timeIndex < this.di.length - 1 && cTime < time) {
-            this.timeIndex += 1
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
             vehicle.setPosition(this.pos.clone())
             vehicle.setRotation(this.rotation.clone())
             this.numNotUpdates = 0
             this.nextPointSet = false
+            this.timeIndex += 1
         } else if (cTime > time) {
             this.numNotUpdates += 1
             this.getPointBetween()
@@ -248,7 +244,6 @@ export class DriveRecorder {
 
     saveTournamentRecording = (totalTime: number, playerName?: string, playerId?: string) => {
         const metaData = [this.getMetadata()]
-        console.log("saving tournament rec, meta data:", metaData)
         uploadTournamentGhost(this.config.tournamentId, metaData.concat(this.instructions), totalTime)
     }
 
@@ -274,9 +269,7 @@ export class DriveRecorder {
      */
     saveRecordedInstructions = () => {
         const metaData = [this.getMetadata()]
-        console.log("meta data", metaData)
         const filename = this.getRecordingFilename()
-        console.log("saving instructions")
         uploadGhost(filename, metaData.concat(this.instructions))
     }
 }

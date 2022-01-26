@@ -83,7 +83,8 @@ const router = (app: any) => {
     })
     const sendIndexHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-        console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
+
+        console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", req.headers?.['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString())
         if (isValidHost(host)) {
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         } else {

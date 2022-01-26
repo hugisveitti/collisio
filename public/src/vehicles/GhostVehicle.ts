@@ -1,6 +1,6 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Scene3D } from "enable3d";
-import { MeshStandardMaterial, Quaternion, Vector3, Object3D, Color } from "three";
+import { MeshStandardMaterial, Quaternion, Vector3, Object3D, Color, RGBAFormat } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -49,7 +49,6 @@ export class GhostVehicle implements IGhostVehicle {
     }
 
     addToScene(scene: Scene3D) {
-        console.log("adding ghost to scene")
         scene.scene.add(this.vehicle)
     }
 
@@ -68,7 +67,6 @@ export class GhostVehicle implements IGhostVehicle {
         this.position = position
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
-        //  console.log("set ghost pos", position.x.toFixed(2), position.z.toFixed(2))
         this.vehicle.position.set(position.x, position.y, position.z)
     };
 
@@ -91,9 +89,10 @@ export class GhostVehicle implements IGhostVehicle {
                 let tires = [] as ExtendedObject3D[]
                 let chassis: ExtendedObject3D
                 let extraCarStuff: ExtendedObject3D;
-                let opacity = 0.5
+                let opacity = 0.2
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh" || child.type === "Group") {
+                        ((child as ExtendedObject3D).material as MeshStandardMaterial).format = RGBAFormat;
 
                         if (child.name.includes("chassis")) {
                             let _chassis = (child as ExtendedObject3D);

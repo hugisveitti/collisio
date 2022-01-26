@@ -812,10 +812,8 @@ export class LowPolyVehicle extends Vehicle {
             )
 
 
-            const newDist = correctNewPos.clone().distanceTo(this.prevPosition)
-            if (Math.abs(newDist - expDist) > 0.1) {
-                console.log("DIST AND EXP DIS NOT SAMEEEE")
-            }
+            // const newDist = correctNewPos.clone().distanceTo(this.prevPosition)
+
 
 
             this.p.setValue(correctNewPos.x, newPos.y, correctNewPos.z)
@@ -853,7 +851,6 @@ export class LowPolyVehicle extends Vehicle {
         if (!this.isReady) return
         this.delta = delta
         const usingJitter = false //this.useChaseCamera && this.detectJitter(delta)
-        //    console.log("ussing jitter", usingJitter)
 
         for (let i = 0; i < 4; i++) {
 
@@ -1153,8 +1150,7 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoa
         const loader = new GLTFLoader()
 
         loader.load(getStaticPath(`${vehicleConfigs[vehicleType].path}`), (gltf: GLTF) => {
-            console.log("${vehicleConfigs[vehicleType].path}", vehicleConfigs[vehicleType].path)
-            console.log("gltf vehicle", gltf)
+
             let tires = [] as ExtendedObject3D[]
             let chassis: ExtendedObject3D
             let extraCarStuff: ExtendedObject3D

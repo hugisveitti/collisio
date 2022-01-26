@@ -69,12 +69,10 @@ export class CourseItemsLoader {
                     textures[0].updateMatrix()
                     textures[1].matrix = ma
                     textures[1].updateMatrix()
-                    console.log("water text", textures)
 
                     let size = Math.max(waterObject.scale.x * 2, waterObject.scale.z * 2)
                     size = Math.ceil(Math.log2(size))
                     size = 2 ** size
-                    console.log("water size", size)
                     // WebGL: INVALID_OPERATION: generateMipmap: level 0 not power of 2 or not all the same size
                     this.course.gameScene.misc.water({
                         y: waterObject.position.y + .1,

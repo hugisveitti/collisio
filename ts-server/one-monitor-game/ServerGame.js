@@ -108,7 +108,6 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
-        // console.log("creating room, all rooms", Object.keys(this.rooms))
         console.log(this.getStatsString());
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });

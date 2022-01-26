@@ -80,7 +80,6 @@ export const createFakeHighscoreData = () => {
                 vehicleType: "test",
                 roomTicks: 0,
                 gameTicks: 0,
-                userAgent: "test data",
                 totalPing: -1,
                 totalPingsGotten: -1,
                 avgFps: -1

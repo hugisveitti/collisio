@@ -263,20 +263,12 @@ export class Vehicle implements IVehicle {
         )
 
         Promise.all(batch).then(() => {
-            console.log("all sounds loaded")
             this.engineSoundLoaded = true
         })
     }
 
     addDownForce() {
-        // const downforceCoeff = .4
-        // const frontalArea = 2
-        // const airDence = 1.2041
 
-        // const v = this.getCurrentSpeedKmHour()
-        // const force = 0.5 * downforceCoeff * frontalArea * airDence * (v * v)
-
-        // this.vehicleBody.body.applyForceY(-force)
     }
 
     updateFov() {
