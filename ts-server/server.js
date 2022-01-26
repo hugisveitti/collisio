@@ -24,180 +24,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /** toDO fix this shit */
 var express = require("express");
-var path = __importStar(require("path"));
-var si = __importStar(require("systeminformation"));
-var fs = __importStar(require("fs"));
-var app = express();
-// promises style - new since version 3
-si.cpu()
-    .then(function (data) {
-    console.log("####CPU Info#####");
-    console.log("cores", data.cores);
-    console.log("#####END CPU INFO#####");
-})
-    .catch(function (error) { return console.error(error); });
-var byteToGig = function (byte) {
-    return byte / (Math.pow(1024, 3));
-};
-var printMemoryInfo = function () {
-    si.mem()
-        .then(function (data) {
-        console.log("#### Memory Info #####", new Date().toISOString());
-        console.log("Total", byteToGig(data.total).toFixed(2), ", Free:", byteToGig(data.free).toFixed(2));
-        console.log("##### END Memory INFO #####");
-    })
-        .catch(function (error) { return console.error(error); });
-};
-printMemoryInfo();
-var port = process.env.PORT || 80;
-var os = __importStar(require("os"));
-/** only works on my PC */
-var onLocalhost = false;
-if (os.hostname().includes("Lisa")) {
-    console.log("On localhost");
-    port = 5000;
-    onLocalhost = true;
-}
-var isValidHost = function (host) {
-    return onLocalhost || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"));
-};
-var buildFolder = "dist";
-var encrypt = require("../public/src/shared-backend/encryption.json");
-console.log("enc", encrypt);
-var _loop_1 = function (key) {
-    app.get("/" + key, function (req, res) {
-        console.log("getting model", key);
-        res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/models/" + encrypt[key]));
-    });
-};
-for (var _i = 0, _a = Object.keys(encrypt); _i < _a.length; _i++) {
-    var key = _a[_i];
-    _loop_1(key);
-}
-app.get("/models/front-page.glb", function (req, res) {
-    console.log("getting model");
-    res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/models/front-page.glb"));
-});
-app.use(express.static(path.join(__dirname, "../public/" + buildFolder), { index: false }));
-app.use(express.static(path.join(__dirname, "../public/src"), { index: false }));
-var indexHTMLPath = "../public/" + buildFolder + "/index.html";
-var sendTestHTML = function (req, res) {
-    var host = req.get("host");
-    console.log("host", host);
-    if (isValidHost(host)) {
-        res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
-    }
-    else {
-        res.send("ERROR");
-    }
-};
-app.get("/test", sendTestHTML);
-app.get("/mobileonly", sendTestHTML);
-app.get("/speedtest", sendTestHTML);
-app.get("/driveinstructions/:filename", function (req, res) {
-    var filename = req.params.filename;
-    console.log("filename", filename);
-    res.sendFile(path.join(__dirname, "./testDriving/recordings/" + filename));
-});
-app.get("/vehicleconfig/:filename", function (req, res) {
-    var filename = req.params.filename;
-    console.log("filename", filename);
-    res.sendFile(path.join(__dirname, "./testDriving/" + filename));
-});
-var bodyParser = require("body-parser");
-app.use(bodyParser.json({ limit: "20mb" }));
-app.post("/saverecording", function (req, res) {
-    var data = req.body;
-    var date = new Date().toISOString().slice(0, 10);
-    var trackName = data.trackName;
-    var numberOfLaps = data.numberOfLaps;
-    var vehicleType = data.vehicleType;
-    //const fn = path.join(__dirname, `./testDriving/recordings/recording_${trackName}_${numberOfLaps}_${vehicleType}_${date}.txt`)
-    var fn = path.join(__dirname, "./testDriving/recordings/recording_" + trackName + "_" + numberOfLaps + "_" + vehicleType + ".txt");
-    // fs.open(fn)
-    fs.writeFile(fn, data.instructions, function (err) {
-        if (err) {
-            console.warn("Error saving recording:", err);
-            res.status(500).send({ "message": "Error saving file", err: err });
-        }
-        else {
-            res.status(200).send({ "message": "nice", fn: fn });
-        }
-    });
-});
-app.get("/ammo.wasm.js", function (_, res) {
-    res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
-});
-var sendIndexHTML = function (req, res) {
-    var host = req.get("host");
-    console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
-    if (isValidHost(host)) {
-        res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
-    }
-    else {
-        res.status(500).send("ERROR");
-    }
-};
-app.get("/", sendIndexHTML);
-app.get("/trophy", sendIndexHTML);
-app.get("/trophy/:id", sendIndexHTML);
-app.get("/tournament", sendIndexHTML);
-app.get("/tournament/:id", sendIndexHTML);
-// There must be some better way to do this shit
-app.get("/wait", sendIndexHTML);
-app.get("/wait/:gameId", sendIndexHTML);
-app.get("/game", sendIndexHTML);
-// app.get("/game/:id", (_: Request, res: Response) => {
-//     res.sendFile(path.join(__dirname, indexHTMLPath));
-// });
-app.get("/premium", sendIndexHTML);
-app.get("/about", sendIndexHTML);
-app.get("/connect", sendIndexHTML);
-app.get("/controls", sendIndexHTML);
-app.get("/how-to-play", sendIndexHTML);
-app.get("/highscores", sendIndexHTML);
-app.get("/private-profile", sendIndexHTML);
-app.get("/user/:id", sendIndexHTML);
-app.get("/show-room", sendIndexHTML);
-var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
-app.get("/admin", function (req, res) {
-    res.sendFile(path.join(__dirname, adminHTMLPath));
-});
+var _a = require("@socket.io/sticky"), setupMaster = _a.setupMaster, setupWorker = _a.setupWorker;
+var _b = require("@socket.io/cluster-adapter"), createAdapter = _b.createAdapter, setupPrimary = _b.setupPrimary;
+var helperFunctions_1 = require("./utils/helperFunctions");
+var router_1 = __importStar(require("./router"));
 var adminTools_1 = require("./adminTools");
-(0, adminTools_1.adminFunctions)(app);
-var server = app.listen(port, function () {
-    console.log("listening on port " + port);
-});
 var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
 var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
-var Worker = require('worker_threads').Worker;
+var process_1 = __importDefault(require("process"));
+var createApp = function (isPrimary) {
+    var app = express();
+    (0, adminTools_1.adminFunctions)(app);
+    (0, helperFunctions_1.printMemoryInfo)();
+    var port = (0, router_1.getPortLocalhost)().port;
+    var server;
+    (0, router_1.default)(app);
+    server = app.listen(port, function () {
+        console.log("---listening on port " + port + "---");
+    });
+    return { server: server, app: app };
+};
+console.log("Primary " + process_1.default.pid + " is running");
+var _c = createApp(true), app = _c.app, server = _c.server;
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
 var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {
     //  const worker = new Worker("./one-monitor-game/ServerGame.js", { socket })
     roomMaster.addSocket(socket);
-    printMemoryInfo();
+    // printMemoryInfo()
     socket.once(shared_stuff_1.mdts_number_connected, function () {
         socket.emit(shared_stuff_1.stmd_number_connected, { data: roomMaster.getStats() });
     });
     socket.on("error", function (err) {
         console.warn("Error occured in socket:", err);
     });
-});
-app.get("/robot.txt", function (req, res) {
-    res.status(200).sendFile(path.join(__dirname, "../robot.txt"));
-});
-app.get("/humans.txt", function (req, res) {
-    res.status(200).sendFile(path.join(__dirname, "../humans.txt"));
-});
-app.get("*", function (req, res) {
-    var host = req.get("host");
-    console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
-    if (isValidHost(host)) {
-        // res.sendFile(path.join(__dirname, indexHTMLPath));
-        res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
-    }
-    else {
-        res.send("ERROR");
-    }
 });

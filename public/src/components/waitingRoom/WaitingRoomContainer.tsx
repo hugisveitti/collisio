@@ -122,18 +122,14 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     _displayName: string,
     gottenFromURL?: boolean
   ) => {
-    console.log("user", user);
     setConnectingGuest(true);
     let userSettings = props.store.userSettings;
-    console.log("gotten from url", gottenFromURL);
     if (gottenFromURL && user) {
       // need to get user setting
       userSettings = await getDBUserSettings(user.uid);
       props.store.setUserSettings(userSettings);
-      console.log("userset", userSettings);
     }
 
-    console.log("store", props.store);
     // send user settings
     props.store.socket.emit(mts_player_connected, {
       roomId,

@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, setDoc, where } from "@firebase/firestore"
+import { collection, deleteDoc, doc, endBefore, getDocs, limit, limitToLast, onSnapshot, orderBy, query, setDoc, startAfter, startAt, where } from "@firebase/firestore"
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game"
 import { IFlattendBracketNode } from "../classes/Tournament"
 import { TrackName } from "../shared-backend/shared-stuff"
@@ -212,23 +212,24 @@ export const getPlayerBestScores = async (playerId: string, callback: (data: IEn
     }
 }
 
-export type BestTrackScore = {
-    [numberOfLaps: number]: IEndOfRaceInfoPlayer[]
-}
-export const getBestScoresOnTrack = async (trackName: string, callback: (data: BestTrackScore) => void) => {
-    const bestScoreRef = collection(firestore, bestHighscoresRefPath)
-    const q = query(bestScoreRef, where("trackName", "==", trackName), orderBy("totalTime", "asc"))
+export type BestTrackScore = IEndOfRaceInfoPlayer[]
 
-    const dict = {}
-    const data = await getDocs(q)
-    data.forEach(doc => {
-        const val = doc.data() as IEndOfRaceInfoPlayer
-        if (!(val.numberOfLaps in dict)) {
-            dict[val.numberOfLaps] = []
-        }
-        dict[val.numberOfLaps].push(val)
+export const getBestScoresOnTrack = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number): Promise<IEndOfRaceInfoPlayer[]> => {
+    return new Promise<IEndOfRaceInfoPlayer[]>(async (resolve, reject) => {
+        const bestScoreRef = collection(firestore, bestHighscoresRefPath)
+        const q = query(bestScoreRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
+
+        const arr = []
+
+        const data = await getDocs(q)
+        data.forEach(doc => {
+            const val = doc.data() as IEndOfRaceInfoPlayer
+            arr.push(val)
+
+        })
+        console.log("arr", arr)
+        resolve(arr)
     })
-    callback(dict)
 }
 
 

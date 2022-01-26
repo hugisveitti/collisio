@@ -16,14 +16,17 @@ import { setLocalGameSetting } from "../../classes/localGameSettings";
 import { IUser } from "../../classes/User";
 import DeleteButton from "../inputs/DeleteButton";
 import { deleteBestScore } from "../../firebase/firestoreGameFunctions";
+import { useHistory } from "react-router";
 
 interface IProps {
   playerData: IEndOfRaceInfoPlayer;
   includeTrackAndNumLaps?: boolean;
   user: IUser;
+  number: number;
 }
 
-export default (props: IProps) => {
+const HighscorePageTableRow = (props: IProps) => {
+  const history = useHistory();
   const [open, setOpen] = useState(false);
   // let open = false;
 
@@ -46,13 +49,20 @@ export default (props: IProps) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        <TableCell>{props.number}</TableCell>
         <TableCell>
-          <a
-            style={{ color: "inherit" }}
-            href={getUserPagePath(playerData.playerId)}
+          <span
+            style={{
+              color: "inherit",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              history.push(getUserPagePath(playerData.playerId));
+            }}
           >
             {playerData.playerName}
-          </a>
+          </span>
         </TableCell>
         <TableCell>{playerData.totalTime}</TableCell>
         <TableCell>{playerData.bestLapTime}</TableCell>
@@ -86,7 +96,7 @@ export default (props: IProps) => {
       <TableRow>
         <TableCell
           style={{ paddingBottom: 0, paddingTop: 0 }}
-          colSpan={5 + (props.includeTrackAndNumLaps ? 2 : 0)}
+          colSpan={7 + (props.includeTrackAndNumLaps ? 2 : 0)}
         >
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div
@@ -136,3 +146,5 @@ export default (props: IProps) => {
     </React.Fragment>
   );
 };
+
+export default HighscorePageTableRow;

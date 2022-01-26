@@ -15,6 +15,8 @@ interface IHighscoreTable {
   noDataText: string;
   includeTrackAndNumLaps?: boolean;
   user: IUser;
+  page?: number;
+  rowsPerPage?: number;
 }
 
 const HighscoreTable = (props: IHighscoreTable) => {
@@ -30,8 +32,8 @@ const HighscoreTable = (props: IHighscoreTable) => {
         <TableHead>
           <TableRow>
             <TableCell />
-
-            <TableCell component="th">Player name</TableCell>
+            <TableCell component="th">Place</TableCell>
+            <TableCell component="th">Player</TableCell>
             <TableCell component="th">Total time</TableCell>
             <TableCell component="th">Best lap time</TableCell>
             {props.includeTrackAndNumLaps && (
@@ -59,6 +61,7 @@ const HighscoreTable = (props: IHighscoreTable) => {
                   playerData={playerData}
                   includeTrackAndNumLaps={props.includeTrackAndNumLaps}
                   user={props.user}
+                  number={i + 1 + (props.rowsPerPage ?? 0) * (props.page ?? 0)}
                 />
               );
             })

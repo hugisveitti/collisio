@@ -1,24 +1,23 @@
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import CircularProgress from "@mui/material/CircularProgress";
-import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import TablePagination from "@mui/material/TablePagination";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
-import { IEndOfRaceInfoPlayer, nonActiveTrackNames } from "../../classes/Game";
 import {
-  BestTrackScore,
-  getBestScoresOnTrack,
-} from "../../firebase/firestoreGameFunctions";
+  IEndOfRaceInfoPlayer,
+  nonActiveTrackNames,
+  numberOfLapsPossibilities,
+} from "../../classes/Game";
+import { getBestScoresOnTrack } from "../../firebase/firestoreGameFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { TrackName } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
-import { itemInArray } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
+import NumberSelect from "../inputs/NumberSelect";
 import "../inputs/select.css";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import TrackSelect from "../inputs/TrackSelect";
@@ -26,32 +25,33 @@ import HighscoreTable from "./HighscoreTable";
 
 interface IHighscorePage {}
 
+let nextStartTotalTime = 0;
+let startTotalTimes = [];
 const HighscorePage = (props: IHighscorePage) => {
-  const [numberOfLapsKeys, setNumberOfLapsKeys] = useState([]);
-  const [numberOfLapsKey, setNumberOfLapsKey] = useState("");
+  // const [numberOfLapsKeys, setNumberOfLapsKeys] = useState([]);
+  const [numberOfLapsKey, setNumberOfLapsKey] = useState(2);
   const [trackKey, setTrackKey] = useState("");
 
   const [highscoreHasLoaded, setHighscoreHasLoaded] = useState(false);
 
-  const [bestTrackScores, setBestTrackScores] = useState({} as BestTrackScore);
   const [highscoreList, setHighscoreList] = useState(
     [] as IEndOfRaceInfoPlayer[]
   );
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+
   const user = useContext(UserContext);
 
   useEffect(() => {
-    if (bestTrackScores[numberOfLapsKey]) {
-      setHighscoreList(bestTrackScores[numberOfLapsKey]);
-    } else {
-      setHighscoreList([]);
-    }
-  }, [numberOfLapsKey]);
-
-  useEffect(() => {
     const storageTrackKey = window.localStorage.getItem("highscoreTrackKey");
+    const storageNumberOfLapsKey =
+      window.localStorage.getItem("numberOfLapsKey");
     if (storageTrackKey) {
       setTrackKey(storageTrackKey as TrackName);
+    }
+    if (storageNumberOfLapsKey && !isNaN(+storageNumberOfLapsKey)) {
+      setNumberOfLapsKey(+storageNumberOfLapsKey);
     }
   }, []);
 
@@ -59,24 +59,63 @@ const HighscorePage = (props: IHighscorePage) => {
     window.localStorage.setItem("highscoreTrackKey", trackKey);
 
     setHighscoreHasLoaded(false);
-    getBestScoresOnTrack(trackKey, (data) => {
+    setPage(0);
+    const startTotalTime = 0;
+
+    getBestScoresOnTrack(
+      trackKey,
+      numberOfLapsKey,
+      startTotalTime,
+      rowsPerPage
+    ).then((data) => {
       setHighscoreHasLoaded(true);
 
-      setBestTrackScores(data);
-      const nolKeys = Object.keys(data);
-      setNumberOfLapsKeys(nolKeys);
-
-      if (!itemInArray(numberOfLapsKey, numberOfLapsKeys)) {
-        if (nolKeys?.length > 0) {
-          setNumberOfLapsKey(nolKeys[0]);
-        } else {
-          setNumberOfLapsKey("");
-        }
-      } else {
-        setHighscoreList(data[numberOfLapsKey]);
+      setHighscoreList(data);
+      if (data?.length) {
+        startTotalTimes = [0];
+        nextStartTotalTime = data[data.length - 1].totalTime + 0.01;
       }
     });
-  }, [trackKey]);
+  }, [trackKey, numberOfLapsKey]);
+
+  const handleChangePage = (
+    event: unknown,
+    newPage: number,
+    _rowsPerPage?: number
+  ) => {
+    let rpp = _rowsPerPage ?? rowsPerPage;
+
+    let startTime = 0;
+    if (newPage > page) {
+      startTime = nextStartTotalTime + 0.01;
+    } else {
+      const newStartTotalTimes = startTotalTimes;
+      startTime = startTotalTimes[newPage];
+    }
+
+    setPage(newPage);
+
+    getBestScoresOnTrack(trackKey, numberOfLapsKey, startTime, rpp).then(
+      (data) => {
+        setHighscoreList(data);
+        if (data?.length) {
+          if (newPage > page) {
+            startTotalTimes[newPage] = data[0].totalTime;
+          }
+          nextStartTotalTime = data[data.length - 1].totalTime + 0.01;
+        }
+      }
+    );
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newRpp = parseInt(event.target.value, 10);
+    setRowsPerPage(newRpp);
+    setPage(0);
+    handleChangePage(null, 0, newRpp);
+  };
 
   const { color, backgroundColor } = getStyledColors("white");
 
@@ -119,7 +158,18 @@ const HighscorePage = (props: IHighscorePage) => {
             </Grid>
 
             <Grid item xs={9} sm={3}>
-              <span style={{ display: "block", color: backgroundColor }}>
+              <NumberSelect
+                title="No. of laps"
+                value={numberOfLapsKey}
+                numbers={numberOfLapsPossibilities}
+                onChange={(val) => {
+                  setNumberOfLapsKey(val);
+                }}
+                style={{
+                  backgroundColor,
+                }}
+              />
+              {/* <span style={{ display: "block", color: backgroundColor }}>
                 Track
               </span>
               <FormControl fullWidth>
@@ -146,7 +196,7 @@ const HighscorePage = (props: IHighscorePage) => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
             </Grid>
             <Grid item xs={3} sm={1}>
               <Tooltip
@@ -162,11 +212,29 @@ const HighscorePage = (props: IHighscorePage) => {
             <Grid item xs={false} sm={4} />
 
             <Grid item xs={12}>
+              <TablePagination
+                page={page}
+                count={-1}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[1, 2, 5, 10, 15, 25, 50]}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                component="div"
+                nextIconButtonProps={{
+                  disabled: highscoreList?.length === 0,
+                }}
+                style={{
+                  color,
+                  backgroundColor,
+                }}
+              />
               <HighscoreTable
                 data={highscoreList}
                 noDataText="No one has recorded with the combination of this
                 track and these number of laps"
                 user={user}
+                page={page}
+                rowsPerPage={rowsPerPage}
               />
             </Grid>
           </>
