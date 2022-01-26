@@ -36,6 +36,11 @@ var getPortLocalhost = function () {
     return { port: port, onLocalhost: onLocalhost };
 };
 exports.getPortLocalhost = getPortLocalhost;
+var printRequestInfo = function (req) {
+    var _a;
+    var host = req.get("host");
+    console.log("host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", (_a = req.headers) === null || _a === void 0 ? void 0 : _a['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString());
+};
 var router = function (app) {
     var onLocalhost = (0, exports.getPortLocalhost)().onLocalhost;
     var isValidHost = function (host) {
@@ -61,7 +66,8 @@ var router = function (app) {
     var indexHTMLPath = "../public/" + buildFolder + "/index.html";
     var sendTestHTML = function (req, res) {
         var host = req.get("host");
-        console.log("host", host);
+        console.log("Sending test");
+        printRequestInfo(req);
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
         }
@@ -72,29 +78,20 @@ var router = function (app) {
     app.get("/test", sendTestHTML);
     app.get("/mobileonly", sendTestHTML);
     app.get("/speedtest", sendTestHTML);
-    app.get("/driveinstructions/:filename", function (req, res) {
-        var filename = req.params.filename;
-        console.log("filename", filename);
-        res.sendFile(path.join(__dirname, "./testDriving/recordings/" + filename));
-    });
-    app.get("/vehicleconfig/:filename", function (req, res) {
-        var filename = req.params.filename;
-        console.log("filename", filename);
-        res.sendFile(path.join(__dirname, "./testDriving/" + filename));
-    });
     var bodyParser = require("body-parser");
     app.use(bodyParser.json({ limit: "20mb" }));
     app.get("/ammo.wasm.js", function (_, res) {
         res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
     });
     var sendIndexHTML = function (req, res) {
-        var _a;
         var host = req.get("host");
-        console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", (_a = req.headers) === null || _a === void 0 ? void 0 : _a['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString());
+        console.log("reqest to index");
+        printRequestInfo(req);
         if (isValidHost(host)) {
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
+            console.log("ERROR");
             res.status(500).send("ERROR");
         }
     };
@@ -128,12 +125,14 @@ var router = function (app) {
     });
     app.get("*", function (req, res) {
         var host = req.get("host");
-        console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString());
+        console.log("Request to star");
+        printRequestInfo(req);
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
+            console.log("ERROR");
             res.send("ERROR");
         }
     });

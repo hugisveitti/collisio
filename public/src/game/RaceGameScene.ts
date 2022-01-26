@@ -25,6 +25,7 @@ export class RaceGameScene extends GameScene {
     /** delete if reset */
     countDownTimeout: NodeJS.Timeout
     gameStartingTimeOut: NodeJS.Timeout
+    countDownInterval: NodeJS.Timer
     course: IRaceCourse
 
     /** the first race count down is longer then after pressing restart game */
@@ -117,7 +118,7 @@ export class RaceGameScene extends GameScene {
 
     async create(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
-
+            this._clearTimeouts()
             if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
                 if (this.gameSettings.useGhost && (this.gameSettings.tournamentId || this.gameSettings.ghostFilename)) {
                     await this.createGhostVehicle()
@@ -141,7 +142,7 @@ export class RaceGameScene extends GameScene {
         })
     }
 
-    startRaceCountdown() {
+    async startRaceCountdown() {
         this.currentNumberOfLaps = this.getNumberOfLaps()
         this.startGameSong()
         if (this.raceCountdownTime < 3) this.raceCountdownTime = 3
@@ -164,7 +165,10 @@ export class RaceGameScene extends GameScene {
             }
         }, (.5) * 1000)
 
-        const timer = () => {
+        clearTimeout(this.countDownInterval)
+        this.countDownInterval = setInterval(() => {
+
+            // while (0 <= this.raceCountdownTime) {
             if (this.raceCountdownTime < 4) {
                 // dont always play beep
                 this.playCountdownBeep()
@@ -181,24 +185,24 @@ export class RaceGameScene extends GameScene {
             }
             // this.showImportantInfo(countdown + "")
             this.showViewsImportantInfo(this.raceCountdownTime + "")
-            this.raceCountdownTime -= 1
-            this.countDownTimeout = setTimeout(() => {
-                if (this.raceCountdownTime > 0) {
-                    timer()
-                } else {
-                    this.playStartBeep()
-                    this.showViewsImportantInfo("GO!")
-                    this.startAllVehicles()
-                    this.gameStarted = true
-                    this.raceCountdownTime = 3
 
-                    setTimeout(() => {
-                        this.clearViewsImportantInfo()
-                    }, 2000)
-                }
-            }, 1000)
-        }
-        timer()
+            if (this.raceCountdownTime > 0) {
+
+                // await this.nSecWait(1)
+                // this.raceCountdownTime -= 1
+            } else {
+                this.playStartBeep()
+                this.showViewsImportantInfo("GO!", true)
+                this.startAllVehicles()
+                this.gameStarted = true
+                clearInterval(this.countDownInterval)
+                this.raceCountdownTime = 3
+
+            }
+            this.raceCountdownTime -= 1
+            // }
+        }, 1000)
+
     }
 
 
@@ -237,13 +241,18 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    _clearTimeouts() {
+        clearTimeout(this.countDownTimeout)
+        clearTimeout(this.gameStartingTimeOut)
+        clearInterval(this.countDownInterval)
+    }
 
     async _restartGame() {
 
+
         this.currentNumberOfLaps = this.getNumberOfLaps()
 
-        window.clearTimeout(this.countDownTimeout)
-        window.clearTimeout(this.gameStartingTimeOut)
+        this._clearTimeouts()
         this.clearTimeouts()
 
         this.gameStarted = false
@@ -255,6 +264,7 @@ export class RaceGameScene extends GameScene {
 
         await this.createGhostVehicle()
 
+        this.resetVehicles()
 
         /**
          * There is a bug here, I dont know what
@@ -579,8 +589,6 @@ export class RaceGameScene extends GameScene {
     }
 
     saveDriveRecording(playerId: string): void {
-        console.log("saving player recording for playerid", this.gameSettings)
-        console.log("drive recorder", this.driverRecorder)
         if (this.gameSettings.record && this.driverRecorder?.instructions) {
             this.driverRecorder.saveRecordedInstructions()
         }

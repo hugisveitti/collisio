@@ -18,6 +18,13 @@ export const getPortLocalhost = () => {
     return { port, onLocalhost }
 }
 
+const printRequestInfo = (req: Request) => {
+    const host = req.get("host")
+    console.log(
+        "host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", req.headers?.['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString()
+    )
+}
+
 const router = (app: any) => {
     const { onLocalhost } = getPortLocalhost()
 
@@ -46,7 +53,8 @@ const router = (app: any) => {
 
     const sendTestHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-        console.log("host", host)
+        console.log("Sending test")
+        printRequestInfo(req)
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
         } else {
@@ -62,18 +70,6 @@ const router = (app: any) => {
 
     app.get("/speedtest", sendTestHTML);
 
-    app.get("/driveinstructions/:filename", (req: Request, res: Response) => {
-        const filename = req.params.filename
-        console.log("filename", filename)
-        res.sendFile(path.join(__dirname, `./testDriving/recordings/${filename}`));
-    });
-
-    app.get("/vehicleconfig/:filename", (req: Request, res: Response) => {
-        const filename = req.params.filename
-        console.log("filename", filename)
-        res.sendFile(path.join(__dirname, `./testDriving/${filename}`));
-    });
-
     var bodyParser = require("body-parser");
 
     app.use(bodyParser.json({ limit: "20mb" }));
@@ -83,11 +79,13 @@ const router = (app: any) => {
     })
     const sendIndexHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-
-        console.log("sending index", "host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", req.headers?.['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString())
+        console.log("reqest to index")
+        printRequestInfo(req)
         if (isValidHost(host)) {
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         } else {
+            console.log("ERROR")
+
             res.status(500).send("ERROR")
         }
     }
@@ -126,11 +124,13 @@ const router = (app: any) => {
 
     app.get("*", (req: Request, res: Response) => {
         const host = req.get("host")
-        console.log("notfound", "host", host, ", ip", req.socket.remoteAddress, ", url:", req.url, "date:", new Date().toISOString())
+        console.log("Request to star")
+        printRequestInfo(req)
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
         } else {
+            console.log("ERROR")
             res.send("ERROR")
         }
     });

@@ -521,8 +521,6 @@ export class GameScene extends Scene3D implements IGameScene {
         // }
 
 
-
-
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
@@ -552,9 +550,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
     clearTimeouts() {
         for (let to of this.viewsImpornantInfoClearTimeout) {
-            window.clearTimeout(to)
+            clearTimeout(to)
         }
-        window.clearTimeout(this.importantInfoTimeout)
+        clearTimeout(this.importantInfoTimeout)
     }
 
     setNeedsReload(needsReload: boolean) {
@@ -1018,6 +1016,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     async restartGame() {
+        this.clearImportantInfo()
+        this.clearViewsImportantInfo()
+
         this.isPaused = false
         this.oldTime = 0
         this.totalPing = 0

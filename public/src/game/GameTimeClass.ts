@@ -92,7 +92,6 @@ export class GameTime {
 
     checkpointCrossed(checkpointNumber: number) {
 
-        console.log("checkpointNumber", checkpointNumber)
         if (!this.isCheckpointCrossed[checkpointNumber - 1]) {
             this.checkpointTimes[checkpointNumber - 1].push(this.getTotalTime())
         }
