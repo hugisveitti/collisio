@@ -25,5 +25,5 @@ To run locally you will need to install the firebase emulator.
 Then
 
 ```
-firebase emulators:start
+./run.sh
 ```
