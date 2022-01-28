@@ -8,6 +8,7 @@ import BackdropButton from "./button/BackdropButton";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import DonateButton from "./monitary/DonateButton";
 import { buyPremiumPagePath } from "./Routes";
+import { IStore } from "./store";
 
 interface IAboutPageComponent {}
 

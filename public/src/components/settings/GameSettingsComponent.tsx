@@ -1,4 +1,6 @@
+import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUp from "@mui/icons-material/VolumeUp";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
@@ -23,13 +25,15 @@ import {
 import { getFastestGhostFilename } from "../../firebase/firebaseStorageFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { GameType } from "../../shared-backend/shared-stuff";
+import { setMusicVolume } from "../../sounds/gameSounds";
 import { DriveRecorder } from "../../test-courses/GhostDriver";
-import { inTestMode } from "../../utils/settings";
+import { getDeviceType, inTestMode } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
 import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import CollabsibleCard from "../inputs/CollapsibleCard";
 import InfoButton from "../inputs/info-button/InfoButton";
 import NumberSelect from "../inputs/NumberSelect";
+import MySlider from "../inputs/slider/MySlider";
 import TrackSelect from "../inputs/TrackSelect";
 import MyRadio from "../radio/MyRadio";
 import MyTextField from "../textField/MyTextField";
@@ -45,6 +49,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const [drawDistanceDefaultVal, setDrawDistanceDefaultVal] = useState(
     props.gameSettings.drawDistance
   );
+
+  const onMobile = getDeviceType() === "mobile";
 
   const { color, backgroundColor } = getStyledColors("black");
 
@@ -204,6 +210,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         <CollabsibleCard header="More settings">
           <Grid container spacing={3}>
             <Grid item xs={6} sm={4}>
+              <Typography>Sound effects</Typography>
               <IconButton
                 style={{ color: backgroundColor }}
                 onClick={() => {
@@ -235,6 +242,27 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 onChange={(newVal) => updateGameSettings("graphics", newVal)}
               />
             </Grid>
+            <Grid item xs={12}>
+              <MySlider
+                startIcon={<VolumeDown />}
+                endIcon={<VolumeUp />}
+                label="Music volume"
+                onChangeCommitted={(newVal) => {
+                  updateGameSettings("musicVolume", newVal);
+                }}
+                onChange={(newVal) => {
+                  if (!onMobile) {
+                    setMusicVolume(newVal as number);
+                  }
+                }}
+                value={gameSettings.musicVolume}
+                step={0.01}
+                max={1}
+                min={0}
+                color="black"
+              />
+            </Grid>
+
             <Grid item xs={12}>
               <Typography>Draw distance</Typography>
               <Slider

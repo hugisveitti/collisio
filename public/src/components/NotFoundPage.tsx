@@ -9,7 +9,7 @@ interface INotFoundPage {}
 
 const NotFoundPage = (props: INotFoundPage) => {
   return (
-    <BackdropContainer backgroundContainer>
+    <BackdropContainer noMusic backgroundContainer>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Typography>Page not found</Typography>

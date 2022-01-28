@@ -1,9 +1,17 @@
+import VolumeDown from "@mui/icons-material/VolumeDown";
+import VolumeUp from "@mui/icons-material/VolumeUp";
 import { CircularProgress, Grid } from "@mui/material";
 import React, { useContext, useEffect } from "react";
+import {
+  IGameSettings,
+  setLocalGameSetting,
+} from "../../classes/localGameSettings";
 import { UserContext } from "../../providers/UserProvider";
+import { setMusicVolume } from "../../sounds/gameSounds";
 import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
+import MySlider from "../inputs/slider/MySlider";
 import {
   aboutPagePath,
   buyPremiumPagePath,
@@ -78,20 +86,50 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           </BackdropButton>
         </Grid>
 
-        <Grid item xs={12} lg={6} style={{}}>
-          {user === null ? (
-            <div style={{ marginTop: 15, margin: "auto", textAlign: "center" }}>
-              <CircularProgress />
-            </div>
-          ) : (
-            <div
-              style={{
-                float: "right",
-              }}
-            >
-              {renderUserInfo()}
-            </div>
-          )}
+        <Grid
+          item
+          xs={12}
+          lg={6}
+          style={{
+            float: "right",
+          }}
+        >
+          <>
+            {user === null ? (
+              <div
+                style={{ marginTop: 15, margin: "auto", textAlign: "center" }}
+              >
+                <CircularProgress />
+              </div>
+            ) : (
+              <div>{renderUserInfo()}</div>
+            )}
+            {!onMobile && (
+              <div style={{ marginTop: 15 }} className="background">
+                <MySlider
+                  startIcon={<VolumeDown />}
+                  endIcon={<VolumeUp />}
+                  label="Music volume"
+                  onChangeCommitted={(newVal) => {
+                    const newGameSettings: IGameSettings = {
+                      ...props.store.gameSettings,
+                      musicVolume: newVal as number,
+                    };
+                    props.store.setGameSettings(newGameSettings);
+                    setLocalGameSetting("musicVolume", newVal as number);
+                  }}
+                  onChange={(newVal) => {
+                    setMusicVolume(newVal as number);
+                  }}
+                  value={props.store.gameSettings.musicVolume}
+                  step={0.01}
+                  max={1}
+                  min={0}
+                  color="white"
+                />
+              </div>
+            )}
+          </>
         </Grid>
         <Grid item xs={12}>
           <p>

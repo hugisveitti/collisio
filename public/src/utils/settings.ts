@@ -52,7 +52,8 @@ export const testGameSettings: IGameSettings = {
     drawDistance: 5000,
     record: false,
     useGhost: true,
-    ghostFilename: "LdEGkMu2r2QCdJ8wMerp1bkRrqd2/sea-side-track/2"
+    ghostFilename: "LdEGkMu2r2QCdJ8wMerp1bkRrqd2/sea-side-track/2",
+    musicVolume: .5
 }
 
 

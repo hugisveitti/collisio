@@ -1,8 +1,9 @@
-import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, Scene, ShaderMaterial, SphereGeometry, sRGBEncoding, Vector3, WebGLRenderer } from "three";
+import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, Scene, ShaderMaterial, SphereGeometry, sRGBEncoding, Vector3, WebGLRenderer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { getTimeOfDayColors } from "../../classes/Game";
 import { skydomeFragmentShader, skydomeVertexShader } from "../../game/shaders";
-import { getStaticPath } from "../../utils/settings";
+import { addMusic, loadMusic, stopMusic } from "../../sounds/gameSounds";
+import { getDeviceType, getStaticPath } from "../../utils/settings";
 import "./backdrop.css";
 
 
@@ -73,8 +74,10 @@ let cameraPositions = []
 let cameraTargetPos = new Vector3(0, 0, 0);
 let reachedTarget = true;
 
-export const changeCameraPosition = (posNum: number) => {
-
+export const changeCameraPosition = (posNum: number, volume: number) => {
+    if (posNum === 1) {
+        addMusic(volume, camera, "menu.mp3")
+    }
 
     if (camera) {
 
@@ -104,6 +107,7 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
 
 
 
+
     renderer = new WebGLRenderer({ antialias: true });
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -125,34 +129,14 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
         camera.lookAt(cameraLookAtPos)
         setPosXZ()
     })
-
-
     camera = new PerspectiveCamera(40, width / height, 1, 2000);
-    // camera.position.set(25, 9, 6);
+
+
+
+
     camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z)
-
-    //  camera.aspect = width/ height
-
-
     camera.lookAt(cameraLookAtPos.clone())
 
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.target.set(0, 0.5, 0);
-    // controls.update();
-    // controls.enablePan = false;
-    // controls.enableDamping = true;
-
-
-
-
-    // window.onresize = function () {
-    //     // remove func
-    //     width = window.innerWidth
-    //     height = window.innerHeight
-    //     camera.aspect = width / height;
-    //     camera.updateProjectionMatrix();
-    //     renderer.setSize(width, height);
-    // };
     window.addEventListener("resize", handleWindowResize)
     window.setTimeout(() => {
         width = window.innerWidth
@@ -181,14 +165,10 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
     const targetFPS = 20
 
     const animate = () => {
-
-
-
         // controls.update();
         if (renderer) {
             const now = Date.now()
             const delta = now - time
-
             renderer.render(scene, camera);
             time = now
 
@@ -284,10 +264,13 @@ export const clearBackdropCanvas = () => {
         clearTimeout(animateTimeout)
     }
     window.removeEventListener("resize", handleWindowResize)
+    stopMusic()
+
     renderer?.clear()
     scene?.clear()
     scene = undefined
     renderer = undefined
+
     cosOff = Math.PI / 2
     sinOff = 0
 
