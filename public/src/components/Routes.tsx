@@ -250,7 +250,7 @@ const Routes = () => {
         />
         <Route
           path={[trophyRoomIdPath, trophyRoomPath]}
-          render={(props) => <TrophyRoomContainer {...props} />}
+          render={(props) => <TrophyRoomContainer {...props} store={store} />}
         />
         <Route
           path={mobileOnlyWaitingRoomPath}

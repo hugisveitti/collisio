@@ -189,7 +189,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
           </Typography>
           <Slider
             style={{
-              color: "black",
+              color: color,
             }}
             min={0}
             max={5}

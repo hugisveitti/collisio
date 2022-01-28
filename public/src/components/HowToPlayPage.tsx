@@ -35,6 +35,7 @@ import BackdropContainer from "./backdrop/BackdropContainer";
 import MyCard from "./card/MyCard";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import { buyPremiumPagePath, highscorePagePath } from "./Routes";
+import { IStore } from "./store";
 
 interface IHowToPlayItem {
   header: string;

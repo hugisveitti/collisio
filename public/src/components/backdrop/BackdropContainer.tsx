@@ -2,6 +2,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import "react-toastify/dist/ReactToastify.css";
+import { getLocalGameSetting } from "../../classes/localGameSettings";
 import { createClassNames } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import { gameRoomPath } from "../Routes";
@@ -22,6 +23,7 @@ interface IBackdropContainer {
   store?: IStore;
   loading?: boolean;
   center?: boolean;
+  noMusic?: boolean;
 }
 
 const BackdropContainer = (props: IBackdropContainer) => {
@@ -33,6 +35,11 @@ const BackdropContainer = (props: IBackdropContainer) => {
 
   const [pressedStartGame, setPressedStartGame] = useState(false);
   const [ratioLoaded, setRatioLoaded] = useState(0);
+
+  const volume = props.noMusic
+    ? 0
+    : props.store?.gameSettings?.musicVolume ??
+      getLocalGameSetting("musicVolume", "number");
 
   useEffect(() => {
     const { renderer, alreadyExisted } = createBackdropRenderer((compl) => {
@@ -46,7 +53,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
       if (history.location.pathname !== "/") {
         num += 1;
       }
-      changeCameraPosition(num);
+      changeCameraPosition(num, volume);
       setCamPosNum(num);
     } else if (props.store?.previousPage === gameRoomPath) {
       // if comming from game then someone pressed back to waiting room
@@ -63,7 +70,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
   }, []);
 
   const handleChangeCameraPos = () => {
-    changeCameraPosition(camPosNum + 1);
+    changeCameraPosition(camPosNum + 1, volume);
     setCamPosNum(camPosNum + 1);
   };
 

@@ -169,7 +169,7 @@ export class RaceGameScene extends GameScene {
         this.countDownInterval = setInterval(() => {
 
             // while (0 <= this.raceCountdownTime) {
-            if (this.raceCountdownTime < 4) {
+            if (this.raceCountdownTime < 4 && this.raceCountdownTime !== 0) {
                 // dont always play beep
                 this.playCountdownBeep()
             }

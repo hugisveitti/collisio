@@ -11,6 +11,7 @@ export type GraphicsType = "low" | "high"
 export interface IGameSettings {
     useShadows: boolean
     useSound: boolean
+    musicVolume: number
     numberOfLaps: number
     trackName: TrackName
     gameType: GameType
@@ -26,6 +27,7 @@ export interface IGameSettings {
 export const defaultGameSettings: IGameSettings = {
     useShadows: false,
     useSound: true,
+    musicVolume: .2,
     numberOfLaps: 1,
     trackName: "farm-track",
     gameType: "race",

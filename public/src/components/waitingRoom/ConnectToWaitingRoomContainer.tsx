@@ -27,7 +27,6 @@ const ConnectToWaitingRoomContainer = (
 
   const quickConnection =
     !onMobile && props.store.previousPage !== waitingRoomPath;
-  console.log("quick conn", quickConnection);
   return (
     <BackdropContainer store={props.store}>
       <Grid container spacing={3}>

@@ -831,7 +831,7 @@ export class LowPolyVehicle extends Vehicle {
     update(delta: number) {
         if (!this.isReady) return
         this.delta = delta
-        const usingJitter = this.useChaseCamera && this.detectJitter(delta)
+        const usingJitter = false //  this.useChaseCamera && this.detectJitter(delta)
 
         for (let i = 0; i < 4; i++) {
 
