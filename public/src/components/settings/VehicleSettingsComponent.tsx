@@ -44,6 +44,10 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.userSettings.vehicleSettings.cameraZoom
   );
 
+  const [noSteerNumberDefaultVal, setNoSteerNumberDefaultVal] = useState(
+    props.store.userSettings.vehicleSettings.noSteerNumber
+  );
+
   const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
     if (user) {
       setDBUserSettings(user.uid, newUserSettings);
@@ -172,6 +176,29 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
             onChange={(e, value) => {}}
             onChangeCommitted={(e, value) => {
               updateVehicleSettings("cameraZoom", value);
+            }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            No Steer range:
+            <i>
+              {" "}
+              small angle where the vehicle won't turn when the phone turns
+            </i>
+          </Typography>
+          <Slider
+            style={{
+              color: "black",
+            }}
+            min={0}
+            max={5}
+            valueLabelDisplay="auto"
+            step={0.5}
+            defaultValue={noSteerNumberDefaultVal}
+            onChange={(e, value) => {}}
+            onChangeCommitted={(e, value) => {
+              updateVehicleSettings("noSteerNumber", value);
             }}
           />
         </Grid>

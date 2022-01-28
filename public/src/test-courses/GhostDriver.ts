@@ -57,7 +57,6 @@ export class GhostDriver {
      */
     async loadDriveInstructions(filename: string, isTournament: boolean): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
-
             if (isTournament) {
                 await this.loadTournamentInstructions(filename)
                 resolve()
@@ -75,15 +74,12 @@ export class GhostDriver {
                     console.warn("Error getting ghost:", err)
                     reject()
                 })
-
             }
-
         })
     }
 
     async loadTournamentInstructions(tournamentId: string) {
         return new Promise<void>((resolve, reject) => {
-
             getTournamentGhost(tournamentId).then(instructions => {
                 this.isReady = true
                 if (instructions?.length) {
@@ -138,13 +134,16 @@ export class GhostDriver {
     getPointBetween() {
         if (!this.nextPointSet && this.timeIndex < this.di.length) {
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.nextPos, this.nextRotation)
+            console.log("next pos", this.nextPos.x.toFixed(2), this.nextPos.z.toFixed(2))
+
             this.nextPointSet = true
         }
 
-        const alpha = this.numNotUpdates / (60 * epsTime)
+        const alpha = this.numNotUpdates / (60 / (epsTime * 100))
+        console.log("alpha", alpha)
         if (alpha < 1) {
-
             this.betweenPos = this.pos.clone().lerp(this.nextPos, alpha)
+            console.log("betweenpos", this.betweenPos.x.toFixed(2), this.betweenPos.z.toFixed(2))
             this.betweenRot = this.rotation.clone().slerp(this.nextRotation, alpha)
 
         }
@@ -171,12 +170,19 @@ export class GhostDriver {
             vehicle.setRotation(this.rotation.clone())
             this.numNotUpdates = 0
             this.nextPointSet = false
+
             this.timeIndex += 1
         } else if (cTime > time) {
             this.numNotUpdates += 1
-            this.getPointBetween()
-            vehicle.setPosition(this.betweenPos.clone())
-            vehicle.setRotation(this.betweenRot.clone())
+            // this.getPointBetween()
+            // vehicle.setPosition(this.betweenPos.clone())
+            // vehicle.setRotation(this.betweenRot.clone())
+        } else {
+            console.log("no update")
+            // this.numNotUpdates += .5
+            // this.getPointBetween()
+            // vehicle.setPosition(this.betweenPos.clone())
+            // vehicle.setRotation(this.betweenRot.clone())
         }
     }
 }
@@ -253,7 +259,6 @@ export class DriveRecorder {
 
     static GetTrackNameNumberOfLapsFromFilename(filename: string): { trackName: TrackName, numberOfLaps: number } {
         if (!filename) return { trackName: undefined, numberOfLaps: undefined }
-
 
         const items = filename.split("/")
         // if tournament ghost

@@ -19,6 +19,9 @@ service cloud.firestore {
       allow write: if request.auth.uid == followerUserId;
       }
     }
+    match /tokens/{userId} {
+      allow read: if request.auth.uid == userId;
+    }
     match /bestHighscores {
     	match/{docs=**}{
       	allow read;

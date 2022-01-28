@@ -78,7 +78,10 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       setInterval(() => {
         gameCanvas.setAttribute(
           "style",
-          `transform: rotateZ(${getSteerAngleFromBeta(controller.beta)}deg)`
+          `transform: rotateZ(${getSteerAngleFromBeta(
+            controller.beta,
+            props.store.userSettings.vehicleSettings.noSteerNumber ?? 4
+          )}deg)`
         );
       }, 1000 / 90);
     }

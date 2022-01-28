@@ -173,7 +173,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     turn(beta: number): void {
         //        this.vehicleBody.body.setAngularVelocity(0, 0, angle)
         //this.yVel = angle * degToRad * this.steeringSensitivity * 25
-        const angle = getSteerAngleFromBeta(beta)
+        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
         this.yVel = angle * degToRad
         this.yRot %= (Math.PI * 2)
         this.yRot -= (angle * degToRad * this.steeringSensitivity * .3)

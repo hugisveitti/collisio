@@ -80,8 +80,6 @@ export class LowPolyTestScene extends GameScene {
     driveVehicle: () => MobileControls
     controls: MobileControls
 
-
-
     ghostDriver: GhostDriver
     driverRecorder: DriveRecorder
 
@@ -160,6 +158,7 @@ export class LowPolyTestScene extends GameScene {
         // The downside is that if we are under 60 fps then the game is slower 
         //  this.physics.config.fixedTimeStep = 1 / 120
         // this.__config.fixedTimeStep =  1 / 120
+        //  this.physics.config.maxSubSteps = 1
 
         this.addLights()
 

@@ -70,7 +70,6 @@ export const downloadGhost = (filename: string) => {
 export const getTournamentGhost = async (tournamentId: string) => {
     return new Promise<string[] | undefined>(async (resolve, reject) => {
         downloadGhost(tournamentRef + "/" + tournamentId).then(instructions => {
-            console.log("instructions", instructions)
             resolve(instructions)
         }).catch(err => {
             console.warn("error getting tournament ghost", err)

@@ -457,19 +457,15 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.applyEngineForce(ef, BACK_RIGHT)
     }
 
-
     noTurn() {
         this.vehicle.setSteeringValue(0, FRONT_LEFT)
         this.vehicle.setSteeringValue(0, FRONT_RIGHT)
     };
 
     turn(beta: number) {
-
-        const angle = getSteerAngleFromBeta(beta)
-
+        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
 
         if (this._canDrive) {
-
             const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
             const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
             this.vehicle.setSteeringValue(steer, FRONT_LEFT)
@@ -481,7 +477,6 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     break(notBreak?: boolean) {
-
         let breakForce = !!notBreak ? 0 : this.breakingForce
         if (!this._canDrive) breakForce = 500
 
@@ -545,7 +540,6 @@ export class LowPolyVehicle extends Vehicle {
             const p = this.getPosition()
             const r = this.vehicleBody.rotation
 
-
             this.camera.position.set(p.x - (20 * Math.sin(r.y)), p.y, p.z + (20 * Math.cos(r.y) * Math.sign(Math.cos(r.z))))
             //   this.camera.position.set(p.x + (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(r.z)))
         }
@@ -562,11 +556,9 @@ export class LowPolyVehicle extends Vehicle {
         }
     }
 
-
     cameraLookAt(camera: PerspectiveCamera, delta: number) {
         if (this.spinCameraAroundVehicle) {
             const rot = this.vehicleBody.rotation
-            //      this.vehicle.updateVehicle(1 / 60)
             const pos = this.vehicleBody.position
 
             this.cameraTarget.set(
@@ -584,18 +576,11 @@ export class LowPolyVehicle extends Vehicle {
 
 
         } else if (this.useChaseCamera) {
-
-
             const rot = this.vehicleBody.rotation
-
             // I think these are always the same
             // this.vehicleBody.pos is set to the value of this.getPosition in update()
-
             const pos = this.vehicleBody.position
-
             const chaseSpeedY = 0.5
-
-
 
             const q = this.vehicleBody.quaternion
 
@@ -656,16 +641,12 @@ export class LowPolyVehicle extends Vehicle {
             this.prevChaseCameraPos = this.cameraLookAtPos.clone()
 
             if (this.scene.getGraphicsType() === "high") {
-
                 this.seeVehicle(this.cameraDir.clone())
             }
-
         } else {
             if (this.scene.getGraphicsType() !== "high") {
                 camera.lookAt(this.vehicleBody.position.clone())
             } else {
-
-
                 const pos = this.vehicleBody.position
                 const rot = this.vehicleBody.rotation
 
@@ -850,7 +831,7 @@ export class LowPolyVehicle extends Vehicle {
     update(delta: number) {
         if (!this.isReady) return
         this.delta = delta
-        const usingJitter = false //this.useChaseCamera && this.detectJitter(delta)
+        const usingJitter = this.useChaseCamera && this.detectJitter(delta)
 
         for (let i = 0; i < 4; i++) {
 

@@ -29,6 +29,8 @@ export interface IVehicleSettings {
     cameraZoom: number
 
     vehicleColor: string
+
+    noSteerNumber: number
 }
 
 export const defaultVehicleSettings = {
@@ -37,7 +39,8 @@ export const defaultVehicleSettings = {
     useChaseCamera: false,
     vehicleType: defaultVehicleType,
     cameraZoom: 1,
-    vehicleColor: vehicleColors[0].value
+    vehicleColor: vehicleColors[0].value,
+    noSteerNumber: 4
 } as IVehicleSettings
 
 export interface IUserSettings {

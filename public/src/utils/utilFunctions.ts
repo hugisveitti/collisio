@@ -187,10 +187,10 @@ export const createClassNames = (...str: string[]) => {
 }
 
 
-export const getSteerAngleFromBeta = (beta: number) => {
+export const getSteerAngleFromBeta = (beta: number, noSteerNumber: number) => {
     let angle = 0
-    if (Math.abs(beta) >= 4) {
-        angle = beta - (4 * Math.sign(beta))
+    if (Math.abs(beta) >= noSteerNumber) {
+        angle = beta - (noSteerNumber * Math.sign(beta))
     }
     return angle
 }
