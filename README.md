@@ -27,3 +27,33 @@ Then
 ```
 ./run.sh
 ```
+
+
+## To run server
+
+```
+npm i
+npm run dev
+```
+
+
+
+## Front end
+```
+cd public
+npm i
+```
+
+#### To access vehicle tests
+```
+npm run testMode
+```
+and access http://localhost:5000/test
+
+#### To access normal app
+```
+npm run start
+```
+and access http://localhost:5000/
+
+
