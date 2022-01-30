@@ -66,8 +66,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   // const [deviceOrientationHandler, setDeviceOrientationHandler] = useState(undefined as () => void)
 
   const [raceMedalData, setRaceMedalData] = useState(
-    //undefined as undefined | { coins: number; XP: number; medal: MedalType }
-    { coins: 10, XP: 10, medal: "gold" as MedalType }
+    undefined as undefined | { coins: number; XP: number; medal: MedalType }
   );
 
   const handleUserLoggedIn = () => {};
@@ -159,6 +158,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         setRaceMedalData(
           getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
         );
+
+        // show for 10 secs?
+        setTimeout(() => {
+          setRaceMedalData(undefined);
+        }, 10000);
       } else {
         toast.warning(
           "Your highscore won't be saved since you are not logged in."
