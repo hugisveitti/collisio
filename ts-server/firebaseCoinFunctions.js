@@ -67,7 +67,7 @@ var updatePlayersTokens = function (data) {
             }
             console.log("update", update);
             // at least 10 secs later then the last update
-            if (Date.now() > update.lastUpdate * 1000 * 10) {
+            if (!update.lastUpdate || Date.now() > update.lastUpdate * 1000 * 10) {
                 update.lastUpdate = Date.now();
                 try {
                     ref_1.set(update).then(function () {

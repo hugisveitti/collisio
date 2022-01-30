@@ -1,18 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultTokenData = exports.getMedalAndTokens = exports.getMedal = void 0;
-var getFarmTrackMedal = function (trackName, numberOfLaps, totalTime) {
-    if (totalTime < 20 * numberOfLaps) {
-        return "gold";
-    }
-    if (totalTime < 25 * numberOfLaps) {
-        return "silver";
-    }
-    if (totalTime < 30 * numberOfLaps) {
-        return "bronze";
-    }
-    return "none";
-};
 var times = {
     "farm-track": {
         gold: 20,
@@ -189,5 +177,5 @@ exports.defaultTokenData = {
     none: 0,
     XP: 0,
     coins: 0,
-    lastUpdate: Date.now()
+    //  lastUpdate: Date.now()
 };

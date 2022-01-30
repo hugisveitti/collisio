@@ -2,19 +2,6 @@ import { TrackName } from "./shared-stuff"
 
 export type MedalType = "gold" | "silver" | "bronze" | "none"
 
-const getFarmTrackMedal = (trackName: TrackName, numberOfLaps: number, totalTime: number): MedalType => {
-    if (totalTime < 20 * numberOfLaps) {
-        return "gold"
-    }
-    if (totalTime < 25 * numberOfLaps) {
-        return "silver"
-    }
-    if (totalTime < 30 * numberOfLaps) {
-        return "bronze"
-    }
-    return "none"
-}
-
 interface TrackTimes {
     gold: number
     silver: number
@@ -218,7 +205,7 @@ export interface ITokenData {
     none: number
     coins: number
     XP: number
-    lastUpdate: number
+    lastUpdate?: number
 }
 
 export const defaultTokenData: ITokenData = {
@@ -228,6 +215,6 @@ export const defaultTokenData: ITokenData = {
     none: 0,
     XP: 0,
     coins: 0,
-    lastUpdate: Date.now()
+    //  lastUpdate: Date.now()
 }
 

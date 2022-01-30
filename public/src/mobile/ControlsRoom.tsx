@@ -145,6 +145,15 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     }, 1000);
 
     props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
+      setRaceMedalData(
+        getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
+      );
+
+      // show for 10 secs?
+      setTimeout(() => {
+        setRaceMedalData(undefined);
+      }, 10000);
+
       if (data.isAuthenticated) {
         saveRaceData(data.playerId, data).then(
           ([setPersonalBest, gameDataInfo]) => {
@@ -155,14 +164,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             });
           }
         );
-        setRaceMedalData(
-          getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
-        );
-
-        // show for 10 secs?
-        setTimeout(() => {
-          setRaceMedalData(undefined);
-        }, 10000);
       } else {
         toast.warning(
           "Your highscore won't be saved since you are not logged in."
