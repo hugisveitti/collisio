@@ -244,7 +244,16 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             </Grid>
             <Grid item xs={12}>
               <MySlider
-                startIcon={<VolumeDown />}
+                startIcon={
+                  <IconButton
+                    style={{ color: "black" }}
+                    onClick={() => {
+                      updateGameSettings("musicVolume", 0);
+                    }}
+                  >
+                    <VolumeDown />
+                  </IconButton>
+                }
                 endIcon={<VolumeUp />}
                 label="Music volume"
                 onChangeCommitted={(newVal) => {

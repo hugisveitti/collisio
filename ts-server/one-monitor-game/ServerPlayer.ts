@@ -23,6 +23,7 @@ import {
     stm_player_info,
     VehicleControls
 } from "../../public/src/shared-backend/shared-stuff"
+import { updatePlayersTokens } from "../firebaseCoinFunctions"
 import { Room } from "./ServerGame"
 
 
@@ -261,7 +262,6 @@ export class Player {
 
             for (let key of keys) {
                 if (playerData[key] !== undefined) {
-
                     // @ts-ignore
                     this[key] = playerData[key]
                 }
@@ -272,8 +272,10 @@ export class Player {
         })
     }
 
+    // data: IEndOfRaceInfoPlayer
     playerFinished(data: any) {
         this.socket.emit(stm_player_finished, data)
+        updatePlayersTokens(data)
     }
 
     gameFinished(data: any) {
@@ -287,7 +289,6 @@ export class Player {
             }
         })
     }
-
 
     toString() {
         return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}`

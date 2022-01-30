@@ -13,7 +13,8 @@ exports.defaultVehicleSettings = {
     useChaseCamera: false,
     vehicleType: shared_stuff_1.defaultVehicleType,
     cameraZoom: 1,
-    vehicleColor: shared_stuff_1.vehicleColors[0].value
+    vehicleColor: shared_stuff_1.vehicleColors[0].value,
+    noSteerNumber: 4
 };
 exports.defaultUserSettings = {
     vehicleSettings: exports.defaultVehicleSettings,

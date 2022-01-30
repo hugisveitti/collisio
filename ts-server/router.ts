@@ -3,6 +3,7 @@ import * as path from "path";
 import { Request, Response } from "express";
 /** toDO fix this shit */
 const express = require("express")
+console.log("router")
 
 export const getPortLocalhost = () => {
     let port = process.env.PORT || 80

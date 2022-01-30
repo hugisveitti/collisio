@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, setDoc } from "firebase/firestore"
 import { v4 as uuid } from "uuid"
 import { IRoomInfo } from "../classes/Game"
 import { IFollower, IPrivateUser, IPublicUser, IUserSettings } from "../classes/User"
+import { defaultTokenData, ITokenData } from "../shared-backend/medalFuncions"
 import { firestore } from "./firebaseInit"
 
 
@@ -306,3 +307,21 @@ export const getDBUserSettings = async (userId: string): Promise<IUserSettings |
 }
 
 
+export const getUserTokens = async (userId: string): Promise<ITokenData> => {
+    return new Promise<ITokenData>((resolve, reject) => {
+        const tokenRef = doc(firestore, "tokens", userId)
+        getDoc(tokenRef).then(val => {
+            if (val.exists) {
+                resolve({
+                    ...defaultTokenData,
+                    ...val.data()
+                })
+            } else {
+                resolve(defaultTokenData)
+            }
+        }).catch(err => {
+            console.warn("Error getting user tokens", err)
+            resolve(defaultTokenData)
+        })
+    })
+}

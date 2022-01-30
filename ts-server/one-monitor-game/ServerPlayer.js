@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
+var firebaseCoinFunctions_1 = require("../firebaseCoinFunctions");
 var Player = /** @class */ (function () {
     function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings) {
         var _a, _b;
@@ -213,8 +214,10 @@ var Player = /** @class */ (function () {
             }
         });
     };
+    // data: IEndOfRaceInfoPlayer
     Player.prototype.playerFinished = function (data) {
         this.socket.emit(shared_stuff_1.stm_player_finished, data);
+        (0, firebaseCoinFunctions_1.updatePlayersTokens)(data);
     };
     Player.prototype.gameFinished = function (data) {
         this.socket.emit(shared_stuff_1.stm_game_finished, data);

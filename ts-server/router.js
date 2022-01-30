@@ -24,6 +24,7 @@ var os = __importStar(require("os"));
 var path = __importStar(require("path"));
 /** toDO fix this shit */
 var express = require("express");
+console.log("router");
 var getPortLocalhost = function () {
     var port = process.env.PORT || 80;
     /** only works on my PC */

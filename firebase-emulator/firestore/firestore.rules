@@ -21,6 +21,7 @@ service cloud.firestore {
     }
     match /tokens/{userId} {
       allow read: if request.auth.uid == userId;
+  //    allow write: if request.auth.uid == 'my-service-worker'"
     }
     match /bestHighscores {
     	match/{docs=**}{

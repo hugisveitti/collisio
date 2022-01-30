@@ -6,26 +6,27 @@
  */
 
 import { IUserSettings } from "../classes/User"
+import { getMedal as _getMedal } from "./medalFuncions"
 
 /** trackName.gltf */
 export type TrackName =
     "farm-track"
     | "f1-track"
-    | "test-course"
     | "sea-side-track"
-    | "simple-tag-course"
-    | "town-track"
     | "f1-track-2"
-    | "monaco-track"
     | "russia-track"
     | "ferrari-track"
-    | "skii-map"
-    | "farmers-little-helper-map"
+    | "spa-track"
+    | "nurn-track"
     | "speed-test-track"
     | "small-track"
     | "small-jump-track"
-    | "spa-track"
-    | "nurn-track"
+    | "farmers-little-helper-map"
+    | "skii-map"
+    | "monaco-track"
+    | "town-track"
+    | "simple-tag-course"
+    | "test-course"
 
 export type VehicleType =
     "normal"
@@ -293,3 +294,6 @@ export const std_send_game_actions = "std_send_game_actions"
 
 export const STD_SENDINTERVAL_MS = 1000 / 60
 export const MTS_SENDINTERVAL_MS = 1000 / 60
+
+
+

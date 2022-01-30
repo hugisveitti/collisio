@@ -8,6 +8,11 @@ import DeviceOrientationPermissionComponent from "../components/waitingRoom/Devi
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
+  getMedalAndTokens,
+  ITokenData,
+  MedalType,
+} from "../shared-backend/medalFuncions";
+import {
   GameActions,
   mdts_game_settings_changed,
   MobileControls,
@@ -59,6 +64,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   const [resetOrientation, setResetOrientation] = useState(false);
 
   // const [deviceOrientationHandler, setDeviceOrientationHandler] = useState(undefined as () => void)
+
+  const [raceMedalData, setRaceMedalData] = useState(
+    //undefined as undefined | { coins: number; XP: number; medal: MedalType }
+    { coins: 10, XP: 10, medal: "gold" as MedalType }
+  );
 
   const handleUserLoggedIn = () => {};
 
@@ -145,6 +155,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
               setPersonalBest,
             });
           }
+        );
+        setRaceMedalData(
+          getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
         );
       } else {
         toast.warning(
@@ -242,6 +255,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         controller={controller}
         orientation={orientation}
         resetOrientation={resetOrientation}
+        raceMedalData={raceMedalData}
       />
 
       <DeviceOrientationPermissionComponent
