@@ -86,7 +86,7 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
 
             console.log("update", update)
             // at least 10 secs later then the last update
-            if (!update.lastUpdate || Date.now() > update.lastUpdate * 1000 * 10) {
+            if (!update.lastUpdate || Date.now() > update.lastUpdate + (1000 * 10)) {
                 update.lastUpdate = Date.now()
                 try {
                     ref.set(update).then(() => {
