@@ -290,6 +290,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         }}
         transparantButtons
         resetOrientation={resetOrientation}
+        raceMedalData={undefined}
       />
 
       <EndOfGameModal

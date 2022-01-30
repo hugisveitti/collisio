@@ -213,11 +213,15 @@ const GameRoom = React.memo((props: IGameRoom) => {
     });
 
     return () => {
+      gameObject?.destroyGame();
       props.store.socket?.disconnect();
+
+      // maybe these off dont matter if we disconnect?
       props.store.socket.off(std_send_game_actions);
       props.store.socket.off(std_game_data_info);
       props.store.socket.off(std_player_disconnected);
       props.store.socket.off(std_quit_game);
+      props.store.socket.off(stmd_game_settings_changed);
     };
   }, []);
 

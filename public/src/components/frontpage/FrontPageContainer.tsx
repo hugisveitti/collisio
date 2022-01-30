@@ -1,6 +1,6 @@
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
-import { CircularProgress, Grid } from "@mui/material";
+import { CircularProgress, Grid, IconButton } from "@mui/material";
 import React, { useContext, useEffect } from "react";
 import {
   IGameSettings,
@@ -26,6 +26,7 @@ import {
   tournamentPagePath,
 } from "../Routes";
 import { IStore } from "../store";
+import TokenComponent from "../tokenComponent/TokenComponent";
 
 interface IFrontPageContainer {
   store: IStore;
@@ -40,9 +41,13 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
 
   const renderUserInfo = () => {
     return user ? (
-      <div className="background" style={{ fontSize: 32 }}>
-        <i>{user.displayName}</i> logged in
-      </div>
+      <>
+        <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
+          <i>{user.displayName}</i> logged in
+        </BackdropButton>
+
+        <TokenComponent user={user} />
+      </>
     ) : (
       <BackdropButton link={loginPagePath}>Login</BackdropButton>
     );
@@ -72,7 +77,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             Tournaments
           </BackdropButton>
           <BackdropButton link={showRoomPagePath} width={btnWidth}>
-            Cars
+            Garage
           </BackdropButton>
           <BackdropButton link={howToPlayPagePath} width={btnWidth}>
             How to play
@@ -107,7 +112,22 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             {!onMobile && (
               <div style={{ marginTop: 15 }} className="background">
                 <MySlider
-                  startIcon={<VolumeDown />}
+                  startIcon={
+                    <IconButton
+                      style={{ color: "white" }}
+                      onClick={() => {
+                        const newGameSettings: IGameSettings = {
+                          ...props.store.gameSettings,
+                          musicVolume: 0 as number,
+                        };
+                        props.store.setGameSettings(newGameSettings);
+                        setLocalGameSetting("musicVolume", 0);
+                        setMusicVolume(0);
+                      }}
+                    >
+                      <VolumeDown />
+                    </IconButton>
+                  }
                   endIcon={<VolumeUp />}
                   label="Music volume"
                   onChangeCommitted={(newVal) => {

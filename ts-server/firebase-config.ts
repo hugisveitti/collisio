@@ -1,6 +1,7 @@
 import { FirebaseOptions, initializeApp } from "firebase/app";
 import { initializeApp as adminApp, } from "firebase-admin/app"
 import { getDatabase } from "firebase/database";
+import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore'
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import * as os from "os"
 
@@ -8,11 +9,10 @@ import * as os from "os"
 export const admin = require("firebase-admin");
 var serviceAccount = require("./configs/race-game-a4327-firebase-adminsdk-jw2qt-30f56f1644.json");
 
-adminApp({
+const aa = adminApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
 });
-
 
 
 // const databaseURL = inDevelopment ? "http://localhost:9000?ns=emulatorui" : "https://race-game-a4327-default-rtdb.europe-west1.firebasedatabase.app"
@@ -30,10 +30,12 @@ let config = {
 } as FirebaseOptions;
 
 const firebaseApp = initializeApp(config);
-export const database = getDatabase(firebaseApp)
 
+export const database = getDatabase(firebaseApp)
+export const adminFirestore = getAdminFirestore(aa)
 
 export const firestore = getFirestore(firebaseApp)
+
 
 /** only works on my PC */
 if (os.hostname().includes("Lisa")) {

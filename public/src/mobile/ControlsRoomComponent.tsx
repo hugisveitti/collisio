@@ -1,11 +1,13 @@
 /**
  * this component steers the MobileControls class
  */
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PauseIcon from "@mui/icons-material/Pause";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import StarsIcon from "@mui/icons-material/Stars";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { blue4, orange2 } from "../providers/theme";
+import { MedalType } from "../shared-backend/medalFuncions";
 import { GameActions, MobileControls } from "../shared-backend/shared-stuff";
 import "./ControlsRoom.css";
 
@@ -18,6 +20,7 @@ interface IControlsRoomComponent {
   // hacky way to reset the event listeners
   resetOrientation: boolean;
   //setDeviceOrientationHandler:React.Dispatch<React.SetStateAction<void>>
+  raceMedalData: undefined | { coins: number; XP: number; medal: MedalType };
 }
 
 const ControlsRoomComponent = (props: IControlsRoomComponent) => {
@@ -176,18 +179,34 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
 
   const settingsStyles = isPortrait
     ? {
-        left: 35 + utilBtnSize * 2,
+        // left: 35 + utilBtnSize * 2,
+        right: 35,
       }
-    : { top: 35 + utilBtnSize * 2 };
+    : {
+        //  top: 35 + utilBtnSize * 2
+        bottom: 35,
+      };
 
-  const resetStyles = isPortrait ? { left: 35 } : { top: 35 };
+  const resetStyles = isPortrait
+    ? {
+        //  left: 35
+        right: 55 + utilBtnSize,
+      }
+    : {
+        //    top: 35
+        bottom: 55 + utilBtnSize,
+      };
 
   const infoStyles = isPortrait
     ? {
-        left: 0,
+        left: 10,
+        width: 100,
+        height: 100,
       }
     : {
-        right: 0,
+        top: 10,
+        height: 100,
+        width: 100,
       };
 
   const getBackgroundColor = (b: boolean) => {
@@ -291,6 +310,46 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
           <span style={rotateText}>
             <PauseIcon fontSize="large" />
           </span>
+        </div>
+        <div
+          style={{
+            ...settingsStyles,
+            ...utilBtnPos,
+            ...infoStyles,
+
+            position: "absolute",
+            zIndex: 99,
+
+            backgroundColor: "white",
+            color: "black",
+            //    outline: "1px solid black",
+            padding: 4,
+          }}
+        >
+          <div style={rotateText}>
+            {props.raceMedalData && (
+              <>
+                {props.raceMedalData.medal === "none" ? (
+                  "You didn't win any medal"
+                ) : (
+                  <span>
+                    <strong>{props.raceMedalData.medal.toUpperCase()}</strong>{" "}
+                    medal winner!
+                  </span>
+                )}
+                <br />
+                <span>
+                  <MonetizationOnIcon style={{ fontSize: 14 }} />{" "}
+                  {props.raceMedalData.coins}
+                </span>
+                <br />
+                <span>
+                  <StarsIcon style={{ fontSize: 14 }} />{" "}
+                  {props.raceMedalData.XP}
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* <div

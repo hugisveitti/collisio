@@ -1,7 +1,7 @@
 import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface IMySlider {
   label: string;
@@ -31,6 +31,7 @@ const MySlider = (props: IMySlider) => {
           valueLabelDisplay="auto"
           step={props.step}
           defaultValue={defaultValue}
+          // value={props.value}
           onChange={(e, value) => {
             props.onChange(value);
           }}
