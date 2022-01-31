@@ -1,0 +1,9 @@
+.garage__item {
+  cursor: pointer;
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+  text-align: center;
+  vertical-align: baseline;
+  transition: 0.2s;
+}

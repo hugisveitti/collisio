@@ -11,7 +11,10 @@ const ShowRoomContainer = (props: IShowRoomContainer) => {
   return (
     <BackdropContainer backgroundContainer>
       <h2>The Garage</h2>
-      <ShowRoomComponent isPremiumUser={false} excludedVehicles={["test"]} />
+      <ShowRoomComponent
+        isPremiumUser={false}
+        excludedVehicles={["test", "simpleCylindar", "normal"]}
+      />
     </BackdropContainer>
   );
 };

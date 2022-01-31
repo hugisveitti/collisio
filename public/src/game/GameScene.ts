@@ -548,7 +548,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     clearViewImportantInfo(i: number) {
-        this.viewsImpornantInfo[i].textContent = ""
+        if (this.viewsImpornantInfo[i]) {
+            this.viewsImpornantInfo[i].textContent = ""
+        }
     }
 
     clearTimeouts() {
@@ -861,7 +863,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     showImportantInfo(text: string, clear?: boolean) {
-        this.importantInfoDiv.textContent = text
+        if (this.importantInfoDiv) {
+            this.importantInfoDiv.textContent = text
+        }
         if (clear) {
             this.importantInfoTimeout = setTimeout(() => {
                 this.clearImportantInfo()
@@ -870,7 +874,9 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     clearImportantInfo() {
-        this.importantInfoDiv.textContent = ""
+        if (this.importantInfoDiv) {
+            this.importantInfoDiv.textContent = ""
+        }
     }
 
     everythingReady(): boolean {

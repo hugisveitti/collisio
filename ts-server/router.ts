@@ -108,6 +108,7 @@ const router = (app: any) => {
     app.get("/private-profile", sendIndexHTML);
     app.get("/user/:id", sendIndexHTML);
     app.get("/show-room", sendIndexHTML);
+    app.get("/garage", sendIndexHTML);
 
 
     const adminHTMLPath = `../public/${buildFolder}/admin.html`
