@@ -16,7 +16,7 @@ export class GhostDriver {
 
     // not sure of the best way to store these
     // but I think a (key, value)
-    // where key is time and value is 
+    // where key is time and value is
     driveInstructions: { [key: number]: string }
     di: string[]
     // first line is metadata
@@ -131,7 +131,7 @@ export class GhostDriver {
         rotation.set(+values[4], +values[5], +values[6], +values[7])
     }
 
-    getPointBetween() {
+    getPointBetween(time:number) {
         if (!this.nextPointSet && this.timeIndex < this.di.length) {
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.nextPos, this.nextRotation)
             console.log("next pos", this.nextPos.x.toFixed(2), this.nextPos.z.toFixed(2))
@@ -139,9 +139,12 @@ export class GhostDriver {
             this.nextPointSet = true
         }
 
-        const alpha = this.numNotUpdates / (60 / (epsTime * 100))
+        //const alpha = this.numNotUpdates / (60 / (epsTime * 100))
+        const cTime = this.getTime(this.timeIndex)
+        const pTime = this.getTime(this.timeIndex-1)
+        const alpha = (time-pTime)/(cTime-pTime)
         console.log("alpha", alpha)
-        if (alpha < 1) {
+        if (alpha <= 1) {
             this.betweenPos = this.pos.clone().lerp(this.nextPos, alpha)
             console.log("betweenpos", this.betweenPos.x.toFixed(2), this.betweenPos.z.toFixed(2))
             this.betweenRot = this.rotation.clone().slerp(this.nextRotation, alpha)
@@ -164,25 +167,20 @@ export class GhostDriver {
     setPlace(vehicle: IGhostVehicle, time: number, delta: number) {
         if (!this.hasInstructions) return
         const cTime = this.getTime(this.timeIndex)
-        if (this.timeIndex < this.di.length - 1 && cTime < time) {
-            this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
-            vehicle.setPosition(this.pos.clone())
-            vehicle.setRotation(this.rotation.clone())
-            this.numNotUpdates = 0
-            this.nextPointSet = false
+        if (this.timeIndex < this.di.length - 1 && cTime <= time) {
 
+            this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.pos, this.rotation)
             this.timeIndex += 1
+            this.nextPointSet = false
+            this.getPointBetween(time)
+            vehicle.setPosition(this.betweenPos.clone())
+            vehicle.setRotation(this.betweenRot.clone())
+
+
         } else if (cTime > time) {
-            this.numNotUpdates += 1
-            // this.getPointBetween()
-            // vehicle.setPosition(this.betweenPos.clone())
-            // vehicle.setRotation(this.betweenRot.clone())
-        } else {
-            console.log("no update")
-            // this.numNotUpdates += .5
-            // this.getPointBetween()
-            // vehicle.setPosition(this.betweenPos.clone())
-            // vehicle.setRotation(this.betweenRot.clone())
+            this.getPointBetween(time)
+            vehicle.setPosition(this.betweenPos.clone())
+            vehicle.setRotation(this.betweenRot.clone())
         }
     }
 }
