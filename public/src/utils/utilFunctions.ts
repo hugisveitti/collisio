@@ -219,3 +219,80 @@ export const getPitchRollYawFromQuaternion = (q: Quaternion) => {
 
     return { yaw, pitch, roll }
 }
+
+const prefixSizes = {
+    3: "K",
+    6: "M",
+    9: "G",
+    12: "T"
+}
+
+export const getSizePrefix = (num: number) => {
+    const str = num.toString()
+    const l = str.length
+    let prefix = ""
+    let prefixSize = 0
+    for (let p of Object.keys(prefixSizes)) {
+
+        if (+p < l && +p > prefixSize) {
+            prefix = prefixSizes[p]
+            prefixSize = +p
+        }
+    }
+
+
+
+    const prefixString = `${(num / (10 ** (prefixSize))).toFixed(2)} ${prefix}`
+    return prefixString
+}
+
+// this is semi random right now
+const XPtoNextLevel = [
+    30, 50, 80, 90, 120, 130, 150, 170, 190, 200, 205, 210, 220, 220, 220, 230, 230, 240, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260
+]
+
+/**
+ * 
+ * @param XP how much xp the player has 
+ * @returns object {currentLevel, pointsToNextLevel, ratioOfLevelFinished}
+ *  currentLevel is the level the player is in based off his XP
+ *  points to next level are how much XP is needed to get to the next level
+ *  ratioOfLevelFinished The ratio of how much of the level the player has completed
+ */
+export const getXPInfo = (XP: number) => {
+    let currentLevel = 0
+    let pointsToNextLevel = 0
+    let pointsFinishedInThisLevel = 0
+    let ratioOfLevelFinished = 0
+
+    let sumXP = 0
+
+    if (XPtoNextLevel[0] > XP) {
+        return {
+            currentLevel: 1, pointsToNextLevel: XPtoNextLevel[0] - XP, ratioOfLevelFinished: XP / XPtoNextLevel[0], pointsFinishedInThisLevel: XP
+        }
+    }
+
+    for (let i = 0; i < XPtoNextLevel.length; i++) {
+        sumXP += XPtoNextLevel[i]
+        let lowerNumber = sumXP
+        let higherNumber = XPtoNextLevel[i + 1] + sumXP
+
+        if (lowerNumber <= XP && XP <= higherNumber) {
+            currentLevel = i + 1
+            pointsToNextLevel = higherNumber - XP
+            console.log(pointsFinishedInThisLevel, lowerNumber, XP)
+            pointsFinishedInThisLevel = XP - lowerNumber
+            ratioOfLevelFinished = pointsFinishedInThisLevel / (pointsFinishedInThisLevel + pointsToNextLevel)
+            break
+        }
+    }
+    if (currentLevel === 0) {
+        currentLevel = XPtoNextLevel.length
+        ratioOfLevelFinished = 1
+        pointsToNextLevel = 0
+        pointsFinishedInThisLevel = 260
+    }
+
+    return { currentLevel, pointsToNextLevel, ratioOfLevelFinished, pointsFinishedInThisLevel }
+}

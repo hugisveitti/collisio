@@ -1,0 +1,6 @@
+.progress {
+  min-width: 50px;
+  color: black;
+  border-radius: 0;
+  margin-left: 10px;
+}
