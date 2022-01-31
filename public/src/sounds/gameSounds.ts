@@ -55,7 +55,7 @@ export const loadMusic = (file: string): Promise<AudioBuffer> => {
 
 let music: Audio
 
-export const addMusic = (volume: number, camera: PerspectiveCamera, filename: string) => {
+export const addMusic = (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
     if (camera && getDeviceType() === "desktop" && !music) {
         const listener = new AudioListener()
         camera.add(listener)
@@ -64,7 +64,9 @@ export const addMusic = (volume: number, camera: PerspectiveCamera, filename: st
             music.setBuffer(buffer)
             music.setLoop(true)
             music.setVolume(volume)
-            music.play()
+            if (!notAutoStart) {
+                music.play()
+            }
         })
     }
 }
@@ -75,5 +77,17 @@ export const setMusicVolume = (volume: number) => {
 
 export const stopMusic = () => {
     music?.stop()
+}
 
+export const removeMusic = () => {
+    music?.stop()
+    music = undefined
+}
+
+export const startMusic = () => {
+    music?.play()
+}
+
+export const pauseMusic = () => {
+    music?.pause()
 }

@@ -490,10 +490,6 @@ export class RaceGameScene extends GameScene {
 
             this.updateVehicles(delta)
 
-
-            if (!this.isGameSongPlaying()) {
-                this.startGameSong()
-            }
             if (this.roomTicks % 90 === 0) {
                 this.updatePing()
             }
