@@ -131,25 +131,21 @@ export class GhostDriver {
         rotation.set(+values[4], +values[5], +values[6], +values[7])
     }
 
-    getPointBetween(time:number) {
+    getPointBetween(time: number) {
         if (!this.nextPointSet && this.timeIndex < this.di.length) {
             this.setPositionRotationFromInstruction(this.di[this.timeIndex], this.nextPos, this.nextRotation)
-            console.log("next pos", this.nextPos.x.toFixed(2), this.nextPos.z.toFixed(2))
-
             this.nextPointSet = true
         }
 
-        //const alpha = this.numNotUpdates / (60 / (epsTime * 100))
+
         const cTime = this.getTime(this.timeIndex)
-        const pTime = this.getTime(this.timeIndex-1)
-        const alpha = (time-pTime)/(cTime-pTime)
-        console.log("alpha", alpha)
+        const pTime = this.getTime(this.timeIndex - 1)
+        const alpha = (time - pTime) / (cTime - pTime)
         if (alpha <= 1) {
             this.betweenPos = this.pos.clone().lerp(this.nextPos, alpha)
-            console.log("betweenpos", this.betweenPos.x.toFixed(2), this.betweenPos.z.toFixed(2))
             this.betweenRot = this.rotation.clone().slerp(this.nextRotation, alpha)
-
         }
+
     }
 
     setToStart(vehicle: IGhostVehicle) {
