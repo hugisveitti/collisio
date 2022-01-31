@@ -1,12 +1,20 @@
+import { ExtendedObject3D } from "enable3d"
 import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
 import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
 import { getDeviceType } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
 import { loadSphereModel } from "../../vehicles/SphereVehicle"
 
+let currentVehicleType: VehicleType | undefined
+let currentChassis: ExtendedObject3D | undefined
+
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
+
+
     if (vehicleType === "simpleSphere") {
         loadSphereModel(vehicleType, true).then((chassis) => {
+            currentVehicleType = vehicleType
+            currentChassis = chassis
             if (vehicleColor) {
                 (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
@@ -18,8 +26,9 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
 
         })
     } else {
-
         loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
+            currentVehicleType = vehicleType
+            currentChassis = chassis
             if (vehicleColor) {
                 (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
@@ -38,7 +47,7 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
         })
     }
 }
-
+let offset = 15
 const addLights = (scene: Scene) => {
 
     const pLigth = new PointLight(0xffffff, 1, 10, 0)
@@ -54,10 +63,18 @@ const addLights = (scene: Scene) => {
 }
 
 
-let renderer: WebGLRenderer | undefined, scene: Scene | undefined
+export const changeChassisColor = (vehicleColor: string) => {
+    // only color changed
+    if (currentChassis) {
+
+        (currentChassis.material as MeshStandardMaterial).color = new Color(vehicleColor)
+    }
+}
+
+let renderer: WebGLRenderer | undefined, scene: Scene | undefined, camera: undefined | PerspectiveCamera
 
 
-export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: string) => {
+export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: string, _height?: number) => {
     if (scene && renderer) {
         scene.clear()
         addVehicle(vehicleType, chassisNum, scene, vehicleColor)
@@ -65,7 +82,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
         return undefined
     }
 
-    const height = 400
+    const height = _height ?? 400
     const width = getDeviceType() === "desktop" ? window.innerWidth : screen.availWidth
 
     renderer = new WebGLRenderer({ antialias: true });
@@ -80,7 +97,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     addLights(scene)
 
-    const camera = new PerspectiveCamera(40, width / height, 1, 100);
+    camera = new PerspectiveCamera(40, width / height, 1, 100);
     camera.position.set(10, 5, -15);
     camera.aspect = width / height
 
@@ -112,7 +129,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     camera.fov = 25
 
     let ry = 0
-    let offset = 15
+
     camera.rotateY(ry)
     const animate = () => {
 
@@ -140,9 +157,16 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     return renderer
 }
 
+export const setShowRoomOffset = (_offset: number, y: number) => {
+    offset = _offset
+
+    camera.position.set(offset, y, offset);
+}
+
 export const removeShowRoomCanvas = () => {
     renderer.clear()
     scene.clear()
     scene = undefined
     renderer = undefined
+    camera = undefined
 }

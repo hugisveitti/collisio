@@ -30,6 +30,7 @@ import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
 import GameRoom from "./gameRoom/GameRoom";
+import GarageContainer from "./garage/GarageContainer";
 import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import LoginPageContainer from "./login/LoginPageContainer";
@@ -72,6 +73,7 @@ export const trophyRoomIdPath = "/trophy/:id";
 export const mobileOnlyWaitingRoomPath = "/mobile-only-wait";
 export const privacyPolicyPage = "/privacy-policy";
 export const loginPagePath = "/login";
+export const garagePagePath = "/garage";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -263,6 +265,10 @@ const Routes = () => {
         <Route
           path={loginPagePath}
           render={(props) => <LoginPageContainer />}
+        />
+        <Route
+          path={garagePagePath}
+          render={(props) => <GarageContainer {...props} store={store} />}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

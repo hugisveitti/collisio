@@ -114,6 +114,7 @@ var router = function (app) {
     app.get("/private-profile", sendIndexHTML);
     app.get("/user/:id", sendIndexHTML);
     app.get("/show-room", sendIndexHTML);
+    app.get("/garage", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {
         res.sendFile(path.join(__dirname, adminHTMLPath));

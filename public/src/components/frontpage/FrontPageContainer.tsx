@@ -17,6 +17,7 @@ import {
   buyPremiumPagePath,
   connectPagePath,
   frontPagePath,
+  garagePagePath,
   highscorePagePath,
   howToPlayPagePath,
   loginPagePath,
@@ -42,11 +43,11 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   const renderUserInfo = () => {
     return user ? (
       <>
+        <TokenComponent user={user} />
+
         <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
           <i>{user.displayName}</i> logged in
         </BackdropButton>
-
-        <TokenComponent user={user} />
       </>
     ) : (
       <BackdropButton link={loginPagePath}>Login</BackdropButton>
@@ -76,7 +77,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={tournamentPagePath} width={btnWidth}>
             Tournaments
           </BackdropButton>
-          <BackdropButton link={showRoomPagePath} width={btnWidth}>
+          <BackdropButton link={garagePagePath} width={btnWidth}>
             Garage
           </BackdropButton>
           <BackdropButton link={howToPlayPagePath} width={btnWidth}>
