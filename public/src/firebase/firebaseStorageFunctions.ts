@@ -92,12 +92,15 @@ export const getFastestGhostFilename = (trackName: TrackName, numberOfLaps: numb
             resolve(undefined)
             return
         }
+        let bestScore = Infinity
+        let bestScoreFile = undefined as undefined | string
         for (let score of bestScores) {
-            if (score.recordingFilename) {
-                resolve(score.recordingFilename)
-                return
+            if (score.recordingFilename && bestScore > score.totalTime) {
+                bestScoreFile = score.recordingFilename
+                bestScore = score.totalTime
             }
         }
-        resolve(undefined)
+        console.log("best score and bestscore file", bestScore, bestScoreFile)
+        resolve(bestScoreFile)
     })
 }
