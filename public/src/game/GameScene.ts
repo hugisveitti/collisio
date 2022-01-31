@@ -9,7 +9,7 @@ import { defaultGameSettings, GraphicsType, IGameSettings } from '../classes/loc
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
-import { getBeep } from "../sounds/gameSounds";
+import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
@@ -278,6 +278,9 @@ export class GameScene extends Scene3D implements IGameScene {
     async preload() {
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
         this.addLights()
+        removeMusic()
+
+        addMusic(this.gameSettings.musicVolume, this.camera as PerspectiveCamera, "racing.mp3")
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
 
@@ -784,8 +787,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
     startGameSong() {
         // not use game song right now...
-        if (!!false && this.useSound && (!this.songIsPlaying) && !this.isPaused) {
+        if ((!this.songIsPlaying) && !this.isPaused) {
             this.songIsPlaying = true
+            startMusic()
         }
     }
 
@@ -798,6 +802,7 @@ export class GameScene extends Scene3D implements IGameScene {
     pauseGame() {
         this.isPaused = true
         if (!this.gameStarted) return
+        pauseMusic()
 
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
@@ -922,6 +927,11 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.toggleUseSound()
 
+        setMusicVolume(gameSettings.musicVolume)
+        if (gameSettings.musicVolume > 0) {
+            this.startGameSong()
+        }
+
         for (let i = 0; i < this.views.length; i++) {
             this.views[i].camera.far = this.getDrawDistance()
         }
@@ -935,12 +945,6 @@ export class GameScene extends Scene3D implements IGameScene {
     _setGameSettings() { }
 
     toggleUseSound() {
-        if (!this.useSound) {
-
-            this.songIsPlaying = false
-        } else {
-            this.startGameSong()
-        }
         for (let vehicle of this.vehicles) {
             vehicle.toggleSound(this.useSound)
         }
@@ -1256,6 +1260,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
+            stopMusic()
             window.removeEventListener("resize", () => this.handleResizeWindow())
 
             if (this.mobileOnlyControllerInterval) {
