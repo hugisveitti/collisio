@@ -588,18 +588,14 @@ export class LowPolyVehicle extends Vehicle {
             camera.lookAt(this.vehicleBody.position.clone())
 
 
-        } else if (this.useChaseCamera) {
+        }
+        else if (this.useChaseCamera) {
             const rot = this.vehicleBody.rotation
-            // I think these are always the same
-            // this.vehicleBody.pos is set to the value of this.getPosition in update()
             const pos = this.vehicleBody.position
-            const chaseSpeedY = 0.5
 
             const q = this.vehicleBody.quaternion
 
             const alpha = 2 * Math.asin(q.y)
-
-            const a = 2 * Math.acos(q.w)
 
 
             this.cameraTarget.set(
@@ -608,46 +604,15 @@ export class LowPolyVehicle extends Vehicle {
                 pos.z + ((Math.cos(alpha) * this.staticCameraPos.z))
             )
 
-            // this is for the follow camera effect
-            // this.cameraTarget.set(
-            //     pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
-            //     pos.y + this.staticCameraPos.y,
-            //     pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-            // )
-
-            this.cameraDiff.subVectors(this.cameraTarget, camera.position)
-
-            let dchaseSpeedX = Math.abs((Math.sin(rot.y))) * 16 / +delta.toFixed(0)  // this.chaseCameraSpeed)
-            let dchaseSpeedZ = Math.abs((Math.cos(rot.y))) * 16 / +delta.toFixed(0) // this.chaseCameraSpeed)
-
-            const diffX = dchaseSpeedX - this.chaseSpeedX
-            const diffZ = dchaseSpeedZ - this.chaseSpeedZ
-
-            let scalerX = this.chaseCameraSpeed * .0051
-            let scalerZ = this.chaseCameraSpeed * .0051
-
-
-            let changeX = (scalerX * Math.abs(diffX)) * Math.sign(diffX)
-            let changeZ = (scalerZ * Math.abs(diffZ)) * Math.sign(diffZ)
-
-
-            this.chaseSpeedZ += changeZ
-            this.chaseSpeedX += changeX
-
-            const chaseXTarget = (1 / (1 + Math.abs(diffX)) ** 2)
-            const chaseZTarget = (1 / (1 + Math.abs(diffZ)) ** 2)
-
-            this.chaseX += (chaseXTarget - this.chaseX) * .01 // (1 / (1 + Math.abs(diffX)) ** 2)
-            this.chaseZ += (chaseZTarget - this.chaseZ) * .01
-
-            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * this.chaseX)) //* this.chaseSpeedX))
-            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * this.chaseZ)) //* this.chaseSpeedZ))
-            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * chaseSpeedY)) // have the y dir change slower?
-
-            const cs = 0.5
-            this.cameraLookAtPos.x = (this.prevChaseCameraPos.x + ((pos.x - this.prevChaseCameraPos.x) * cs))
-            this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z - this.prevChaseCameraPos.z) * cs))
+            const cs = 0.4
+            this.cameraLookAtPos.x = (this.prevChaseCameraPos.x + ((pos.x + ((Math.sin(alpha) * 10) * Math.sign(q.w)) - this.prevChaseCameraPos.x) * cs))
+            this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z + ((Math.cos(alpha) * 10)) - this.prevChaseCameraPos.z) * cs))
             this.cameraLookAtPos.y = (this.prevChaseCameraPos.y + ((pos.y - this.prevChaseCameraPos.y) * cs))
+
+            const ct = 0.25
+            this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * ct)) //* this.chaseSpeedX))
+            this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * ct)) //* this.chaseSpeedZ))
+            this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * ct))
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
@@ -656,7 +621,8 @@ export class LowPolyVehicle extends Vehicle {
             if (this.scene.getGraphicsType() === "high") {
                 this.seeVehicle(this.cameraDir.clone())
             }
-        } else {
+        }
+        else {
             if (this.scene.getGraphicsType() !== "high") {
                 camera.lookAt(this.vehicleBody.position.clone())
             } else {

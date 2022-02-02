@@ -347,7 +347,8 @@ export class GameScene extends Scene3D implements IGameScene {
 
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
-
+        //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
+        this.physics.config.maxSubSteps = 0
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -362,6 +363,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
         if (this.deltaFPS > this.targetFPS && !this.isPaused) {
+
+
+
             let delta = +(this.updateDelta * 1000)//.toPrecision(3)
 
             this.updateDelta = 0
@@ -370,11 +374,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
             // must always satisfy the equation timeStep < maxSubSteps * fixedTimeStep
             // update physics, then update models, opposite to enabled3d
-            this.physics.config.maxSubSteps = 1
-            this.physics.config.fixedTimeStep = delta / 1000
 
-            // never below 20 fps, otherwise strange thing happen
-            this.physics.config.fixedTimeStep = Math.min(this.physics.config.fixedTimeStep, 1 / 15)
+            this.gameTicks += 1
+            this.roomTicks += 1
 
             this.physics?.update(delta)
             this.physics?.updateDebugger()

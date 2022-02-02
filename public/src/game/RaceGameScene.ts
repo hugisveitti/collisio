@@ -478,8 +478,7 @@ export class RaceGameScene extends GameScene {
         this.time = time
         this.updateFps(time)
 
-        this.gameTicks += 1
-        this.roomTicks += 1
+
         if (this.everythingReady()) {
             this.course.updateCourse()
 
