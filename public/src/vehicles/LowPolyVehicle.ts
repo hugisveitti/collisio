@@ -389,8 +389,21 @@ export class LowPolyVehicle extends Vehicle {
 
         if (kmh < 2) {
             this.break(true)
-
         }
+
+
+        let abs = 1000
+
+        let possibleEf = this.currentEngineForce + ((eF - this.currentEngineForce) * .05)
+        if (Math.abs(this.currentEngineForce - eF) > abs) {
+            //   console.warn("big diff", this.currentEngineForce - eF)
+            this.currentEngineForce = this.currentEngineForce - (abs * Math.sign(this.currentEngineForce - eF))
+        } else {
+            this.currentEngineForce = possibleEf
+        }
+
+        eF = this.currentEngineForce
+
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -666,8 +679,9 @@ export class LowPolyVehicle extends Vehicle {
      * @param cameraPos position of camera relative to the world
      */
     seeVehicle(cameraPos: Vector3) {
-
-        this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
+        if (this.delta < 33) {
+            this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
+        }
     }
 
     checkIfSpinning(log?: boolean) {

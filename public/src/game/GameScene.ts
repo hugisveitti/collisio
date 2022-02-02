@@ -335,6 +335,7 @@ export class GameScene extends Scene3D implements IGameScene {
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -20, 0)
 
+
     }
 
 
@@ -361,18 +362,24 @@ export class GameScene extends Scene3D implements IGameScene {
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
         if (this.deltaFPS > this.targetFPS && !this.isPaused) {
-            const delta = this.updateDelta * 1000
+            let delta = +(this.updateDelta * 1000)//.toPrecision(3)
 
             this.updateDelta = 0
             this.deltaFPS = this.deltaFPS % this.targetFPS
             const time = this.clock.getElapsedTime()
 
+            // must always satisfy the equation timeStep < maxSubSteps * fixedTimeStep
             // update physics, then update models, opposite to enabled3d
+            this.physics.config.maxSubSteps = 1
+            this.physics.config.fixedTimeStep = delta / 1000
+
+            // never below 20 fps, otherwise strange thing happen
+            this.physics.config.fixedTimeStep = Math.min(this.physics.config.fixedTimeStep, 1 / 15)
 
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
-            this.update?.(parseFloat(time.toFixed(8)), delta)
+            this.update?.(+(time.toFixed(8)), delta)
 
             this.animationMixers.update(delta)
 

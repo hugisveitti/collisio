@@ -21,8 +21,8 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         bronze: 35
     },
     "f1-track-2": {
-        gold: 26,
-        silver: 30,
+        gold: 27.2,
+        silver: 31,
         bronze: 35
     },
     // Beach
