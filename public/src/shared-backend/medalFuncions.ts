@@ -105,6 +105,21 @@ export const getMedal = (trackName: TrackName, numberOfLaps: number, totalTime: 
 
     if (trackName in times) {
         const { gold, silver, bronze } = times[trackName]
+
+        // first lap is slowest
+        if (numberOfLaps === 1) {
+            if (totalTime < gold + 3) {
+                return "gold"
+            }
+            if (totalTime < silver + 3) {
+                return "silver"
+            }
+            if (totalTime < bronze + 3) {
+                return "bronze"
+            }
+            return "none"
+        }
+
         if (totalTime < gold * numberOfLaps) {
             return "gold"
         }
