@@ -11,7 +11,7 @@ import {
   nonActiveTrackNames,
   numberOfLapsPossibilities,
 } from "../../classes/Game";
-import { getBestScoresOnTrack } from "../../firebase/firestoreGameFunctions";
+import { getBestScoresOnTrackAndLap } from "../../firebase/firestoreGameFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { TrackName } from "../../shared-backend/shared-stuff";
@@ -62,7 +62,7 @@ const HighscorePage = (props: IHighscorePage) => {
     setPage(0);
     const startTotalTime = 0;
 
-    getBestScoresOnTrack(
+    getBestScoresOnTrackAndLap(
       trackKey,
       numberOfLapsKey,
       startTotalTime,
@@ -95,7 +95,7 @@ const HighscorePage = (props: IHighscorePage) => {
 
     setPage(newPage);
 
-    getBestScoresOnTrack(trackKey, numberOfLapsKey, startTime, rpp).then(
+    getBestScoresOnTrackAndLap(trackKey, numberOfLapsKey, startTime, rpp).then(
       (data) => {
         setHighscoreList(data);
         if (data?.length) {

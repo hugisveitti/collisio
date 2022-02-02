@@ -118,7 +118,7 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer)
             console.warn("error saving race", e)
         })
 
-        const bestScores = await getBestScoresOnTrackAndLap(data.trackName, data.numberOfLaps, 3)
+        const bestScores = await getBestScoresOnTrackAndLap(data.trackName, data.numberOfLaps, 0, 3)
 
         if (bestScores && bestScores.length > 0) {
             let place = -1
@@ -153,33 +153,33 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer)
 * unique to each player
 * stored on highscores/userId/bestHighscoresRefPath
 */
-export const getBestScoresOnTrackAndLap = async (trackName: TrackName, numberOfLaps: number, limitToN: number | undefined): Promise<IBestTime[] | undefined> => {
-    return new Promise<IBestTime[] | undefined>(async (resolve, reject) => {
+// export const getBestScoresOnTrackAndLap = async (trackName: TrackName, numberOfLaps: number, limitToN: number | undefined): Promise<IBestTime[] | undefined> => {
+//     return new Promise<IBestTime[] | undefined>(async (resolve, reject) => {
 
-        const highscoresRef = collection(firestore, bestHighscoresRefPath)
-        let q = query(highscoresRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"))
-        if (limitToN) {
-            q = query(q, limit(limitToN))
-        }
-        const data = await getDocs(q)
+//         const highscoresRef = collection(firestore, bestHighscoresRefPath)
+//         let q = query(highscoresRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"))
+//         if (limitToN) {
+//             q = query(q, limit(limitToN))
+//         }
+//         const data = await getDocs(q)
 
-        if (data.empty) {
+//         if (data.empty) {
 
-            resolve(undefined)
-        } else {
-            const arr: IBestTime[] = []
-            data.forEach(doc => {
-                const item = doc.data() as IEndOfRaceInfoPlayer
-                arr.push({
-                    playerId: item.playerId,
-                    totalTime: item.totalTime,
-                    recordingFilename: item.recordingFilename
-                })
-            })
-            resolve(arr)
-        }
-    })
-}
+//             resolve(undefined)
+//         } else {
+//             const arr: IBestTime[] = []
+//             data.forEach(doc => {
+//                 const item = doc.data() as IEndOfRaceInfoPlayer
+//                 arr.push({
+//                     playerId: item.playerId,
+//                     totalTime: item.totalTime,
+//                     recordingFilename: item.recordingFilename
+//                 })
+//             })
+//             resolve(arr)
+//         }
+//     })
+// }
 
 export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame, callback: (res: TournamentFinishedResponse) => void, activeBracketNode?: IFlattendBracketNode) => {
 
@@ -214,10 +214,10 @@ export const getPlayerBestScores = async (playerId: string, callback: (data: IEn
 
 export type BestTrackScore = IEndOfRaceInfoPlayer[]
 
-export const getBestScoresOnTrack = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number): Promise<IEndOfRaceInfoPlayer[]> => {
+export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number): Promise<IEndOfRaceInfoPlayer[]> => {
     return new Promise<IEndOfRaceInfoPlayer[]>(async (resolve, reject) => {
         const bestScoreRef = collection(firestore, bestHighscoresRefPath)
-        const q = query(bestScoreRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
+        const q = query(bestScoreRef, orderBy("vehicleType", "asc"), where("vehicleType", "!=", "simpleSphere"), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
 
         const arr = []
 
