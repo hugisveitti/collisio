@@ -3,11 +3,13 @@
  */
 
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3, PositionalAudio } from "three";
+import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
+import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
@@ -163,6 +165,23 @@ export class Vehicle implements IVehicle {
         })
     };
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) { };
+
+    addItemToVehicle(filename: string) {
+        return new Promise<void>((resolve, reject) => {
+            const loader = new GLTFLoader()
+            loader.load(getStaticPath("models/f1/exhaust1.glb"), (gltf: GLTF) => {
+                console.log("exhaust", gltf)
+                for (let child of gltf.scene.children) {
+                    if (child.type === "Mesh") {
+                        console.log("CHILD", child)
+                        child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
+                        this.vehicleBody.add(child)
+                    }
+                }
+            })
+            resolve()
+        })
+    }
 
     constructor(config: IVehicleClassConfig) {
         this.vehicleType = config.vehicleType

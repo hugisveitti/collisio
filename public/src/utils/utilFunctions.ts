@@ -228,6 +228,7 @@ const prefixSizes = {
 }
 
 export const getSizePrefix = (num: number) => {
+    if (!num) return "0"
     const str = num.toString()
     const l = str.length
     let prefix = ""

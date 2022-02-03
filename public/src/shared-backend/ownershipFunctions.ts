@@ -34,7 +34,7 @@ export const getDefaultVehicleOwnership = () => {
 const vehicleCosts: { [vehicleType in VehicleType]: number } = {
     f1: 0,
     normal: 0,
-    tractor: 1000,
+    tractor: 50,
     test: 0,
     offRoader: 0,
     sportsCar: 3000,
@@ -42,7 +42,7 @@ const vehicleCosts: { [vehicleType in VehicleType]: number } = {
     simpleSphere: 500,
     simpleCylindar: 50000,
     gokart: 3000,
-    future: 60000
+    future: 20000
 }
 
 
@@ -74,7 +74,7 @@ const trackCosts: { [trackName in TrackName]: number } = {
     "farm-track": 0,
     "f1-track": 0,
     "sea-side-track": 0,
-    "f1-track-2": 0,
+    "f1-track-2": 2000,
     "russia-track": 500,
     "ferrari-track": 1000,
     "spa-track": 10000,
@@ -94,7 +94,6 @@ const trackCosts: { [trackName in TrackName]: number } = {
 const defaultOwnedColors: VehicleColorType[] = [
     "#1d8a47",
     "#8b0000",
-    "#185676",
 ]
 
 type VehicleColorOwnership = { [vehicleColor in VehicleColorType]: boolean }

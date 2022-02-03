@@ -89,6 +89,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <React.Fragment>
             <Grid item xs={4}>
               <VehicleSelect
+                simpleSelect
                 user={props.user}
                 value={props.store.userSettings.vehicleSettings.vehicleType}
                 onChange={(vehicleType) => {

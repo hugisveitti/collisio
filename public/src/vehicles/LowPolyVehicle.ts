@@ -1032,8 +1032,9 @@ export class LowPolyVehicle extends Vehicle {
         } catch (err) {
             console.warn("Error destorying:", name)
         }
-
     }
+
+
 
     async destroy() {
         new Promise<void>(async (resolve, reject) => {
