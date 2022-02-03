@@ -26,6 +26,7 @@ const BasicModal = (props: IBasicModal) => {
           outline: 0,
           maxHeight: "80%",
           overflowY: "auto",
+          maxWidth: "90%",
         }}
       >
         {props.children}

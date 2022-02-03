@@ -9,6 +9,7 @@ import { IVehicleSettings } from "../../classes/User";
 import { getStyledColors } from "../../providers/theme";
 import {
   allVehicleTypes,
+  VehicleColorType,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import { itemInArray } from "../../utils/utilFunctions";
@@ -23,6 +24,7 @@ import "./select.css";
 interface IVehicleSelect {
   value: VehicleType;
   onChange: (vehicleType: VehicleType) => void;
+  onChangeColor?: (color: VehicleColorType) => void;
   excludedVehicles?: VehicleType[];
   fullWidth?: boolean;
   disabled?: boolean;
@@ -87,28 +89,12 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
             <GarageComponent
               store={props.store}
               onChangeVehicleColor={(color) => {
-                const newVehicleSettings: IVehicleSettings = {
-                  ...props.store.userSettings.vehicleSettings,
-                  vehicleColor: color,
-                };
-
-                const newUserSettings = {
-                  ...props.store.userSettings,
-                  vehicleSettings: newVehicleSettings,
-                };
-                props.store.setUserSettings(newUserSettings);
+                if (props.onChangeColor) {
+                  props.onChangeColor(color);
+                }
               }}
               onChangeVehicleType={(v) => {
-                const newVehicleSettings: IVehicleSettings = {
-                  ...props.store.userSettings.vehicleSettings,
-                  vehicleType: v,
-                };
-
-                const newUserSettings = {
-                  ...props.store.userSettings,
-                  vehicleSettings: newVehicleSettings,
-                };
-                props.store.setUserSettings(newUserSettings);
+                props.onChange(v);
               }}
             />
           )}

@@ -81,7 +81,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   return (
     <CollabsibleCard header="Vehicle settings">
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={12}>
+        <Grid item xs={12} lg={12} style={{}}>
           {props.linkToGarage ? (
             <BackdropButton link={garagePagePath}>Go to garage</BackdropButton>
           ) : (
@@ -94,6 +94,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               }
               onChange={(value) => {
                 updateVehicleSettings("vehicleType", value);
+              }}
+              onChangeColor={(color) => {
+                updateVehicleSettings("vehicleColor", color);
               }}
             />
           )}

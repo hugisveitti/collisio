@@ -44,12 +44,12 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={6} style={{ textAlign: "left" }}>
-        <FullscreenButton />
-      </Grid>
-      <Grid item xs={6} style={{ textAlign: "right" }}>
         <IconButton onClick={() => props.onClose()} style={{ color: "white" }}>
           <CloseIcon />
         </IconButton>
+      </Grid>
+      <Grid item xs={6} style={{ textAlign: "right" }}>
+        <FullscreenButton />
       </Grid>
       {props.store.player.isLeader && (
         <>
@@ -83,9 +83,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           </Grid>
         </>
       )}
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
       <Grid item xs={12}>
         <VehicleSettingsComponent
           store={props.store}

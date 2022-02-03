@@ -1,14 +1,6 @@
-import {
-  Tab,
-  Tabs,
-  Box,
-  Typography,
-  Grid,
-  CircularProgress,
-} from "@mui/material";
+import { Box, CircularProgress, Grid, Tab, Tabs } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { IVehicleSettings } from "../../classes/User";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import {
   buyItem,
@@ -28,9 +20,7 @@ import {
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
-import BackdropContainer from "../backdrop/BackdropContainer";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import ShowRoomComponent from "../showRoom/ShowRoomComponent";
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
 import BuyItemComponent from "./BuyItemComponent";
@@ -110,7 +100,10 @@ const GarageComponent = (props: IGarageComponent) => {
     setSelectedTab(newSelectedTab);
   };
 
-  const handleBuyItem = (item: AllOwnableItems) => {
+  const handleBuyItem = (
+    item: AllOwnableItems,
+    type: "vehicleType" | "vehicleColor"
+  ) => {
     setIsBuying(true);
     buyItem(user.uid, item).then((data) => {
       if (data.completed) {
@@ -126,6 +119,11 @@ const GarageComponent = (props: IGarageComponent) => {
           coins: props.store.tokenData.coins - allCosts[item],
         };
         props.store.setTokenData(newTokenData);
+        if (type === "vehicleColor") {
+          props.onChangeVehicleColor(item as VehicleColorType);
+        } else if (type === "vehicleType") {
+          props.onChangeVehicleType(item as VehicleType);
+        }
       } else {
         toast.error(data.message);
       }
@@ -153,7 +151,7 @@ const GarageComponent = (props: IGarageComponent) => {
           cost={allCosts[selectedVehicleType]}
           label={getVehicleNameFromType(selectedVehicleType)}
           onBuy={() => {
-            handleBuyItem(selectedVehicleType);
+            handleBuyItem(selectedVehicleType, "vehicleType");
           }}
           owned={ownership[selectedVehicleType]}
           buyButtonText="vehicle"
@@ -167,7 +165,7 @@ const GarageComponent = (props: IGarageComponent) => {
           cost={allCosts[selectedVehicleColor]}
           label={getColorNameFromType(selectedVehicleColor)}
           onBuy={() => {
-            handleBuyItem(selectedVehicleColor);
+            handleBuyItem(selectedVehicleColor, "vehicleColor");
           }}
           owned={ownership[selectedVehicleColor]}
           buyButtonText="color"
@@ -191,14 +189,14 @@ const GarageComponent = (props: IGarageComponent) => {
   };
 
   return (
-    <Grid container spacing={3} style={{ width: "95%", margin: "auto" }}>
+    <Grid container spacing={3} style={{}}>
       {props.showBackButton && (
         <Grid item xs={12}>
           <ToFrontPageButton color="black" />
         </Grid>
       )}
-      <Grid item xs={12} sm={6} style={{ paddingLeft: 0 }}>
-        <Grid container spacing={1} style={{ maxWidth: "95%" }}>
+      <Grid item xs={12} sm={6} style={{}}>
+        <Grid container spacing={1} style={{}}>
           <Grid item xs={12}>
             <TokenComponent user={user} store={props.store} />
           </Grid>
@@ -213,8 +211,8 @@ const GarageComponent = (props: IGarageComponent) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12} sm={6} style={{ paddingLeft: 0, maxWidth: "85%" }}>
-        <div style={{ width: "100%", color, backgroundColor, padding: 10 }}>
+      <Grid item xs={12} sm={6} style={{}}>
+        <div style={{ color, backgroundColor, padding: 10 }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
               value={selectedTab}

@@ -25,8 +25,8 @@ const CollabsibleCard = (props: ICollabsibleCard) => {
     <Card
       variant="outlined"
       style={{
-        maxWidth: 600,
         margin: "auto",
+        maxWidth: 600,
         cursor: "pointer",
         backgroundColor: alphaColor,
         color: oppositeColor,
