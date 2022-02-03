@@ -276,6 +276,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         }}
         store={props.store}
         userId={user?.uid}
+        user={user}
         isTestMode={props.isTestMode}
         updateGameSettings={updateGameSettings}
         quitGame={(newPath: string) => {

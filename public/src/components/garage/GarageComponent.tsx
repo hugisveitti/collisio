@@ -83,8 +83,7 @@ const GarageComponent = (props: IGarageComponent) => {
       setSelectedVehicleType(value);
     }
 
-    console.log("owner ship of ", value, ownership[value]);
-    if (ownership[value]) {
+    if (ownership && ownership[value]) {
       if (key === "vehicleColor") {
         props.onChangeVehicleColor?.(value);
       } else if (key === "vehicleType") {
@@ -143,6 +142,9 @@ const GarageComponent = (props: IGarageComponent) => {
   }, [user]);
 
   const renderOwnershipComponent = () => {
+    if (!user) {
+      return <span>Only logged in players can buy items.</span>;
+    }
     if (!ownership) return <CircularProgress />;
     if (selectedTab === 0) {
       return (

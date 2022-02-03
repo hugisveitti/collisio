@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import React, { useState } from "react";
-import { IVehicleSettings } from "../../classes/User";
+import { IUser, IVehicleSettings } from "../../classes/User";
 import { getStyledColors } from "../../providers/theme";
 import {
   allVehicleTypes,
@@ -31,6 +31,7 @@ interface IVehicleSelect {
   vehicleColor?: string;
   store?: IStore;
   simpleSelect?: boolean;
+  user: IUser;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
@@ -71,6 +72,11 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
   }
   return (
     <React.Fragment>
+      {!props.user && (
+        <span className="select__label" style={{ color, fontSize: 16 }}>
+          <i>Vehicle selection is only available for logged in users.</i>
+        </span>
+      )}
       <span className="select__label" style={{ color, fontSize: 16 }}>
         Selected vehicle is{" "}
         <strong>{getVehicleNameFromType(props.value)}</strong>
@@ -89,11 +95,17 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
             <GarageComponent
               store={props.store}
               onChangeVehicleColor={(color) => {
+                if (!props.user) {
+                  return;
+                }
                 if (props.onChangeColor) {
                   props.onChangeColor(color);
                 }
               }}
               onChangeVehicleType={(v) => {
+                if (!props.user) {
+                  return;
+                }
                 props.onChange(v);
               }}
             />

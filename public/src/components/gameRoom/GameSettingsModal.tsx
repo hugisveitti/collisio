@@ -14,6 +14,7 @@ import { IStore } from "../store";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
 import BackdropButton from "../button/BackdropButton";
 import { connectPagePath } from "../Routes";
+import { IUser } from "../../classes/User";
 
 interface IGameSettingsModal {
   open: boolean;
@@ -24,6 +25,7 @@ interface IGameSettingsModal {
   isTestMode?: boolean;
   updateGameSettings: (gameSettings: IGameSettings) => void;
   quitGame: (newPath: string) => void;
+  user: IUser;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -87,6 +89,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <React.Fragment>
             <Grid item xs={4}>
               <VehicleSelect
+                user={props.user}
                 value={props.store.userSettings.vehicleSettings.vehicleType}
                 onChange={(vehicleType) => {
                   const newVehicleSettings = {

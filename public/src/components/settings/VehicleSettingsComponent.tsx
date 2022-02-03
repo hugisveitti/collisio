@@ -98,6 +98,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               onChangeColor={(color) => {
                 updateVehicleSettings("vehicleColor", color);
               }}
+              user={props.user}
             />
           )}
         </Grid>

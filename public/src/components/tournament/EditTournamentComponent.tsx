@@ -73,6 +73,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
       <Grid item xs={12}>
         <Collapse in={onlyAllowSpecificVechileType}>
           <VehicleSelect
+            user={props.user}
             value={
               onlyAllowSpecificVechileType
                 ? props.tournament.vehicleType
