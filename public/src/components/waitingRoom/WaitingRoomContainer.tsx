@@ -1,8 +1,5 @@
-import { LoadingButton } from "@mui/lab";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
@@ -20,7 +17,7 @@ import {
   removeFromAvailableRooms,
   saveRoom,
 } from "../../firebase/firestoreFunctions";
-import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
   IPlayerConnectedData,

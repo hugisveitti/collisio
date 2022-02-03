@@ -107,6 +107,8 @@ const Routes = () => {
   const [previousPage, setPreviousPage] = useState("");
   const deviceType = getDeviceType();
 
+  const [tokenData, setTokenData] = useState(undefined);
+
   useEffect(() => {
     if (!inTestMode) {
       const _gameSettings = getAllLocalGameSettings();
@@ -153,6 +155,8 @@ const Routes = () => {
     setActiveBracketNode,
     previousPage,
     setPreviousPage,
+    tokenData,
+    setTokenData,
   };
 
   const user = useContext(UserContext);

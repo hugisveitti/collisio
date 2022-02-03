@@ -1,9 +1,6 @@
 import Collapse from "@mui/material/Collapse";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   nonActiveTrackNames,
   numberOfLapsPossibilities,
@@ -16,13 +13,13 @@ import {
 import { IUser } from "../../classes/User";
 import { inputBackgroundColor } from "../../providers/theme";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import NumberSelect from "../inputs/NumberSelect";
 import TrackSelect from "../inputs/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
+import MyTextField from "../textField/MyTextField";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
 import EditLocalTournamentComponent from "./localTournament/EditLocalTournamentComponent";
-import MyTextField from "../textField/MyTextField";
-import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 
 interface IEditTournamentComponent<V> {
   user: IUser;

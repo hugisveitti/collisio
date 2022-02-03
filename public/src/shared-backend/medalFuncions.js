@@ -13,8 +13,8 @@ var times = {
         bronze: 35
     },
     "f1-track-2": {
-        gold: 26,
-        silver: 30,
+        gold: 27.2,
+        silver: 31,
         bronze: 35
     },
     // Beach
@@ -94,6 +94,19 @@ var times = {
 var getMedal = function (trackName, numberOfLaps, totalTime) {
     if (trackName in times) {
         var _a = times[trackName], gold = _a.gold, silver = _a.silver, bronze = _a.bronze;
+        // first lap is slowest
+        if (numberOfLaps === 1) {
+            if (totalTime < gold + 3) {
+                return "gold";
+            }
+            if (totalTime < silver + 3) {
+                return "silver";
+            }
+            if (totalTime < bronze + 3) {
+                return "bronze";
+            }
+            return "none";
+        }
         if (totalTime < gold * numberOfLaps) {
             return "gold";
         }

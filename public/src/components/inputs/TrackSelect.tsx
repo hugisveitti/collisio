@@ -8,7 +8,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import { allTrackNames, ITrackInfo } from "../../classes/Game";
 import f1TrackImage from "../../images/tracks/f1-track.PNG";
 import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
 import russiaTrackImage from "../../images/tracks/russia-top.png";
@@ -18,7 +17,12 @@ import spaTrackImage from "../../images/tracks/spa-top.png";
 import farmTrackImage from "../../images/tracks/farm-track.PNG";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
 import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
-import { GameType, TrackName } from "../../shared-backend/shared-stuff";
+import {
+  allTrackNames,
+  GameType,
+  ITrackInfo,
+  TrackName,
+} from "../../shared-backend/shared-stuff";
 import { itemInArray } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import "./select.css";

@@ -1,9 +1,9 @@
 import { Vector3 } from "three";
-import { VehicleColor, vehicleColors, VehicleType } from "../shared-backend/shared-stuff";
+import { allVehicleTypes, VehicleClass, VehicleColor, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { degToRad, itemInArray } from "../utils/utilFunctions";
 import { SimpleVector } from "./IVehicle";
 
-export const getVehicleColorOption = (value: string): VehicleColor => {
+export const getVehicleColorOption = (value: VehicleColorType): VehicleColor => {
     for (let option of vehicleColors) {
         if (option.value === value) return option
     }
@@ -12,22 +12,7 @@ export const getVehicleColorOption = (value: string): VehicleColor => {
     }
 }
 
-type VehicleClass = "LowPoly" | "Sphere"
 
-export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: VehicleClass }[] = [
-    { name: "MacNormie", type: "normal2" },
-    { name: "Old Normie", type: "normal" },
-    { name: "Trakkie Tractor", type: "tractor" },
-    { name: "Phil the Phast", type: "f1" },
-    // { name: "Monster truck", type: "monsterTruck" },
-    { name: "test", type: "test" },
-    { name: "Jackie", type: "future" },
-    { name: "Big girl Sally", type: "offRoader" },
-    { name: "Thunderparrot", type: "sportsCar" },
-    { name: "Goonie", type: "gokart" },
-    { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" },
-    { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
-]
 
 export const getVehicleClassFromType = (vehicleType: VehicleType): VehicleClass => {
     for (let v of allVehicleTypes) {

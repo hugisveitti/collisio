@@ -1,33 +1,38 @@
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
 import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
-import { VehicleType } from "../../shared-backend/shared-stuff";
+import { IVehicleSettings } from "../../classes/User";
+import { getStyledColors } from "../../providers/theme";
+import {
+  allVehicleTypes,
+  VehicleType,
+} from "../../shared-backend/shared-stuff";
 import { itemInArray } from "../../utils/utilFunctions";
-import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
+import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
+import GarageComponent from "../garage/GarageComponent";
+import GarageContainer from "../garage/GarageComponent";
 import ShowRoomComponent from "../showRoom/ShowRoomComponent";
+import { IStore } from "../store";
 import "./select.css";
 
 interface IVehicleSelect {
   value: VehicleType;
   onChange: (vehicleType: VehicleType) => void;
-  previewVehicle?: boolean;
   excludedVehicles?: VehicleType[];
   fullWidth?: boolean;
   disabled?: boolean;
   vehicleColor?: string;
+  store?: IStore;
+  simpleSelect?: boolean;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
-  const [showPreview, setShowPreview] = useState(false);
+  const [open, setOpen] = useState(false);
   const { color, backgroundColor } = getStyledColors("white");
   const vehicleOptions = props.excludedVehicles
     ? allVehicleTypes.filter(
@@ -35,48 +40,78 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
       )
     : allVehicleTypes;
 
+  if (props.simpleSelect) {
+    return (
+      <>
+        <span className="select__label" style={{ color: backgroundColor }}>
+          Vehicle
+        </span>
+        <FormControl fullWidth={props.fullWidth}>
+          <Select
+            className="select"
+            disabled={props.disabled}
+            name="vehicle"
+            onChange={(e) => {
+              props.onChange(e.target.value as VehicleType);
+            }}
+            value={props.value}
+            style={{ color, backgroundColor }}
+          >
+            {vehicleOptions.map((vehicle) => (
+              <MenuItem key={vehicle.type} value={vehicle.type}>
+                {vehicle.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </>
+    );
+  }
   return (
     <React.Fragment>
-      <span className="select__label" style={{ color: backgroundColor }}>
-        Vehicle
+      <span className="select__label" style={{ color, fontSize: 16 }}>
+        Selected vehicle is{" "}
+        <strong>{getVehicleNameFromType(props.value)}</strong>
       </span>
-      <FormControl fullWidth={props.fullWidth}>
-        <Select
-          className="select"
-          disabled={props.disabled}
-          name="vehicle"
-          onChange={(e) => {
-            props.onChange(e.target.value as VehicleType);
-          }}
-          value={props.value}
-          style={{ color, backgroundColor }}
-        >
-          {vehicleOptions.map((vehicle) => (
-            <MenuItem key={vehicle.type} value={vehicle.type}>
-              {vehicle.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      {props.previewVehicle && (
+      {props.store && (
         <React.Fragment>
           <BackdropButton
+            disabled={props.disabled}
             style={{ marginTop: 10, marginLeft: 5 }}
-            onClick={() => setShowPreview(!showPreview)}
-            startIcon={showPreview ? <ExpandMore /> : <ExpandLess />}
+            onClick={() => setOpen(!open)}
+            startIcon={open ? <ExpandMore /> : <ExpandLess />}
           >
-            Vehicle preview
+            Select vehicle
           </BackdropButton>
-          <Collapse in={showPreview} style={{ marginTop: 10 }}>
-            {showPreview && (
-              <ShowRoomComponent
-                excludedVehicles={props.excludedVehicles}
-                isPremiumUser={false}
-                vehcileType={props.value}
-                vehicleColor={props.vehicleColor}
-              />
-            )}
-          </Collapse>
+          {open && (
+            <GarageComponent
+              store={props.store}
+              onChangeVehicleColor={(color) => {
+                const newVehicleSettings: IVehicleSettings = {
+                  ...props.store.userSettings.vehicleSettings,
+                  vehicleColor: color,
+                };
+
+                const newUserSettings = {
+                  ...props.store.userSettings,
+                  vehicleSettings: newVehicleSettings,
+                };
+                props.store.setUserSettings(newUserSettings);
+              }}
+              onChangeVehicleType={(v) => {
+                const newVehicleSettings: IVehicleSettings = {
+                  ...props.store.userSettings.vehicleSettings,
+                  vehicleType: v,
+                };
+
+                const newUserSettings = {
+                  ...props.store.userSettings,
+                  vehicleSettings: newVehicleSettings,
+                };
+                props.store.setUserSettings(newUserSettings);
+              }}
+            />
+          )}
         </React.Fragment>
       )}
     </React.Fragment>

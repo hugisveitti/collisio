@@ -47,8 +47,6 @@ export class RaceGameScene extends GameScene {
     constructor() {
         super()
 
-
-
         this.winner = ""
         this.winTime = -1
         this.gameTimers = []

@@ -1,4 +1,4 @@
-import { defaultVehicleType, vehicleColors, VehicleType } from "../shared-backend/shared-stuff"
+import { defaultVehicleType, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff"
 
 export const minSteeringSensitivity = 0.1
 export const maxSteeringSensitivity = 3
@@ -28,7 +28,7 @@ export interface IVehicleSettings {
 
     cameraZoom: number
 
-    vehicleColor: string
+    vehicleColor: VehicleColorType
 
     noSteerNumber: number
 }

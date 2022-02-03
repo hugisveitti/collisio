@@ -1,9 +1,12 @@
-import { increment, updateDoc, doc, DocumentReference } from "firebase/firestore"
-import { adminFirestore, firestore } from "./firebase-config"
+import { adminFirestore } from "./firebase-config"
 import { defaultTokenData, getMedalAndTokens, ITokenData } from "../public/src/shared-backend/medalFuncions"
 import { TrackName } from "../public/src/shared-backend/shared-stuff"
+import { allCosts, AllOwnableItems, AllOwnership, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
+import { runTransaction } from "@firebase/firestore"
 
 const tokenRefPath = "tokens"
+const ownershipPath = "ownership"
+const vehicleSetupPath = "vehicleSetup"
 
 interface IEndOfRaceInfoPlayerServer {
     totalTime: number
@@ -116,3 +119,123 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
 //         gameTicks: 100,
 //     })
 // }, 500)
+
+interface BuyCallback {
+    completed: boolean
+    message: string
+}
+
+
+/**
+ * Get user coins, get user items, see if user already owns item, see if user has enough coins
+ * If user has enough coins and does not own the item, the item will be bought
+ * @param userId 
+ * @returns object with {completed, message}
+ */
+export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallback> => {
+    return new Promise<BuyCallback>(async (resolve, reject) => {
+        const tokenRef = adminFirestore.doc(tokenRefPath + "/" + userId)
+        const tokensRes = await tokenRef.get()
+        let tokenData = defaultTokenData
+        let coins = 0
+        if (tokensRes.exists) {
+            tokenData = {
+                ...defaultTokenData,
+                ...tokensRes.data()
+            }
+            coins = tokenData.coins
+        }
+
+
+        const itemCost = allCosts[item]
+
+        console.log("item cost", itemCost)
+        if (itemCost === undefined) {
+            resolve({
+                completed: false,
+                message: `Unknown item ${item}`
+            })
+            return
+        }
+
+        if (coins < itemCost) {
+            resolve({
+                completed: false,
+                message: `Not enough money, you need ${itemCost - coins} coins to buy this item`
+            })
+            return
+        }
+
+        // see if owned
+        const ownershipRef = adminFirestore.doc(ownershipPath + "/" + userId)
+        let owned = await ownershipRef.get()
+        let ownership = getDefaultOwnership()
+        console.log("owend", owned)
+        if (owned.exists) {
+            ownership = {
+                ...ownership,
+                ...owned.data()
+            }
+        }
+
+        if (ownership[item]) {
+            resolve({
+                completed: false,
+                message: `Item ${item} is already owned`
+            })
+            return
+        }
+
+        // this should be atomic
+        // can buy
+        ownership[item] = true
+        const newTokens = {
+            ...tokenData,
+            coins: coins - itemCost
+        }
+
+        const batch = adminFirestore.batch()
+
+
+
+        batch.update(ownershipRef, ownership)
+        batch.update(tokenRef, newTokens)
+        batch.commit().then(() => {
+            resolve({
+                completed: true,
+                message: `Item ${item} was bought!`
+            })
+        }).catch(err => {
+            console.warn("Error committing buy batch", err)
+            resolve({
+                completed: false,
+                message: "Unknow error buying item"
+            })
+        })
+
+
+
+    })
+}
+
+/**
+ * Set default owner ship,
+ * use merge, otherwise users could destroy accounts of each other
+ */
+export const setDefaultOwnership = (userId: string): Promise<void> => {
+    return new Promise<void>(async (resolve, reject) => {
+
+        const ref = adminFirestore.doc(ownershipPath + "/" + userId) //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
+        console.log("setting default ownership")
+        const defaultOwnership = getDefaultOwnership()
+        try {
+
+            await ref.set(defaultOwnership)
+            resolve()
+        } catch (err) {
+            console.warn("error setting default ownership", err)
+            resolve()
+        }
+    })
+
+}

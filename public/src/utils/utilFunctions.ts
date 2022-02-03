@@ -279,9 +279,8 @@ export const getXPInfo = (XP: number) => {
         let higherNumber = XPtoNextLevel[i + 1] + sumXP
 
         if (lowerNumber <= XP && XP <= higherNumber) {
-            currentLevel = i + 1
+            currentLevel = i + 2
             pointsToNextLevel = higherNumber - XP
-            console.log(pointsFinishedInThisLevel, lowerNumber, XP)
             pointsFinishedInThisLevel = XP - lowerNumber
             ratioOfLevelFinished = pointsFinishedInThisLevel / (pointsFinishedInThisLevel + pointsToNextLevel)
             break

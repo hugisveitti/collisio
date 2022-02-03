@@ -33,7 +33,7 @@ const TestApp = () => {
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
-
+  const [tokenData, setTokenData] = useState(undefined);
   const [activeBracketNode, setActiveBracketNode] = useState(undefined);
 
   // not sure how to implement tournaments
@@ -85,6 +85,8 @@ const TestApp = () => {
     setActiveBracketNode,
     previousPage,
     setPreviousPage,
+    tokenData,
+    setTokenData,
   } as IStore;
 
   return (

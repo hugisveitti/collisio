@@ -43,7 +43,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   const renderUserInfo = () => {
     return user ? (
       <>
-        <TokenComponent user={user} />
+        <TokenComponent user={user} store={props.store} />
 
         <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
           <i>{user.displayName}</i> logged in
@@ -64,6 +64,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
             Play mobile version
           </BackdropButton>
+          <BackdropButton link={garagePagePath} width={btnWidth}>
+            Garage
+          </BackdropButton>
           <BackdropButton
             disabled={!user}
             link={privateProfilePagePath}
@@ -77,9 +80,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={tournamentPagePath} width={btnWidth}>
             Tournaments
           </BackdropButton>
-          <BackdropButton link={garagePagePath} width={btnWidth}>
-            Garage
-          </BackdropButton>
+
           <BackdropButton link={howToPlayPagePath} width={btnWidth}>
             How to play
           </BackdropButton>
