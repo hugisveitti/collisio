@@ -1,6 +1,8 @@
 import * as os from "os"
 import * as path from "path";
 import { Request, Response } from "express";
+import { buyItem, setDefaultOwnership } from "./firebaseCoinFunctions";
+import { AllOwnableItems } from "../public/src/shared-backend/ownershipFunctions";
 /** toDO fix this shit */
 const express = require("express")
 console.log("router")
@@ -27,11 +29,54 @@ const printRequestInfo = (req: Request) => {
 }
 
 const router = (app: any) => {
+
+
+    var bodyParser = require("body-parser");
+
+    app.use(bodyParser.json({ limit: "20mb" }));
+
     const { onLocalhost } = getPortLocalhost()
 
     const isValidHost = (host: string | undefined) => {
         return onLocalhost || host?.includes("collisio.club") || host?.includes("collisia.club")
     }
+
+    app.post("/defaultownership", (req: Request, res: Response) => {
+        // @ts-ignore
+        const { userId } = req.body
+
+        console.log("Setting default ownership of userid", userId)
+        if (userId) {
+
+            setDefaultOwnership(userId).then(() => {
+                res.status(200).send({
+                    message: "Default ownership set",
+                    status: "success"
+                })
+            })
+        } else {
+            res.status(404).send({
+                message: "Unknown user",
+                status: "Error"
+            })
+        }
+    })
+
+    app.post("/buyitem", (req: Request, res: Response) => {
+        const { userId, item } = req.body
+        console.log("Buy item", userId, item)
+        if (userId && item) {
+
+            buyItem(userId, item).then((data) => {
+                res.status(200).send(data)
+            })
+        } else {
+            res.status(404).send({
+                message: "Unknown user or item",
+                completed: false
+            })
+        }
+    })
 
     const buildFolder = "dist"
 
@@ -71,9 +116,6 @@ const router = (app: any) => {
 
     app.get("/speedtest", sendTestHTML);
 
-    var bodyParser = require("body-parser");
-
-    app.use(bodyParser.json({ limit: "20mb" }));
 
     app.get("/ammo.wasm.js", (_: Request, res: Response) => {
         res.sendFile(path.join(__dirname, `./public/${buildFolder}/ammo/ammo.wasm.js`));

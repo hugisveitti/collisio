@@ -476,6 +476,7 @@ export class Room {
                     this.setupStartGameListener()
                 }, 50)
             } else {
+                // TODO: do some check to see if player owns vehicle
                 this.socket.emit(std_start_game_callback, {
                     message: "Game starting",
                     status: successStatus

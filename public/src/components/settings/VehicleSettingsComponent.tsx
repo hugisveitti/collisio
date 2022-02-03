@@ -1,4 +1,3 @@
-import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import Slider from "@mui/material/Slider";
@@ -20,6 +19,7 @@ import {
 } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import AnySelect from "../inputs/AnySelect";
+import { garagePagePath } from "../Routes";
 
 interface IVehicleSettingsComponent {
   store: IStore;
@@ -27,6 +27,8 @@ interface IVehicleSettingsComponent {
   resetOrientation?: () => void;
   notInGame?: boolean;
   previewVehicle?: boolean;
+  // if true, then the vehicle select is a garage button
+  linkToGarage?: boolean;
 }
 
 const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
@@ -80,17 +82,23 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     <CollabsibleCard header="Vehicle settings">
       <Grid container spacing={3}>
         <Grid item xs={12} lg={12}>
-          <VehicleSelect
-            previewVehicle={props.previewVehicle}
-            value={props.store.userSettings.vehicleSettings.vehicleType}
-            excludedVehicles={nonactiveVehcileTypes}
-            vehicleColor={props.store.userSettings.vehicleSettings.vehicleColor}
-            onChange={(value) => {
-              updateVehicleSettings("vehicleType", value);
-            }}
-          />
+          {props.linkToGarage ? (
+            <BackdropButton link={garagePagePath}>Go to garage</BackdropButton>
+          ) : (
+            <VehicleSelect
+              store={props.store}
+              value={props.store.userSettings.vehicleSettings.vehicleType}
+              excludedVehicles={nonactiveVehcileTypes}
+              vehicleColor={
+                props.store.userSettings.vehicleSettings.vehicleColor
+              }
+              onChange={(value) => {
+                updateVehicleSettings("vehicleType", value);
+              }}
+            />
+          )}
         </Grid>
-        <Grid item xs={12} lg={6}>
+        {/* <Grid item xs={12} lg={6}>
           <AnySelect
             selectedValue={getVehicleColorOption(
               props.store.userSettings.vehicleSettings.vehicleColor
@@ -101,7 +109,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               updateVehicleSettings("vehicleColor", selected);
             }}
           />
-        </Grid>
+        </Grid> */}
         <Grid item xs={6} sm={4}>
           {props.resetOrientation && (
             <BackdropButton onClick={props.resetOrientation}>

@@ -44,6 +44,7 @@ const UserSettingsComponent = (props: IUserSettingsComponent) => {
           subheader="Most of these are also editable in-game"
         />
         <VehicleSettingsComponent
+          linkToGarage
           store={props.store}
           user={props.user}
           previewVehicle

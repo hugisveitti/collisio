@@ -217,6 +217,7 @@ export type BestTrackScore = IEndOfRaceInfoPlayer[]
 export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number): Promise<IEndOfRaceInfoPlayer[]> => {
     return new Promise<IEndOfRaceInfoPlayer[]>(async (resolve, reject) => {
         const bestScoreRef = collection(firestore, bestHighscoresRefPath)
+        // TODO maybe have list of vehicles that are in a different highscore list
         const q = query(bestScoreRef, orderBy("vehicleType", "asc"), where("vehicleType", "!=", "simpleSphere"), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
 
         const arr = []

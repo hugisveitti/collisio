@@ -1,6 +1,4 @@
-import { VehicleType } from "../shared-backend/shared-stuff"
-import { itemInArray } from "../utils/utilFunctions"
-import { allVehicleTypes } from "../vehicles/VehicleConfigs"
+import { allVehicleTypes, VehicleType } from "../shared-backend/shared-stuff"
 import { allWagonTypes, WagonType } from "../vehicles/WagonConfigs"
 
 const structureBounciness = 0.05

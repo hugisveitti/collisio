@@ -4,11 +4,11 @@ import { Socket } from "socket.io-client";
 import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
-import { getTimeOfDay, getTimeOfDayColors, getTrackInfo, TimeOfDay } from "../classes/Game";
-import { defaultGameSettings, GraphicsType, IGameSettings } from '../classes/localGameSettings';
+import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
+import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TimeOfDay, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
 import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -366,7 +366,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
 
 
-            let delta = +(this.updateDelta * 1000)//.toPrecision(3)
+            let delta = (this.updateDelta * 1000)//.toPrecision(3)
 
             this.updateDelta = 0
             this.deltaFPS = this.deltaFPS % this.targetFPS

@@ -384,6 +384,7 @@ var Room = /** @class */ (function () {
                 }, 50);
             }
             else {
+                // TODO: do some check to see if player owns vehicle
                 _this.socket.emit(shared_stuff_1.std_start_game_callback, {
                     message: "Game starting",
                     status: successStatus

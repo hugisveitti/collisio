@@ -41,4 +41,5 @@ export const firestore = getFirestore(firebaseApp)
 if (os.hostname().includes("Lisa")) {
     console.log("On localhost")
     connectFirestoreEmulator(firestore, "localhost", 8000)
+
 }

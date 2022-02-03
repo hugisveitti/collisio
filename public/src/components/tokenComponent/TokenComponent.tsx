@@ -6,37 +6,50 @@ import { getUserTokens } from "../../firebase/firestoreFunctions";
 import { defaultTokenData } from "../../shared-backend/medalFuncions";
 import { getSizePrefix, getXPInfo } from "../../utils/utilFunctions";
 import Progress from "../inputs/progress/Progress";
+import { IStore } from "../store";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface ITokenComponent {
   user: IUser;
   showInfo?: boolean;
+  store: IStore;
 }
 
 const TokenComponent = (props: ITokenComponent) => {
-  const [tokenData, setTokenData] = useState(defaultTokenData);
-
   useEffect(() => {
-    if (props.user?.uid) {
-      getUserTokens(props.user.uid).then((data) => {
-        console.log("got token data", data);
-        setTokenData(data);
-      });
+    if (props.user?.uid && !props.store.tokenData) {
+      getUserTokens(props.user.uid)
+        .then((data) => {
+          console.log("got token data", data);
+          props.store.setTokenData(data);
+        })
+        .catch(() => {
+          props.store.setTokenData(defaultTokenData);
+        });
     }
   }, [props.user]);
 
   if (!props.user) return null;
 
-  let coinsString = getSizePrefix(tokenData.coins);
+  if (!props.store.tokenData) {
+    return (
+      <div className="background">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  let coinsString = getSizePrefix(props.store.tokenData.coins);
 
   const {
     currentLevel,
     pointsToNextLevel,
     ratioOfLevelFinished,
     pointsFinishedInThisLevel,
-  } = getXPInfo(tokenData.XP);
+  } = getXPInfo(props.store.tokenData.XP);
 
   return (
-    <div className="background" style={{ fontSize: 32 }}>
+    <div className="background" style={{ fontSize: 32, color: "white" }}>
       <MonetizationOnIcon /> <span style={{ fontSize: 24 }}>Coins</span>{" "}
       {coinsString}
       <br />

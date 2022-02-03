@@ -1,10 +1,13 @@
 import Grid from "@mui/material/Grid";
 import React from "react";
-import { vehicleColors } from "../../shared-backend/shared-stuff";
+import {
+  vehicleColors,
+  VehicleColorType,
+} from "../../shared-backend/shared-stuff";
 import GarageItem from "./GarageItem";
 
 interface IGarageColors {
-  onChange: (newColor: string) => void;
+  onChange: (newColor: VehicleColorType) => void;
   selected: string;
 }
 

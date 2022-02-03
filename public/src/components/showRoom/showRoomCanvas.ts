@@ -61,7 +61,7 @@ const addLights = (scene: Scene) => {
     aLigth.position.set(5, 5, 5)
     scene.add(aLigth)
 }
-
+let animateTimeout: NodeJS.Timeout
 
 export const changeChassisColor = (vehicleColor: string) => {
     // only color changed
@@ -131,23 +131,38 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     let ry = 0
 
     camera.rotateY(ry)
+
+    let time = Date.now()
+    const targetFPS = 30
+
     const animate = () => {
 
-        requestAnimationFrame(animate);
+        // requestAnimationFrame(animate);
 
 
         // controls.update();
-        if (renderer) {
+        if (renderer && camera) {
 
             renderer.render(scene, camera);
+            const now = Date.now()
+            const delta = now - time
+
+            time = now
+        } else if (renderer) {
+            renderer.clear()
         }
-        ry += .01
+        ry += .01 * 3
         // camera.rotateY(ry)
         camera.position.setX(Math.cos(ry) * offset)
         camera.position.setZ(Math.sin(ry) * offset)
         camera.lookAt(0, 0, 0)
-    }
 
+        animateTimeout = setTimeout(() => {
+
+            requestAnimationFrame(animate);
+
+        }, 1000 / targetFPS)
+    }
     animate()
     // controls.addEventListener('change', () => {
     // 
@@ -164,6 +179,7 @@ export const setShowRoomOffset = (_offset: number, y: number) => {
 }
 
 export const removeShowRoomCanvas = () => {
+    clearTimeout(animateTimeout)
     renderer.clear()
     scene.clear()
     scene = undefined

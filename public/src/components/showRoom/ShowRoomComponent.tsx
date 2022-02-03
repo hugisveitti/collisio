@@ -10,13 +10,13 @@ import Collapse from "@mui/material/Collapse";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import {
+  allVehicleTypes,
   defaultVehicleType,
   vehicleColors,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
 import { itemInArray } from "../../utils/utilFunctions";
-import { allVehicleTypes } from "../../vehicles/VehicleConfigs";
 import { buyPremiumPagePath } from "../Routes";
 import { createShowRoomCanvas, removeShowRoomCanvas } from "./showRoomCanvas";
 import { getStyledColors } from "../../providers/theme";

@@ -2,24 +2,14 @@ import { GameScene } from "../game/GameScene";
 import { RaceGameScene } from "../game/RaceGameScene";
 import { StoryGameScene } from "../game/StoryGameScene";
 import { TagGameScene } from "../game/TagGameScene";
-import { TrackName, GameType, VehicleType, IPreGamePlayerInfo } from "../shared-backend/shared-stuff";
+import { TrackName, GameType, VehicleType, IPreGamePlayerInfo, allTrackNames, TimeOfDay } from "../shared-backend/shared-stuff";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
 
 
 export const numberOfLapsPossibilities = [1, 2, 3, 5, 7, 13]
 
-export type TimeOfDay = "day" | "evening"
-/** change name to map
- * since a racetrack is a map and the tag courses are also maps but not tracks....
- */
-export interface ITrackInfo {
-    name: string
-    type: TrackName
-    gameType: GameType
-    timeOfDay?: TimeOfDay
-    hemisphereRadius?: number
-}
+
 
 export const getTrackNameFromType = (trackName: TrackName) => {
     return allTrackNames.find(track => track.type === trackName)?.name ?? "-"
@@ -40,57 +30,7 @@ export const getGameTypeNameFromType = (gameType: GameType) => {
     }
 }
 
-export const allTrackNames: ITrackInfo[] = [
-    {
-        name: "Test", type: "test-course", gameType: "race"
-    },
-    {
-        name: "Farm track", type: "farm-track", gameType: "race"
-    },
-    {
-        name: "German track", type: "nurn-track", gameType: "race"
-    },
-    {
-        name: "F1 track", type: "f1-track", gameType: "race"
-    },
-    {
-        name: "F1 track-2", type: "f1-track-2", gameType: "race"
-    },
-    {
-        name: "Beach track", type: "sea-side-track", gameType: "race"
-    },
-    {
-        name: "Tag course", type: "simple-tag-course", gameType: "tag"
-    },
-    {
-        name: "Town track", type: "town-track", gameType: "race"
-    },
-    {
-        name: "Monaco track", type: "monaco-track", gameType: "race"
-    },
-    {
-        name: "Mountain track", type: "russia-track", gameType: "race"
-    },
-    {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
-    },
-    {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
-    },
-    {
-        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
-    },
-    {
-        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
-    },
 
-    {
-        name: "Small track", type: "small-track", gameType: "race"
-    },
-    // {
-    //     name: "Small jump track", type: "small-jump-track", gameType: "race"
-    // },
-]
 
 export const getTrackInfo = (trackName: TrackName) => {
     for (let track of allTrackNames) {

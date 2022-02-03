@@ -28,6 +28,67 @@ export type TrackName =
     | "simple-tag-course"
     | "test-course"
 
+export type TimeOfDay = "day" | "evening"
+/** change name to map
+ * since a racetrack is a map and the tag courses are also maps but not tracks....
+ */
+export interface ITrackInfo {
+    name: string
+    type: TrackName
+    gameType: GameType
+    timeOfDay?: TimeOfDay
+    hemisphereRadius?: number
+}
+
+export const allTrackNames: ITrackInfo[] = [
+    {
+        name: "Test", type: "test-course", gameType: "race"
+    },
+    {
+        name: "Farm track", type: "farm-track", gameType: "race"
+    },
+    {
+        name: "German track", type: "nurn-track", gameType: "race"
+    },
+    {
+        name: "F1 track", type: "f1-track", gameType: "race"
+    },
+    {
+        name: "F1 track-2", type: "f1-track-2", gameType: "race"
+    },
+    {
+        name: "Beach track", type: "sea-side-track", gameType: "race"
+    },
+    {
+        name: "Tag course", type: "simple-tag-course", gameType: "tag"
+    },
+    {
+        name: "Town track", type: "town-track", gameType: "race"
+    },
+    {
+        name: "Monaco track", type: "monaco-track", gameType: "race"
+    },
+    {
+        name: "Mountain track", type: "russia-track", gameType: "race"
+    },
+    {
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
+    },
+    {
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
+    },
+    {
+        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
+    },
+    {
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
+    },
+
+    {
+        name: "Small track", type: "small-track", gameType: "race"
+    },
+]
+
 export type VehicleType =
     "normal"
     | "tractor"
@@ -41,34 +102,74 @@ export type VehicleType =
     | "gokart"
     | "future"
 
+export type VehicleClass = "LowPoly" | "Sphere"
+
+export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: VehicleClass }[] = [
+    { name: "MacNormie", type: "normal2" },
+    { name: "Old Normie", type: "normal" },
+    { name: "Trakkie Tractor", type: "tractor" },
+    { name: "Phil the Phast", type: "f1" },
+    // { name: "Monster truck", type: "monsterTruck" },
+    { name: "test", type: "test" },
+    { name: "Jackie", type: "future" },
+    { name: "Big girl Sally", type: "offRoader" },
+    { name: "Thunderparrot", type: "sportsCar" },
+    { name: "Goonie", type: "gokart" },
+    { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" },
+    { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
+]
+
 export const defaultVehicleType: VehicleType = "normal2"
 
 export type GameType = "ball" | "race" | "tag" | "story"
 
+
+
+export type VehicleColorType =
+    "#1d8a47"
+    | "#8b0000"
+    | "#185676"
+    | "#f07900"
+    | "#61f72a"
+    | "#97b0ba"
+    | "#bf923b"
+
 export interface VehicleColor {
-    name: string, value: string
+    name: string, value: VehicleColorType
 }
+
 export const vehicleColors: VehicleColor[] = [
     {
-        name: "Green", value: "#1d8a47",
+        name: "Olive", value: "#1d8a47",
     },
     {
-        name: "Red", value: "#8b0000"
+        name: "Ruby", value: "#8b0000"
     },
     {
-        name: "Blue", value: "#185676",
+        name: "Sadness", value: "#185676",
     },
     {
-        name: "Orange", value: "#f07900", //"#fda000"
+        name: "Rage", value: "#f07900", //"#fda000"
     },
     {
-        name: "Light green", value: "#61f72a"
+        name: "Synthetic happiness", value: "#61f72a"
     },
     {
-        name: "Gray", value: "#97b0ba"
+        name: "Real happiness", value: "#97b0ba"
     },
-
+    {
+        name: "Wheat", value: "#bf923b"
+    },
 ]
+
+export const getColorNameFromType = (colorType: VehicleColorType) => {
+    for (let c of vehicleColors) {
+        if (c.value === colorType) {
+            return c.name
+        }
+    }
+    return "Unknown color"
+}
 
 export interface IPlayerConnectedData {
     roomId: string

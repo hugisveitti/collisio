@@ -98,6 +98,12 @@ service cloud.firestore {
           allow write;
        }
     }
+    match /ownership/{userId} {
+      allow read; // I think everyone should be able to read?
+    }
+    match /vehicleSetup/{userId} {
+      allow read;
+    }
     match /customers/{uid} {
       allow read: if request.auth.uid == uid;
 

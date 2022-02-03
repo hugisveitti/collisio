@@ -242,6 +242,7 @@ export class Player {
             if (newUserSettings) {
                 this.userSettings = newUserSettings
             }
+            // TODO: check if user owns vehicleType
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (this.game) {
                 this.game.userSettingsChanged({ userSettings: newUserSettings, playerNumber: this.playerNumber })

@@ -108,7 +108,6 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
                   props.gameObject.setNeedsReload(true);
                   props.store.setUserSettings(newUserSettings);
                 }}
-                previewVehicle={false}
               />
             </Grid>
           </React.Fragment>

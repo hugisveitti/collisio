@@ -22,6 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPortLocalhost = void 0;
 var os = __importStar(require("os"));
 var path = __importStar(require("path"));
+var firebaseCoinFunctions_1 = require("./firebaseCoinFunctions");
 /** toDO fix this shit */
 var express = require("express");
 console.log("router");
@@ -43,10 +44,46 @@ var printRequestInfo = function (req) {
     console.log("host", host, ", ip", req.socket.remoteAddress, ", behind proxy ip:", (_a = req.headers) === null || _a === void 0 ? void 0 : _a['x-forwarded-for'], ", express ip:", req.ip, ", url:", req.url, "date:", new Date().toISOString());
 };
 var router = function (app) {
+    var bodyParser = require("body-parser");
+    app.use(bodyParser.json({ limit: "20mb" }));
     var onLocalhost = (0, exports.getPortLocalhost)().onLocalhost;
     var isValidHost = function (host) {
         return onLocalhost || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"));
     };
+    app.post("/defaultownership", function (req, res) {
+        // @ts-ignore
+        var userId = req.body.userId;
+        console.log("Setting default ownership of userid", userId);
+        if (userId) {
+            (0, firebaseCoinFunctions_1.setDefaultOwnership)(userId).then(function () {
+                res.status(200).send({
+                    message: "Default ownership set",
+                    status: "success"
+                });
+            });
+        }
+        else {
+            res.status(404).send({
+                message: "Unknown user",
+                status: "Error"
+            });
+        }
+    });
+    app.post("/buyitem", function (req, res) {
+        var _a = req.body, userId = _a.userId, item = _a.item;
+        console.log("Buy item", userId, item);
+        if (userId && item) {
+            (0, firebaseCoinFunctions_1.buyItem)(userId, item).then(function (data) {
+                res.status(200).send(data);
+            });
+        }
+        else {
+            res.status(404).send({
+                message: "Unknown user or item",
+                completed: false
+            });
+        }
+    });
     var buildFolder = "dist";
     var encrypt = require("../public/src/shared-backend/encryption.json");
     var _loop_1 = function (key) {
@@ -79,8 +116,6 @@ var router = function (app) {
     app.get("/test", sendTestHTML);
     app.get("/mobileonly", sendTestHTML);
     app.get("/speedtest", sendTestHTML);
-    var bodyParser = require("body-parser");
-    app.use(bodyParser.json({ limit: "20mb" }));
     app.get("/ammo.wasm.js", function (_, res) {
         res.sendFile(path.join(__dirname, "./public/" + buildFolder + "/ammo/ammo.wasm.js"));
     });
