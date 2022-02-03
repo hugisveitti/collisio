@@ -236,11 +236,6 @@ export class LowPolyTestScene extends GameScene {
                     }
                 }
             }
-            this.renderer.clear()
-            this.renderer.info.autoReset = false
-            //  this.renderer.capabilities.precision = "lowp"
-            this.renderer.autoClear = false
-            this.renderer.shadowMap.autoUpdate = false
         })
 
         window.addEventListener("keydown", (e) => {
@@ -249,7 +244,17 @@ export class LowPolyTestScene extends GameScene {
                 this.togglePauseGame()
             }
         })
+        console.log("lo polu test")
+        setTimeout(() => {
+            console.log("calling add item to vehicle")
+            this.vehicle.addItemToVehicle("")
+        }, 1000)
 
+        this.renderer.clear()
+        this.renderer.info.autoReset = false
+        //  this.renderer.capabilities.precision = "lowp"
+        this.renderer.autoClear = false
+        this.renderer.shadowMap.autoUpdate = false
         this.initVehicles()
     }
 

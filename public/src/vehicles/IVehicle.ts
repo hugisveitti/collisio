@@ -88,6 +88,8 @@ export interface IVehicle {
 
     setToGround: () => void
     destroy: () => Promise<void>
+
+    addItemToVehicle: (filename: string) => Promise<void>
 }
 
 
