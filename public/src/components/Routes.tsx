@@ -9,12 +9,13 @@ import {
   defaultGameSettings,
   getAllLocalGameSettings,
 } from "../classes/localGameSettings";
-import { defaultUserSettings } from "../classes/User";
+import { defaultUserSettings, defaultVehicleSettings } from "../classes/User";
 import PrivayPolicyComponent from "../extra/PrivacyPolicyComponent";
 import {
   getDBUserSettings,
   setDBUserSettings,
 } from "../firebase/firestoreFunctions";
+import { getVehiclesSetup } from "../firebase/firestoreOwnershipFunctions";
 import ControlsRoomContainer from "../mobile/ControlsRoomContainer";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
@@ -26,6 +27,7 @@ import {
 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
+import { defaultVehiclesSetup } from "../vehicles/VehicleSetup";
 import AboutPageComponent from "./AboutPageComponent";
 import OneMonitorFrontPage from "./FrontPage";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
@@ -108,6 +110,7 @@ const Routes = () => {
   const deviceType = getDeviceType();
 
   const [tokenData, setTokenData] = useState(undefined);
+  const [vehiclesSetup, setVehiclesSetup] = useState(defaultVehiclesSetup);
 
   useEffect(() => {
     if (!inTestMode) {
@@ -157,6 +160,8 @@ const Routes = () => {
     setPreviousPage,
     tokenData,
     setTokenData,
+    vehiclesSetup,
+    setVehiclesSetup,
   };
 
   const user = useContext(UserContext);
@@ -173,6 +178,10 @@ const Routes = () => {
         } else {
           setDBUserSettings(user.uid, defaultUserSettings);
         }
+      });
+
+      getVehiclesSetup(user.uid).then((_vehiclesSetup) => {
+        setVehiclesSetup(_vehiclesSetup);
       });
     }
   }, [user]);

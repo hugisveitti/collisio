@@ -5,6 +5,7 @@ import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import {
   buyItem,
   getOwnership,
+  getVehicleItemsOwnership,
 } from "../../firebase/firestoreOwnershipFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
@@ -20,6 +21,12 @@ import {
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
+import {
+  defaultItemsOwnership,
+  getDefaultItemsOwnership,
+  ItemProperties,
+} from "../../shared-backend/vehicleItems";
+import { VehicleSetup } from "../../vehicles/VehicleSetup";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
@@ -41,7 +48,16 @@ interface IGarageComponent {
   showBackButton?: boolean;
   onChangeVehicleType?: (vehicleType: VehicleType) => void;
   onChangeVehicleColor?: (vehicleColor: VehicleColorType) => void;
+  onChangeVehicleItem?: (
+    item: ItemProperties,
+    vehicleType: VehicleType
+  ) => void;
+  onUnequipVehicleItem?: (item: ItemProperties) => void;
 }
+
+let _vehicleType: VehicleType;
+let _vehicleColor: VehicleColorType;
+let _vehicleSetup: VehicleSetup;
 
 const GarageComponent = (props: IGarageComponent) => {
   const user = useContext(UserContext);
@@ -55,11 +71,29 @@ const GarageComponent = (props: IGarageComponent) => {
     props.store.userSettings.vehicleSettings.vehicleColor
   );
 
+  const [selectedVehicleSetup, setSelectedVehicleSetup] = useState(
+    props.store.vehiclesSetup[
+      props.store.userSettings.vehicleSettings.vehicleType
+    ]
+  );
+
+  const [selectedItem, setSelectedItem] = useState(
+    undefined as undefined | ItemProperties
+  );
+
   const [ownership, setOwnership] = useState(
     undefined as undefined | AllOwnership
   );
 
+  const [itemOwnership, setItemOwnership] = useState(defaultItemsOwnership);
+
   const [isBuying, setIsBuying] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      console.log("on unmount", _vehicleSetup, _vehicleType, _vehicleColor);
+    };
+  }, []);
 
   useEffect(() => {
     if (user?.uid) {
@@ -70,8 +104,29 @@ const GarageComponent = (props: IGarageComponent) => {
         .catch(() => {
           toast.error("Error getting ownership");
         });
+      console.log("selectedVehicleType", selectedVehicleType);
+      getVehicleItemsOwnership(user.uid, selectedVehicleType).then(
+        (_ownership) => {
+          const newItemOwnership = { ...itemOwnership };
+          newItemOwnership[selectedVehicleType] = _ownership;
+          setItemOwnership(newItemOwnership);
+        }
+      );
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    // no need to call again
+    if (itemOwnership[selectedVehicleType]) return;
+    getVehicleItemsOwnership(user.uid, selectedVehicleType).then(
+      (_ownership) => {
+        const newItemOwnership = { ...itemOwnership };
+        newItemOwnership[selectedVehicleType] = _ownership;
+        setItemOwnership(newItemOwnership);
+      }
+    );
+  }, [selectedVehicleType]);
 
   const handleChangeVehicle = (
     value: any,
@@ -85,10 +140,40 @@ const GarageComponent = (props: IGarageComponent) => {
 
     if (ownership && ownership[value]) {
       if (key === "vehicleColor") {
+        _vehicleColor = value as VehicleColorType;
         props.onChangeVehicleColor?.(value);
       } else if (key === "vehicleType") {
+        _vehicleType = value as VehicleType;
         props.onChangeVehicleType?.(value);
       }
+    }
+  };
+
+  const handleChangeVehicleItem = (item: ItemProperties) => {
+    const newSetup: VehicleSetup = {
+      ...selectedVehicleSetup,
+    };
+    newSetup[item.type] = item;
+    _vehicleSetup = newSetup;
+
+    setSelectedVehicleSetup(newSetup);
+    setSelectedItem(item);
+    if (itemOwnership[selectedVehicleType][item.path]) {
+      props.onChangeVehicleItem?.(item, selectedVehicleType);
+    }
+  };
+
+  const handleUnequipItem = (item: ItemProperties) => {
+    const newSetup: VehicleSetup = {
+      ...selectedVehicleSetup,
+    };
+    newSetup[item.type] = undefined;
+    _vehicleSetup = newSetup;
+
+    setSelectedVehicleSetup(newSetup);
+    setSelectedItem(undefined);
+    if (itemOwnership[selectedVehicleType][item.path]) {
+      props.onUnequipVehicleItem?.(item);
     }
   };
 
@@ -126,6 +211,37 @@ const GarageComponent = (props: IGarageComponent) => {
       } else {
         toast.error(data.message);
       }
+      setIsBuying(false);
+    });
+  };
+
+  const handleBuyVehicleItem = (
+    item: ItemProperties,
+    vehicleType: VehicleType
+  ) => {
+    setIsBuying(true);
+    buyItem(user.uid, item.path, vehicleType).then((data) => {
+      console.log("data from buy item", data);
+      if (data.completed) {
+        toast.success(data.message);
+
+        const newItemOwnership = {
+          ...itemOwnership,
+        };
+        newItemOwnership[vehicleType][item.path] = true;
+        setItemOwnership(newItemOwnership);
+
+        const newTokenData: ITokenData = {
+          ...props.store.tokenData,
+          coins: props.store.tokenData.coins - item.cost,
+        };
+        props.store.setTokenData(newTokenData);
+
+        props.onChangeVehicleItem?.(item, vehicleType);
+      } else {
+        toast.error(data.message);
+      }
+      console.log("set is buying to false");
       setIsBuying(false);
     });
   };
@@ -175,15 +291,44 @@ const GarageComponent = (props: IGarageComponent) => {
       );
     }
     if (selectedTab === 2) {
+      if (!selectedItem) {
+        return <div>No item selected</div>;
+      }
+
+      const possiblePros = [
+        "engineForce",
+        "mass",
+        "frictionSlip",
+        "suspensionRestLength",
+      ];
+
       return (
         <BuyItemComponent
           loading={isBuying}
-          cost={100}
-          label={"item"}
-          onBuy={() => {
-            console.log("buying", "item");
+          cost={selectedItem.cost}
+          label={
+            <div>
+              <span>
+                {selectedItem.name} the {selectedItem.type}
+              </span>
+              {possiblePros.map((p) => {
+                if (selectedItem[p]) {
+                  return (
+                    <div key={p}>
+                      {p}: {selectedItem[p]}
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          }
+          onUnequip={() => {
+            handleUnequipItem(selectedItem);
           }}
-          owned={false}
+          onBuy={() => {
+            handleBuyVehicleItem(selectedItem, selectedVehicleType);
+          }}
+          owned={itemOwnership[selectedVehicleType]?.[selectedItem.path]}
           buyButtonText="item"
         />
       );
@@ -206,6 +351,7 @@ const GarageComponent = (props: IGarageComponent) => {
             <GarageVehicle
               vehicleColor={selectedVehicleColor}
               vehicleType={selectedVehicleType}
+              vehicleSetup={selectedVehicleSetup}
             />
           </Grid>
           <Grid item xs={12}>
@@ -231,6 +377,7 @@ const GarageComponent = (props: IGarageComponent) => {
               selected={selectedVehicleType}
               onChange={(v) => {
                 handleChangeVehicle(v, "vehicleType");
+                setSelectedItem(undefined);
               }}
             />
           )}
@@ -243,7 +390,14 @@ const GarageComponent = (props: IGarageComponent) => {
               }}
             />
           )}
-          {selectedTab === 2 && <GarageItems />}
+          {selectedTab === 2 && (
+            <GarageItems
+              vehicleType={selectedVehicleType}
+              onChange={(item: ItemProperties) => {
+                handleChangeVehicleItem(item);
+              }}
+            />
+          )}
         </div>
       </Grid>
     </Grid>

@@ -70,10 +70,10 @@ var router = function (app) {
         }
     });
     app.post("/buyitem", function (req, res) {
-        var _a = req.body, userId = _a.userId, item = _a.item;
+        var _a = req.body, userId = _a.userId, item = _a.item, vehicleType = _a.vehicleType;
         console.log("Buy item", userId, item);
         if (userId && item) {
-            (0, firebaseCoinFunctions_1.buyItem)(userId, item).then(function (data) {
+            (0, firebaseCoinFunctions_1.buyItem)(userId, item, vehicleType).then(function (data) {
                 res.status(200).send(data);
             });
         }
@@ -84,6 +84,20 @@ var router = function (app) {
             });
         }
     });
+    // app.post("/buyvehicleitem", (req: Request, res: Response) => {
+    //     const { userId, item, vehicleType } = req.body
+    //     console.log("Buy item", userId, item)
+    //     if (userId && item) {
+    //         buyItem(userId, item, vehicleType).then((data) => {
+    //             res.status(200).send(data)
+    //         })
+    //     } else {
+    //         res.status(404).send({
+    //             message: "Unknown user or item",
+    //             completed: false
+    //         })
+    //     }
+    // })
     var buildFolder = "dist";
     var encrypt = require("../public/src/shared-backend/encryption.json");
     var _loop_1 = function (key) {

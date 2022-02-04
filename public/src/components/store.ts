@@ -6,6 +6,7 @@ import { IFlattendBracketNode, ITournament } from "../classes/Tournament";
 import { IUserSettings } from "../classes/User";
 import { ITokenData } from "../shared-backend/medalFuncions";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
+import { VehiclesSetup } from "../vehicles/VehicleSetup";
 
 
 export interface IStore {
@@ -29,4 +30,6 @@ export interface IStore {
     setPreviousPage: React.Dispatch<React.SetStateAction<string>>
     tokenData: ITokenData
     setTokenData: React.Dispatch<React.SetStateAction<ITokenData>>
+    vehiclesSetup: VehiclesSetup
+    setVehiclesSetup: React.Dispatch<React.SetStateAction<VehiclesSetup>>
 }

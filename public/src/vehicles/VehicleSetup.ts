@@ -1,4 +1,5 @@
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
+import { ItemProperties } from "../shared-backend/vehicleItems";
 
 /**
  * Layout that user has set for a vehicle
@@ -9,12 +10,53 @@ import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
  */
 export interface VehicleSetup {
     vehicleType: VehicleType
-    color?: VehicleColorType
-    exhaust?: string // filename or id
-    spoiler?: string
+    exhaust?: ItemProperties // filename or id
+    spoiler?: ItemProperties
+    wheelGuards?: ItemProperties
 }
 
 export const defaultVehicleSetup: VehicleSetup = {
     vehicleType: "normal2",
-    color: "#1d8a47"
+
 }
+
+
+export type VehiclesSetup = {
+    [vehicleType in VehicleType]: VehicleSetup
+}
+
+export const defaultVehiclesSetup: VehiclesSetup = {
+    normal: {
+        vehicleType: "normal",
+    },
+    tractor: {
+        vehicleType: "tractor",
+    },
+    f1: {
+        vehicleType: "f1",
+    },
+    test: {
+        vehicleType: "test",
+    },
+    offRoader: {
+        vehicleType: "offRoader",
+    },
+    sportsCar: {
+        vehicleType: "sportsCar",
+    },
+    normal2: {
+        vehicleType: "normal2",
+    },
+    simpleSphere: {
+        vehicleType: "simpleSphere",
+    },
+    simpleCylindar: {
+        vehicleType: "simpleCylindar",
+    },
+    gokart: {
+        vehicleType: "gokart",
+    },
+    future: {
+        vehicleType: "future",
+    }
+} 

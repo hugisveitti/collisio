@@ -27,13 +27,14 @@ const CollabsibleCard = (props: ICollabsibleCard) => {
       style={{
         margin: "auto",
         maxWidth: 600,
-        cursor: "pointer",
+
         backgroundColor: alphaColor,
         color: oppositeColor,
         borderRadius: 0,
       }}
     >
       <CardHeader
+        style={{ cursor: "pointer" }}
         onClick={() => setOpen(!open)}
         subheader={props.header}
         action={

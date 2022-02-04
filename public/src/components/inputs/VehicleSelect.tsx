@@ -1,11 +1,10 @@
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import Collapse from "@mui/material/Collapse";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import React, { useState } from "react";
-import { IUser, IVehicleSettings } from "../../classes/User";
+import { IUser } from "../../classes/User";
 import { getStyledColors } from "../../providers/theme";
 import {
   allVehicleTypes,
@@ -16,8 +15,6 @@ import { itemInArray } from "../../utils/utilFunctions";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import GarageComponent from "../garage/GarageComponent";
-import GarageContainer from "../garage/GarageComponent";
-import ShowRoomComponent from "../showRoom/ShowRoomComponent";
 import { IStore } from "../store";
 import "./select.css";
 
@@ -107,6 +104,9 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
                   return;
                 }
                 props.onChange(v);
+              }}
+              onChangeVehicleItem={() => {
+                console.log("On change vehicle item not imple");
               }}
             />
           )}

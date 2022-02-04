@@ -63,11 +63,11 @@ const router = (app: any) => {
     })
 
     app.post("/buyitem", (req: Request, res: Response) => {
-        const { userId, item } = req.body
+        const { userId, item, vehicleType } = req.body
         console.log("Buy item", userId, item)
         if (userId && item) {
 
-            buyItem(userId, item).then((data) => {
+            buyItem(userId, item, vehicleType).then((data) => {
                 res.status(200).send(data)
             })
         } else {
@@ -77,6 +77,21 @@ const router = (app: any) => {
             })
         }
     })
+    // app.post("/buyvehicleitem", (req: Request, res: Response) => {
+    //     const { userId, item, vehicleType } = req.body
+    //     console.log("Buy item", userId, item)
+    //     if (userId && item) {
+
+    //         buyItem(userId, item, vehicleType).then((data) => {
+    //             res.status(200).send(data)
+    //         })
+    //     } else {
+    //         res.status(404).send({
+    //             message: "Unknown user or item",
+    //             completed: false
+    //         })
+    //     }
+    // })
 
     const buildFolder = "dist"
 

@@ -51,9 +51,11 @@ exports.setDefaultOwnership = exports.buyItem = exports.updatePlayersTokens = vo
 var firebase_config_1 = require("./firebase-config");
 var medalFuncions_1 = require("../public/src/shared-backend/medalFuncions");
 var ownershipFunctions_1 = require("../public/src/shared-backend/ownershipFunctions");
+var vehicleItems_1 = require("../public/src/shared-backend/vehicleItems");
 var tokenRefPath = "tokens";
 var ownershipPath = "ownership";
 var vehicleSetupPath = "vehicleSetup";
+var itemOwnershipPath = "itemOwnership";
 /**
  * Trying to eliminate cheaters, don't know if that will work
  * Do just some obvious shit for now
@@ -130,14 +132,18 @@ exports.updatePlayersTokens = updatePlayersTokens;
  * Get user coins, get user items, see if user already owns item, see if user has enough coins
  * If user has enough coins and does not own the item, the item will be bought
  * @param userId
+ * @param item, item to buy
+ * @param vehicleType, if defined then we assume the item to be a vehicle item
+ *  and search for costs and ownership in different places
  * @returns object with {completed, message}
  */
-var buyItem = function (userId, item) {
+var buyItem = function (userId, item, vehicleType) {
     return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
         var tokenRef, tokensRes, tokenData, coins, itemCost, ownershipRef, owned, ownership, newTokens, batch;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    console.log("User buying item", userId, item);
                     tokenRef = firebase_config_1.adminFirestore.doc(tokenRefPath + "/" + userId);
                     return [4 /*yield*/, tokenRef.get()];
                 case 1:
@@ -148,7 +154,7 @@ var buyItem = function (userId, item) {
                         tokenData = __assign(__assign({}, medalFuncions_1.defaultTokenData), tokensRes.data());
                         coins = tokenData.coins;
                     }
-                    itemCost = ownershipFunctions_1.allCosts[item];
+                    itemCost = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].cost : ownershipFunctions_1.allCosts[item];
                     console.log("item cost", itemCost);
                     if (itemCost === undefined) {
                         resolve({
@@ -164,12 +170,13 @@ var buyItem = function (userId, item) {
                         });
                         return [2 /*return*/];
                     }
-                    ownershipRef = firebase_config_1.adminFirestore.doc(ownershipPath + "/" + userId);
+                    ownershipRef = vehicleType ?
+                        firebase_config_1.adminFirestore.doc(ownershipPath + "/" + userId + "/" + itemOwnershipPath + "/" + vehicleType)
+                        : firebase_config_1.adminFirestore.doc(ownershipPath + "/" + userId);
                     return [4 /*yield*/, ownershipRef.get()];
                 case 2:
                     owned = _a.sent();
-                    ownership = (0, ownershipFunctions_1.getDefaultOwnership)();
-                    console.log("owend", owned);
+                    ownership = vehicleType ? (0, vehicleItems_1.getDefaultItemsOwnership)(vehicleType) : (0, ownershipFunctions_1.getDefaultOwnership)();
                     if (owned.exists) {
                         ownership = __assign(__assign({}, ownership), owned.data());
                     }
@@ -185,7 +192,13 @@ var buyItem = function (userId, item) {
                     ownership[item] = true;
                     newTokens = __assign(__assign({}, tokenData), { coins: coins - itemCost });
                     batch = firebase_config_1.adminFirestore.batch();
-                    batch.update(ownershipRef, ownership);
+                    if (owned.exists) {
+                        batch.update(ownershipRef, ownership);
+                    }
+                    else {
+                        console.log("owner ship does not exist");
+                        batch.set(ownershipRef, ownership);
+                    }
                     batch.update(tokenRef, newTokens);
                     batch.commit().then(function () {
                         resolve({

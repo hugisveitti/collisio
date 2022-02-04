@@ -1,13 +1,15 @@
-import { doc, getDoc } from "@firebase/firestore"
+import { doc, getDoc, setDoc } from "@firebase/firestore"
 import { AllOwnership, getDefaultOwnership, getDefaultVehicleOwnership, } from "../shared-backend/ownershipFunctions"
 import { VehicleType } from "../shared-backend/shared-stuff"
-import { VehicleSetup } from "../vehicles/VehicleSetup"
+import { getDefaultItemsOwnership, ItemOwnership } from "../shared-backend/vehicleItems"
+import { defaultVehiclesSetup, VehicleSetup, VehiclesSetup } from "../vehicles/VehicleSetup"
 import { firestore } from "./firebaseInit"
 
 // Structure:
 // ownership/{userId}/{vehicleType}/listOfItemsOwned
 const ownershipPath = "ownership"
 const vehicleSetupPath = "vehicleSetup"
+const itemOwnershipPath = "itemOwnership"
 
 
 const setDefaultOwnership = (userId: string) => {
@@ -60,20 +62,39 @@ export const getOwnership = (userId: string): Promise<AllOwnership> => {
     })
 }
 
-
-
-
-export const getVechileSetup = (userId: string, vehicleType: VehicleType): Promise<VehicleSetup> => {
-    return new Promise<VehicleSetup>(async (resolve, reject) => {
-        let setup: VehicleSetup = { vehicleType }
-
-        const ref = doc(firestore, vehicleSetupPath, userId, vehicleType)
+export const getVehicleItemsOwnership = (userId: string, vehicleType: VehicleType): Promise<ItemOwnership> => {
+    return new Promise<ItemOwnership>(async (resolve, reject) => {
+        let itemsOwnership = getDefaultItemsOwnership(vehicleType)
+        const ref = doc(firestore, ownershipPath, userId, itemOwnershipPath, vehicleType)
         try {
             const res = await getDoc(ref)
-            if (res.exists) {
-                console.log("Res of vehicle setup", res.data)
-                setup = res.data() as VehicleSetup
+            if (res.exists()) {
+                itemsOwnership = {
+                    ...itemsOwnership,
+                    ...res.data()
+                }
+            }
+            resolve(itemsOwnership)
+        } catch (err) {
+            console.warn("Error getting items ownership", err)
+            resolve(itemsOwnership)
+        }
+    })
+}
 
+export const getVehiclesSetup = (userId: string): Promise<VehiclesSetup> => {
+    return new Promise<VehiclesSetup>(async (resolve, reject) => {
+        let setup: VehiclesSetup = defaultVehiclesSetup
+
+        const ref = doc(firestore, vehicleSetupPath, userId)
+        try {
+            const res = await getDoc(ref)
+            if (res.exists()) {
+                console.log("Res of vehicle setup", res.data)
+                setup = {
+                    ...setup,
+                    ...res.data()
+                }
             }
             resolve(setup)
         } catch (err) {
@@ -83,13 +104,25 @@ export const getVechileSetup = (userId: string, vehicleType: VehicleType): Promi
     })
 }
 
+export const setDBVehiclesSetup = (userId: string, vehiclesSetup: VehiclesSetup): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
+        const ref = doc(firestore, vehicleSetupPath, userId)
+        setDoc(ref, vehiclesSetup).then(() => {
+            console.log("set db vehicles setup")
+            resolve()
+        }).catch((err) => {
+            console.warn("Error setting vehicle setup", err)
+        })
+    })
+}
+
 
 interface BuyCallback {
     completed: boolean
     message: string
 }
 
-export const buyItem = (userId: string, item: string): Promise<BuyCallback> => {
+export const buyItem = (userId: string, item: string, vehicleType?: VehicleType): Promise<BuyCallback> => {
     return new Promise<BuyCallback>((resolve, reject) => {
 
         const options: RequestInit = {
@@ -101,7 +134,8 @@ export const buyItem = (userId: string, item: string): Promise<BuyCallback> => {
             },
             body: JSON.stringify({
                 userId,
-                item
+                item,
+                vehicleType
             })
         }
         fetch("/buyitem", options).then(res => res.json()).then(data => {
@@ -109,3 +143,26 @@ export const buyItem = (userId: string, item: string): Promise<BuyCallback> => {
         })
     })
 }
+
+// export const buyVehicleItem = (userId: string, vehicleType: VehicleType, item: string): Promise<BuyCallback> => {
+//     return new Promise<BuyCallback>((resolve, reject) => {
+
+//         const options: RequestInit = {
+//             method: "POST",
+//             mode: "same-origin",
+//             headers: {
+//                 'Content-Type': 'application/json'
+//                 // 'Content-Type': 'application/x-www-form-urlencoded',
+//             },
+//             body: JSON.stringify({
+//                 userId,
+//                 item,
+//                 vehicleType
+//             })
+//         }
+//         fetch("/buyitem", options).then(res => res.json()).then(data => {
+//             resolve(data)
+//         })
+//     })
+// }
+

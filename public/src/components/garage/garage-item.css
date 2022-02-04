@@ -1,6 +1,7 @@
 .garage__item {
   cursor: pointer;
   width: 100%;
+  min-height: 50px;
   height: auto;
   max-height: 150px;
   text-align: center;
