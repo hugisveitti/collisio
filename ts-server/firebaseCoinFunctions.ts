@@ -1,12 +1,13 @@
-import { adminFirestore } from "./firebase-config"
+import { admin, adminFirestore } from "./firebase-config"
 import { defaultTokenData, getMedalAndTokens, ITokenData } from "../public/src/shared-backend/medalFuncions"
-import { TrackName } from "../public/src/shared-backend/shared-stuff"
+import { TrackName, VehicleType } from "../public/src/shared-backend/shared-stuff"
 import { allCosts, AllOwnableItems, AllOwnership, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
-import { runTransaction } from "@firebase/firestore"
+import { getDefaultItemsOwnership, vehicleItems } from "../public/src/shared-backend/vehicleItems"
 
 const tokenRefPath = "tokens"
 const ownershipPath = "ownership"
 const vehicleSetupPath = "vehicleSetup"
+const itemOwnershipPath = "itemOwnership"
 
 interface IEndOfRaceInfoPlayerServer {
     totalTime: number
@@ -126,14 +127,19 @@ interface BuyCallback {
 }
 
 
+
 /**
  * Get user coins, get user items, see if user already owns item, see if user has enough coins
  * If user has enough coins and does not own the item, the item will be bought
  * @param userId 
+ * @param item, item to buy
+ * @param vehicleType, if defined then we assume the item to be a vehicle item 
+ *  and search for costs and ownership in different places
  * @returns object with {completed, message}
  */
-export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallback> => {
+export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: VehicleType): Promise<BuyCallback> => {
     return new Promise<BuyCallback>(async (resolve, reject) => {
+        console.log("User buying item", userId, item)
         const tokenRef = adminFirestore.doc(tokenRefPath + "/" + userId)
         const tokensRes = await tokenRef.get()
         let tokenData = defaultTokenData
@@ -147,7 +153,7 @@ export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallb
         }
 
 
-        const itemCost = allCosts[item]
+        const itemCost = vehicleType ? vehicleItems[vehicleType][item].cost : allCosts[item]
 
         console.log("item cost", itemCost)
         if (itemCost === undefined) {
@@ -167,10 +173,11 @@ export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallb
         }
 
         // see if owned
-        const ownershipRef = adminFirestore.doc(ownershipPath + "/" + userId)
+        const ownershipRef = vehicleType ?
+            adminFirestore.doc(ownershipPath + "/" + userId + "/" + itemOwnershipPath + "/" + vehicleType)
+            : adminFirestore.doc(ownershipPath + "/" + userId)
         let owned = await ownershipRef.get()
-        let ownership = getDefaultOwnership()
-        console.log("owend", owned)
+        let ownership = vehicleType ? getDefaultItemsOwnership(vehicleType) : getDefaultOwnership()
         if (owned.exists) {
             ownership = {
                 ...ownership,
@@ -197,8 +204,13 @@ export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallb
         const batch = adminFirestore.batch()
 
 
+        if (owned.exists) {
+            batch.update(ownershipRef, ownership)
+        } else {
+            console.log("owner ship does not exist")
+            batch.set(ownershipRef, ownership)
 
-        batch.update(ownershipRef, ownership)
+        }
         batch.update(tokenRef, newTokens)
         batch.commit().then(() => {
             resolve({
@@ -212,9 +224,6 @@ export const buyItem = (userId: string, item: AllOwnableItems): Promise<BuyCallb
                 message: "Unknow error buying item"
             })
         })
-
-
-
     })
 }
 

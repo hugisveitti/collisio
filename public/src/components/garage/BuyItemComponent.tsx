@@ -6,14 +6,28 @@ import MyCard from "../card/MyCard";
 
 interface IBuyItemComponent {
   cost: number;
-  label: string;
+  label: React.ReactNode;
   onBuy: () => void;
   owned: boolean;
   loading?: boolean;
   buyButtonText?: string;
+  onUnequip?: () => void;
 }
 
 const BuyItemComponent = (props: IBuyItemComponent) => {
+  console.log("Loading", props.loading);
+
+  const renderUnequipButton = () => {
+    if (props.onUnequip) {
+      return (
+        <BackdropButton onClick={props.onUnequip}>
+          Unequip {props.buyButtonText ?? "item"}
+        </BackdropButton>
+      );
+    }
+    return <Typography>Owned</Typography>;
+  };
+
   return (
     <MyCard>
       <CardContent>
@@ -21,9 +35,9 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
           <CircularProgress />
         ) : (
           <>
-            <Typography>{props.label}</Typography>
+            <div>{props.label}</div>
             {props.owned ? (
-              <Typography>Owned</Typography>
+              renderUnequipButton()
             ) : (
               <>
                 <Typography>Cost {getSizePrefix(props.cost)}</Typography>

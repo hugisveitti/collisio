@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { VehicleType } from "../../shared-backend/shared-stuff";
 import { getDeviceType } from "../../utils/settings";
+import { VehicleSetup } from "../../vehicles/VehicleSetup";
 import {
   changeChassisColor,
+  changeVehicleSetup,
   createShowRoomCanvas,
   removeShowRoomCanvas,
   setShowRoomOffset,
@@ -11,6 +13,7 @@ import {
 interface IGarageVehicle {
   vehicleType: VehicleType;
   vehicleColor: string;
+  vehicleSetup: VehicleSetup;
 }
 
 const GarageVehicle = (props: IGarageVehicle) => {
@@ -26,9 +29,9 @@ const GarageVehicle = (props: IGarageVehicle) => {
   useEffect(() => {
     const renderer = createShowRoomCanvas(
       props.vehicleType,
-
       0,
       props.vehicleColor,
+      props.vehicleSetup,
       onMobile ? 400 : 800
     );
     if (canvasWrapperRef.current && renderer) {
@@ -44,6 +47,10 @@ const GarageVehicle = (props: IGarageVehicle) => {
       changeChassisColor(props.vehicleColor);
     }
   }, [props.vehicleColor]);
+
+  useEffect(() => {
+    changeVehicleSetup(props.vehicleSetup);
+  }, [props.vehicleSetup]);
 
   return <div ref={canvasWrapperRef}></div>;
 };

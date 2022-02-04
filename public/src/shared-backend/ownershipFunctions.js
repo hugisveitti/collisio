@@ -39,7 +39,7 @@ exports.getDefaultVehicleOwnership = getDefaultVehicleOwnership;
 var vehicleCosts = {
     f1: 0,
     normal: 0,
-    tractor: 1000,
+    tractor: 50,
     test: 0,
     offRoader: 0,
     sportsCar: 3000,
@@ -47,7 +47,7 @@ var vehicleCosts = {
     simpleSphere: 500,
     simpleCylindar: 50000,
     gokart: 3000,
-    future: 60000
+    future: 20000
 };
 var defaultOwnedTracks = [
     "farm-track",
@@ -71,7 +71,7 @@ var trackCosts = {
     "farm-track": 0,
     "f1-track": 0,
     "sea-side-track": 0,
-    "f1-track-2": 0,
+    "f1-track-2": 2000,
     "russia-track": 500,
     "ferrari-track": 1000,
     "spa-track": 10000,
@@ -89,7 +89,6 @@ var trackCosts = {
 var defaultOwnedColors = [
     "#1d8a47",
     "#8b0000",
-    "#185676",
 ];
 var getDefaultVehicleColorOwnership = function () {
     // @ts-ignore

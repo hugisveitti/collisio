@@ -1,22 +1,34 @@
 import Grid from "@mui/material/Grid";
 import React from "react";
+import { VehicleType } from "../../shared-backend/shared-stuff";
+import {
+  ItemProperties,
+  vehicleItems,
+} from "../../shared-backend/vehicleItems";
 import GarageItem from "./GarageItem";
 
-interface IGarageItems {}
+interface IGarageItems {
+  vehicleType: VehicleType;
+  onChange: (newItem: ItemProperties) => void;
+}
 
 const GarageItems = (props: IGarageItems) => {
-  const items = ["no items"];
+  const items = vehicleItems[props.vehicleType];
 
+  const keys = Object.keys(items);
   return (
     <Grid container spacing={3} style={{ marginTop: 10 }}>
-      {items.map((item) => {
+      {keys.map((key) => {
+        const item = items[key];
         return (
-          <Grid key={item} item xs={12} md={6} lg={4}>
+          <Grid key={key} item xs={12} md={6} lg={4}>
             <GarageItem
-              label={item}
-              onClick={() => {}}
+              label={`${item.name} the ${item.type}`}
+              onClick={() => {
+                props.onChange(item);
+              }}
               //  selected={props.selected === v.type}
-              thumbnail={<div>No thumbnail</div>}
+              thumbnail={<div></div>}
             />
           </Grid>
         );

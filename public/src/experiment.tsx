@@ -9,6 +9,7 @@ import {
 } from "./classes/localGameSettings";
 import {
   defaultUserSettings,
+  defaultVehicleSettings,
   IUserSettings,
   IVehicleSettings,
 } from "./classes/User";
@@ -20,6 +21,7 @@ import SpeedTestContainer from "./testMode/SpeedTestContainer";
 import TestContainer from "./testMode/TestContainer";
 import { createSocket } from "./utils/connectSocket";
 import { getDeviceType } from "./utils/settings";
+import { defaultVehiclesSetup } from "./vehicles/VehicleSetup";
 
 export const mobileOnlyPath = "/mobileonly";
 export const speedTestPath = "/speedtest";
@@ -40,10 +42,11 @@ const TestApp = () => {
   const [tournament, setTournament] = useState(undefined);
   const [previousPage, setPreviousPage] = useState("");
   const deviceType = getDeviceType();
+  const [vehiclesSetup, setVehiclesSetup] = useState(defaultVehiclesSetup);
+
   const onMobile = deviceType === "mobile";
 
   useEffect(() => {
-    console.log("gong to create socket");
     createSocket(deviceType, "test").then((newSocket) => setSocket(newSocket));
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
@@ -87,6 +90,8 @@ const TestApp = () => {
     setPreviousPage,
     tokenData,
     setTokenData,
+    vehiclesSetup,
+    setVehiclesSetup,
   } as IStore;
 
   return (
