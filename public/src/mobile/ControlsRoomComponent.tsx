@@ -340,12 +340,12 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
                 <br />
                 <span>
                   <MonetizationOnIcon style={{ fontSize: 14 }} />{" "}
-                  {props.raceMedalData.coins}
+                  {props.raceMedalData.coins.toFixed(0)}
                 </span>
                 <br />
                 <span>
                   <StarsIcon style={{ fontSize: 14 }} />{" "}
-                  {props.raceMedalData.XP}
+                  {props.raceMedalData.XP.toFixed(0)}
                 </span>
               </>
             )}

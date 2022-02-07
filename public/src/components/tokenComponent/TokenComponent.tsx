@@ -56,7 +56,7 @@ const TokenComponent = (props: ITokenComponent) => {
       <StarsIcon /> <span style={{ fontSize: 24, marginRight: 10 }}>Level</span>
       {currentLevel}
       <span style={{ fontSize: 16, marginRight: 5, marginLeft: 10 }}>
-        {pointsFinishedInThisLevel} /{" "}
+        {pointsFinishedInThisLevel.toFixed(0)} /{" "}
         {pointsFinishedInThisLevel + pointsToNextLevel}
       </span>
       <Progress value={ratioOfLevelFinished} max={1} />
