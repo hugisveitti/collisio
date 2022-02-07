@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Tab, Tabs } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
@@ -7,7 +7,6 @@ import {
   getOwnership,
   getVehicleItemsOwnership,
 } from "../../firebase/firestoreOwnershipFunctions";
-import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import { ITokenData } from "../../shared-backend/medalFuncions";
 import {
@@ -144,6 +143,7 @@ const GarageComponent = (props: IGarageComponent) => {
       setSelectedVehicleColor(value);
     } else if (key === "vehicleType") {
       setSelectedVehicleType(value);
+      setSelectedVehicleSetup(props.store.vehiclesSetup[value]);
     }
 
     if (ownership && ownership[value]) {
@@ -247,16 +247,14 @@ const GarageComponent = (props: IGarageComponent) => {
     });
   };
 
-  const { color, backgroundColor } = getStyledColors("black");
-
-  useEffect(() => {
-    return () => {
-      if (user?.uid) {
-        // save on unmount?
-        setDBUserSettings(user?.uid, props.store.userSettings);
-      }
-    };
-  }, [user]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (user?.uid) {
+  //       // save on unmount?
+  //       //   setDBUserSettings(user?.uid, props.store.userSettings);
+  //     }
+  //   };
+  // }, [user]);
 
   const renderOwnershipComponent = () => {
     if (!user) {

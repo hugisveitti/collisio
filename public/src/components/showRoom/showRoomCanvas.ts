@@ -143,6 +143,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
         wheelGuards: undefined
     }
     if (scene && renderer) {
+        stopSpinCamera = false
         scene.clear()
         addVehicle(vehicleType, chassisNum, scene, vehicleColor)
         addLights(scene)
@@ -226,7 +227,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
             renderer.clear()
         }
 
-        if (!mousedown) {
+        if (!stopSpinCamera) {
 
             ry += .01 * 3
             // camera.rotateY(ry)
@@ -253,10 +254,10 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     return renderer
 }
-let mousedown = false
+let stopSpinCamera = false
 const handleMouse = (e: MouseEvent) => {
     e.preventDefault()
-    mousedown = true // !mousedown
+    stopSpinCamera = true // !mousedown
 }
 
 //window.addEventListener("mouseup", handleMouse)
