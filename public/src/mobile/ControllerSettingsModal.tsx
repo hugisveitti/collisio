@@ -22,17 +22,17 @@ interface IControllerSettingsModal {
 }
 
 const ControllerSettingsModal = (props: IControllerSettingsModal) => {
-  if (!props.user) {
-    return (
-      <NotLoggedInModal
-        onClose={props.onClose}
-        infoText="To set user settings, you need to be logged in."
-        onContinoueAsGuest={props.onClose}
-        open={props.open}
-        signInWithPopup
-      />
-    );
-  }
+  // if (!props.user) {
+  //   return (
+  //     <NotLoggedInModal
+  //       onClose={props.onClose}
+  //       infoText="To set user settings, you need to be logged in."
+  //       onContinoueAsGuest={props.onClose}
+  //       open={props.open}
+  //       signInWithPopup
+  //     />
+  //   );
+  // }
 
   return (
     <BasicModal open={props.open} onClose={props.onClose}>

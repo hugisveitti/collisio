@@ -7,6 +7,7 @@
 
 import { IUserSettings } from "../classes/User"
 import { getMedal as _getMedal } from "./medalFuncions"
+import { ItemProperties, VehicleSetup } from "./vehicleItems"
 
 /** trackName.gltf */
 export type TrackName =
@@ -16,6 +17,9 @@ export type TrackName =
     | "f1-track-2"
     | "russia-track"
     | "ferrari-track"
+    | "basic-track"
+    | "basic-track2"
+    | "basic-track3"
     | "spa-track"
     | "nurn-track"
     | "speed-test-track"
@@ -46,6 +50,15 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Farm track", type: "farm-track", gameType: "race"
+    },
+    {
+        name: "Basic track", type: "basic-track", gameType: "race"
+    },
+    {
+        name: "Basic track 2", type: "basic-track2", gameType: "race"
+    },
+    {
+        name: "Basic track 3", type: "basic-track3", gameType: "race"
     },
     {
         name: "German track", type: "nurn-track", gameType: "race"
@@ -83,7 +96,6 @@ export const allTrackNames: ITrackInfo[] = [
     {
         name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
     },
-
     {
         name: "Small track", type: "small-track", gameType: "race"
     },
@@ -171,6 +183,8 @@ export const getColorNameFromType = (colorType: VehicleColorType) => {
     return "Unknown color"
 }
 
+
+
 export interface IPlayerConnectedData {
     roomId: string
     playerName: string
@@ -179,6 +193,7 @@ export interface IPlayerConnectedData {
     photoURL: string
     isStressTest?: boolean
     userSettings: IUserSettings
+    vehicleSetup: VehicleSetup
 }
 
 
@@ -246,6 +261,7 @@ export interface IPreGamePlayerInfo {
     isAuthenticated: boolean
     vehicleType: VehicleType
     photoURL: string
+    vehicleSetup: VehicleSetup
 }
 
 
@@ -264,7 +280,7 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
         id,
         isAuthenticated,
         vehicleType,
-        photoURL, } = playerInfo
+        photoURL, vehicleSetup } = playerInfo
 
     return {
         playerName: playerName ?? "undefined",
@@ -275,6 +291,7 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
         isAuthenticated: isAuthenticated ?? false,
         vehicleType: vehicleType ?? "test",
         photoURL: photoURL ?? "",
+        vehicleSetup: vehicleSetup ?? { vehicleType: "test" }
     }
 }
 

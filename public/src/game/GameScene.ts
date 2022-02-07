@@ -9,6 +9,7 @@ import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TimeOfDay, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { getStaticPath } from '../utils/settings';
@@ -36,7 +37,8 @@ const fadeSecs = 2
 
 interface IUserSettingsMessage {
     playerNumber: number
-    userSettings: IUserSettings
+    userSettings: IUserSettings | undefined
+    vehicleSetup: VehicleSetup | undefined
 }
 
 interface IView {
@@ -1123,16 +1125,18 @@ export class GameScene extends Scene3D implements IGameScene {
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
                     */
-                    this.setVehicleSettings(data.playerNumber, data.userSettings.vehicleSettings)
+                    this.setVehicleSettings(data.playerNumber, data.userSettings?.vehicleSettings, data.vehicleSetup)
                     //   this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
                 }
             }
         })
     }
 
-    setVehicleSettings(vehicleNumber: number, vehicleSettings: IVehicleSettings) {
-        this.players[vehicleNumber].vehicleType = vehicleSettings.vehicleType
-        this.vehicles[vehicleNumber].updateVehicleSettings(vehicleSettings)
+    setVehicleSettings(vehicleNumber: number, vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) {
+        if (vehicleSettings) {
+            this.players[vehicleNumber].vehicleType = vehicleSettings.vehicleType
+        }
+        this.vehicles[vehicleNumber].updateVehicleSettings(vehicleSettings, vehicleSetup)
     }
 
     resetPlayer(idx: number) {

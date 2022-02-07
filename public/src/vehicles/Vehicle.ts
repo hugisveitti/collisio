@@ -6,13 +6,16 @@ import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
+import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleType } from "../shared-backend/shared-stuff";
+import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
+import { VehiclesSetup } from "./VehicleSetup";
 
 const maxFov = 80
 const minFov = 55
@@ -31,6 +34,9 @@ export interface IVehicleClassConfig {
 
 export class Vehicle implements IVehicle {
     vehicleConfig: IVehicleConfig
+    vehicleSetup: VehicleSetup
+    // maybe this shouldnt import from showRoomCanvas
+    vehicleItems: CurrentItemProps
     name: string
     mass: number
     vehicleColor: number | string
@@ -131,7 +137,7 @@ export class Vehicle implements IVehicle {
 
     setToGround() { }
 
-    updateVehicleSettings(vehicleSettings: IVehicleSettings) {
+    updateVehicleSettings(vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) {
         this.vehicleSettings =
         {
             ...defaultVehicleSettings,
@@ -139,8 +145,12 @@ export class Vehicle implements IVehicle {
         }
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
+            console.log("NEEEDS RELOAD")
             this.scene.setNeedsReload(true)
         }
+        console.log("update vehicle settings", vehicleSetup, vehicleSettings)
+
+        console.log("vehicle setup in vehicle.ts", vehicleSetup)
 
         const keys = Object.keys(vehicleSettings)
         for (let key of keys) {
@@ -154,7 +164,55 @@ export class Vehicle implements IVehicle {
             this.setColor(this.vehicleColor)
         }
         this._updateVehicleSettings()
+
+
+        if (vehicleSetup) {
+            if (vehicleSetup.vehicleType === this.vehicleType) {
+
+                this.updateVehicleSetup(vehicleSetup)
+            } else {
+                console.warn("Vehiclesetup does not match the vehicle type")
+            }
+        }
     };
+
+    updateVehicleSetup(vehicleSetup: VehicleSetup) {
+        console.log("updating vehicle setup", vehicleSetup)
+        this.vehicleConfig = this.getDefaultVehicleConfig()
+
+        this.vehicleSetup = vehicleSetup
+        for (let item of possibleVehicleItemTypes) {
+            if (this.vehicleItems[item]?.props?.path !== vehicleSetup[item]?.path) {
+                if (this.vehicleItems[item]?.model) {
+                    this.vehicleBody.remove(this.vehicleItems[item].model)
+                    this.vehicleItems[item] = undefined
+                }
+                if (vehicleSetup[item]) {
+                    this.addItemToVehicle(vehicleSetup[item].path).then(model => {
+
+                        this.vehicleItems[item] = {
+                            props: vehicleSetup[item], model
+                        }
+                    }).catch(() => {
+                        this.vehicleItems[item] = undefined
+                    })
+                }
+            }
+
+
+            for (let mod of possibleVehicleMods) {
+                if (vehicleSetup?.[item]?.[mod.type]) {
+
+
+                    this.vehicleConfig[mod.type] += vehicleSetup?.[item]?.[mod.type]
+                    console.log("updating", item, "and changing", mod.name, "by", vehicleSetup?.[item]?.[mod.type])
+                }
+            }
+        }
+        console.log("new vehicle config", this.vehicleConfig)
+    }
+
+    _updateVehicleSetup() { }
 
     _updateVehicleSettings() { }
 
@@ -166,32 +224,43 @@ export class Vehicle implements IVehicle {
     };
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) { };
 
-    addItemToVehicle(filename: string) {
-        return new Promise<void>((resolve, reject) => {
+    addItemToVehicle(itemPath: string) {
+        return new Promise<ExtendedObject3D>((resolve, reject) => {
+            if (!this.vehicleBody) {
+
+                console.warn("No vehiclebody to add items to")
+                reject()
+                return
+            }
             const loader = new GLTFLoader()
-            loader.load(getStaticPath("models/f1/exhaust1.glb"), (gltf: GLTF) => {
-                console.log("exhaust", gltf)
+            loader.load(getStaticPath(`models/${this.vehicleType}/${itemPath}.glb`), (gltf: GLTF) => {
+
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh") {
-                        console.log("CHILD", child)
+                        console.log("adding CHILD", child)
                         child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
                         this.vehicleBody.add(child)
+                        resolve(child as ExtendedObject3D)
                     }
                 }
             })
-            resolve()
         })
+    }
+
+    getDefaultVehicleConfig() {
+        return JSON.parse(JSON.stringify(vehicleConfigs[this.vehicleType]))
     }
 
     constructor(config: IVehicleClassConfig) {
         this.vehicleType = config.vehicleType
+        this.vehicleSetup = { vehicleType: this.vehicleType }
         this.vehicleNumber = config.vehicleNumber
         this.name = config.name
         this.useSoundEffects = config.useSoundEffects
         this.scene = config.scene
         this.vehicleColor = config.vehicleColor
 
-        this.vehicleConfig = JSON.parse(JSON.stringify(vehicleConfigs[this.vehicleType]))
+        this.vehicleConfig = this.getDefaultVehicleConfig()
         this.isReady = false
         this.isPaused = false
         this._canDrive = false
@@ -208,6 +277,11 @@ export class Vehicle implements IVehicle {
 
         this.oldPos = new Vector3(0, 0, 0)
         this.currentFov = 55
+        this.vehicleItems = {
+            exhaust: undefined,
+            spoiler: undefined,
+            wheelGuards: undefined
+        }
     }
 
     getTowPivot() {

@@ -108,6 +108,10 @@ const ConnectToWaitingRoomComponent = (
     setConnectingToRoom(true);
 
     console.log("connect to room mobile, store", props.store);
+    const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
+    const vehicleSetup = props.store.vehiclesSetup?.[vehicleType] ?? {
+      vehicleType,
+    };
     socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
@@ -115,6 +119,7 @@ const ConnectToWaitingRoomComponent = (
       isAuthenticated: Boolean(user),
       photoURL: user?.photoURL,
       userSettings: props.store.userSettings,
+      vehicleSetup,
     } as IPlayerConnectedData);
 
     socket.once(stm_player_connected_callback, (response: ISocketCallback) => {

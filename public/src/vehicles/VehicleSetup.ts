@@ -1,5 +1,5 @@
-import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
-import { ItemProperties } from "../shared-backend/vehicleItems";
+import { VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleSetup } from "../shared-backend/vehicleItems";
 
 /**
  * Layout that user has set for a vehicle
@@ -8,12 +8,6 @@ import { ItemProperties } from "../shared-backend/vehicleItems";
  * - exhaust
  * - Spoiler
  */
-export interface VehicleSetup {
-    vehicleType: VehicleType
-    exhaust?: ItemProperties // filename or id
-    spoiler?: ItemProperties
-    wheelGuards?: ItemProperties
-}
 
 export const defaultVehicleSetup: VehicleSetup = {
     vehicleType: "normal2",

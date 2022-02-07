@@ -2,6 +2,7 @@ import ExtendedObject3D from '@enable3d/common/dist/extendedObject3D';
 import { Vector3, Quaternion } from "three"
 import { IVehicleSettings } from '../classes/User';
 import { VehicleType } from '../shared-backend/shared-stuff';
+import { VehicleSetup } from '../shared-backend/vehicleItems';
 import { numberScaler } from '../utils/utilFunctions';
 
 export interface SimpleVector {
@@ -78,7 +79,7 @@ export interface IVehicle {
 
     resetPosition: () => void
     setCheckpointPositionRotation: (positionRotation: IPositionRotation) => void
-    updateVehicleSettings: (vehicleSettings: IVehicleSettings) => void
+    updateVehicleSettings: (vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) => void
     setColor: (color: string | number) => void
     toggleSound: (useSound: boolean) => void
 
@@ -89,7 +90,7 @@ export interface IVehicle {
     setToGround: () => void
     destroy: () => Promise<void>
 
-    addItemToVehicle: (filename: string) => Promise<void>
+    addItemToVehicle: (filename: string) => Promise<ExtendedObject3D>
 }
 
 

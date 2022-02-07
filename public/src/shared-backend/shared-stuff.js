@@ -16,6 +16,15 @@ exports.allTrackNames = [
         name: "Farm track", type: "farm-track", gameType: "race"
     },
     {
+        name: "Basic track", type: "basic-track", gameType: "race"
+    },
+    {
+        name: "Basic track 2", type: "basic-track2", gameType: "race"
+    },
+    {
+        name: "Basic track 3", type: "basic-track3", gameType: "race"
+    },
+    {
         name: "German track", type: "nurn-track", gameType: "race"
     },
     {
@@ -135,7 +144,7 @@ var VehicleControls = /** @class */ (function () {
 }());
 exports.VehicleControls = VehicleControls;
 var playerInfoToPreGamePlayerInfo = function (playerInfo) {
-    var playerName = playerInfo.playerName, teamName = playerInfo.teamName, teamNumber = playerInfo.teamNumber, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL;
+    var playerName = playerInfo.playerName, teamName = playerInfo.teamName, teamNumber = playerInfo.teamNumber, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL, vehicleSetup = playerInfo.vehicleSetup;
     return {
         playerName: playerName !== null && playerName !== void 0 ? playerName : "undefined",
         teamName: teamName !== null && teamName !== void 0 ? teamName : "undefined",
@@ -145,6 +154,7 @@ var playerInfoToPreGamePlayerInfo = function (playerInfo) {
         isAuthenticated: isAuthenticated !== null && isAuthenticated !== void 0 ? isAuthenticated : false,
         vehicleType: vehicleType !== null && vehicleType !== void 0 ? vehicleType : "test",
         photoURL: photoURL !== null && photoURL !== void 0 ? photoURL : "",
+        vehicleSetup: vehicleSetup !== null && vehicleSetup !== void 0 ? vehicleSetup : { vehicleType: "test" }
     };
 };
 exports.playerInfoToPreGamePlayerInfo = playerInfoToPreGamePlayerInfo;

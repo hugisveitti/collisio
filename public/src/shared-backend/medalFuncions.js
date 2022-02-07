@@ -5,90 +5,125 @@ var times = {
     "farm-track": {
         gold: 20,
         silver: 25,
-        bronze: 30
+        bronze: 30,
+        weight: 1
+    },
+    "basic-track": {
+        gold: 17,
+        silver: 20,
+        bronze: 22,
+        weight: .9
+    },
+    "basic-track2": {
+        gold: 18,
+        silver: 21,
+        bronze: 22,
+        weight: .9
+    },
+    "basic-track3": {
+        gold: 21.5,
+        silver: 24,
+        bronze: 26.5,
+        weight: 1.3
     },
     "f1-track": {
         gold: 21,
         silver: 29,
-        bronze: 35
+        bronze: 35,
+        weight: 1
     },
     "f1-track-2": {
         gold: 27.2,
         silver: 31,
-        bronze: 35
+        bronze: 35,
+        weight: 1.4
     },
     // Beach
     "sea-side-track": {
         gold: 52,
         silver: 62,
-        bronze: 69
+        bronze: 69,
+        weight: 2.1
     },
     // Mountain
     "russia-track": {
         gold: 28.5,
         silver: 33,
-        bronze: 39
+        bronze: 39,
+        weight: 1.45
     },
     "ferrari-track": {
         gold: 41.5,
         silver: 48,
-        bronze: 55
+        bronze: 55,
+        weight: 1.7
     },
     // Desert
     "spa-track": {
         gold: 45,
         silver: 55,
-        bronze: 65
+        bronze: 65,
+        weight: 1.8
     },
     "nurn-track": {
         gold: 23,
         silver: 28,
-        bronze: 33
+        bronze: 33,
+        weight: 1.1
     },
     "town-track": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "monaco-track": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "farmers-little-helper-map": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "speed-test-track": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "skii-map": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "simple-tag-course": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "small-track": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "small-jump-track": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
     "test-course": {
         gold: 1000,
         silver: 1000,
-        bronze: 1000
+        bronze: 1000,
+        weight: 0,
     },
 };
 var getMedal = function (trackName, numberOfLaps, totalTime) {
@@ -119,33 +154,6 @@ var getMedal = function (trackName, numberOfLaps, totalTime) {
         return "none";
     }
     return "none";
-    // switch (trackName) {
-    //     case "farm-track":
-    //         return getFarmTrackMedal(trackName, numberOfLaps, totalTime)
-    //     case "f1-track":
-    //     // Beach track
-    //     case "sea-side-track":
-    //     case "f1-track-2":
-    //     // Mountain track
-    //     case "russia-track":
-    //     // Winter track
-    //     case "ferrari-track":
-    //     // desert track
-    //     case "spa-track":
-    //     // German track
-    //     case "nurn-track":
-    //     case "town-track":
-    //     case "monaco-track":
-    //     case "farmers-little-helper-map":
-    //     case "speed-test-track":
-    //     case "skii-map":
-    //     case "simple-tag-course":
-    //     case "small-track":
-    //     case "small-jump-track":
-    //     case "test-course":
-    //     default:
-    //         return "bronze"
-    // }
 };
 exports.getMedal = getMedal;
 /**
@@ -168,7 +176,7 @@ var coinsAmount = {
  * @returns XP, I think it makes sense that XP is not determined by how well you play
  */
 var getXP = function (trackName, numberOfLaps) {
-    return Math.floor(10 * (Math.pow(numberOfLaps, 1.1)));
+    return Math.floor(10 * (Math.pow(numberOfLaps, 1.1))) * times[trackName].weight;
 };
 /**
  * Returns how much XP and coins a player recieves for
@@ -176,8 +184,9 @@ var getXP = function (trackName, numberOfLaps) {
  */
 var getMedalAndTokens = function (trackName, numberOfLaps, totalTime) {
     var medal = (0, exports.getMedal)(trackName, numberOfLaps, totalTime);
+    var trackWeight = times[trackName].weight;
     return {
-        coins: Math.floor(coinsAmount[medal] * (Math.pow(numberOfLaps, 1.1))),
+        coins: Math.floor(coinsAmount[medal] * (Math.pow(numberOfLaps, 1.1))) * trackWeight,
         XP: getXP(trackName, numberOfLaps),
         medal: medal
     };

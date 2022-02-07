@@ -6,6 +6,7 @@ interface IGarageItem {
   label: string;
   onClick: () => void;
   selected?: boolean;
+  style?: React.CSSProperties;
 }
 
 const GarageItem = (props: IGarageItem) => {
@@ -13,6 +14,7 @@ const GarageItem = (props: IGarageItem) => {
     <div
       className="garage__item"
       style={{
+        ...props.style,
         outline: props.selected ? "4px solid" : "1px solid",
       }}
       onClick={props.onClick}

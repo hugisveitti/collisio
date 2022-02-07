@@ -11,6 +11,7 @@ import {
   VehicleColorType,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
+import { ItemProperties } from "../../shared-backend/vehicleItems";
 import { itemInArray } from "../../utils/utilFunctions";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
@@ -23,6 +24,8 @@ interface IVehicleSelect {
   onChange: (vehicleType: VehicleType) => void;
   onChangeColor?: (color: VehicleColorType) => void;
   excludedVehicles?: VehicleType[];
+  onChangeVehicleItem?: (item: ItemProperties) => void;
+
   fullWidth?: boolean;
   disabled?: boolean;
   vehicleColor?: string;
@@ -105,8 +108,8 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
                 }
                 props.onChange(v);
               }}
-              onChangeVehicleItem={() => {
-                console.log("On change vehicle item not imple");
+              onChangeVehicleItem={(item) => {
+                props.onChangeVehicleItem?.(item);
               }}
             />
           )}

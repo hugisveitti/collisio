@@ -18,6 +18,7 @@ import {
   saveBestRaceData,
   saveRaceDataGame,
 } from "../firebase/firestoreGameFunctions";
+import { getVehiclesSetup } from "../firebase/firestoreOwnershipFunctions";
 import { startGame } from "../game/GameScene";
 import { IEndOfGameData, IGameScene } from "../game/IGameScene";
 import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
@@ -157,26 +158,30 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       getDBUserSettings(user?.uid)
         .then((settings) => {
           props.store.setUserSettings(settings);
+          getVehiclesSetup(user.uid).then((setups) => {
+            props.store.setVehiclesSetup(setups);
 
-          const newPlayer = {
-            playerName: user.displayName,
-            teamName: "",
-            teamNumber: -1,
-            playerNumber: 0,
-            id: user.uid,
-            isAuthenticated: true,
-            vehicleType: settings.vehicleSettings.vehicleType,
-            photoURL: user.photoURL,
-          };
-          const player: IPlayerInfo = {
-            ...newPlayer,
-            isLeader: true,
-            isConnected: true,
-            mobileControls: controller,
-          };
-          console.log("player", player);
+            const newPlayer = {
+              playerName: user.displayName,
+              teamName: "",
+              teamNumber: -1,
+              playerNumber: 0,
+              id: user.uid,
+              isAuthenticated: true,
+              vehicleType: settings.vehicleSettings.vehicleType,
+              photoURL: user.photoURL,
+            };
+            const player: IPlayerInfo = {
+              ...newPlayer,
+              isLeader: true,
+              isConnected: true,
+              mobileControls: controller,
+              vehicleSetup: setups[settings.vehicleSettings.vehicleType],
+            };
+            console.log("player", player);
 
-          props.store.setPlayer(player);
+            props.store.setPlayer(player);
+          });
         })
         .catch(() => {
           console.warn("user settings not found");
@@ -197,6 +202,9 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         isLeader: true,
         isConnected: true,
         mobileControls: controller,
+        vehicleSetup: {
+          vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
+        },
       };
       console.log("player", player);
 
@@ -242,7 +250,10 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       gameObject.setGameSettings(props.store.gameSettings);
       gameObject.setVehicleSettings(
         0,
-        props.store.userSettings.vehicleSettings
+        props.store.userSettings.vehicleSettings,
+        props.store.vehiclesSetup[
+          props.store.userSettings.vehicleSettings.vehicleType
+        ]
       );
 
       if (gameActions.pause) {

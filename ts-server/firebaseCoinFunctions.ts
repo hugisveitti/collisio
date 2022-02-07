@@ -26,16 +26,21 @@ interface IEndOfRaceInfoPlayerServer {
  */
 const isValidRace = (run: IEndOfRaceInfoPlayerServer): boolean => {
     if (run.gameTicks < 10) {
+        console.log("not valid race, gameTicks:", run.gameTicks)
         return false
     }
     if (run.roomTicks < 10) {
+        console.log("not valid race, roomTicks:", run.roomTicks)
+
         return false
     }
     if (run.numberOfLaps !== run.lapTimes.length) {
+        console.log("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length)
         return false
     }
     // no map can be beat under 10 sec?
     if (run.totalTime < 4) {
+        console.log("Total time under 4 seconds", run.totalTime)
         return false
     }
 
@@ -212,10 +217,13 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
 
         }
         batch.update(tokenRef, newTokens)
+
+        // think this needs to be changed for item
+        let itemName = vehicleType ? vehicleItems[vehicleType][item].name : item
         batch.commit().then(() => {
             resolve({
                 completed: true,
-                message: `Item ${item} was bought!`
+                message: `Item ${itemName} was bought!`
             })
         }).catch(err => {
             console.warn("Error committing buy batch", err)

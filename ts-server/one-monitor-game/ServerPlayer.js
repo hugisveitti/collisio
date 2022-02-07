@@ -4,11 +4,12 @@ exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var firebaseCoinFunctions_1 = require("../firebaseCoinFunctions");
 var Player = /** @class */ (function () {
-    function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings) {
+    function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings, vehicleSetup) {
         var _a, _b;
         this.playerName = playerName;
         this.teamNumber = 1;
         this.vehicleType = (_b = (_a = userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings) === null || _a === void 0 ? void 0 : _a.vehicleType) !== null && _b !== void 0 ? _b : "normal2";
+        this.vehicleSetup = vehicleSetup;
         this.id = id;
         this.isAuthenticated = isAuthenticated;
         this.isLeader = false;
@@ -170,6 +171,7 @@ var Player = /** @class */ (function () {
             vehicleType: this.vehicleType,
             photoURL: this.photoURL,
             isConnected: this.isConnected,
+            vehicleSetup: this.vehicleSetup
         };
     };
     Player.prototype.getPlayerControls = function () {
@@ -177,19 +179,23 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.onReconnection = function () {
         if (this.game) {
-            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber });
+            this.game.userSettingsChanged({ userSettings: this.userSettings, playerNumber: this.playerNumber, vehicleSetup: this.vehicleSetup });
         }
     };
     Player.prototype.setupUserSettingsListener = function () {
         var _this = this;
-        this.socket.on(shared_stuff_1.mts_user_settings_changed, function (newUserSettings) {
-            if (newUserSettings) {
-                _this.userSettings = newUserSettings;
+        this.socket.on(shared_stuff_1.mts_user_settings_changed, function (_a) {
+            var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
+            if (userSettings) {
+                _this.userSettings = userSettings;
+            }
+            if (vehicleSetup) {
+                _this.vehicleSetup = vehicleSetup;
             }
             // TODO: check if user owns vehicleType
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (_this.game) {
-                _this.game.userSettingsChanged({ userSettings: newUserSettings, playerNumber: _this.playerNumber });
+                _this.game.userSettingsChanged({ userSettings: _this.userSettings, playerNumber: _this.playerNumber, vehicleSetup: _this.vehicleSetup });
             }
         });
     };

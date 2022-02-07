@@ -1,6 +1,20 @@
 import { VehicleType } from "./shared-stuff"
 
 export type ItemType = "exhaust" | "spoiler" | "wheelGuards"
+export const possibleVehicleItemTypes: ItemType[] = ["exhaust", "spoiler", "wheelGuards"]
+export const getVehicleItemNameFromType = (type: ItemType) => {
+    switch (type) {
+        case "exhaust":
+            return "Exhaust"
+        case "spoiler":
+            return "Spoiler"
+        case "wheelGuards":
+            return "Wheel guards"
+        default:
+            return type
+    }
+}
+
 
 export interface ItemProperties {
     /** path of item */
@@ -9,13 +23,41 @@ export interface ItemProperties {
     cost: number
     type: ItemType
 
-    /** an item can modifie the config of a car */
+    /** an item can modify the config of a car */
     mass?: number
     engineForce?: number
     frictionSlip?: number
     suspensionStiffness?: number
     suspensionRestLength?: number
 }
+
+type VehicleProps = "engineForce" | "mass" | "frictionSlip" | "suspensionStiffness" | "suspensionRestLength"
+
+export const possibleVehicleMods: { name: string, type: VehicleProps }[] = [
+    {
+        name: "Speed", type: "engineForce"
+    },
+    {
+        name: "Mass", type: "mass"
+    },
+    {
+        name: "Handling", type: "frictionSlip"
+    },
+    {
+        name: "Suspension stiffness", type: "suspensionStiffness"
+    },
+    {
+        name: "Suspension Rest Length", type: "suspensionRestLength"
+    }
+];
+
+export interface VehicleSetup {
+    vehicleType: VehicleType
+    exhaust?: ItemProperties // filename or id
+    spoiler?: ItemProperties
+    wheelGuards?: ItemProperties
+}
+
 
 interface CarItems {
     [itempath: string]: ItemProperties

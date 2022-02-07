@@ -132,7 +132,8 @@ export const fakePlayer1: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "future",
     isConnected: true,
-    photoURL: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Bart_-_Good_Night.png/200px-Bart_-_Good_Night.png"
+    photoURL: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Bart_-_Good_Night.png/200px-Bart_-_Good_Night.png",
+    vehicleSetup: { vehicleType: "f1" }
 };
 
 export const fakePlayer2: IPlayerInfo = {
@@ -147,7 +148,8 @@ export const fakePlayer2: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "f1",
     isConnected: true,
-    photoURL: ""
+    photoURL: "",
+    vehicleSetup: { vehicleType: "f1" }
 
 };
 
@@ -164,7 +166,9 @@ export const fakePlayer3: IPlayerInfo = {
     vehicleType: "f1",
     isConnected: true,
 
-    photoURL: ""
+    photoURL: "",
+    vehicleSetup: { vehicleType: "f1" }
+
 };
 
 export const fakePlayer4: IPlayerInfo = {
@@ -180,4 +184,6 @@ export const fakePlayer4: IPlayerInfo = {
     vehicleType: "future",
     isConnected: true,
     photoURL: "https://static3.srcdn.com/wordpress/wp-content/uploads/2016/12/The-Simpsons-Roasting-On-An-Open-Fire-Christmas.jpg?q=50&fit=crop&w=960&h=500&dpr=1.5"
+    ,
+    vehicleSetup: { vehicleType: "future" }
 };

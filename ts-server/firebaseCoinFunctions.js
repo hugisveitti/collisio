@@ -62,16 +62,20 @@ var itemOwnershipPath = "itemOwnership";
  */
 var isValidRace = function (run) {
     if (run.gameTicks < 10) {
+        console.log("not valid race, gameTicks:", run.gameTicks);
         return false;
     }
     if (run.roomTicks < 10) {
+        console.log("not valid race, roomTicks:", run.roomTicks);
         return false;
     }
     if (run.numberOfLaps !== run.lapTimes.length) {
+        console.log("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length);
         return false;
     }
     // no map can be beat under 10 sec?
     if (run.totalTime < 4) {
+        console.log("Total time under 4 seconds", run.totalTime);
         return false;
     }
     for (var _i = 0, _a = run.lapTimes; _i < _a.length; _i++) {
@@ -139,7 +143,7 @@ exports.updatePlayersTokens = updatePlayersTokens;
  */
 var buyItem = function (userId, item, vehicleType) {
     return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-        var tokenRef, tokensRes, tokenData, coins, itemCost, ownershipRef, owned, ownership, newTokens, batch;
+        var tokenRef, tokensRes, tokenData, coins, itemCost, ownershipRef, owned, ownership, newTokens, batch, itemName;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -200,10 +204,11 @@ var buyItem = function (userId, item, vehicleType) {
                         batch.set(ownershipRef, ownership);
                     }
                     batch.update(tokenRef, newTokens);
+                    itemName = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].name : item;
                     batch.commit().then(function () {
                         resolve({
                             completed: true,
-                            message: "Item " + item + " was bought!"
+                            message: "Item " + itemName + " was bought!"
                         });
                     }).catch(function (err) {
                         console.warn("Error committing buy batch", err);

@@ -37,8 +37,9 @@ var TestRoom = /** @class */ (function () {
             // set fps
         }, shared_stuff_1.STD_SENDINTERVAL_MS);
     };
-    TestRoom.prototype.handleSettingsChanged = function (newUserSettings) {
-        this.userSettingsChanged({ userSettings: newUserSettings, playerNumber: 0 });
+    TestRoom.prototype.handleSettingsChanged = function (_a) {
+        var userSettings = _a.userSettings;
+        this.userSettingsChanged({ userSettings: userSettings, playerNumber: 0 });
     };
     TestRoom.prototype.setupUserSettingsListener = function () {
         var _this = this;

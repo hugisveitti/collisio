@@ -1,8 +1,8 @@
 import { doc, getDoc, setDoc } from "@firebase/firestore"
-import { AllOwnership, getDefaultOwnership, getDefaultVehicleOwnership, } from "../shared-backend/ownershipFunctions"
+import { AllOwnership, getDefaultOwnership } from "../shared-backend/ownershipFunctions"
 import { VehicleType } from "../shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, ItemOwnership } from "../shared-backend/vehicleItems"
-import { defaultVehiclesSetup, VehicleSetup, VehiclesSetup } from "../vehicles/VehicleSetup"
+import { defaultVehiclesSetup, VehiclesSetup } from "../vehicles/VehicleSetup"
 import { firestore } from "./firebaseInit"
 
 // Structure:
@@ -90,7 +90,7 @@ export const getVehiclesSetup = (userId: string): Promise<VehiclesSetup> => {
         try {
             const res = await getDoc(ref)
             if (res.exists()) {
-                console.log("Res of vehicle setup", res.data)
+                console.log("Res of vehicle setup", res.data())
                 setup = {
                     ...setup,
                     ...res.data()
@@ -106,9 +106,10 @@ export const getVehiclesSetup = (userId: string): Promise<VehiclesSetup> => {
 
 export const setDBVehiclesSetup = (userId: string, vehiclesSetup: VehiclesSetup): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
+        console.log("setting vehicle setup", vehiclesSetup)
         const ref = doc(firestore, vehicleSetupPath, userId)
         setDoc(ref, vehiclesSetup).then(() => {
-            console.log("set db vehicles setup")
+            console.log("set db vehicles setup", vehiclesSetup)
             resolve()
         }).catch((err) => {
             console.warn("Error setting vehicle setup", err)
@@ -144,25 +145,4 @@ export const buyItem = (userId: string, item: string, vehicleType?: VehicleType)
     })
 }
 
-// export const buyVehicleItem = (userId: string, vehicleType: VehicleType, item: string): Promise<BuyCallback> => {
-//     return new Promise<BuyCallback>((resolve, reject) => {
-
-//         const options: RequestInit = {
-//             method: "POST",
-//             mode: "same-origin",
-//             headers: {
-//                 'Content-Type': 'application/json'
-//                 // 'Content-Type': 'application/x-www-form-urlencoded',
-//             },
-//             body: JSON.stringify({
-//                 userId,
-//                 item,
-//                 vehicleType
-//             })
-//         }
-//         fetch("/buyitem", options).then(res => res.json()).then(data => {
-//             resolve(data)
-//         })
-//     })
-// }
 
