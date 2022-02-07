@@ -30,7 +30,10 @@ class SpeedTestScene extends GameScene {
                 teamName: "",
                 teamNumber: -1,
                 isLeader: i === 0,
-                isConnected: false
+                isConnected: false,
+                vehicleSetup: {
+                    vehicleType: vehicleTypes[i]
+                }
             })
         }
         this.course = new Course(this, this.trackName)

@@ -60,8 +60,8 @@ export default class TestRoom {
         }, STD_SENDINTERVAL_MS)
     }
 
-    handleSettingsChanged(newUserSettings: any) {
-        this.userSettingsChanged({ userSettings: newUserSettings, playerNumber: 0 })
+    handleSettingsChanged({ userSettings }: { userSettings: any, vehicleSetup: any }) {
+        this.userSettingsChanged({ userSettings, playerNumber: 0 })
     }
 
     setupUserSettingsListener() {

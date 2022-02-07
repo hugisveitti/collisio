@@ -15,8 +15,6 @@ interface IBuyItemComponent {
 }
 
 const BuyItemComponent = (props: IBuyItemComponent) => {
-  console.log("Loading", props.loading);
-
   const renderUnequipButton = () => {
     if (props.onUnequip) {
       return (

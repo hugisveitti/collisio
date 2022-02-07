@@ -1,6 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultItemsOwnership = exports.getDefaultItemsOwnership = exports.vehicleItems = void 0;
+exports.defaultItemsOwnership = exports.getDefaultItemsOwnership = exports.vehicleItems = exports.possibleVehicleMods = exports.getVehicleItemNameFromType = exports.possibleVehicleItemTypes = void 0;
+exports.possibleVehicleItemTypes = ["exhaust", "spoiler", "wheelGuards"];
+var getVehicleItemNameFromType = function (type) {
+    switch (type) {
+        case "exhaust":
+            return "Exhaust";
+        case "spoiler":
+            return "Spoiler";
+        case "wheelGuards":
+            return "Wheel guards";
+        default:
+            return type;
+    }
+};
+exports.getVehicleItemNameFromType = getVehicleItemNameFromType;
+exports.possibleVehicleMods = [
+    {
+        name: "Speed", type: "engineForce"
+    },
+    {
+        name: "Mass", type: "mass"
+    },
+    {
+        name: "Handling", type: "frictionSlip"
+    },
+    {
+        name: "Suspension stiffness", type: "suspensionStiffness"
+    },
+    {
+        name: "Suspension Rest Length", type: "suspensionRestLength"
+    }
+];
 var sportsCarItems = {
     exhaust1: {
         path: "exhaust1",

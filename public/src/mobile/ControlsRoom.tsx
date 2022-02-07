@@ -138,10 +138,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       // hacky way
       // should have some emit from the game to the devices telling them to send info such as userSettings
       // 5000 ms then send it is hackkkky
-      props.store.socket.emit(
-        mts_user_settings_changed,
-        props.store.userSettings
-      );
+      const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
+      props.store.socket.emit(mts_user_settings_changed, {
+        userSettings: props.store.userSettings,
+        vehicleSetup: props.store.vehiclesSetup[vehicleType],
+      });
     }, 1000);
 
     props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {

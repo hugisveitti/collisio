@@ -164,46 +164,6 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         }
     }
 
-
-
-    updateWheelsSuspension() {
-
-        this.tuning.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness);
-        this.tuning.set_m_suspensionCompression(this.vehicleConfig.suspensionCompression);
-        this.tuning.set_m_suspensionDamping(this.vehicleConfig.suspensionDamping);
-
-        this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
-        this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
-        this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
-
-
-        for (let i = 0; i < this.vehicle.getNumWheels(); i++) {
-            const wheelInfo = this.vehicle.getWheelInfo(i)
-
-            wheelInfo.set_m_suspensionRestLength1(this.vehicleConfig.suspensionRestLength)
-            wheelInfo.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness)
-
-            wheelInfo.set_m_wheelsDampingRelaxation(this.vehicleConfig.suspensionDamping)
-            wheelInfo.set_m_wheelsDampingCompression(this.vehicleConfig.suspensionDamping)
-
-            wheelInfo.set_m_frictionSlip(this.vehicleConfig.frictionSlip)
-            wheelInfo.set_m_rollInfluence(this.vehicleConfig.rollInfluence)
-            //    wheelInfo.updateWheel(this.vehicle.getRigidBody(), this.vehicle.getRigidBody().)
-            this.vehicle.updateSuspension(0)
-        }
-    }
-
-    updateMass(mass: number) {
-
-        this.mass = mass
-        this.setLocalStorage("mass", mass)
-
-        const inertia = this.getAmmoInertia()
-        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, inertia)
-
-        this.vehicle.getRigidBody().setMassProps(this.mass, inertia)
-    }
-
     updateMaxSpeed(speed: number) {
         this.setLocalStorage("maxSpeed", speed)
 

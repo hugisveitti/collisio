@@ -7,6 +7,7 @@ import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleSetup } from "../shared-backend/vehicleItems";
 
 export interface IEndOfGameData {
     endOfRaceInfo?: IEndOfRaceInfoGame
@@ -43,7 +44,7 @@ export interface IGameScene extends Scene3D {
     resetVehicleCallback: (vehicleNumber: number) => void
     setNeedsReload: (needsReload: boolean) => void
     destroyGame: () => Promise<void>
-    setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings) => void
+    setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) => void
     getGraphicsType: () => GraphicsType
     saveDriveRecording: (playerId: string) => void
 

@@ -1,12 +1,13 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Color, Euler, Mesh, MeshLambertMaterial, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Color, Euler, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleType } from "../shared-backend/shared-stuff";
+import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, getSteerAngleFromBeta, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
 import { IVehicleClassConfig, Vehicle } from "./Vehicle";
-import { vehicleConfigs } from "./VehicleConfigs";
+import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 
 export const isVehicle = (object: ExtendedObject3D) => {
@@ -414,6 +415,8 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.applyEngineForce(eF, BACK_RIGHT)
 
     };
+
+
 
     goBackward() {
         if (!this._canDrive) {
@@ -1014,7 +1017,6 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.resetVehicleCallback(this.vehicleNumber)
     };
 
-
     _updateVehicleSettings() {
         this.vehicleBody.remove(this.camera)
         if (!this.useChaseCamera && this.camera) {
@@ -1023,8 +1025,61 @@ export class LowPolyVehicle extends Vehicle {
             this.vehicleBody.add(this.camera)
             //    this.camera.updateProjectionMatrix()
         }
-
     };
+
+    // set to default vehicle config
+    _updateVehicleSetup() {
+
+        this.updateMass(this.vehicleConfig.mass)
+        this.updateWheelsSuspension()
+    }
+
+    updateMass(mass: number) {
+        this.mass = mass
+        this.vehicleConfig.mass = mass
+
+        const inertia = this.vector.setValue(this.vehicleConfig.inertia.x, this.vehicleConfig.inertia.y, this.vehicleConfig.inertia.z)
+        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vector)
+
+        this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
+    }
+
+    updateWheelsSuspension() {
+        this.tuning.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness);
+        this.tuning.set_m_suspensionCompression(this.vehicleConfig.suspensionCompression);
+        this.tuning.set_m_suspensionDamping(this.vehicleConfig.suspensionDamping);
+
+        this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
+        this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
+        this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
+
+
+        for (let i = 0; i < this.vehicle.getNumWheels(); i++) {
+            const wheelInfo = this.vehicle.getWheelInfo(i)
+
+            wheelInfo.set_m_suspensionRestLength1(this.vehicleConfig.suspensionRestLength)
+            wheelInfo.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness)
+
+            wheelInfo.set_m_wheelsDampingRelaxation(this.vehicleConfig.suspensionDamping)
+            wheelInfo.set_m_wheelsDampingCompression(this.vehicleConfig.suspensionDamping)
+
+            wheelInfo.set_m_frictionSlip(this.vehicleConfig.frictionSlip)
+            wheelInfo.set_m_rollInfluence(this.vehicleConfig.rollInfluence)
+            //    wheelInfo.updateWheel(this.vehicle.getRigidBody(), this.vehicle.getRigidBody().)
+            this.vehicle.updateSuspension(0)
+        }
+    }
+
+    setVehicleConfigKey(key: keyof IVehicleConfig, value: number) {
+        // this is for engineForce
+        // @ts-ignore
+        this.vehicleConfig[key] = value
+        if (this[key] !== undefined) {
+            this[key] = value
+        }
+        this.updateWheelsSuspension()
+    }
+
 
     destroyAmmo(obj: any, name?: string) {
         try {

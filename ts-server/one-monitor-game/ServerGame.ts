@@ -110,7 +110,7 @@ export default class RoomMaster {
 
     setupPlayerConnectedListener(mobileSocket: Socket) {
 
-        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings }: IPlayerConnectedData) => {
+        mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings, vehicleSetup }: IPlayerConnectedData) => {
 
 
 
@@ -119,7 +119,7 @@ export default class RoomMaster {
             } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted && !this.rooms[roomId].playerIsInRoom(playerId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
             } else {
-                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings)
+                const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings, vehicleSetup)
                 this.rooms[roomId].addPlayer(player)
             }
         })

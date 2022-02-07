@@ -2,23 +2,19 @@ import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IUser, IUserSettings, IVehicleSettings } from "../../classes/User";
 import CollabsibleCard from "../../components/inputs/CollapsibleCard";
 import VehicleSelect from "../../components/inputs/VehicleSelect";
 import { IStore } from "../../components/store";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
+import { setDBVehiclesSetup } from "../../firebase/firestoreOwnershipFunctions";
 import { getStyledColors } from "../../providers/theme";
-import {
-  mts_user_settings_changed,
-  vehicleColors,
-} from "../../shared-backend/shared-stuff";
-import {
-  getVehicleColorOption,
-  nonactiveVehcileTypes,
-} from "../../vehicles/VehicleConfigs";
+import { mts_user_settings_changed } from "../../shared-backend/shared-stuff";
+import { ItemProperties } from "../../shared-backend/vehicleItems";
+import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
+import { VehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
-import AnySelect from "../inputs/AnySelect";
 import { garagePagePath } from "../Routes";
 
 interface IVehicleSettingsComponent {
@@ -31,6 +27,8 @@ interface IVehicleSettingsComponent {
   linkToGarage?: boolean;
 }
 
+let userSettingsToSave: IUserSettings;
+let vehiclesSetupToSave: VehiclesSetup;
 const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const user = props.user;
 
@@ -50,15 +48,36 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.userSettings.vehicleSettings.noSteerNumber
   );
 
-  const saveUserSettingsToBD = (newUserSettings: IUserSettings) => {
-    if (user) {
-      setDBUserSettings(user.uid, newUserSettings);
-      if (props.store.socket) {
-        props.store.socket.emit(mts_user_settings_changed, newUserSettings);
-        props.store.setUserSettings(newUserSettings);
-      }
-    }
+  const sendUserSettingsToServer = (newUserSettings: IUserSettings) => {
+    // if (user) {
+    //   setDBUserSettings(user.uid, newUserSettings);
+    //   if (props.store.socket) {
+    props.store.socket.emit(mts_user_settings_changed, {
+      userSettings: newUserSettings,
+      vehicleSetup: undefined,
+    });
+    props.store.setUserSettings(newUserSettings);
+    // }
+    // }
   };
+
+  useEffect(() => {
+    return () => {
+      console.log(
+        "unmount vehicle settings",
+        vehiclesSetupToSave,
+        userSettingsToSave
+      );
+      if (user?.uid) {
+        if (userSettingsToSave) {
+          setDBUserSettings(user.uid, userSettingsToSave);
+        }
+        if (vehiclesSetupToSave) {
+          setDBVehiclesSetup(user.uid, vehiclesSetupToSave);
+        }
+      }
+    };
+  }, []);
 
   const updateVehicleSettings = (key: keyof IVehicleSettings, value: any) => {
     const newVehicleSettings = {
@@ -72,8 +91,25 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
       ...props.store.userSettings,
       vehicleSettings: newVehicleSettings,
     } as IUserSettings;
-    props.store.setUserSettings(newUserSettings);
-    saveUserSettingsToBD(newUserSettings);
+
+    sendUserSettingsToServer(newUserSettings);
+  };
+
+  const updateVehicleSetup = (item: ItemProperties) => {
+    const newVehiclesSetup = { ...props.store.vehiclesSetup };
+
+    newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType][
+      item.type
+    ] = item;
+
+    props.store.setVehiclesSetup(newVehiclesSetup);
+    vehiclesSetupToSave = newVehiclesSetup;
+
+    props.store.socket.emit(mts_user_settings_changed, {
+      userSettings: undefined,
+      vehicleSetup:
+        newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType],
+    });
   };
 
   const { color, backgroundColor } = getStyledColors("white");
@@ -98,6 +134,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               onChangeColor={(color) => {
                 updateVehicleSettings("vehicleColor", color);
               }}
+              onChangeVehicleItem={updateVehicleSetup}
               user={props.user}
             />
           )}

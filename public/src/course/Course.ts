@@ -123,6 +123,10 @@ export class Course implements ICourse {
                 this.courseScene = gltf.scene
 
                 this.courseItemsLoader.loadGameItemsToCourse(gltf)
+                // do this check for neccisary items, such as ground, road, goals and checkpoints?
+                if (!this.ground) {
+                    console.warn("No ground added to course")
+                }
 
 
                 this.addParentCollision()

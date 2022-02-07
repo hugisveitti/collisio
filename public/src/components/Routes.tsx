@@ -110,7 +110,7 @@ const Routes = () => {
   const deviceType = getDeviceType();
 
   const [tokenData, setTokenData] = useState(undefined);
-  const [vehiclesSetup, setVehiclesSetup] = useState(defaultVehiclesSetup);
+  const [vehiclesSetup, setVehiclesSetup] = useState(undefined);
 
   useEffect(() => {
     if (!inTestMode) {
@@ -181,6 +181,7 @@ const Routes = () => {
       });
 
       getVehiclesSetup(user.uid).then((_vehiclesSetup) => {
+        console.log("got vehicle setup", _vehiclesSetup);
         setVehiclesSetup(_vehiclesSetup);
       });
     }

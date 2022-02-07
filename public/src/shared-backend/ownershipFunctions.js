@@ -69,6 +69,9 @@ var getDefaultTrackOwnership = function () {
 exports.getDefaultTrackOwnership = getDefaultTrackOwnership;
 var trackCosts = {
     "farm-track": 0,
+    "basic-track": 0,
+    "basic-track2": 100,
+    "basic-track3": 1000,
     "f1-track": 0,
     "sea-side-track": 0,
     "f1-track-2": 2000,

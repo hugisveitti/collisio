@@ -20,15 +20,16 @@ import {
   VehicleColorType,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
-import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import {
   defaultItemsOwnership,
-  getDefaultItemsOwnership,
   ItemProperties,
+  possibleVehicleMods,
+  VehicleSetup,
 } from "../../shared-backend/vehicleItems";
-import { VehicleSetup } from "../../vehicles/VehicleSetup";
+import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { IStore } from "../store";
+import MyTabs from "../tabs/MyTabs";
 import TokenComponent from "../tokenComponent/TokenComponent";
 import BuyItemComponent from "./BuyItemComponent";
 import GarageCars from "./GarageCars";
@@ -55,6 +56,7 @@ interface IGarageComponent {
   onUnequipVehicleItem?: (item: ItemProperties) => void;
 }
 
+// to be saved on unmount
 let _vehicleType: VehicleType;
 let _vehicleColor: VehicleColorType;
 let _vehicleSetup: VehicleSetup;
@@ -71,6 +73,12 @@ const GarageComponent = (props: IGarageComponent) => {
     props.store.userSettings.vehicleSettings.vehicleColor
   );
 
+  console.log(
+    "selected vehicle setup",
+    props.store.vehiclesSetup[
+      props.store.userSettings.vehicleSettings.vehicleType
+    ]
+  );
   const [selectedVehicleSetup, setSelectedVehicleSetup] = useState(
     props.store.vehiclesSetup[
       props.store.userSettings.vehicleSettings.vehicleType
@@ -175,13 +183,6 @@ const GarageComponent = (props: IGarageComponent) => {
     if (itemOwnership[selectedVehicleType][item.path]) {
       props.onUnequipVehicleItem?.(item);
     }
-  };
-
-  const handleChange = (
-    event: React.SyntheticEvent,
-    newSelectedTab: number
-  ) => {
-    setSelectedTab(newSelectedTab);
   };
 
   const handleBuyItem = (
@@ -292,15 +293,8 @@ const GarageComponent = (props: IGarageComponent) => {
     }
     if (selectedTab === 2) {
       if (!selectedItem) {
-        return <div>No item selected</div>;
+        return <div className="background">No item selected</div>;
       }
-
-      const possiblePros = [
-        "engineForce",
-        "mass",
-        "frictionSlip",
-        "suspensionRestLength",
-      ];
 
       return (
         <BuyItemComponent
@@ -311,11 +305,14 @@ const GarageComponent = (props: IGarageComponent) => {
               <span>
                 {selectedItem.name} the {selectedItem.type}
               </span>
-              {possiblePros.map((p) => {
-                if (selectedItem[p]) {
+              {possibleVehicleMods.map((p) => {
+                if (selectedItem[p.type]) {
                   return (
-                    <div key={p}>
-                      {p}: {selectedItem[p]}
+                    <div key={p.type}>
+                      {p.name}:{" "}
+                      {selectedItem[p.type] > 0
+                        ? `+${selectedItem[p.type]}`
+                        : selectedItem[p.type]}
                     </div>
                   );
                 }
@@ -360,45 +357,48 @@ const GarageComponent = (props: IGarageComponent) => {
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6} style={{}}>
-        <div style={{ color, backgroundColor, padding: 10 }}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              value={selectedTab}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab label="Cars" {...a11yProps(0)} style={{ color }} />
-              <Tab label="Color" {...a11yProps(1)} style={{ color }} />
-              <Tab label="Items" {...a11yProps(2)} style={{ color }} />
-            </Tabs>
-          </Box>
-          {selectedTab === 0 && (
-            <GarageCars
-              selected={selectedVehicleType}
-              onChange={(v) => {
-                handleChangeVehicle(v, "vehicleType");
-                setSelectedItem(undefined);
-              }}
-            />
-          )}
-
-          {selectedTab === 1 && (
-            <GarageColors
-              selected={selectedVehicleColor}
-              onChange={(color) => {
-                handleChangeVehicle(color, "vehicleColor");
-              }}
-            />
-          )}
-          {selectedTab === 2 && (
-            <GarageItems
-              vehicleType={selectedVehicleType}
-              onChange={(item: ItemProperties) => {
-                handleChangeVehicleItem(item);
-              }}
-            />
-          )}
-        </div>
+        <MyTabs
+          onTabChange={(newTab) => setSelectedTab(newTab)}
+          tabs={[
+            {
+              label: "Cars",
+              renderElement: () => (
+                <GarageCars
+                  selected={selectedVehicleType}
+                  onChange={(v) => {
+                    handleChangeVehicle(v, "vehicleType");
+                    setSelectedItem(undefined);
+                  }}
+                />
+              ),
+            },
+            {
+              label: "Colors",
+              renderElement: () => (
+                <GarageColors
+                  selected={selectedVehicleColor}
+                  onChange={(color) => {
+                    handleChangeVehicle(color, "vehicleColor");
+                  }}
+                />
+              ),
+            },
+            {
+              label: "Items",
+              renderElement: () => {
+                return (
+                  <GarageItems
+                    vehicleType={selectedVehicleType}
+                    onChange={(item: ItemProperties) => {
+                      handleChangeVehicleItem(item);
+                    }}
+                    vehicleSetup={selectedVehicleSetup}
+                  />
+                );
+              },
+            },
+          ]}
+        />
       </Grid>
     </Grid>
   );

@@ -247,7 +247,7 @@ export class LowPolyTestScene extends GameScene {
         console.log("lo polu test")
         setTimeout(() => {
             console.log("calling add item to vehicle")
-            this.vehicle.addItemToVehicle("")
+            //     this.vehicle.addItemToVehicle("")
         }, 1000)
 
         this.renderer.clear()
@@ -397,7 +397,7 @@ export class LowPolyTestScene extends GameScene {
             if (this.numberOfOtherVehicles === 0) {
                 resolve()
             }
-            const p = this.course.ground.scale
+
             const helper = (i: number) => {
                 loadLowPolyVehicleModels(this.otherVehicles[i].vehicleType, false).then(([tires, chassis]) => {
                     this.otherVehicles[i].addModels(tires, chassis)
@@ -689,7 +689,7 @@ export class LowPolyTestScene extends GameScene {
 
     userSettingsListener() {
         this.socket.on(std_user_settings_changed, (data: any) => {
-            this.vehicle.updateVehicleSettings(data.userSettings.vehicleSettings)
+            this.vehicle.updateVehicleSettings(data.userSettings.vehicleSettings, data.vehicleSetup)
         })
     }
 

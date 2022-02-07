@@ -6,48 +6,50 @@ import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
 import { getDeviceType, getStaticPath } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
 import { loadSphereModel } from "../../vehicles/SphereVehicle"
-import { ItemProperties, ItemType } from "../../shared-backend/vehicleItems"
-import { VehicleSetup } from "../../vehicles/VehicleSetup"
+import { ItemProperties, ItemType, VehicleSetup } from "../../shared-backend/vehicleItems"
 
 let currentVehicleType: VehicleType | undefined
 let currentChassis: ExtendedObject3D | undefined
 
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
+    return new Promise<void>((resolve, reject) => {
 
 
-    if (vehicleType === "simpleSphere") {
-        loadSphereModel(vehicleType, true).then((chassis) => {
-            currentVehicleType = vehicleType
-            currentChassis = chassis
-            if (vehicleColor) {
-                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+        if (vehicleType === "simpleSphere") {
+            loadSphereModel(vehicleType, true).then((chassis) => {
+                currentVehicleType = vehicleType
+                currentChassis = chassis
+                if (vehicleColor) {
+                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
-            } else {
-                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
-            }
-            scene.add(chassis)
+                } else {
+                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
+                }
+                scene.add(chassis)
 
+                resolve()
+            })
+        } else {
+            loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
+                currentVehicleType = vehicleType
+                currentChassis = chassis
+                if (vehicleColor) {
+                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
 
-        })
-    } else {
-        loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
-            currentVehicleType = vehicleType
-            currentChassis = chassis
-            if (vehicleColor) {
-                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+                } else {
+                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
+                }
+                scene.add(chassis)
 
-            } else {
-                (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
-            }
-            scene.add(chassis)
-
-            for (let tire of tires) {
-                scene.add(tire)
-                tire.castShadow = tire.receiveShadow = true
-            }
-            //scene.add(tires[0])
-        })
-    }
+                for (let tire of tires) {
+                    scene.add(tire)
+                    tire.castShadow = tire.receiveShadow = true
+                }
+                //scene.add(tires[0])
+                resolve()
+            })
+        }
+    })
 }
 let offset = 15
 const addLights = (scene: Scene) => {
@@ -92,8 +94,7 @@ const addItem = (itemPath: string): Promise<ExtendedObject3D> => {
 }
 
 
-type CurrentItemProps = {
-
+export type CurrentItemProps = {
     [item in ItemType]: { model: ExtendedObject3D, props: ItemProperties }
 }
 
@@ -112,13 +113,11 @@ export const changeVehicleSetup = (vehicleSetup: VehicleSetup) => {
     if (!currentChassis) return
 
     let possibleItems = ["exhaust", "spoiler", "wheelGuards"]
-    console.log("current items", currentItems)
     for (let item of possibleItems) {
-        console.log("vehicleSetup[item]", vehicleSetup[item])
         if (vehicleSetup[item] !== currentItems[item]?.props) {
             if (currentItems[item]?.model) {
-                console.log("removing item")
                 currentChassis.remove(currentItems[item].model)
+
             }
             if (vehicleSetup[item]) {
                 addItem(vehicleSetup[item].path).then(model => {
@@ -182,7 +181,10 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     camera.lookAt(0, 0, 0)
 
 
-    addVehicle(vehicleType, chassisNum, scene, vehicleColor)
+    addVehicle(vehicleType, chassisNum, scene, vehicleColor).then(() => {
+        changeVehicleSetup(vehicleSetup)
+    })
+
 
 
 
@@ -252,7 +254,8 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     return renderer
 }
 let mousedown = false
-const handleMouse = () => {
+const handleMouse = (e: MouseEvent) => {
+    e.preventDefault()
     mousedown = true // !mousedown
 }
 
