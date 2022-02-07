@@ -365,6 +365,8 @@ export class Vehicle implements IVehicle {
     }
 
     updateFov() {
+        if (!this.vehicleSettings.useDynamicFOV) return
+
         if (this.camera) {
             if (this.getCurrentSpeedKmHour() > 10) {
                 this.currentFov = Math.min(fovScaler(this.getCurrentSpeedKmHour()), maxFov)

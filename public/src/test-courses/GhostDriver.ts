@@ -1,6 +1,7 @@
 import { Quaternion, Vector3 } from "three";
 import { downloadGhost, getTournamentGhost, uploadGhost, uploadTournamentGhost } from "../firebase/firebaseStorageFunctions";
 import { TrackName, VehicleType } from "../shared-backend/shared-stuff";
+import { possibleVehicleItemTypes, VehicleSetup } from "../shared-backend/vehicleItems";
 import { IGhostVehicle } from "../vehicles/GhostVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
 import { isVehicleType } from "../vehicles/VehicleConfigs";
@@ -192,6 +193,7 @@ interface DriveRecorderConfig {
     tournamentId: string | undefined
     playerId: string
     playerName: string
+    vehicleSetup: VehicleSetup
 }
 
 export class DriveRecorder {
@@ -239,7 +241,16 @@ export class DriveRecorder {
     }
 
     getMetadata() {
-        return `${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId ?? "no-tournament"} ${this.config.playerName} ${this.config.playerId}`
+        let vehicleSetupString = ""
+        for (let item of possibleVehicleItemTypes) {
+            if (this.config.vehicleSetup[item]?.path) {
+                vehicleSetupString += `${this.config.vehicleSetup[item]?.path} `
+            } else {
+                vehicleSetupString += `no-${item} `
+            }
+        }
+
+        return `${this.config.vehicleType} ${this.config.numberOfLaps} ${this.config.trackName} ${this.config.tournamentId ?? "no-tournament"} ${this.config.playerName} ${this.config.playerId} ${vehicleSetupString}`
     }
 
     saveTournamentRecording = (totalTime: number, playerName?: string, playerId?: string) => {

@@ -135,7 +135,7 @@ export class LowPolyTestScene extends GameScene {
         this.isIt = 0
         this.ghostDriver = new GhostDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
         this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
-        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test" })
+        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test", vehicleSetup: { vehicleType: "normal" } })
 
     }
 

@@ -35,6 +35,7 @@ export interface IVehicle {
     engineForce: number
 
     vehicleSettings: IVehicleSettings
+    vehicleSetup: VehicleSetup
     steeringSensitivity: number
     breakingForce: number
 

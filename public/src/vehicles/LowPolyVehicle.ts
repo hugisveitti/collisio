@@ -480,7 +480,7 @@ export class LowPolyVehicle extends Vehicle {
 
     turn(beta: number) {
         const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
-
+        console.log("angle beta nosteer", angle, beta, this.vehicleSettings.noSteerNumber)
         if (this._canDrive) {
             const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
             const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)

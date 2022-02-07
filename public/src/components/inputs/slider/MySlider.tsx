@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 
 interface IMySlider {
-  label: string;
+  label: React.ReactNode;
   onChangeCommitted: (newVal: number | number[]) => void;
   onChange: (newVal: number | number[]) => void;
   max: number;

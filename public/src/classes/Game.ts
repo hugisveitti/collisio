@@ -3,6 +3,7 @@ import { RaceGameScene } from "../game/RaceGameScene";
 import { StoryGameScene } from "../game/StoryGameScene";
 import { TagGameScene } from "../game/TagGameScene";
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo, allTrackNames, TimeOfDay } from "../shared-backend/shared-stuff";
+import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings } from "./localGameSettings";
 
@@ -186,6 +187,7 @@ export interface IEndOfRaceInfoPlayer {
     avgFps: number
     tournamentId?: string
     recordingFilename?: string
+    vehicleSetup: VehicleSetup
 }
 
 export interface IPlayerGameInfo {

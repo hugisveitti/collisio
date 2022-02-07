@@ -15,6 +15,8 @@ import { ItemProperties } from "../../shared-backend/vehicleItems";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import { VehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
+import MySlider from "../inputs/slider/MySlider";
+import MyRadio from "../radio/MyRadio";
 import { garagePagePath } from "../Routes";
 
 interface IVehicleSettingsComponent {
@@ -197,57 +199,74 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography>Steering sensitivity</Typography>
-          <Slider
-            style={{
-              color: "black",
-            }}
+          <MySlider
+            label="Steering sensitivity"
+            color={color}
             min={0.01}
             max={1}
-            valueLabelDisplay="auto"
+            //      valueLabelDisplay="auto"
             step={0.01}
-            defaultValue={steerSenceDefaultVal}
-            onChange={(e, value) => {}}
-            onChangeCommitted={(e, value) => {
-              updateVehicleSettings("steeringSensitivity", value);
+            value={steerSenceDefaultVal}
+            onChange={(value) => {}}
+            onChangeCommitted={(value) => {
+              updateVehicleSettings("steeringSensitivity", value as number);
             }}
+            startIcon={<span>-</span>}
+            endIcon={<span>+</span>}
           />
         </Grid>
         <Grid item xs={12}>
-          <Typography>Camera zoom</Typography>
-          <Slider
-            style={{ color }}
+          <MySlider
+            label="Camera position"
+            color={color}
             min={1}
             max={10}
-            valueLabelDisplay="auto"
+            //    valueLabelDisplay="auto"
             step={1}
-            defaultValue={cameraZoomDefaultVal}
-            onChange={(e, value) => {}}
-            onChangeCommitted={(e, value) => {
-              updateVehicleSettings("cameraZoom", value);
+            value={cameraZoomDefaultVal}
+            onChange={(value) => {}}
+            onChangeCommitted={(value) => {
+              updateVehicleSettings("cameraZoom", value as number);
             }}
+            startIcon={<span>Close</span>}
+            endIcon={<span>Far</span>}
           />
         </Grid>
         <Grid item xs={12}>
-          <Typography>
-            No Steer range:
-            <i>
-              {" "}
-              small angle where the vehicle won't turn when the phone turns
-            </i>
-          </Typography>
-          <Slider
-            style={{
-              color: color,
-            }}
+          <MySlider
+            label={
+              <>
+                No Steer range:
+                <i>
+                  {" "}
+                  small angle where the vehicle won't turn when the phone turns
+                </i>
+              </>
+            }
+            color={color}
             min={0}
             max={5}
-            valueLabelDisplay="auto"
+            //       valueLabelDisplay="auto"
             step={0.5}
-            defaultValue={noSteerNumberDefaultVal}
-            onChange={(e, value) => {}}
-            onChangeCommitted={(e, value) => {
-              updateVehicleSettings("noSteerNumber", value);
+            value={noSteerNumberDefaultVal}
+            onChange={(value) => {}}
+            onChangeCommitted={(value) => {
+              updateVehicleSettings("noSteerNumber", value as number);
+            }}
+            startIcon={<span>-</span>}
+            endIcon={<span>+</span>}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <MyRadio<boolean>
+            options={[
+              { label: "On", value: true },
+              { label: "Off", value: false },
+            ]}
+            label="Dynamic camera field of view"
+            checked={props.store.userSettings.vehicleSettings.useDynamicFOV}
+            onChange={(newVal) => {
+              updateVehicleSettings("useDynamicFOV", newVal);
             }}
           />
         </Grid>

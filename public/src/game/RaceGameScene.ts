@@ -129,6 +129,7 @@ export class RaceGameScene extends GameScene {
                     trackName: this.getTrackName(),
                     playerId: this.players[0].id,
                     playerName: this.players[0].playerName,
+                    vehicleSetup: this.vehicles[0].vehicleSetup
                 })
             }
             this.createViews()
@@ -520,6 +521,7 @@ export class RaceGameScene extends GameScene {
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
+            vehicleSetup: this.vehicles[i].vehicleSetup
 
         }
         if (this.gameSettings.record && this.driverRecorder) {
