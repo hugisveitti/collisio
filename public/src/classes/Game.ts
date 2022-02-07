@@ -96,6 +96,9 @@ export const activeTrackNames: TrackName[] = [
     "farmers-little-helper-map",
     "spa-track",
     "small-track",
+    "basic-track",
+    "basic-track2",
+    "basic-track3",
     "small-jump-track"
 ]
 
