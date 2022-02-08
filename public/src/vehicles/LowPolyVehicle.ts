@@ -139,10 +139,7 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicleBody.receiveShadow = false
         this.vehicleBody.castShadow = true
         this.modelsLoaded = true;
-        const material = (this.vehicleBody.material as MeshStandardMaterial).clone();
-        this.vehicleBody.material = material;
-
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
+        changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor] as VehicleColorType[])
 
         this.createVehicle()
     }
@@ -151,17 +148,18 @@ export class LowPolyVehicle extends Vehicle {
 
     changeCenterOfMass() {
 
-
         // set center of mass
         const mw = this.vehicleBody.matrixWorld.clone()
         mw.elements[13] = mw.elements[13] + this.vehicleConfig.centerOfMassOffset
+        if (this.vehicleBody.geometry) {
 
-        this.vehicleBody.geometry = this.vehicleBody.geometry.clone()
-        this.vehicleBody.geometry.applyMatrix4(mw)
-        if (this.vehicleBody.children.length > 0) {
-            const p = this.vehicleBody.children[0].position
-            this.vehicleBody.children[0].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
-            this.vehicleBody.children[0].updateWorldMatrix(true, true)
+            this.vehicleBody.geometry = this.vehicleBody.geometry.clone()
+            this.vehicleBody.geometry.applyMatrix4(mw)
+        }
+        for (let i = 0; i < this.vehicleBody.children.length; i++) {
+            const p = this.vehicleBody.children[i].position
+            this.vehicleBody.children[i].position.setY(p.y + this.vehicleConfig.centerOfMassOffset)
+            this.vehicleBody.children[i].updateWorldMatrix(true, true)
         }
 
         //  this.vehicleBody.updateWorldMatrix(true, true)
@@ -212,10 +210,26 @@ export class LowPolyVehicle extends Vehicle {
 
     createVehicle() {
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        this.scene.add.existing(this.vehicleBody)
+        console.log("vehicle boyd", this.vehicleBody)
+        if (this.vehicleBody.type === "Mesh") {
+
+            this.scene.add.existing(this.vehicleBody)
+        } else {
+            console.log("group")
+            this.scene.add.existing(this.vehicleBody)
+
+            // for (let child of this.vehicleBody.children) {
+            //     if (child.name.includes("extra")) {
+            //         console.log("includes extra", child)
+            //         this.scene.physics.destroy(child.body)
+            //     } else {
+
+            //     }
+            // }
+        }
 
         this.changeCenterOfMass()
-
+        console.log("vehicle config", this.vehicleType, this.vehicleConfig)
 
         this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
 
@@ -477,7 +491,6 @@ export class LowPolyVehicle extends Vehicle {
 
     turn(beta: number) {
         const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
-        console.log("angle beta nosteer", angle, beta, this.vehicleSettings.noSteerNumber)
         if (this._canDrive) {
             const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
             const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
@@ -1026,9 +1039,15 @@ export class LowPolyVehicle extends Vehicle {
 
     // set to default vehicle config
     _updateVehicleSetup() {
-
+        return
         this.updateMass(this.vehicleConfig.mass)
         this.updateWheelsSuspension()
+        this.updateMaxSpeed()
+    }
+
+    updateMaxSpeed() {
+        console.log("new max speed", this.vehicleConfig.maxSpeed)
+        this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
     }
 
     updateMass(mass: number) {

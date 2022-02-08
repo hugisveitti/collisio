@@ -93,6 +93,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
       ...props.store.userSettings,
       vehicleSettings: newVehicleSettings,
     } as IUserSettings;
+    userSettingsToSave = newUserSettings;
 
     sendUserSettingsToServer(newUserSettings);
   };

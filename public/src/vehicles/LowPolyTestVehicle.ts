@@ -164,7 +164,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         }
     }
 
-    updateMaxSpeed(speed: number) {
+    updateMaxSpeed(speed?: number) {
         this.setLocalStorage("maxSpeed", speed)
 
         this.vehicleConfig.maxSpeed = speed

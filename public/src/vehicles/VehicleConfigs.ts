@@ -283,12 +283,12 @@ export const vehicleConfigs = {
         wheelAxisBackPosition: -2.7,
         wheelRadiusBack: 0.95 / 2,
         wheelHalfTrackBack: 1.3,
-        wheelAxisHeightBack: .1,
+        wheelAxisHeightBack: 0.,
 
         wheelAxisFrontPosition: 2.95,
         wheelRadiusFront: 0.95 / 2,
         wheelHalfTrackFront: 1.3,
-        wheelAxisHeightFront: 0.1,
+        wheelAxisHeightFront: 0,
 
         suspensionRestLength: .4,
         //  inertia: { x: 4000, y: 1000, z: 4000 },

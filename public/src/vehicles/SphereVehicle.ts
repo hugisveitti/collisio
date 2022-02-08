@@ -35,15 +35,8 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     prevPosition: Vector3
 
-    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
+    constructor(config: IVehicleClassConfig) {
         super(config)
-
-
-        //   this.vehicleBody = this.scene.physics.add.sphere({ mass: 100, radius: 2 }, { lambert: { color: this.color } })
-
-
-        //   this.vehicleBody.castShadow = true
-
 
         this.xVel = 0
         this.zVel = 0
@@ -92,10 +85,6 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
         (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
 
-        // const { x, y, z } = vehicleConfigs[this.vehicleType].inertia
-        // this.vector.setValue(x, y, z)
-        // // //this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
-        // this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
 
         this.vehicleBody.body.setAngularFactor(0, 1, 0)
         this.vehicleBody.body.setFriction(1)
@@ -103,17 +92,12 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.vehicleBody.body.setBounciness(0.4)
         this.isReady = true
         this._canDrive = true
-        // this.isPaused = false
+
     };
 
 
     goForward(): void {
-        // if (this.zVel > -this.engineForce) {
-        //     this.zVel -= this.dzVel
-        // }
         if (!this._canDrive) return
-
-
         this.zVel = -this.engineForce
     }
     goBackward(speed?: number): void {
@@ -126,17 +110,6 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
             this.zVel = this.engineForce
         }
 
-        return
-        if (this.zVel < this.dVel * 5) {
-            this.zVel += this.dVel * 5
-
-        } else {
-            // if (this.zVel < this.engineForce) {
-            //     this.zVel += this.dzVel
-            // }
-            this.zVel = this.engineForce
-
-        }
     }
 
     noForce(): void {

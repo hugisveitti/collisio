@@ -246,7 +246,7 @@ export class LowPolyTestScene extends GameScene {
         })
         console.log("lo polu test")
         setTimeout(() => {
-            console.log("calling add item to vehicle")
+            // console.log("calling add item to vehicle")
             //     this.vehicle.addItemToVehicle("")
         }, 1000)
 
@@ -286,7 +286,6 @@ export class LowPolyTestScene extends GameScene {
 
                 const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
-                    console.log("vt ", vt)
                     this.ghostVehicle = new GhostVehicle({
                         vehicleType: vt, color: "#10eedd"
                     })
@@ -328,7 +327,7 @@ export class LowPolyTestScene extends GameScene {
             this.courseLoaded = true
             await this.createOtherVehicles()
             await this.createTestVehicle()
-            this.vehicle.useBadRotationTicks = true
+            this.vehicle.useBadRotationTicks = false
 
             const allVehicles = this.otherVehicles.concat(this.vehicle)
             this.vehicles = allVehicles

@@ -2,8 +2,9 @@ import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Scene3D } from "enable3d";
 import { MeshStandardMaterial, Quaternion, Vector3, Object3D, Color, RGBAFormat } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
+import { changeVehicleBodyColor } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
 
 export interface IGhostVehicle {
@@ -92,22 +93,21 @@ export class GhostVehicle implements IGhostVehicle {
                 let opacity = 0.2
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh" || child.type === "Group") {
-                        ((child as ExtendedObject3D).material as MeshStandardMaterial).format = RGBAFormat;
+                        makeObjectOpague(child as ExtendedObject3D);
+
 
                         if (child.name.includes("chassis")) {
                             let _chassis = (child as ExtendedObject3D);
                             chassis = _chassis
                             // import to clone the material since the tires share material
-                            const material = (chassis.material as MeshStandardMaterial).clone();
+                            changeVehicleBodyColor(chassis, [this.config.color] as VehicleColorType[])
+                            // const material = (chassis.material as MeshStandardMaterial).clone();
 
-                            (chassis.material as MeshStandardMaterial) = material;
-                            (chassis.material as MeshStandardMaterial).color = new Color(this.config.color);
-                            (chassis.material as MeshStandardMaterial).opacity = opacity;
-                            (chassis.material as MeshStandardMaterial).transparent = true
+                            // (chassis.material as MeshStandardMaterial) = material;
+                            // //  (chassis.material as MeshStandardMaterial).color = new Color(this.config.color);
+
                         } else if (child.name.includes("extra-car-stuff")) {
                             extraCarStuff = (child as ExtendedObject3D);
-                            ((child as ExtendedObject3D).material as MeshStandardMaterial).opacity = opacity;
-                            ((child as ExtendedObject3D).material as MeshStandardMaterial).transparent = true
 
                         } else if (child.name === "tire") {
                             const tire = (child as ExtendedObject3D)
@@ -117,8 +117,7 @@ export class GhostVehicle implements IGhostVehicle {
 
                             if (child.name.includes("tire")) {
                                 tires.push(child as ExtendedObject3D);
-                                ((child as ExtendedObject3D).material as MeshStandardMaterial).opacity = opacity;
-                                ((child as ExtendedObject3D).material as MeshStandardMaterial).transparent = true
+
 
                             }
 
@@ -142,5 +141,18 @@ export class GhostVehicle implements IGhostVehicle {
         })
         return promise
     }
+}
 
+const makeObjectOpague = (object: ExtendedObject3D) => {
+    if (object.type === "Mesh") {
+        (object.material as MeshStandardMaterial).format = RGBAFormat;
+        (object.material as MeshStandardMaterial).opacity = .2;
+        (object.material as MeshStandardMaterial).transparent = true
+    } else {
+        for (let child of object.children) {
+            (child.material as MeshStandardMaterial).format = RGBAFormat;
+            (child.material as MeshStandardMaterial).opacity = .2;
+            (child.material as MeshStandardMaterial).transparent = true
+        }
+    }
 }
