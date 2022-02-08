@@ -143,10 +143,12 @@ export class Vehicle implements IVehicle {
             ...defaultVehicleSettings,
             ...vehicleSettings
         }
+        let goingToReload = false
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
             console.log("NEEEDS RELOAD")
             this.scene.setNeedsReload(true)
+            goingToReload = true
         }
         console.log("update vehicle settings", vehicleSetup, vehicleSettings)
 
@@ -167,7 +169,7 @@ export class Vehicle implements IVehicle {
 
 
         if (vehicleSetup) {
-            if (vehicleSetup.vehicleType === this.vehicleType) {
+            if (vehicleSetup.vehicleType === this.vehicleType && !goingToReload) {
 
                 this.updateVehicleSetup(vehicleSetup)
             } else {

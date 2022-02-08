@@ -15,15 +15,15 @@ var times = {
         weight: .9
     },
     "basic-track2": {
-        gold: 18,
-        silver: 21,
-        bronze: 22,
-        weight: .9
+        gold: 23,
+        silver: 25,
+        bronze: 27,
+        weight: 1.3
     },
     "basic-track3": {
-        gold: 21.5,
-        silver: 24,
-        bronze: 26.5,
+        gold: 22.7,
+        silver: 25,
+        bronze: 28.5,
         weight: 1.3
     },
     "f1-track": {

@@ -326,7 +326,7 @@ export class Room {
         this.socket.on(dts_vehicles_ready, () => {
             for (let player of this.players) {
                 if (player.userSettings) {
-                    this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber })
+                    this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber, vehicleSetup: player.vehicleSetup })
                 }
             }
         })

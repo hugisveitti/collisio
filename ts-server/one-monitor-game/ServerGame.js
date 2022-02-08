@@ -248,7 +248,7 @@ var Room = /** @class */ (function () {
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 if (player.userSettings) {
-                    _this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber });
+                    _this.userSettingsChanged({ userSettings: player.userSettings, playerNumber: player.playerNumber, vehicleSetup: player.vehicleSetup });
                 }
             }
         });
