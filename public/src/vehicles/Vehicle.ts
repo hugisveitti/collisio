@@ -278,7 +278,7 @@ export class Vehicle implements IVehicle {
         this.mass = this.vehicleConfig.mass
 
         this.useChaseCamera = false
-        this.chaseCameraSpeed = 0.3
+        this.chaseCameraSpeed = 0.25
         this.chaseCameraTicks = 0
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)

@@ -50,4 +50,5 @@ export interface IGameScene extends Scene3D {
 
     course: ICourse
     gameSceneConfig: IGameSceneConfig
+    targetFPS: number
 }

@@ -326,7 +326,7 @@ export class LowPolyVehicle extends Vehicle {
             }
         })
 
-        this.vehicleBody.body.setCcdMotionThreshold(1)
+        //  this.vehicleBody.body.setCcdMotionThreshold(1)
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
@@ -615,7 +615,7 @@ export class LowPolyVehicle extends Vehicle {
             this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z + ((Math.cos(alpha) * 10)) - this.prevChaseCameraPos.z) * cs))
             this.cameraLookAtPos.y = (this.prevChaseCameraPos.y + ((pos.y - this.prevChaseCameraPos.y) * cs))
 
-            const ct = 0.25
+            const ct = this.chaseCameraSpeed * (60 / this.scene.targetFPS)
             this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * ct)) //* this.chaseSpeedX))
             this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * ct)) //* this.chaseSpeedZ))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * ct))

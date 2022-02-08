@@ -127,7 +127,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
     // for some reason on mobile you could get much higher (100+) fps
     // but that never happened on desktop
-    targetFPS = 1 / 60
+    targetFPS = 60
     deltaFPS = 0
     updateDelta = 0
 
@@ -335,7 +335,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
-        this.physics.setGravity(0, -20, 0)
+        this.physics.setGravity(0, -9.82, 0)
 
 
     }
@@ -350,7 +350,9 @@ export class GameScene extends Scene3D implements IGameScene {
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
-        this.physics.config.maxSubSteps = 0
+        this.physics.config.maxSubSteps = 1 // + 1
+        this.physics.config.fixedTimeStep = 1 / this.targetFPS
+        console.log("Fixed time step", this.physics.config.fixedTimeStep)
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -364,14 +366,15 @@ export class GameScene extends Scene3D implements IGameScene {
         const currDelta = this.clock.getDelta()
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
-        if (this.deltaFPS > this.targetFPS && !this.isPaused) {
+        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused) {
 
 
 
-            let delta = (this.updateDelta * 1000)//.toPrecision(3)
+            let delta = (this.updateDelta * 1000) //.toPrecision(3) 
+
 
             this.updateDelta = 0
-            this.deltaFPS = this.deltaFPS % this.targetFPS
+            this.deltaFPS = this.deltaFPS % this.physics.config.fixedTimeStep
             const time = this.clock.getElapsedTime()
 
             // must always satisfy the equation timeStep < maxSubSteps * fixedTimeStep
@@ -379,7 +382,6 @@ export class GameScene extends Scene3D implements IGameScene {
 
             this.gameTicks += 1
             this.roomTicks += 1
-
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
@@ -956,6 +958,9 @@ export class GameScene extends Scene3D implements IGameScene {
 
         // if gameSettings change and needs reload then restart without user say?
         this.socket?.emit(dts_game_settings_changed_callback, {})
+        if (this.targetFPS) {
+            this.physics.config.fixedTimeStep = 1 / this.targetFPS
+        }
         this._setGameSettings()
     }
 

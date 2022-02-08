@@ -152,7 +152,7 @@ export const vehicleConfigs = {
         is4x4: false,
         maxSpeed: 200,
         frictionSlip: 15.5,
-        suspensionDamping: 12,
+        //  suspensionDamping: 12,
         suspensionCompression: 5,
         centerOfMassOffset: .5,
 
@@ -173,7 +173,7 @@ export const vehicleConfigs = {
         wheelHalfTrackFront: 1.36,
         wheelAxisHeightFront: -.5 - .6,
 
-        suspensionDamping: 12,
+        //  suspensionDamping: 12,
         suspensionStiffness: 120,
         suspensionRestLength: 1,
         mass: 1000,
@@ -207,7 +207,7 @@ export const vehicleConfigs = {
 
         maxSuspensionTravelCm: 1500,
         suspensionStiffness: 120,
-        suspensionDamping: 15,
+        //  suspensionDamping: 15,
 
 
         path: "low-poly-monster-truck.glb"
@@ -234,7 +234,7 @@ export const vehicleConfigs = {
         frictionSlip: 15.5,
         maxSuspensionTravelCm: 100,
         suspensionStiffness: 120,
-        suspensionDamping: 12,
+        //  suspensionDamping: 12,
         suspensionCompression: 20,
 
         path: "off-roader.glb",
@@ -341,7 +341,7 @@ export const vehicleConfigs = {
 
         suspensionCompression: 1,
         suspensionStiffness: 75,
-        suspensionDamping: 5,
+        // suspensionDamping: 5,
         maxSuspensionTravelCm: 500,
         maxSpeed: 270,
 
@@ -371,7 +371,7 @@ export const vehicleConfigs = {
         suspensionRestLength: .35,
         suspensionStiffness: 150,
 
-        suspensionDamping: 20,
+        //     suspensionDamping: 20,
 
         maxSpeed: 250,
         mass: 200,

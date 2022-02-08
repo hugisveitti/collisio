@@ -1,4 +1,5 @@
 import { allVehicleTypes, VehicleType } from "../shared-backend/shared-stuff"
+import { itemInArray } from "../utils/utilFunctions"
 import { allWagonTypes, WagonType } from "../vehicles/WagonConfigs"
 
 const structureBounciness = 0.05
@@ -68,7 +69,8 @@ export const gameItems = {
         castsShadow: false,
         receiveShadow: true,
         objectName: "checkpoints",
-        isCourseObjectArray: true
+        isCourseObjectArray: true,
+
     },
     "goal": {
         collisionFlags: 5,
@@ -228,7 +230,7 @@ export const gameItems = {
         notVisible: true,
     },
     "align": {
-        collisionFlags: 1,
+        collisionFlags: -1,
         shape: "concave",
         notAddPhysics: true,
         isCourseObjectDict: true,
@@ -272,6 +274,7 @@ export const gameItems = {
 
 
 } as { [key: string]: IGameItem }
+
 
 
 export const keyNameMatch = (key: string, name: string) => {

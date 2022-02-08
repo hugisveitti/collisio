@@ -22,6 +22,7 @@ export interface IGameSettings {
     record: boolean
     useGhost: boolean
     ghostFilename?: string
+    targetFPS: number
 }
 
 export const defaultGameSettings: IGameSettings = {
@@ -36,6 +37,7 @@ export const defaultGameSettings: IGameSettings = {
     drawDistance: 7500,
     record: false,
     useGhost: false,
+    targetFPS: 30
 }
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {

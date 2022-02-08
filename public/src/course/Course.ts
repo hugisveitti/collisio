@@ -139,6 +139,17 @@ export class Course implements ICourse {
                 for (let c of this.clouds) {
                     this.cloudSpeed.push((Math.random() * .5) + .2)
                 }
+                for (let key of Object.keys(this.spawnAligners)) {
+                    if ((this.spawnAligners[key] as ExtendedObject3D).body) {
+                        console.log("spawn aligner has object", key)
+                        this.gameScene.physics.destroy(this.spawnAligners[key] as ExtendedObject3D)
+                    }
+                }
+                for (let spawn of this.spawns) {
+                    if ((spawn as ExtendedObject3D).body) {
+                        this.gameScene.physics.destroy(spawn as ExtendedObject3D)
+                    }
+                }
                 resolve()
             })
         })

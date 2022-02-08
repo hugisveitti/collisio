@@ -291,6 +291,19 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               />
             </Grid>
             <Grid item xs={12}>
+              <MySlider
+                label="Target FPS"
+                max={60}
+                min={20}
+                step={5}
+                onChangeCommitted={(newVal) => {
+                  updateGameSettings("targetFPS", newVal);
+                }}
+                onChange={(newVal) => {}}
+                value={gameSettings.targetFPS}
+              />
+            </Grid>
+            <Grid item xs={12}>
               <MyCheckbox
                 label="Record session?"
                 checked={props.gameSettings.record}
