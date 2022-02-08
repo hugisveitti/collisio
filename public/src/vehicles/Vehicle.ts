@@ -177,7 +177,7 @@ export class Vehicle implements IVehicle {
     };
 
     updateVehicleSetup(vehicleSetup: VehicleSetup) {
-        return
+
         console.log("updating vehicle setup", vehicleSetup)
         this.vehicleConfig = this.getDefaultVehicleConfig()
 

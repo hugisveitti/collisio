@@ -218,14 +218,7 @@ export class LowPolyVehicle extends Vehicle {
             console.log("group")
             this.scene.add.existing(this.vehicleBody)
 
-            // for (let child of this.vehicleBody.children) {
-            //     if (child.name.includes("extra")) {
-            //         console.log("includes extra", child)
-            //         this.scene.physics.destroy(child.body)
-            //     } else {
 
-            //     }
-            // }
         }
 
         this.changeCenterOfMass()
@@ -1039,7 +1032,7 @@ export class LowPolyVehicle extends Vehicle {
 
     // set to default vehicle config
     _updateVehicleSetup() {
-        return
+
         this.updateMass(this.vehicleConfig.mass)
         this.updateWheelsSuspension()
         this.updateMaxSpeed()
