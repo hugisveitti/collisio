@@ -1,13 +1,16 @@
 import { collection, deleteDoc, doc, endBefore, getDocs, limit, limitToLast, onSnapshot, orderBy, query, setDoc, startAfter, startAt, where } from "@firebase/firestore"
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game"
 import { IFlattendBracketNode } from "../classes/Tournament"
-import { TrackName } from "../shared-backend/shared-stuff"
+import { TrackName, VehicleType } from "../shared-backend/shared-stuff"
+import { itemInArray } from "../utils/utilFunctions"
 import { firestore } from "./firebaseInit"
 import { saveTournamentRaceDataPlayer, saveTournamentRaceGame, TournamentFinishedResponse } from "./firestoreTournamentFunctions"
 
 
 const highscoresRefPath = "highscores"
 const bestHighscoresRefPath = "bestHighscores"
+// for special vehicles such as simple sphere
+const bestSpecialHighscoresRefPath = "bestSpecialHighscores"
 const allHighscoresRefPath = "allHighscores"
 const allGamesRefPath = "allGames"
 
@@ -20,30 +23,30 @@ interface IBestTime {
 
 type IBestTimeD = { [userId: string]: IBestTime }
 
-export const getPlayerBestScoreOnTrackAndLap = async (playerId: string, trackName: TrackName, numberOfLaps: number, callback: (pb: IBestTime | undefined) => void) => {
+export const getPlayerBestScoreOnTrackAndLap = (playerId: string, trackName: TrackName, numberOfLaps: number, specialVehicle: boolean): Promise<IBestTime | undefined> => {
+    return new Promise<IBestTime | undefined>(async (resolve, reject) => {
+        const highscoreRef = specialVehicle ? bestSpecialHighscoresRefPath : bestHighscoresRefPath
 
-    //  const highscoresRef = collection(firestore, highscoresRefPath, playerId, bestHighscoresRefPath)
-    const highscoresRef = collection(firestore, bestHighscoresRefPath)
-    const q = query(highscoresRef, where("playerId", "==", playerId), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "desc"), limit(1))
-    const data = await getDocs(q)
+        const highscoresRef = collection(firestore, highscoreRef)
+        const q = query(highscoresRef, where("playerId", "==", playerId), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "desc"), limit(1))
+        const data = await getDocs(q)
 
+        if (data.empty) {
+            resolve(undefined)
+        } else {
+            data.forEach(doc => {
+                if (doc.exists()) {
+                    resolve(doc.data() as IBestTime)
+                } else {
+                    resolve(undefined)
+                }
 
-    if (data.empty) {
-
-        callback(undefined)
-    } else {
-
-        data.forEach(doc => {
-            if (doc.exists()) {
-                callback(doc.data() as IBestTime)
-            } else {
-                callback(undefined)
-            }
-        })
-
-    }
-
+            })
+        }
+    })
 }
+
+const specialVehicleTypes: VehicleType[] = ["simpleCylindar", "simpleSphere"]
 
 /**
  * 
@@ -58,8 +61,11 @@ export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPla
 
         let setPersonalBest = false
         const gameDataInfo: string[] = []
-        getPlayerBestScoreOnTrackAndLap(playerId, data.trackName, data.numberOfLaps, (pb) => {
-            const highscoresRef = doc(firestore, bestHighscoresRefPath, `${playerId}#${data.trackName}#${data.numberOfLaps}`)
+        const specialVehicle = itemInArray(data.vehicleType, specialVehicleTypes)
+        const highscoreRef = specialVehicle ? bestSpecialHighscoresRefPath : bestHighscoresRefPath
+        getPlayerBestScoreOnTrackAndLap(playerId, data.trackName, data.numberOfLaps, specialVehicle).then((pb) => {
+
+            const highscoresRef = doc(firestore, highscoreRef, `${playerId}#${data.trackName}#${data.numberOfLaps}`)
 
             const overwriteData = () => {
                 setDoc(highscoresRef, data).then(() => {
@@ -218,7 +224,7 @@ export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps
     return new Promise<IEndOfRaceInfoPlayer[]>(async (resolve, reject) => {
         const bestScoreRef = collection(firestore, bestHighscoresRefPath)
         // TODO maybe have list of vehicles that are in a different highscore list
-        const q = query(bestScoreRef, orderBy("vehicleType", "asc"), where("vehicleType", "!=", "simpleSphere"), where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
+        const q = query(bestScoreRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
 
         const arr = []
 

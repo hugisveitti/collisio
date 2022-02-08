@@ -1,14 +1,11 @@
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { getTrackNameFromType } from "../../classes/Game";
 import { IFollower, IUser } from "../../classes/User";
-import { getPlayerBestScoreOnTrackAndLap } from "../../firebase/firestoreGameFunctions";
 import { viewBottoms, viewLefts } from "../../game/GameScene";
-import { cardBackgroundColor } from "../../providers/theme";
 import {
   GameType,
   IPlayerInfo,
@@ -79,23 +76,6 @@ const WaitingRoomPlayerItem = (props: IWaitingRoomPlayerItem) => {
   };
 
   const playerName = props.player.playerName;
-
-  // useEffect(() => {
-  //   if (props.gameType === "race" && showPB) {
-  //     getPlayerBestScoreOnTrackAndLap(
-  //       props.player.id,
-  //       props.trackName,
-  //       props.numberOfLaps,
-  //       (personalBest) => {
-  //         if (personalBest?.totalTime) {
-  //           setPersonalBest(personalBest.totalTime);
-  //         } else {
-  //           setPersonalBest(-1);
-  //         }
-  //       }
-  //     );
-  //   }
-  // }, [props.trackName, props.numberOfLaps]);
 
   return (
     <MyCard style={{ height: "100%" }}>
