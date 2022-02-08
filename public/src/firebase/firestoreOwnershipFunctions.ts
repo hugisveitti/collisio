@@ -64,6 +64,7 @@ export const getOwnership = (userId: string): Promise<AllOwnership> => {
 
 export const getVehicleItemsOwnership = (userId: string, vehicleType: VehicleType): Promise<ItemOwnership> => {
     return new Promise<ItemOwnership>(async (resolve, reject) => {
+        console.log("vehicle type", vehicleType)
         let itemsOwnership = getDefaultItemsOwnership(vehicleType)
         const ref = doc(firestore, ownershipPath, userId, itemOwnershipPath, vehicleType)
         try {

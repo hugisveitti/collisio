@@ -362,13 +362,6 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     _updateVehicleSettings(): void {
     }
 
-
-    setColor(color: string | number) {
-        this.vehicleColor = color;
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
-    }
-
-
     destroy() {
         return new Promise<void>((resolve, reject) => {
 
@@ -411,22 +404,13 @@ export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boole
                         sphere = _sphere
                         // import to clone the material since the tires share material
                         const material = (sphere.material as MeshStandardMaterial).clone();
-                        //  material.color = new Color("");
+
                         (sphere.material as MeshStandardMaterial) = material
-                        if (!onlyLoad) {
-                            // chassis.geometry.center();
-                        }
                     } else if (child.name.includes("extra-stuff")) {
                         extraStuff = (child as ExtendedObject3D)
-                        if (!onlyLoad) {
-                            // extraCarStuff.geometry.center()
-                        }
-
                     }
                 }
             }
-
-
             resolve(sphere)
         })
     })

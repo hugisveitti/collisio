@@ -229,7 +229,7 @@ const prefixSizes = {
 
 export const getSizePrefix = (num: number) => {
     if (!num) return "0"
-    const str = num.toString()
+    const str = num.toFixed(0)
     const l = str.length
     let prefix = ""
     let prefixSize = 0
@@ -240,8 +240,6 @@ export const getSizePrefix = (num: number) => {
             prefixSize = +p
         }
     }
-
-
 
     const prefixString = `${(num / (10 ** (prefixSize))).toFixed(2)} ${prefix}`
     return prefixString

@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { VehicleType } from "../../shared-backend/shared-stuff";
+import {
+  VehicleColorType,
+  VehicleType,
+} from "../../shared-backend/shared-stuff";
 import { VehicleSetup } from "../../shared-backend/vehicleItems";
 import { getDeviceType } from "../../utils/settings";
 import {
@@ -12,7 +15,7 @@ import {
 
 interface IGarageVehicle {
   vehicleType: VehicleType;
-  vehicleColor: string;
+  vehicleColor: VehicleColorType;
   vehicleSetup: VehicleSetup;
 }
 
@@ -27,7 +30,6 @@ const GarageVehicle = (props: IGarageVehicle) => {
   }, []);
 
   useEffect(() => {
-    console.log("creating show room vehicle setup", props.vehicleSetup);
     const renderer = createShowRoomCanvas(
       props.vehicleType,
       0,

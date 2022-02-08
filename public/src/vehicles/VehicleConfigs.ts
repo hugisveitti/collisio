@@ -151,7 +151,7 @@ export const vehicleConfigs = {
         breakingForce: 200,
         is4x4: false,
         maxSpeed: 200,
-        frictionSlip: 27.5,
+        frictionSlip: 15.5,
         suspensionDamping: 12,
         suspensionCompression: 5,
         centerOfMassOffset: .5,
@@ -176,8 +176,8 @@ export const vehicleConfigs = {
         suspensionDamping: 12,
         suspensionStiffness: 120,
         suspensionRestLength: 1,
-        mass: 1600,
-        engineForce: 12500,
+        mass: 1000,
+        engineForce: 8000,
         breakingForce: 400,
         is4x4: false,
 
@@ -231,7 +231,7 @@ export const vehicleConfigs = {
         is4x4: true,
 
         suspensionRestLength: 1.6 - .5,
-        frictionSlip: 27.5,
+        frictionSlip: 15.5,
         maxSuspensionTravelCm: 100,
         suspensionStiffness: 120,
         suspensionDamping: 12,
@@ -293,7 +293,6 @@ export const vehicleConfigs = {
         suspensionRestLength: .4,
         //  inertia: { x: 4000, y: 1000, z: 4000 },
 
-        //   frictionSlip: 27.5,
 
         // maxSuspensionTravelCm: 500,
         // suspensionStiffness: 120,
@@ -377,7 +376,7 @@ export const vehicleConfigs = {
         maxSpeed: 250,
         mass: 200,
         engineForce: 2500,
-        frictionSlip: 27.5,
+        frictionSlip: 15.5,
         path: "gokart.glb",
         maxSteeringAngle: 20 * degToRad,
         centerOfMassOffset: .5

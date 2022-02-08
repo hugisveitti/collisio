@@ -26,6 +26,7 @@ import {
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
+import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { IStore } from "../store";
 import MyTabs from "../tabs/MyTabs";
@@ -35,13 +36,7 @@ import GarageCars from "./GarageCars";
 import GarageColors from "./GarageColors";
 import GarageItems from "./GarageItems";
 import GarageVehicle from "./GarageVehicle";
-
-const a11yProps = (index: number) => {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-};
+import VehicleStatsComponent from "./VehicleStatsComponent";
 
 interface IGarageComponent {
   store: IStore;
@@ -53,6 +48,8 @@ interface IGarageComponent {
     vehicleType: VehicleType
   ) => void;
   onUnequipVehicleItem?: (item: ItemProperties) => void;
+  saveSetup?: () => void;
+  disableInputs?: boolean;
 }
 
 // to be saved on unmount
@@ -72,16 +69,10 @@ const GarageComponent = (props: IGarageComponent) => {
     props.store.userSettings.vehicleSettings.vehicleColor
   );
 
-  console.log(
-    "selected vehicle setup",
-    props.store.vehiclesSetup[
-      props.store.userSettings.vehicleSettings.vehicleType
-    ]
-  );
   const [selectedVehicleSetup, setSelectedVehicleSetup] = useState(
-    props.store.vehiclesSetup[
+    props.store.vehiclesSetup?.[
       props.store.userSettings.vehicleSettings.vehicleType
-    ]
+    ] ?? { vehicleType: props.store.userSettings.vehicleSettings.vehicleType }
   );
 
   const [selectedItem, setSelectedItem] = useState(
@@ -97,12 +88,6 @@ const GarageComponent = (props: IGarageComponent) => {
   const [isBuying, setIsBuying] = useState(false);
 
   useEffect(() => {
-    return () => {
-      console.log("on unmount", _vehicleSetup, _vehicleType, _vehicleColor);
-    };
-  }, []);
-
-  useEffect(() => {
     if (user?.uid) {
       getOwnership(user.uid)
         .then((_ownership) => {
@@ -111,7 +96,6 @@ const GarageComponent = (props: IGarageComponent) => {
         .catch(() => {
           toast.error("Error getting ownership");
         });
-      console.log("selectedVehicleType", selectedVehicleType);
       getVehicleItemsOwnership(user.uid, selectedVehicleType).then(
         (_ownership) => {
           const newItemOwnership = { ...itemOwnership };
@@ -143,6 +127,12 @@ const GarageComponent = (props: IGarageComponent) => {
       setSelectedVehicleColor(value);
     } else if (key === "vehicleType") {
       setSelectedVehicleType(value);
+      console.log(
+        "changine vehicle setup",
+        value,
+        props.store.vehiclesSetup[value],
+        props.store.vehiclesSetup
+      );
       setSelectedVehicleSetup(props.store.vehiclesSetup[value]);
     }
 
@@ -222,7 +212,6 @@ const GarageComponent = (props: IGarageComponent) => {
   ) => {
     setIsBuying(true);
     buyItem(user.uid, item.path, vehicleType).then((data) => {
-      console.log("data from buy item", data);
       if (data.completed) {
         toast.success(data.message);
 
@@ -242,19 +231,9 @@ const GarageComponent = (props: IGarageComponent) => {
       } else {
         toast.error(data.message);
       }
-      console.log("set is buying to false");
       setIsBuying(false);
     });
   };
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (user?.uid) {
-  //       // save on unmount?
-  //       //   setDBUserSettings(user?.uid, props.store.userSettings);
-  //     }
-  //   };
-  // }, [user]);
 
   const renderOwnershipComponent = () => {
     if (!user) {
@@ -333,16 +312,39 @@ const GarageComponent = (props: IGarageComponent) => {
   return (
     <Grid container spacing={3} style={{}}>
       {props.showBackButton && (
-        <Grid item xs={12}>
-          <ToFrontPageButton color="black" />
-        </Grid>
-      )}
-      <Grid item xs={12} sm={6} style={{}}>
-        <Grid container spacing={1} style={{}}>
-          <Grid item xs={12}>
-            <TokenComponent user={user} store={props.store} />
+        <>
+          <Grid item xs={6}>
+            <ToFrontPageButton color="black" />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
+            <BackdropButton
+              disabled={props.disableInputs}
+              style={{ float: "right" }}
+              onClick={() => {
+                props.saveSetup?.();
+              }}
+            >
+              Save setup
+            </BackdropButton>
+          </Grid>
+        </>
+      )}
+      <Grid item xs={12} sm={6} lg={7} style={{}}>
+        <Grid container spacing={1} style={{}}>
+          <Grid item xs={12} lg={5}>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <TokenComponent user={user} store={props.store} />
+              </Grid>
+              <Grid item xs={12}>
+                <VehicleStatsComponent
+                  vehicleSetup={selectedVehicleSetup}
+                  vehicleType={selectedVehicleType}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} lg={7}>
             <GarageVehicle
               vehicleColor={selectedVehicleColor}
               vehicleType={selectedVehicleType}
@@ -354,7 +356,7 @@ const GarageComponent = (props: IGarageComponent) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12} sm={6} style={{}}>
+      <Grid item xs={12} sm={6} lg={5} style={{}}>
         <MyTabs
           onTabChange={(newTab) => setSelectedTab(newTab)}
           tabs={[

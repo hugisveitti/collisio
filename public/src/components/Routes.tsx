@@ -9,7 +9,7 @@ import {
   defaultGameSettings,
   getAllLocalGameSettings,
 } from "../classes/localGameSettings";
-import { defaultUserSettings, defaultVehicleSettings } from "../classes/User";
+import { defaultUserSettings } from "../classes/User";
 import PrivayPolicyComponent from "../extra/PrivacyPolicyComponent";
 import {
   getDBUserSettings,
@@ -19,17 +19,10 @@ import { getVehiclesSetup } from "../firebase/firestoreOwnershipFunctions";
 import ControlsRoomContainer from "../mobile/ControlsRoomContainer";
 import { UserContext } from "../providers/UserProvider";
 import { IPlayerInfo } from "../shared-backend/shared-stuff";
-import {
-  fakePlayer1,
-  fakePlayer2,
-  fakePlayer3,
-  fakePlayer4,
-} from "../tests/fakeData";
+import { fakePlayer1 } from "../tests/fakeData";
 import { createSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
-import { defaultVehiclesSetup } from "../vehicles/VehicleSetup";
 import AboutPageComponent from "./AboutPageComponent";
-import OneMonitorFrontPage from "./FrontPage";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
 import GameRoom from "./gameRoom/GameRoom";
 import GarageContainer from "./garage/GarageContainer";

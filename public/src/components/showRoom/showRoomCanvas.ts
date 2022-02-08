@@ -2,16 +2,17 @@ import { ExtendedObject3D } from "enable3d"
 import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { vehicleColors, VehicleType } from "../../shared-backend/shared-stuff"
+import { vehicleColors, VehicleColorType, VehicleType } from "../../shared-backend/shared-stuff"
 import { getDeviceType, getStaticPath } from "../../utils/settings"
 import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
 import { loadSphereModel } from "../../vehicles/SphereVehicle"
-import { ItemProperties, ItemType, VehicleSetup } from "../../shared-backend/vehicleItems"
+import { ItemProperties, ItemType, possibleVehicleItemTypes, VehicleSetup } from "../../shared-backend/vehicleItems"
+import { changeVehicleBodyColor } from "../../vehicles/Vehicle";
 
 let currentVehicleType: VehicleType | undefined
 let currentChassis: ExtendedObject3D | undefined
 
-const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: string) => {
+const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: VehicleColorType) => {
     return new Promise<void>((resolve, reject) => {
 
 
@@ -20,10 +21,9 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
                 currentVehicleType = vehicleType
                 currentChassis = chassis
                 if (vehicleColor) {
-                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+                    // (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+                    changeVehicleBodyColor(currentChassis, [vehicleColor])
 
-                } else {
-                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
                 }
                 scene.add(chassis)
 
@@ -34,10 +34,11 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
                 currentVehicleType = vehicleType
                 currentChassis = chassis
                 if (vehicleColor) {
-                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+                    console.log("chassis material", chassis.material);
+                    changeVehicleBodyColor(currentChassis, [vehicleColor])
 
-                } else {
-                    (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[chassisNum % vehicleColors.length].value);
+                    //        (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
+
                 }
                 scene.add(chassis)
 
@@ -67,11 +68,12 @@ const addLights = (scene: Scene) => {
 }
 let animateTimeout: NodeJS.Timeout
 
-export const changeChassisColor = (vehicleColor: string) => {
+export const changeChassisColor = (vehicleColor: VehicleColorType) => {
     // only color changed
     if (currentChassis) {
-
-        (currentChassis.material as MeshStandardMaterial).color = new Color(vehicleColor)
+        console.log("chassis material", currentChassis.material);
+        changeVehicleBodyColor(currentChassis, [vehicleColor])
+        // (currentChassis.material as MeshStandardMaterial).color = new Color(vehicleColor)
     }
 }
 
@@ -80,10 +82,8 @@ const addItem = (itemPath: string): Promise<ExtendedObject3D> => {
     return new Promise<ExtendedObject3D>((resolve, reject) => {
 
         loader.load(getStaticPath(`models/${currentVehicleType}/${itemPath}.glb`), (gltf: GLTF) => {
-            console.log("item path", itemPath)
             for (let child of gltf.scene.children) {
                 if (child.type === "Mesh") {
-                    console.log("CHILD", child)
                     // child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
                     currentChassis.add(child)
                     resolve(child as ExtendedObject3D)
@@ -109,21 +109,20 @@ let currentItems: CurrentItemProps = {
 // let currentWheelGuards: ItemProperties
 let currentColor: string
 
-export const changeVehicleSetup = (vehicleSetup: VehicleSetup) => {
-    if (!currentChassis) return
+export const changeVehicleSetup = async (vehicleSetup: VehicleSetup) => {
+    if (!currentChassis || !vehicleSetup) return
 
-    let possibleItems = ["exhaust", "spoiler", "wheelGuards"]
-    for (let item of possibleItems) {
+    for (let item of possibleVehicleItemTypes) {
         if (vehicleSetup[item] !== currentItems[item]?.props) {
             if (currentItems[item]?.model) {
                 currentChassis.remove(currentItems[item].model)
-
             }
             if (vehicleSetup[item]) {
-                addItem(vehicleSetup[item].path).then(model => {
+                const model = await addItem(vehicleSetup[item].path)
 
-                    currentItems[item] = { props: vehicleSetup[item], model }
-                })
+
+                currentItems[item] = { props: vehicleSetup[item], model }
+
             } else {
                 currentItems[item] = undefined
             }
@@ -134,16 +133,12 @@ export const changeVehicleSetup = (vehicleSetup: VehicleSetup) => {
 
 let renderer: WebGLRenderer | undefined, scene: Scene | undefined, camera: undefined | PerspectiveCamera
 
+let ry = 0
 
-export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: string, vehicleSetup?: VehicleSetup, _height?: number) => {
+export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: VehicleColorType, vehicleSetup?: VehicleSetup, _height?: number) => {
     currentVehicleType = vehicleType
-    currentItems = {
-        exhaust: undefined,
-        spoiler: undefined,
-        wheelGuards: undefined
-    }
+    stopSpinCamera = false
     if (scene && renderer) {
-        stopSpinCamera = false
         scene.clear()
         addVehicle(vehicleType, chassisNum, scene, vehicleColor)
         addLights(scene)
@@ -155,7 +150,6 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     renderer = new WebGLRenderer({ antialias: true });
 
-    console.log("domElement", renderer.domElement)
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
@@ -183,7 +177,9 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
 
     addVehicle(vehicleType, chassisNum, scene, vehicleColor).then(() => {
-        changeVehicleSetup(vehicleSetup)
+        if (vehicleSetup) {
+            changeVehicleSetup(vehicleSetup)
+        }
     })
 
 
@@ -202,7 +198,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
 
     camera.fov = 25
 
-    let ry = 0
+
 
     camera.rotateY(ry)
 

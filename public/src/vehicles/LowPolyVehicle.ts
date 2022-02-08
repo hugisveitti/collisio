@@ -1,12 +1,12 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Color, Euler, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, getSteerAngleFromBeta, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
-import { IVehicleClassConfig, Vehicle } from "./Vehicle";
+import { changeVehicleBodyColor, IVehicleClassConfig, Vehicle } from "./Vehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 
@@ -147,10 +147,7 @@ export class LowPolyVehicle extends Vehicle {
         this.createVehicle()
     }
 
-    setColor(color: string | number) {
-        this.vehicleColor = color;
-        (this.vehicleBody.material as MeshStandardMaterial).color = new Color(this.vehicleColor);
-    }
+
 
     changeCenterOfMass() {
 
@@ -1178,17 +1175,13 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoa
                         let _chassis = (child as ExtendedObject3D);
                         chassis = _chassis
                         // import to clone the material since the tires share material
-                        const material = (chassis.material as MeshStandardMaterial).clone();
+                        console.log("chassis", chassis)
+                        // const material = (chassis.material as MeshStandardMaterial).clone();
+                        // (chassis.material as MeshStandardMaterial) = material
 
-                        (chassis.material as MeshStandardMaterial) = material
-                        if (!onlyLoad) {
-                            // chassis.geometry.center();
-                        }
                     } else if (child.name.includes("extra-car-stuff")) {
                         extraCarStuff = (child as ExtendedObject3D)
-                        if (!onlyLoad) {
-                            // extraCarStuff.geometry.center()
-                        }
+
 
                     } else if (child.name === "tire") {
                         const tire = (child as ExtendedObject3D)
@@ -1218,3 +1211,5 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoa
     })
     return promise
 }
+
+

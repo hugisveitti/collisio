@@ -3,12 +3,12 @@
  */
 
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3, Color, MeshStandardMaterial } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
 import { IGameScene } from "../game/IGameScene";
-import { VehicleType } from "../shared-backend/shared-stuff";
+import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
@@ -216,7 +216,11 @@ export class Vehicle implements IVehicle {
 
     _updateVehicleSettings() { }
 
-    setColor(color: string | number) { };
+    setColor(color: string | number) {
+        this.vehicleColor = color;
+        changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor as VehicleColorType])
+    }
+
     destroy() {
         return new Promise<void>((resolve, reject) => {
             resolve()
@@ -405,5 +409,19 @@ export class Vehicle implements IVehicle {
             this.skidSound?.stop()
         }
     }
+}
 
+export const changeVehicleBodyColor = (chassis: ExtendedObject3D, vehicleColors: VehicleColorType[]) => {
+    // single material
+    if (chassis.type === "Mesh") {
+        (chassis.material as MeshStandardMaterial) = (chassis.material as MeshStandardMaterial).clone();
+        (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[0])
+    } else {
+        // Group
+        // multiple materials found in children
+        for (let i = 0; i < chassis.children.length; i++) {
+            (chassis.children[i].material as MeshStandardMaterial) = (chassis.children[i].material as MeshStandardMaterial).clone();
+            (chassis.children[i].material as MeshStandardMaterial).color = new Color(vehicleColors[i % vehicleColors.length])
+        }
+    }
 }

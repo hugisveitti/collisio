@@ -1,12 +1,13 @@
 import { Label } from "@mui/icons-material";
 import Grid from "@mui/material/Grid";
-import React from "react";
+import React, { useState } from "react";
 import { VehicleType } from "../../shared-backend/shared-stuff";
 import {
   getVehicleItemNameFromType,
   ItemProperties,
   ItemType,
   possibleVehicleItemTypes,
+  possibleVehicleMods,
   vehicleItems,
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
@@ -20,15 +21,13 @@ interface IGarageItems {
 }
 
 const GarageItems = (props: IGarageItems) => {
+  const [selectedItemType, setSelectedItemType] = useState(
+    "exhaust" as ItemType
+  );
   const items = vehicleItems[props.vehicleType];
 
   const isSelected = (item: ItemProperties) => {
-    for (let itemType of possibleVehicleItemTypes) {
-      if (item.type === itemType) {
-        return props.vehicleSetup?.[itemType]?.name === item.name;
-      }
-    }
-    return false;
+    return props.vehicleSetup?.[selectedItemType]?.id === item.id;
   };
 
   const keys = Object.keys(items);
@@ -49,7 +48,20 @@ const GarageItems = (props: IGarageItems) => {
                 onClick={() => {
                   props.onChange(item);
                 }}
-                thumbnail={<div></div>}
+                thumbnail={
+                  <div>
+                    {possibleVehicleMods.map((p) => {
+                      if (item[p.type]) {
+                        return (
+                          <div key={`${key}-${p.type}`} style={{ fontSize: 8 }}>
+                            {p.name}: {item[p.type]}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                }
                 selected={isSelected(item)}
               />
             </Grid>
@@ -61,6 +73,7 @@ const GarageItems = (props: IGarageItems) => {
 
   return (
     <MyTabs
+      defaultTab={0}
       subtabs
       tabs={possibleVehicleItemTypes.map((itemType) => {
         return {
@@ -68,6 +81,9 @@ const GarageItems = (props: IGarageItems) => {
           renderElement: () => renderItemsFromType(itemType),
         };
       })}
+      onTabChange={(i) => {
+        setSelectedItemType(possibleVehicleItemTypes[i]);
+      }}
     />
   );
 };

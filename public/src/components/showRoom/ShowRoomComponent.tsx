@@ -13,6 +13,7 @@ import {
   allVehicleTypes,
   defaultVehicleType,
   vehicleColors,
+  VehicleColorType,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
@@ -29,7 +30,7 @@ interface IShowRoom {
   excludedVehicles?: VehicleType[];
   isPremiumUser: boolean;
   vehcileType?: VehicleType;
-  vehicleColor?: string;
+  vehicleColor?: VehicleColorType;
 }
 
 const ShowRoomComponent = (props: IShowRoom) => {

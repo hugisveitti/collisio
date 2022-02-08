@@ -1,7 +1,17 @@
 .progress {
-  min-width: 50px;
+  /* min-width: 50px;
   color: black;
   border-radius: 0;
   margin-left: 10px;
-  max-width: 90%;
+  max-width: 90%; */
+
+  border: 1px solid white;
+  width: 200px;
+  height: 20px;
+}
+
+.progress__inner {
+  background-color: white;
+  height: 100%;
+  transition: 0.2s;
 }

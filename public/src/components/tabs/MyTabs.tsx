@@ -15,10 +15,11 @@ interface IMyTabs {
   tabs: { label: string; renderElement: () => JSX.Element }[];
   onTabChange?: (newTab: number) => void;
   subtabs?: boolean;
+  defaultTab?: number;
 }
 
 const MyTabs = (props: IMyTabs) => {
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(props.defaultTab ?? 0);
   const { color, backgroundColor } = getStyledColors("black");
 
   const handleChange = (
