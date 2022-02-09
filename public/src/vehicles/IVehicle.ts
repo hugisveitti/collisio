@@ -81,6 +81,7 @@ export interface IVehicle {
     resetPosition: () => void
     setCheckpointPositionRotation: (positionRotation: IPositionRotation) => void
     updateVehicleSettings: (vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) => void
+    updateVehicleSetup: (vehicleSetup: VehicleSetup) => void
     setColor: (color: string | number) => void
     toggleSound: (useSound: boolean) => void
 

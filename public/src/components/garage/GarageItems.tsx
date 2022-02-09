@@ -1,4 +1,4 @@
-import { Label } from "@mui/icons-material";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
 import { VehicleType } from "../../shared-backend/shared-stuff";
@@ -11,6 +11,7 @@ import {
   vehicleItems,
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
+import { getSizePrefix } from "../../utils/utilFunctions";
 import MyTabs from "../tabs/MyTabs";
 import GarageItem from "./GarageItem";
 
@@ -49,12 +50,28 @@ const GarageItems = (props: IGarageItems) => {
                   props.onChange(item);
                 }}
                 thumbnail={
-                  <div>
+                  <div style={{ position: "relative" }}>
+                    <div
+                      style={{
+                        fontStyle: "bold",
+                        fontSize: 10,
+                      }}
+                    >
+                      <span>$ {getSizePrefix(item.cost)}</span>
+                    </div>
                     {possibleVehicleMods.map((p) => {
                       if (item[p.type]) {
                         return (
-                          <div key={`${key}-${p.type}`} style={{ fontSize: 8 }}>
-                            {p.name}: {item[p.type]}
+                          <div
+                            key={`${key}-${p.type}`}
+                            style={{
+                              fontSize: 8,
+                            }}
+                          >
+                            {p.name}:{" "}
+                            {item[p.type] > 0
+                              ? `+${item[p.type]}`
+                              : item[p.type]}
                           </div>
                         );
                       }

@@ -42,6 +42,7 @@ exports.possibleVehicleMods = [
         name: "Suspension Rest Length", type: "suspensionRestLength", min: 0, max: 2
     }
 ];
+// have to have some kind of low tier, mid tier and high tier items
 var sportsCarItems = {
     exhaust1: {
         path: "exhaust1",
@@ -49,17 +50,17 @@ var sportsCarItems = {
         name: "Willie",
         type: "exhaust",
         cost: 10,
-        engineForce: 200,
-        maxSpeed: 10
+        engineForce: 100,
+        maxSpeed: 10,
     },
     exhaust2: {
         path: "exhaust2",
         id: "sportsCar-exhaust2",
         type: "exhaust",
         name: "Jonny",
-        engineForce: 250,
+        engineForce: 200,
         cost: 200,
-        maxSpeed: 20
+        maxSpeed: 11
     },
     exhaust3: {
         id: "sportsCar-exhaust3",
@@ -67,27 +68,30 @@ var sportsCarItems = {
         name: "Executive",
         type: "exhaust",
         cost: 800,
-        engineForce: 400,
-        frictionSlip: -5,
-        maxSpeed: -10
+        engineForce: 300,
+        mass: 110,
+        frictionSlip: -1,
+        maxSpeed: -5
     },
     exhaust4: {
         id: "sportsCar-exhaust4",
         path: "exhaust4",
         type: "exhaust",
         name: "Ernie Johnson",
-        engineForce: 950,
+        engineForce: 350,
+        mass: 80,
+        maxSpeed: -5,
         cost: 1000,
-        maxSpeed: -5
     },
     exhaust5: {
         id: "sportsCar-exhaust5",
         path: "exhaust5",
         type: "exhaust",
         name: "Sad Charlie",
-        engineForce: 1200,
+        engineForce: 380,
         frictionSlip: -1,
-        mass: 500,
+        maxSpeed: -1,
+        mass: 100,
         cost: 200000
     },
     spoiler1: {
@@ -98,7 +102,7 @@ var sportsCarItems = {
         cost: 150,
         frictionSlip: 2,
         mass: 100,
-        engineForce: -1000,
+        engineForce: -100,
         maxSpeed: -15
     },
     spoiler2: {
@@ -109,7 +113,7 @@ var sportsCarItems = {
         cost: 500,
         frictionSlip: 3.2,
         mass: -120,
-        engineForce: -1500,
+        engineForce: -100,
         maxSpeed: -10
     },
     spoiler3: {
@@ -119,7 +123,9 @@ var sportsCarItems = {
         name: "Sonja",
         cost: 500,
         frictionSlip: 2.3,
-        mass: 130
+        mass: -130,
+        engineForce: -80,
+        maxSpeed: 2
     },
     spoiler4: {
         id: "sportsCar-spoiler4",
@@ -129,7 +135,7 @@ var sportsCarItems = {
         cost: 2500,
         frictionSlip: 3,
         mass: 230,
-        engineForce: -500,
+        engineForce: -120,
         maxSpeed: -2
     },
     spoiler5: {
@@ -139,8 +145,8 @@ var sportsCarItems = {
         name: "Sylvester",
         cost: 5000,
         frictionSlip: 3,
-        mass: -390,
-        engineForce: 500
+        mass: 80,
+        engineForce: 150,
     },
     wheelGuards1: {
         id: "sportsCar-wheelGuards1",
@@ -162,8 +168,8 @@ var f1Items = {
         type: "exhaust",
         cost: 10,
         engineForce: 50,
-        mass: 100,
-        maxSpeed: 10
+        mass: 25,
+        maxSpeed: 2
     },
     exhaust2: {
         id: "f1-exhaust2",
@@ -171,7 +177,8 @@ var f1Items = {
         type: "exhaust",
         name: "Jonny",
         engineForce: 220,
-        cost: 200
+        cost: 200,
+        maxSpeed: 4
     },
     exhaust3: {
         id: "f1-exhaust3",
@@ -181,6 +188,7 @@ var f1Items = {
         cost: 500,
         engineForce: 300,
         frictionSlip: -1,
+        maxSpeed: 8
     },
     exhaust4: {
         id: "f1-exhaust4",
@@ -190,7 +198,8 @@ var f1Items = {
         cost: 2000,
         engineForce: 400,
         frictionSlip: -1,
-        suspensionRestLength: -.05
+        suspensionRestLength: -.05,
+        maxSpeed: 12
     },
     exhaust5: {
         id: "f1-exhaust5",
@@ -198,7 +207,7 @@ var f1Items = {
         type: "exhaust",
         name: "Everlyn",
         cost: 5000,
-        engineForce: 800,
+        engineForce: 600,
         frictionSlip: -2,
         maxSpeed: 25
     },
@@ -237,7 +246,7 @@ var f1Items = {
         cost: 2500,
         frictionSlip: 3,
         mass: 230,
-        engineForce: 500
+        engineForce: 250
     },
     wheelGuards1: {
         id: "f1-wheelGuards1",

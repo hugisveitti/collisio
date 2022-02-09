@@ -17,7 +17,7 @@ import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from ".
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 import { VehiclesSetup } from "./VehicleSetup";
 
-const maxFov = 80
+const maxFov = 70
 const minFov = 55
 const fovScaler = numberScaler(minFov, maxFov, 1, 400, 8)
 const soundScaler = numberScaler(1, 5, 0, 330, 2)
@@ -38,7 +38,6 @@ export class Vehicle implements IVehicle {
     // maybe this shouldnt import from showRoomCanvas
     vehicleItems: CurrentItemProps
     name: string
-    mass: number
     vehicleColor: number | string
     useSoundEffects: boolean
     engineSoundLoaded = false
@@ -88,6 +87,7 @@ export class Vehicle implements IVehicle {
     vehicleType: VehicleType;
 
     currentFov: number
+    delta: number = 0
 
     getCanDrive() {
         return this._canDrive
@@ -115,7 +115,7 @@ export class Vehicle implements IVehicle {
     cameraLookAt(camera: any, detla: number) { };
     update(delta: number) { };
     setPosition(x: number, y: number, z: number) { };
-    getPosition(): SimpleVector {
+    getPosition(): Vector3 {
         console.warn("This function should not be called, getPosition of vehicle class")
         return new Vector3(0, 0, 0)
     };
@@ -137,6 +137,17 @@ export class Vehicle implements IVehicle {
 
     setToGround() { }
 
+    /**
+   * make items between camera and vehicle see through
+   * @param cameraPos position of camera relative to the world
+   */
+    seeVehicle(cameraPos: Vector3) {
+        if (this.delta < 33) {
+            this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
+        }
+    }
+
+
     updateVehicleSettings(vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) {
         this.vehicleSettings =
         {
@@ -146,13 +157,9 @@ export class Vehicle implements IVehicle {
         let goingToReload = false
 
         if (this.vehicleSettings.vehicleType !== this.vehicleType) {
-            console.log("NEEEDS RELOAD")
             this.scene.setNeedsReload(true)
             goingToReload = true
         }
-        console.log("update vehicle settings", vehicleSetup, vehicleSettings)
-
-        console.log("vehicle setup in vehicle.ts", vehicleSetup)
 
         const keys = Object.keys(vehicleSettings)
         for (let key of keys) {
@@ -178,9 +185,12 @@ export class Vehicle implements IVehicle {
         }
     };
 
-    updateVehicleSetup(vehicleSetup: VehicleSetup) {
+    async updateVehicleSetup(vehicleSetup: VehicleSetup) {
+        if (vehicleSetup.vehicleType !== this.vehicleType) {
+            console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
+            return
+        }
 
-        console.log("updating vehicle setup", vehicleSetup)
         this.vehicleConfig = this.getDefaultVehicleConfig()
 
         this.vehicleSetup = vehicleSetup
@@ -191,7 +201,7 @@ export class Vehicle implements IVehicle {
                     this.vehicleItems[item] = undefined
                 }
                 if (vehicleSetup[item]) {
-                    this.addItemToVehicle(vehicleSetup[item].path).then(model => {
+                    await this.addItemToVehicle(vehicleSetup[item].path).then(model => {
 
                         this.vehicleItems[item] = {
                             props: vehicleSetup[item], model
@@ -202,17 +212,12 @@ export class Vehicle implements IVehicle {
                 }
             }
 
-
             for (let mod of possibleVehicleMods) {
                 if (vehicleSetup?.[item]?.[mod.type]) {
-
-
-                    this.vehicleConfig[mod.type] += vehicleSetup?.[item]?.[mod.type]
-                    console.log("updating", item, "and changing", mod.name, "by", vehicleSetup?.[item]?.[mod.type])
+                    this.vehicleConfig[mod.type] += Math.floor(vehicleSetup?.[item]?.[mod.type] * 1000) / 1000
                 }
             }
         }
-        console.log("new vehicle config", this.vehicleConfig)
         this._updateVehicleSetup()
     }
 
@@ -245,7 +250,6 @@ export class Vehicle implements IVehicle {
 
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh") {
-                        console.log("adding CHILD", child)
                         child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
                         this.vehicleBody.add(child)
                         resolve(child as ExtendedObject3D)
@@ -275,10 +279,9 @@ export class Vehicle implements IVehicle {
 
         this.vehicleSettings = defaultVehicleSettings
 
-        this.mass = this.vehicleConfig.mass
 
         this.useChaseCamera = false
-        this.chaseCameraSpeed = 0.25
+        this.chaseCameraSpeed = defaultVehicleSettings.chaseCameraSpeed
         this.chaseCameraTicks = 0
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)

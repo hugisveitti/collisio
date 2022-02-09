@@ -166,11 +166,7 @@ export const createTestVehicleInputs = (testScene: LowPolyTestScene, vehicleInpu
             testScene.vehicle.updateVehicleSettings({
                 ...testScene.vehicle.vehicleSettings,
                 useChaseCamera: !testScene.vehicle.useChaseCamera
-            },
-                {
-                    vehicleType:
-                        testScene.vehicle.vehicleType
-                })
+            }, testScene.vehicle.vehicleSetup)
             useChaseCamButton.innerHTML = testScene.vehicle.useChaseCamera ? "ON" : "OFF"
 
         })

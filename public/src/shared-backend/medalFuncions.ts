@@ -35,6 +35,12 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         bronze: 28.5,
         weight: 1.3
     },
+    "basic-track4": {
+        gold: 22.7,
+        silver: 25,
+        bronze: 28.5,
+        weight: 1.3
+    },
     "f1-track": {
         gold: 21,
         silver: 29,

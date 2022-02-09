@@ -28,7 +28,6 @@ export class CourseItemsLoader {
             if (!isNaN(+sDistance)) {
                 distance = +sDistance
             }
-
             const pLight = new PointLight(yellow2, 1, distance, 1)
             this.course.lights.push(pLight)
 
@@ -88,9 +87,6 @@ export class CourseItemsLoader {
 
                     })
 
-                    //    this.course.gameScene.misc.textureCube(textures)
-
-
                 }).catch(err => {
                     console.warn("Error loading water texture", err)
                 })
@@ -128,9 +124,19 @@ export class CourseItemsLoader {
         eObject.body.breakable = true
     }
 
+    // if a number is before the name then that is its mass 
+    getMassFromName(name: string): number | undefined {
+        let split = name.split("-")
+        return !isNaN(+split[0]) ? +split[0] : undefined
+    }
+
     handleCreatePhysicsObject(child: Object3D, key: string) {
         const eObject = (child as ExtendedObject3D)
-        this.course.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass: gameItems[key].mass, });
+
+        let mass = this.getMassFromName(child.name) ?? gameItems[key].mass
+
+
+        this.course.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass });
         eObject.castShadow = this.course.gameScene.useShadows && Boolean(gameItems[key].castsShadow);
         eObject.receiveShadow = this.course.gameScene.useShadows && Boolean(gameItems[key].receiveShadow);
         //  eObject.visible = !Boolean(gameItems[key].notVisible);

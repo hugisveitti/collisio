@@ -8,7 +8,10 @@ import {
   VehicleColorType,
   VehicleType,
 } from "../../shared-backend/shared-stuff";
-import { ItemProperties } from "../../shared-backend/vehicleItems";
+import {
+  ItemProperties,
+  possibleVehicleItemTypes,
+} from "../../shared-backend/vehicleItems";
 import { VehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import { IStore } from "../store";
@@ -96,8 +99,24 @@ const GarageContainer = (props: IGarageContainer) => {
 
           props.store.setVehiclesSetup(newVehicleSetup);
         }}
-        onUnequipVehicleItem={() => {
-          console.log("unequi on impl");
+        onUnequipVehicleItem={(item: ItemProperties) => {
+          const newVehicleSetup = { ...props.store.vehiclesSetup };
+
+          delete newVehicleSetup[
+            props.store.userSettings.vehicleSettings.vehicleType
+          ][item.type];
+
+          props.store.setVehiclesSetup(newVehicleSetup);
+        }}
+        onUnequipAllItems={() => {
+          const newVehicleSetup = { ...props.store.vehiclesSetup };
+
+          for (let item of possibleVehicleItemTypes) {
+            delete newVehicleSetup[
+              props.store.userSettings.vehicleSettings.vehicleType
+            ][item];
+          }
+          props.store.setVehiclesSetup(newVehicleSetup);
         }}
         saveSetup={() => {
           setIsSaving(true);

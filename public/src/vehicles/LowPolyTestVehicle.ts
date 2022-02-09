@@ -42,17 +42,12 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
             ])
             this.lineForward = new Line(geometry, material)
 
-
-
             this.lineRight = new Line(geometry.clone(), material)
             this.lineLeft = new Line(geometry.clone(), material)
             this.scene.scene.add(this.lineForward)
             this.scene.scene.add(this.lineLeft)
             this.scene.scene.add(this.lineRight)
-
-
         }
-
     }
 
     setLocalStorageVec(key: keyof IVehicleConfig, vec: SimpleVector) {
@@ -68,7 +63,6 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         const x = +window.localStorage.getItem(`${key}-${this.vehicleType}-x`)
         const y = +window.localStorage.getItem(`${key}-${this.vehicleType}-y`)
         const z = +window.localStorage.getItem(`${key}-${this.vehicleType}-z`)
-
 
         return { x, y, z } as SimpleVector
     }
@@ -116,7 +110,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
         const { x, y, z } = inertia
         this.setLocalStorageVec("inertia", inertia)
 
-        this.vehicle.getRigidBody().setMassProps(this.mass, new Ammo.btVector3(x, y, z))
+        this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, new Ammo.btVector3(x, y, z))
 
     }
 
@@ -165,8 +159,10 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     }
 
     updateMaxSpeed(speed?: number) {
+        console.log("this.vehicleConfig.maxSpeed.", this.vehicleConfig.maxSpeed)
+        speed = speed ?? this.vehicleConfig.maxSpeed
         this.setLocalStorage("maxSpeed", speed)
-
+        console.log("speed", speed)
         this.vehicleConfig.maxSpeed = speed
         this.vehicleConfig.maxSpeed = speed
         this.setVehicleConfigKey("maxSpeed", speed)
@@ -195,17 +191,11 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     intelligentDrive(log: boolean) {
         /** wait with this */
 
-
-
         const p = this.getPosition()
         const tm = this.vehicle.getWheelInfo(2).get_m_worldTransform();
 
         const r = this.vehicleBody.rotation //  new Euler().setFromQuaternion(q)
-
         const q = this.getRotation()
-
-
-
 
         const lineLenght = 20
         this.l1.set(p.x, p.y, p.z)

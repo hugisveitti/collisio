@@ -9,12 +9,12 @@ exports.maxEngineForce = 20000;
 exports.minEngineForce = 500;
 exports.defaultVehicleSettings = {
     steeringSensitivity: 0.2,
-    chaseCameraSpeed: .15,
-    useChaseCamera: false,
+    chaseCameraSpeed: .25,
+    useChaseCamera: true,
     vehicleType: shared_stuff_1.defaultVehicleType,
-    cameraZoom: 3,
+    cameraZoom: 4,
     vehicleColor: shared_stuff_1.vehicleColors[0].value,
-    noSteerNumber: 4,
+    noSteerNumber: 1,
     useDynamicFOV: true
 };
 exports.defaultUserSettings = {

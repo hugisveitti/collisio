@@ -38,11 +38,11 @@ export interface IVehicleSettings {
 export const defaultVehicleSettings = {
     steeringSensitivity: 0.2,
     chaseCameraSpeed: .25,
-    useChaseCamera: false,
+    useChaseCamera: true,
     vehicleType: defaultVehicleType,
-    cameraZoom: 3,
+    cameraZoom: 4,
     vehicleColor: vehicleColors[0].value,
-    noSteerNumber: 4,
+    noSteerNumber: 1,
     useDynamicFOV: true
 } as IVehicleSettings
 

@@ -1,8 +1,7 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Color, Euler, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
-import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
 import { getStaticPath } from "../utils/settings";
 import { degToRad, getSteerAngleFromBeta, numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos } from "./IVehicle";
@@ -99,7 +98,6 @@ export class LowPolyVehicle extends Vehicle {
 
         this.maxSpeedTime = 0
 
-        this.mass = this.vehicleConfig.mass
         this.engineForce = this.vehicleConfig.engineForce
         this.breakingForce = this.vehicleConfig.breakingForce
         this.is4x4 = this.vehicleConfig.is4x4
@@ -210,21 +208,16 @@ export class LowPolyVehicle extends Vehicle {
 
     createVehicle() {
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        console.log("vehicle boyd", this.vehicleBody)
         if (this.vehicleBody.type === "Mesh") {
 
             this.scene.add.existing(this.vehicleBody)
         } else {
-            console.log("group")
             this.scene.add.existing(this.vehicleBody)
-
-
         }
 
         this.changeCenterOfMass()
-        console.log("vehicle config", this.vehicleType, this.vehicleConfig)
 
-        this.scene.physics.add.existing(this.vehicleBody, { mass: this.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
+        this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
 
         this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
 
@@ -313,8 +306,8 @@ export class LowPolyVehicle extends Vehicle {
         /** setting inertia */
         const { x, y, z } = this.vehicleConfig.inertia
         this.vector.setValue(x, y, z)
-        this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
-        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.mass, this.vector)
+        this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, this.vector)
+        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.vehicleConfig.mass, this.vector)
 
         this.isReady = true
         /** don't start the vehicle until race */
@@ -548,25 +541,34 @@ export class LowPolyVehicle extends Vehicle {
         }
     };
 
+    getPositionInfrontOfBody() {
+        const p = this.getPosition()
+        const r = this.vehicleBody.rotation
+        return { x: p.x + (20 * Math.sin(r.y)), y: p.y + 10, z: p.z - (20 * Math.cos(r.y) * Math.sign(Math.cos(r.z))) }
+    }
+
     addCamera(camera: PerspectiveCamera) {
         if (!this.vehicleBody) return
         const c = this.vehicleBody.getObjectByName(camera.name)
         this.camera = camera
         if (!this.useChaseCamera && !c) {
-            camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
+            camera.position
+            // camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
             this.vehicleBody.add(camera)
         } else if (this.useChaseCamera) {
-            const p = this.getPosition()
-            const r = this.vehicleBody.rotation
 
-            this.camera.position.set(p.x - (20 * Math.sin(r.y)), p.y, p.z + (20 * Math.cos(r.y) * Math.sign(Math.cos(r.z))))
+            const { x, y, z } = this.getPositionInfrontOfBody()
+            this.camera.position.set(x, y, z)
+            this.camera.lookAt(this.vehicleBody.position.clone())
             //   this.camera.position.set(p.x + (10 * Math.sin(r.y)), p.y, p.z + (10 * Math.cos(r.y) * Math.sign(r.z)))
+            this.camera.updateProjectionMatrix()
         }
         if (!this.engineSound) {
             this.createCarSounds()
         }
     };
 
+    // delete this?
     removeCamera() {
         for (let i = 0; i < this.vehicleBody.children.length; i++) {
             if (this.vehicleBody.children[i].type === "PerspectiveCamera") {
@@ -596,13 +598,9 @@ export class LowPolyVehicle extends Vehicle {
 
         }
         else if (this.useChaseCamera) {
-            const rot = this.vehicleBody.rotation
             const pos = this.vehicleBody.position
-
             const q = this.vehicleBody.quaternion
-
             const alpha = 2 * Math.asin(q.y)
-
 
             this.cameraTarget.set(
                 pos.x + ((Math.sin(alpha) * this.staticCameraPos.z) * Math.sign(q.w)),
@@ -646,15 +644,6 @@ export class LowPolyVehicle extends Vehicle {
         }
     };
 
-    /**
-     * make items between camera and vehicle see through
-     * @param cameraPos position of camera relative to the world
-     */
-    seeVehicle(cameraPos: Vector3) {
-        if (this.delta < 33) {
-            this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
-        }
-    }
 
     checkIfSpinning(log?: boolean) {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
@@ -997,8 +986,9 @@ export class LowPolyVehicle extends Vehicle {
      * return the height vehicle needs to offset from its relative origin to reach to bottom of the wheels 
      */
     getVehicleYOffset() {
-        const frontHeight = this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength - this.vehicleConfig.wheelRadiusFront //+ this.vehicleConfig.centerOfMassOffset
-        const backHeight = this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength - this.vehicleConfig.wheelRadiusBack //+ this.vehicleConfig.centerOfMassOffset
+        const frontHeight = - this.vehicleConfig.wheelAxisHeightFront + this.vehicleConfig.suspensionRestLength + (this.vehicleConfig.wheelRadiusFront)
+        const backHeight = - this.vehicleConfig.wheelAxisHeightBack + this.vehicleConfig.suspensionRestLength + (this.vehicleConfig.wheelRadiusBack)
+
         const y = Math.max(backHeight, frontHeight) ?? 2
         return y
     }
@@ -1027,6 +1017,12 @@ export class LowPolyVehicle extends Vehicle {
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
             //    this.camera.updateProjectionMatrix()
+        } else {
+
+            const { x, y, z } = this.getPositionInfrontOfBody()
+            this.camera.position.set(x, y, z)
+            this.camera.lookAt(this.vehicleBody.position.clone())
+
         }
     };
 
@@ -1039,18 +1035,17 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     updateMaxSpeed() {
-        console.log("new max speed", this.vehicleConfig.maxSpeed)
+        console.log("updating maxspeed", this.vehicleConfig.maxSpeed)
         this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
     }
 
     updateMass(mass: number) {
-        this.mass = mass
         this.vehicleConfig.mass = mass
 
-        const inertia = this.vector.setValue(this.vehicleConfig.inertia.x, this.vehicleConfig.inertia.y, this.vehicleConfig.inertia.z)
+        this.vector.setValue(this.vehicleConfig.inertia.x, this.vehicleConfig.inertia.y, this.vehicleConfig.inertia.z)
         this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vector)
 
-        this.vehicle.getRigidBody().setMassProps(this.mass, this.vector)
+        this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, this.vector)
     }
 
     updateWheelsSuspension() {
@@ -1065,7 +1060,6 @@ export class LowPolyVehicle extends Vehicle {
 
         for (let i = 0; i < this.vehicle.getNumWheels(); i++) {
             const wheelInfo = this.vehicle.getWheelInfo(i)
-
             wheelInfo.set_m_suspensionRestLength1(this.vehicleConfig.suspensionRestLength)
             wheelInfo.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness)
 
@@ -1139,9 +1133,6 @@ export class LowPolyVehicle extends Vehicle {
     }
 }
 
-
-// window.addEventListener('mousemove', onMouseMove, false);
-
 const tiresConfig = [
     {
         name: "back-right-tire",
@@ -1186,10 +1177,6 @@ export const loadLowPolyVehicleModels = async (vehicleType: VehicleType, onlyLoa
                     if (child.name.includes("chassis")) {
                         let _chassis = (child as ExtendedObject3D);
                         chassis = _chassis
-                        // import to clone the material since the tires share material
-                        console.log("chassis", chassis)
-                        // const material = (chassis.material as MeshStandardMaterial).clone();
-                        // (chassis.material as MeshStandardMaterial) = material
 
                     } else if (child.name.includes("extra-car-stuff")) {
                         extraCarStuff = (child as ExtendedObject3D)

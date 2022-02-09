@@ -23,6 +23,8 @@ import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
 import { DriveRecorder, GhostDriver } from "./GhostDriver"
 import { createTestVehicleInputs } from "./testVehicleInputs"
+import { defaultVehicleSettings, IVehicleSettings } from "../classes/User"
+import { ItemProperties, vehicleItems } from "../shared-backend/vehicleItems"
 
 const vechicleFov = 60
 
@@ -438,6 +440,16 @@ export class LowPolyTestScene extends GameScene {
                     this.camera.position.set(0, 10, -25)
                     // this.loadFont()
                     this.vehicle.unpause()
+                    setTimeout(() => {
+                        console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
+                        this.vehicle.updateVehicleSetup({
+                            vehicleType: this.vehicleType,
+                            exhaust: vehicleItems[this.vehicleType]?.["exhaust1"] as ItemProperties,
+                            wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
+                            spoiler: vehicleItems[this.vehicleType]?.["spoiler1"] as ItemProperties,
+                        })
+
+                    }, 1000)
                     resolve()
                 })
             } else {
@@ -447,8 +459,6 @@ export class LowPolyTestScene extends GameScene {
 
                     this.vehicle.addModels(tires, chassis)
 
-
-
                     const useChaseCamera = window.localStorage.getItem("useChaseCamera")
                     this.vehicle.useChaseCamera = eval(useChaseCamera)
                     this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
@@ -457,6 +467,16 @@ export class LowPolyTestScene extends GameScene {
                     this.camera.position.set(0, 10, -25)
 
 
+                    setTimeout(() => {
+                        console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
+                        this.vehicle.updateVehicleSetup({
+                            vehicleType: this.vehicleType,
+                            exhaust: vehicleItems[this.vehicleType]?.["exhaust1"] as ItemProperties,
+                            wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
+                            spoiler: vehicleItems[this.vehicleType]?.["spoiler1"] as ItemProperties,
+                        })
+
+                    }, 1000)
 
                     const createVehicleInputButtons = () => {
                         createTestVehicleInputs(this, vehicleInputsContainer)

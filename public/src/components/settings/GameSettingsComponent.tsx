@@ -294,7 +294,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               <MySlider
                 label="Target FPS"
                 max={60}
-                min={20}
+                min={25} // becomes very unstable at 20 and less
                 step={5}
                 onChangeCommitted={(newVal) => {
                   updateGameSettings("targetFPS", newVal);

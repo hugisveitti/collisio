@@ -34,11 +34,7 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
                 currentVehicleType = vehicleType
                 currentChassis = chassis
                 if (vehicleColor) {
-                    console.log("chassis material", chassis.material);
                     changeVehicleBodyColor(currentChassis, [vehicleColor])
-
-                    //        (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
-
                 }
                 scene.add(chassis)
 
@@ -46,7 +42,7 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
                     scene.add(tire)
                     tire.castShadow = tire.receiveShadow = true
                 }
-                //scene.add(tires[0])
+
                 resolve()
             })
         }
@@ -71,9 +67,7 @@ let animateTimeout: NodeJS.Timeout
 export const changeChassisColor = (vehicleColor: VehicleColorType) => {
     // only color changed
     if (currentChassis) {
-        console.log("chassis material", currentChassis.material);
         changeVehicleBodyColor(currentChassis, [vehicleColor])
-        // (currentChassis.material as MeshStandardMaterial).color = new Color(vehicleColor)
     }
 }
 

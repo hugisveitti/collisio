@@ -50,6 +50,7 @@ interface IGarageComponent {
   onUnequipVehicleItem?: (item: ItemProperties) => void;
   saveSetup?: () => void;
   disableInputs?: boolean;
+  onUnequipAllItems?: () => void;
 }
 
 // to be saved on unmount
@@ -127,12 +128,7 @@ const GarageComponent = (props: IGarageComponent) => {
       setSelectedVehicleColor(value);
     } else if (key === "vehicleType") {
       setSelectedVehicleType(value);
-      console.log(
-        "changine vehicle setup",
-        value,
-        props.store.vehiclesSetup[value],
-        props.store.vehiclesSetup
-      );
+
       setSelectedVehicleSetup(props.store.vehiclesSetup[value]);
     }
 
@@ -151,6 +147,10 @@ const GarageComponent = (props: IGarageComponent) => {
     const newSetup: VehicleSetup = {
       ...selectedVehicleSetup,
     };
+    if (selectedVehicleSetup[item.type]?.id === item.id) {
+      handleUnequipItem(item);
+      return;
+    }
     newSetup[item.type] = item;
     _vehicleSetup = newSetup;
 
@@ -170,9 +170,9 @@ const GarageComponent = (props: IGarageComponent) => {
 
     setSelectedVehicleSetup(newSetup);
     setSelectedItem(undefined);
-    if (itemOwnership[selectedVehicleType][item.path]) {
-      props.onUnequipVehicleItem?.(item);
-    }
+    //  if (itemOwnership[selectedVehicleType][item.path]) {
+    props.onUnequipVehicleItem?.(item);
+    //   }
   };
 
   const handleBuyItem = (
@@ -270,7 +270,22 @@ const GarageComponent = (props: IGarageComponent) => {
     }
     if (selectedTab === 2) {
       if (!selectedItem) {
-        return <div className="background">No item selected</div>;
+        return (
+          <div className="background">
+            <BackdropButton
+              onClick={() => {
+                props.onUnequipAllItems?.();
+                setSelectedVehicleSetup({
+                  vehicleType: selectedVehicleType,
+                });
+                setSelectedItem(undefined);
+              }}
+              disabled={Object.keys(selectedVehicleSetup).length === 1}
+            >
+              Unequip all items
+            </BackdropButton>
+          </div>
+        );
       }
 
       return (

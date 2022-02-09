@@ -12,6 +12,7 @@ import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import MySlider from "../inputs/slider/MySlider";
+import AdSense from "../monitary/AdSense";
 import {
   aboutPagePath,
   buyPremiumPagePath,
@@ -44,7 +45,6 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
     return user ? (
       <>
         <TokenComponent user={user} store={props.store} />
-
         <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
           <i>{user.displayName}</i> logged in
         </BackdropButton>
@@ -157,6 +157,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <p>
             <i>Pre alpha</i>
           </p>
+        </Grid>
+        <Grid item xs={12}>
+          <AdSense slotId="7059022973" />
         </Grid>
       </Grid>
     </BackdropContainer>
