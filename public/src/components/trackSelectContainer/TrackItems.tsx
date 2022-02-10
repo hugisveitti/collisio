@@ -9,23 +9,23 @@ import f1TrackImage from "../../images/tracks/f1-track.PNG";
 import farmTrackImage from "../../images/tracks/farm.PNG";
 import ferrariTrackImage from "../../images/tracks/ferrari-top.png";
 import nurnImage from "../../images/tracks/german2.png";
-import basic1MinImage from "../../images/tracks/min/basic1.png";
-import basic2MinImage from "../../images/tracks/min/basic2.png";
-import basic3MinImage from "../../images/tracks/min/basic3.png";
-import basic4MinImage from "../../images/tracks/min/basic4.png";
-import f12TrackMinImage from "../../images/tracks/min/f1-track-2.PNG";
-import f1TrackMinImage from "../../images/tracks/min/f1-track.PNG";
-import farmTrackMinImage from "../../images/tracks/min/farm-track.PNG";
-import ferrariTrackMinImage from "../../images/tracks/min/ferrari-top.png";
-import nurnMinImage from "../../images/tracks/min/german2.png";
-import russiaTrackMinImage from "../../images/tracks/min/russia-top.png";
-import seaSideTrackMinImage from "../../images/tracks/min/sea-side-track.PNG";
-import spaTrackMinImage from "../../images/tracks/min/spa-top.png";
+import basic1MinImage from "../../images/tracks/min/min-basic1.png";
+import basic2MinImage from "../../images/tracks/min/min-basic2.png";
+import basic3MinImage from "../../images/tracks/min/min-basic3.png";
+import basic4MinImage from "../../images/tracks/min/min-basic4.png";
+import f12TrackMinImage from "../../images/tracks/min/min-f1-track-2.PNG";
+import f1TrackMinImage from "../../images/tracks/min/min-f1-track.PNG";
+import farmTrackMinImage from "../../images/tracks/min/min-farm-track.PNG";
+import ferrariTrackMinImage from "../../images/tracks/min/min-ferrari-top.png";
+import nurnMinImage from "../../images/tracks/min/min-german2.png";
+import russiaTrackMinImage from "../../images/tracks/min/min-russia-top.png";
+import seaSideTrackMinImage from "../../images/tracks/min/min-sea-side-track.PNG";
+import spaTrackMinImage from "../../images/tracks/min/min-spa-top.png";
 import russiaTrackImage from "../../images/tracks/russia-top.png";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
 import spaTrackImage from "../../images/tracks/spa-top.png";
 import simpleTagImage from "../../images/tracks/simple-tag-course.png";
-import simpleTagMinImage from "../../images/tracks/min/simple-tag-course.png";
+import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.png";
 
 import {
   getTrackInfos,

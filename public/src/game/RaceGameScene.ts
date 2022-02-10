@@ -160,7 +160,6 @@ export class RaceGameScene extends GameScene {
                 //      vehicle.setToGround()
                 vehicle.start()
                 vehicle.setCanDrive(false)
-
             }
         }, (.5) * 1000)
 
@@ -173,15 +172,15 @@ export class RaceGameScene extends GameScene {
                 this.playCountdownBeep()
             }
 
-            if (this.raceCountdownTime === 2) {
-                for (let i = 0; i < this.vehicles.length; i++) {
-                    this.vehicles[i].spinCameraAroundVehicle = false
-                    //  if (!this.vehicles[i].useChaseCamera) {
+            // if (this.raceCountdownTime === 2) {
+            //     for (let i = 0; i < this.vehicles.length; i++) {
+            //         this.vehicles[i].spinCameraAroundVehicle = false
+            //         //  if (!this.vehicles[i].useChaseCamera) {
 
-                    this.vehicles[i].addCamera(this.views[i].camera)
-                    // }
-                }
-            }
+            //         this.vehicles[i].addCamera(this.views[i].camera)
+            //         // }
+            //     }
+            // }
             // this.showImportantInfo(countdown + "")
             this.showViewsImportantInfo(this.raceCountdownTime + "")
 

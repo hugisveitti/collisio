@@ -1,9 +1,7 @@
-import {
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
 import React from "react";
 import "./radio.css";
 

@@ -1,6 +1,7 @@
 var path = require('path')
 
-var NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+var NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 // if issue with images go to "import-png.d.ts"
@@ -28,7 +29,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|PNG|gif|GIF)$/i,
-        loader: 'url-loader',
+        loader: 'file-loader',
         options: {
           name: 'images/[name].[ext]'
         },
@@ -54,7 +55,11 @@ module.exports = {
         }
       }
     ]
+
   },
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ],
   resolve: {
     extensions: [".webpack.js", '.tsx', '.ts', '.js']
   },

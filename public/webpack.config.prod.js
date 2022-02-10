@@ -1,12 +1,13 @@
-const path = require('path')
-const TerserPlugin = require('terser-webpack-plugin');
+var path = require('path')
+var TerserPlugin = require('terser-webpack-plugin');
+var CompressionPlugin = require("compression-webpack-plugin");
 
 
 
 
 // if issue with images go to "import-png.d.ts"
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     index: './src/index.tsx',
     admin: "./src/admin/admin.tsx",
@@ -25,7 +26,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|PNG|gif|GIF)$/i,
-        loader: 'url-loader',
+        loader: 'file-loader',
         options: {
           name: 'images/[name].[ext]'
         },
@@ -50,6 +51,7 @@ module.exports = {
       }
     ]
   },
+  plugins: [new CompressionPlugin()],
   resolve: {
     extensions: [".webpack.js", '.tsx', '.ts', '.js']
   },
