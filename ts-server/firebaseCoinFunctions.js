@@ -48,10 +48,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setDefaultOwnership = exports.buyItem = exports.updatePlayersTokens = void 0;
-var firebase_config_1 = require("./firebase-config");
 var medalFuncions_1 = require("../public/src/shared-backend/medalFuncions");
 var ownershipFunctions_1 = require("../public/src/shared-backend/ownershipFunctions");
+var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
 var vehicleItems_1 = require("../public/src/shared-backend/vehicleItems");
+var firebase_config_1 = require("./firebase-config");
 var tokenRefPath = "tokens";
 var ownershipPath = "ownership";
 var vehicleSetupPath = "vehicleSetup";
@@ -143,7 +144,7 @@ exports.updatePlayersTokens = updatePlayersTokens;
  */
 var buyItem = function (userId, item, vehicleType) {
     return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-        var tokenRef, tokensRes, tokenData, coins, itemCost, ownershipRef, owned, ownership, newTokens, batch, itemName;
+        var tokenRef, tokensRes, tokenData, coins, itemName, itemCost, ownershipRef, owned, ownership, newTokens, batch;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -158,6 +159,7 @@ var buyItem = function (userId, item, vehicleType) {
                         tokenData = __assign(__assign({}, medalFuncions_1.defaultTokenData), tokensRes.data());
                         coins = tokenData.coins;
                     }
+                    itemName = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].name : (0, shared_stuff_1.getItemName)(item);
                     itemCost = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].cost : ownershipFunctions_1.allCosts[item];
                     console.log("item cost", itemCost);
                     if (itemCost === undefined) {
@@ -170,7 +172,7 @@ var buyItem = function (userId, item, vehicleType) {
                     if (coins < itemCost) {
                         resolve({
                             completed: false,
-                            message: "Not enough money, you need " + (itemCost - coins) + " coins to buy this item"
+                            message: "Not enough money, you need " + Math.ceil(itemCost - coins) + " coins to buy this item"
                         });
                         return [2 /*return*/];
                     }
@@ -187,7 +189,7 @@ var buyItem = function (userId, item, vehicleType) {
                     if (ownership[item]) {
                         resolve({
                             completed: false,
-                            message: "Item " + item + " is already owned"
+                            message: "Item " + itemName + " is already owned"
                         });
                         return [2 /*return*/];
                     }
@@ -204,7 +206,7 @@ var buyItem = function (userId, item, vehicleType) {
                         batch.set(ownershipRef, ownership);
                     }
                     batch.update(tokenRef, newTokens);
-                    itemName = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].name : item;
+                    // think this needs to be changed for item
                     batch.commit().then(function () {
                         resolve({
                             completed: true,

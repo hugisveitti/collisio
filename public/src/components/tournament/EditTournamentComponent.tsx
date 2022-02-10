@@ -15,7 +15,7 @@ import { inputBackgroundColor } from "../../providers/theme";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import NumberSelect from "../inputs/NumberSelect";
-import TrackSelect from "../inputs/TrackSelect";
+import TrackSelect from "../trackSelectContainer/TrackSelect";
 import VehicleSelect from "../inputs/VehicleSelect";
 import MyTextField from "../textField/MyTextField";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";

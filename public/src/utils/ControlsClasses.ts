@@ -31,7 +31,8 @@ export const requestDeviceOrientation = (callback: (permissionGranted: boolean, 
                 callback(false, "Error occured when asking for permission")
             });
     } else {
-        callback(true, "Permission access not available, you might not need to worry.")
+        // maybe not granted hahah
+        callback(true, "Permission granted.")
         console.log("Device motion permission access method not available");
         setHasAskedDeviceOrientation(true)
     }

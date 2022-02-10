@@ -34,14 +34,16 @@ import CollabsibleCard from "../inputs/CollapsibleCard";
 import InfoButton from "../inputs/info-button/InfoButton";
 import NumberSelect from "../inputs/NumberSelect";
 import MySlider from "../inputs/slider/MySlider";
-import TrackSelect from "../inputs/TrackSelect";
+import TrackSelect from "../trackSelectContainer/TrackSelect";
 import MyRadio from "../radio/MyRadio";
 import MyTextField from "../textField/MyTextField";
+import { IStore } from "../store";
 
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;
   onChange: (gameSettings: IGameSettings) => void;
   inTestMode?: boolean;
+  store: IStore;
 }
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
@@ -116,9 +118,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
     ).then((filename) => {
       setGettingGhost(false);
 
-      console.log("got filename", filename);
       if (!filename) {
-        toast.warn("No ghost found.");
+        // tell people that no ghost was found?
+        //     toast.warn("No ghost found.");
         updateGameSettings("ghostFilename", "", _gameSettings);
       } else {
         _gameSettings.ghostFilename = filename;
@@ -193,6 +195,22 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
       </Grid>
       {renderGameTypeInputs()}
       <Grid item xs={12} lg={4}>
+        <p>
+          Selected track is{" "}
+          <strong
+            style={{
+              backgroundColor: "white",
+              color: "black",
+              padding: 3,
+              fontSize: 16,
+            }}
+          >
+            {" "}
+            {getTrackNameFromType(gameSettings.trackName)}
+          </strong>
+        </p>
+      </Grid>
+      <Grid item xs={12}>
         <TrackSelect
           disabled={disableInputs}
           gameType={gameSettings.gameType}
@@ -203,7 +221,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           onChange={(newTrackName) => {
             updateGameSettings("trackName", newTrackName);
           }}
-          showMapPreview
+          store={props.store}
+          buttonToOpen
         />
       </Grid>
       <Grid item xs={12}>

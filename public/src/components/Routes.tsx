@@ -39,6 +39,7 @@ import ShowRoomContainer from "./showRoom/ShowRoomContainer";
 import { IStore } from "./store";
 import CreateTournamentContainer from "./tournament/CreateTournamentContainer";
 import TournamentPageContainer from "./tournament/TournamentOverviewContainer";
+import TrackSelectContainer from "./trackSelectContainer/TrackSelectContainer";
 import TrophyRoomContainer from "./trophy/TrophyRoomContainer";
 import ConnectToWaitingRoomContainer from "./waitingRoom/ConnectToWaitingRoomContainer";
 import WaitingRoom from "./waitingRoom/WaitingRoomContainer";
@@ -69,6 +70,7 @@ export const mobileOnlyWaitingRoomPath = "/mobile-only-wait";
 export const privacyPolicyPage = "/privacy-policy";
 export const loginPagePath = "/login";
 export const garagePagePath = "/garage";
+export const trackPagePath = "/tracks";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -174,7 +176,6 @@ const Routes = () => {
       });
 
       getVehiclesSetup(user.uid).then((_vehiclesSetup) => {
-        console.log("got vehicle setup", _vehiclesSetup);
         setVehiclesSetup(_vehiclesSetup);
       });
     }
@@ -276,6 +277,10 @@ const Routes = () => {
         <Route
           path={garagePagePath}
           render={(props) => <GarageContainer {...props} store={store} />}
+        />
+        <Route
+          path={trackPagePath}
+          render={(props) => <TrackSelectContainer {...props} store={store} />}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

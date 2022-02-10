@@ -67,6 +67,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
                 gameSettings: newGameSettings,
               });
             }}
+            store={props.store}
           />
         </CardContent>
         <CardContent>

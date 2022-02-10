@@ -1,33 +1,34 @@
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import {
   buyItem,
   getOwnership,
-  getVehicleItemsOwnership,
+  getVehicleItemsOwnership
 } from "../../firebase/firestoreOwnershipFunctions";
 import { UserContext } from "../../providers/UserProvider";
 import { ITokenData } from "../../shared-backend/medalFuncions";
 import {
   allCosts,
   AllOwnableItems,
-  AllOwnership,
+  AllOwnership
 } from "../../shared-backend/ownershipFunctions";
 import {
   getColorNameFromType,
   VehicleColorType,
-  VehicleType,
+  VehicleType
 } from "../../shared-backend/shared-stuff";
 import {
   defaultItemsOwnership,
   ItemProperties,
   possibleVehicleMods,
-  VehicleSetup,
+  VehicleSetup
 } from "../../shared-backend/vehicleItems";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import { loginPagePath } from "../Routes";
 import { IStore } from "../store";
 import MyTabs from "../tabs/MyTabs";
 import TokenComponent from "../tokenComponent/TokenComponent";
@@ -129,7 +130,7 @@ const GarageComponent = (props: IGarageComponent) => {
     } else if (key === "vehicleType") {
       setSelectedVehicleType(value);
 
-      setSelectedVehicleSetup(props.store.vehiclesSetup[value]);
+      setSelectedVehicleSetup(props.store.vehiclesSetup?.[value]);
     }
 
     if (ownership && ownership[value]) {
@@ -237,7 +238,12 @@ const GarageComponent = (props: IGarageComponent) => {
 
   const renderOwnershipComponent = () => {
     if (!user) {
-      return <span>Only logged in players can buy items.</span>;
+      return (
+        <div>
+          <span>Only logged in players can buy items.</span>
+          <BackdropButton link={loginPagePath}>Login</BackdropButton>
+        </div>
+      );
     }
     if (!ownership) return <CircularProgress />;
     if (selectedTab === 0) {
@@ -379,6 +385,7 @@ const GarageComponent = (props: IGarageComponent) => {
               label: "Cars",
               renderElement: () => (
                 <GarageCars
+                  ownership={ownership}
                   selected={selectedVehicleType}
                   onChange={(v) => {
                     handleChangeVehicle(v, "vehicleType");
@@ -391,6 +398,7 @@ const GarageComponent = (props: IGarageComponent) => {
               label: "Colors",
               renderElement: () => (
                 <GarageColors
+                  ownership={ownership}
                   selected={selectedVehicleColor}
                   onChange={(color) => {
                     handleChangeVehicle(color, "vehicleColor");
@@ -403,6 +411,7 @@ const GarageComponent = (props: IGarageComponent) => {
               renderElement: () => {
                 return (
                   <GarageItems
+                    ownership={itemOwnership[selectedVehicleType]}
                     vehicleType={selectedVehicleType}
                     onChange={(item: ItemProperties) => {
                       handleChangeVehicleItem(item);

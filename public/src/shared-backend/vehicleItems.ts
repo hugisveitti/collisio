@@ -1,4 +1,3 @@
-import { Mode } from "@mui/icons-material"
 import { VehicleType } from "./shared-stuff"
 
 export type ItemType = "exhaust" | "spoiler" | "wheelGuards"

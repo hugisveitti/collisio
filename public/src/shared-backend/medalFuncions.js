@@ -8,7 +8,7 @@ var times = {
         bronze: 30,
         weight: 1
     },
-    "basic-track": {
+    "basic-track1": {
         gold: 17,
         silver: 20,
         bronze: 22,

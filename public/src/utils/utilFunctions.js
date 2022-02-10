@@ -223,7 +223,9 @@ var prefixSizes = {
     12: "T"
 };
 var getSizePrefix = function (num) {
-    var str = num.toString();
+    if (!num)
+        return "0";
+    var str = num.toFixed(0);
     var l = str.length;
     var prefix = "";
     var prefixSize = 0;
@@ -266,9 +268,8 @@ var getXPInfo = function (XP) {
         var lowerNumber = sumXP;
         var higherNumber = XPtoNextLevel[i + 1] + sumXP;
         if (lowerNumber <= XP && XP <= higherNumber) {
-            currentLevel = i + 1;
+            currentLevel = i + 2;
             pointsToNextLevel = higherNumber - XP;
-            console.log(pointsFinishedInThisLevel, lowerNumber, XP);
             pointsFinishedInThisLevel = XP - lowerNumber;
             ratioOfLevelFinished = pointsFinishedInThisLevel / (pointsFinishedInThisLevel + pointsToNextLevel);
             break;

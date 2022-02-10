@@ -24,8 +24,8 @@ import {
   loginPagePath,
   mobileOnlyWaitingRoomPath,
   privateProfilePagePath,
-  showRoomPagePath,
   tournamentPagePath,
+  trackPagePath,
 } from "../Routes";
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
@@ -44,7 +44,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   const renderUserInfo = () => {
     return user ? (
       <>
-        <TokenComponent user={user} store={props.store} />
+        <TokenComponent user={user} store={props.store} showInfo />
         <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
           <i>{user.displayName}</i> logged in
         </BackdropButton>
@@ -66,6 +66,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           </BackdropButton>
           <BackdropButton link={garagePagePath} width={btnWidth}>
             Garage
+          </BackdropButton>
+          <BackdropButton link={trackPagePath} width={btnWidth}>
+            Tracks
           </BackdropButton>
           <BackdropButton
             disabled={!user}

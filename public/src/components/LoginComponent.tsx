@@ -4,15 +4,12 @@ import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
 import LoginIcon from "@mui/icons-material/Login";
 import { Typography } from "@mui/material";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
-
 import React, {
   Dispatch,
   SetStateAction,
@@ -29,6 +26,8 @@ import {
 } from "../firebase/firebaseInit";
 import { basicColor } from "../providers/theme";
 import { UserContext } from "../providers/UserProvider";
+import BackdropButton from "./button/BackdropButton";
+import MyCard from "./card/MyCard";
 import { frontPagePath, privacyPolicyPage } from "./Routes";
 
 interface ILoginComponent {
@@ -63,43 +62,26 @@ const LoginComponent = (props: ILoginComponent) => {
 
   if (isSigningIn) {
     return (
-      <Card
-        variant="outlined"
-        className="card"
-        style={{
-          backgroundColor: "inherit",
-          width: "100%",
-          color: "#fff",
-        }}
-      >
+      <MyCard>
         <CardContent style={{ textAlign: "center" }}>
           <CircularProgress />
         </CardContent>
-      </Card>
+      </MyCard>
     );
   }
 
   return (
-    <Card
-      className="card"
-      variant="outlined"
-      style={{
-        background: "none",
-        width: "100%",
-        color: "#fff",
-      }}
-    >
+    <MyCard>
       <CardHeader
         title="Login"
         subheader="Login or signup with one of the methods below."
-        subheaderTypographyProps={{
-          color: "#eee",
-        }}
+        subheaderTypographyProps={
+          {
+            //   color: "#eee",
+          }
+        }
         action={
-          <IconButton
-            style={{ color: "white" }}
-            onClick={() => props.onClose()}
-          >
+          <IconButton style={{}} onClick={() => props.onClose()}>
             <CloseIcon />
           </IconButton>
         }
@@ -108,14 +90,11 @@ const LoginComponent = (props: ILoginComponent) => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
+            <BackdropButton
+              onClick={() => {
                 signInWithGoogle(props.signInWithPopup);
                 setIsSigningIn(true);
               }}
-              disableElevation
-              variant="contained"
               style={{
                 backgroundColor: "#de5246",
                 textAlign: "left",
@@ -124,7 +103,7 @@ const LoginComponent = (props: ILoginComponent) => {
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
-            </Button>
+            </BackdropButton>
           </Grid>
 
           {creatingAccountWithEmail ? (
@@ -161,9 +140,7 @@ const LoginComponent = (props: ILoginComponent) => {
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
-                <Button
-                  disableElevation
-                  variant="contained"
+                <BackdropButton
                   startIcon={<LoginIcon />}
                   onClick={() => {
                     if (password.length < 6) {
@@ -180,10 +157,10 @@ const LoginComponent = (props: ILoginComponent) => {
                   }}
                 >
                   Login
-                </Button>
+                </BackdropButton>
               </Grid>
               <Grid item xs={12} sm={12}>
-                <Button
+                <BackdropButton
                   onClick={() => {
                     if (password.length < 6) {
                       toast.error("The password must be atleast 6 characters.");
@@ -196,20 +173,16 @@ const LoginComponent = (props: ILoginComponent) => {
                     setIsSigningIn(true);
                     createAccountWithEmail(email, password, displayName);
                   }}
-                  variant="outlined"
-                  disableElevation
                   startIcon={<ControlPointIcon />}
                 >
                   Sign up
-                </Button>
+                </BackdropButton>
               </Grid>
             </React.Fragment>
           ) : (
             <Grid item xs={12}>
-              <Button
+              <BackdropButton
                 onClick={() => setCreatingAccountWithEmail(true)}
-                variant="contained"
-                disableElevation
                 startIcon={<EmailIcon />}
                 style={{
                   backgroundColor: basicColor,
@@ -219,7 +192,7 @@ const LoginComponent = (props: ILoginComponent) => {
                 }}
               >
                 Sign up/in with email
-              </Button>
+              </BackdropButton>
             </Grid>
           )}
           <Grid item xs>
@@ -230,7 +203,7 @@ const LoginComponent = (props: ILoginComponent) => {
           </Grid>
         </Grid>
       </CardContent>
-    </Card>
+    </MyCard>
   );
 };
 

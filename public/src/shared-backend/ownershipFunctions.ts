@@ -50,7 +50,6 @@ const defaultOwnedTracks: TrackName[] = [
     "farm-track",
     "nurn-track",
     "f1-track",
-    "f1-track-2",
     "sea-side-track",
     "simple-tag-course"
 ]
@@ -72,14 +71,14 @@ export const getDefaultTrackOwnership = () => {
 
 const trackCosts: { [trackName in TrackName]: number } = {
     "farm-track": 0,
-    "basic-track": 0,
+    "basic-track1": 0,
     "basic-track2": 100,
     "basic-track3": 5000,
     "basic-track4": 10000,
     "f1-track": 0,
     "sea-side-track": 0,
-    "f1-track-2": 2000,
-    "russia-track": 500,
+    "f1-track-2": 500,
+    "russia-track": 10000,
     "ferrari-track": 1000,
     "spa-track": 10000,
     "nurn-track": 0,

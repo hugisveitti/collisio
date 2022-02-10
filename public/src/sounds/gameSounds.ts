@@ -72,6 +72,9 @@ export const addMusic = (volume: number, camera: PerspectiveCamera, filename: st
 }
 
 export const setMusicVolume = (volume: number) => {
+    if (!isFinite(volume)) {
+        volume = 0
+    }
     music?.setVolume(volume)
 }
 

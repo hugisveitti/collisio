@@ -20,7 +20,7 @@ import BackdropContainer from "../backdrop/BackdropContainer";
 import NumberSelect from "../inputs/NumberSelect";
 import "../inputs/select.css";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import TrackSelect from "../inputs/TrackSelect";
+import TrackSelect from "../trackSelectContainer/TrackSelect";
 import HighscoreTable from "./HighscoreTable";
 
 interface IHighscorePage {}
@@ -154,6 +154,7 @@ const HighscorePage = (props: IHighscorePage) => {
                 gameType="race"
                 value={trackKey as TrackName}
                 showMapPreview={false}
+                simpleSelect
               />
             </Grid>
 

@@ -141,7 +141,7 @@ var router = function (app) {
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
-            console.log("ERROR");
+            console.log("Not valid host");
             res.status(500).send("ERROR");
         }
     };
@@ -164,6 +164,10 @@ var router = function (app) {
     app.get("/user/:id", sendIndexHTML);
     app.get("/show-room", sendIndexHTML);
     app.get("/garage", sendIndexHTML);
+    app.get("/tracks", sendIndexHTML);
+    app.get("/login", sendIndexHTML);
+    app.get("/privacy-policy", sendIndexHTML);
+    app.get("/mobile-only-wait", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {
         res.sendFile(path.join(__dirname, adminHTMLPath));
@@ -176,14 +180,14 @@ var router = function (app) {
     });
     app.get("*", function (req, res) {
         var host = req.get("host");
-        console.log("Request to star");
+        // console.log("Request to star")
         printRequestInfo(req);
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
-            console.log("ERROR");
+            // console.log("ERROR")
             res.send("ERROR");
         }
     });

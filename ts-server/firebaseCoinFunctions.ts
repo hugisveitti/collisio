@@ -1,8 +1,8 @@
-import { admin, adminFirestore } from "./firebase-config"
 import { defaultTokenData, getMedalAndTokens, ITokenData } from "../public/src/shared-backend/medalFuncions"
-import { TrackName, VehicleType } from "../public/src/shared-backend/shared-stuff"
-import { allCosts, AllOwnableItems, AllOwnership, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
+import { allCosts, AllOwnableItems, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
+import { getItemName, TrackName, VehicleType } from "../public/src/shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, vehicleItems } from "../public/src/shared-backend/vehicleItems"
+import { adminFirestore } from "./firebase-config"
 
 const tokenRefPath = "tokens"
 const ownershipPath = "ownership"
@@ -113,18 +113,6 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
     }
 }
 
-// setTimeout(() => {
-//     updatePlayersTokens({
-//         playerId: "test2",
-//         trackName: "farm-track",
-//         numberOfLaps: 2,
-//         totalTime: 100,
-//         lapTimes: [50, 50],
-//         isAuthenticated: true,
-//         roomTicks: 100,
-//         gameTicks: 100,
-//     })
-// }, 500)
 
 interface BuyCallback {
     completed: boolean
@@ -158,6 +146,8 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         }
 
 
+        // TODO , item name 
+        let itemName = vehicleType ? vehicleItems[vehicleType][item].name : getItemName(item)
         const itemCost = vehicleType ? vehicleItems[vehicleType][item].cost : allCosts[item]
 
         console.log("item cost", itemCost)
@@ -172,7 +162,7 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         if (coins < itemCost) {
             resolve({
                 completed: false,
-                message: `Not enough money, you need ${itemCost - coins} coins to buy this item`
+                message: `Not enough money, you need ${Math.ceil(itemCost - coins)} coins to buy this item`
             })
             return
         }
@@ -193,7 +183,7 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         if (ownership[item]) {
             resolve({
                 completed: false,
-                message: `Item ${item} is already owned`
+                message: `Item ${itemName} is already owned`
             })
             return
         }
@@ -219,7 +209,7 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         batch.update(tokenRef, newTokens)
 
         // think this needs to be changed for item
-        let itemName = vehicleType ? vehicleItems[vehicleType][item].name : item
+
         batch.commit().then(() => {
             resolve({
                 completed: true,

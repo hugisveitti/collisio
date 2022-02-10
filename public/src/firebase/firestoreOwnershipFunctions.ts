@@ -13,7 +13,6 @@ const itemOwnershipPath = "itemOwnership"
 
 
 const setDefaultOwnership = (userId: string) => {
-    console.log("set default ownershipt", userId)
     const options: RequestInit = {
         method: "POST",
         mode: "same-origin",
@@ -37,14 +36,10 @@ const setDefaultOwnership = (userId: string) => {
 export const getOwnership = (userId: string): Promise<AllOwnership> => {
     return new Promise<AllOwnership>(async (resolve, reject) => {
         let ownership: AllOwnership = getDefaultOwnership()
-        console.log("user id own", userId)
         const ref = doc(firestore, ownershipPath, userId)
         try {
             const res = await getDoc(ref)
             if (res.exists()) {
-                console.log("Res of ownership", res.data())
-
-
                 ownership = {
                     ...ownership,
                     ...res.data()
@@ -64,7 +59,6 @@ export const getOwnership = (userId: string): Promise<AllOwnership> => {
 
 export const getVehicleItemsOwnership = (userId: string, vehicleType: VehicleType): Promise<ItemOwnership> => {
     return new Promise<ItemOwnership>(async (resolve, reject) => {
-        console.log("vehicle type", vehicleType)
         let itemsOwnership = getDefaultItemsOwnership(vehicleType)
         const ref = doc(firestore, ownershipPath, userId, itemOwnershipPath, vehicleType)
         try {
@@ -91,7 +85,6 @@ export const getVehiclesSetup = (userId: string): Promise<VehiclesSetup> => {
         try {
             const res = await getDoc(ref)
             if (res.exists()) {
-                console.log("Res of vehicle setup", res.data())
                 setup = {
                     ...setup,
                     ...res.data()
@@ -107,10 +100,8 @@ export const getVehiclesSetup = (userId: string): Promise<VehiclesSetup> => {
 
 export const setDBVehiclesSetup = (userId: string, vehiclesSetup: VehiclesSetup): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
-        console.log("setting vehicle setup", vehiclesSetup)
         const ref = doc(firestore, vehicleSetupPath, userId)
         setDoc(ref, vehiclesSetup).then(() => {
-            console.log("set db vehicles setup", vehiclesSetup)
             resolve()
         }).catch((err) => {
             console.warn("Error setting vehicle setup", err)

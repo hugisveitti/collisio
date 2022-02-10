@@ -6,8 +6,9 @@
  */
 
 import { IUserSettings } from "../classes/User"
+
 import { getMedal as _getMedal } from "./medalFuncions"
-import { ItemProperties, VehicleSetup } from "./vehicleItems"
+import { VehicleSetup } from "./vehicleItems"
 
 /** trackName.gltf */
 export type TrackName =
@@ -17,7 +18,7 @@ export type TrackName =
     | "f1-track-2"
     | "russia-track"
     | "ferrari-track"
-    | "basic-track"
+    | "basic-track1"
     | "basic-track2"
     | "basic-track3"
     | "basic-track4"
@@ -33,6 +34,15 @@ export type TrackName =
     | "simple-tag-course"
     | "test-course"
 
+export type TrackCategory = "basic" | "long" | "short"
+export const possibleTrackCategories: { category: TrackCategory, name: string }[] = [
+    { category: "basic", name: "Basic" },
+    { category: "long", name: "Long" },
+    { category: "short", name: "Short" },
+
+]
+
+
 export type TimeOfDay = "day" | "evening"
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
@@ -41,69 +51,80 @@ export interface ITrackInfo {
     name: string
     type: TrackName
     gameType: GameType
+    category: TrackCategory
     timeOfDay?: TimeOfDay
     hemisphereRadius?: number
 }
 
 export const allTrackNames: ITrackInfo[] = [
     {
-        name: "Test", type: "test-course", gameType: "race"
+        name: "Test", type: "test-course", gameType: "race", category: "basic"
     },
     {
-        name: "Farm track", type: "farm-track", gameType: "race"
+        name: "Farm track", type: "farm-track", gameType: "race", category: "short"
     },
     {
-        name: "Basic track", type: "basic-track", gameType: "race"
+        name: "Basic track", type: "basic-track1", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 2", type: "basic-track2", gameType: "race"
+        name: "Basic track 2", type: "basic-track2", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 3", type: "basic-track3", gameType: "race"
+        name: "Basic track 3", type: "basic-track3", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 4", type: "basic-track4", gameType: "race"
+        name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic"
     },
     {
-        name: "German track", type: "nurn-track", gameType: "race"
+        name: "German track", type: "nurn-track", gameType: "race", category: "short"
     },
     {
-        name: "F1 track", type: "f1-track", gameType: "race"
+        name: "F1 track", type: "f1-track", gameType: "race", category: "short"
     },
     {
-        name: "F1 track-2", type: "f1-track-2", gameType: "race"
+        name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short"
     },
     {
-        name: "Beach track", type: "sea-side-track", gameType: "race"
+        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long"
     },
     {
-        name: "Tag course", type: "simple-tag-course", gameType: "tag"
+        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short"
     },
     {
-        name: "Town track", type: "town-track", gameType: "race"
+        name: "Town track", type: "town-track", gameType: "race", category: "long"
     },
     {
-        name: "Monaco track", type: "monaco-track", gameType: "race"
+        name: "Monaco track", type: "monaco-track", gameType: "race", category: "long"
     },
     {
-        name: "Mountain track", type: "russia-track", gameType: "race"
+        name: "Mountain track", type: "russia-track", gameType: "race", category: "short"
     },
     {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long"
     },
     {
-        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
+        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long"
     },
     {
-        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000, category: "long"
     },
     {
-        name: "Small track", type: "small-track", gameType: "race"
+        name: "Small track", type: "small-track", gameType: "race", category: "short"
     },
 ]
+
+export const getTrackInfos = (trackNames: TrackName[]) => {
+    return trackNames.map(t => {
+        for (let at of allTrackNames) {
+            if (at.type === t) {
+                return at
+            }
+        }
+    })
+}
 
 export type VehicleType =
     "normal"
@@ -187,6 +208,26 @@ export const getColorNameFromType = (colorType: VehicleColorType) => {
     return "Unknown color"
 }
 
+
+export const getItemName = (type: string) => {
+    for (let v of vehicleColors) {
+        if (v.value === type) {
+            return v.name
+        }
+    }
+    for (let v of allVehicleTypes) {
+        if (v.type === type) {
+            return v.name
+        }
+    }
+
+    for (let v of allTrackNames) {
+        if (v.type === type) {
+            return v.name
+        }
+    }
+    return type
+}
 
 
 export interface IPlayerConnectedData {

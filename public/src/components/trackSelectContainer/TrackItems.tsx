@@ -1,0 +1,189 @@
+import Grid from "@mui/material/Grid";
+import React from "react";
+import basic1Image from "../../images/tracks/basic1.png";
+import basic2Image from "../../images/tracks/basic2.png";
+import basic3Image from "../../images/tracks/basic3.png";
+import basic4Image from "../../images/tracks/basic4.png";
+import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
+import f1TrackImage from "../../images/tracks/f1-track.PNG";
+import farmTrackImage from "../../images/tracks/farm.PNG";
+import ferrariTrackImage from "../../images/tracks/ferrari-top.png";
+import nurnImage from "../../images/tracks/german2.png";
+import basic1MinImage from "../../images/tracks/min/basic1.png";
+import basic2MinImage from "../../images/tracks/min/basic2.png";
+import basic3MinImage from "../../images/tracks/min/basic3.png";
+import basic4MinImage from "../../images/tracks/min/basic4.png";
+import f12TrackMinImage from "../../images/tracks/min/f1-track-2.PNG";
+import f1TrackMinImage from "../../images/tracks/min/f1-track.PNG";
+import farmTrackMinImage from "../../images/tracks/min/farm-track.PNG";
+import ferrariTrackMinImage from "../../images/tracks/min/ferrari-top.png";
+import nurnMinImage from "../../images/tracks/min/german2.png";
+import russiaTrackMinImage from "../../images/tracks/min/russia-top.png";
+import seaSideTrackMinImage from "../../images/tracks/min/sea-side-track.PNG";
+import spaTrackMinImage from "../../images/tracks/min/spa-top.png";
+import russiaTrackImage from "../../images/tracks/russia-top.png";
+import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
+import spaTrackImage from "../../images/tracks/spa-top.png";
+import simpleTagImage from "../../images/tracks/simple-tag-course.png";
+import simpleTagMinImage from "../../images/tracks/min/simple-tag-course.png";
+
+import {
+  getTrackInfos,
+  possibleTrackCategories,
+  TrackCategory,
+  TrackName,
+} from "../../shared-backend/shared-stuff";
+import GarageItem from "../garage/GarageItem";
+import MyTabs from "../tabs/MyTabs";
+
+interface ITrackMinImagePair {
+  minImage: any;
+  largeImage: any;
+  trackName: TrackName;
+}
+
+const trackImagePair: ITrackMinImagePair[] = [
+  {
+    trackName: "f1-track",
+    minImage: f1TrackMinImage,
+    largeImage: f1TrackImage,
+  },
+  {
+    trackName: "f1-track-2",
+    minImage: f12TrackMinImage,
+    largeImage: f12TrackImage,
+  },
+  {
+    trackName: "farm-track",
+    minImage: farmTrackMinImage,
+    largeImage: farmTrackImage,
+  },
+  {
+    trackName: "sea-side-track",
+    minImage: seaSideTrackMinImage,
+    largeImage: seaSideTrackImage,
+  },
+  {
+    trackName: "russia-track",
+    minImage: russiaTrackMinImage,
+    largeImage: russiaTrackImage,
+  },
+  {
+    trackName: "ferrari-track",
+    minImage: ferrariTrackMinImage,
+    largeImage: ferrariTrackImage,
+  },
+  {
+    trackName: "spa-track",
+    minImage: spaTrackMinImage,
+    largeImage: spaTrackImage,
+  },
+  { trackName: "nurn-track", minImage: nurnMinImage, largeImage: nurnImage },
+  {
+    trackName: "basic-track1",
+    minImage: basic1MinImage,
+    largeImage: basic1Image,
+  },
+  {
+    trackName: "basic-track2",
+    minImage: basic2MinImage,
+    largeImage: basic2Image,
+  },
+  {
+    trackName: "basic-track3",
+    minImage: basic3MinImage,
+    largeImage: basic3Image,
+  },
+  {
+    trackName: "basic-track4",
+    minImage: basic4MinImage,
+    largeImage: basic4Image,
+  },
+  {
+    trackName: "simple-tag-course",
+    minImage: simpleTagMinImage,
+    largeImage: simpleTagImage,
+  },
+];
+
+export const getTrackLargeImage = (trackName: TrackName) => {
+  for (let tip of trackImagePair) {
+    if (tip.trackName === trackName) {
+      return tip.largeImage;
+    }
+  }
+  return undefined;
+};
+
+const getTrackMinImage = (trackName: TrackName) => {
+  for (let tip of trackImagePair) {
+    if (tip.trackName === trackName) {
+      return tip.minImage;
+    }
+  }
+  return undefined;
+};
+
+interface ITrackItems {
+  // all active tracks?
+  tracks: TrackName[];
+  onChange: (newTrack: TrackName) => void;
+  selectedTrack: TrackName;
+  ownership: { [key: string]: boolean };
+}
+
+const TrackItems = (props: ITrackItems) => {
+  const trackInfos = getTrackInfos(props.tracks);
+  const renderTracks = (category: TrackCategory) => {
+    const filteredTracks = trackInfos.filter(
+      (track) => track.category === category
+    );
+    return (
+      <Grid container spacing={1} style={{ marginTop: 10 }}>
+        {filteredTracks.map((track) => {
+          const imgPath = getTrackMinImage(track.type);
+          return (
+            <Grid key={track.type} item xs={12} md={6} lg={4}>
+              <GarageItem
+                owned={props.ownership?.[track.type]}
+                selected={track.type === props.selectedTrack}
+                label={track.name}
+                onClick={() => props.onChange(track.type)}
+                thumbnail={
+                  <>
+                    {imgPath ? (
+                      <img
+                        src={imgPath}
+                        style={{
+                          width: "auto",
+                          maxHeight: 120,
+                          margin: "auto",
+                          display: "block",
+                        }}
+                      />
+                    ) : (
+                      <span>No thumbnail</span>
+                    )}
+                  </>
+                }
+              />
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
+  };
+  return (
+    <MyTabs
+      defaultTab={0}
+      tabs={possibleTrackCategories.map((item) => {
+        return {
+          label: item.name,
+          renderElement: () => renderTracks(item.category),
+        };
+      })}
+    />
+  );
+};
+
+export default TrackItems;

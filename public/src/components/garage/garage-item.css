@@ -8,3 +8,8 @@
   vertical-align: baseline;
   transition: 0.2s;
 }
+
+.garage__item--not-owned {
+  filter: opacity(0.5);
+  border-color: gray;
+}

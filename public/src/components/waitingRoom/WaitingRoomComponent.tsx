@@ -97,6 +97,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               backgroundColor: green4,
               color: "white",
               position: onMobile ? "relative" : "absolute",
+              fontSize: 64,
             }}
           >
             {roomId}

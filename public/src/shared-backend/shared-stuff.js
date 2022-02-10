@@ -6,67 +6,83 @@
  * So this limits the .js to one file.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = exports.mts_quit_game = exports.std_quit_game = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = exports.getColorNameFromType = exports.vehicleColors = exports.defaultVehicleType = exports.allVehicleTypes = exports.allTrackNames = void 0;
-exports.MTS_SENDINTERVAL_MS = exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = void 0;
+exports.mts_quit_game = exports.std_quit_game = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = exports.getItemName = exports.getColorNameFromType = exports.vehicleColors = exports.defaultVehicleType = exports.allVehicleTypes = exports.getTrackInfos = exports.allTrackNames = exports.possibleTrackCategories = void 0;
+exports.MTS_SENDINTERVAL_MS = exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = void 0;
+exports.possibleTrackCategories = [
+    { category: "basic", name: "Basic" },
+    { category: "long", name: "Long" },
+    { category: "short", name: "Short" },
+];
 exports.allTrackNames = [
     {
-        name: "Test", type: "test-course", gameType: "race"
+        name: "Test", type: "test-course", gameType: "race", category: "basic"
     },
     {
-        name: "Farm track", type: "farm-track", gameType: "race"
+        name: "Farm track", type: "farm-track", gameType: "race", category: "short"
     },
     {
-        name: "Basic track", type: "basic-track", gameType: "race"
+        name: "Basic track", type: "basic-track1", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 2", type: "basic-track2", gameType: "race"
+        name: "Basic track 2", type: "basic-track2", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 3", type: "basic-track3", gameType: "race"
+        name: "Basic track 3", type: "basic-track3", gameType: "race", category: "basic"
     },
     {
-        name: "Basic track 4", type: "basic-track4", gameType: "race"
+        name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic"
     },
     {
-        name: "German track", type: "nurn-track", gameType: "race"
+        name: "German track", type: "nurn-track", gameType: "race", category: "short"
     },
     {
-        name: "F1 track", type: "f1-track", gameType: "race"
+        name: "F1 track", type: "f1-track", gameType: "race", category: "short"
     },
     {
-        name: "F1 track-2", type: "f1-track-2", gameType: "race"
+        name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short"
     },
     {
-        name: "Beach track", type: "sea-side-track", gameType: "race"
+        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long"
     },
     {
-        name: "Tag course", type: "simple-tag-course", gameType: "tag"
+        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short"
     },
     {
-        name: "Town track", type: "town-track", gameType: "race"
+        name: "Town track", type: "town-track", gameType: "race", category: "long"
     },
     {
-        name: "Monaco track", type: "monaco-track", gameType: "race"
+        name: "Monaco track", type: "monaco-track", gameType: "race", category: "long"
     },
     {
-        name: "Mountain track", type: "russia-track", gameType: "race"
+        name: "Mountain track", type: "russia-track", gameType: "race", category: "short"
     },
     {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening"
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long"
     },
     {
-        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day"
+        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long"
     },
     {
-        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000, category: "long"
     },
     {
-        name: "Small track", type: "small-track", gameType: "race"
+        name: "Small track", type: "small-track", gameType: "race", category: "short"
     },
 ];
+var getTrackInfos = function (trackNames) {
+    return trackNames.map(function (t) {
+        for (var _i = 0, allTrackNames_1 = exports.allTrackNames; _i < allTrackNames_1.length; _i++) {
+            var at = allTrackNames_1[_i];
+            if (at.type === t) {
+                return at;
+            }
+        }
+    });
+};
+exports.getTrackInfos = getTrackInfos;
 exports.allVehicleTypes = [
     { name: "MacNormie", type: "normal2" },
     { name: "Old Normie", type: "normal" },
@@ -115,6 +131,28 @@ var getColorNameFromType = function (colorType) {
     return "Unknown color";
 };
 exports.getColorNameFromType = getColorNameFromType;
+var getItemName = function (type) {
+    for (var _i = 0, vehicleColors_2 = exports.vehicleColors; _i < vehicleColors_2.length; _i++) {
+        var v = vehicleColors_2[_i];
+        if (v.value === type) {
+            return v.name;
+        }
+    }
+    for (var _a = 0, allVehicleTypes_1 = exports.allVehicleTypes; _a < allVehicleTypes_1.length; _a++) {
+        var v = allVehicleTypes_1[_a];
+        if (v.type === type) {
+            return v.name;
+        }
+    }
+    for (var _b = 0, allTrackNames_2 = exports.allTrackNames; _b < allTrackNames_2.length; _b++) {
+        var v = allTrackNames_2[_b];
+        if (v.type === type) {
+            return v.name;
+        }
+    }
+    return type;
+};
+exports.getItemName = getItemName;
 var MobileControls = /** @class */ (function () {
     function MobileControls(data) {
         this.beta = 0;

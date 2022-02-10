@@ -142,18 +142,6 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
             />
           )}
         </Grid>
-        {/* <Grid item xs={12} lg={6}>
-          <AnySelect
-            selectedValue={getVehicleColorOption(
-              props.store.userSettings.vehicleSettings.vehicleColor
-            )}
-            options={vehicleColors}
-            title="Vehicle color"
-            onChange={(selected) => {
-              updateVehicleSettings("vehicleColor", selected);
-            }}
-          />
-        </Grid> */}
         <Grid item xs={6} sm={4}>
           {props.resetOrientation && (
             <BackdropButton onClick={props.resetOrientation}>

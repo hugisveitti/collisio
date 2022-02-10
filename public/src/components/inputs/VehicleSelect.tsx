@@ -16,6 +16,7 @@ import { itemInArray } from "../../utils/utilFunctions";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import GarageComponent from "../garage/GarageComponent";
+import { loginPagePath } from "../Routes";
 import { IStore } from "../store";
 import "./select.css";
 
@@ -73,9 +74,12 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
   return (
     <React.Fragment>
       {!props.user && (
-        <span className="select__label" style={{ color, fontSize: 16 }}>
-          <i>Vehicle selection is only available for logged in users.</i>
-        </span>
+        <div>
+          <BackdropButton link={loginPagePath}>Login</BackdropButton>
+          <span className="select__label" style={{ color, fontSize: 16 }}>
+            <i>Vehicle selection is only available for logged in users.</i>
+          </span>
+        </div>
       )}
       <span className="select__label" style={{ color, fontSize: 16 }}>
         Selected vehicle is{" "}

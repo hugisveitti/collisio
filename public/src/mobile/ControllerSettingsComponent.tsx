@@ -79,6 +79,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               onChange={(newGameSettings) => {
                 props.store.setGameSettings(newGameSettings);
               }}
+              store={props.store}
             />
           </Grid>
         </>

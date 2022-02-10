@@ -97,7 +97,7 @@ export const activeTrackNames: TrackName[] = [
     "farmers-little-helper-map",
     "spa-track",
     "small-track",
-    "basic-track",
+    "basic-track1",
     "basic-track2",
     "basic-track3",
     "basic-track4",
@@ -112,6 +112,17 @@ export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name =>
     }
     return false
 })
+
+export const activeTagTrackNames: TrackName[] = activeTrackNames.filter(name => {
+    for (let i = 0; i < allTrackNames.length; i++) {
+        if (allTrackNames[i].type === name) {
+            return allTrackNames[i].gameType === "tag"
+        }
+    }
+    return false
+})
+
+
 export const activeGameTypes: GameType[] = ["race", "tag"]
 
 const getNonActiveTrackNames = (): TrackName[] => {

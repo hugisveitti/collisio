@@ -1,4 +1,3 @@
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
 import { VehicleType } from "../../shared-backend/shared-stuff";
@@ -19,6 +18,7 @@ interface IGarageItems {
   vehicleType: VehicleType;
   onChange: (newItem: ItemProperties) => void;
   vehicleSetup: VehicleSetup;
+  ownership: { [key: string]: boolean };
 }
 
 const GarageItems = (props: IGarageItems) => {
@@ -39,12 +39,13 @@ const GarageItems = (props: IGarageItems) => {
     });
 
     return (
-      <Grid container spacing={3} style={{ marginTop: 10 }}>
+      <Grid container spacing={1} style={{ marginTop: 10 }}>
         {filteredKeys.map((key) => {
           const item = items[key];
           return (
             <Grid key={key} item xs={12} md={6} lg={4}>
               <GarageItem
+                owned={props.ownership?.[item.path]}
                 label={`${item.name} the ${item.type}`}
                 onClick={() => {
                   props.onChange(item);

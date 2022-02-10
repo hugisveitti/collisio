@@ -1,15 +1,15 @@
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
-  requestDeviceOrientation,
   getHasAskedDeviceOrientation,
+  requestDeviceOrientation,
 } from "../../utils/ControlsClasses";
+import BackdropButton from "../button/BackdropButton";
+import MyCard from "../card/MyCard";
 import BasicModal from "../modal/BasicModal";
 
 interface IDeviceOrientationPermissionComponent {
@@ -35,7 +35,7 @@ const DeviceOrientationPermissionComponent = (
         setModalOpen(false);
       }}
     >
-      <Card>
+      <MyCard>
         <CardHeader subheader="Orientation permission" />
         <CardContent>
           <Grid container spacing={3}>
@@ -47,8 +47,7 @@ const DeviceOrientationPermissionComponent = (
               </Typography>
             </Grid>
             <Grid item xs={12} style={{ textAlign: "center" }}>
-              <Button
-                variant="contained"
+              <BackdropButton
                 onClick={() => {
                   requestDeviceOrientation(
                     (permissionGranted: boolean, message: string) => {
@@ -66,11 +65,11 @@ const DeviceOrientationPermissionComponent = (
                 }}
               >
                 Click me!
-              </Button>
+              </BackdropButton>
             </Grid>
           </Grid>
         </CardContent>
-      </Card>
+      </MyCard>
     </BasicModal>
   );
 };

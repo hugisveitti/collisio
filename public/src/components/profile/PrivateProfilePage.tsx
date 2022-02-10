@@ -7,7 +7,6 @@ import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -163,7 +162,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                   <Typography>Loading your profile...</Typography>
                   <br />
                   <br />
-                  <Typography>You might not be logged in...</Typography>
+                  {/* <Typography>You might not be logged in...</Typography> */}
                   <br />
                   <br />
                   <CircularProgress />
