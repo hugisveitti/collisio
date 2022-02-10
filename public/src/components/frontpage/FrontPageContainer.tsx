@@ -1,18 +1,24 @@
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import { CircularProgress, Grid, IconButton } from "@mui/material";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
 import { UserContext } from "../../providers/UserProvider";
 import { setMusicVolume } from "../../sounds/gameSounds";
-import { getDeviceType } from "../../utils/settings";
+import {
+  getDefaultTabletSetting,
+  getDeviceType,
+  onTablet,
+  setDefaultTabletSetting,
+} from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import MySlider from "../inputs/slider/MySlider";
 import AdSense from "../monitary/AdSense";
+import MyRadio from "../radio/MyRadio";
 import {
   aboutPagePath,
   buyPremiumPagePath,
@@ -34,6 +40,7 @@ interface IFrontPageContainer {
   store: IStore;
 }
 const FrontPageContainer = (props: IFrontPageContainer) => {
+  const [tabletSetting, setTabletSetting] = useState(getDefaultTabletSetting());
   useEffect(() => {
     props.store.setPreviousPage(frontPagePath);
   }, []);
@@ -161,6 +168,24 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             <i>Pre alpha</i>
           </p>
         </Grid>
+        {onTablet() && (
+          <Grid item xs={12}>
+            <div className="background">
+              <MyRadio<boolean>
+                label="Use tablet as?"
+                options={[
+                  { label: "Mobile", value: true },
+                  { label: "Desktop", value: false },
+                ]}
+                checked={tabletSetting}
+                onChange={() => {
+                  setTabletSetting(!tabletSetting);
+                  setDefaultTabletSetting(!tabletSetting);
+                }}
+              />
+            </div>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <AdSense slotId="7059022973" />
         </Grid>
