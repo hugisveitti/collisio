@@ -299,7 +299,7 @@ export class Player {
     }
 
     toString() {
-        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}`
+        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetup}`
     }
 }
 

@@ -33,6 +33,9 @@ exports.allTrackNames = [
         name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic"
     },
     {
+        name: "Basic track 5", type: "basic-track5", gameType: "race", category: "basic"
+    },
+    {
         name: "German track", type: "nurn-track", gameType: "race", category: "short"
     },
     {

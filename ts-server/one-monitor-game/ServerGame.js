@@ -273,7 +273,7 @@ var Room = /** @class */ (function () {
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 // disconnect old socket always
-                console.log("disconnecting old socket", i);
+                console.log("disconnecting old socket", i, "isLeader:", this.players[i].isLeader);
                 if (this.gameStarted) {
                     this.players[i].setSocket(player.socket);
                     player = this.players[i];

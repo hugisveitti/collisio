@@ -4,6 +4,7 @@ import basic1Image from "../../images/tracks/basic1.png";
 import basic2Image from "../../images/tracks/basic2.png";
 import basic3Image from "../../images/tracks/basic3.png";
 import basic4Image from "../../images/tracks/basic4.png";
+import basic5Image from "../../images/tracks/basic5.png";
 import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
 import f1TrackImage from "../../images/tracks/f1-track.PNG";
 import farmTrackImage from "../../images/tracks/farm.PNG";
@@ -13,6 +14,7 @@ import basic1MinImage from "../../images/tracks/min/min-basic1.png";
 import basic2MinImage from "../../images/tracks/min/min-basic2.png";
 import basic3MinImage from "../../images/tracks/min/min-basic3.png";
 import basic4MinImage from "../../images/tracks/min/min-basic4.png";
+import basic5MinImage from "../../images/tracks/min/min-basic5.png";
 import f12TrackMinImage from "../../images/tracks/min/min-f1-track-2.PNG";
 import f1TrackMinImage from "../../images/tracks/min/min-f1-track.PNG";
 import farmTrackMinImage from "../../images/tracks/min/min-farm-track.PNG";
@@ -100,6 +102,12 @@ const trackImagePair: ITrackMinImagePair[] = [
     trackName: "basic-track4",
     minImage: basic4MinImage,
     largeImage: basic4Image,
+  },
+  {
+    //change
+    trackName: "basic-track5",
+    minImage: basic5MinImage,
+    largeImage: basic5Image,
   },
   {
     trackName: "simple-tag-course",

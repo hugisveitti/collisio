@@ -122,6 +122,9 @@ export class LowPolyVehicle extends Vehicle {
 
         this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(600), 2)
 
+        if (config.vehicleSetup) {
+            this.vehicleSetup = config.vehicleSetup
+        }
     }
 
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -317,6 +320,10 @@ export class LowPolyVehicle extends Vehicle {
             }
         })
 
+        if (this.vehicleSetup) {
+
+            this.updateVehicleSetup(this.vehicleSetup)
+        }
         //  this.vehicleBody.body.setCcdMotionThreshold(1)
     }
 

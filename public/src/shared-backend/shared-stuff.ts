@@ -22,6 +22,7 @@ export type TrackName =
     | "basic-track2"
     | "basic-track3"
     | "basic-track4"
+    | "basic-track5"
     | "spa-track"
     | "nurn-track"
     | "speed-test-track"
@@ -75,6 +76,9 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic"
+    },
+    {
+        name: "Basic track 5", type: "basic-track5", gameType: "race", category: "basic"
     },
     {
         name: "German track", type: "nurn-track", gameType: "race", category: "short"

@@ -30,6 +30,7 @@ export interface IVehicleClassConfig {
     vehicleType: VehicleType
     scene: IGameScene
     useSoundEffects?: boolean
+    vehicleSetup?: VehicleSetup
 }
 
 export class Vehicle implements IVehicle {
@@ -192,7 +193,7 @@ export class Vehicle implements IVehicle {
         }
 
         this.vehicleConfig = this.getDefaultVehicleConfig()
-
+        // not load if already loaded?
         this.vehicleSetup = vehicleSetup
         for (let item of possibleVehicleItemTypes) {
             if (this.vehicleItems[item]?.props?.path !== vehicleSetup[item]?.path) {

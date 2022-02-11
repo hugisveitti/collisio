@@ -100,6 +100,7 @@ export const activeTrackNames: TrackName[] = [
     "basic-track2",
     "basic-track3",
     "basic-track4",
+    "basic-track5",
     "small-jump-track",
     "simple-tag-course",
     "basic-tag-course",

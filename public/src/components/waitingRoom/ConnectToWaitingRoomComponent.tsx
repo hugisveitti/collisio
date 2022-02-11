@@ -21,7 +21,7 @@ import { getDeviceType } from "../../utils/settings";
 import AvailableRoomsComponent from "../AvailableRoomsComponent";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import { waitingRoomPath } from "../Routes";
+import { loginPagePath, waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
 
@@ -223,6 +223,7 @@ const ConnectToWaitingRoomComponent = (
           {!onMobile ? "Create a Game" : "Join Game"}
         </BackdropButton>
       </Grid>
+      {!user && <BackdropButton link={loginPagePath}>Login</BackdropButton>}
     </React.Fragment>
   );
 };

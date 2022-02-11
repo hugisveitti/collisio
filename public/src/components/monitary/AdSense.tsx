@@ -18,6 +18,8 @@ import React from "react";
 interface IAdSence {
   slotId: string;
 }
+
+// Held að ég geti ekki verið með Adsence því ég er ekki með næga traffic á síðunni...
 const AdSense = (props: IAdSence) => {
   // <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4972710693486281"
   // crossorigin="anonymous"></script>

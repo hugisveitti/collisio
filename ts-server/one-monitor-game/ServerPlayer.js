@@ -238,7 +238,7 @@ var Player = /** @class */ (function () {
         });
     };
     Player.prototype.toString = function () {
-        return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType;
+        return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetup;
     };
     return Player;
 }());

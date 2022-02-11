@@ -72,6 +72,7 @@ var trackCosts = {
     "basic-track2": 100,
     "basic-track3": 5000,
     "basic-track4": 10000,
+    "basic-track5": 40000,
     "f1-track": 0,
     "sea-side-track": 0,
     "f1-track-2": 500,
