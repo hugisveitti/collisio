@@ -129,6 +129,14 @@ let renderer: WebGLRenderer | undefined, scene: Scene | undefined, camera: undef
 
 let ry = 0
 
+const width = getDeviceType() === "desktop" ? window.innerWidth : screen.availWidth
+export const setRendererHeight = (height: number) => {
+    if (!renderer) return
+    renderer.setSize(width, height)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+}
+
 export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: number, vehicleColor?: VehicleColorType, vehicleSetup?: VehicleSetup, _height?: number) => {
     currentVehicleType = vehicleType
     stopSpinCamera = false
@@ -140,7 +148,6 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
     }
 
     const height = _height ?? 400
-    const width = getDeviceType() === "desktop" ? window.innerWidth : screen.availWidth
 
     renderer = new WebGLRenderer({ antialias: true });
 

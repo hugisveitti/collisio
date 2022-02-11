@@ -50,6 +50,8 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.userSettings.vehicleSettings.noSteerNumber
   );
 
+  const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
+
   const sendUserSettingsToServer = (newUserSettings: IUserSettings) => {
     // if (user) {
     //   setDBUserSettings(user.uid, newUserSettings);
@@ -142,130 +144,143 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
             />
           )}
         </Grid>
-        <Grid item xs={6} sm={4}>
-          {props.resetOrientation && (
-            <BackdropButton onClick={props.resetOrientation}>
-              Reset orientation
-            </BackdropButton>
-          )}
-        </Grid>
-        <Grid item xs={6} sm={4}>
-          <BackdropButton
-            onClick={() => {
-              updateVehicleSettings(
-                "useChaseCamera",
-                !props.store.userSettings.vehicleSettings.useChaseCamera
-              );
-            }}
-          >
-            <>
-              Camera chaser{" "}
-              {props.store.userSettings.vehicleSettings.useChaseCamera
-                ? "On"
-                : "Off"}
-            </>
-          </BackdropButton>
-        </Grid>
+        <Grid item xs={12}>
+          <CollabsibleCard header="More vehicle settings">
+            <Grid container spacing={1}>
+              <Grid item xs={6} sm={4}>
+                {props.resetOrientation && (
+                  <BackdropButton onClick={props.resetOrientation}>
+                    Reset orientation
+                  </BackdropButton>
+                )}
+              </Grid>
+              <Grid item xs={6} sm={4}>
+                <BackdropButton
+                  onClick={() => {
+                    updateVehicleSettings(
+                      "useChaseCamera",
+                      !props.store.userSettings.vehicleSettings.useChaseCamera
+                    );
+                  }}
+                >
+                  <>
+                    Camera chaser{" "}
+                    {props.store.userSettings.vehicleSettings.useChaseCamera
+                      ? "On"
+                      : "Off"}
+                  </>
+                </BackdropButton>
+              </Grid>
 
-        <Grid item xs={12}>
-          <Collapse
-            in={props.store.userSettings.vehicleSettings.useChaseCamera}
-          >
-            <Typography>Chase camera speed</Typography>
-            <Slider
-              style={{ color }}
-              min={0.01}
-              max={1}
-              valueLabelDisplay="auto"
-              step={0.01}
-              defaultValue={chaseSpeedDefaultVal}
-              onChange={(e, value) => {}}
-              onChangeCommitted={(e, value) => {
-                updateVehicleSettings("chaseCameraSpeed", value);
-              }}
-            />
-          </Collapse>
-        </Grid>
+              <Grid item xs={12}>
+                <Collapse
+                  in={props.store.userSettings.vehicleSettings.useChaseCamera}
+                >
+                  <Typography>Chase camera speed</Typography>
+                  <Slider
+                    style={{ color }}
+                    min={0.01}
+                    max={1}
+                    valueLabelDisplay="auto"
+                    step={0.01}
+                    defaultValue={chaseSpeedDefaultVal}
+                    onChange={(e, value) => {}}
+                    onChangeCommitted={(e, value) => {
+                      updateVehicleSettings("chaseCameraSpeed", value);
+                    }}
+                  />
+                </Collapse>
+              </Grid>
 
-        <Grid item xs={12}>
-          <MySlider
-            label="Steering sensitivity"
-            color={color}
-            min={0.01}
-            max={1}
-            //      valueLabelDisplay="auto"
-            step={0.01}
-            value={steerSenceDefaultVal}
-            onChange={(value) => {}}
-            onChangeCommitted={(value) => {
-              updateVehicleSettings("steeringSensitivity", value as number);
-            }}
-            startIcon={<span>-</span>}
-            endIcon={<span>+</span>}
-          />
+              <Grid item xs={12}>
+                <MySlider
+                  label="Steering sensitivity"
+                  color={color}
+                  min={0.01}
+                  max={1}
+                  //      valueLabelDisplay="auto"
+                  step={0.01}
+                  value={steerSenceDefaultVal}
+                  onChange={(value) => {}}
+                  onChangeCommitted={(value) => {
+                    updateVehicleSettings(
+                      "steeringSensitivity",
+                      value as number
+                    );
+                  }}
+                  startIcon={<span>-</span>}
+                  endIcon={<span>+</span>}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <MySlider
+                  label="Camera position"
+                  color={color}
+                  min={1}
+                  max={10}
+                  //    valueLabelDisplay="auto"
+                  step={1}
+                  value={cameraZoomDefaultVal}
+                  onChange={(value) => {}}
+                  onChangeCommitted={(value) => {
+                    updateVehicleSettings("cameraZoom", value as number);
+                  }}
+                  startIcon={<span>Close</span>}
+                  endIcon={<span>Far</span>}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <MySlider
+                  label={
+                    <>
+                      No Steer range:
+                      <i>
+                        {" "}
+                        small angle where the vehicle won't turn when the phone
+                        turns
+                      </i>
+                    </>
+                  }
+                  color={color}
+                  min={0}
+                  max={5}
+                  //       valueLabelDisplay="auto"
+                  step={0.5}
+                  value={noSteerNumberDefaultVal}
+                  onChange={(value) => {}}
+                  onChangeCommitted={(value) => {
+                    updateVehicleSettings("noSteerNumber", value as number);
+                  }}
+                  startIcon={<span>-</span>}
+                  endIcon={<span>+</span>}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <MyRadio<boolean>
+                  options={[
+                    { label: "On", value: true },
+                    { label: "Off", value: false },
+                  ]}
+                  label="Dynamic camera field of view"
+                  checked={
+                    props.store.userSettings.vehicleSettings.useDynamicFOV
+                  }
+                  onChange={(newVal) => {
+                    updateVehicleSettings("useDynamicFOV", newVal);
+                  }}
+                />
+              </Grid>
+              {!props.notInGame && (
+                <Grid item xs={12}>
+                  <Typography>
+                    For the vehicle type to update, the leader must restart the
+                    game.
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </CollabsibleCard>
         </Grid>
-        <Grid item xs={12}>
-          <MySlider
-            label="Camera position"
-            color={color}
-            min={1}
-            max={10}
-            //    valueLabelDisplay="auto"
-            step={1}
-            value={cameraZoomDefaultVal}
-            onChange={(value) => {}}
-            onChangeCommitted={(value) => {
-              updateVehicleSettings("cameraZoom", value as number);
-            }}
-            startIcon={<span>Close</span>}
-            endIcon={<span>Far</span>}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <MySlider
-            label={
-              <>
-                No Steer range:
-                <i>
-                  {" "}
-                  small angle where the vehicle won't turn when the phone turns
-                </i>
-              </>
-            }
-            color={color}
-            min={0}
-            max={5}
-            //       valueLabelDisplay="auto"
-            step={0.5}
-            value={noSteerNumberDefaultVal}
-            onChange={(value) => {}}
-            onChangeCommitted={(value) => {
-              updateVehicleSettings("noSteerNumber", value as number);
-            }}
-            startIcon={<span>-</span>}
-            endIcon={<span>+</span>}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <MyRadio<boolean>
-            options={[
-              { label: "On", value: true },
-              { label: "Off", value: false },
-            ]}
-            label="Dynamic camera field of view"
-            checked={props.store.userSettings.vehicleSettings.useDynamicFOV}
-            onChange={(newVal) => {
-              updateVehicleSettings("useDynamicFOV", newVal);
-            }}
-          />
-        </Grid>
-        {!props.notInGame && (
-          <Grid item xs={12}>
-            <Typography>
-              For the vehicle type to update, the leader must restart the game.
-            </Typography>
-          </Grid>
-        )}
       </Grid>
     </CollabsibleCard>
   );

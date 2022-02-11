@@ -42,13 +42,16 @@ class SpeedTestScene extends GameScene {
 
     async loadAssets(): Promise<void> {
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
-
+        console.log("camera", this.camera)
         await this.course.createCourse()
         this.courseLoaded = true
         await this.createVehicles()
 
         this.vehicles[0].addCamera(this.camera)
         this.vehicles[0].useChaseCamera = false
+        for (let v of this.vehicles) {
+            v.isReady = true
+        }
 
         this.resetVehicles()
         this.restartGame()

@@ -28,8 +28,6 @@ const BACK_RIGHT = 3
 
 const DISABLE_DEACTIVATION = 4;
 
-
-
 export class LowPolyVehicle extends Vehicle {
 
     tires: ExtendedObject3D[]
@@ -552,8 +550,8 @@ export class LowPolyVehicle extends Vehicle {
         const c = this.vehicleBody.getObjectByName(camera.name)
         this.camera = camera
         if (!this.useChaseCamera && !c) {
-            camera.position
-            // camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
+
+            camera.position.set(this.staticCameraPos.x, this.staticCameraPos.y, this.staticCameraPos.z)
             this.vehicleBody.add(camera)
         } else if (this.useChaseCamera) {
 

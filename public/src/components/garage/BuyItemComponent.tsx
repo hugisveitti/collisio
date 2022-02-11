@@ -49,7 +49,7 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
   };
 
   return (
-    <MyCard>
+    <MyCard nonOpague>
       <CardContent>
         {props.loading ? (
           <CircularProgress />

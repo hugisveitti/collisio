@@ -152,6 +152,7 @@ export class RaceGameScene extends GameScene {
             this.showImportantInfo(`Race starting in ${this.raceCountdownTime} seconds`, true)
         }
 
+
         /** hacky way to make vehicles stopp
          * TODO: not this, find a way to make vechicles reliably start on the ground paused..
          */
@@ -172,16 +173,6 @@ export class RaceGameScene extends GameScene {
                 this.playCountdownBeep()
             }
 
-            // if (this.raceCountdownTime === 2) {
-            //     for (let i = 0; i < this.vehicles.length; i++) {
-            //         this.vehicles[i].spinCameraAroundVehicle = false
-            //         //  if (!this.vehicles[i].useChaseCamera) {
-
-            //         this.vehicles[i].addCamera(this.views[i].camera)
-            //         // }
-            //     }
-            // }
-            // this.showImportantInfo(countdown + "")
             this.showViewsImportantInfo(this.raceCountdownTime + "")
 
             if (this.raceCountdownTime > 0) {
@@ -202,7 +193,6 @@ export class RaceGameScene extends GameScene {
         }, 1000)
 
     }
-
 
     _togglePauseGame(wasPaused: boolean) {
         if (!this.gameStarted) return

@@ -146,9 +146,20 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     }, 1000);
 
     props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
-      setRaceMedalData(
-        getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
+      const md = getMedalAndTokens(
+        data.trackName,
+        data.numberOfLaps,
+        data.totalTime
       );
+      setRaceMedalData(md);
+      const newTokenData: ITokenData = {
+        ...props.store.tokenData,
+        coins: props.store.tokenData.coins + md.coins,
+        XP: props.store.tokenData.XP + md.XP,
+      };
+      newTokenData[md.medal] += 1;
+      props.store.setTokenData(newTokenData);
+
       const medalDiv = document.getElementById("medal-data");
       medalDiv.classList.remove("hide");
       // show for 10 secs?

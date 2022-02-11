@@ -6,9 +6,11 @@ interface IMyCard {
   color?: "white" | "black";
   children: React.ReactNode;
   style?: React.CSSProperties;
+  nonOpague?: boolean;
 }
 
 const MyCard = (props: IMyCard) => {
+  const alpha = props.nonOpague ? 1 : 0.82;
   return (
     <Card
       className="card"
@@ -16,8 +18,8 @@ const MyCard = (props: IMyCard) => {
         ...props.style,
         backgroundColor:
           props.color === "black"
-            ? "rgba(0,0,0, 0.82)"
-            : "rgba(255,255,255,0.8)",
+            ? `rgba(0,0,0, ${alpha})`
+            : `rgba(255,255,255, ${alpha})`,
       }}
       variant="outlined"
     >

@@ -1,6 +1,7 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import React, { useContext, useEffect, useState } from "react";
+import { height } from "@mui/material/node_modules/@mui/system";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import {
   buyItem,
@@ -29,6 +30,7 @@ import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { loginPagePath } from "../Routes";
+import { setRendererHeight } from "../showRoom/showRoomCanvas";
 import { IStore } from "../store";
 import MyTabs from "../tabs/MyTabs";
 import TokenComponent from "../tokenComponent/TokenComponent";
@@ -59,6 +61,10 @@ let _vehicleType: VehicleType;
 let _vehicleColor: VehicleColorType;
 let _vehicleSetup: VehicleSetup;
 
+let originalTop = 0;
+let firstScroll = false;
+let box = { height: 0 };
+
 const GarageComponent = (props: IGarageComponent) => {
   const user = useContext(UserContext);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -85,9 +91,83 @@ const GarageComponent = (props: IGarageComponent) => {
     undefined as undefined | AllOwnership
   );
 
+  const stickyDivRef = useRef<HTMLDivElement>();
+  const garageRef = useRef<HTMLDivElement>();
+
   const [itemOwnership, setItemOwnership] = useState(defaultItemsOwnership);
 
   const [isBuying, setIsBuying] = useState(false);
+  const [vehicleRef, setVehicleRef] = useState(
+    undefined as undefined | React.MutableRefObject<HTMLDivElement>
+  );
+
+  const handleScrolling = () => {
+    const originalHeight = box.height;
+
+    // hacky, was happening because some items were still loading
+    if (!firstScroll) {
+      firstScroll = true;
+      originalTop = stickyDivRef.current.offsetTop;
+    }
+
+    if (window.scrollY > originalTop) {
+      let height = originalHeight - (window.scrollY - originalTop);
+      height = Math.max(height, 100);
+
+      setRendererHeight(height);
+      if (
+        window.scrollY > window.innerHeight - originalTop &&
+        window.scrollY <
+          garageRef.current.offsetTop +
+            garageRef.current.clientHeight -
+            box.height
+      ) {
+        stickyDivRef.current.setAttribute(
+          "style",
+          `
+          position:relative;
+          top:${window.scrollY - originalTop}px;
+          max-width:100%;
+          z-index:1000;
+        `
+        );
+      } else {
+        stickyDivRef.current.setAttribute(
+          "style",
+          `
+        position:static;
+        z-index:1000;
+       `
+        );
+      }
+    } else if (
+      window.scrollY >
+      garageRef.current.offsetTop + garageRef.current.clientHeight
+    ) {
+    } else {
+      stickyDivRef.current.setAttribute(
+        "style",
+        `
+        position:static;
+        z-index:1000;
+       `
+      );
+      originalTop = stickyDivRef.current.offsetTop;
+    }
+  };
+
+  useEffect(() => {
+    if (vehicleRef && stickyDivRef) {
+      const top = stickyDivRef.current.offsetTop;
+      originalTop = top;
+      box = vehicleRef.current.getBoundingClientRect();
+      console.log("box", box);
+      window.addEventListener("scroll", handleScrolling);
+    }
+    return () => {
+      window.removeEventListener("scroll", handleScrolling);
+    };
+  }, [vehicleRef, stickyDivRef]);
 
   useEffect(() => {
     if (user?.uid) {
@@ -338,7 +418,7 @@ const GarageComponent = (props: IGarageComponent) => {
   };
 
   return (
-    <Grid container spacing={3} style={{}}>
+    <Grid container spacing={3} style={{}} ref={garageRef}>
       {props.showBackButton && (
         <>
           <Grid item xs={6}>
@@ -372,14 +452,14 @@ const GarageComponent = (props: IGarageComponent) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} lg={7}>
+          <Grid item xs={12} lg={7} ref={stickyDivRef}>
             <GarageVehicle
+              setRef={(ref) => setVehicleRef(ref)}
               vehicleColor={selectedVehicleColor}
               vehicleType={selectedVehicleType}
               vehicleSetup={selectedVehicleSetup}
             />
-          </Grid>
-          <Grid item xs={12}>
+            <br />
             {renderOwnershipComponent()}
           </Grid>
         </Grid>

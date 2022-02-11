@@ -62,6 +62,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
     if (canvasWrapperRef?.current) {
       if (!alreadyExisted) {
         renderer.domElement.setAttribute("style", "max-width:100%;");
+        renderer.domElement.setAttribute("style", "position:fixed;");
       }
 
       // @ts-ignore
@@ -111,13 +112,16 @@ const BackdropContainer = (props: IBackdropContainer) => {
         renderEnterGameButton()
       ) : (
         <div
+          id="backdrop-container"
           className={createClassNames(
             "container",
             props.backgroundContainer ? "background" : ""
           )}
-          style={{
-            maxHeight: `${(screen?.availHeight ?? window.innerHeight) * 0.9}px`,
-          }}
+          style={
+            {
+              // maxHeight: `${(screen?.availHeight ?? window.innerHeight) * 0.9}px`,
+            }
+          }
         >
           {props.loading ? (
             <div

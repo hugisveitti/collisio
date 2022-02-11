@@ -141,7 +141,6 @@ export class Course implements ICourse {
                 }
                 for (let key of Object.keys(this.spawnAligners)) {
                     if ((this.spawnAligners[key] as ExtendedObject3D).body) {
-                        console.log("spawn aligner has object", key)
                         this.gameScene.physics.destroy(this.spawnAligners[key] as ExtendedObject3D)
                     }
                 }

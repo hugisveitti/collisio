@@ -17,13 +17,15 @@ interface IGarageVehicle {
   vehicleType: VehicleType;
   vehicleColor: VehicleColorType;
   vehicleSetup: VehicleSetup;
+  setRef?: (ref: React.MutableRefObject<HTMLDivElement>) => void;
 }
 
 const GarageVehicle = (props: IGarageVehicle) => {
-  const canvasWrapperRef = useRef();
+  const canvasWrapperRef = useRef<HTMLDivElement>();
   const onMobile = getDeviceType() === "mobile";
 
   useEffect(() => {
+    props.setRef?.(canvasWrapperRef);
     return () => {
       removeShowRoomCanvas();
     };
