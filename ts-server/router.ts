@@ -168,6 +168,7 @@ const router = (app: any) => {
     app.get("/login", sendIndexHTML);
     app.get("/privacy-policy", sendIndexHTML);
     app.get("/mobile-only-wait", sendIndexHTML);
+    app.get("/buycoins", sendIndexHTML);
 
 
     const adminHTMLPath = `../public/${buildFolder}/admin.html`

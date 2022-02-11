@@ -168,6 +168,7 @@ var router = function (app) {
     app.get("/login", sendIndexHTML);
     app.get("/privacy-policy", sendIndexHTML);
     app.get("/mobile-only-wait", sendIndexHTML);
+    app.get("/buycoins", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {
         res.sendFile(path.join(__dirname, adminHTMLPath));

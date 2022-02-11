@@ -30,6 +30,7 @@ import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import LoginPageContainer from "./login/LoginPageContainer";
 import MobileOnlyWaitingRoom from "./mobileOnly/MobileOnlyWaitingRoom";
+import BuyCoinsComponent from "./monitary/BuyCoinsComponent";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
@@ -71,6 +72,7 @@ export const privacyPolicyPage = "/privacy-policy";
 export const loginPagePath = "/login";
 export const garagePagePath = "/garage";
 export const trackPagePath = "/tracks";
+export const buyCoinsPagePath = "/buycoins";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -281,6 +283,10 @@ const Routes = () => {
         <Route
           path={trackPagePath}
           render={(props) => <TrackSelectContainer {...props} store={store} />}
+        />
+        <Route
+          path={buyCoinsPagePath}
+          render={(props) => <BuyCoinsComponent {...props} store={store} />}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

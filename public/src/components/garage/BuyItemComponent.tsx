@@ -3,6 +3,7 @@ import React from "react";
 import { getSizePrefix } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
+import { buyCoinsPagePath } from "../Routes";
 
 interface IBuyItemComponent {
   cost: number;
@@ -12,6 +13,7 @@ interface IBuyItemComponent {
   loading?: boolean;
   buyButtonText?: string;
   onUnequip?: () => void;
+  notAfford: boolean;
 }
 
 const BuyItemComponent = (props: IBuyItemComponent) => {
@@ -26,6 +28,26 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
     return <Typography>Owned</Typography>;
   };
 
+  const renderBuyButton = () => {
+    if (props.notAfford) {
+      return (
+        <>
+          <Typography>You don't have enough coins</Typography>
+          <BackdropButton link={buyCoinsPagePath}>Buy coins</BackdropButton>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Typography>Cost {getSizePrefix(props.cost)}</Typography>
+        <BackdropButton onClick={props.onBuy}>
+          Buy {props.buyButtonText ?? "item"}
+        </BackdropButton>
+      </>
+    );
+  };
+
   return (
     <MyCard>
       <CardContent>
@@ -34,16 +56,7 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
         ) : (
           <>
             <div>{props.label}</div>
-            {props.owned ? (
-              renderUnequipButton()
-            ) : (
-              <>
-                <Typography>Cost {getSizePrefix(props.cost)}</Typography>
-                <BackdropButton onClick={props.onBuy}>
-                  Buy {props.buyButtonText ?? "item"}
-                </BackdropButton>
-              </>
-            )}
+            {props.owned ? renderUnequipButton() : renderBuyButton()}
           </>
         )}
       </CardContent>

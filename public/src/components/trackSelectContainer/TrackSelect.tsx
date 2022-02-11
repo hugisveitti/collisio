@@ -146,6 +146,7 @@ const TrackSelect = (props: ITrackSelect) => {
     if (!ownership) return null;
     return (
       <BuyItemComponent
+        notAfford={allCosts[selectedTrack] > props.store.tokenData?.coins}
         loading={isBuying}
         cost={allCosts[selectedTrack]}
         label={getTrackNameFromType(selectedTrack)}

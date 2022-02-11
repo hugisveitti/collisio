@@ -275,7 +275,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
         </div>
 
         <div
-          className="controller-btn"
+          className="controller-btn util-btn"
           onTouchStart={(e) => {
             e.preventDefault();
             handleButtonAction(true, "resetVehicle", setReset);
@@ -295,7 +295,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
         </div>
 
         <div
-          className="controller-btn"
+          className="controller-btn util-btn"
           onClick={() => {
             props.handlePausePressed();
           }}
@@ -312,6 +312,8 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
           </span>
         </div>
         <div
+          className="hide"
+          id="medal-data"
           style={{
             ...settingsStyles,
             ...utilBtnPos,
@@ -326,7 +328,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             padding: 4,
           }}
         >
-          <div style={rotateText} className="hide" id="medal-data">
+          <div style={rotateText}>
             {props.raceMedalData && (
               <>
                 {props.raceMedalData.medal === "none" ? (

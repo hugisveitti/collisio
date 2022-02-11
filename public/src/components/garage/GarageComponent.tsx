@@ -5,25 +5,25 @@ import { toast } from "react-toastify";
 import {
   buyItem,
   getOwnership,
-  getVehicleItemsOwnership
+  getVehicleItemsOwnership,
 } from "../../firebase/firestoreOwnershipFunctions";
 import { UserContext } from "../../providers/UserProvider";
 import { ITokenData } from "../../shared-backend/medalFuncions";
 import {
   allCosts,
   AllOwnableItems,
-  AllOwnership
+  AllOwnership,
 } from "../../shared-backend/ownershipFunctions";
 import {
   getColorNameFromType,
   VehicleColorType,
-  VehicleType
+  VehicleType,
 } from "../../shared-backend/shared-stuff";
 import {
   defaultItemsOwnership,
   ItemProperties,
   possibleVehicleMods,
-  VehicleSetup
+  VehicleSetup,
 } from "../../shared-backend/vehicleItems";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
@@ -257,6 +257,9 @@ const GarageComponent = (props: IGarageComponent) => {
           }}
           owned={ownership[selectedVehicleType]}
           buyButtonText="vehicle"
+          notAfford={
+            allCosts[selectedVehicleType] > props.store.tokenData?.coins
+          }
         />
       );
     }
@@ -271,6 +274,9 @@ const GarageComponent = (props: IGarageComponent) => {
           }}
           owned={ownership[selectedVehicleColor]}
           buyButtonText="color"
+          notAfford={
+            allCosts[selectedVehicleColor] > props.store.tokenData?.coins
+          }
         />
       );
     }
@@ -296,6 +302,7 @@ const GarageComponent = (props: IGarageComponent) => {
 
       return (
         <BuyItemComponent
+          notAfford={selectedItem.cost > props.store.tokenData?.coins}
           loading={isBuying}
           cost={selectedItem.cost}
           label={

@@ -21,6 +21,7 @@ import AdSense from "../monitary/AdSense";
 import MyRadio from "../radio/MyRadio";
 import {
   aboutPagePath,
+  buyCoinsPagePath,
   buyPremiumPagePath,
   connectPagePath,
   frontPagePath,
@@ -94,8 +95,8 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={howToPlayPagePath} width={btnWidth}>
             How to play
           </BackdropButton>
-          <BackdropButton link={buyPremiumPagePath} width={btnWidth}>
-            Go Premium
+          <BackdropButton link={buyCoinsPagePath} width={btnWidth}>
+            Buy coins
           </BackdropButton>
 
           <BackdropButton link={aboutPagePath} width={btnWidth}>
