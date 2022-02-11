@@ -48,12 +48,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setDefaultOwnership = exports.buyItem = exports.updatePlayersTokens = void 0;
+var firestore_1 = require("firebase-admin/firestore");
 var medalFuncions_1 = require("../public/src/shared-backend/medalFuncions");
 var ownershipFunctions_1 = require("../public/src/shared-backend/ownershipFunctions");
 var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
 var vehicleItems_1 = require("../public/src/shared-backend/vehicleItems");
 var firebase_config_1 = require("./firebase-config");
 var tokenRefPath = "tokens";
+var medalsRefPath = "medals";
 var ownershipPath = "ownership";
 var vehicleSetupPath = "vehicleSetup";
 var itemOwnershipPath = "itemOwnership";
@@ -90,6 +92,23 @@ var isValidRace = function (run) {
         return false;
     return true;
 };
+var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, medal) {
+    var ref = firebase_config_1.adminFirestore.collection(medalsRefPath).doc(userId); //.collection(trackName).doc(numberOfLaps.toString())
+    // want to keep all the medals of a track together
+    // will be max og like 30 fields, if each numberoflaps and medal is a field
+    // this will give the possibility of searching without going into subcollections
+    // I will just have to parse the results myself
+    //  const medalString = `${numberOfLaps}-${medal}`
+    var update = {};
+    update[trackName] = {};
+    update[trackName][numberOfLaps] = {};
+    update[trackName][numberOfLaps][medal] = firestore_1.FieldValue.increment(1);
+    ref.set(update, { merge: true }).then(function () {
+        console.log("updated medals");
+    }).catch(function (err) {
+        console.warn("Error updating medals", err);
+    });
+};
 /**
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
  */
@@ -98,6 +117,7 @@ var updatePlayersTokens = function (data) {
     if (isValidRace(data)) {
         var _a = (0, medalFuncions_1.getMedalAndTokens)(data.trackName, data.numberOfLaps, data.totalTime), medal_1 = _a.medal, XP_1 = _a.XP, coins_1 = _a.coins;
         console.log("medal", medal_1, "XP:", XP_1, "coins:", coins_1);
+        updateTrackNumberOfLapsMedal(data.playerId, data.trackName, data.numberOfLaps, medal_1);
         var ref_1 = firebase_config_1.adminFirestore.doc(tokenRefPath + "/" + data.playerId); //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
         ref_1.get().then(function (snap) {
             var update;

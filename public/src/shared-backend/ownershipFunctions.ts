@@ -89,8 +89,9 @@ const trackCosts: { [trackName in TrackName]: number } = {
     "skii-map": 0,
     "monaco-track": 100000000,
     "town-track": 0,
+    "test-course": 0,
     "simple-tag-course": 0,
-    "test-course": 0
+    "basic-tag-course": 40000,
 }
 
 

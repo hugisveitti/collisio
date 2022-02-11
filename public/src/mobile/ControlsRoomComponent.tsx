@@ -326,7 +326,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             padding: 4,
           }}
         >
-          <div style={rotateText}>
+          <div style={rotateText} className="hide" id="medal-data">
             {props.raceMedalData && (
               <>
                 {props.raceMedalData.medal === "none" ? (

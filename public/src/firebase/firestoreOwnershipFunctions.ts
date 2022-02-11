@@ -1,6 +1,6 @@
-import { doc, getDoc, setDoc } from "@firebase/firestore"
+import { collection, doc, getDoc, setDoc } from "@firebase/firestore"
 import { AllOwnership, getDefaultOwnership } from "../shared-backend/ownershipFunctions"
-import { VehicleType } from "../shared-backend/shared-stuff"
+import { TrackName, VehicleType } from "../shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, ItemOwnership } from "../shared-backend/vehicleItems"
 import { defaultVehiclesSetup, VehiclesSetup } from "../vehicles/VehicleSetup"
 import { firestore } from "./firebaseInit"
@@ -10,6 +10,7 @@ import { firestore } from "./firebaseInit"
 const ownershipPath = "ownership"
 const vehicleSetupPath = "vehicleSetup"
 const itemOwnershipPath = "itemOwnership"
+const medalsRefPath = "medals"
 
 
 const setDefaultOwnership = (userId: string) => {
@@ -138,3 +139,26 @@ export const buyItem = (userId: string, item: string, vehicleType?: VehicleType)
 }
 
 
+export interface ITrackMedals {
+    [numberOfLaps: number]: {
+        gold?: number
+        silver?: number
+        bronze?: number
+        none?: number
+    }
+}
+
+export interface IUserMedals {
+    [trackName: string]: ITrackMedals
+}
+export const getUserMedals = (userId: string): Promise<IUserMedals | undefined> => {
+    return new Promise<IUserMedals>(async (resolve, reject) => {
+        const ref = doc(firestore, medalsRefPath, userId)
+        const res = await getDoc(ref)
+        if (res.exists()) {
+            resolve(res.data() as IUserMedals)
+        } else {
+            resolve(undefined)
+        }
+    })
+}

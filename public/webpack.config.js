@@ -57,9 +57,9 @@ module.exports = {
     ]
 
   },
-  plugins: [
-    new BundleAnalyzerPlugin()
-  ],
+  // plugins: [
+  //   new BundleAnalyzerPlugin()
+  // ],
   resolve: {
     extensions: [".webpack.js", '.tsx', '.ts', '.js']
   },

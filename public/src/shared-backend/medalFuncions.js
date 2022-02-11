@@ -107,17 +107,11 @@ var times = {
         bronze: 1000,
         weight: 0,
     },
-    "simple-tag-course": {
-        gold: 1000,
-        silver: 1000,
-        bronze: 1000,
-        weight: 0,
-    },
     "small-track": {
-        gold: 1000,
-        silver: 1000,
-        bronze: 1000,
-        weight: 0,
+        gold: 5,
+        silver: 10,
+        bronze: 15,
+        weight: .1,
     },
     "small-jump-track": {
         gold: 1000,
@@ -126,6 +120,18 @@ var times = {
         weight: 0,
     },
     "test-course": {
+        gold: 1000,
+        silver: 1000,
+        bronze: 1000,
+        weight: 0,
+    },
+    "simple-tag-course": {
+        gold: 1000,
+        silver: 1000,
+        bronze: 1000,
+        weight: 0,
+    },
+    "basic-tag-course": {
         gold: 1000,
         silver: 1000,
         bronze: 1000,

@@ -6,15 +6,18 @@ import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import { profile } from "console";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IEndOfRaceInfoPlayer } from "../../classes/Game";
 import { IFollower, IPublicUser, IUser } from "../../classes/User";
+import { getUserMedals } from "../../firebase/firestoreOwnershipFunctions";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
 import HighscoreTable from "../highscore/HighscoreTable";
 import { getUserPagePath } from "../Routes";
 import FollowButton from "./FollowButton";
+import MedalsComponent from "./MedalsComponent";
 
 interface IPublicProfilePageComponent {
   profile: IPublicUser;
@@ -44,6 +47,7 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
     typeof props.profile.latestLogin === "number"
       ? new Date(props.profile.latestLogin).toISOString()
       : "-";
+
   return (
     <>
       <Grid item xs={12} lg={6}>
@@ -105,6 +109,10 @@ const PublicProfilePageComponent = (props: IPublicProfilePageComponent) => {
             <Typography>No profile image</Typography>
           )}
         </MyCard>
+      </Grid>
+
+      <Grid item xs={12} lg={6}>
+        <MedalsComponent userId={props.profile.uid} />
       </Grid>
 
       <Grid item xs={12} lg={6}>

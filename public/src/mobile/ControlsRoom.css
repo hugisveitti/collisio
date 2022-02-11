@@ -77,3 +77,7 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+.hide {
+  display: none;
+}

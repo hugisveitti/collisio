@@ -1,10 +1,12 @@
-import { defaultTokenData, getMedalAndTokens, ITokenData } from "../public/src/shared-backend/medalFuncions"
+import { FieldValue } from "firebase-admin/firestore"
+import { defaultTokenData, getMedalAndTokens, ITokenData, MedalType } from "../public/src/shared-backend/medalFuncions"
 import { allCosts, AllOwnableItems, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
 import { getItemName, TrackName, VehicleType } from "../public/src/shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, vehicleItems } from "../public/src/shared-backend/vehicleItems"
 import { adminFirestore } from "./firebase-config"
 
 const tokenRefPath = "tokens"
+const medalsRefPath = "medals"
 const ownershipPath = "ownership"
 const vehicleSetupPath = "vehicleSetup"
 const itemOwnershipPath = "itemOwnership"
@@ -58,7 +60,29 @@ const isValidRace = (run: IEndOfRaceInfoPlayerServer): boolean => {
 }
 
 
+const updateTrackNumberOfLapsMedal = (userId: string, trackName: string, numberOfLaps: number, medal: MedalType) => {
+    const ref = adminFirestore.collection(medalsRefPath).doc(userId)//.collection(trackName).doc(numberOfLaps.toString())
+    // want to keep all the medals of a track together
+    // will be max og like 30 fields, if each numberoflaps and medal is a field
+    // this will give the possibility of searching without going into subcollections
+    // I will just have to parse the results myself
+    //  const medalString = `${numberOfLaps}-${medal}`
 
+
+
+    const update: any = {}
+    update[trackName] = {}
+    update[trackName][numberOfLaps] = {}
+    update[trackName][numberOfLaps][medal] = FieldValue.increment(1)
+
+
+    ref.set(update, { merge: true }
+    ).then(() => {
+        console.log("updated medals")
+    }).catch((err) => {
+        console.warn("Error updating medals", err)
+    })
+}
 
 /**
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
@@ -69,7 +93,7 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
         const { medal, XP, coins } = getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
         console.log("medal", medal, "XP:", XP, "coins:", coins)
 
-
+        updateTrackNumberOfLapsMedal(data.playerId, data.trackName, data.numberOfLaps, medal)
         const ref = adminFirestore.doc(tokenRefPath + "/" + data.playerId) //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
 
         ref.get().then(snap => {

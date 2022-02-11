@@ -64,7 +64,8 @@ const TokenComponent = (props: ITokenComponent) => {
         <>
           <br />
           <span>
-            Finish races to earn XP and tokens, spend tokens in the Garage!
+            Finish races to earn XP and tokens, spend tokens in the Garage and
+            buy Tracks!
           </span>
         </>
       )}

@@ -52,7 +52,7 @@ const facebookProvider = new FacebookAuthProvider()
 export const signInWithGoogle = (usePopup?: boolean) => {
     if (usePopup) {
         signInWithPopup(auth, googleProvider).then(user => {
-
+            // TODO: if user is signing in for the first time, make display name just the first name plus maybe "the dragon" or something funny so "eric the dragon"
         }).catch((err) => {
             toast.error("Error logging in with Google.")
             console.warn("error logging in", err)
@@ -61,7 +61,8 @@ export const signInWithGoogle = (usePopup?: boolean) => {
 
 
         signInWithRedirect(auth, googleProvider).then(user => {
-
+            // const displayName = user.user.displayName.split(" ")[0]
+            // updateProfile(auth.currentUser, { displayName })
         }).catch((err) => {
             toast.error("Error logging in with Google.")
             console.warn("error logging in", err)

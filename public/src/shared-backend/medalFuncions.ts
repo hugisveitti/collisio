@@ -117,17 +117,11 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         bronze: 1000,
         weight: 0,
     },
-    "simple-tag-course": {
-        gold: 1000,
-        silver: 1000,
-        bronze: 1000,
-        weight: 0,
-    },
     "small-track": {
-        gold: 1000,
-        silver: 1000,
-        bronze: 1000,
-        weight: 0,
+        gold: 5,
+        silver: 10,
+        bronze: 15,
+        weight: .1,
     },
     "small-jump-track": {
         gold: 1000,
@@ -136,6 +130,18 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         weight: 0,
     },
     "test-course": {
+        gold: 1000,
+        silver: 1000,
+        bronze: 1000,
+        weight: 0,
+    },
+    "simple-tag-course": {
+        gold: 1000,
+        silver: 1000,
+        bronze: 1000,
+        weight: 0,
+    },
+    "basic-tag-course": {
         gold: 1000,
         silver: 1000,
         bronze: 1000,

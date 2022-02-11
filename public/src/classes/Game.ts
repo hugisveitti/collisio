@@ -89,7 +89,6 @@ export const activeTrackNames: TrackName[] = [
     "farm-track",
     "nurn-track",
     "sea-side-track",
-    "simple-tag-course",
     "f1-track",
     "f1-track-2",
     "russia-track",
@@ -101,7 +100,9 @@ export const activeTrackNames: TrackName[] = [
     "basic-track2",
     "basic-track3",
     "basic-track4",
-    "small-jump-track"
+    "small-jump-track",
+    "simple-tag-course",
+    "basic-tag-course",
 ]
 
 export const activeRaceTrackNames: TrackName[] = activeTrackNames.filter(name => {

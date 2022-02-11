@@ -26,6 +26,8 @@ import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
 import spaTrackImage from "../../images/tracks/spa-top.png";
 import simpleTagImage from "../../images/tracks/simple-tag-course.png";
 import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.png";
+import basicTagImage from "../../images/tracks/basic-tag-course.png";
+import basicTagMinImage from "../../images/tracks/min/min-basic-tag-course.png";
 
 import {
   getTrackInfos,
@@ -103,6 +105,11 @@ const trackImagePair: ITrackMinImagePair[] = [
     trackName: "simple-tag-course",
     minImage: simpleTagMinImage,
     largeImage: simpleTagImage,
+  },
+  {
+    trackName: "basic-tag-course",
+    minImage: basicTagMinImage,
+    largeImage: basicTagImage,
   },
 ];
 

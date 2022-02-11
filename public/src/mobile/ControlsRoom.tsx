@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
@@ -149,9 +149,11 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setRaceMedalData(
         getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
       );
-
+      const medalDiv = document.getElementById("medal-data");
+      medalDiv.classList.remove("hide");
       // show for 10 secs?
       setTimeout(() => {
+        medalDiv.classList.add("hide");
         setRaceMedalData(undefined);
       }, 10000);
 

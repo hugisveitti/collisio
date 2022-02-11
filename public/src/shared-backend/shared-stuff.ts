@@ -32,6 +32,7 @@ export type TrackName =
     | "monaco-track"
     | "town-track"
     | "simple-tag-course"
+    | "basic-tag-course"
     | "test-course"
 
 export type TrackCategory = "basic" | "long" | "short"
@@ -88,9 +89,6 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Beach track", type: "sea-side-track", gameType: "race", category: "long"
     },
     {
-        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short"
-    },
-    {
         name: "Town track", type: "town-track", gameType: "race", category: "long"
     },
     {
@@ -113,6 +111,12 @@ export const allTrackNames: ITrackInfo[] = [
     },
     {
         name: "Small track", type: "small-track", gameType: "race", category: "short"
+    },
+    {
+        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short"
+    },
+    {
+        name: "Basic tag course", type: "basic-tag-course", gameType: "tag", category: "basic"
     },
 ]
 
