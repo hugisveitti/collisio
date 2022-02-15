@@ -82,6 +82,7 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
               >
                 <MyCard>
                   <CardContent>
+                    <h3>{option.name}</h3>
                     <Typography>
                       Cost in euros <strong>€{option.euros}</strong>
                     </Typography>

@@ -10,6 +10,8 @@ export interface IBuyOption {
     coins: number
     type: "coins"
     id: string
+    name: string
+    currency: string
 }
 
 
