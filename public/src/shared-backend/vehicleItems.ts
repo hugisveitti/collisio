@@ -40,13 +40,14 @@ export interface ItemProperties extends IVehicleProps {
     name: string
     cost: number
     type: ItemType
+    physicalObject?: boolean
 }
 
 type VehicleProps = "engineForce" | "mass" | "frictionSlip" | "suspensionStiffness" | "suspensionRestLength" | "maxSpeed"
 
 export const possibleVehicleMods: { name: string, type: VehicleProps, max: number, min: number }[] = [
     {
-        name: "Acceleration", type: "engineForce", max: 12000, min: 3000,
+        name: "Acceleration", type: "engineForce", max: 14000, min: 3000,
     },
     {
         name: "Speed", type: "maxSpeed", max: 400, min: 100,
@@ -404,6 +405,28 @@ const normal2Items: CarItems = {
         frictionSlip: 2.3,
         mass: 130
     },
+    spoiler4: {
+        id: "normal2-spoiler4",
+        path: "spoiler4",
+        type: "spoiler",
+        name: "Spike",
+        cost: 40000,
+        frictionSlip: 3.3,
+        engineForce: 100,
+        maxSpeed: 10,
+        mass: 50
+    },
+    spoiler5: {
+        id: "normal2-spoiler5",
+        path: "spoiler5",
+        type: "spoiler",
+        name: "Spike",
+        cost: 60000,
+        frictionSlip: 1.2,
+        engineForce: 120,
+        maxSpeed: 11,
+        mass: 100
+    },
     wheelGuards1: {
         id: "normal2-wheelGuards1",
         path: "wheelGuards1",
@@ -609,6 +632,88 @@ const gokartItems: CarItems = {
 }
 
 const futureItems: CarItems = {
+    exhaust1: {
+        name: "Ellie",
+        path: "exhaust1",
+        id: "future-exhaust1",
+        type: "exhaust",
+        cost: 1000,
+        mass: 10,
+        maxSpeed: 5
+    },
+    spoiler1: {
+        name: "Steve",
+        path: "spoiler1",
+        id: "future-spolier1",
+        type: "spoiler",
+        cost: 1000,
+        mass: 5,
+        maxSpeed: 5,
+        frictionSlip: 2,
+        engineForce: 100
+    },
+    spoiler2: {
+        name: "Stoney",
+        path: "spoiler2",
+        id: "future-spolier2",
+        type: "spoiler",
+        cost: 20000,
+        mass: 25,
+        maxSpeed: 15,
+        frictionSlip: 2.2,
+        engineForce: 150
+    },
+    wheelGuards1: {
+        id: "future-wheelGuards1",
+        path: "wheelGuards1",
+        type: "wheelGuards",
+        name: "Wendy",
+        cost: 2500,
+        frictionSlip: 1,
+        mass: -75,
+        engineForce: 50,
+        suspensionRestLength: .2,
+        physicalObject: true
+    },
+    wheelGuards2: {
+        id: "future-wheelGuards2",
+        path: "wheelGuards2",
+        type: "wheelGuards",
+        name: "Wonkie",
+        cost: 10000,
+        frictionSlip: 1.1,
+        mass: -100,
+        engineForce: -50,
+        maxSpeed: 10,
+        suspensionRestLength: .2,
+        physicalObject: true
+    },
+    wheelGuards3: {
+        id: "future-wheelGuards3",
+        path: "wheelGuards3",
+        type: "wheelGuards",
+        name: "Wromby",
+        cost: 20000,
+        frictionSlip: 1.1,
+        mass: -120,
+        engineForce: 80,
+        maxSpeed: -10,
+        suspensionRestLength: .1,
+        physicalObject: true
+    },
+    wheelGuards4: {
+        id: "future-wheelGuards4",
+        path: "wheelGuards4",
+        type: "wheelGuards",
+        name: "Whip",
+        cost: 20000,
+        frictionSlip: 1.5,
+        mass: -130,
+        engineForce: 50,
+        maxSpeed: 25,
+        suspensionRestLength: .23,
+        physicalObject: true
+    },
 
 }
 

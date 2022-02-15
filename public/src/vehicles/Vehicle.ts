@@ -9,7 +9,7 @@ import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
 import { IGameScene } from "../game/IGameScene";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
-import { possibleVehicleItemTypes, possibleVehicleMods, VehicleSetup } from "../shared-backend/vehicleItems";
+import { possibleVehicleItemTypes, possibleVehicleMods, vehicleItems, VehicleSetup } from "../shared-backend/vehicleItems";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
@@ -240,6 +240,8 @@ export class Vehicle implements IVehicle {
 
     addItemToVehicle(itemPath: string) {
         return new Promise<ExtendedObject3D>((resolve, reject) => {
+            const itemProperties = vehicleItems[this.vehicleType][itemPath]
+            console.log("item props", itemProperties)
             if (!this.vehicleBody) {
 
                 console.warn("No vehiclebody to add items to")
@@ -252,7 +254,17 @@ export class Vehicle implements IVehicle {
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh") {
                         child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
+
+                        if (itemProperties?.physicalObject) {
+                            // this.scene.physics.destroy(this.vehicleBody)
+                            console.log("is physical object")
+                            this.scene.physics.add.existing(child as ExtendedObject3D, { mass: 1, collisionFlags: 1, shape: "convex", autoCenter: false })
+                            this.vehicleBody.add(child)
+
+                        }
+
                         this.vehicleBody.add(child)
+
                         resolve(child as ExtendedObject3D)
                     }
                 }

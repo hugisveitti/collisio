@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, setDoc } from "@firebase/firestore"
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc, where } from "@firebase/firestore"
 import { AllOwnership, getDefaultOwnership } from "../shared-backend/ownershipFunctions"
 import { TrackName, VehicleType } from "../shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, ItemOwnership } from "../shared-backend/vehicleItems"
@@ -162,3 +162,4 @@ export const getUserMedals = (userId: string): Promise<IUserMedals | undefined> 
         }
     })
 }
+

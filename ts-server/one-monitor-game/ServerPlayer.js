@@ -237,8 +237,12 @@ var Player = /** @class */ (function () {
             }
         });
     };
+    Player.prototype.vehicleSetupString = function () {
+        var _a, _b, _c;
+        return "exhaust: " + ((_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.exhaust) + ", spoiler: " + ((_b = this.vehicleSetup) === null || _b === void 0 ? void 0 : _b.spoiler) + ", wheel guards: " + ((_c = this.vehicleSetup) === null || _c === void 0 ? void 0 : _c.wheelGuards);
+    };
     Player.prototype.toString = function () {
-        return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetup;
+        return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetupString();
     };
     return Player;
 }());

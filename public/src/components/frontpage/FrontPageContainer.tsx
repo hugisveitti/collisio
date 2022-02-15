@@ -78,6 +78,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={trackPagePath} width={btnWidth}>
             Tracks
           </BackdropButton>
+          <BackdropButton link={buyCoinsPagePath} width={btnWidth}>
+            Buy coins
+          </BackdropButton>
           <BackdropButton
             disabled={!user}
             link={privateProfilePagePath}
@@ -91,12 +94,8 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={tournamentPagePath} width={btnWidth}>
             Tournaments
           </BackdropButton>
-
           <BackdropButton link={howToPlayPagePath} width={btnWidth}>
             How to play
-          </BackdropButton>
-          <BackdropButton link={buyCoinsPagePath} width={btnWidth}>
-            Buy coins
           </BackdropButton>
 
           <BackdropButton link={aboutPagePath} width={btnWidth}>

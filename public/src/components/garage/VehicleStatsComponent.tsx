@@ -16,6 +16,7 @@ interface IVehicleStatsComponent {
 
 const VehicleStatsComponent = (props: IVehicleStatsComponent) => {
   const stats = getStatsFromSetup(props.vehicleSetup);
+  console.log("type", props.vehicleType, "stats", stats);
 
   return (
     <div className="background" style={{ paddingBottom: 25 }}>

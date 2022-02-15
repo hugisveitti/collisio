@@ -1,15 +1,23 @@
-import { FieldValue } from "firebase-admin/firestore"
+import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import { defaultTokenData, getMedalAndTokens, ITokenData, MedalType } from "../public/src/shared-backend/medalFuncions"
 import { allCosts, AllOwnableItems, getDefaultOwnership } from "../public/src/shared-backend/ownershipFunctions"
 import { getItemName, TrackName, VehicleType } from "../public/src/shared-backend/shared-stuff"
 import { getDefaultItemsOwnership, vehicleItems } from "../public/src/shared-backend/vehicleItems"
-import { adminFirestore } from "./firebase-config"
+import { adminFirestore, firestore } from "./firebase-config"
 
 const tokenRefPath = "tokens"
 const medalsRefPath = "medals"
 const ownershipPath = "ownership"
 const vehicleSetupPath = "vehicleSetup"
 const itemOwnershipPath = "itemOwnership"
+// keep all transactions
+// itemTransactions/{userId}/{itemId}/:
+// -amount
+// -date
+// -itemId
+
+const transactionsPath = "transactions"
+const itemTransactionsPath = "items"
 
 interface IEndOfRaceInfoPlayerServer {
     totalTime: number
@@ -171,7 +179,8 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
 
 
         // TODO , item name 
-        let itemName = vehicleType ? vehicleItems[vehicleType][item].name : getItemName(item)
+        const itemName = vehicleType ? vehicleItems[vehicleType][item].name : getItemName(item)
+        const itemId = vehicleType ? vehicleItems[vehicleType][item].id : item
         const itemCost = vehicleType ? vehicleItems[vehicleType][item].cost : allCosts[item]
 
         console.log("item cost", itemCost)
@@ -220,17 +229,29 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
             coins: coins - itemCost
         }
 
-        const batch = adminFirestore.batch()
+        const transactionRef = adminFirestore.collection(transactionsPath).doc(userId).collection(itemTransactionsPath).doc(itemId)
 
+        const batch = adminFirestore.batch()
 
         if (owned.exists) {
             batch.update(ownershipRef, ownership)
         } else {
             console.log("owner ship does not exist")
             batch.set(ownershipRef, ownership)
-
         }
-        batch.update(tokenRef, newTokens)
+
+        if (tokensRes.exists) {
+            batch.update(tokenRef, newTokens)
+        } else {
+            batch.set(tokenRef, newTokens)
+        }
+        batch.set(transactionRef, {
+            date: Timestamp.now(),
+            cost: itemCost,
+            id: itemId,
+            name: itemName
+        })
+
 
         // think this needs to be changed for item
 

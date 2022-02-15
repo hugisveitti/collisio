@@ -1,6 +1,6 @@
 var path = require('path')
 
-var NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+// var NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
@@ -67,5 +67,14 @@ module.exports = {
     filename: '[name].bundle.js',
     //  filename: PROD ? '[name].bundle.min.js' : '[name].bundle.js',
     path: path.resolve(__dirname, 'dist')
-  }
+  },
+  // plugins: [
+  //   new NodePolyfillPlugin()
+  // ]
+  // target: "node",
+  // externals: {
+  //   bufferutil: "bufferutil",
+  //   "utf-8-validate": "utf-8-validate",
+  //   'commonjs2 firebase-admin': 'commonjs2 firebase-admin'
+  // }
 }

@@ -47,7 +47,7 @@ var vehicleCosts = {
     simpleSphere: 500,
     simpleCylindar: 50000,
     gokart: 3000,
-    future: 20000
+    future: 40000
 };
 var defaultOwnedTracks = [
     "farm-track",

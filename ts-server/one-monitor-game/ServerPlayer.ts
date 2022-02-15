@@ -298,8 +298,12 @@ export class Player {
         })
     }
 
+    vehicleSetupString() {
+        return `exhaust: ${this.vehicleSetup?.exhaust}, spoiler: ${this.vehicleSetup?.spoiler}, wheel guards: ${this.vehicleSetup?.wheelGuards}`
+    }
+
     toString() {
-        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetup}`
+        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetupString()}`
     }
 }
 

@@ -32,6 +32,7 @@ import LoginPageContainer from "./login/LoginPageContainer";
 import MobileOnlyWaitingRoom from "./mobileOnly/MobileOnlyWaitingRoom";
 import BuyCoinsComponent from "./monitary/BuyCoinsComponent";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
+import PaymentCallbackContainer from "./monitary/PaymentCallbackContainer";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
@@ -73,6 +74,8 @@ export const loginPagePath = "/login";
 export const garagePagePath = "/garage";
 export const trackPagePath = "/tracks";
 export const buyCoinsPagePath = "/buycoins";
+export const successfullPaymentPagePath = "/successfulpayment";
+export const cancelPaymentPagePath = "/cancelpayment";
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -287,6 +290,18 @@ const Routes = () => {
         <Route
           path={buyCoinsPagePath}
           render={(props) => <BuyCoinsComponent {...props} store={store} />}
+        />
+        <Route
+          path={successfullPaymentPagePath}
+          render={(props) => (
+            <PaymentCallbackContainer {...props} store={store} />
+          )}
+        />
+        <Route
+          path={cancelPaymentPagePath}
+          render={(props) => (
+            <PaymentCallbackContainer canceled {...props} store={store} />
+          )}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

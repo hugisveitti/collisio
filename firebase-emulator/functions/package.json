@@ -1,0 +1,14 @@
+{
+    "name": "race-game-firebase-functions",
+    "author": "Hugi Holm",
+    "license": "ISC",
+    "main": "index.js",
+    "engines": {
+        "node": "16"
+    },
+    "dependencies": {
+        "firebase-functions": "3.18.0",
+        "firebase-admin": "10.0.0",
+        "stripe": "8.202.0"
+    }
+}

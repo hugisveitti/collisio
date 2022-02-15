@@ -59,6 +59,13 @@ var medalsRefPath = "medals";
 var ownershipPath = "ownership";
 var vehicleSetupPath = "vehicleSetup";
 var itemOwnershipPath = "itemOwnership";
+// keep all transactions
+// itemTransactions/{userId}/{itemId}/:
+// -amount
+// -date
+// -itemId
+var transactionsPath = "transactions";
+var itemTransactionsPath = "items";
 /**
  * Trying to eliminate cheaters, don't know if that will work
  * Do just some obvious shit for now
@@ -164,7 +171,7 @@ exports.updatePlayersTokens = updatePlayersTokens;
  */
 var buyItem = function (userId, item, vehicleType) {
     return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-        var tokenRef, tokensRes, tokenData, coins, itemName, itemCost, ownershipRef, owned, ownership, newTokens, batch;
+        var tokenRef, tokensRes, tokenData, coins, itemName, itemId, itemCost, ownershipRef, owned, ownership, newTokens, transactionRef, batch;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -180,6 +187,7 @@ var buyItem = function (userId, item, vehicleType) {
                         coins = tokenData.coins;
                     }
                     itemName = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].name : (0, shared_stuff_1.getItemName)(item);
+                    itemId = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].id : item;
                     itemCost = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].cost : ownershipFunctions_1.allCosts[item];
                     console.log("item cost", itemCost);
                     if (itemCost === undefined) {
@@ -217,6 +225,7 @@ var buyItem = function (userId, item, vehicleType) {
                     // can buy
                     ownership[item] = true;
                     newTokens = __assign(__assign({}, tokenData), { coins: coins - itemCost });
+                    transactionRef = firebase_config_1.adminFirestore.collection(transactionsPath).doc(userId).collection(itemTransactionsPath).doc(itemId);
                     batch = firebase_config_1.adminFirestore.batch();
                     if (owned.exists) {
                         batch.update(ownershipRef, ownership);
@@ -225,7 +234,18 @@ var buyItem = function (userId, item, vehicleType) {
                         console.log("owner ship does not exist");
                         batch.set(ownershipRef, ownership);
                     }
-                    batch.update(tokenRef, newTokens);
+                    if (tokensRes.exists) {
+                        batch.update(tokenRef, newTokens);
+                    }
+                    else {
+                        batch.set(tokenRef, newTokens);
+                    }
+                    batch.set(transactionRef, {
+                        date: firestore_1.Timestamp.now(),
+                        cost: itemCost,
+                        id: itemId,
+                        name: itemName
+                    });
                     // think this needs to be changed for item
                     batch.commit().then(function () {
                         resolve({

@@ -1,12 +1,13 @@
 // Import the functions you need from the SDKs you need
 import { getStorage } from "@firebase/storage";
 import { initializeApp } from "firebase/app";
-import { createUserWithEmailAndPassword, FacebookAuthProvider, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from "firebase/auth";
+import { connectAuthEmulator, createUserWithEmailAndPassword, FacebookAuthProvider, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import "firebase/storage";
 import { toast } from "react-toastify";
 import { inDevelopment } from "../utils/settings";
 import { getFirebaseConfig } from "./firebaseConfig";
+import { connectFunctionsEmulator, getFunctions } from "@firebase/functions"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -28,14 +29,19 @@ const getMyFirestore = () => {
     return getFirestore(app)
 }
 
+export const functions = getFunctions(app)
 export const firestore = getMyFirestore()
+export const auth = getAuth(app)
 
 if (inDevelopment) {
+    console.log("connecting to emulator")
 
     connectFirestoreEmulator(firestore, "localhost", 8000)
+    connectFunctionsEmulator(functions, "localhost", 5001)
+    connectAuthEmulator(auth, "http://localhost:9099")
+
 }
 
-export const auth = getAuth(app)
 getRedirectResult(auth).then(res => {
     // console.log("redirect res", res)
 }).catch(err => {

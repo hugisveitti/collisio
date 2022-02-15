@@ -42,7 +42,7 @@ const vehicleCosts: { [vehicleType in VehicleType]: number } = {
     simpleSphere: 500,
     simpleCylindar: 50000,
     gokart: 3000,
-    future: 20000
+    future: 40000
 }
 
 

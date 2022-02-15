@@ -492,7 +492,7 @@ export class GameScene extends Scene3D implements IGameScene {
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound })
+                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound, vehicleSetup: this.players[i].vehicleSetup })
                 } else {
                     newVehicle = new SphereVehicle(
                         { scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound }

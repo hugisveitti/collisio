@@ -32,6 +32,7 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
     if (props.notAfford) {
       return (
         <>
+          <Typography>Cost {getSizePrefix(props.cost)}</Typography>
           <Typography>You don't have enough coins</Typography>
           <BackdropButton link={buyCoinsPagePath}>Buy coins</BackdropButton>
         </>

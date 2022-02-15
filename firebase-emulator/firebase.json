@@ -13,10 +13,17 @@
     "firestore": {
       "port": 8000,
       "rules": "./firestore/firestore.rules"
+    },
+    "functions": {
+      "source": "./functions",
+      "port": 5001
     }
   },
   "firestore": {
     "port": 8000,
     "rules": "./firestore/firestore.rules"
+  },
+  "functions": {
+    "source": "./functions"
   }
 }

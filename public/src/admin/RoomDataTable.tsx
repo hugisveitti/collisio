@@ -44,6 +44,13 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open}>
+            <div>
+              {props.roomInfo.players.map((p) => (
+                <div>
+                  id:{p.id} name:{p.playerName}
+                </div>
+              ))}
+            </div>
             <List>
               {keys.map((k) => {
                 if (typeof props.roomInfo[k] === "object") {

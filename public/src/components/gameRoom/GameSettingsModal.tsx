@@ -1,20 +1,18 @@
 import CloseIcon from "@mui/icons-material/Close";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { IGameSettings } from "../../classes/localGameSettings";
+import { IUser } from "../../classes/User";
 import { IGameScene } from "../../game/IGameScene";
+import BackdropButton from "../button/BackdropButton";
 import FullscreenButton from "../inputs/FullscreenButton";
-import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import VehicleSelect from "../inputs/VehicleSelect";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
-import { IStore } from "../store";
-import GameSettingsComponent from "../settings/GameSettingsComponent";
-import BackdropButton from "../button/BackdropButton";
 import { connectPagePath } from "../Routes";
-import { IUser } from "../../classes/User";
+import GameSettingsComponent from "../settings/GameSettingsComponent";
+import { IStore } from "../store";
 
 interface IGameSettingsModal {
   open: boolean;
