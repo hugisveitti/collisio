@@ -30,6 +30,7 @@ interface IBuyCoinsComponent {
 const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
   const user = useContext(UserContext);
 
+  const [isBuying, setIsBuying] = useState(false);
   const [buyOptions, setBuyOptions] = useState(
     undefined as IBuyOption[] | undefined
   );
@@ -65,10 +66,21 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
             <BackdropButton link={loginPagePath}>Login</BackdropButton>
           </Grid>
         )}
-        {!buyOptions ? (
-          <Grid item xs={12}>
-            <CircularProgress />
-          </Grid>
+        {!buyOptions || isBuying ? (
+          <>
+            <Grid item xs={12}>
+              <CircularProgress />
+            </Grid>
+            <Grid item xs={12}>
+              <div className="background">
+                <Typography>
+                  {isBuying
+                    ? "Loading checkout..."
+                    : "Loading coin packages..."}
+                </Typography>
+              </div>
+            </Grid>
+          </>
         ) : (
           buyOptions.map((option) => {
             return (
@@ -95,7 +107,14 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
                           toast.error("Please login to buy coins");
                           return;
                         }
-                        buyCoins(user.uid, option.id);
+                        setIsBuying(true);
+                        buyCoins(user.uid, option.id)
+                          .then(() => {
+                            setIsBuying(false);
+                          })
+                          .catch((err) => {
+                            setIsBuying(false);
+                          });
                       }}
                     >
                       Buy {getSizePrefix(option.coins)} coins

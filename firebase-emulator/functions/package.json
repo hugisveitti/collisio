@@ -9,6 +9,7 @@
     "dependencies": {
         "firebase-functions": "3.18.0",
         "firebase-admin": "10.0.0",
-        "stripe": "8.202.0"
+        "stripe": "8.202.0",
+        "cors": "*"
     }
 }

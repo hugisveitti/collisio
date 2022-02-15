@@ -1,0 +1,1 @@
+stripe listen --forward-to http://localhost:5001/race-game-a4327/europe-west1/stripeWebhook -e checkout.session.completed

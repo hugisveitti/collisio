@@ -1,7 +1,6 @@
 {
   "stripe": {
     "secret": "sk_test_HMC2pcWKK2uBCFgzg5OONC7Q",
-    "payments_webhooks_secret": "whsec_b6GAjJfGo7Avypn8aKovfQ1kSY6HlKBi",
-    "payments_webhooks_secret2": "whsec_7cb9dbc11e86c56deb00314ecf5ace5de9f5a7d6f663e6c525f7ef55731b93ba"
+    "payments_webhooks_secret": "whsec_7cb9dbc11e86c56deb00314ecf5ace5de9f5a7d6f663e6c525f7ef55731b93ba"
   }
 }

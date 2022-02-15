@@ -55,7 +55,7 @@ export const loadMusic = (file: string): Promise<AudioBuffer> => {
 
 let music: Audio
 
-export const addMusic = (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
+export const addMusic = async (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
     if (camera && getDeviceType() === "desktop" && !music) {
         const listener = new AudioListener()
         camera.add(listener)

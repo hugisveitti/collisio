@@ -2,11 +2,10 @@
 
 const functions = require("firebase-functions")
 const admin = require("firebase-admin")
-
+const stripe = require("stripe")(functions.config().stripe.secret);
 
 admin.initializeApp()
 
-const stripe = require("stripe")(functions.config().stripe.token);
 
 const productsPath = "products"
 const transactionsPath = "transactions"
@@ -25,20 +24,26 @@ const getProduct = (productId) => {
     })
 }
 
-exports.createStripeCheckout = functions.region("europe-west1").https.onCall(async (data, context) => {
-    // exports.createStripeCheckout = functions.https.onCall(async (data, context) => {
+//exports.createStripeCheckout = functions.region("europe-west1").https.onCall(async (data, context) => {
+exports.createStripeCheckout = functions.https.onCall(async (data, context) => {
+    // cors(data, context, async () => {
 
-    const { userId, productId } = data
+    const userId = context.auth.uid
+    if (!userId) {
+        throw new functions.https.HttpsError("failed-precondition", "User must be authenticated")
+    }
+    const { productId } = data
     console.log("userId", userId, "productId", productId)
     const product = await getProduct(productId)
     if (!product) {
-        return
+        console.log("No product")
+        throw new functions.https.HttpsError("failed-precondition", "Product with id " + productId + " not found")
     }
 
     // since metadata can only contain string values
 
 
-    const stripe = require("stripe")(functions.config().stripe.secret);
+    console.log("staring session", functions.config().stripe.secret)
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -66,6 +71,9 @@ exports.createStripeCheckout = functions.region("europe-west1").https.onCall(asy
             userId
         }
     })
+
+
+    console.log("session id", session.id)
     return {
         id: session.id
     }

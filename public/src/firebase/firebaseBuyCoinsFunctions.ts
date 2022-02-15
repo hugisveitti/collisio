@@ -37,7 +37,7 @@ export const getCoinsBuyOptions = () => {
         }
     })
 }
-const stripePublicKey = "pk_test_V8RLXWQsXMTEZDD3hQIv8Pfg"
+const stripePublicKey = inDevelopment ? "pk_test_V8RLXWQsXMTEZDD3hQIv8Pfg" : "pk_live_QYyQV8tNjrnhAQUYO2jBczsI"
 // import Stripe from "stripe"
 
 // const stripe = new Stripe(stripePublicKey, {
@@ -45,6 +45,8 @@ const stripePublicKey = "pk_test_V8RLXWQsXMTEZDD3hQIv8Pfg"
 // })
 
 import { loadStripe } from '@stripe/stripe-js';
+import { toast } from "react-toastify"
+import { inDevelopment } from "../utils/settings"
 
 
 interface IStripeCheckoutData {
@@ -60,6 +62,7 @@ export const buyCoins = (userId: string, productId: string): Promise<void> => {
 
         const stripe = await loadStripe(stripePublicKey);
 
+
         const createStripeCheckout = httpsCallable<IStripeCheckoutData, IStripeCheckoutCallback>(functions, "createStripeCheckout")
         createStripeCheckout({ userId, productId }).then(async (response) => {
             console.log("results of checkout", response)
@@ -72,6 +75,8 @@ export const buyCoins = (userId: string, productId: string): Promise<void> => {
 
         }).catch((err) => {
             console.warn("Error checking out:", err)
+            toast.error("An error occured while checking out" + err)
+            reject()
         })
     })
 }
