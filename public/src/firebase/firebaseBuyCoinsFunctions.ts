@@ -1,6 +1,9 @@
 import { collection, getDocs, orderBy, query, where } from "@firebase/firestore"
 import { firestore, functions } from "./firebaseInit"
 import { httpsCallable } from "@firebase/functions"
+import { loadStripe } from '@stripe/stripe-js';
+import { toast } from "react-toastify"
+import { inDevelopment } from "../utils/settings"
 
 const productsRefPath = "products"
 
@@ -37,16 +40,6 @@ export const getCoinsBuyOptions = () => {
         }
     })
 }
-const stripePublicKey = inDevelopment ? "pk_test_V8RLXWQsXMTEZDD3hQIv8Pfg" : "pk_live_QYyQV8tNjrnhAQUYO2jBczsI"
-// import Stripe from "stripe"
-
-// const stripe = new Stripe(stripePublicKey, {
-//     apiVersion: null
-// })
-
-import { loadStripe } from '@stripe/stripe-js';
-import { toast } from "react-toastify"
-import { inDevelopment } from "../utils/settings"
 
 
 interface IStripeCheckoutData {
@@ -59,6 +52,7 @@ interface IStripeCheckoutCallback {
 }
 export const buyCoins = (userId: string, productId: string): Promise<void> => {
     return new Promise<void>(async (resolve, reject) => {
+        const stripePublicKey = inDevelopment ? "pk_test_V8RLXWQsXMTEZDD3hQIv8Pfg" : "pk_live_QYyQV8tNjrnhAQUYO2jBczsI"
 
         const stripe = await loadStripe(stripePublicKey);
 
