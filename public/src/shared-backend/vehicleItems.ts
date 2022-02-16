@@ -53,7 +53,7 @@ export const possibleVehicleMods: { name: string, type: VehicleProps, max: numbe
         name: "Speed", type: "maxSpeed", max: 400, min: 100,
     },
     {
-        name: "Mass", type: "mass", max: 1200, min: 0
+        name: "Mass", type: "mass", max: 1500, min: 0
     },
     {
         name: "Handling", type: "frictionSlip", max: 22, min: 0
@@ -779,6 +779,7 @@ export const defaultItemsOwnership: ItemsOwnership = {
 
 
 export const getStatsFromSetup = (setup: VehicleSetup) => {
+    if (!setup) return {}
     const stats: IVehicleProps = {}
 
     for (let item of possibleVehicleItemTypes) {
@@ -789,7 +790,7 @@ export const getStatsFromSetup = (setup: VehicleSetup) => {
                 }
                 if (setup?.[item]?.[mod.type]) {
                     // @ts-ignore
-                    stats[mod.type] += (setup[item][mod.type] ?? 0)
+                    stats[mod.type] += (setup[item]?.[mod.type] ?? 0)
                 }
             }
         }

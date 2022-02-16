@@ -121,7 +121,7 @@ const HighscorePage = (props: IHighscorePage) => {
 
   /** use window.localStorage to remember what user was looking at */
   return (
-    <BackdropContainer backgroundContainer>
+    <BackdropContainer backgroundContainer autoEnter>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <ToFrontPageButton color="white" />

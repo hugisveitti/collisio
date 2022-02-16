@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query, where } from "@firebase/firestore"
+import { collection, getDocs, limit, orderBy, query, where } from "@firebase/firestore"
 import { firestore, functions } from "./firebaseInit"
 import { httpsCallable } from "@firebase/functions"
 import { loadStripe } from '@stripe/stripe-js';
@@ -6,7 +6,8 @@ import { toast } from "react-toastify"
 import { inDevelopment } from "../utils/settings"
 
 const productsRefPath = "products"
-
+const transactionsPath = "transactions"
+const coinTransactionsPath = "coins"
 
 export interface IBuyOption {
     euros: number
@@ -72,5 +73,27 @@ export const buyCoins = (userId: string, productId: string): Promise<void> => {
             toast.error("An error occured while checking out" + err)
             reject()
         })
+    })
+}
+
+export interface ICoinTransaction {
+    amount: number
+    metadata: {
+        coins: number
+        euros: number
+        productName: string
+    }
+}
+
+export const getLatestCoinTransaction = (userId: string) => {
+    return new Promise<ICoinTransaction | undefined>(async (resolve, reject) => {
+        const ref = collection(firestore, transactionsPath, userId, coinTransactionsPath)
+        const q = query(ref, orderBy("date", "asc"), limit(1))
+        const res = await getDocs(q)
+        let transaction = undefined
+        res.forEach(d => {
+            transaction = d.data()
+        })
+        resolve(transaction)
     })
 }

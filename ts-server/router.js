@@ -50,25 +50,6 @@ var router = function (app) {
     var isValidHost = function (host) {
         return onLocalhost || (host === null || host === void 0 ? void 0 : host.includes("collisio.club")) || (host === null || host === void 0 ? void 0 : host.includes("collisia.club"));
     };
-    app.post("/defaultownership", function (req, res) {
-        // @ts-ignore
-        var userId = req.body.userId;
-        console.log("Setting default ownership of userid", userId);
-        if (userId) {
-            (0, firebaseCoinFunctions_1.setDefaultOwnership)(userId).then(function () {
-                res.status(200).send({
-                    message: "Default ownership set",
-                    status: "success"
-                });
-            });
-        }
-        else {
-            res.status(404).send({
-                message: "Unknown user",
-                status: "Error"
-            });
-        }
-    });
     app.post("/buyitem", function (req, res) {
         var _a = req.body, userId = _a.userId, item = _a.item, vehicleType = _a.vehicleType;
         console.log("Buy item", userId, item);
@@ -135,13 +116,13 @@ var router = function (app) {
     });
     var sendIndexHTML = function (req, res) {
         var host = req.get("host");
-        console.log("reqest to index");
-        printRequestInfo(req);
+        //   console.log("reqest to index")
         if (isValidHost(host)) {
+            printRequestInfo(req);
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
-            console.log("Not valid host");
+            //   console.log("Not valid host")
             res.status(500).send("ERROR");
         }
     };

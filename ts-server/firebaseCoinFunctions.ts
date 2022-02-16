@@ -270,24 +270,3 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
     })
 }
 
-/**
- * Set default owner ship,
- * use merge, otherwise users could destroy accounts of each other
- */
-export const setDefaultOwnership = (userId: string): Promise<void> => {
-    return new Promise<void>(async (resolve, reject) => {
-
-        const ref = adminFirestore.doc(ownershipPath + "/" + userId) //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
-        console.log("setting default ownership")
-        const defaultOwnership = getDefaultOwnership()
-        try {
-
-            await ref.set(defaultOwnership)
-            resolve()
-        } catch (err) {
-            console.warn("error setting default ownership", err)
-            resolve()
-        }
-    })
-
-}

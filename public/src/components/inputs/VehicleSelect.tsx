@@ -33,6 +33,7 @@ interface IVehicleSelect {
   store?: IStore;
   simpleSelect?: boolean;
   user: IUser;
+  onUnequipAllItems?: () => void;
 }
 
 const VehicleSelect = ({ ...props }: IVehicleSelect) => {
@@ -114,6 +115,9 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
               }}
               onChangeVehicleItem={(item) => {
                 props.onChangeVehicleItem?.(item);
+              }}
+              onUnequipAllItems={() => {
+                props.onUnequipAllItems?.();
               }}
             />
           )}

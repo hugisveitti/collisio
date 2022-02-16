@@ -100,15 +100,16 @@ const GarageContainer = (props: IGarageContainer) => {
           props.store.setVehiclesSetup(newVehicleSetup);
         }}
         onUnequipVehicleItem={(item: ItemProperties) => {
-          const newVehicleSetup = { ...props.store.vehiclesSetup };
-
-          delete newVehicleSetup[
+          if (!user) return;
+          const newVehiclesSetup = { ...props.store.vehiclesSetup };
+          delete newVehiclesSetup[
             props.store.userSettings.vehicleSettings.vehicleType
           ][item.type];
 
-          props.store.setVehiclesSetup(newVehicleSetup);
+          props.store.setVehiclesSetup(newVehiclesSetup);
         }}
         onUnequipAllItems={() => {
+          if (!user) return;
           const newVehicleSetup = { ...props.store.vehiclesSetup };
 
           for (let item of possibleVehicleItemTypes) {

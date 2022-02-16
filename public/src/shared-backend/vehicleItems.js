@@ -30,7 +30,7 @@ exports.possibleVehicleMods = [
         name: "Speed", type: "maxSpeed", max: 400, min: 100,
     },
     {
-        name: "Mass", type: "mass", max: 1200, min: 0
+        name: "Mass", type: "mass", max: 1500, min: 0
     },
     {
         name: "Handling", type: "frictionSlip", max: 22, min: 0
@@ -702,19 +702,21 @@ exports.defaultItemsOwnership = {
     future: undefined
 };
 var getStatsFromSetup = function (setup) {
-    var _a, _b;
+    var _a, _b, _c;
+    if (!setup)
+        return {};
     var stats = {};
     for (var _i = 0, possibleVehicleItemTypes_1 = exports.possibleVehicleItemTypes; _i < possibleVehicleItemTypes_1.length; _i++) {
         var item = possibleVehicleItemTypes_1[_i];
         if (setup[item]) {
-            for (var _c = 0, possibleVehicleMods_1 = exports.possibleVehicleMods; _c < possibleVehicleMods_1.length; _c++) {
-                var mod = possibleVehicleMods_1[_c];
+            for (var _d = 0, possibleVehicleMods_1 = exports.possibleVehicleMods; _d < possibleVehicleMods_1.length; _d++) {
+                var mod = possibleVehicleMods_1[_d];
                 if (stats[mod.type] === undefined) {
                     stats[mod.type] = 0;
                 }
                 if ((_a = setup === null || setup === void 0 ? void 0 : setup[item]) === null || _a === void 0 ? void 0 : _a[mod.type]) {
                     // @ts-ignore
-                    stats[mod.type] += ((_b = setup[item][mod.type]) !== null && _b !== void 0 ? _b : 0);
+                    stats[mod.type] += ((_c = (_b = setup[item]) === null || _b === void 0 ? void 0 : _b[mod.type]) !== null && _c !== void 0 ? _c : 0);
                 }
             }
         }

@@ -190,6 +190,7 @@ var Player = /** @class */ (function () {
                 _this.userSettings = userSettings;
             }
             if (vehicleSetup) {
+                console.log("vehiclesetup changed", vehicleSetup.exhaust, vehicleSetup.wheelGuards, vehicleSetup.spoiler);
                 _this.vehicleSetup = vehicleSetup;
             }
             // TODO: check if user owns vehicleType

@@ -24,6 +24,7 @@ interface IBackdropContainer {
   loading?: boolean;
   center?: boolean;
   noMusic?: boolean;
+  autoEnter?: boolean;
 }
 
 const BackdropContainer = (props: IBackdropContainer) => {
@@ -33,7 +34,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
 
   const [camPosNum, setCamPosNum] = useState(0);
 
-  const [pressedStartGame, setPressedStartGame] = useState(false);
+  const [pressedStartGame, setPressedStartGame] = useState(props.autoEnter);
   const [ratioLoaded, setRatioLoaded] = useState(0);
 
   const volume = props.noMusic

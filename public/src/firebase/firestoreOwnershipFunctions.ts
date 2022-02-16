@@ -13,20 +13,6 @@ const itemOwnershipPath = "itemOwnership"
 const medalsRefPath = "medals"
 
 
-const setDefaultOwnership = (userId: string) => {
-    const options: RequestInit = {
-        method: "POST",
-        mode: "same-origin",
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-            userId
-        })
-    }
-    fetch(`/defaultownership`, options)
-}
 
 
 /**
@@ -48,7 +34,7 @@ export const getOwnership = (userId: string): Promise<AllOwnership> => {
 
             } else {
                 // set ownership to default
-                setDefaultOwnership(userId)
+                console.log("no ownership")
             }
             resolve(ownership)
         } catch (err) {

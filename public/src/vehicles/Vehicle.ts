@@ -15,7 +15,7 @@ import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
 import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
-import { VehiclesSetup } from "./VehicleSetup";
+
 
 const maxFov = 70
 const minFov = 55
@@ -51,6 +51,7 @@ export class Vehicle implements IVehicle {
     badRotationTicks = 0
     useBadRotationTicks = true
     modelsLoaded = false
+    isUpdatingVehicleSetup = false
 
     oldPos: Vector3
 
@@ -187,6 +188,10 @@ export class Vehicle implements IVehicle {
     };
 
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
+        console.log("this.isUpdatingVehicleSetup ", this.isUpdatingVehicleSetup)
+        console.log("vehiclesetup", vehicleSetup.exhaust?.path, vehicleSetup.wheelGuards?.path, vehicleSetup.spoiler?.path)
+        if (this.isUpdatingVehicleSetup) return
+        this.isUpdatingVehicleSetup = true
         if (vehicleSetup.vehicleType !== this.vehicleType) {
             console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
             return
@@ -195,7 +200,9 @@ export class Vehicle implements IVehicle {
         this.vehicleConfig = this.getDefaultVehicleConfig()
         // not load if already loaded?
         this.vehicleSetup = vehicleSetup
+        console.log("updating vehicle setup in Vehicle.ts, vehiclesetup:", vehicleSetup, "vehicleItems", this.vehicleItems)
         for (let item of possibleVehicleItemTypes) {
+            console.log("possible item", item)
             if (this.vehicleItems[item]?.props?.path !== vehicleSetup[item]?.path) {
                 if (this.vehicleItems[item]?.model) {
                     this.vehicleBody.remove(this.vehicleItems[item].model)
@@ -215,10 +222,12 @@ export class Vehicle implements IVehicle {
 
             for (let mod of possibleVehicleMods) {
                 if (vehicleSetup?.[item]?.[mod.type]) {
-                    this.vehicleConfig[mod.type] += Math.floor(vehicleSetup?.[item]?.[mod.type] * 1000) / 1000
+                    console.log("this.vehicleConfig[mod.type] , Math.floor(vehicleSetup?.[item]?.[mod.type])", mod.type, this.vehicleConfig[mod.type], Math.floor(vehicleSetup?.[item]?.[mod.type]))
+                    this.vehicleConfig[mod.type] += Math.floor(vehicleSetup?.[item]?.[mod.type])
                 }
             }
         }
+        this.isUpdatingVehicleSetup = false
         this._updateVehicleSetup()
     }
 

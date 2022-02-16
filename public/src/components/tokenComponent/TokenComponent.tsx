@@ -59,7 +59,7 @@ const TokenComponent = (props: ITokenComponent) => {
         {pointsFinishedInThisLevel.toFixed(0)} /{" "}
         {pointsFinishedInThisLevel + pointsToNextLevel}
       </span>
-      <Progress value={ratioOfLevelFinished} max={1} />
+      <Progress value={ratioOfLevelFinished + 0.1} max={1} />
       {props.showInfo && (
         <>
           <br />

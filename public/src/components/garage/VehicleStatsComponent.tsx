@@ -16,14 +16,12 @@ interface IVehicleStatsComponent {
 
 const VehicleStatsComponent = (props: IVehicleStatsComponent) => {
   const stats = getStatsFromSetup(props.vehicleSetup);
-  console.log("type", props.vehicleType, "stats", stats);
 
   return (
     <div className="background" style={{ paddingBottom: 25 }}>
       {possibleVehicleMods.map((mod) => {
         const key = mod.type;
-        const val =
-          vehicleConfigs[props.vehicleType][key] + (stats[mod.type] ?? 0);
+        const val = vehicleConfigs[props.vehicleType][key]; //+ (stats[mod.type] ?? 0);
 
         return (
           <div key={key} style={{ height: 25, marginTop: 10, color: "white" }}>
@@ -34,6 +32,7 @@ const VehicleStatsComponent = (props: IVehicleStatsComponent) => {
               }}
               max={mod.max - mod.min}
               value={val - mod.min}
+              extraValue={stats[mod.type] ?? 0}
             />
           </div>
         );

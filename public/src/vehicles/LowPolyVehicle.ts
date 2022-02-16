@@ -1033,7 +1033,7 @@ export class LowPolyVehicle extends Vehicle {
 
     // set to default vehicle config
     _updateVehicleSetup() {
-
+        console.log("updated vehilce config", this.vehicleConfig)
         this.updateMass(this.vehicleConfig.mass)
         this.updateWheelsSuspension()
         this.updateMaxSpeed()

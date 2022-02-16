@@ -1128,6 +1128,7 @@ export class GameScene extends Scene3D implements IGameScene {
         this.socket?.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
                 if (this.vehicles.length >= data.playerNumber - 1) {
+                    console.log("user settings changed", data)
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
                     */

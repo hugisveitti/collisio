@@ -247,8 +247,8 @@ export class RaceGameScene extends GameScene {
         this.winner = ""
         this.winTime = -1
 
-        // this.driverRecorder?.reset()
-        // this.ghostDriver?.reset()
+        this.driverRecorder?.reset()
+        this.ghostDriver?.reset()
 
         await this.createGhostVehicle()
 

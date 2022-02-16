@@ -2,13 +2,13 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import collisioPic from "../images/collisio-fb.png";
+import logo from "../images/logo.jpg";
 import hugi from "../images/hugi.jpg";
 import BackdropContainer from "./backdrop/BackdropContainer";
 import BackdropButton from "./button/BackdropButton";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import DonateButton from "./monitary/DonateButton";
-import { buyPremiumPagePath } from "./Routes";
-import { IStore } from "./store";
+import { buyCoinsPagePath } from "./Routes";
 
 interface IAboutPageComponent {}
 
@@ -23,7 +23,7 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           <Typography variant="h3">About Collisio</Typography>
         </Grid>
         <Grid item xs={12}>
-          <img src={collisioPic} style={{ width: "100%", maxWidth: 500 }} />
+          <img src={logo} style={{ width: 500, maxWidth: "90%" }} />
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body1">
@@ -61,11 +61,11 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
         </Grid>
         <Grid item xs={12}>
           <Typography>
-            Help support this project by buying a premium account or donating.
+            Help support this project by buying in game coins or donating.
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <BackdropButton link={buyPremiumPagePath}>Go Premium</BackdropButton>
+          <BackdropButton link={buyCoinsPagePath}>Buy Coins</BackdropButton>
         </Grid>
         <Grid item xs={12}>
           <DonateButton />

@@ -104,7 +104,7 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
                     <BackdropButton
                       onClick={() => {
                         if (!user) {
-                          toast.error("Please login to buy coins");
+                          toast.error("You need to be logged in to buy coins");
                           return;
                         }
                         setIsBuying(true);

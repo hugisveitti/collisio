@@ -14,4 +14,11 @@
   background-color: white;
   height: 100%;
   transition: 0.2s;
+  display: inline-block;
+}
+.progress__inner--extra {
+  background-color: #aaa;
+  height: 100%;
+  transition: 0.3s;
+  display: inline-block;
 }

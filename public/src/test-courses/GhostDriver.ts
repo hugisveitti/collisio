@@ -221,6 +221,9 @@ export class DriveRecorder {
     }
 
     reset() {
+        console.log("resetting ghost recorder")
+        this.prevTime = 0
+        this.instructions = []
         this.finishedLaps = 0
     }
 

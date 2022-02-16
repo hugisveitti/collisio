@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setDefaultOwnership = exports.buyItem = exports.updatePlayersTokens = void 0;
+exports.buyItem = exports.updatePlayersTokens = void 0;
 var firestore_1 = require("firebase-admin/firestore");
 var medalFuncions_1 = require("../public/src/shared-backend/medalFuncions");
 var ownershipFunctions_1 = require("../public/src/shared-backend/ownershipFunctions");
@@ -265,36 +265,3 @@ var buyItem = function (userId, item, vehicleType) {
     }); });
 };
 exports.buyItem = buyItem;
-/**
- * Set default owner ship,
- * use merge, otherwise users could destroy accounts of each other
- */
-var setDefaultOwnership = function (userId) {
-    return new Promise(function (resolve, reject) { return __awaiter(void 0, void 0, void 0, function () {
-        var ref, defaultOwnership, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    ref = firebase_config_1.adminFirestore.doc(ownershipPath + "/" + userId) //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
-                    ;
-                    console.log("setting default ownership");
-                    defaultOwnership = (0, ownershipFunctions_1.getDefaultOwnership)();
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, ref.set(defaultOwnership)];
-                case 2:
-                    _a.sent();
-                    resolve();
-                    return [3 /*break*/, 4];
-                case 3:
-                    err_1 = _a.sent();
-                    console.warn("error setting default ownership", err_1);
-                    resolve();
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
-};
-exports.setDefaultOwnership = setDefaultOwnership;

@@ -26,6 +26,7 @@ import {
   possibleVehicleMods,
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
+import { getDeviceType } from "../../utils/settings";
 import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
@@ -65,7 +66,22 @@ let originalTop = 0;
 let firstScroll = false;
 let box = { height: 0 };
 
+function getScrollParent(node) {
+  if (node == null) {
+    return null;
+  }
+
+  if (node.scrollHeight > node.clientHeight) {
+    return node;
+  } else {
+    return getScrollParent(node.parentNode);
+  }
+}
+
+let scrollParent: HTMLElement | Window;
+
 const GarageComponent = (props: IGarageComponent) => {
+  const onMobile = getDeviceType() === "mobile";
   const user = useContext(UserContext);
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -102,6 +118,9 @@ const GarageComponent = (props: IGarageComponent) => {
   );
 
   const handleScrolling = () => {
+    // only scrolling on mobile
+
+    if (!onMobile) return;
     const originalHeight = box.height;
 
     // hacky, was happening because some items were still loading
@@ -110,14 +129,26 @@ const GarageComponent = (props: IGarageComponent) => {
       originalTop = stickyDivRef.current.offsetTop;
     }
 
-    if (window.scrollY > originalTop) {
-      let height = originalHeight - (window.scrollY - originalTop);
+    if (!scrollParent) {
+      console.warn("No scrollparent");
+      return;
+    }
+    const scrollY =
+      scrollParent instanceof HTMLElement
+        ? scrollParent.scrollTop
+        : scrollParent.scrollY;
+    if (scrollY > originalTop) {
+      // if over then make renderer smaller
+      let height = originalHeight - (scrollY - originalTop);
       height = Math.max(height, 100);
 
       setRendererHeight(height);
+      // if over so much that the renderer cant be seen, move the div
+      // as long as the garage is in frame
+
       if (
-        window.scrollY > window.innerHeight - originalTop &&
-        window.scrollY <
+        scrollY > window.innerHeight - originalTop &&
+        scrollY <
           garageRef.current.offsetTop +
             garageRef.current.clientHeight -
             box.height
@@ -126,7 +157,7 @@ const GarageComponent = (props: IGarageComponent) => {
           "style",
           `
           position:relative;
-          top:${window.scrollY - originalTop}px;
+          top:${scrollY - originalTop}px;
           max-width:100%;
           z-index:1000;
         `
@@ -141,7 +172,7 @@ const GarageComponent = (props: IGarageComponent) => {
         );
       }
     } else if (
-      window.scrollY >
+      scrollY >
       garageRef.current.offsetTop + garageRef.current.clientHeight
     ) {
     } else {
@@ -161,11 +192,18 @@ const GarageComponent = (props: IGarageComponent) => {
       const top = stickyDivRef.current.offsetTop;
       originalTop = top;
       box = vehicleRef.current.getBoundingClientRect();
-      console.log("box", box);
-      window.addEventListener("scroll", handleScrolling);
+
+      scrollParent = getScrollParent(garageRef.current) ?? window;
+      if ((scrollParent as HTMLElement)?.tagName === "HTML") {
+        scrollParent = window;
+      }
+
+      scrollParent.addEventListener("scroll", handleScrolling);
     }
     return () => {
-      window.removeEventListener("scroll", handleScrolling);
+      if (scrollParent) {
+        scrollParent.removeEventListener("scroll", handleScrolling);
+      }
     };
   }, [vehicleRef, stickyDivRef]);
 
@@ -237,7 +275,7 @@ const GarageComponent = (props: IGarageComponent) => {
 
     setSelectedVehicleSetup(newSetup);
     setSelectedItem(item);
-    if (itemOwnership[selectedVehicleType][item.path]) {
+    if (itemOwnership[selectedVehicleType]?.[item.path]) {
       props.onChangeVehicleItem?.(item, selectedVehicleType);
     }
   };

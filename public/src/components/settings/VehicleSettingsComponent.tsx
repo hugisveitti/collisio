@@ -11,7 +11,11 @@ import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { setDBVehiclesSetup } from "../../firebase/firestoreOwnershipFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { mts_user_settings_changed } from "../../shared-backend/shared-stuff";
-import { ItemProperties } from "../../shared-backend/vehicleItems";
+import {
+  ItemProperties,
+  possibleVehicleItemTypes,
+  VehicleSetup,
+} from "../../shared-backend/vehicleItems";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import { VehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
@@ -110,10 +114,15 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.setVehiclesSetup(newVehiclesSetup);
     vehiclesSetupToSave = newVehiclesSetup;
 
+    sendVehicleSetupToServer(
+      newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType]
+    );
+  };
+
+  const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
     props.store.socket.emit(mts_user_settings_changed, {
       userSettings: undefined,
-      vehicleSetup:
-        newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType],
+      vehicleSetup,
     });
   };
 
@@ -140,6 +149,20 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                 updateVehicleSettings("vehicleColor", color);
               }}
               onChangeVehicleItem={updateVehicleSetup}
+              onUnequipAllItems={() => {
+                const newVehicleSetup = { ...props.store.vehiclesSetup };
+
+                for (let item of possibleVehicleItemTypes) {
+                  delete newVehicleSetup[
+                    props.store.userSettings.vehicleSettings.vehicleType
+                  ][item];
+                }
+                props.store.setVehiclesSetup(newVehicleSetup);
+                sendVehicleSetupToServer({
+                  vehicleType:
+                    props.store.userSettings.vehicleSettings.vehicleType,
+                });
+              }}
               user={props.user}
             />
           )}

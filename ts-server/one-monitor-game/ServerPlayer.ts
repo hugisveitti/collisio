@@ -247,6 +247,8 @@ export class Player {
                 this.userSettings = userSettings
             }
             if (vehicleSetup) {
+                console.log("vehiclesetup changed", vehicleSetup.exhaust, vehicleSetup.wheelGuards, vehicleSetup.spoiler)
+
                 this.vehicleSetup = vehicleSetup
             }
             // TODO: check if user owns vehicleType

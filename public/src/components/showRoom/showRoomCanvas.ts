@@ -1,12 +1,12 @@
-import { ExtendedObject3D } from "enable3d"
-import { AmbientLight, Color, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three"
+import { ExtendedObject3D } from "enable3d";
+import { AmbientLight, Color, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { vehicleColors, VehicleColorType, VehicleType } from "../../shared-backend/shared-stuff"
-import { getDeviceType, getStaticPath } from "../../utils/settings"
-import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
-import { loadSphereModel } from "../../vehicles/SphereVehicle"
-import { ItemProperties, ItemType, possibleVehicleItemTypes, VehicleSetup } from "../../shared-backend/vehicleItems"
+import { VehicleColorType, VehicleType } from "../../shared-backend/shared-stuff";
+import { ItemProperties, ItemType, possibleVehicleItemTypes, VehicleSetup } from "../../shared-backend/vehicleItems";
+import { getDeviceType, getStaticPath } from "../../utils/settings";
+import { loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle";
+import { loadSphereModel } from "../../vehicles/SphereVehicle";
 import { changeVehicleBodyColor } from "../../vehicles/Vehicle";
 
 let currentVehicleType: VehicleType | undefined
@@ -104,6 +104,8 @@ let currentItems: CurrentItemProps = {
 let currentColor: string
 
 export const changeVehicleSetup = async (vehicleSetup: VehicleSetup) => {
+    console.log("changing vehicle setup", vehicleSetup)
+    console.log("current items", currentItems)
     if (!currentChassis || !vehicleSetup) return
 
     for (let item of possibleVehicleItemTypes) {
@@ -113,10 +115,7 @@ export const changeVehicleSetup = async (vehicleSetup: VehicleSetup) => {
             }
             if (vehicleSetup[item]) {
                 const model = await addItem(vehicleSetup[item].path)
-
-
                 currentItems[item] = { props: vehicleSetup[item], model }
-
             } else {
                 currentItems[item] = undefined
             }

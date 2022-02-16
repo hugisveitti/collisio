@@ -32,10 +32,15 @@ import vehicleSelect1 from "../images/vehicle-select-1.PNG";
 import vehicleSelect2 from "../images/vehicle-select-2.PNG";
 import "../styles/main.css";
 import BackdropContainer from "./backdrop/BackdropContainer";
+import BackdropButton from "./button/BackdropButton";
 import MyCard from "./card/MyCard";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
-import { buyPremiumPagePath, highscorePagePath } from "./Routes";
-import { IStore } from "./store";
+import {
+  buyCoinsPagePath,
+  buyPremiumPagePath,
+  garagePagePath,
+  highscorePagePath,
+} from "./Routes";
 
 interface IHowToPlayItem {
   header: string;
@@ -138,9 +143,6 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
 
             <Grid item xs={12}>
               <Typography>Entering the room id</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <CardMedia src={connectWithRoomId} component="img" />
             </Grid>
             <Grid item xs={12}>
               <Typography>
@@ -432,18 +434,19 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Typography>
-                There are various race tracks, game modes and vehicles. For
-                premium users everything is available, but basic users are
-                limited to one vehicle and one race course.
+                There are various race tracks, game modes, vehicles and vehicle
+                upgrades. You can upgrade your vehicle in the garage, buy buying
+                items. You buy items with coins. You can either earn coins by
+                racing or you can buy them.
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                onClick={() => history.push(buyPremiumPagePath)}
-              >
-                Go Premium
-              </Button>
+            <Grid item xs={6}>
+              <BackdropButton link={buyCoinsPagePath}>Buy coins</BackdropButton>
+            </Grid>
+            <Grid item xs={6}>
+              <BackdropButton link={garagePagePath}>
+                Go to garage
+              </BackdropButton>
             </Grid>
           </Grid>
         </HowToPlayItem>
@@ -460,7 +463,7 @@ const HowToPlayPage = (props: IHowToPlayProps) => {
             <Grid item xs={12}>
               <Typography>
                 You can also put the graphics in low settings and turn off
-                shadows.
+                shadow, and lower your targetFPS.
               </Typography>
             </Grid>
           </Grid>
