@@ -187,12 +187,13 @@ var Player = /** @class */ (function () {
     Player.prototype.setupUserSettingsListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mts_user_settings_changed, function (_a) {
+            var _b, _c, _d;
             var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
             if (userSettings) {
                 _this.userSettings = userSettings;
             }
             if (vehicleSetup) {
-                console.log("vehiclesetup changed", vehicleSetup.exhaust, vehicleSetup.wheelGuards, vehicleSetup.spoiler);
+                console.log("vehiclesetup changed", vehicleSetup.vehicleType, (_b = vehicleSetup.exhaust) === null || _b === void 0 ? void 0 : _b.id, (_c = vehicleSetup.wheelGuards) === null || _c === void 0 ? void 0 : _c.id, (_d = vehicleSetup.spoiler) === null || _d === void 0 ? void 0 : _d.id);
                 _this.vehicleSetup = vehicleSetup;
             }
             // TODO: check if user owns vehicleType
@@ -241,8 +242,8 @@ var Player = /** @class */ (function () {
         });
     };
     Player.prototype.vehicleSetupString = function () {
-        var _a, _b, _c;
-        return "exhaust: " + ((_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.exhaust) + ", spoiler: " + ((_b = this.vehicleSetup) === null || _b === void 0 ? void 0 : _b.spoiler) + ", wheel guards: " + ((_c = this.vehicleSetup) === null || _c === void 0 ? void 0 : _c.wheelGuards);
+        var _a, _b, _c, _d, _e, _f;
+        return "vehicleType:" + this.vehicleSetup.vehicleType + ", exhaust: " + ((_b = (_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.exhaust) === null || _b === void 0 ? void 0 : _b.id) + ", spoiler: " + ((_d = (_c = this.vehicleSetup) === null || _c === void 0 ? void 0 : _c.spoiler) === null || _d === void 0 ? void 0 : _d.id) + ", wheel guards: " + ((_f = (_e = this.vehicleSetup) === null || _e === void 0 ? void 0 : _e.wheelGuards) === null || _f === void 0 ? void 0 : _f.id);
     };
     Player.prototype.toString = function () {
         return this.playerName + ": number: " + this.teamNumber + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetupString();

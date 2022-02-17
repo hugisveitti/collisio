@@ -311,7 +311,8 @@ export const getUserTokens = async (userId: string): Promise<ITokenData> => {
     return new Promise<ITokenData>((resolve, reject) => {
         const tokenRef = doc(firestore, "tokens", userId)
         getDoc(tokenRef).then(val => {
-            if (val.exists) {
+            if (val.exists()) {
+                console.log("got tokens", val.data())
                 resolve({
                     ...defaultTokenData,
                     ...val.data()

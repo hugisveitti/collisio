@@ -116,7 +116,7 @@ const ConnectToWaitingRoomComponent = (
     history.push(waitingRoomPath + "/" + roomId);
   };
 
-  const connectToRoomMobile = (
+  const connectToRoomMobile = async (
     roomId: string,
     playerName: string,
     socket: Socket

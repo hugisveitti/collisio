@@ -1022,7 +1022,7 @@ export class LowPolyVehicle extends Vehicle {
             this.camera.position.set(x, y, z)
             this.vehicleBody.add(this.camera)
             //    this.camera.updateProjectionMatrix()
-        } else {
+        } else if (this.camera) {
 
             const { x, y, z } = this.getPositionInfrontOfBody()
             this.camera.position.set(x, y, z)

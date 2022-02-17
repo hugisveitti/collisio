@@ -250,7 +250,7 @@ export class Player {
                 this.userSettings = userSettings
             }
             if (vehicleSetup) {
-                console.log("vehiclesetup changed", vehicleSetup.exhaust, vehicleSetup.wheelGuards, vehicleSetup.spoiler)
+                console.log("vehiclesetup changed", vehicleSetup.vehicleType, vehicleSetup.exhaust?.id, vehicleSetup.wheelGuards?.id, vehicleSetup.spoiler?.id)
 
                 this.vehicleSetup = vehicleSetup
             }
@@ -304,7 +304,7 @@ export class Player {
     }
 
     vehicleSetupString() {
-        return `exhaust: ${this.vehicleSetup?.exhaust}, spoiler: ${this.vehicleSetup?.spoiler}, wheel guards: ${this.vehicleSetup?.wheelGuards}`
+        return `vehicleType:${this.vehicleSetup.vehicleType}, exhaust: ${this.vehicleSetup?.exhaust?.id}, spoiler: ${this.vehicleSetup?.spoiler?.id}, wheel guards: ${this.vehicleSetup?.wheelGuards?.id}`
     }
 
     toString() {

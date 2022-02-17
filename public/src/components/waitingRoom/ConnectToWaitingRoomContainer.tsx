@@ -40,8 +40,6 @@ const ConnectToWaitingRoomContainer = (
     }
   }, []);
 
-  console.log("param roomId", roomId);
-
   const quickConnection =
     (onMobile && !!roomId && !!user?.displayName) ||
     (!onMobile && props.store.previousPage !== waitingRoomPath);

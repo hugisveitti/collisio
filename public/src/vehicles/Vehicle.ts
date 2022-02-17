@@ -181,21 +181,21 @@ export class Vehicle implements IVehicle {
             if (vehicleSetup.vehicleType === this.vehicleType && !goingToReload) {
 
                 this.updateVehicleSetup(vehicleSetup)
-            } else {
-                console.warn("Vehiclesetup does not match the vehicle type")
+            } else if (!goingToReload) {
+                console.warn("Vehiclesetup does not match the vehicle type, vehicleType", this.vehicleType, vehicleSetup.vehicleType)
             }
         }
     };
 
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
         console.log("this.isUpdatingVehicleSetup ", this.isUpdatingVehicleSetup)
-        console.log("vehiclesetup", vehicleSetup.exhaust?.path, vehicleSetup.wheelGuards?.path, vehicleSetup.spoiler?.path)
+        console.log("vehiclesetup", vehicleSetup.vehicleType, vehicleSetup.exhaust?.id, vehicleSetup.wheelGuards?.id, vehicleSetup.spoiler?.id)
         if (this.isUpdatingVehicleSetup) return
-        this.isUpdatingVehicleSetup = true
         if (vehicleSetup.vehicleType !== this.vehicleType) {
             console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
             return
         }
+        this.isUpdatingVehicleSetup = true
 
         this.vehicleConfig = this.getDefaultVehicleConfig()
         // not load if already loaded?
@@ -203,7 +203,7 @@ export class Vehicle implements IVehicle {
         console.log("updating vehicle setup in Vehicle.ts, vehiclesetup:", vehicleSetup, "vehicleItems", this.vehicleItems)
         for (let item of possibleVehicleItemTypes) {
             console.log("possible item", item)
-            if (this.vehicleItems[item]?.props?.path !== vehicleSetup[item]?.path) {
+            if (this.vehicleItems[item]?.props?.id !== vehicleSetup[item]?.id) {
                 if (this.vehicleItems[item]?.model) {
                     this.vehicleBody.remove(this.vehicleItems[item].model)
                     this.vehicleItems[item] = undefined

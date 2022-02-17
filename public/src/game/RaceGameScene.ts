@@ -363,7 +363,7 @@ export class RaceGameScene extends GameScene {
             this.gameTimers[vehicleNumber].checkpointCrossed(checkpointNumber)
             if (this.vehicles.length === 1) {
 
-                this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime()}`, vehicleNumber, true)
+                this.setViewImportantInfo(`Checkpoint ${this.gameTimers[vehicleNumber].getCurrentLapTime().toFixed(2)}`, vehicleNumber, true)
             } else {
                 const info = this.getCheckpointDiff(vehicleNumber, checkpointNumber)
                 this.setViewImportantInfo(`Checkpoint ${info}`, vehicleNumber, true)
