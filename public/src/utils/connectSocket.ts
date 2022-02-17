@@ -9,7 +9,19 @@ export interface ISocketCallback {
     data: any
 }
 
+let socket: Socket | undefined
+
+export const getSocket = () => {
+    return socket
+}
+
+export const disconnectSocket = () => {
+    socket?.disconnect()
+    socket = undefined
+}
+
 export const createSocket = (deviceType: string, mode: string = "not-test") => {
+
     return new Promise<Socket>((resolve, reject) => {
 
         // not secure, device orientation wont work
@@ -19,12 +31,13 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
         // return
 
-        const socket = io()
+        socket = io()
 
 
         socket.on("connect", () => {
             socket.emit(mdts_device_type, { deviceType: deviceType, mode })
             socket.on(stmd_socket_ready, () => {
+
                 resolve(socket)
             })
 
@@ -32,7 +45,7 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
         if (deviceType === "mobile") {
             if (!window.DeviceMotionEvent) {
-                toast("Device motion not supported in the browser, please use Firefox")
+                toast("Device motion not supported in the browser, please use Firefox or Chrome")
             } else {
                 console.log("device motion supported")
             }

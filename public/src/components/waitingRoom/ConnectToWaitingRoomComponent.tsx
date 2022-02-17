@@ -6,8 +6,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { v4 as uuid } from "uuid";
-import { getLocalStorageItem } from "../../classes/localStorage";
+import {
+  getLocalDisplayName,
+  getLocalStorageItem,
+  getLocalUid,
+  setLocalDisplayName,
+} from "../../classes/localStorage";
+import { IUser } from "../../classes/User";
 import { UserContext } from "../../providers/UserProvider";
 import {
   dts_create_room,
@@ -16,12 +21,16 @@ import {
   std_room_created_callback,
   stm_player_connected_callback,
 } from "../../shared-backend/shared-stuff";
-import { createSocket, ISocketCallback } from "../../utils/connectSocket";
+import {
+  createSocket,
+  getSocket,
+  ISocketCallback,
+} from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import AvailableRoomsComponent from "../AvailableRoomsComponent";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import { loginPagePath, waitingRoomPath } from "../Routes";
+import { getControlsRoomPath, loginPagePath, waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
 
@@ -32,22 +41,26 @@ interface IConnectToWaitingRoomComponent {
    * used if button in side nav clicked
    */
   quickConnection?: boolean;
+  roomId?: string;
+  user: IUser;
 }
 
 const ConnectToWaitingRoomComponent = (
   props: IConnectToWaitingRoomComponent
 ) => {
-  const user = useContext(UserContext);
+  const user = props.user;
 
   const history = useHistory();
-
-  const [playerName, setPlayerName] = useState("");
+  const [playerName, setPlayerName] = useState(
+    user?.displayName ?? getLocalDisplayName() ?? ""
+  );
   const onMobile = getDeviceType() === "mobile";
 
   const [connectingToRoom, setConnectingToRoom] = useState(
     props.quickConnection
   );
 
+  let socket = getSocket();
   const createRoomDesktop = (socket: Socket) => {
     setConnectingToRoom(true);
 
@@ -80,19 +93,22 @@ const ConnectToWaitingRoomComponent = (
         toast.error("Room id cannot be undefined");
         return;
       }
+      if (!user) {
+        setLocalDisplayName(playerName);
+      }
       connectToRoomMobile(roomId, playerName, socket);
     }
   };
 
   // need the roomId for the mobile
   const connectButtonClicked = (roomId?: string) => {
-    if (!props.store.socket || !props.store.socket.connected) {
-      createSocket(getDeviceType()).then((socket) => {
-        props.store.setSocket(socket);
+    if (!socket || !socket.connected) {
+      createSocket(getDeviceType()).then(() => {
+        socket = getSocket();
         handleConnection(socket, roomId);
       });
     } else {
-      handleConnection(props.store.socket, roomId);
+      handleConnection(socket, roomId);
     }
   };
 
@@ -106,8 +122,6 @@ const ConnectToWaitingRoomComponent = (
     socket: Socket
   ) => {
     setConnectingToRoom(true);
-
-    console.log("connect to room mobile, store", props.store);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
     const vehicleSetup = props.store.vehiclesSetup?.[vehicleType] ?? {
       vehicleType,
@@ -115,7 +129,7 @@ const ConnectToWaitingRoomComponent = (
     socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
-      playerId: user?.uid ?? uuid(),
+      playerId: user?.uid ?? getLocalUid(),
       isAuthenticated: Boolean(user),
       photoURL: user?.photoURL,
       userSettings: props.store.userSettings,
@@ -133,7 +147,11 @@ const ConnectToWaitingRoomComponent = (
 
         props.store.setGameSettings(response.data.gameSettings);
         props.store.setPlayer(response.data.player);
-        goToWaitingRoom(response.data.roomId);
+        if (response.data.gameStarted) {
+          history.push(getControlsRoomPath(roomId));
+        } else {
+          goToWaitingRoom(response.data.roomId);
+        }
       }
     });
   };
@@ -145,25 +163,21 @@ const ConnectToWaitingRoomComponent = (
   }, [user]);
 
   useEffect(() => {
-    const roomId = getLocalStorageItem<string>("roomId");
+    const roomId = props.roomId ?? getLocalStorageItem<string>("roomId");
     if (roomId) {
       props.store.setRoomId(roomId);
     }
 
-    if (props.quickConnection && !onMobile) {
-      connectButtonClicked();
+    if (props.quickConnection) {
+      connectButtonClicked(roomId);
     }
-    return () => {};
-  }, []);
-
-  useEffect(() => {
     return () => {
-      if (props.store.socket) {
-        props.store.socket.off(stm_player_connected_callback);
-        props.store.socket.off(std_room_created_callback);
+      if (socket) {
+        socket.off(stm_player_connected_callback);
+        socket.off(std_room_created_callback);
       }
     };
-  }, [props.store.socket]);
+  }, []);
 
   if (connectingToRoom) {
     return (
@@ -223,7 +237,11 @@ const ConnectToWaitingRoomComponent = (
           {!onMobile ? "Create a Game" : "Join Game"}
         </BackdropButton>
       </Grid>
-      {!user && <BackdropButton link={loginPagePath}>Login</BackdropButton>}
+      {!user && (
+        <Grid item xs={12}>
+          <BackdropButton link={loginPagePath}>Login</BackdropButton>
+        </Grid>
+      )}
     </React.Fragment>
   );
 };

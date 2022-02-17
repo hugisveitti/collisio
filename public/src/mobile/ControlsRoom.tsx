@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
@@ -27,6 +27,7 @@ import {
   stm_player_finished,
   stm_player_info,
 } from "../shared-backend/shared-stuff";
+import { disconnectSocket, getSocket } from "../utils/connectSocket";
 import { inTestMode, isIphone } from "../utils/settings";
 import { invertedControllerKey } from "./ControllerSettingsComponent";
 import ControllerSettingsModal from "./ControllerSettingsModal";
@@ -46,6 +47,7 @@ let invertedController = 1;
 const ControlsRoom = (props: IControlsRoomProps) => {
   const history = useHistory();
   const user = useContext(UserContext);
+  const socket = getSocket();
 
   const [orientation, setOrientation] = useState({
     gamma: 0,
@@ -78,7 +80,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
 
   const createSendControlsInterval = () => {
     const _sendControlsInterval = setInterval(() => {
-      props.store.socket.emit(mts_controls, controller);
+      socket.emit(mts_controls, controller);
       // setSteeringDirection(getSteeringDirection());
       const { gamma, beta, alpha } = controller;
       setOrientation({
@@ -101,15 +103,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       invertedController = +_invertedController;
     }
 
-    props.store.socket.on(stm_desktop_disconnected, () => {
+    socket.on(stm_desktop_disconnected, () => {
       toast.error("Game disconnected");
-      props.store.socket.disconnect();
-      props.store.setSocket(undefined);
+      disconnectSocket();
       history.push(frontPagePath);
       /** go to front page? */
     });
 
-    props.store.socket.on(stm_player_info, (res) => {
+    socket.on(stm_player_info, (res) => {
       const { player } = res;
       if (player) {
         props.store.setPlayer(player);
@@ -117,9 +118,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
 
     return () => {
-      props.store.socket.off(stm_desktop_disconnected);
-      props.store.socket.off(stm_player_info);
+      console.log("disconnecting socket");
       window.clearInterval(sendControlsInterval);
+      disconnectSocket();
+      props.store.setPlayer(undefined);
+      props.store.setPlayers(undefined);
+      props.store.setRoomId(undefined);
     };
   }, []);
 
@@ -139,13 +143,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       // should have some emit from the game to the devices telling them to send info such as userSettings
       // 5000 ms then send it is hackkkky
       const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
-      props.store.socket.emit(mts_user_settings_changed, {
+      socket.emit(mts_user_settings_changed, {
         userSettings: props.store.userSettings,
-        vehicleSetup: props.store.vehiclesSetup[vehicleType],
+        vehicleSetup: props.store.vehiclesSetup?.[vehicleType],
       });
     }, 1000);
 
-    props.store.socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
+    socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       const md = getMedalAndTokens(
         data.trackName,
         data.numberOfLaps,
@@ -171,7 +175,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       if (data.isAuthenticated) {
         saveRaceData(data.playerId, data).then(
           ([setPersonalBest, gameDataInfo]) => {
-            props.store.socket.emit(mts_game_data_info, {
+            socket.emit(mts_game_data_info, {
               playerId: data.playerId,
               gameDataInfo,
               setPersonalBest,
@@ -186,7 +190,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
 
     // saving game data from game
-    props.store.socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
+    socket.on(stm_game_finished, (data: IEndOfRaceInfoGame) => {
       if (user?.uid) {
         // saveRaceDataGame(data);
       } else {
@@ -198,9 +202,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       /**
        * remove all socket listeners
        */
-      props.store.socket.off(stm_game_settings_changed_callback);
-      props.store.socket.off(stm_game_finished);
-      props.store.socket.off(stm_player_finished);
+      socket.off(stm_game_settings_changed_callback);
+      socket.off(stm_game_finished);
+      socket.off(stm_player_finished);
     };
   }, []);
 
@@ -211,7 +215,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   };
 
   const sendGameActions = () => {
-    props.store.socket.emit(mts_send_game_actions, gameActions);
+    socket.emit(mts_send_game_actions, gameActions);
     gameActions.pause = false;
     gameActions.restart = false;
   };
@@ -222,7 +226,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
       return;
     }
-    props.store.socket.emit(mdts_game_settings_changed, {
+    socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
     });
     setGameSettingsLoading(true);
@@ -237,7 +241,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
     }, 1000);
 
-    props.store.socket.once(stm_game_settings_changed_callback, () => {
+    socket.once(stm_game_settings_changed_callback, () => {
       clearTimeout(timout);
       setSettingsModalOpen(false);
       setGameSettingsLoading(false);
@@ -257,7 +261,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         }}
         user={user}
         store={props.store}
-        socket={props.store.socket}
+        socket={socket}
         gameActions={gameActions}
         loading={gameSettingsLoading}
       />

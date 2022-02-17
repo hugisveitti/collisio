@@ -16,6 +16,7 @@ import GameSettingsComponent from "../components/settings/GameSettingsComponent"
 import VehicleSettingsComponent from "../components/settings/VehicleSettingsComponent";
 import { IStore } from "../components/store";
 import { GameActions, mts_quit_game } from "../shared-backend/shared-stuff";
+import { disconnectSocket, getSocket } from "../utils/connectSocket";
 
 export const invertedControllerKey = "invertedController";
 
@@ -23,7 +24,7 @@ interface IControllerSettingsComponent {
   onClose: () => void;
   userLoggedIn: () => void;
   resetOrientation: () => void;
-  socket: Socket;
+
   user: IUser;
   store: IStore;
   gameActions: GameActions;
@@ -32,6 +33,7 @@ interface IControllerSettingsComponent {
 const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
   const user = props.user;
   const history = useHistory();
+  const socket = getSocket();
 
   if (!props.store.userSettings) {
     return (
@@ -98,9 +100,8 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           color="white"
           onClick={() => {
             console.log("quit game button");
-            props.socket.emit(mts_quit_game, {});
-            props.socket.disconnect();
-            props.store.setSocket(undefined);
+            socket.emit(mts_quit_game, {});
+            disconnectSocket();
             history.push(frontPagePath);
           }}
           startIcon={<ExitToAppIcon />}

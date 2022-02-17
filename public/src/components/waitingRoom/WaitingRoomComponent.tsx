@@ -12,15 +12,21 @@ import { Socket } from "socket.io-client";
 import { IUser } from "../../classes/User";
 import { checkIfCanStartGame } from "../../functions/validationFunctions";
 import { green4 } from "../../providers/theme";
-import { std_start_game_callback } from "../../shared-backend/shared-stuff";
-import { ISocketCallback } from "../../utils/connectSocket";
+import {
+  mdts_start_game,
+  std_start_game_callback,
+} from "../../shared-backend/shared-stuff";
+import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
-import { socketHandleStartGame } from "../../utils/socketFunctions";
 import BackdropButton from "../button/BackdropButton";
 import CopyTextButton from "../inputs/CopyTextButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import { gameRoomPath, tournamentPagePath } from "../Routes";
+import {
+  gameRoomPath,
+  getConnectPagePath,
+  tournamentPagePath,
+} from "../Routes";
 import GameSettingsComponent from "../settings/GameSettingsContainer";
 import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
@@ -45,9 +51,11 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const user = props.user;
 
   const roomId = props.roomId;
+  const socket = getSocket();
 
   const handleStartGame = () => {
-    socketHandleStartGame(props.store.socket, (response: ISocketCallback) => {
+    socket.emit(mdts_start_game);
+    socket.once(std_start_game_callback, (response: ISocketCallback) => {
       if (response.status === "success") {
         history.push(gameRoomPath);
       } else {
@@ -56,10 +64,13 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
     });
   };
 
+  const connectionRoomHref =
+    window.location.origin + getConnectPagePath(roomId);
+
   useEffect(() => {
     // only generate qr code on desktop
     if (!onMobile) {
-      QRCode.toDataURL(window.location.href)
+      QRCode.toDataURL(connectionRoomHref)
         .then((url) => {
           setRoomQrCode(url);
         })
@@ -69,7 +80,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
     }
 
     return () => {
-      props.store.socket.off(std_start_game_callback);
+      socket.off(std_start_game_callback);
     };
   }, []);
 
@@ -135,8 +146,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
           <Grid item xs={12} lg={3}>
             <CopyTextButton
-              infoText={`Link to room: ${window.location.href}`}
-              copyText={window.location.href}
+              infoText={`Link to room: ${connectionRoomHref}`}
+              copyText={connectionRoomHref}
             />
           </Grid>
 

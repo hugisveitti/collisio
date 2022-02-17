@@ -4,6 +4,7 @@ import GameRoom from "../components/gameRoom/GameRoom";
 import { IStore } from "../components/store";
 import ControlsRoom from "../mobile/ControlsRoom";
 import { fakePlayer1 } from "../tests/fakeData";
+import { getSocket } from "../utils/connectSocket";
 
 interface ITestContainer {
   store: IStore;
@@ -15,9 +16,11 @@ const TestContainer = (props: ITestContainer) => {
     props.store.setPlayer(fakePlayer1);
   }, []);
 
+  const socket = getSocket();
+
   if (props.onMobile && !props.store.player)
     return <span>Loading on mobile test setup...</span>;
-  if (!props.store.socket) return <span>Loading test setup...</span>;
+  if (!socket) return <span>Loading test setup...</span>;
 
   // if (!onMobile && !canStartGame)
   //   return <span>Loading test setup desktop...</span>;

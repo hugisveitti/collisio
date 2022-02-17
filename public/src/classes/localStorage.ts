@@ -1,4 +1,4 @@
-
+import { v4 as uuid } from "uuid";
 
 export function getLocalStorageItem<T extends string | number | boolean>(key: string, type?: "string" | "boolean" | "number"): T | undefined {
     const item = window.localStorage.getItem(key)
@@ -20,4 +20,24 @@ export function getLocalStorageItem<T extends string | number | boolean>(key: st
 
 export const saveLocalStorageItem = (key: string, value: string) => {
     window.localStorage.setItem(key, value)
+}
+
+export const getLocalUid = () => {
+    let uid = window.localStorage.getItem("uid")
+    if (!uid) {
+        uid = uuid()
+        window.localStorage.setItem("uid", uid)
+    }
+    return uid
+}
+
+const displayNameKey = "guestDisplayName"
+export const getLocalDisplayName = () => {
+    let name = window.localStorage.getItem(displayNameKey)
+
+    return name
+}
+
+export const setLocalDisplayName = (name: string) => {
+    window.localStorage.setItem(displayNameKey, name)
 }

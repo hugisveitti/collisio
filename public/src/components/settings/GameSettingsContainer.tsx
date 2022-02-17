@@ -16,6 +16,7 @@ import GameSettingsComponent from "./GameSettingsComponent";
 import TagRulesComponent from "../waitingRoom/TagRulesComponent";
 import { getDeviceType } from "../../utils/settings";
 import { setMusicVolume } from "../../sounds/gameSounds";
+import { getSocket } from "../../utils/connectSocket";
 
 interface IGameSettingsContainer {
   store: IStore;
@@ -24,8 +25,10 @@ interface IGameSettingsContainer {
 const GameSettingsContainer = (props: IGameSettingsContainer) => {
   const onMobile = getDeviceType() === "mobile";
 
+  const socket = getSocket();
+
   useEffect(() => {
-    props.store.socket.on(
+    socket.on(
       stmd_game_settings_changed,
       (data: { gameSettings: IGameSettings }) => {
         props.store.setGameSettings(data.gameSettings);
@@ -37,7 +40,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
       }
     );
     return () => {
-      props.store.socket.off(stmd_game_settings_changed);
+      socket.off(stmd_game_settings_changed);
     };
   }, []);
 
@@ -63,7 +66,7 @@ const GameSettingsContainer = (props: IGameSettingsContainer) => {
             gameSettings={props.store.gameSettings}
             onChange={(newGameSettings) => {
               props.store.setGameSettings(newGameSettings);
-              props.store.socket.emit(mdts_game_settings_changed, {
+              socket.emit(mdts_game_settings_changed, {
                 gameSettings: newGameSettings,
               });
             }}

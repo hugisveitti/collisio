@@ -24,7 +24,15 @@ const VehicleStatsComponent = (props: IVehicleStatsComponent) => {
         const val = vehicleConfigs[props.vehicleType][key]; //+ (stats[mod.type] ?? 0);
 
         return (
-          <div key={key} style={{ height: 25, marginTop: 10, color: "white" }}>
+          <div
+            key={key}
+            style={{
+              height: 25,
+              marginTop: 10,
+              color: "white",
+              marginBottom: 15,
+            }}
+          >
             <span>{mod.name}</span>
             <Progress
               style={{

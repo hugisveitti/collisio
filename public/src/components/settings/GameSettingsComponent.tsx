@@ -77,7 +77,8 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const updateGameSettings = (
     key: keyof IGameSettings,
     value: any,
-    _gameSettings?: IGameSettings
+    _gameSettings?: IGameSettings,
+    notEmit?: boolean
   ) => {
     const newGameSettings = _gameSettings
       ? {
@@ -102,7 +103,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
     setLocalGameSetting(key, value);
 
     setGameSettings(newGameSettings);
-    props.onChange(newGameSettings);
+    if (!notEmit) {
+      props.onChange(newGameSettings);
+    }
 
     if (
       (key === "numberOfLaps" || key === "trackName") &&
@@ -279,6 +282,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                   updateGameSettings("musicVolume", newVal);
                 }}
                 onChange={(newVal) => {
+                  updateGameSettings("musicVolume", newVal, undefined, true);
                   if (!onMobile) {
                     setMusicVolume(newVal as number);
                   }
@@ -318,7 +322,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 onChangeCommitted={(newVal) => {
                   updateGameSettings("targetFPS", newVal);
                 }}
-                onChange={(newVal) => {}}
+                onChange={(newVal) => {
+                  updateGameSettings("targetFPS", newVal, undefined, true);
+                }}
                 value={gameSettings.targetFPS}
               />
             </Grid>
@@ -355,12 +361,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                       DriveRecorder.GetTrackNameNumberOfLapsFromFilename(
                         props.gameSettings.ghostFilename
                       );
-                    console.log(
-                      "updating number of laps and track name",
-                      props.gameSettings.ghostFilename,
-                      trackName,
-                      numberOfLaps
-                    );
+
                     if (trackName && numberOfLaps) {
                       updateGameSettingsBatch(
                         ["trackName", "numberOfLaps"],

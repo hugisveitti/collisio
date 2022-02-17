@@ -41,11 +41,14 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="body2">
-            Currently I am the only person working on Collisio.
-          </Typography>
+          The music in this game, is made by Teitur Skúlason.
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
+          <Typography variant="body2">
+            Currently I am the only person working on Collisio. 
+          </Typography>
+        </Grid> */}
+        {/* <Grid item xs={12}>
           <img
             src={hugi}
             style={{
@@ -58,7 +61,7 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           <Typography>
             <i>Me, Hugi :)</i>
           </Typography>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           <Typography>
             Help support this project by buying in game coins or donating.

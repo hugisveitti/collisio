@@ -135,6 +135,7 @@ export class GameScene extends Scene3D implements IGameScene {
     isPaused: boolean
 
     totalTimeDiv: HTMLDivElement
+    pingTimeout: NodeJS.Timeout
 
 
     constructor() {
@@ -1161,17 +1162,23 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
     updatePing() {
+
         const start = Date.now()
 
         this.socket?.off(std_ping_test_callback)
 
         this.socket?.emit(dts_ping_test)
         this.socket?.once(std_ping_test_callback, () => {
+            clearTimeout(this.pingTimeout)
             const ping = Date.now() - start
             this.pingInfo.textContent = `ping ${ping}ms`
             this.totalPing += ping
             this.totalPingsGotten += 1
         })
+        this.pingTimeout = setTimeout(() => {
+            //    toast.error("There seems to be some connection issue")
+            this.pingInfo.textContent = `Connection issue`
+        }, 2 * 1000) // 2 ses?
     }
 
     updateFps(time: number) {

@@ -29,7 +29,6 @@ export const speedTestPath = "/speedtest";
 const TestApp = () => {
   const user = useContext(UserContext);
 
-  const [socket, setSocket] = useState(undefined as Socket | undefined);
   const [roomId, setRoomId] = useState("testRoom");
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
@@ -47,7 +46,9 @@ const TestApp = () => {
   const onMobile = deviceType === "mobile";
 
   useEffect(() => {
-    createSocket(deviceType, "test").then((newSocket) => setSocket(newSocket));
+    createSocket(deviceType, "test").then(() => {
+      // socket = newSocket;
+    });
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
   }, []);
@@ -80,8 +81,6 @@ const TestApp = () => {
     setGameSettings,
     userSettings,
     setUserSettings,
-    socket,
-    setSocket,
     tournament,
     setTournament,
     activeBracketNode,

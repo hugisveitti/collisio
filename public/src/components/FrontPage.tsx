@@ -11,7 +11,6 @@ import logo from "../images/collisio-logo.png";
 import "../styles/main.css";
 import { highscorePagePath, howToPlayPagePath } from "./Routes";
 import { IStore } from "./store";
-import ConnectToWaitingRoomComponent from "./waitingRoom/ConnectToWaitingRoomComponent";
 
 interface FrontPageProps {
   store: IStore;
@@ -42,7 +41,6 @@ const FrontPage = (props: FrontPageProps) => {
         <Grid item xs={12}>
           <img src={logo} style={{ width: 400, maxWidth: "80%" }} alt="" />
         </Grid>
-        <ConnectToWaitingRoomComponent store={props.store} />
         <Grid item xs={12}>
           <Typography color="gray">
             Create a room, you and upto 3 friends connect to that room with your

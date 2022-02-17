@@ -88,7 +88,9 @@ export const removeMusic = () => {
 }
 
 export const startMusic = () => {
-    music?.play()
+    if (!music?.isPlaying) {
+        music?.play()
+    }
 }
 
 export const pauseMusic = () => {

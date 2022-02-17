@@ -20,8 +20,8 @@ export interface IStore {
     setGameSettings: React.Dispatch<React.SetStateAction<IGameSettings>>
     userSettings: IUserSettings
     setUserSettings: React.Dispatch<React.SetStateAction<IUserSettings>>
-    socket: Socket | undefined
-    setSocket: React.Dispatch<React.SetStateAction<Socket>>
+    // socket: Socket | undefined
+    // setSocket: React.Dispatch<React.SetStateAction<Socket>>
     tournament: ITournament | undefined
     setTournament: React.Dispatch<React.SetStateAction<ITournament | undefined>>
     activeBracketNode: IFlattendBracketNode | undefined

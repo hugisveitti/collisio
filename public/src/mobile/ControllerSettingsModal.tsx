@@ -45,7 +45,6 @@ const ControllerSettingsModal = (props: IControllerSettingsModal) => {
           onClose={props.onClose}
           resetOrientation={props.resetOrientation}
           userLoggedIn={props.userLoggedIn}
-          socket={props.store.socket}
           user={props.user}
           store={props.store}
           gameActions={props.gameActions}

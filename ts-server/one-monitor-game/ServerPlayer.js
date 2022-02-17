@@ -81,10 +81,12 @@ var Player = /** @class */ (function () {
     Player.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mdts_left_waiting_room, function () {
-            var _a, _b;
+            var _a;
             if (!((_a = _this.game) === null || _a === void 0 ? void 0 : _a.gameStarted)) {
-                (_b = _this.game) === null || _b === void 0 ? void 0 : _b.playerDisconnected(_this.playerName, _this.id);
+                // this.game?.playerDisconnected(this.playerName, this.id)
+                _this.socket.disconnect();
             }
+            // disconnect from game handled in another function
         });
     };
     Player.prototype.setupPingListener = function () {

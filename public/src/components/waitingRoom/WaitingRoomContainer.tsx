@@ -1,10 +1,7 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
-import { v4 as uuid } from "uuid";
 import { IRoomInfo } from "../../classes/Game";
 import {
   IGameSettings,
@@ -13,19 +10,15 @@ import {
 import { saveLocalStorageItem } from "../../classes/localStorage";
 import {
   addToAvailableRooms,
-  getDBUserSettings,
   removeFromAvailableRooms,
   saveRoom,
 } from "../../firebase/firestoreFunctions";
-import { getStyledColors } from "../../providers/theme";
 import { UserContext } from "../../providers/UserProvider";
 import {
-  IPlayerConnectedData,
   IPlayerInfo,
   mdts_left_waiting_room,
   mdts_players_in_room,
   mts_connected_to_waiting_room,
-  mts_player_connected,
   playerInfoToPreGamePlayerInfo,
   std_player_disconnected,
   stmd_game_settings_changed,
@@ -37,22 +30,19 @@ import {
   stm_player_info,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
-import { createSocket, ISocketCallback } from "../../utils/connectSocket";
+import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
-import { sendPlayerInfoChanged } from "../../utils/socketFunctions";
 import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
-import BackdropButton from "../button/BackdropButton";
-import ToFrontPageButton from "../inputs/ToFrontPageButton";
-import LoginComponent from "../LoginComponent";
 import {
+  connectPagePath,
   frontPagePath,
   gameRoomPath,
+  getConnectPagePath,
   getControlsRoomPath,
   waitingRoomPath,
 } from "../Routes";
 import { IStore } from "../store";
-import MyTextField from "../textField/MyTextField";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 
@@ -72,19 +62,14 @@ let toSaveRoomId = "";
 let toSaveGameSettings = {};
 
 const WaitingRoomContainer = (props: IWaitingRoomProps) => {
-  const [userLoading, setUserLoading] = useState(true);
-  const [displayNameModalOpen, setDisplayNameModalOpen] = useState(false);
-  const [displayName, setDisplayName] = useState("");
-  const [connectingGuest, setConnectingGuest] = useState(false);
-  const [showLoginInComponent, setShowLoginInComponent] = useState(false);
-
   const user = useContext(UserContext);
   const onMobile = getDeviceType() === "mobile";
   const history = useHistory();
   const params = useParams<WaitParamType>();
   const roomId = params?.roomId;
 
-  const { color, backgroundColor } = getStyledColors("black");
+  const socket = getSocket();
+  // have to have socket to get in
 
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
@@ -102,92 +87,31 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   };
 
   const getPlayersInRoom = () => {
-    props.store.socket.emit(mdts_players_in_room, { roomId });
-    props.store.socket.once(
-      stmd_players_in_room_callback,
-      (response: ISocketCallback) => {
-        if (response.status === "error") {
-          toast.error(response.message);
-        } else {
-          props.store.setPlayers(response.data.players);
-        }
+    socket.emit(mdts_players_in_room, { roomId });
+    socket.once(stmd_players_in_room_callback, (response: ISocketCallback) => {
+      if (response.status === "error") {
+        toast.error(response.message);
+      } else {
+        props.store.setPlayers(response.data.players);
       }
-    );
-  };
-
-  const connectToRoom = async (
-    _displayName: string,
-    gottenFromURL?: boolean
-  ) => {
-    setConnectingGuest(true);
-    let userSettings = props.store.userSettings;
-    if (gottenFromURL && user) {
-      // need to get user setting
-      userSettings = await getDBUserSettings(user.uid);
-      props.store.setUserSettings(userSettings);
-    }
-
-    // send user settings
-    props.store.socket.emit(mts_player_connected, {
-      roomId,
-      playerName: _displayName,
-      playerId: user?.uid ?? uuid(),
-      isAuthenticated: Boolean(user),
-      photoURL: user?.photoURL,
-      userSettings,
-    } as IPlayerConnectedData);
-    props.store.socket.once(
-      stm_player_connected_callback,
-      (response: ISocketCallback) => {
-        if (response.status === "success") {
-          props.store.setPlayer(response.data.player);
-          props.store.setRoomId(roomId);
-          props.store.setGameSettings(response.data.gameSettings);
-          props.store.setPlayers(response.data.players);
-          setConnectingGuest(false);
-          //  toast.success(response.message);
-          setDisplayNameModalOpen(false);
-        } else {
-          // this was spamming pleaople
-          //   toast.error(response.message);
-          setConnectingGuest(false);
-          history.push(frontPagePath);
-        }
-      }
-    );
+    });
   };
 
   useEffect(() => {
-    if (!onMobile) return;
-
-    if (!user && !props.store.player && !props.store.socket) {
-      createSocket(getDeviceType()).then((_socket) => {
-        props.store.setSocket(_socket);
-        setDisplayNameModalOpen(true);
-      });
-    } else if (props.store.socket) {
-      if (!props.store.player) {
-        /** if gotten here through url */
-        /** shouldnt we catch this in the connect to room container */
-        connectToRoom(
-          user?.displayName ?? "Guest" + Math.floor(Math.random() * 20),
-          true
-        );
-      }
-
-      setDisplayNameModalOpen(false);
+    console.log("socket", socket);
+    if (!socket?.connected && !inTestMode) {
+      let path = roomId ? getConnectPagePath(roomId) : connectPagePath;
+      history.push(path);
+      return null;
     }
-  }, [user, props.store.socket]);
-
-  useEffect(() => {
     // TODO: create a function that verifies gameSettings
     if (onMobile) {
       saveLocalStorageItem("roomId", roomId.toLowerCase());
     }
 
-    if (!props.store.socket && !onMobile && !inTestMode) {
+    if (!socket && !onMobile && !inTestMode) {
       /** Desktops should always have a socket when connected to waiting room */
-
+      console.log("not connected", socket);
       history.push(frontPagePath);
     }
 
@@ -202,7 +126,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   }, []);
 
   useEffect(() => {
-    if (!props.store.socket) return;
+    if (!socket) return;
     toSaveGameSettings = props.store.gameSettings;
     /**
      * if desktop goes in and out and in of waitingRoom
@@ -211,17 +135,12 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.store.setPlayers([]);
     }
 
-    const userLoadingTimout = setTimeout(() => {
-      /** TODO: do this */
-      setUserLoading(false);
-    }, 1000);
-
-    props.store.socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
+    socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
       props.store.setPlayers(_players);
       toSavePlayers = _players;
     });
 
-    props.store.socket.on(stmd_game_starting, () => {
+    socket.on(stmd_game_starting, () => {
       if (onMobile) {
         history.push(getControlsRoomPath(roomId));
       } else {
@@ -230,9 +149,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     });
 
     if (onMobile) {
-      props.store.socket.emit(mts_connected_to_waiting_room);
+      socket.emit(mts_connected_to_waiting_room);
 
-      props.store.socket.on(stm_player_info, (res) => {
+      socket.on(stm_player_info, (res) => {
         const { player } = res;
         if (player) {
           props.store.setPlayer(player);
@@ -240,7 +159,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       });
 
       getPlayersInRoom();
-      props.store.socket.on(stmd_game_settings_changed, (data) => {
+      socket.on(stmd_game_settings_changed, (data) => {
         toSaveGameSettings = data.gameSettings;
         for (let key of Object.keys(data.gameSettings)) {
           // @ts-ignore
@@ -249,30 +168,29 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         props.store.setGameSettings(data.gameSettings);
       });
 
-      props.store.socket.on(stm_desktop_disconnected, () => {
+      socket.on(stm_desktop_disconnected, () => {
         toast.error("Game disconnected");
         history.push(frontPagePath);
         /** go to front page? */
       });
     } else {
-      props.store.socket.on(std_player_disconnected, ({ playerName }) => {
+      socket.on(std_player_disconnected, ({ playerName }) => {
         toast.warn(`${playerName} disconnected from waiting room`);
       });
     }
 
     return () => {
-      window.clearTimeout(userLoadingTimout);
-      props.store.socket.emit(mdts_left_waiting_room, {});
-      props.store.socket.off(stmd_game_starting);
-      props.store.socket.off(stm_desktop_disconnected);
-      props.store.socket.off(stmd_game_settings_changed);
-      props.store.socket.off(stmd_waiting_room_alert);
-      props.store.socket.off(std_player_disconnected);
-      props.store.socket.off(stmd_players_in_room_callback);
-      props.store.socket.off(stm_player_connected_callback);
-      props.store.socket.off(stm_player_info);
+      socket.emit(mdts_left_waiting_room, {});
+      socket.off(stmd_game_starting);
+      socket.off(stm_desktop_disconnected);
+      socket.off(stmd_game_settings_changed);
+      socket.off(stmd_waiting_room_alert);
+      socket.off(std_player_disconnected);
+      socket.off(stmd_players_in_room_callback);
+      socket.off(stm_player_connected_callback);
+      socket.off(stm_player_info);
     };
-  }, [props.store.socket]);
+  }, []);
 
   useEffect(() => {
     if (props.store.userSettings && props.store.player && !inTestMode) {
@@ -283,7 +201,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       };
 
       props.store.setPlayer(newPlayer);
-      sendPlayerInfoChanged(props.store.socket, newPlayer);
+      socket?.emit("player-info-changed", newPlayer);
     }
   }, [props.store.userSettings]);
 
@@ -312,108 +230,43 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     };
   }, [user]);
 
-  const renderDisplayNameModal = () => {
-    if (userLoading) return null;
-    return (
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <ToFrontPageButton color="white" />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography>
-            You are not logged in, please type in your name or log in.
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <MyTextField
-            label="Enter your name"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <BackdropButton
-            disabled={connectingGuest}
-            onClick={() => {
-              let _displayName = displayName;
-              if (displayName === "") {
-                _displayName = "Clown-" + (Math.random() * 1000).toFixed(0);
-                setDisplayName(_displayName);
-              }
-              setShowLoginInComponent(false);
-              connectToRoom(_displayName);
-              setDisplayNameModalOpen(false);
-            }}
-          >
-            Submit
-          </BackdropButton>
-        </Grid>
-        {showLoginInComponent ? (
-          <Grid item xs={12}>
-            <LoginComponent
-              onClose={() => setShowLoginInComponent(false)}
-              signInWithPopup={false}
-            />
-          </Grid>
-        ) : (
-          <Grid item xs={6}>
-            <BackdropButton
-              onClick={() => {
-                setShowLoginInComponent(true);
-              }}
-            >
-              Login
-            </BackdropButton>
-          </Grid>
-        )}
-      </Grid>
-    );
-  };
-
-  /** usering loading be */
+  console.log("props.store.roomId", props.store.roomId);
   if (!onMobile && !props.store.roomId && !inTestMode) {
     history.push(frontPagePath);
     return null;
   }
 
   return (
-    // <AppContainer loading={!props.store.socket}>
     <BackdropContainer
       store={props.store}
       backgroundContainer
-      loading={!props.store.socket}
+      loading={!socket}
     >
       <React.Fragment>
-        {displayNameModalOpen ? (
-          renderDisplayNameModal()
+        {(onMobile && !props.store.player) || !socket?.connected ? (
+          <div
+            className="container"
+            style={{ marginTop: 75, textAlign: "center", margin: "auto" }}
+          >
+            <CircularProgress />
+          </div>
         ) : (
-          <>
-            {onMobile && !props.store.player ? (
-              <div
-                className="container"
-                style={{ marginTop: 75, textAlign: "center", margin: "auto" }}
-              >
-                <CircularProgress />
-              </div>
-            ) : (
-              <React.Fragment>
-                <WaitingRoomComponent
-                  socket={props.store.socket}
-                  store={props.store}
-                  user={user}
-                  roomId={roomId}
-                />
-              </React.Fragment>
-            )}
-          </>
+          <React.Fragment>
+            <WaitingRoomComponent
+              socket={socket}
+              store={props.store}
+              user={user}
+              roomId={roomId}
+            />
+          </React.Fragment>
         )}
+
         <DeviceOrientationPermissionComponent
           onMobile={onMobile}
           onIphone={isIphone()}
         />
       </React.Fragment>
     </BackdropContainer>
-    //  </AppContainer>
   );
 };
 

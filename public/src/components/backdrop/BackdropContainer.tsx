@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import "react-toastify/dist/ReactToastify.css";
 import { getLocalGameSetting } from "../../classes/localGameSettings";
+import { addMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds";
 import { createClassNames } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import { gameRoomPath } from "../Routes";
@@ -72,6 +73,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
   }, []);
 
   const handleChangeCameraPos = () => {
+    // startMusic();
     changeCameraPosition(camPosNum + 1, volume);
     setCamPosNum(camPosNum + 1);
   };

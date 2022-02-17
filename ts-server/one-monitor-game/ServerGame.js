@@ -63,9 +63,12 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
+        console.log("setting player connected listener");
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest, userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
+            console.log("connecting to room", roomId, playerName);
             if (!_this.roomExists(roomId)) {
+                console.log("room does not exist", roomId, mobileSocket.id, shared_stuff_1.stm_player_connected_callback);
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
             else if (!isStressTest && _this.rooms[roomId].isFull() && !_this.rooms[roomId].gameStarted && !_this.rooms[roomId].playerIsInRoom(playerId)) {
@@ -89,7 +92,8 @@ var RoomMaster = /** @class */ (function () {
     RoomMaster.prototype.createRoom = function (socket, roomId, data) {
         var _this = this;
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
-        if (numberOfRoomsSendingControls > 15) {
+        if (numberOfRoomsSendingControls > 25) {
+            console.warn("Too many rooms, so not creating room");
             socket.emit(shared_stuff_1.std_room_created_callback, {
                 status: errorStatus,
                 message: "Number of active rooms is full. Consider donaiting to help support this project which will allow us to buy better servers."
@@ -108,7 +112,7 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
-        console.log(this.getStatsString());
+        console.log("room created", roomId, this.getStatsString());
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };
@@ -117,9 +121,10 @@ var RoomMaster = /** @class */ (function () {
         var roomId;
         var isTestMode = false;
         var onMobile;
-        this.allSocketIds.push(socket.id);
+        //   this.allSocketIds.push(socket.id)
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode;
+            console.log("socket connected", deviceType);
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
             if (isTestMode) {
@@ -133,6 +138,7 @@ var RoomMaster = /** @class */ (function () {
             else {
                 if (deviceType === "desktop") {
                     socket.on(shared_stuff_1.dts_create_room, function (req) {
+                        console.log("creating room");
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = (0, uuid_1.v4)().slice(0, 4);
@@ -144,9 +150,11 @@ var RoomMaster = /** @class */ (function () {
                             delete _this.rooms[roomId];
                         }
                     });
+                    socket.emit(shared_stuff_1.stmd_socket_ready, {});
                 }
                 else {
                     _this.setupPlayerConnectedListener(socket);
+                    socket.emit(shared_stuff_1.stmd_socket_ready, {});
                 }
                 socket.on(shared_stuff_1.mdts_players_in_room, function (_a) {
                     var roomId = _a.roomId;
@@ -164,11 +172,10 @@ var RoomMaster = /** @class */ (function () {
                     socket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: message, status: status, data: { players: players } });
                 });
             }
-            socket.emit(shared_stuff_1.stmd_socket_ready, {});
-            socket.on("disconnect", function () {
-                var idx = _this.allSocketIds.indexOf(socket.id);
-                _this.allSocketIds.splice(idx, 1);
-            });
+            // socket.on("disconnect", () => {
+            //     const idx = this.allSocketIds.indexOf(socket.id)
+            //     this.allSocketIds.splice(idx, 1)
+            // })
         });
     };
     return RoomMaster;
@@ -268,7 +275,7 @@ var Room = /** @class */ (function () {
         return false;
     };
     Room.prototype.addPlayer = function (player) {
-        console.log("player ", player.toString());
+        console.log("adding player", player.toString());
         var playerExists = false;
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
@@ -287,12 +294,13 @@ var Room = /** @class */ (function () {
         }
         if (this.gameStarted) {
             if (!playerExists) {
+                console.log("game started and player does not exist");
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
             }
             else {
-                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
-                player.socket.emit(shared_stuff_1.stmd_game_starting);
                 console.log("Player reconnected", player.playerName);
+                player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings, gameStarted: true } });
+                // player.socket.emit(stmd_game_starting)
                 this.playerReconnected();
                 player.onReconnection();
             }

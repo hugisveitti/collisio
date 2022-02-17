@@ -25,7 +25,7 @@ import {
   fakePlayer3,
   fakePlayer4,
 } from "../tests/fakeData";
-import { createSocket } from "../utils/connectSocket";
+import { createSocket, getSocket } from "../utils/connectSocket";
 import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
@@ -68,6 +68,7 @@ export const showRoomPagePath = "/show-room";
 export const buyPremiumPagePath = "/premium";
 export const aboutPagePath = "/about";
 export const connectPagePath = "/connect";
+export const connectIdPagePath = "/connect/:roomId";
 export const tournamentPagePath = "/tournament";
 export const createTournamentPagePath = "/tournament/create";
 export const tournamentIdPagePath = "/tournament/:tournamentId";
@@ -93,13 +94,16 @@ export const getGameRoomPath = (roomId: string) => `${gameRoomPath}/${roomId}`;
 export const getWaitingRoomPath = (roomId: string) =>
   `${waitingRoomPath}/${roomId}`;
 
+export const getConnectPagePath = (roomId: string) =>
+  `${connectPagePath}/${roomId}`;
+
 export const getControlsRoomPath = (roomId: string) =>
   `${controlsRoomPath}/${roomId}`;
 
 export const getTrophyRoomPath = (id: string) => `${trophyRoomPath}/${id}`;
 
+let socket = undefined as Socket | undefined;
 const Routes = () => {
-  const [socket, setSocket] = useState(undefined as Socket | undefined);
   const [roomId, setRoomId] = useState("");
   const [players, setPlayers] = useState([] as IPlayerInfo[]);
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
@@ -140,7 +144,7 @@ const Routes = () => {
       // setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
 
-      createSocket(getDeviceType()).then((_s) => setSocket(_s));
+      createSocket(getDeviceType()).then((_s) => {});
     }
   }, []);
 
@@ -155,8 +159,6 @@ const Routes = () => {
     setUserSettings,
     gameSettings,
     setGameSettings,
-    socket,
-    setSocket,
     tournament,
     setTournament,
     activeBracketNode,
@@ -191,7 +193,9 @@ const Routes = () => {
     }
   }, [user]);
 
-  if (inTestMode && !store.socket) return null;
+  const socket = getSocket();
+
+  if (inTestMode && !socket) return null;
 
   return (
     <Router>
@@ -263,7 +267,7 @@ const Routes = () => {
           )}
         />
         <Route
-          path={connectPagePath}
+          path={[connectIdPagePath, connectPagePath]}
           render={(props) => (
             <ConnectToWaitingRoomContainer {...props} store={store} />
           )}

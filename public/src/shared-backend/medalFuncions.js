@@ -33,9 +33,9 @@ var times = {
         weight: 1.3
     },
     "basic-track5": {
-        gold: 30.7,
-        silver: 35,
-        bronze: 40.5,
+        gold: 36.7,
+        silver: 40,
+        bronze: 46.5,
         weight: 1.9
     },
     "f1-track": {

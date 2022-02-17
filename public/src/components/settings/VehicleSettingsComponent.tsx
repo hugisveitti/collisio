@@ -22,6 +22,7 @@ import BackdropButton from "../button/BackdropButton";
 import MySlider from "../inputs/slider/MySlider";
 import MyRadio from "../radio/MyRadio";
 import { garagePagePath } from "../Routes";
+import { getSocket } from "../../utils/connectSocket";
 
 interface IVehicleSettingsComponent {
   store: IStore;
@@ -37,6 +38,7 @@ let userSettingsToSave: IUserSettings;
 let vehiclesSetupToSave: VehiclesSetup;
 const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const user = props.user;
+  const socket = getSocket();
 
   const [chaseSpeedDefaultVal, setChaseSpeedDefaultVal] = useState(
     props.store.userSettings.vehicleSettings.chaseCameraSpeed
@@ -59,8 +61,8 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const sendUserSettingsToServer = (newUserSettings: IUserSettings) => {
     // if (user) {
     //   setDBUserSettings(user.uid, newUserSettings);
-    //   if (props.store.socket) {
-    props.store.socket.emit(mts_user_settings_changed, {
+    //   if (socket) {
+    socket.emit(mts_user_settings_changed, {
       userSettings: newUserSettings,
       vehicleSetup: undefined,
     });
@@ -87,7 +89,11 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     };
   }, []);
 
-  const updateVehicleSettings = (key: keyof IVehicleSettings, value: any) => {
+  const updateVehicleSettings = (
+    key: keyof IVehicleSettings,
+    value: any,
+    notEmit?: boolean
+  ) => {
     const newVehicleSettings = {
       ...props.store.userSettings.vehicleSettings,
     } as IVehicleSettings;
@@ -101,7 +107,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     } as IUserSettings;
     userSettingsToSave = newUserSettings;
 
-    sendUserSettingsToServer(newUserSettings);
+    if (!notEmit) {
+      sendUserSettingsToServer(newUserSettings);
+    }
   };
 
   const updateVehicleSetup = (item: ItemProperties) => {
@@ -120,7 +128,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
-    props.store.socket.emit(mts_user_settings_changed, {
+    socket.emit(mts_user_settings_changed, {
       userSettings: undefined,
       vehicleSetup,
     });
@@ -224,7 +232,13 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   //      valueLabelDisplay="auto"
                   step={0.01}
                   value={steerSenceDefaultVal}
-                  onChange={(value) => {}}
+                  onChange={(value) => {
+                    updateVehicleSettings(
+                      "steeringSensitivity",
+                      value as number,
+                      true
+                    );
+                  }}
                   onChangeCommitted={(value) => {
                     updateVehicleSettings(
                       "steeringSensitivity",
@@ -244,7 +258,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   //    valueLabelDisplay="auto"
                   step={1}
                   value={cameraZoomDefaultVal}
-                  onChange={(value) => {}}
+                  onChange={(value) => {
+                    updateVehicleSettings("cameraZoom", value as number, true);
+                  }}
                   onChangeCommitted={(value) => {
                     updateVehicleSettings("cameraZoom", value as number);
                   }}
@@ -267,10 +283,15 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   color={color}
                   min={0}
                   max={5}
-                  //       valueLabelDisplay="auto"
                   step={0.5}
                   value={noSteerNumberDefaultVal}
-                  onChange={(value) => {}}
+                  onChange={(value) => {
+                    updateVehicleSettings(
+                      "noSteerNumber",
+                      value as number,
+                      true
+                    );
+                  }}
                   onChangeCommitted={(value) => {
                     updateVehicleSettings("noSteerNumber", value as number);
                   }}

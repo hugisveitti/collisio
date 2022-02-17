@@ -20,6 +20,7 @@ export const getDefaultTabletSetting = () => {
 }
 
 export const setDefaultTabletSetting = (useAsMobile: boolean) => {
+    console.log("use as mobile", useAsMobile)
     if (useAsMobile) {
         deviceType = "mobile"
     } else {
@@ -38,8 +39,8 @@ export const getDeviceType = (): DeviceType => {
         //     deviceType = "mobile"
         //     return "mobile"
         // }
-        deviceType = "desktop"
-        return "desktop" // "tablet";
+        deviceType = getDefaultTabletSetting() ? "mobile" : "desktop"
+        return deviceType // "tablet";
     } else if (
         /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
             ua
@@ -56,7 +57,7 @@ export const isIphone = () => {
 }
 
 // this will only work on my network
-export const inDevelopment = false//window.location.href.includes("localhost") || window.location.href.includes("192.168")
+export const inDevelopment = window.location.href.includes("localhost") || window.location.href.includes("192.168")
 
 /** test mode means:
  * Not being redirected from pages

@@ -41,7 +41,9 @@ interface IFrontPageContainer {
   store: IStore;
 }
 const FrontPageContainer = (props: IFrontPageContainer) => {
-  const [tabletSetting, setTabletSetting] = useState(getDefaultTabletSetting());
+  const [useTabletAsMobile, setUseTabletAsMobile] = useState(
+    getDefaultTabletSetting() as boolean
+  );
   useEffect(() => {
     props.store.setPreviousPage(frontPagePath);
   }, []);
@@ -152,6 +154,11 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
                   }}
                   onChange={(newVal) => {
                     setMusicVolume(newVal as number);
+                    const newGameSettings: IGameSettings = {
+                      ...props.store.gameSettings,
+                      musicVolume: newVal as number,
+                    };
+                    props.store.setGameSettings(newGameSettings);
                   }}
                   value={props.store.gameSettings.musicVolume}
                   step={0.01}
@@ -177,10 +184,14 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
                   { label: "Mobile", value: true },
                   { label: "Desktop", value: false },
                 ]}
-                checked={tabletSetting}
+                checked={useTabletAsMobile}
                 onChange={() => {
-                  setTabletSetting(!tabletSetting);
-                  setDefaultTabletSetting(!tabletSetting);
+                  setUseTabletAsMobile(!useTabletAsMobile);
+                  setDefaultTabletSetting(!useTabletAsMobile);
+                  if (!useTabletAsMobile) {
+                    setLocalGameSetting("musicVolume", 0);
+                    setMusicVolume(0);
+                  }
                 }}
               />
             </div>

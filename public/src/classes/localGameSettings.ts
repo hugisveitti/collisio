@@ -67,7 +67,6 @@ export const getAllLocalGameSettings = () => {
             gameSettings[key] = value
         }
     }
-
     return gameSettings
 }
 

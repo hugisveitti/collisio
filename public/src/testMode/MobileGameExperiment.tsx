@@ -29,6 +29,7 @@ import {
   IPlayerInfo,
   MobileControls,
 } from "../shared-backend/shared-stuff";
+import { disconnectSocket, getSocket } from "../utils/connectSocket";
 import { isIphone } from "../utils/settings";
 import { getSteerAngleFromBeta } from "../utils/utilFunctions";
 import "./MobileExperiment.css";
@@ -42,6 +43,7 @@ const gameActions = new GameActions();
 
 const MobileGameExperiment = (props: IMobileGameExperiment) => {
   const user = useContext(UserContext);
+  const socket = getSocket();
 
   const [gameObject, setGameObject] = useState(undefined as IGameScene);
   // const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -145,12 +147,11 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   };
 
   useEffect(() => {
-    if (props.store.socket) {
+    if (socket) {
       console.log("disconnecting socket");
-      props.store.setSocket(undefined);
-      props.store.socket.disconnect();
+      disconnectSocket();
     }
-  }, [props.store.socket]);
+  }, [socket]);
 
   useEffect(() => {
     if (user === null) return;
@@ -220,7 +221,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
     startGame(
       CurrGameScene,
       {
-        socket: props.store.socket,
+        socket: socket,
         players: [props.store.player],
         gameSettings: props.store.gameSettings,
         roomId: props.store.roomId,
@@ -286,7 +287,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         }}
         user={user}
         store={props.store}
-        socket={props.store.socket}
+        socket={socket}
         gameActions={gameActions}
         loading={gameSettingsLoading}
       />

@@ -25,6 +25,7 @@ import {
   stmd_game_settings_changed,
 } from "../../shared-backend/shared-stuff";
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
+import { disconnectSocket, getSocket } from "../../utils/connectSocket";
 import { inTestMode } from "../../utils/settings";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import { connectPagePath, frontPagePath, gameRoomPath } from "../Routes";
@@ -57,6 +58,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
   const user = useContext(UserContext);
   const history = useHistory();
+  const socket = getSocket();
   const handleEscPressed = () => {
     // basically have to create a modal in the game class and show it there...
     setSettingsModalOpen(!settingsModalOpen);
@@ -94,7 +96,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    props.store.socket.emit(dts_player_finished, data);
+    socket.emit(dts_player_finished, data);
   };
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
@@ -117,21 +119,19 @@ const GameRoom = React.memo((props: IGameRoom) => {
     setSettingsModalOpen(false);
   };
 
-  if (!props.store.socket && !inTestMode) {
+  if (!socket && !inTestMode) {
     history.push(frontPagePath);
     return null;
   }
 
   useEffect(() => {
-    props.store.socket.on(std_player_disconnected, ({ playerName }) => {
-      toast.warn(
-        `${playerName} disconnected from game, logged in players can reconnect!`
-      );
+    socket.on(std_player_disconnected, ({ playerName }) => {
+      toast.warn(`${playerName} disconnected from game, they can reconnect!`);
     });
 
     if (props.useTestCourse) {
       return startLowPolyTest(
-        props.store.socket,
+        socket,
         props.store.gameSettings,
         handleEscPressed,
         (_gameObject) => {
@@ -153,7 +153,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
     startGame(
       CurrGameScene,
       {
-        socket: props.store.socket,
+        socket: socket,
         players: props.store.players,
         gameSettings: props.store.gameSettings,
         roomId: props.store.roomId,
@@ -173,7 +173,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
       }
     );
 
-    props.store.socket.on(
+    socket.on(
       std_game_data_info,
       (data: {
         playerId: string;
@@ -193,17 +193,13 @@ const GameRoom = React.memo((props: IGameRoom) => {
       }
     );
 
-    props.store.socket.on(
-      std_send_game_actions,
-      (_gameActions: GameActions) => {
-        setGameActions(_gameActions);
-      }
-    );
+    socket.on(std_send_game_actions, (_gameActions: GameActions) => {
+      setGameActions(_gameActions);
+    });
 
-    props.store.socket.once(std_quit_game, async () => {
-      props.store.socket.disconnect();
-      //     props.store.setSocket(undefined);
-      // setGameObject(undefined);
+    socket.once(std_quit_game, async () => {
+      disconnectSocket();
+
       await gameObject.destroyGame();
       gameObject = undefined;
 
@@ -214,19 +210,19 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
     return () => {
       gameObject?.destroyGame();
-      props.store.socket?.disconnect();
+      socket?.disconnect();
 
       // maybe these off dont matter if we disconnect?
-      props.store.socket.off(std_send_game_actions);
-      props.store.socket.off(std_game_data_info);
-      props.store.socket.off(std_player_disconnected);
-      props.store.socket.off(std_quit_game);
-      props.store.socket.off(stmd_game_settings_changed);
+      socket.off(std_send_game_actions);
+      socket.off(std_game_data_info);
+      socket.off(std_player_disconnected);
+      socket.off(std_quit_game);
+      socket.off(stmd_game_settings_changed);
     };
   }, []);
 
   const gameObjectCreated = () => {
-    props.store.socket.on(stmd_game_settings_changed, (data) => {
+    socket.on(stmd_game_settings_changed, (data) => {
       props.store.setGameSettings(data.gameSettings);
       if (data.gameSettings) {
         setAllLocalGameSettings(data.gameSettings);
@@ -237,11 +233,11 @@ const GameRoom = React.memo((props: IGameRoom) => {
     });
 
     return () => {
-      props.store.socket.off(stmd_game_settings_changed);
+      socket.off(stmd_game_settings_changed);
       if (gameObject) {
         gameObject.destroyGame().then(() => {
           /** do some kind of back to waiting room? */
-          props.store.socket.emit(dts_back_to_waiting_room, {});
+          socket.emit(dts_back_to_waiting_room, {});
         });
       }
     };
@@ -281,7 +277,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         updateGameSettings={updateGameSettings}
         quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
-            props.store.socket.disconnect();
+            socket.disconnect();
             //     props.store.setSocket(undefined);
             //   setGameObject(undefined);
             gameObject = undefined;
@@ -304,7 +300,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         gameDataInfo={gameDataInfo}
         quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
-            props.store.socket.disconnect();
+            socket.disconnect();
             //     props.store.setSocket(undefined);
             //   setGameObject(undefined);
             gameObject = undefined;

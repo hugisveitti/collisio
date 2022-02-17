@@ -17,8 +17,6 @@ interface IMySlider {
 }
 
 const MySlider = (props: IMySlider) => {
-  const [defaultValue, setDefaultValue] = useState(props.value);
-
   return (
     <>
       <Typography>{props.label}</Typography>
@@ -30,8 +28,8 @@ const MySlider = (props: IMySlider) => {
           max={props.max}
           valueLabelDisplay="auto"
           step={props.step}
-          defaultValue={defaultValue}
-          // value={props.value}
+          // defaultValue={defaultValue}
+          value={props.value}
           onChange={(e, value) => {
             props.onChange(value);
           }}

@@ -131,9 +131,12 @@ export class Player {
     setupLeftWaitingRoomListener() {
         this.socket.on(mdts_left_waiting_room, () => {
             if (!this.game?.gameStarted) {
-                this.game?.playerDisconnected(this.playerName, this.id)
+                // this.game?.playerDisconnected(this.playerName, this.id)
+                this.socket.disconnect()
             }
+            // disconnect from game handled in another function
         })
+
     }
 
     setupPingListener() {

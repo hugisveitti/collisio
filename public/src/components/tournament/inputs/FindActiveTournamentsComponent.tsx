@@ -14,6 +14,7 @@ import {
 } from "../../../firebase/firestoreTournamentFunctions";
 import { yellow3 } from "../../../providers/theme";
 import { mdts_game_settings_changed } from "../../../shared-backend/shared-stuff";
+import { getSocket } from "../../../utils/connectSocket";
 import BackdropButton from "../../button/BackdropButton";
 import TournamentSelect from "../../inputs/TournamentSelect";
 import { IStore } from "../../store";
@@ -29,6 +30,8 @@ const FindActiveTournamentComponent = (
   const [activeTournaments, setActiveTournamnets] = useState(
     [] as ITournament[]
   );
+
+  const socket = getSocket();
 
   const handleGetBracketNode = (tournament: Tournament) => {
     if (tournament.tournamentType === "local") {
@@ -88,7 +91,7 @@ const FindActiveTournamentComponent = (
     console.log("new game settings", newGameSettings);
 
     props.store.setGameSettings(newGameSettings);
-    props.store.socket.emit(mdts_game_settings_changed, {
+    socket.emit(mdts_game_settings_changed, {
       gameSettings: newGameSettings,
     });
   };

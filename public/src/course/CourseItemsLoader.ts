@@ -235,5 +235,6 @@ export const notSeeThroughObjects = [
     "crops",
     "scarecrow",
     "field",
-    "sheep"
+    "sheep",
+    "water"
 ]
