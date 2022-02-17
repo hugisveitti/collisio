@@ -23,6 +23,7 @@ import MySlider from "../inputs/slider/MySlider";
 import MyRadio from "../radio/MyRadio";
 import { garagePagePath } from "../Routes";
 import { getSocket } from "../../utils/connectSocket";
+import { propsToClassKey } from "@mui/styles";
 
 interface IVehicleSettingsComponent {
   store: IStore;
@@ -40,33 +41,19 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const user = props.user;
   const socket = getSocket();
 
-  const [chaseSpeedDefaultVal, setChaseSpeedDefaultVal] = useState(
-    props.store.userSettings.vehicleSettings.chaseCameraSpeed
+  const [vehicleSettings, setVehicleSettings] = useState(
+    props.store.userSettings.vehicleSettings
   );
-
-  const [steerSenceDefaultVal, setSteerSenceDefaultVal] = useState(
-    props.store.userSettings.vehicleSettings.steeringSensitivity
-  );
-
-  const [cameraZoomDefaultVal, setCameraZoomDefaultVal] = useState(
-    props.store.userSettings.vehicleSettings.cameraZoom
-  );
-
-  const [noSteerNumberDefaultVal, setNoSteerNumberDefaultVal] = useState(
-    props.store.userSettings.vehicleSettings.noSteerNumber
-  );
-
-  const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
 
   const sendUserSettingsToServer = (newUserSettings: IUserSettings) => {
     // if (user) {
     //   setDBUserSettings(user.uid, newUserSettings);
     //   if (socket) {
-    socket.emit(mts_user_settings_changed, {
+    socket?.emit(mts_user_settings_changed, {
       userSettings: newUserSettings,
       vehicleSetup: undefined,
     });
-    props.store.setUserSettings(newUserSettings);
+
     // }
     // }
   };
@@ -95,7 +82,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     notEmit?: boolean
   ) => {
     const newVehicleSettings = {
-      ...props.store.userSettings.vehicleSettings,
+      ...vehicleSettings,
     } as IVehicleSettings;
 
     // @ts-ignore
@@ -105,6 +92,8 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
       ...props.store.userSettings,
       vehicleSettings: newVehicleSettings,
     } as IUserSettings;
+    props.store.setUserSettings(newUserSettings);
+    setVehicleSettings(newVehicleSettings);
     userSettingsToSave = newUserSettings;
 
     if (!notEmit) {
@@ -115,16 +104,12 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const updateVehicleSetup = (item: ItemProperties) => {
     const newVehiclesSetup = { ...props.store.vehiclesSetup };
 
-    newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType][
-      item.type
-    ] = item;
+    newVehiclesSetup[vehicleSettings.vehicleType][item.type] = item;
 
     props.store.setVehiclesSetup(newVehiclesSetup);
     vehiclesSetupToSave = newVehiclesSetup;
 
-    sendVehicleSetupToServer(
-      newVehiclesSetup[props.store.userSettings.vehicleSettings.vehicleType]
-    );
+    sendVehicleSetupToServer(newVehiclesSetup[vehicleSettings.vehicleType]);
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
@@ -145,11 +130,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
           ) : (
             <VehicleSelect
               store={props.store}
-              value={props.store.userSettings.vehicleSettings.vehicleType}
+              value={vehicleSettings.vehicleType}
               excludedVehicles={nonactiveVehcileTypes}
-              vehicleColor={
-                props.store.userSettings.vehicleSettings.vehicleColor
-              }
+              vehicleColor={vehicleSettings.vehicleColor}
               onChange={(value) => {
                 updateVehicleSettings("vehicleType", value);
               }}
@@ -161,14 +144,11 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                 const newVehicleSetup = { ...props.store.vehiclesSetup };
 
                 for (let item of possibleVehicleItemTypes) {
-                  delete newVehicleSetup[
-                    props.store.userSettings.vehicleSettings.vehicleType
-                  ][item];
+                  delete newVehicleSetup[vehicleSettings.vehicleType][item];
                 }
                 props.store.setVehiclesSetup(newVehicleSetup);
                 sendVehicleSetupToServer({
-                  vehicleType:
-                    props.store.userSettings.vehicleSettings.vehicleType,
+                  vehicleType: vehicleSettings.vehicleType,
                 });
               }}
               user={props.user}
@@ -190,34 +170,40 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   onClick={() => {
                     updateVehicleSettings(
                       "useChaseCamera",
-                      !props.store.userSettings.vehicleSettings.useChaseCamera
+                      !vehicleSettings.useChaseCamera
                     );
                   }}
                 >
                   <>
                     Camera chaser{" "}
-                    {props.store.userSettings.vehicleSettings.useChaseCamera
-                      ? "On"
-                      : "Off"}
+                    {vehicleSettings.useChaseCamera ? "On" : "Off"}
                   </>
                 </BackdropButton>
               </Grid>
 
               <Grid item xs={12}>
-                <Collapse
-                  in={props.store.userSettings.vehicleSettings.useChaseCamera}
-                >
-                  <Typography>Chase camera speed</Typography>
-                  <Slider
-                    style={{ color }}
+                <Collapse in={vehicleSettings.useChaseCamera}>
+                  <MySlider
+                    color="black"
+                    label="Chase camera speed"
                     min={0.01}
                     max={1}
-                    valueLabelDisplay="auto"
                     step={0.01}
-                    defaultValue={chaseSpeedDefaultVal}
-                    onChange={(e, value) => {}}
-                    onChangeCommitted={(e, value) => {
-                      updateVehicleSettings("chaseCameraSpeed", value);
+                    value={vehicleSettings.chaseCameraSpeed}
+                    startIcon={<span>-</span>}
+                    endIcon={<span>+</span>}
+                    onChange={(value) => {
+                      updateVehicleSettings(
+                        "chaseCameraSpeed",
+                        value as number,
+                        true
+                      );
+                    }}
+                    onChangeCommitted={(value) => {
+                      updateVehicleSettings(
+                        "chaseCameraSpeed",
+                        value as number
+                      );
                     }}
                   />
                 </Collapse>
@@ -231,7 +217,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   max={1}
                   //      valueLabelDisplay="auto"
                   step={0.01}
-                  value={steerSenceDefaultVal}
+                  value={vehicleSettings.steeringSensitivity}
                   onChange={(value) => {
                     updateVehicleSettings(
                       "steeringSensitivity",
@@ -257,7 +243,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   max={10}
                   //    valueLabelDisplay="auto"
                   step={1}
-                  value={cameraZoomDefaultVal}
+                  value={vehicleSettings.cameraZoom}
                   onChange={(value) => {
                     updateVehicleSettings("cameraZoom", value as number, true);
                   }}
@@ -284,7 +270,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   min={0}
                   max={5}
                   step={0.5}
-                  value={noSteerNumberDefaultVal}
+                  value={vehicleSettings.noSteerNumber}
                   onChange={(value) => {
                     updateVehicleSettings(
                       "noSteerNumber",
@@ -306,9 +292,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                     { label: "Off", value: false },
                   ]}
                   label="Dynamic camera field of view"
-                  checked={
-                    props.store.userSettings.vehicleSettings.useDynamicFOV
-                  }
+                  checked={vehicleSettings.useDynamicFOV}
                   onChange={(newVal) => {
                     updateVehicleSettings("useDynamicFOV", newVal);
                   }}

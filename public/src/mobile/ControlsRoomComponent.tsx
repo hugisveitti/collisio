@@ -125,12 +125,15 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   //   }
   // }, []);
 
-  const screenHeight =
-    document.fullscreenElement === null
-      ? screen.availHeight
-      : window.innerHeight;
-  const screenWidth =
-    document.fullscreenElement === null ? screen.availWidth : window.innerWidth;
+  // const screenHeight =
+  //   document.fullscreenElement === null
+  //     ? screen.availHeight
+  //     : window.innerHeight;
+  // const screenWidth =
+  //   document.fullscreenElement === null ? screen.availWidth : window.innerWidth;
+
+  const screenHeight = window.innerHeight;
+  const screenWidth = window.innerWidth;
 
   //const btnSize = screenWidth < 350 ? 120 : 150;
 
