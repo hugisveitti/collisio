@@ -190,6 +190,7 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
             camera.position.setZ(posZ + Math.sin(sinOff) + Math.cos(cosOff))
             camera.position.setY(posY + Math.sin(sinOff) + Math.cos(cosOff))
         } else {
+
             const newPos = camera.position.clone().sub(camera.position.clone().sub(cameraTargetPos).multiplyScalar(cameraMoveSpeed))
             camera.position.set(newPos.x, newPos.y, newPos.z)
 

@@ -280,16 +280,18 @@ var Room = /** @class */ (function () {
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 // disconnect old socket always
-                console.log("disconnecting old socket", i, "isLeader:", this.players[i].isLeader);
-                if (this.gameStarted) {
-                    this.players[i].setSocket(player.socket);
-                    player = this.players[i];
-                    playerExists = true;
-                }
-                else {
-                    this.players[i].desktopDisconnected();
-                    this.players[i].socket.disconnect();
-                }
+                //   this.players[i].socket.disconnect()
+                playerExists = true;
+                console.log("player exists!, disconnecting old socket, i:", i, "isLeader:", this.players[i].isLeader);
+                // this.players[i].setSocket(player.socket)
+                // player = this.players[i]
+                this.players[i].turnOffSocket();
+                var isLeader = this.players[i].isLeader;
+                delete this.players[i];
+                this.players[i] = player;
+                this.players[i].playerNumber = i;
+                this.players[i].setGame(this);
+                this.players[i].setLeader();
             }
         }
         if (this.gameStarted) {
@@ -309,9 +311,11 @@ var Room = /** @class */ (function () {
         if (this.players.length === 0) {
             player.setLeader();
         }
-        this.players.push(player);
-        player.setGame(this);
-        player.playerNumber = this.players.length - 1;
+        if (!playerExists) {
+            this.players.push(player);
+            player.setGame(this);
+            player.playerNumber = this.players.length - 1;
+        }
         player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "Successfully connected to room!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings } });
         player.socket.join(this.roomId);
         this.alertWaitingRoom();
@@ -402,8 +406,10 @@ var Room = /** @class */ (function () {
         });
     };
     Room.prototype.startGame = function () {
-        this.setupControlsListener();
+        if (this.gameStarted)
+            return;
         this.gameStarted = true;
+        this.setupControlsListener();
         for (var i = 0; i < this.players.length; i++) {
             this.players[i].startGame();
         }
@@ -415,7 +421,7 @@ var Room = /** @class */ (function () {
             var wasLeader = false;
             for (var i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
-                if (this.players[i].id === playerId) {
+                if (this.players[i].id === playerId && !this.players[i].isConnected) {
                     wasLeader = this.players[i].isLeader;
                     this.players.splice(i, 1);
                 }

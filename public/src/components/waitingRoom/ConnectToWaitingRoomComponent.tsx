@@ -87,9 +87,12 @@ const ConnectToWaitingRoomComponent = (
       createRoomDesktop(socket);
     } else {
       if (playerName.length === 0) {
+        setConnectingToRoom(false);
         toast.error("Player name cannot be empty");
         return;
       } else if (!roomId) {
+        setConnectingToRoom(false);
+
         toast.error("Room id cannot be undefined");
         return;
       }
@@ -121,6 +124,7 @@ const ConnectToWaitingRoomComponent = (
     playerName: string,
     socket: Socket
   ) => {
+    console.log("set connecting to room");
     setConnectingToRoom(true);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
     const vehicleSetup = props.store.vehiclesSetup?.[vehicleType] ?? {
@@ -137,11 +141,12 @@ const ConnectToWaitingRoomComponent = (
     } as IPlayerConnectedData);
 
     socket.once(stm_player_connected_callback, (response: ISocketCallback) => {
+      console.log("unset connecting to room");
+      setConnectingToRoom(false);
       if (response.status === "error") {
         const { message } = response;
         // was spamming people
         // toast.error(message);
-        setConnectingToRoom(false);
       } else {
         // toast.success(response.message);
 
@@ -203,7 +208,10 @@ const ConnectToWaitingRoomComponent = (
             <Grid item xs={12} sm={12}>
               <AvailableRoomsComponent
                 store={props.store}
-                connectButtonClicked={connectButtonClicked}
+                connectButtonClicked={(roomId: string) => {
+                  setConnectingToRoom(true);
+                  connectButtonClicked(roomId);
+                }}
                 userId={user.uid}
               />
             </Grid>
@@ -231,7 +239,10 @@ const ConnectToWaitingRoomComponent = (
 
       <Grid item xs={12}>
         <BackdropButton
-          onClick={() => connectButtonClicked(props.store.roomId)}
+          onClick={() => {
+            setConnectingToRoom(true);
+            connectButtonClicked(props.store.roomId);
+          }}
           startIcon={<VideogameAssetIcon />}
         >
           {!onMobile ? "Create a Game" : "Join Game"}

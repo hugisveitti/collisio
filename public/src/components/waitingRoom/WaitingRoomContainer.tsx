@@ -30,7 +30,11 @@ import {
   stm_player_info,
 } from "../../shared-backend/shared-stuff";
 import "../../styles/main.css";
-import { getSocket, ISocketCallback } from "../../utils/connectSocket";
+import {
+  disconnectSocket,
+  getSocket,
+  ISocketCallback,
+} from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
 import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
@@ -111,7 +115,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
     if (!socket && !onMobile && !inTestMode) {
       /** Desktops should always have a socket when connected to waiting room */
-      console.log("not connected", socket);
+
       history.push(frontPagePath);
     }
 
@@ -169,7 +173,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       });
 
       socket.on(stm_desktop_disconnected, () => {
+        console.log("desktop disconnected");
         toast.error("Game disconnected");
+        disconnectSocket();
         history.push(frontPagePath);
         /** go to front page? */
       });
@@ -180,7 +186,8 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
-      socket.emit(mdts_left_waiting_room, {});
+      console.log("removing all socket listeners");
+      socket?.emit(mdts_left_waiting_room, {});
       socket.off(stmd_game_starting);
       socket.off(stm_desktop_disconnected);
       socket.off(stmd_game_settings_changed);
@@ -230,7 +237,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     };
   }, [user]);
 
-  console.log("props.store.roomId", props.store.roomId);
   if (!onMobile && !props.store.roomId && !inTestMode) {
     history.push(frontPagePath);
     return null;

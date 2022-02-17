@@ -16,6 +16,7 @@ export const getSocket = () => {
 }
 
 export const disconnectSocket = () => {
+    console.log("calling disconnect socket")
     socket?.disconnect()
     socket = undefined
 }

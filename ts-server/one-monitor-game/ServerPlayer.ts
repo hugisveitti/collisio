@@ -76,7 +76,9 @@ export class Player {
      */
     setSocket(newSocket: Socket) {
 
-        this.socket?.disconnect()
+        console.log("disconnecting old socket")
+        //   this.desktopDisconnected()
+        this.turnOffSocket()
         this.socket = newSocket
         this.isConnected = true
         this.setupControler()
@@ -93,6 +95,14 @@ export class Player {
         this.setupPingListener()
         this.setupLeftWaitingRoomListener()
         this.setupQuitGameListener()
+    }
+
+    turnOffSocket() {
+        if (!this.socket) return
+        console.log("turn off socket")
+        this.socket.emit(stm_desktop_disconnected, {})
+        this.socket.removeAllListeners()
+        this.socket.disconnect()
     }
 
     /**
@@ -130,6 +140,7 @@ export class Player {
 
     setupLeftWaitingRoomListener() {
         this.socket.on(mdts_left_waiting_room, () => {
+            console.log("left waiting room, game started:", this.game?.gameStarted)
             if (!this.game?.gameStarted) {
                 // this.game?.playerDisconnected(this.playerName, this.id)
                 this.socket.disconnect()
@@ -197,7 +208,8 @@ export class Player {
     }
 
     desktopDisconnected() {
-        this.socket.emit(stm_desktop_disconnected, {})
+        console.log("desktop disconnected", this.playerName)
+        this.socket?.emit(stm_desktop_disconnected, {})
     }
 
     setGame(game: Room) {

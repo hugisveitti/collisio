@@ -217,7 +217,7 @@ const GarageComponent = (props: IGarageComponent) => {
           setOwnership(_ownership);
         })
         .catch(() => {
-          toast.error("Error getting ownership");
+          console.warn("Error getting ownership");
         });
       getVehicleItemsOwnership(user.uid, selectedVehicleType).then(
         (_ownership) => {

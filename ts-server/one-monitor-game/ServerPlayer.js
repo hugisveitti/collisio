@@ -26,8 +26,9 @@ var Player = /** @class */ (function () {
      * @param newSocket Socket
      */
     Player.prototype.setSocket = function (newSocket) {
-        var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.disconnect();
+        console.log("disconnecting old socket");
+        //   this.desktopDisconnected()
+        this.turnOffSocket();
         this.socket = newSocket;
         this.isConnected = true;
         this.setupControler();
@@ -43,6 +44,14 @@ var Player = /** @class */ (function () {
         this.setupPingListener();
         this.setupLeftWaitingRoomListener();
         this.setupQuitGameListener();
+    };
+    Player.prototype.turnOffSocket = function () {
+        if (!this.socket)
+            return;
+        console.log("turn off socket");
+        this.socket.emit(shared_stuff_1.stm_desktop_disconnected, {});
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
     };
     /**
      * actions like reset game
@@ -81,8 +90,9 @@ var Player = /** @class */ (function () {
     Player.prototype.setupLeftWaitingRoomListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mdts_left_waiting_room, function () {
-            var _a;
-            if (!((_a = _this.game) === null || _a === void 0 ? void 0 : _a.gameStarted)) {
+            var _a, _b;
+            console.log("left waiting room, game started:", (_a = _this.game) === null || _a === void 0 ? void 0 : _a.gameStarted);
+            if (!((_b = _this.game) === null || _b === void 0 ? void 0 : _b.gameStarted)) {
                 // this.game?.playerDisconnected(this.playerName, this.id)
                 _this.socket.disconnect();
             }
@@ -144,7 +154,9 @@ var Player = /** @class */ (function () {
         this.isLeader = true;
     };
     Player.prototype.desktopDisconnected = function () {
-        this.socket.emit(shared_stuff_1.stm_desktop_disconnected, {});
+        var _a;
+        console.log("desktop disconnected", this.playerName);
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(shared_stuff_1.stm_desktop_disconnected, {});
     };
     Player.prototype.setGame = function (game) {
         this.game = game;

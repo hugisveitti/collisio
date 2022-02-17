@@ -92,8 +92,8 @@ const router = (app: any) => {
 
     const sendTestHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-        console.log("Sending test")
-        printRequestInfo(req)
+        //   console.log("Sending test")
+        //     printRequestInfo(req)
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
         } else {
@@ -117,7 +117,7 @@ const router = (app: any) => {
         const host = req.get("host")
         //   console.log("reqest to index")
         if (isValidHost(host)) {
-            printRequestInfo(req)
+            //      printRequestInfo(req)
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         } else {
             //   console.log("Not valid host")
@@ -168,7 +168,7 @@ const router = (app: any) => {
     app.get("*", (req: Request, res: Response) => {
         const host = req.get("host")
         // console.log("Request to star")
-        printRequestInfo(req)
+        //  printRequestInfo(req)
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));

@@ -99,8 +99,8 @@ var router = function (app) {
     var indexHTMLPath = "../public/" + buildFolder + "/index.html";
     var sendTestHTML = function (req, res) {
         var host = req.get("host");
-        console.log("Sending test");
-        printRequestInfo(req);
+        //   console.log("Sending test")
+        //     printRequestInfo(req)
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
         }
@@ -118,7 +118,7 @@ var router = function (app) {
         var host = req.get("host");
         //   console.log("reqest to index")
         if (isValidHost(host)) {
-            printRequestInfo(req);
+            //      printRequestInfo(req)
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
@@ -165,7 +165,7 @@ var router = function (app) {
     app.get("*", function (req, res) {
         var host = req.get("host");
         // console.log("Request to star")
-        printRequestInfo(req);
+        //  printRequestInfo(req)
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));

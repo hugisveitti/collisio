@@ -352,17 +352,20 @@ export class Room {
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 // disconnect old socket always
-                console.log("disconnecting old socket", i, "isLeader:", this.players[i].isLeader)
-                if (this.gameStarted) {
+                //   this.players[i].socket.disconnect()
+                playerExists = true
+                console.log("player exists!, disconnecting old socket, i:", i, "isLeader:", this.players[i].isLeader)
 
-                    this.players[i].setSocket(player.socket)
-                    player = this.players[i]
+                // this.players[i].setSocket(player.socket)
+                // player = this.players[i]
+                this.players[i].turnOffSocket()
+                let isLeader = this.players[i].isLeader
+                delete this.players[i]
+                this.players[i] = player
+                this.players[i].playerNumber = i
+                this.players[i].setGame(this)
+                this.players[i].setLeader()
 
-                    playerExists = true
-                } else {
-                    this.players[i].desktopDisconnected()
-                    this.players[i].socket.disconnect()
-                }
             }
         }
 
@@ -384,9 +387,11 @@ export class Room {
             player.setLeader()
         }
 
-        this.players.push(player)
-        player.setGame(this)
-        player.playerNumber = this.players.length - 1
+        if (!playerExists) {
+            this.players.push(player)
+            player.setGame(this)
+            player.playerNumber = this.players.length - 1
+        }
 
 
 
@@ -487,8 +492,10 @@ export class Room {
     }
 
     startGame() {
-        this.setupControlsListener()
+        if (this.gameStarted) return
         this.gameStarted = true
+        this.setupControlsListener()
+
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].startGame()
         }
@@ -503,7 +510,7 @@ export class Room {
             let wasLeader = false
             for (let i = 0; i < this.players.length; i++) {
                 // change to id's and give un auth players id's
-                if (this.players[i].id === playerId) {
+                if (this.players[i].id === playerId && !this.players[i].isConnected) {
                     wasLeader = this.players[i].isLeader
                     this.players.splice(i, 1)
                 }

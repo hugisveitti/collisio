@@ -130,7 +130,8 @@ export class LowPolyVehicle extends Vehicle {
     addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
         this.tires = []
         for (let tire of tires) {
-            tire.receiveShadow = tire.castShadow = true
+            tire.receiveShadow = false
+            tire.castShadow = true
             this.tires.push(tire.clone())
         }
 

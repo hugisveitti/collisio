@@ -67,7 +67,7 @@ const TrackSelect = (props: ITrackSelect) => {
           setOwnership(_ownership);
         })
         .catch(() => {
-          toast.error("Error getting ownership");
+          console.warn("Error getting ownership");
         });
     }
   }, [user]);
