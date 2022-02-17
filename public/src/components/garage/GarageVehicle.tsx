@@ -37,7 +37,7 @@ const GarageVehicle = (props: IGarageVehicle) => {
       0,
       props.vehicleColor,
       props.vehicleSetup,
-      onMobile ? 400 : 800
+      onMobile ? 100 : 800
     );
     if (canvasWrapperRef.current && renderer) {
       renderer.domElement.setAttribute("style", "max-width:100%;");

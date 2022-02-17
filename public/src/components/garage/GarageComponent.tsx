@@ -139,25 +139,16 @@ const GarageComponent = (props: IGarageComponent) => {
         ? scrollParent.getBoundingClientRect().height
         : window.innerHeight;
 
-    console.log("parent Height", parentHeight);
     const scrollY =
       scrollParent instanceof HTMLElement
         ? scrollParent.scrollTop
         : scrollParent.scrollY;
     if (scrollY > originalTop) {
       // if over then make renderer smaller
-      let height = originalHeight - (scrollY - originalTop);
-      height = Math.max(height, 100);
 
-      setRendererHeight(height);
       // if over so much that the renderer cant be seen, move the div
       // as long as the garage is in frame
-      console.log(
-        "box.height",
-        box.height,
-        garageRef.current.offsetTop,
-        garageRef.current.clientHeight
-      );
+
       if (
         scrollY > parentHeight - originalTop &&
         scrollY <
