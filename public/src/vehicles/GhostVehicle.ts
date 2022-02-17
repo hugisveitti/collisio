@@ -66,6 +66,7 @@ export class GhostVehicle implements IGhostVehicle {
     setPosition(position: Vector3) {
         if (!this.isReady) return
         this.position = position
+        // console.log("setting pos", position.x.toFixed(2), position.z.toFixed(2))
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
         this.vehicle.position.set(position.x, position.y, position.z)

@@ -141,12 +141,13 @@ export class GhostDriver {
 
         const cTime = this.getTime(this.timeIndex)
         const pTime = this.getTime(this.timeIndex - 1)
+        // time wasnt accurate enough and cause some stutters
         const alpha = (time - pTime) / (cTime - pTime)
+
         if (alpha <= 1) {
             this.betweenPos = this.pos.clone().lerp(this.nextPos, alpha)
             this.betweenRot = this.rotation.clone().slerp(this.nextRotation, alpha)
         }
-
     }
 
     setToStart(vehicle: IGhostVehicle) {
@@ -172,8 +173,6 @@ export class GhostDriver {
             this.getPointBetween(time)
             vehicle.setPosition(this.betweenPos.clone())
             vehicle.setRotation(this.betweenRot.clone())
-
-
         } else if (cTime > time) {
             this.getPointBetween(time)
             vehicle.setPosition(this.betweenPos.clone())

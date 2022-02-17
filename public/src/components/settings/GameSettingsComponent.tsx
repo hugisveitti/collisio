@@ -1,14 +1,15 @@
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import VolumeUp from "@mui/icons-material/VolumeUp";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import {
+  default as VolumeUp,
+  default as VolumeUpIcon,
+} from "@mui/icons-material/VolumeUp";
 import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import {
   defaultRaceTrack,
   defaultStoryTrack,
@@ -34,10 +35,10 @@ import CollabsibleCard from "../inputs/CollapsibleCard";
 import InfoButton from "../inputs/info-button/InfoButton";
 import NumberSelect from "../inputs/NumberSelect";
 import MySlider from "../inputs/slider/MySlider";
-import TrackSelect from "../trackSelectContainer/TrackSelect";
 import MyRadio from "../radio/MyRadio";
-import MyTextField from "../textField/MyTextField";
 import { IStore } from "../store";
+import MyTextField from "../textField/MyTextField";
+import TrackSelect from "../trackSelectContainer/TrackSelect";
 
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;
@@ -226,6 +227,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           }}
           store={props.store}
           buttonToOpen
+          simpleSelect={props.inTestMode}
         />
       </Grid>
       <Grid item xs={12}>

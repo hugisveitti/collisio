@@ -328,7 +328,7 @@ export class RaceGameScene extends GameScene {
 
                 if (!this.gameTimers[vehicleNumber].hasSendRaceData) {
 
-                    this.setViewImportantInfo(`Race finished, total time: ${totalTime}`, +vehicleNumber)
+                    this.setViewImportantInfo(`Race finished, total time: ${totalTime.toFixed(2)}`, +vehicleNumber)
                     this.prepareEndOfRacePlayer(+vehicleNumber)
                     this.checkRaceOver()
                     this.gameTimers[vehicleNumber].hasSendRaceData = true
@@ -527,7 +527,7 @@ export class RaceGameScene extends GameScene {
         }
 
         if (i === 0 && this.driverRecorder && this.gameSettings?.tournamentId) {
-            this.driverRecorder.saveTournamentRecording(this.gameTimers[i].getTotalTime(), this.players[i].playerName, this.players[i].id,)
+            this.driverRecorder.saveTournamentRecording(+this.gameTimers[i].getTotalTime().toFixed(2), this.players[i].playerName, this.players[i].id,)
         }
 
     }
@@ -542,7 +542,7 @@ export class RaceGameScene extends GameScene {
             playerGameInfos.push({
                 id: this.players[i].id,
                 name: this.players[i].playerName,
-                totalTime: this.gameTimers[i].getTotalTime(),
+                totalTime: +this.gameTimers[i].getTotalTime().toFixed(2),
                 lapTimes: this.gameTimers[i].getLapTimes(),
                 vehicleType: this.players[i].vehicleType,
                 engineForce: this.vehicles[i].engineForce,

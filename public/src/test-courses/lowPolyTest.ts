@@ -471,9 +471,9 @@ export class LowPolyTestScene extends GameScene {
                         console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
                         this.vehicle.updateVehicleSetup({
                             vehicleType: this.vehicleType,
-                            exhaust: vehicleItems[this.vehicleType]?.["exhaust1"] as ItemProperties,
-                            wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
-                            spoiler: vehicleItems[this.vehicleType]?.["spoiler1"] as ItemProperties,
+                            exhaust: vehicleItems[this.vehicleType]?.["exhaust4"] as ItemProperties,
+                            //  wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
+                            spoiler: vehicleItems[this.vehicleType]?.["spoiler2"] as ItemProperties,
                         })
 
                     }, 1000)

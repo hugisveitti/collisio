@@ -456,7 +456,7 @@ const normal2Items: CarItems = {
         frictionSlip: 3.8,
         engineForce: 1500,
         mass: 120,
-        suspensionRestLength: 1,
+        suspensionRestLength: .1,
         suspensionStiffness: 20
     }
 }

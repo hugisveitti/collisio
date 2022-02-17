@@ -58,7 +58,7 @@ export class GameTime {
 
     getCurrentLapTime() {
         if (this.isPaused) return this.currentLapTime
-        return around(this.currentLapTime + this.clock.getElapsedTime())
+        return (this.currentLapTime + this.clock.getElapsedTime())
     }
 
     lapDone() {
@@ -86,14 +86,14 @@ export class GameTime {
     }
 
     getTotalTime() {
-        if (this.finished()) return around(this.totalTime)
+        if (this.finished()) return (this.totalTime)
         return this.totalTime + this.getCurrentLapTime()
     }
 
     checkpointCrossed(checkpointNumber: number) {
 
         if (!this.isCheckpointCrossed[checkpointNumber - 1]) {
-            this.checkpointTimes[checkpointNumber - 1].push(this.getTotalTime())
+            this.checkpointTimes[checkpointNumber - 1].push(around(this.getTotalTime()))
         }
         /**
          * checkpoints indexed at 1 in blender
