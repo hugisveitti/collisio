@@ -38,6 +38,9 @@ import MobileOnlyWaitingRoom from "./mobileOnly/MobileOnlyWaitingRoom";
 import BuyCoinsComponent from "./monitary/BuyCoinsComponent";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import PaymentCallbackContainer from "./monitary/PaymentCallbackContainer";
+import MultiplayerConnectRoomContainer from "./multiplayer/MultiplayerConnectRoomContainer";
+import MultiplayerWaitingRoomContainer from "./multiplayer/MultiplayerWaitingRoomContainer";
+import MultiplayerGameRoom from "./multiplayerGameRoom/MuliplayerGameRoom";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
@@ -82,6 +85,16 @@ export const trackPagePath = "/tracks";
 export const buyCoinsPagePath = "/buycoins";
 export const successfullPaymentPagePath = "/successfulpayment";
 export const cancelPaymentPagePath = "/cancelpayment";
+export const multiplayerConnectPagePath = "/multiplayer";
+export const multiplayerRoomIdPagePath = "/multiplayer/:roomId";
+export const multiplayerGameRoomIdPagePath = "/playmultiplayer/:roomId";
+const multiplayerGameRoomPagePath = "/playmultiplayer";
+
+export const getMultiplayerGameRoomPath = (roomId: string) =>
+  `${multiplayerGameRoomPagePath}/${roomId}`;
+
+export const getMultiplayerWaitingRoom = (roomId: string) =>
+  `${multiplayerConnectPagePath}/${roomId}`;
 
 export const getUserPagePath = (userId: string) =>
   `${publicProfilePath}/${userId}`;
@@ -311,6 +324,22 @@ const Routes = () => {
           render={(props) => (
             <PaymentCallbackContainer canceled {...props} store={store} />
           )}
+        />
+        <Route
+          path={multiplayerRoomIdPagePath}
+          render={(props) => (
+            <MultiplayerWaitingRoomContainer {...props} store={store} />
+          )}
+        />
+        <Route
+          path={multiplayerConnectPagePath}
+          render={(props) => (
+            <MultiplayerConnectRoomContainer {...props} store={store} />
+          )}
+        />
+        <Route
+          path={[multiplayerGameRoomIdPagePath, multiplayerGameRoomPagePath]}
+          render={(props) => <MultiplayerGameRoom {...props} store={store} />}
         />
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>

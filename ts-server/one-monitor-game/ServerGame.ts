@@ -34,6 +34,7 @@ import {
     IPlayerConnectedData,
     std_quit_game
 } from "../../public/src/shared-backend/shared-stuff";
+import { handleMutliplayerSocket } from "../multiplayer-game/MutliplayerGame";
 import { addCreatedRooms, removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
@@ -180,9 +181,15 @@ export default class RoomMaster {
         //   this.allSocketIds.push(socket.id)
 
         socket.once(mdts_device_type, ({ deviceType, mode, userId }) => {
-            console.log("socket connected", deviceType)
+            console.log("socket connected", deviceType, ", mode", mode)
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
+
+            if (mode === "multiplayer") {
+                console.log("multiplayer socket")
+                handleMutliplayerSocket(this.io, socket, userId)
+                return
+            }
             if (isTestMode) {
                 if (onMobile) {
                     this.testRoom.setMobileSocket(socket)
@@ -338,7 +345,6 @@ export class Room {
             }
         })
     }
-
 
     setupPingListener() {
         this.socket.on(dts_ping_test, () => {

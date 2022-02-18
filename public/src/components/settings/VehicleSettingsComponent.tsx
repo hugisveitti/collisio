@@ -60,11 +60,6 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
 
   useEffect(() => {
     return () => {
-      console.log(
-        "unmount vehicle settings",
-        vehiclesSetupToSave,
-        userSettingsToSave
-      );
       if (user?.uid) {
         if (userSettingsToSave) {
           setDBUserSettings(user.uid, userSettingsToSave);

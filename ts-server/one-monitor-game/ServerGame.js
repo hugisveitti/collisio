@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
 var uuid_1 = require("uuid");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
+var MutliplayerGame_1 = require("../multiplayer-game/MutliplayerGame");
 var serverFirebaseFunctions_1 = require("../serverFirebaseFunctions");
 var ServerPlayer_1 = require("./ServerPlayer");
 var TestRoom_1 = __importDefault(require("./TestRoom"));
@@ -132,9 +133,14 @@ var RoomMaster = /** @class */ (function () {
         //   this.allSocketIds.push(socket.id)
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode, userId = _a.userId;
-            console.log("socket connected", deviceType);
+            console.log("socket connected", deviceType, ", mode", mode);
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
+            if (mode === "multiplayer") {
+                console.log("multiplayer socket");
+                (0, MutliplayerGame_1.handleMutliplayerSocket)(_this.io, socket, userId);
+                return;
+            }
             if (isTestMode) {
                 if (onMobile) {
                     _this.testRoom.setMobileSocket(socket);

@@ -150,6 +150,8 @@ const router = (app: any) => {
     app.get("/buycoins", sendIndexHTML);
     app.get("/successfulpayment", sendIndexHTML);
     app.get("/cancelpayment", sendIndexHTML);
+    app.get("/multiplayer", sendIndexHTML);
+    app.get("/multiplayer/:roomId", sendIndexHTML);
 
 
     const adminHTMLPath = `../public/${buildFolder}/admin.html`

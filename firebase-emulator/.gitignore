@@ -68,3 +68,5 @@ node_modules/
 .env
 
 .runtimeconfig.json
+.runtimeconfig_real.json
+.runtimeconfig_test.json

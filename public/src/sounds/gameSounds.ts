@@ -63,6 +63,10 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
         loadMusic(filename).then((buffer) => {
             music.setBuffer(buffer)
             music.setLoop(true)
+            if (!isFinite(volume)) {
+                console.warn("volume not finite", volume)
+                volume = 0
+            }
             music.setVolume(volume)
             if (!notAutoStart) {
                 music.play()
@@ -74,6 +78,8 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
 export const setMusicVolume = (volume: number) => {
     if (!isFinite(volume)) {
         volume = 0
+        console.warn("volume not finite", volume)
+        music?.stop()
     }
     music?.setVolume(volume)
 }

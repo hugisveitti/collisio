@@ -21,7 +21,9 @@ export const disconnectSocket = () => {
     socket = undefined
 }
 
-export const createSocket = (deviceType: string, userId?: string, mode: string = "not-test") => {
+type SocketMode = "test" | "not-test" | "multiplayer"
+
+export const createSocket = (deviceType: string, userId?: string, mode: SocketMode = "not-test") => {
 
     return new Promise<Socket>((resolve, reject) => {
 

@@ -45,6 +45,7 @@ interface IGameSettingsComponent {
   onChange: (gameSettings: IGameSettings) => void;
   inTestMode?: boolean;
   store: IStore;
+  onlyRace?: boolean;
 }
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
@@ -58,6 +59,19 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const { color, backgroundColor } = getStyledColors("black");
 
   const [gettingGhost, setGettingGhost] = useState(false);
+
+  useEffect(() => {
+    if (props.onlyRace) {
+      if (gameSettings.gameType !== "race") {
+        const newGameSettings: IGameSettings = {
+          ...gameSettings,
+          gameType: "race",
+        };
+        setGameSettings(newGameSettings);
+        props.onChange(newGameSettings);
+      }
+    }
+  }, []);
 
   const updateGameSettingsBatch = (
     keys: (keyof IGameSettings)[],
@@ -185,18 +199,20 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} lg={4}>
-        <MyRadio<GameType>
-          label="Type of game"
-          checked={gameSettings.gameType}
-          onChange={(newType) => updateGameSettings("gameType", newType)}
-          options={[
-            { label: "Race", value: "race" },
-            { label: "Tag", value: "tag" },
-          ]}
-          disabled={disableInputs}
-        />
-      </Grid>
+      {!props.onlyRace && (
+        <Grid item xs={12} lg={4}>
+          <MyRadio<GameType>
+            label="Type of game"
+            checked={gameSettings.gameType}
+            onChange={(newType) => updateGameSettings("gameType", newType)}
+            options={[
+              { label: "Race", value: "race" },
+              { label: "Tag", value: "tag" },
+            ]}
+            disabled={disableInputs}
+          />
+        </Grid>
+      )}
       {renderGameTypeInputs()}
       <Grid item xs={12} lg={4}>
         <p>
@@ -298,20 +314,26 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             </Grid>
 
             <Grid item xs={12}>
-              <Typography>Draw distance</Typography>
-              <Slider
-                color="secondary"
-                style={{
-                  width: "90%",
-                }}
+              <MySlider
+                label="Draw distance"
+                //   color="secondary"
+                // style={{
+                //   width: "90%",
+                // }}
                 min={50}
                 max={7500}
-                valueLabelDisplay="auto"
                 step={50}
-                defaultValue={drawDistanceDefaultVal}
-                onChange={(e, value) => {}}
-                onChangeCommitted={(e, value) => {
-                  updateGameSettings("drawDistance", value);
+                value={drawDistanceDefaultVal}
+                onChange={(value) => {
+                  updateGameSettings(
+                    "drawDistance",
+                    value as number,
+                    undefined,
+                    true
+                  );
+                }}
+                onChangeCommitted={(value) => {
+                  updateGameSettings("drawDistance", value as number);
                 }}
               />
             </Grid>

@@ -9,6 +9,7 @@ admin.initializeApp()
 
 const productsPath = "products"
 const transactionsPath = "transactions"
+const duplicateTransactionsPath = "duplicateTransactions"
 const tokensPath = "tokens"
 
 const getProduct = (productId) => {
@@ -111,7 +112,31 @@ exports.stripeWebhook = functions.region("europe-west1").https.onRequest(async (
         return res.sendStatus(400)
     }
 
-    await admin.firestore().collection(`${transactionsPath}`).doc(userId).collection("coins").doc().set({
+    const transactionId = event.id
+
+    // see if transaction has already been made
+    const dublicateRef = admin.firestore().collection(transactionsPath).doc(userId).collection("coins").where("id", "==", transactionId)
+    const prevTrans = await dublicateRef.get()
+
+    console.log("prevTrans.empty", prevTrans.empty)
+    if (!prevTrans.empty) {
+        await admin.firestore().collection(duplicateTransactionsPath).doc(userId).collection("coins").doc().set({
+            id: transactionId,
+            checkoutSessionId: dataObject.id,
+            automaticTax: dataObject.automatic_tax,
+            customerDetails: dataObject.customer_details,
+            paymentStatus: dataObject.payment_status,
+            amount: dataObject.amount_total,
+            metadata: dataObject.metadata,
+            date: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        return res.sendStatus(208)
+    }
+
+
+    await admin.firestore().collection(transactionsPath).doc(userId).collection("coins").doc().set({
+        id: transactionId,
         checkoutSessionId: dataObject.id,
         automaticTax: dataObject.automatic_tax,
         customerDetails: dataObject.customer_details,
