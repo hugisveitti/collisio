@@ -135,8 +135,8 @@ export default class RoomMaster {
     }
 
     createRoom(socket: Socket, roomId: string, data: any, userId: string) {
-        console.log("Creating room", roomId, socket.handshake.address)
-        addCreatedRooms(socket.handshake.address, roomId, userId)
+        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress)
+        addCreatedRooms(socket.conn.remoteAddress, roomId, userId)
 
         const { numberOfRoomsSendingControls } = this.getStats()
         if (numberOfRoomsSendingControls > 25) {

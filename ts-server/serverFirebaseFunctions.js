@@ -36,34 +36,24 @@ var removeAvailableRoom = function (userId) {
 };
 exports.removeAvailableRoom = removeAvailableRoom;
 var addCreatedRooms = function (ip, roomId, userId) {
-    if (!userId) {
-        console.log("No user id, not saving room");
-        return;
-    }
     var ref = firebase_config_1.adminFirestore.collection(createdRoomsPath).doc();
     var geo = geoip.lookup(ip);
-    if (geo) {
-        ref.set({
-            geo: geo,
-            ip: ip,
-            roomId: roomId,
-            userId: userId
-        }).then(function () {
-            console.log("Saved created room with geo");
-        }).catch(function (err) {
-            console.warn("Error saving created room with geo", err);
-        });
+    var obj = { ip: ip, roomId: roomId, userId: userId, geo: geo };
+    var key;
+    for (key in obj) {
+        if (!obj[key]) {
+            delete obj[key];
+        }
     }
-    else {
-        ref.set({
-            ip: ip,
-            roomId: roomId,
-            userId: userId
-        }).then(function () {
-            console.log("Saved created room without geo");
-        }).catch(function (err) {
-            console.warn("Error saving created room without geo", err);
-        });
-    }
+    ref.set({
+        geo: geo,
+        ip: ip,
+        roomId: roomId,
+        userId: userId
+    }).then(function () {
+        console.log("Saved created room");
+    }).catch(function (err) {
+        console.warn("Error saving created room", err);
+    });
 };
 exports.addCreatedRooms = addCreatedRooms;
