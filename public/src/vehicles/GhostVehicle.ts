@@ -46,14 +46,16 @@ export class GhostVehicle implements IGhostVehicle {
             console.warn("Round betty not suported as ghost!")
             this.config.vehicleType = "normal"
         }
-
     }
 
     addToScene(scene: Scene3D) {
+
+        scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "box" })
         scene.scene.add(this.vehicle)
     }
 
     removeFromScene(scene: Scene3D) {
+        scene.physics.destroy(this.vehicle)
         scene.scene.remove(this.vehicle)
     }
 
