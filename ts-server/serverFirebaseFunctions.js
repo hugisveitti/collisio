@@ -36,6 +36,10 @@ var removeAvailableRoom = function (userId) {
 };
 exports.removeAvailableRoom = removeAvailableRoom;
 var addCreatedRooms = function (ip, roomId, userId) {
+    if (firebase_config_1.onLocalHost) {
+        console.log("on local host");
+        return;
+    }
     var ref = firebase_config_1.adminFirestore.collection(createdRoomsPath).doc();
     var geo = geoip.lookup(ip);
     var obj = { ip: ip, roomId: roomId, userId: userId, geo: geo };

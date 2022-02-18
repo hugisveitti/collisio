@@ -91,7 +91,9 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.createRoom = function (socket, roomId, data, userId) {
         var _this = this;
-        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress);
+        var _a;
+        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress, socket.handshake.headers['x-forwarded-for']);
+        var ip = (_a = socket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : socket.conn.remoteAddress;
         (0, serverFirebaseFunctions_1.addCreatedRooms)(socket.conn.remoteAddress, roomId, userId);
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
         if (numberOfRoomsSendingControls > 25) {

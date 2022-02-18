@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firestore = exports.adminFirestore = exports.database = exports.admin = void 0;
+exports.onLocalHost = exports.firestore = exports.adminFirestore = exports.database = exports.admin = void 0;
 var app_1 = require("firebase/app");
 var app_2 = require("firebase-admin/app");
 var database_1 = require("firebase/database");
@@ -48,8 +48,9 @@ var firebaseApp = (0, app_1.initializeApp)(config);
 exports.database = (0, database_1.getDatabase)(firebaseApp);
 exports.adminFirestore = (0, firestore_1.getFirestore)(aa);
 exports.firestore = (0, firestore_2.getFirestore)(firebaseApp);
+exports.onLocalHost = os.hostname().includes("Lisa");
 /** only works on my PC */
-if (os.hostname().includes("Lisa")) {
+if (exports.onLocalHost) {
     console.log("On localhost");
     (0, firestore_2.connectFirestoreEmulator)(exports.firestore, "localhost", 8000);
 }

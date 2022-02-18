@@ -135,7 +135,8 @@ export default class RoomMaster {
     }
 
     createRoom(socket: Socket, roomId: string, data: any, userId: string) {
-        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress)
+        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress, socket.handshake.headers['x-forwarded-for'])
+        const ip = socket.handshake.headers['x-forwarded-for'] ?? socket.conn.remoteAddress
         addCreatedRooms(socket.conn.remoteAddress, roomId, userId)
 
         const { numberOfRoomsSendingControls } = this.getStats()

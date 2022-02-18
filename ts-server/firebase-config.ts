@@ -36,9 +36,10 @@ export const adminFirestore = getAdminFirestore(aa)
 
 export const firestore = getFirestore(firebaseApp)
 
+export const onLocalHost = os.hostname().includes("Lisa")
 
 /** only works on my PC */
-if (os.hostname().includes("Lisa")) {
+if (onLocalHost) {
     console.log("On localhost")
     connectFirestoreEmulator(firestore, "localhost", 8000)
 
