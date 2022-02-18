@@ -34,7 +34,7 @@ import {
     IPlayerConnectedData,
     std_quit_game
 } from "../../public/src/shared-backend/shared-stuff";
-import { removeAvailableRoom } from "../serverFirebaseFunctions";
+import { addCreatedRooms, removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
 
@@ -109,7 +109,7 @@ export default class RoomMaster {
 
 
     setupPlayerConnectedListener(mobileSocket: Socket) {
-        console.log("setting player connected listener")
+        console.log("setting player connected listener", mobileSocket.id)
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings, vehicleSetup }: IPlayerConnectedData) => {
             console.log("connecting to room", roomId, playerName)
             if (!this.roomExists(roomId)) {
@@ -134,7 +134,9 @@ export default class RoomMaster {
         return false
     }
 
-    createRoom(socket: Socket, roomId: string, data: any) {
+    createRoom(socket: Socket, roomId: string, data: any, userId: string) {
+        console.log("Creating room", roomId, socket.handshake.address)
+        addCreatedRooms(socket.handshake.address, roomId, userId)
 
         const { numberOfRoomsSendingControls } = this.getStats()
         if (numberOfRoomsSendingControls > 25) {
@@ -171,7 +173,7 @@ export default class RoomMaster {
 
         //   this.allSocketIds.push(socket.id)
 
-        socket.once(mdts_device_type, ({ deviceType, mode }) => {
+        socket.once(mdts_device_type, ({ deviceType, mode, userId }) => {
             console.log("socket connected", deviceType)
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
@@ -189,7 +191,7 @@ export default class RoomMaster {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = uuid().slice(0, 4)
-                        this.createRoom(socket, roomId, req.data)
+                        this.createRoom(socket, roomId, req.data, userId)
                     })
 
                     socket.on("disconnect", () => {
@@ -358,14 +360,13 @@ export class Room {
 
                 // this.players[i].setSocket(player.socket)
                 // player = this.players[i]
+                player.copyPlayer(this.players[i])
+
                 this.players[i].turnOffSocket()
                 let isLeader = this.players[i].isLeader
                 delete this.players[i]
                 this.players[i] = player
-                this.players[i].playerNumber = i
                 this.players[i].setGame(this)
-                this.players[i].setLeader()
-
             }
         }
 
@@ -492,6 +493,7 @@ export class Room {
     }
 
     startGame() {
+        console.log("starting game, roomId:", this.roomId)
         if (this.gameStarted) return
         this.gameStarted = true
         this.setupControlsListener()

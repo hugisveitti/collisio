@@ -15,10 +15,15 @@ let currentChassis: ExtendedObject3D | undefined
 const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, vehicleColor?: VehicleColorType) => {
     return new Promise<void>((resolve, reject) => {
 
+        currentVehicleType = vehicleType
 
         if (vehicleType === "simpleSphere") {
             loadSphereModel(vehicleType, true).then((chassis) => {
-                currentVehicleType = vehicleType
+                if (vehicleType !== currentVehicleType) {
+                    console.warn("vehicle type changed after load",)
+                    // if vehicle type changes before the load completes
+                    return
+                }
                 currentChassis = chassis
                 if (vehicleColor) {
                     // (chassis.material as MeshStandardMaterial).color = new Color(vehicleColor);
@@ -31,7 +36,10 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
             })
         } else {
             loadLowPolyVehicleModels(vehicleType, true).then(([tires, chassis]) => {
-                currentVehicleType = vehicleType
+                if (vehicleType !== currentVehicleType) {
+                    console.warn("vehicle type changed after load",)
+                    return
+                }
                 currentChassis = chassis
                 if (vehicleColor) {
                     changeVehicleBodyColor(currentChassis, [vehicleColor])
@@ -115,6 +123,10 @@ export const changeVehicleSetup = async (vehicleSetup: VehicleSetup) => {
             }
             if (vehicleSetup[item]) {
                 const model = await addItem(vehicleSetup[item].path)
+                if (vehicleSetup.vehicleType !== currentVehicleType) {
+                    console.warn("vehicle type has changed", vehicleSetup.vehicleType, currentVehicleType)
+                    return
+                }
                 currentItems[item] = { props: vehicleSetup[item], model }
             } else {
                 currentItems[item] = undefined
@@ -181,9 +193,6 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
             changeVehicleSetup(vehicleSetup)
         }
     })
-
-
-
 
 
     window.onresize = function () {

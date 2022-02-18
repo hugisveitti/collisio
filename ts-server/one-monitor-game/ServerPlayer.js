@@ -20,6 +20,28 @@ var Player = /** @class */ (function () {
         this.userSettings = userSettings;
         this.setSocket(socket);
     }
+    Player.prototype.copyPlayer = function (player) {
+        for (var _i = 0, _a = Object.keys(player.vehicleSetup); _i < _a.length; _i++) {
+            var key = _a[_i];
+            // @ts-ignore
+            this.vehicleSetup[key] = player.vehicleSetup[key];
+        }
+        for (var _b = 0, _c = Object.keys(player.userSettings); _b < _c.length; _b++) {
+            var key = _c[_b];
+            // @ts-ignore
+            this.userSettings[key] = player.userSettings[key];
+        }
+        for (var _d = 0, _e = Object.keys(player.userSettings.vehicleSettings); _d < _e.length; _d++) {
+            var key = _e[_d];
+            // @ts-ignore
+            this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key];
+        }
+        // only primative types? otherwise shallow copy
+        this.playerNumber = player.playerNumber;
+        this.isLeader = player.isLeader;
+        this.vehicleType = player.vehicleType;
+        this.teamNumber = player.teamNumber;
+    };
     /**
      * idea: turn off some of these listeners when the game has started TODO
      *

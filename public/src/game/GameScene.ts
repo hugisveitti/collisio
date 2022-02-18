@@ -214,6 +214,7 @@ export class GameScene extends Scene3D implements IGameScene {
 
         this.extraVehicles = []
         this.wagons = []
+        document.body.setAttribute("style", "overflow:hidden;")
     }
 
     async addLights() {
@@ -1301,7 +1302,7 @@ export class GameScene extends Scene3D implements IGameScene {
             await this.destroyVehicles()
 
             await this.stop()
-
+            document.body.setAttribute("style", "")
             resolve()
         })
     }

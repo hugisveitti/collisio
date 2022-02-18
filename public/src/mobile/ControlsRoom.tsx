@@ -8,6 +8,7 @@ import DeviceOrientationPermissionComponent from "../components/waitingRoom/Devi
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
+  defaultTokenData,
   getMedalAndTokens,
   ITokenData,
   MedalType,
@@ -38,6 +39,7 @@ interface IControlsRoomProps {
   store: IStore;
 }
 
+let tokenData: ITokenData = defaultTokenData;
 const controller = new MobileControls();
 const gameActions = new GameActions();
 
@@ -157,9 +159,9 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       );
       setRaceMedalData(md);
       const newTokenData: ITokenData = {
-        ...props.store.tokenData,
-        coins: props.store.tokenData.coins + md.coins,
-        XP: props.store.tokenData.XP + md.XP,
+        ...tokenData,
+        coins: tokenData.coins + md.coins,
+        XP: tokenData.XP + md.XP,
       };
       newTokenData[md.medal] += 1;
       props.store.setTokenData(newTokenData);
@@ -207,6 +209,12 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       socket.off(stm_player_finished);
     };
   }, []);
+
+  useEffect(() => {
+    if (props.store.tokenData) {
+      tokenData = props.store.tokenData;
+    }
+  }, [props.store.tokenData]);
 
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");

@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IUser } from "../../classes/User";
 import { checkIfCanStartGame } from "../../functions/validationFunctions";
-import { green4 } from "../../providers/theme";
+import { green4, orange2 } from "../../providers/theme";
 import {
   mdts_start_game,
   std_start_game_callback,
@@ -130,29 +130,27 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
       {!onMobile && (
         <>
-          <Grid item xs={12} lg={3}>
-            <Typography>
-              On your mobile, either scan the QR code, copy the link to room and
-              paste it in your phone or write the room id '{roomId}' in input on
-              the front page.
-            </Typography>
-          </Grid>
+          <Grid item xs={12} md={8} lg={9}>
+            <p
+              style={{ fontSize: 24, backgroundColor: orange2, color: "black" }}
+            >
+              On your mobile go to collisio.club, press 'Join game' and write in
+              the room id:{" "}
+              <span
+                style={{
+                  backgroundColor: green4,
+                  color: "white",
 
-          <Grid item xs={12} lg={3}>
-            <Typography color="#eee">
-              You can press 'esc' to pause the game and open the settings.
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} lg={3}>
-            <CopyTextButton
-              infoText={`Link to room: ${connectionRoomHref}`}
-              copyText={connectionRoomHref}
-            />
+                  fontSize: 28,
+                }}
+              >
+                {roomId}
+              </span>
+            </p>
           </Grid>
 
           {roomQrCode && (
-            <Grid item xs={12} lg={3}>
+            <Grid item xs={12} md={4} lg={3}>
               <img src={roomQrCode} alt="" />
             </Grid>
           )}

@@ -63,7 +63,7 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
-        console.log("setting player connected listener");
+        console.log("setting player connected listener", mobileSocket.id);
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest, userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
             console.log("connecting to room", roomId, playerName);
@@ -89,8 +89,10 @@ var RoomMaster = /** @class */ (function () {
         }
         return false;
     };
-    RoomMaster.prototype.createRoom = function (socket, roomId, data) {
+    RoomMaster.prototype.createRoom = function (socket, roomId, data, userId) {
         var _this = this;
+        console.log("Creating room", roomId, socket.handshake.address);
+        (0, serverFirebaseFunctions_1.addCreatedRooms)(socket.handshake.address, roomId, userId);
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
         if (numberOfRoomsSendingControls > 25) {
             console.warn("Too many rooms, so not creating room");
@@ -123,7 +125,7 @@ var RoomMaster = /** @class */ (function () {
         var onMobile;
         //   this.allSocketIds.push(socket.id)
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
-            var deviceType = _a.deviceType, mode = _a.mode;
+            var deviceType = _a.deviceType, mode = _a.mode, userId = _a.userId;
             console.log("socket connected", deviceType);
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
@@ -142,7 +144,7 @@ var RoomMaster = /** @class */ (function () {
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = (0, uuid_1.v4)().slice(0, 4);
-                        _this.createRoom(socket, roomId, req.data);
+                        _this.createRoom(socket, roomId, req.data, userId);
                     });
                     socket.on("disconnect", function () {
                         if (roomId && _this.rooms[roomId]) {
@@ -285,13 +287,12 @@ var Room = /** @class */ (function () {
                 console.log("player exists!, disconnecting old socket, i:", i, "isLeader:", this.players[i].isLeader);
                 // this.players[i].setSocket(player.socket)
                 // player = this.players[i]
+                player.copyPlayer(this.players[i]);
                 this.players[i].turnOffSocket();
                 var isLeader = this.players[i].isLeader;
                 delete this.players[i];
                 this.players[i] = player;
-                this.players[i].playerNumber = i;
                 this.players[i].setGame(this);
-                this.players[i].setLeader();
             }
         }
         if (this.gameStarted) {
@@ -406,6 +407,7 @@ var Room = /** @class */ (function () {
         });
     };
     Room.prototype.startGame = function () {
+        console.log("starting game, roomId:", this.roomId);
         if (this.gameStarted)
             return;
         this.gameStarted = true;

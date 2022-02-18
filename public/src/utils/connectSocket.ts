@@ -21,7 +21,7 @@ export const disconnectSocket = () => {
     socket = undefined
 }
 
-export const createSocket = (deviceType: string, mode: string = "not-test") => {
+export const createSocket = (deviceType: string, userId?: string, mode: string = "not-test") => {
 
     return new Promise<Socket>((resolve, reject) => {
 
@@ -36,7 +36,7 @@ export const createSocket = (deviceType: string, mode: string = "not-test") => {
 
 
         socket.on("connect", () => {
-            socket.emit(mdts_device_type, { deviceType: deviceType, mode })
+            socket.emit(mdts_device_type, { deviceType: deviceType, mode, userId })
             socket.on(stmd_socket_ready, () => {
 
                 resolve(socket)

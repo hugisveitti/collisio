@@ -25,7 +25,7 @@ export const saveLocalStorageItem = (key: string, value: string) => {
 export const getLocalUid = () => {
     let uid = window.localStorage.getItem("uid")
     if (!uid) {
-        uid = uuid()
+        uid = "undef_" + uuid()
         window.localStorage.setItem("uid", uid)
     }
     return uid

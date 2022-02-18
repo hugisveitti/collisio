@@ -7,7 +7,7 @@ import {
   IGameSettings,
   setLocalGameSetting,
 } from "../../classes/localGameSettings";
-import { saveLocalStorageItem } from "../../classes/localStorage";
+import { getLocalUid, saveLocalStorageItem } from "../../classes/localStorage";
 import {
   addToAvailableRooms,
   removeFromAvailableRooms,
@@ -78,13 +78,13 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
   const handleSaveRoomInfo = () => {
     if (toSaveRoomId) {
       const roomInfo: IRoomInfo = {
-        desktopId: user?.uid ?? "undefined",
+        desktopId: user?.uid ?? getLocalUid(),
         desktopAuthenticated: !!user,
         roomId: toSaveRoomId,
         gameSettings: toSaveGameSettings as IGameSettings,
         players: toSavePlayers.map(playerInfoToPreGamePlayerInfo),
         date: getDateNow(),
-        canceledGame: history.location?.pathname !== gameRoomPath,
+        canceledGame: false,
       };
       saveRoom(roomInfo);
     }

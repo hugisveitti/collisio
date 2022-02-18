@@ -47,7 +47,7 @@ export class Player {
     isAuthenticated
     vehicleType
     photoURL
-    userSettings: any
+    userSettings: IUserSettings
     vehicleSetup
 
     constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string, userSettings: IUserSettings, vehicleSetup: VehicleSetup) {
@@ -67,6 +67,29 @@ export class Player {
         this.userSettings = userSettings
 
         this.setSocket(socket)
+    }
+
+    copyPlayer(player: Player) {
+
+        for (let key of Object.keys(player.vehicleSetup)) {
+            // @ts-ignore
+            this.vehicleSetup[key] = player.vehicleSetup[key]
+        }
+        for (let key of Object.keys(player.userSettings)) {
+            // @ts-ignore
+            this.userSettings[key] = player.userSettings[key]
+        }
+        for (let key of Object.keys(player.userSettings.vehicleSettings)) {
+            // @ts-ignore
+            this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key]
+        }
+
+        // only primative types? otherwise shallow copy
+        this.playerNumber = player.playerNumber
+
+        this.isLeader = player.isLeader
+        this.vehicleType = player.vehicleType
+        this.teamNumber = player.teamNumber
     }
 
     /**
