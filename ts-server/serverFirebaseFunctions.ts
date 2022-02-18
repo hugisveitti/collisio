@@ -51,10 +51,7 @@ export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
         console.log("No geo for ip:", ip)
     }
 
-    ref.set({
-        geo,
-        ip, roomId, userId
-    }).then(() => {
+    ref.set(obj).then(() => {
         console.log("Saved created room")
     }).catch((err) => {
         console.warn("Error saving created room", err)

@@ -60,12 +60,7 @@ var addCreatedRooms = function (ip, roomId, userId) {
     if (!geo) {
         console.log("No geo for ip:", ip);
     }
-    ref.set({
-        geo: geo,
-        ip: ip,
-        roomId: roomId,
-        userId: userId
-    }).then(function () {
+    ref.set(obj).then(function () {
         console.log("Saved created room");
     }).catch(function (err) {
         console.warn("Error saving created room", err);
