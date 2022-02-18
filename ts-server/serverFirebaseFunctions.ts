@@ -5,6 +5,7 @@
 import { deleteDoc, doc, setDoc } from "@firebase/firestore"
 import { adminFirestore, firestore, onLocalHost } from "./firebase-config"
 import * as geoip from "geoip-lite"
+import { Timestamp } from "firebase-admin/firestore"
 
 const availableRoomsRefPath = "availableRooms"
 const createdRoomsPath = "created-rooms"
@@ -21,6 +22,7 @@ interface ICreateRoom {
     roomId?: string
     ip?: string
     geo?: geoip.Lookup | null
+    date?: Timestamp
 }
 
 export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
@@ -30,12 +32,22 @@ export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
     }
     const ref = adminFirestore.collection(createdRoomsPath).doc()
     const geo = geoip.lookup(ip)
-    const obj: ICreateRoom = { ip, roomId, userId, geo }
+    const obj: ICreateRoom = {
+        ip,
+        roomId,
+        userId,
+        geo,
+        date: Timestamp.now()
+    }
     let key: keyof typeof obj
     for (key in obj) {
         if (!obj[key]) {
             delete obj[key]
         }
+    }
+
+    if (!geo) {
+        console.log("No geo for ip:", ip)
     }
 
     ref.set({

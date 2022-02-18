@@ -26,6 +26,7 @@ exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
 var firestore_1 = require("@firebase/firestore");
 var firebase_config_1 = require("./firebase-config");
 var geoip = __importStar(require("geoip-lite"));
+var firestore_2 = require("firebase-admin/firestore");
 var availableRoomsRefPath = "availableRooms";
 var createdRoomsPath = "created-rooms";
 var removeAvailableRoom = function (userId) {
@@ -42,12 +43,21 @@ var addCreatedRooms = function (ip, roomId, userId) {
     }
     var ref = firebase_config_1.adminFirestore.collection(createdRoomsPath).doc();
     var geo = geoip.lookup(ip);
-    var obj = { ip: ip, roomId: roomId, userId: userId, geo: geo };
+    var obj = {
+        ip: ip,
+        roomId: roomId,
+        userId: userId,
+        geo: geo,
+        date: firestore_2.Timestamp.now()
+    };
     var key;
     for (key in obj) {
         if (!obj[key]) {
             delete obj[key];
         }
+    }
+    if (!geo) {
+        console.log("No geo for ip:", ip);
     }
     ref.set({
         geo: geo,
