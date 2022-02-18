@@ -94,7 +94,8 @@ var RoomMaster = /** @class */ (function () {
         var _a;
         console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress, socket.handshake.headers['x-forwarded-for']);
         var ip = (_a = socket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : socket.conn.remoteAddress;
-        (0, serverFirebaseFunctions_1.addCreatedRooms)(socket.conn.remoteAddress, roomId, userId);
+        // @ts-ignore
+        (0, serverFirebaseFunctions_1.addCreatedRooms)((ip === null || ip === void 0 ? void 0 : ip.length) > 0 ? ip[0] : ip, roomId, userId);
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
         if (numberOfRoomsSendingControls > 25) {
             console.warn("Too many rooms, so not creating room");

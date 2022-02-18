@@ -53,6 +53,7 @@ var addCreatedRooms = function (ip, roomId, userId) {
     var key;
     for (key in obj) {
         if (!obj[key]) {
+            console.log("deleting key", key);
             delete obj[key];
         }
     }

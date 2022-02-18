@@ -42,6 +42,7 @@ export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
     let key: keyof typeof obj
     for (key in obj) {
         if (!obj[key]) {
+            console.log("deleting key", key)
             delete obj[key]
         }
     }
