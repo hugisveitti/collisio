@@ -4,7 +4,7 @@ import { PerspectiveCamera } from "three";
 import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo } from "../shared-backend/multiplayer-shared-stuff";
+import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished } from "../shared-backend/multiplayer-shared-stuff";
 import { IPlayerInfo, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addKeyboardControls, driveVehicleWithKeyboard } from "../utils/controls";
@@ -15,6 +15,7 @@ import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { IVehicleClassConfig } from "../vehicles/Vehicle";
 import { getVehicleClassFromType } from "../vehicles/VehicleConfigs";
 import { GameTime } from "./GameTimeClass";
+import { IGameRoomActions } from "./IGameScene";
 import { MyScene } from "./MyScene";
 
 export interface IMultiplayergameSceneConfig {
@@ -24,6 +25,7 @@ export interface IMultiplayergameSceneConfig {
     vehicleSetup: VehicleSetup
     player: IPlayerInfo
     players: IPlayerInfo[]
+    gameRoomActions: IGameRoomActions
 }
 
 export interface IMultiplayerRaceGameScene {
@@ -47,9 +49,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     course: RaceCourse
 
     kmhInfo: HTMLSpanElement
+    lapsInfo: HTMLSpanElement
+
+    currentNumberOfLaps: number
 
     constructor() {
         super()
+        this.currentNumberOfLaps = 2
         this.isReady = false
         this.vehiclesPositionInfo = {}
         this.vehicleControls = new VehicleControls()
@@ -66,10 +72,48 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             transform: translate(-50%, 0);
             font-size:24px;
         `)
+
+        this.lapsInfo = document.createElement("span")
+        this.gameInfoDiv.appendChild(this.lapsInfo)
+        this.lapsInfo.classList.add("game-text")
+        this.lapsInfo.setAttribute("style", `
+        position:absolute;
+        bottom: 30px;
+        left:${window.innerWidth / 2}px;
+        transform: translate(-50%, 0);
+        font-size:24px;
+    `)
+
+        const fontSize = window.innerWidth < 1500 ? 32 : 82
+        this.lapsInfo.setAttribute("style", `
+            position:absolute;
+            right:0;
+            bottom:0;
+            font-size:${fontSize}px;
+        `)
+
+
+        // need to add "esc" to open menu
+        // no pause possible, but leader can restart
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                if (this.gameRoomActions.escPressed) {
+                    this.gameRoomActions.escPressed()
+                }
+            }
+        })
+
+        window.addEventListener("resize", () => this.windowResize())
     }
 
     windowResize() {
-
+        this.kmhInfo.setAttribute("style", `
+        position:absolute;
+        bottom: 30px;
+        left:${window.innerWidth / 2}px;
+        transform: translate(-50%, 0);
+        font-size:24px;
+    `)
     }
 
     async preload() {
@@ -153,12 +197,36 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         })
     }
 
-    handleGoalCrossed(vehicle: ExtendedObject3D) {
+    sendLapDone() {
+        this.socket.emit(m_ts_lap_done, {
+            totalTime: this.gameTime.getTotalTime(),
+            latestLapTime: this.gameTime.getLatestLapTime(),
+            lapNumber: this.gameTime.getCurrentLapNumber()
+        })
+    }
 
+    handleGoalCrossed(vehicle: ExtendedObject3D) {
+        if (this.gameTime.allCheckpointsCrossed()) {
+            const cLapTime = this.gameTime.getCurrentLapTime()
+
+            this.gameTime.lapDone()
+            const { position, rotation } = this.course.getGoalCheckpoint()
+
+            this.vehicle.setCheckpointPositionRotation({ position, rotation })
+
+            if (this.gameTime.finished()) {
+                console.log("finished race!")
+            }
+            this.sendLapDone()
+            this.showSecondaryInfo(`Lap time: ${cLapTime.toFixed(2)}`, true)
+        }
     }
 
     handleCheckpointCrossed(vehicle: ExtendedObject3D, checkpointNumber: number) {
-
+        if (!this.gameTime.crossedCheckpoint(checkpointNumber)) {
+            this.gameTime.checkpointCrossed(checkpointNumber)
+            this.showSecondaryInfo(`Checkpoint ${this.gameTime.getCurrentLapTime().toFixed(2)}`, true)
+        }
     }
 
     setSocket(socket: Socket) {
@@ -169,6 +237,14 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupCountdownListener()
         this.setupStartGameListener()
         this.setupVehiclesPositionInfo()
+        this.setupRaceFinishedListener()
+    }
+
+    setupRaceFinishedListener() {
+        this.socket.on(m_fs_game_finished, (data) => {
+            const { winner, raceData } = data
+            this.showImportantInfo(`Race finished, ${winner.name} is the winner with total time ${winner.totalTime.toFixed(2)}`)
+        })
     }
 
     sendPlayerReady() {
@@ -207,6 +283,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         // countdown is a number
         this.socket.on(m_fs_game_starting, ({ spawnPositions, countdown }) => {
             console.log("start game", spawnPositions, countdown)
+            this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
+
             // start count down?
             // or do the count down on the backend
             this.showImportantInfo(`Race starting in ${countdown} seconds`, true)
@@ -219,6 +297,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         })
     }
 
+
+
     setupVehiclesPositionInfo() {
         this.socket.on(m_fs_vehicles_position_info, (info: any) => {
             this.vehiclesPositionInfo = info
@@ -228,6 +308,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     setupPlayersInfoListener() {
         this.socket.on(m_fs_room_info, ({ players, gameSettings }) => {
             // setup players
+
             console.log("got players info but not doing anything", players, gameSettings)
         })
     }
@@ -237,6 +318,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.config = gameSceneConfig
         this.setSocket(this.config.socket)
         this.setGameSettings(this.config.gameSettings)
+        this.currentNumberOfLaps = this.config.gameSettings.numberOfLaps
+        this.gameRoomActions = gameSceneConfig.gameRoomActions
     }
 
     restartGame() {
@@ -246,7 +329,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     updateScoreTable(delta: number) {
         this.totalTimeDiv.textContent = this.gameTime.getTotalTime().toFixed(2)
         this.kmhInfo.textContent = `${this.vehicle.getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
+        this.lapsInfo.textContent = `${this.gameTime.lapNumber} / ${this.currentNumberOfLaps}`
     }
+
 
     sendPosition() {
         if (!this.isReady) return
@@ -304,6 +389,14 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.updateScoreTable(_delta)
 
         driveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
+    }
+
+    async _destoryGame() {
+        return new Promise<void>((resolve, reject) => {
+
+            window.removeEventListener("resize", () => this.windowResize())
+            resolve()
+        })
     }
 }
 

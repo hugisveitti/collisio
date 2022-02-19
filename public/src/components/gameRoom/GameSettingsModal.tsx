@@ -25,6 +25,7 @@ interface IGameSettingsModal {
   updateGameSettings: (gameSettings: IGameSettings) => void;
   quitGame: (newPath: string) => void;
   user: IUser;
+  restarBtnPressed: () => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -74,13 +75,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         </Grid>
 
         <Grid item xs={4}>
-          <BackdropButton
-            color="white"
-            onClick={() => {
-              props.gameObject.restartGame();
-              props.onClose();
-            }}
-          >
+          <BackdropButton color="white" onClick={props.restarBtnPressed}>
             Reset game
           </BackdropButton>
         </Grid>

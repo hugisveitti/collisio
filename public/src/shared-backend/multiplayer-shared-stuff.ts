@@ -40,5 +40,8 @@ export const m_fs_game_countdown = "m_fs_game_countdown"
 
 export const m_ts_pos_rot = "f_ts_pos_rot"
 export const m_fs_vehicles_position_info = "m_fs_vehicles_position_info"
-
+export const m_ts_lap_done = "m_ts_lap_done"
+export const m_fs_game_finished = "m_fs_game_finished"
+export const m_fs_race_info = "m_fs_race_info"
+export const m_ts_restart_game = "m_ts_restart_game"
 

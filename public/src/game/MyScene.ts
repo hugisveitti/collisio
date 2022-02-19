@@ -8,7 +8,7 @@ import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-back
 import { stopMusic } from "../sounds/gameSounds";
 import { IVehicle } from "../vehicles/IVehicle";
 import "./game-styles.css";
-import { IGameSceneConfig } from "./IGameScene";
+import { IGameRoomActions, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 const fadeSecs = 2
@@ -27,6 +27,7 @@ export class MyScene extends Scene3D {
     course: ICourse
 
     importantInfoTimeout: NodeJS.Timeout
+    secondaryInfoTimeout: NodeJS.Timeout
     pingInfo: HTMLSpanElement
     fpsInfo: HTMLSpanElement
 
@@ -56,10 +57,13 @@ export class MyScene extends Scene3D {
   */
     gameInfoDiv: HTMLDivElement
     importantInfoDiv: HTMLDivElement
+    secondaryInfoDiv: HTMLDivElement
     totalTimeDiv: HTMLDivElement
 
     gameSceneConfig: IGameSceneConfig
     needsReload: boolean
+
+    gameRoomActions: IGameRoomActions
 
     constructor() {
         super()
@@ -80,19 +84,22 @@ export class MyScene extends Scene3D {
         this.isPaused = false
         this.needsReload = false
 
+        this.gameRoomActions = {}
+
 
         this.gameInfoDiv = document.createElement("div")
         this.gameInfoDiv.setAttribute("id", "game-info")
-
         document.body.appendChild(this.gameInfoDiv)
+
         this.importantInfoDiv = document.createElement("div")
-
         this.importantInfoDiv.setAttribute("id", "important-info")
-
         this.gameInfoDiv.appendChild(this.importantInfoDiv)
 
-        this.totalTimeDiv = document.createElement("div")
+        this.secondaryInfoDiv = document.createElement("div")
+        this.secondaryInfoDiv.setAttribute("id", "secondary-info")
+        this.gameInfoDiv.appendChild(this.secondaryInfoDiv)
 
+        this.totalTimeDiv = document.createElement("div")
         this.gameInfoDiv.appendChild(this.totalTimeDiv)
         this.totalTimeDiv.setAttribute("id", "totalTime")
 
@@ -118,6 +125,8 @@ export class MyScene extends Scene3D {
 
         document.body.setAttribute("style", "overflow:hidden;")
     }
+
+
 
 
     public async start(key?: string, data?: any) {
@@ -186,7 +195,6 @@ export class MyScene extends Scene3D {
         return this.gameSettings.graphics
     }
 
-
     getTimeOfDay() {
         return this.gameSettings.graphics === "low" ? "day" : getTimeOfDay(this.getTrackName())
     }
@@ -197,6 +205,10 @@ export class MyScene extends Scene3D {
 
     getDrawDistance() {
         return this.gameSettings.drawDistance
+    }
+
+    setGameRoomActions(gameRoomActions: IGameRoomActions) {
+        this.gameRoomActions = gameRoomActions
     }
 
     async addLights() {
@@ -326,6 +338,7 @@ export class MyScene extends Scene3D {
     }
 
     showImportantInfo(text: string, clear?: boolean) {
+        clearInterval(this.importantInfoTimeout)
         if (this.importantInfoDiv) {
             this.importantInfoDiv.textContent = text
         }
@@ -342,6 +355,31 @@ export class MyScene extends Scene3D {
         }
     }
 
+    showSecondaryInfo(text: string, clear?: boolean) {
+        clearInterval(this.secondaryInfoTimeout)
+        if (this.secondaryInfoDiv) {
+            this.secondaryInfoDiv.textContent = text
+        }
+        if (clear) {
+            this.secondaryInfoTimeout = setTimeout(() => {
+                this.clearSecondaryInfo()
+            }, fadeSecs * 1000)
+        }
+    }
+
+    clearSecondaryInfo() {
+        if (this.secondaryInfoDiv) {
+            this.secondaryInfoDiv.textContent = ""
+        }
+    }
+
+    _clearTimeouts() { }
+
+    clearTimeouts() {
+        clearTimeout(this.importantInfoTimeout)
+        this._clearTimeouts()
+    }
+
     // to be overritten
     resetVehicleCallback(vehicleNumber: number) {
 
@@ -350,6 +388,8 @@ export class MyScene extends Scene3D {
     getVehicles(): IVehicle[] {
         return []
     }
+
+    async _destroyGame() { }
 
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
@@ -361,6 +401,7 @@ export class MyScene extends Scene3D {
 
             await this.stop()
             document.body.setAttribute("style", "")
+            await this._destroyGame()
             resolve()
         })
     }

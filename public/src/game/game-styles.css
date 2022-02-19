@@ -42,6 +42,18 @@
   text-align: center;
 }
 
+#secondary-info {
+  color: black;
+  text-shadow: 1px 1px white;
+  font-size: 32px;
+  position: absolute;
+
+  left: 1%;
+  right: 1%;
+  top: 100px;
+  text-align: center;
+}
+
 .game-text {
   color: black;
   text-shadow: 1px 1px white;

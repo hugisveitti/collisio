@@ -285,6 +285,10 @@ const GameRoom = React.memo((props: IGameRoom) => {
             history.push(newPath);
           });
         }}
+        restarBtnPressed={() => {
+          gameObject.restartGame();
+          setSettingsModalOpen(false);
+        }}
       />
       <EndOfGameModal
         open={endOfGameModalOpen}

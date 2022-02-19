@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
 import { IUserSettings, IVehicleSettings } from "../../public/src/classes/User";
-import { m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_settings_changed, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room, m_ts_game_settings_changed, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_ts_in_waiting_room, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo } from "../../public/src/shared-backend/multiplayer-shared-stuff";
+import { m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_settings_changed, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room, m_ts_game_settings_changed, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_ts_in_waiting_room, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_race_info, m_fs_game_finished, m_ts_restart_game } from "../../public/src/shared-backend/multiplayer-shared-stuff";
 import { dts_ping_test, IPlayerInfo, mts_user_settings_changed, std_ping_test_callback, stmd_socket_ready } from "../../public/src/shared-backend/shared-stuff";
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems";
 import { Player } from "../one-monitor-game/ServerPlayer";
@@ -82,6 +82,7 @@ class MultiplayerRoom {
     countdownTimeout?: NodeJS.Timeout
     isSendingVehicleInfo: boolean
     countdownStarted: boolean;
+    numberOfLaps: number
 
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
@@ -97,6 +98,7 @@ class MultiplayerRoom {
         this.startTime = 0
         this.isSendingVehicleInfo = false
 
+        this.numberOfLaps = -1
         this.countdownStarted = false
         // in test mode 
         if (false) {
@@ -125,13 +127,12 @@ class MultiplayerRoom {
                 vehicleType,
             }
             testPlayer.isReady = true
-
-
         }
     }
 
     setGameSettings(gameSettings: any) {
         this.gameSettings = gameSettings
+        // set number of laps when game starts
     }
 
     addPlayer(player: MulitplayerPlayer) {
@@ -292,7 +293,22 @@ class MultiplayerRoom {
 
             // const arr = this.players.map(p => p.getVehicleInfo())
             this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
-        }, 1000 / 60) // how many times?
+        }, 1000 / this.gameSettings.targetFPS ?? 45) // how many times?
+    }
+
+    startGame() {
+        this.numberOfLaps = this.gameSettings.numberOfLaps
+        console.log("countdown finished")
+        this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
+        this.countdownStarted = false
+        this.startTime = Date.now()
+    }
+
+    restartGame() {
+        for (let p of this.players) {
+            p.restartGame()
+        }
+        //  this.startGameCountDown()
     }
 
     startGameCountDown() {
@@ -309,7 +325,6 @@ class MultiplayerRoom {
         this.startGameInterval()
 
         const countdownTimer = () => {
-
             countdown -= 1
             this.countdownTimeout = setTimeout(() => {
                 console.log("count down", countdown)
@@ -317,17 +332,12 @@ class MultiplayerRoom {
                     this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown })
                     countdownTimer()
                 } else {
-                    console.log("countdown finished")
-                    this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
-                    this.countdownStarted = false
-                    this.startTime = Date.now()
+                    this.startGame()
                 }
             }, 1000)
         }
         countdownTimer()
     }
-
-
 
     playerReady() {
         // check if all players are ready
@@ -342,6 +352,48 @@ class MultiplayerRoom {
             console.log("every thing ready")
             this.startGameCountDown()
         }
+    }
+
+    sendGameFinished() {
+        let winner = {
+            name: "",
+            totalTime: Infinity
+        }
+        for (let p of this.players) {
+            if (p.totalTime < winner.totalTime) {
+                winner = {
+                    name: p.displayName,
+                    totalTime: p.totalTime
+                }
+            }
+        }
+
+        for (let p of this.players) {
+            p.gameFinished({ raceData: this.getPlayersRaceData(), winner })
+        }
+    }
+
+    playerFinishedLap(player: MulitplayerPlayer) {
+        if (player.lapNumber > this.numberOfLaps) {
+            player.isFinished = true
+        }
+        let gameFinished = true
+        for (let p of this.players) {
+            if (!p.isFinished) {
+                gameFinished = false
+            }
+        }
+        if (gameFinished) {
+            this.sendGameFinished()
+        }
+    }
+
+    sendRaceInfo() {
+        this.io.to(this.roomId).emit(m_fs_race_info, { raceData: this.getPlayersRaceData() })
+    }
+
+    getPlayersRaceData() {
+        return this.players.map(p => p.getPlayerRaceData())
     }
 }
 
@@ -373,6 +425,10 @@ class MulitplayerPlayer {
     isReady: boolean
 
     vehiclePositionInfo: VehiclePositionInfo
+    lapNumber: number
+    latestLapTime: number
+    isFinished: boolean
+    totalTime: number
 
     constructor(desktopSocket: Socket, config: PlayerConfig) {
         this.desktopSocket = desktopSocket
@@ -386,6 +442,10 @@ class MulitplayerPlayer {
         this.isConnected = true
         this.isReady = false
         this.vehiclePositionInfo = new VehiclePositionInfo(this.userId)
+        this.lapNumber = 0
+        this.latestLapTime = 0
+        this.isFinished = false
+        this.totalTime = 0
 
         this.setupSocket()
     }
@@ -397,6 +457,15 @@ class MulitplayerPlayer {
         this.setupPlayerReadyListener()
         this.setupPingListener()
         this.setupGetPosRotListener()
+        this.setupLapDoneListener()
+        this.setupRestartGameListener()
+    }
+
+    setupRestartGameListener() {
+        this.desktopSocket.on(m_ts_restart_game, () => {
+            // only leader?
+            this.room?.restartGame()
+        })
     }
 
     setupPingListener() {
@@ -428,6 +497,16 @@ class MulitplayerPlayer {
         return this.vehiclePositionInfo
     }
 
+    restartGame() {
+        this.lapNumber = 0
+        this.latestLapTime = 0
+        this.isFinished = false
+
+    }
+
+    gameFinished(data: any) {
+        this.desktopSocket.emit(m_fs_game_finished, data)
+    }
 
     setupStartGameListener() {
         this.desktopSocket.on(m_ts_go_to_game_room_from_leader, () => {
@@ -444,7 +523,9 @@ class MulitplayerPlayer {
     }
 
     sendGoToGameRoom() {
-        this.desktopSocket.emit(m_fs_game_starting, {})
+        this.desktopSocket.emit(m_fs_game_starting, {
+
+        })
     }
 
 
@@ -508,6 +589,16 @@ class MulitplayerPlayer {
         })
     }
 
+    setupLapDoneListener() {
+        this.desktopSocket.on(m_ts_lap_done, ({ totalTime, latestLapTime, lapNumber }) => {
+            this.lapNumber = lapNumber
+            this.latestLapTime = latestLapTime
+            // dont know if total time should come from player or server
+            this.totalTime = totalTime
+            this.room?.playerFinishedLap(this)
+        })
+    }
+
     setRoom(room: MultiplayerRoom) {
         this.room = room
     }
@@ -529,6 +620,7 @@ class MulitplayerPlayer {
 
     setupGameSettingsChangedListener() {
         this.desktopSocket.on(m_ts_game_settings_changed, ({ gameSettings }) => {
+            console.log("new game settings")
             this.room?.setGameSettings(gameSettings)
             this.room?.gameSettingsChanged()
         })
@@ -536,6 +628,13 @@ class MulitplayerPlayer {
 
     sendGameSettingsChanged() {
         this.desktopSocket.emit(m_fs_game_settings_changed, { gameSettings: this.room?.gameSettings })
+    }
+
+    getPlayerRaceData() {
+        return {
+            playerName: this.displayName,
+            lapNumber: this.lapNumber
+        }
     }
 
     getPlayerInfo() {

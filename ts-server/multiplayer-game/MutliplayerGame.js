@@ -77,6 +77,7 @@ var MultiplayerRoom = /** @class */ (function () {
         this.io = io;
         this.startTime = 0;
         this.isSendingVehicleInfo = false;
+        this.numberOfLaps = -1;
         this.countdownStarted = false;
         // in test mode 
         if (false) {
@@ -109,6 +110,7 @@ var MultiplayerRoom = /** @class */ (function () {
     }
     MultiplayerRoom.prototype.setGameSettings = function (gameSettings) {
         this.gameSettings = gameSettings;
+        // set number of laps when game starts
     };
     MultiplayerRoom.prototype.addPlayer = function (player) {
         // check if player exists
@@ -245,19 +247,34 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.startGameInterval = function () {
         var _this = this;
+        var _a;
         if (this.isSendingVehicleInfo)
             return;
         this.isSendingVehicleInfo = true;
         // dont do this if only one player
         var obj = {};
-        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
-            var p = _a[_i];
+        for (var _i = 0, _b = this.players; _i < _b.length; _i++) {
+            var p = _b[_i];
             obj[p.userId] = p.getVehicleInfo();
         }
         this.gameInterval = setInterval(function () {
             // const arr = this.players.map(p => p.getVehicleInfo())
             _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_vehicles_position_info, obj);
-        }, 1000 / 60); // how many times?
+        }, (_a = 1000 / this.gameSettings.targetFPS) !== null && _a !== void 0 ? _a : 45); // how many times?
+    };
+    MultiplayerRoom.prototype.startGame = function () {
+        this.numberOfLaps = this.gameSettings.numberOfLaps;
+        console.log("countdown finished");
+        this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: 0 });
+        this.countdownStarted = false;
+        this.startTime = Date.now();
+    };
+    MultiplayerRoom.prototype.restartGame = function () {
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            p.restartGame();
+        }
+        //  this.startGameCountDown()
     };
     MultiplayerRoom.prototype.startGameCountDown = function () {
         var _this = this;
@@ -280,10 +297,7 @@ var MultiplayerRoom = /** @class */ (function () {
                     countdownTimer();
                 }
                 else {
-                    console.log("countdown finished");
-                    _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: 0 });
-                    _this.countdownStarted = false;
-                    _this.startTime = Date.now();
+                    _this.startGame();
                 }
             }, 1000);
         };
@@ -304,6 +318,46 @@ var MultiplayerRoom = /** @class */ (function () {
             this.startGameCountDown();
         }
     };
+    MultiplayerRoom.prototype.sendGameFinished = function () {
+        var winner = {
+            name: "",
+            totalTime: Infinity
+        };
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            if (p.totalTime < winner.totalTime) {
+                winner = {
+                    name: p.displayName,
+                    totalTime: p.totalTime
+                };
+            }
+        }
+        for (var _b = 0, _c = this.players; _b < _c.length; _b++) {
+            var p = _c[_b];
+            p.gameFinished({ raceData: this.getPlayersRaceData(), winner: winner });
+        }
+    };
+    MultiplayerRoom.prototype.playerFinishedLap = function (player) {
+        if (player.lapNumber > this.numberOfLaps) {
+            player.isFinished = true;
+        }
+        var gameFinished = true;
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            if (!p.isFinished) {
+                gameFinished = false;
+            }
+        }
+        if (gameFinished) {
+            this.sendGameFinished();
+        }
+    };
+    MultiplayerRoom.prototype.sendRaceInfo = function () {
+        this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_race_info, { raceData: this.getPlayersRaceData() });
+    };
+    MultiplayerRoom.prototype.getPlayersRaceData = function () {
+        return this.players.map(function (p) { return p.getPlayerRaceData(); });
+    };
     return MultiplayerRoom;
 }());
 var MulitplayerPlayer = /** @class */ (function () {
@@ -319,6 +373,10 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.isConnected = true;
         this.isReady = false;
         this.vehiclePositionInfo = new VehiclePositionInfo(this.userId);
+        this.lapNumber = 0;
+        this.latestLapTime = 0;
+        this.isFinished = false;
+        this.totalTime = 0;
         this.setupSocket();
     }
     MulitplayerPlayer.prototype.setupSocket = function () {
@@ -328,6 +386,16 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.setupPlayerReadyListener();
         this.setupPingListener();
         this.setupGetPosRotListener();
+        this.setupLapDoneListener();
+        this.setupRestartGameListener();
+    };
+    MulitplayerPlayer.prototype.setupRestartGameListener = function () {
+        var _this = this;
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_restart_game, function () {
+            var _a;
+            // only leader?
+            (_a = _this.room) === null || _a === void 0 ? void 0 : _a.restartGame();
+        });
     };
     MulitplayerPlayer.prototype.setupPingListener = function () {
         var _this = this;
@@ -358,6 +426,14 @@ var MulitplayerPlayer = /** @class */ (function () {
     };
     MulitplayerPlayer.prototype.getVehicleInfo = function () {
         return this.vehiclePositionInfo;
+    };
+    MulitplayerPlayer.prototype.restartGame = function () {
+        this.lapNumber = 0;
+        this.latestLapTime = 0;
+        this.isFinished = false;
+    };
+    MulitplayerPlayer.prototype.gameFinished = function (data) {
+        this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_finished, data);
     };
     MulitplayerPlayer.prototype.setupStartGameListener = function () {
         var _this = this;
@@ -425,7 +501,6 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.on(shared_stuff_1.mts_user_settings_changed, function (_a) {
             var _b;
             var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
-            console.log("usersettings changed", vehicleSetup);
             if (userSettings) {
                 _this.userSettings = userSettings;
             }
@@ -435,6 +510,18 @@ var MulitplayerPlayer = /** @class */ (function () {
             if (_this.vehicleSetup || _this.userSettings) {
                 (_b = _this.room) === null || _b === void 0 ? void 0 : _b.userSettingsChanged({ userId: _this.userId, vehicleSetup: _this.vehicleSetup, userSettings: _this.userSettings });
             }
+        });
+    };
+    MulitplayerPlayer.prototype.setupLapDoneListener = function () {
+        var _this = this;
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_lap_done, function (_a) {
+            var _b;
+            var totalTime = _a.totalTime, latestLapTime = _a.latestLapTime, lapNumber = _a.lapNumber;
+            _this.lapNumber = lapNumber;
+            _this.latestLapTime = latestLapTime;
+            // dont know if total time should come from player or server
+            _this.totalTime = totalTime;
+            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.playerFinishedLap(_this);
         });
     };
     MulitplayerPlayer.prototype.setRoom = function (room) {
@@ -462,6 +549,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_game_settings_changed, function (_a) {
             var _b, _c;
             var gameSettings = _a.gameSettings;
+            console.log("new game settings");
             (_b = _this.room) === null || _b === void 0 ? void 0 : _b.setGameSettings(gameSettings);
             (_c = _this.room) === null || _c === void 0 ? void 0 : _c.gameSettingsChanged();
         });
@@ -469,6 +557,12 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.sendGameSettingsChanged = function () {
         var _a;
         this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_settings_changed, { gameSettings: (_a = this.room) === null || _a === void 0 ? void 0 : _a.gameSettings });
+    };
+    MulitplayerPlayer.prototype.getPlayerRaceData = function () {
+        return {
+            playerName: this.displayName,
+            lapNumber: this.lapNumber
+        };
     };
     MulitplayerPlayer.prototype.getPlayerInfo = function () {
         var _a;

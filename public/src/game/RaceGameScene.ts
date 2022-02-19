@@ -316,7 +316,7 @@ export class RaceGameScene extends GameScene {
         if (this.gameTimers[vehicleNumber].allCheckpointsCrossed()) {
             const cLapTime = this.gameTimers[vehicleNumber].getCurrentLapTime()
             this.gameTimers[vehicleNumber].lapDone()
-            const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
+            const { position, rotation } = this.course.getGoalCheckpoint()
 
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position, rotation })
 

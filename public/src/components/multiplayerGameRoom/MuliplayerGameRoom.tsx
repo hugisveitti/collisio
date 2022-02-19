@@ -7,6 +7,10 @@ import {
   MultiplayerRaceGameScene,
 } from "../../game/MultiplayerRaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
+import {
+  m_ts_game_settings_changed,
+  m_ts_restart_game,
+} from "../../shared-backend/multiplayer-shared-stuff";
 import { getSocket } from "../../utils/connectSocket";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
@@ -47,6 +51,10 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
     return null;
   }
 
+  const handleEscPressed = () => {
+    setSettingsModalOpen(true);
+  };
+
   useEffect(() => {
     console.log("store", props.store);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
@@ -60,6 +68,9 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
       userSettings: props.store.userSettings,
       vehicleSetup: vehicleSetup,
       players: props.store.players,
+      gameRoomActions: {
+        escPressed: handleEscPressed,
+      },
     };
     createMultiplayerGameScene(MultiplayerRaceGameScene, config).then((g) => {
       gameObject = g;
@@ -73,7 +84,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   }, []);
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
-    console.log("update game settings not implemented");
+    socket.emit(m_ts_game_settings_changed, { gameSettings: newGameSettings });
   };
 
   // gamesettings modal only for LEADEr?
@@ -102,6 +113,10 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
             //   window.location.href = connectPagePath;
             history.push(newPath);
           });
+        }}
+        restarBtnPressed={() => {
+          socket.emit(m_ts_restart_game, {});
+          setSettingsModalOpen(false);
         }}
       />
     </React.Fragment>

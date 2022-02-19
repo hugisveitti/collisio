@@ -68,7 +68,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     private _everythingReady: boolean
 
-    gameRoomActions: IGameRoomActions
+
 
     viewDivs: HTMLDivElement[]
     viewsKmhInfo: HTMLSpanElement[]
@@ -112,8 +112,6 @@ export class GameScene extends MyScene implements IGameScene {
         this.gameStarted = false
 
         this.gameId = uuid()
-
-        this.gameRoomActions = {}
 
         this.viewDivs = []
         this.viewsKmhInfo = []
@@ -368,11 +366,10 @@ export class GameScene extends MyScene implements IGameScene {
         }
     }
 
-    clearTimeouts() {
+    _clearTimeouts() {
         for (let to of this.viewsImpornantInfoClearTimeout) {
             clearTimeout(to)
         }
-        clearTimeout(this.importantInfoTimeout)
     }
 
 
@@ -653,8 +650,6 @@ export class GameScene extends MyScene implements IGameScene {
             if (!vehicle.isReady) return false
         }
 
-
-
         this._everythingReady = true
         return true
     }
@@ -662,12 +657,6 @@ export class GameScene extends MyScene implements IGameScene {
     saveDriveRecording(playerId: string) {
         console.warn("Save drive recording not implemented")
     }
-
-
-    setGameRoomActions(gameRoomActions: IGameRoomActions) {
-        this.gameRoomActions = gameRoomActions
-    }
-
 
     setGameSettings(gameSettings: IGameSettings) {
 

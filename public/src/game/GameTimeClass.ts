@@ -45,6 +45,14 @@ export class GameTime {
         }
     }
 
+    getLatestLapTime() {
+        if (this.lapTimes.length === 0) {
+            return -1
+        }
+
+        return this.lapTimes[this.lapTimes.length - 1]
+    }
+
     start() {
         this.isPaused = false
         this.clock.start()
