@@ -1,6 +1,7 @@
 import { ExtendedObject3D, Scene3D } from "enable3d";
 import { Euler, Object3D, Vector3 } from "three";
 import { GameScene } from '../game/GameScene';
+import { MyScene } from "../game/MyScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { Course } from "./Course";
 import { ITagCourse } from "./ICourse";
@@ -72,7 +73,7 @@ export class Coin {
         })
     }
 
-    removeFromScene(gameScene: GameScene) {
+    removeFromScene(gameScene: MyScene) {
         this.destroyed = true
         const obj = gameScene.scene.getObjectByName(this.model.name)
         if (!this.model?.body) return

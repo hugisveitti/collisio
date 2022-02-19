@@ -1,3 +1,4 @@
+import { Timestamp } from "@firebase/firestore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
@@ -17,8 +18,17 @@ import React, { useState } from "react";
 import { IRoomInfo } from "../classes/Game";
 import { getDateFromNumber } from "../utils/utilFunctions";
 
+interface ICreatedRoomInfo {
+  userId: string;
+  geo: {
+    country: string;
+  };
+  date: Timestamp;
+  roomId: string;
+}
+
 interface IRoomInfoRow {
-  roomInfo: IRoomInfo;
+  roomInfo: ICreatedRoomInfo;
 }
 
 const RoomInfoRow = (props: IRoomInfoRow) => {
@@ -35,22 +45,17 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
           </IconButton>
         </TableCell>
         <TableCell>{props.roomInfo.roomId}</TableCell>
-        <TableCell>{getDateFromNumber(props.roomInfo.date)}</TableCell>
-        <TableCell>{props.roomInfo.players?.length ?? "-"}</TableCell>
-        <TableCell>{props.roomInfo.canceledGame ? "Yes" : "No"}</TableCell>
-        <TableCell>{props.roomInfo.gameSettings.trackName}</TableCell>
-        <TableCell>{props.roomInfo.gameSettings.numberOfLaps}</TableCell>
+        <TableCell>
+          {getDateFromNumber(props.roomInfo.date.seconds * 1000)}
+        </TableCell>
+        <TableCell>{props.roomInfo.userId}</TableCell>
+        <TableCell>
+          {props.roomInfo.geo?.country ?? "unknown country"}
+        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <Collapse in={open}>
-            <div>
-              {props.roomInfo.players.map((p) => (
-                <div key={p.id}>
-                  id:{p.id} name:{p.playerName}
-                </div>
-              ))}
-            </div>
             <List>
               {keys.map((k) => {
                 if (typeof props.roomInfo[k] === "object") {
@@ -74,11 +79,11 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   );
 };
 
-interface IRoomDataTable {
-  roomsInfo: IRoomInfo[];
+interface ICreatedRoomsDataTable {
+  roomsInfo: ICreatedRoomInfo[];
 }
 
-const RoomDataTable = (props: IRoomDataTable) => {
+const CreatedRoomsDataTable = (props: ICreatedRoomsDataTable) => {
   return (
     <TableContainer
       component={Paper}
@@ -93,10 +98,8 @@ const RoomDataTable = (props: IRoomDataTable) => {
             <TableCell />
             <TableCell>RoomId</TableCell>
             <TableCell>Date</TableCell>
-            <TableCell>Number of players</TableCell>
-            <TableCell>Game cancelled</TableCell>
-            <TableCell>Trackname</TableCell>
-            <TableCell>Number of laps</TableCell>
+            <TableCell>UserId</TableCell>
+            <TableCell>Country</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -109,4 +112,4 @@ const RoomDataTable = (props: IRoomDataTable) => {
   );
 };
 
-export default RoomDataTable;
+export default CreatedRoomsDataTable;

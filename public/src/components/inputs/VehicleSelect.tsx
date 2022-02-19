@@ -29,7 +29,6 @@ interface IVehicleSelect {
 
   fullWidth?: boolean;
   disabled?: boolean;
-  vehicleColor?: string;
   store?: IStore;
   simpleSelect?: boolean;
   user: IUser;

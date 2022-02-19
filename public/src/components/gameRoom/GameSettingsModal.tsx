@@ -6,6 +6,7 @@ import React from "react";
 import { IGameSettings } from "../../classes/localGameSettings";
 import { IUser } from "../../classes/User";
 import { IGameScene } from "../../game/IGameScene";
+import { IMultiplayerRaceGameScene } from "../../game/MultiplayerRaceGameScene";
 import BackdropButton from "../button/BackdropButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import VehicleSelect from "../inputs/VehicleSelect";
@@ -17,7 +18,7 @@ import { IStore } from "../store";
 interface IGameSettingsModal {
   open: boolean;
   onClose: () => void;
-  gameObject: IGameScene | undefined;
+  gameObject: IMultiplayerRaceGameScene | IGameScene | undefined;
   store: IStore;
   userId: string | undefined;
   isTestMode?: boolean;

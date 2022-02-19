@@ -1,7 +1,8 @@
 import { ClosestRaycaster } from "@enable3d/ammo-physics";
 import { BufferGeometry, Line, LineBasicMaterial, Vector3 } from "three";
 import { IGameScene } from '../game/IGameScene';
-import { VehicleType } from "../shared-backend/shared-stuff";
+import { MyScene } from "../game/MyScene";
+import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { vehicleItems } from "../shared-backend/vehicleItems";
 import { numberScaler } from "../utils/utilFunctions";
 import { instanceOfSimpleVector, ITestVehicle, SimpleVector } from "./IVehicle";
@@ -26,8 +27,8 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     inertia: Ammo.btVector3
 
 
-    constructor(scene: IGameScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects: boolean) {
-        super({ scene, vehicleColor: color, name, vehicleNumber, vehicleType, useSoundEffects, vehicleSetup: { vehicleType: vehicleType, exhaust: vehicleItems[vehicleType]?.exhaust1 } })
+    constructor(scene: MyScene, color: string | number, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects: boolean) {
+        super({ id: `test-vehicle-${vehicleNumber}`, scene, name, vehicleNumber, vehicleType, useSoundEffects, vehicleSetup: { vehicleType: vehicleType, exhaust: vehicleItems[vehicleType]?.exhaust1, vehicleColor: color as VehicleColorType } })
         this.closestRaycaster = this.scene.physics.add.raycaster("closest") as ClosestRaycaster
         //  this.vehicleConfig.maxSpeed = 1000
         this.inertia = new Ammo.btVector3(0, 0, 0)

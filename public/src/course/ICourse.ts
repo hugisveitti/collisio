@@ -1,5 +1,6 @@
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Euler, Vector3 } from "three";
+import { GhostVehicle } from "../vehicles/GhostVehicle";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 
 
@@ -10,6 +11,7 @@ export interface ICourse {
     clearCourse: () => void
     updateCourse: () => void
     setStartPositions: (vehicle: IVehicle[]) => void
+    setToSpawnPostion: (spawnPosition: number, vehicle: IVehicle) => void
     ground: ExtendedObject3D
     startPosition: Vector3
     startRotation: Euler

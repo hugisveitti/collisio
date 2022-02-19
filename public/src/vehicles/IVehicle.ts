@@ -22,6 +22,9 @@ export interface IPositionRotation {
 
 export interface IVehicle {
 
+    // hopefully a userId
+    id: string
+
     /** could try and have a function getCollisionBody
      * But I couldn't import the definition of PhysicsBody
      */

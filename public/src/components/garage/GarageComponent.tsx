@@ -16,6 +16,7 @@ import {
   AllOwnership,
 } from "../../shared-backend/ownershipFunctions";
 import {
+  defaultVehicleColorType,
   getColorNameFromType,
   VehicleColorType,
   VehicleType,
@@ -89,14 +90,16 @@ const GarageComponent = (props: IGarageComponent) => {
     props.store.userSettings.vehicleSettings.vehicleType
   );
 
-  const [selectedVehicleColor, setSelectedVehicleColor] = useState(
-    props.store.userSettings.vehicleSettings.vehicleColor
-  );
-
   const [selectedVehicleSetup, setSelectedVehicleSetup] = useState(
     props.store.vehiclesSetup?.[
       props.store.userSettings.vehicleSettings.vehicleType
-    ] ?? { vehicleType: props.store.userSettings.vehicleSettings.vehicleType }
+    ] ?? {
+      vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
+      vehicleColor: defaultVehicleColorType,
+    }
+  );
+  const [selectedVehicleColor, setSelectedVehicleColor] = useState(
+    selectedVehicleSetup.vehicleColor
   );
 
   const [selectedItem, setSelectedItem] = useState(
@@ -242,26 +245,25 @@ const GarageComponent = (props: IGarageComponent) => {
     );
   }, [selectedVehicleType]);
 
-  const handleChangeVehicle = (
-    value: any,
-    key: "vehicleType" | "vehicleColor"
-  ) => {
-    if (key === "vehicleColor") {
-      setSelectedVehicleColor(value);
-    } else if (key === "vehicleType") {
-      setSelectedVehicleType(value);
+  const handleChangeVehicle = (value: any) => {
+    setSelectedVehicleType(value);
 
-      setSelectedVehicleSetup(props.store.vehiclesSetup?.[value]);
-    }
+    setSelectedVehicleSetup(props.store.vehiclesSetup?.[value]);
 
     if (ownership && ownership[value]) {
-      if (key === "vehicleColor") {
-        _vehicleColor = value as VehicleColorType;
-        props.onChangeVehicleColor?.(value);
-      } else if (key === "vehicleType") {
-        _vehicleType = value as VehicleType;
-        props.onChangeVehicleType?.(value);
-      }
+      _vehicleType = value as VehicleType;
+      props.onChangeVehicleType?.(value);
+    }
+  };
+
+  const handleChangeVehicleColor = (color: VehicleColorType) => {
+    setSelectedVehicleColor(color);
+    setSelectedVehicleSetup({
+      ...selectedVehicleSetup,
+      vehicleColor: color,
+    });
+    if (ownership && ownership[color]) {
+      props.onChangeVehicleColor?.(color);
     }
   };
 
@@ -410,6 +412,7 @@ const GarageComponent = (props: IGarageComponent) => {
                 props.onUnequipAllItems?.();
                 setSelectedVehicleSetup({
                   vehicleType: selectedVehicleType,
+                  vehicleColor: selectedVehicleColor,
                 });
                 setSelectedItem(undefined);
               }}
@@ -516,7 +519,7 @@ const GarageComponent = (props: IGarageComponent) => {
                   ownership={ownership}
                   selected={selectedVehicleType}
                   onChange={(v) => {
-                    handleChangeVehicle(v, "vehicleType");
+                    handleChangeVehicle(v);
                     setSelectedItem(undefined);
                   }}
                 />
@@ -529,7 +532,7 @@ const GarageComponent = (props: IGarageComponent) => {
                   ownership={ownership}
                   selected={selectedVehicleColor}
                   onChange={(color) => {
-                    handleChangeVehicle(color, "vehicleColor");
+                    handleChangeVehicleColor(color);
                   }}
                 />
               ),

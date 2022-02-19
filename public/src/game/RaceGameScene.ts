@@ -98,7 +98,9 @@ export class RaceGameScene extends GameScene {
                 const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
                     this.ghostVehicle = new GhostVehicle({
-                        vehicleType: vt, color: "#10eedd"
+                        vehicleType: vt,
+                        color: "#10eedd",
+                        id: this.gameSettings.ghostFilename
                     })
                     await this.ghostVehicle.loadModel()
                     this.ghostVehicle.addToScene(this)

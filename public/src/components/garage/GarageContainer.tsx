@@ -23,7 +23,7 @@ interface IGarageContainer {
 
 let vehicleSetupToSave = undefined as undefined | VehiclesSetup;
 let vehicleTypeToSave = undefined as undefined | VehicleType;
-let vehicleColorToSave = undefined as undefined | VehicleColorType;
+// let vehicleColorToSave = undefined as undefined | VehicleColorType;
 
 const GarageContainer = (props: IGarageContainer) => {
   const user = useContext(UserContext);
@@ -41,11 +41,11 @@ const GarageContainer = (props: IGarageContainer) => {
         if (vehicleTypeToSave) {
           newVehicleSettings.vehicleType = vehicleTypeToSave;
         }
-        if (vehicleColorToSave) {
-          newVehicleSettings.vehicleColor = vehicleColorToSave;
-        }
+        // if (vehicleColorToSave) {
+        //   newVehicleSettings.vehicleColor = vehicleColorToSave;
+        // }
 
-        if (vehicleColorToSave || vehicleTypeToSave) {
+        if (vehicleTypeToSave) {
           const newUserSettings: IUserSettings = {
             ...props.store.userSettings,
             vehicleSettings: newVehicleSettings,
@@ -79,16 +79,13 @@ const GarageContainer = (props: IGarageContainer) => {
           props.store.setUserSettings(newUserSettings);
         }}
         onChangeVehicleColor={(newVehicleColor: VehicleColorType) => {
-          vehicleColorToSave = newVehicleColor;
-          const newVehicleSettings: IVehicleSettings = {
-            ...props.store.userSettings.vehicleSettings,
-            vehicleColor: newVehicleColor,
-          };
-          const newUserSettings: IUserSettings = {
-            ...props.store.userSettings,
-            vehicleSettings: newVehicleSettings,
-          };
-          props.store.setUserSettings(newUserSettings);
+          const newVehicleSetup = { ...props.store.vehiclesSetup };
+
+          newVehicleSetup[
+            props.store.userSettings.vehicleSettings.vehicleType
+          ].vehicleColor = newVehicleColor;
+
+          props.store.setVehiclesSetup(newVehicleSetup);
         }}
         onChangeVehicleItem={(item: ItemProperties) => {
           const newVehicleSetup = { ...props.store.vehiclesSetup };

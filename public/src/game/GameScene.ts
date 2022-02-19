@@ -1,14 +1,11 @@
-import { ExtendedObject3D, PhysicsLoader, Project, Scene3D } from "enable3d";
-import { toast } from "react-toastify";
+import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLight, Mesh, PerspectiveCamera, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { Audio, AudioListener, Color, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
-import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
-import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
+import { IGameSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
-import { ICourse } from "../course/ICourse";
-import { dts_game_settings_changed_callback, dts_ping_test, dts_vehicles_ready, IPlayerInfo, std_controls, std_ping_test_callback, std_user_settings_changed, TimeOfDay, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
@@ -21,7 +18,7 @@ import { getWagonNumber, Wagon } from "../vehicles/Wagon";
 import { WagonType } from "../vehicles/WagonConfigs";
 import "./game-styles.css";
 import { IGameRoomActions, IGameScene, IGameSceneConfig } from "./IGameScene";
-import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
+import { MyScene } from "./MyScene";
 
 
 
@@ -52,24 +49,19 @@ interface IView {
 }
 
 
-export class GameScene extends Scene3D implements IGameScene {
+export class GameScene extends MyScene implements IGameScene {
 
     players: IPlayerInfo[]
     vehicles: IVehicle[]
-    gameSettings: IGameSettings
-    timeOfDay: TimeOfDay
-    useSound: boolean
-    useShadows: boolean
-    pLight: PointLight
-    course: ICourse
+
     roomId: string
     gameId: string
-    courseLoaded: boolean
+
     views: IView[]
     songIsPlaying: boolean
-    socket: Socket
+
     vehicleControls: VehicleControls
-    importantInfoDiv: HTMLDivElement
+
 
     gameStarted: boolean
 
@@ -84,9 +76,6 @@ export class GameScene extends Scene3D implements IGameScene {
     viewsImpornantInfo: HTMLSpanElement[]
     viewsNameInfo: HTMLSpanElement[]
     viewsImpornantInfoClearTimeout: NodeJS.Timeout[]
-    importantInfoTimeout: NodeJS.Timeout
-    pingInfo: HTMLSpanElement
-    fpsInfo: HTMLSpanElement
     playerInfosContainer: HTMLDivElement
 
     /**
@@ -94,54 +83,24 @@ export class GameScene extends Scene3D implements IGameScene {
      * e.g. when trackName is changed
      * Then we reload the map 
      */
-    needsReload: boolean
 
-    /**
-     * all spans and divs become children of this element to easily delete
-     * not calling it gameDiv since the game canvas doesnt go into this
-     */
-    gameInfoDiv: HTMLDivElement
 
     beepE4: Audio
     beepC4: Audio
 
-
-    totalPing: number
-    totalPingsGotten: number
-    time: number
-
-
-    fpsTick: number
-    totalFpsTicks: number
-    totalNumberOfFpsTicks: number
-    oldTime: number
-
-    roomTicks: number
-    gameTicks: number
-
     hasAskedToLowerSettings: boolean
 
-    gameSceneConfig: IGameSceneConfig
+
     extraVehicles: IVehicle[]
     wagons: Wagon[]
-
-    // for some reason on mobile you could get much higher (100+) fps
-    // but that never happened on desktop
-    targetFPS = 60
-    deltaFPS = 0
-    updateDelta = 0
-
     mobileOnlyControllerInterval: NodeJS.Timer
-    isPaused: boolean
 
-    totalTimeDiv: HTMLDivElement
-    pingTimeout: NodeJS.Timeout
 
 
     constructor() {
         super()
-        this.needsReload = false
-        this.timeOfDay = this.timeOfDay
+
+
         this.players = []
         this.vehicles = []
         this.views = []
@@ -151,22 +110,9 @@ export class GameScene extends Scene3D implements IGameScene {
         this.songIsPlaying = false
         this._everythingReady = false
         this.gameStarted = false
-        this.isPaused = false
+
         this.gameId = uuid()
-        this.gameSettings = defaultGameSettings
-        this.gameInfoDiv = document.createElement("div")
-        this.gameInfoDiv.setAttribute("id", "game-info")
 
-        document.body.appendChild(this.gameInfoDiv)
-        this.importantInfoDiv = document.createElement("div")
-
-        this.importantInfoDiv.setAttribute("id", "important-info")
-        this.gameInfoDiv.appendChild(this.importantInfoDiv)
-
-        this.totalTimeDiv = document.createElement("div")
-
-        this.gameInfoDiv.appendChild(this.totalTimeDiv)
-        this.totalTimeDiv.setAttribute("id", "totalTime")
         this.gameRoomActions = {}
 
         this.viewDivs = []
@@ -174,110 +120,18 @@ export class GameScene extends Scene3D implements IGameScene {
         this.viewsLapsInfo = []
         this.viewsImpornantInfo = []
         this.viewsImpornantInfoClearTimeout = [] as NodeJS.Timeout[]
-
         this.viewsNameInfo = []
-
-
-        this.pingInfo = document.createElement("span")
-        this.pingInfo.setAttribute("class", "game-text")
-        this.pingInfo.setAttribute("style", `
-            position:absolute;
-            top:25px;
-            left:5px;
-        `)
-
-        this.fpsInfo = document.createElement("span")
-        this.fpsInfo.setAttribute("class", "game-text")
-        this.fpsInfo.setAttribute("style", `
-            position:absolute;
-            top:5px;
-            left:5px;
-        `)
-
-        this.gameInfoDiv.appendChild(this.pingInfo)
-        this.gameInfoDiv.appendChild(this.fpsInfo)
 
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
 
-        this.totalPing = 0
-        this.totalPingsGotten = 0
-        this.time = 0
-        this.fpsTick = 0
-        this.totalFpsTicks = 0
-        this.totalNumberOfFpsTicks = 0
-        this.oldTime = 0
 
-        this.roomTicks = 0
-        this.gameTicks = 0
         this.hasAskedToLowerSettings = eval(window.localStorage.getItem("hasAskedToLowerSettings")) ?? false
 
         this.extraVehicles = []
         this.wagons = []
-        document.body.setAttribute("style", "overflow:hidden;")
     }
 
-    async addLights() {
-
-        this.timeOfDay = this.getTimeOfDay()
-
-        const { ambientLightColor,
-            hemisphereTopColor,
-            hemisphereBottomColor,
-            pointLightIntesity,
-            ambientLightIntesity
-        } = getTimeOfDayColors(this.timeOfDay)
-
-        // this.pLight = new PointLight(0xffffff, 1, 0, 1)
-        // maybe if evening then dont show shadows?
-        this.pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
-        this.pLight.position.set(100, 150, 100);
-        if (this.useShadows && this.timeOfDay === "day") {
-            this.pLight.castShadow = true
-            this.pLight.shadow.bias = 0.01
-        }
-
-        this.scene.add(this.pLight)
-
-
-        const hLight = new HemisphereLight(hemisphereTopColor, 1)
-        hLight.position.set(0, 1, 0);
-        hLight.color.setHSL(0.6, 1, 0.4);
-        this.scene.add(hLight)
-
-        const aLight = new AmbientLight(ambientLightColor, ambientLightIntesity)
-        aLight.position.set(0, 0, 0)
-        this.scene.add(aLight)
-
-        const uniforms = {
-            "topColor": { value: new Color(hemisphereTopColor) },
-            "bottomColor": { value: new Color(hemisphereBottomColor) },
-            "offset": { value: 33 },
-            "exponent": { value: 0.6 }
-        };
-
-        uniforms["topColor"].value.copy(hLight.color);
-        this.scene.background = new Color().setHSL(0.6, 0, 1);
-        this.scene.fog = new Fog(this.scene.background, 1, 5000);
-        this.scene.fog.color.copy(uniforms["bottomColor"].value);
-
-        const trackInfo = getTrackInfo(this.getTrackName())
-
-        const hemisphereRadius = trackInfo?.hemisphereRadius ?? 1000
-
-        const skyGeo = new SphereGeometry(hemisphereRadius, 32, 15);
-        const skyMat = new ShaderMaterial({
-            uniforms: uniforms,
-            vertexShader: skydomeVertexShader,
-            fragmentShader: skydomeFragmentShader,
-            side: BackSide
-        });
-
-        // move the sky?
-        const sky = new Mesh(skyGeo, skyMat);
-
-        this.scene.add(sky);
-    }
 
     async preload() {
         const warp = await this.warpSpeed("-ground", "-light", "-sky")
@@ -343,63 +197,6 @@ export class GameScene extends Scene3D implements IGameScene {
     }
 
 
-    public async start(key?: string, data?: any) {
-
-        await this.init?.(data)
-        await this.preload()
-        await this.create()
-        // this.physics.config.maxSubSteps = 4
-        // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
-        //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
-        this.physics.config.maxSubSteps = 1 + 1
-
-        this.physics.config.fixedTimeStep = 1 / this.targetFPS
-        console.log("Fixed time step", this.physics.config.fixedTimeStep)
-
-        this.renderer.setAnimationLoop(() => {
-            this._myupdate()
-        })
-    }
-
-    private _myupdate() {
-        const currDelta = this.clock.getDelta()
-        this.deltaFPS += currDelta
-        this.updateDelta += currDelta
-        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused) {
-            const time = this.clock.getElapsedTime()
-            let delta = (this.updateDelta * 1000)
-
-            this.updateDelta = 0
-            this.deltaFPS = this.deltaFPS % this.physics.config.fixedTimeStep
-
-
-            // must always satisfy the equation timeStep < maxSubSteps * fixedTimeStep
-            // update physics, then update models, opposite to enabled3d
-
-            this.gameTicks += 1
-            this.roomTicks += 1
-            this.physics?.update(delta)
-            this.physics?.updateDebugger()
-
-            this.update?.(+(time.toFixed(8)), delta)
-
-            this.animationMixers.update(delta)
-
-            this.preRender()
-
-            if (this.composer) {
-                this.composer.render()
-            }
-            else {
-                // am already rendering in updateVehicles
-                //    this.renderer.render(this.scene, this.camera)
-            }
-            this.postRender()
-        } else {
-
-        }
-    }
-
     createWagons(wagonTypes: WagonType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
         const batch: Promise<Wagon>[] = []
         for (let i = 0; i < wagonTypes.length; i++) {
@@ -456,10 +253,19 @@ export class GameScene extends Scene3D implements IGameScene {
     async createVehicle(vehicleType: VehicleType, vehicleColor: string | number, name: string, vehicleNumber: number): Promise<IVehicle> {
         return new Promise<IVehicle>(async (resolve, reject) => {
             let newVehicle: IVehicle
+            const config = {
+                scene: this,
+                name,
+                vehicleNumber,
+                vehicleType,
+                useSoundEffects: this.useSound,
+                vehicleSetup: { vehicleColor: vehicleColor as VehicleColorType, vehicleType },
+                id: `vehicle-${vehicleNumber}-id`
+            }
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useSoundEffects: this.useSound })
+                newVehicle = new LowPolyVehicle(config)
             } else {
-                newVehicle = new SphereVehicle({ scene: this, vehicleColor, name, vehicleNumber, vehicleType, useSoundEffects: this.useSound })
+                newVehicle = new SphereVehicle(config)
             }
             this.vehicles.push(newVehicle)
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
@@ -486,11 +292,20 @@ export class GameScene extends Scene3D implements IGameScene {
                 const vehicleColor = vehicleColors[(chassisColOffset + i) % vehicleColors.length]?.value ?? "red"
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
+                const config = {
+                    scene: this,
+                    name: this.players[i].playerName,
+                    vehicleNumber: i,
+                    vehicleType,
+                    useSoundEffects: this.useSound,
+                    vehicleSetup: this.players[i].vehicleSetup,
+                    id: this.players[i].id
+                }
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                    newVehicle = new LowPolyVehicle({ scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound, vehicleSetup: this.players[i].vehicleSetup })
+                    newVehicle = new LowPolyVehicle(config)
                 } else {
                     newVehicle = new SphereVehicle(
-                        { scene: this, vehicleColor, name: this.players[i].playerName, vehicleNumber: i, vehicleType, useSoundEffects: this.useSound }
+                        config
                     )
                 }
                 this.vehicles.push(newVehicle)
@@ -509,19 +324,14 @@ export class GameScene extends Scene3D implements IGameScene {
                 this.emitVehiclesReady()
                 topresolve()
             })
-
         })
         return promise
     }
 
-
-    getTrackName() {
-        return this.gameSceneConfig?.tournament?.trackName ?? this.gameSettings.trackName
+    getVehicles(): IVehicle[] {
+        return this.vehicles
     }
 
-    getGraphicsType() {
-        return this.gameSettings.graphics
-    }
 
     setPixelRatio() {
         const lowGraphics = this.gameSettings.graphics === "low"
@@ -531,8 +341,6 @@ export class GameScene extends Scene3D implements IGameScene {
         // if (window.devicePixelRatio < ratio && lowGraphics) {
         //     ratio = Math.floor(window.devicePixelRatio)
         // }
-
-
         this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
@@ -547,8 +355,6 @@ export class GameScene extends Scene3D implements IGameScene {
     setViewImportantInfo(info: string, i: number, clear?: boolean) {
         // this.viewsImpornantInfo[i].textContent = info
         this.viewsImpornantInfo[i].textContent = info
-
-
         if (clear) {
             this.viewsImpornantInfoClearTimeout[i] = setTimeout(() => {
                 this.clearViewImportantInfo(i)
@@ -569,13 +375,6 @@ export class GameScene extends Scene3D implements IGameScene {
         clearTimeout(this.importantInfoTimeout)
     }
 
-    setNeedsReload(needsReload: boolean) {
-        this.needsReload = needsReload
-    }
-
-    getDrawDistance() {
-        return this.gameSettings.drawDistance
-    }
 
     createViews() {
         this.gameInfoDiv.appendChild(this.playerInfosContainer)
@@ -728,38 +527,8 @@ export class GameScene extends Scene3D implements IGameScene {
                 `)
             }, 1500)
 
-            const callNameAnimate = () => {
-                nameInfo.textContent = pName
-
-
-
-                setTimeout(() => {
-                    if (nameRight > 0) {
-                        nameTop -= 2;
-                        nameRight -= 2;
-                        nameFontSize -= 4;
-                        nameInfo.setAttribute("style", `
-                        position:absolute;
-                        right:${nameRight}%;
-                        top:${nameTop}%;
-                        font-size:${nameFontSize}px;
-                        transform:translate(${nameRight}%, -${nameTop}%);
-                        `)
-
-                        callNameAnimate()
-                    }
-                }, 5)
-            }
-
-            setTimeout(() => {
-
-                //  callNameAnimate()
-            }, 1500)
-
 
             this.playerInfosContainer.appendChild(viewDiv)
-
-
         }
     }
 
@@ -871,22 +640,7 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-    showImportantInfo(text: string, clear?: boolean) {
-        if (this.importantInfoDiv) {
-            this.importantInfoDiv.textContent = text
-        }
-        if (clear) {
-            this.importantInfoTimeout = setTimeout(() => {
-                this.clearImportantInfo()
-            }, fadeSecs * 1000)
-        }
-    }
 
-    clearImportantInfo() {
-        if (this.importantInfoDiv) {
-            this.importantInfoDiv.textContent = ""
-        }
-    }
 
     everythingReady(): boolean {
         if (!this.courseLoaded) {
@@ -914,9 +668,6 @@ export class GameScene extends Scene3D implements IGameScene {
         this.gameRoomActions = gameRoomActions
     }
 
-    getTimeOfDay() {
-        return this.gameSettings.graphics === "low" ? "day" : getTimeOfDay(this.getTrackName())
-    }
 
     setGameSettings(gameSettings: IGameSettings) {
 
@@ -1155,48 +906,9 @@ export class GameScene extends Scene3D implements IGameScene {
         }
     }
 
-    updatePing() {
 
-        const start = Date.now()
-
-        this.socket?.off(std_ping_test_callback)
-
-        this.socket?.emit(dts_ping_test)
-        this.socket?.once(std_ping_test_callback, () => {
-            clearTimeout(this.pingTimeout)
-            const ping = Date.now() - start
-            this.pingInfo.textContent = `ping ${ping}ms`
-            this.totalPing += ping
-            this.totalPingsGotten += 1
-        })
-        this.pingTimeout = setTimeout(() => {
-            //    toast.error("There seems to be some connection issue")
-            this.pingInfo.textContent = `Connection issue`
-        }, 2 * 1000) // 2 ses?
-    }
-
-    updateFps(time: number) {
-        this.fpsTick += 1
-        if (Math.floor(time) > this.oldTime) {
-            this.fpsInfo.textContent = `fps ${this.fpsTick}`
-            this.totalFpsTicks += this.fpsTick
-            this.totalNumberOfFpsTicks += 1
-            this.fpsTick = 0
-            this.oldTime = Math.floor(time)
-        }
-        if (time > 30 && !this.hasAskedToLowerSettings) {
-            this.hasAskedToLowerSettings = true
-            window.localStorage.setItem("hasAskedToLowerSettings", "true")
-            if (this.totalFpsTicks / this.totalNumberOfFpsTicks < 40) {
-                if (this.gameSettings.graphics === "high" || this.gameSettings.useShadows) {
-                    toast.warn("Low fps detected, to increase fps and a more smooth game, go into settings (esc) and turn off shadows and put the graphics on low. Also close other tabs in your browser.", {})
-                }
-            }
-        }
-    }
 
     resetVehicles() {
-
         this.course.setStartPositions(this.vehicles)
         this.stopAllVehicles()
         this._resetVehicles()

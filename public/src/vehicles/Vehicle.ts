@@ -3,17 +3,17 @@
  */
 
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Audio, AudioListener, PerspectiveCamera, Quaternion, Vector3, Color, MeshStandardMaterial } from "three";
+import { Audio, AudioListener, Color, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
-import { IGameScene } from "../game/IGameScene";
-import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
+import { MyScene } from "../game/MyScene";
+import { defaultVehicleColorType, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { possibleVehicleItemTypes, possibleVehicleMods, vehicleItems, VehicleSetup } from "../shared-backend/vehicleItems";
 import { loadEngineSoundBuffer, loadSkidSoundBuffer } from "../sounds/gameSounds";
 import { getStaticPath } from "../utils/settings";
 import { numberScaler } from "../utils/utilFunctions";
-import { getStaticCameraPos, IPositionRotation, IVehicle, SimpleVector } from "./IVehicle";
+import { getStaticCameraPos, IPositionRotation, IVehicle } from "./IVehicle";
 import { IVehicleConfig, vehicleConfigs } from "./VehicleConfigs";
 
 
@@ -24,16 +24,17 @@ const soundScaler = numberScaler(1, 5, 0, 330, 2)
 
 
 export interface IVehicleClassConfig {
-    vehicleColor: string | number | undefined
     name: string
     vehicleNumber: number
     vehicleType: VehicleType
-    scene: IGameScene
+    scene: MyScene
     useSoundEffects?: boolean
     vehicleSetup?: VehicleSetup
+    id: string
 }
 
 export class Vehicle implements IVehicle {
+    id: string
     vehicleConfig: IVehicleConfig
     vehicleSetup: VehicleSetup
     // maybe this shouldnt import from showRoomCanvas
@@ -69,7 +70,7 @@ export class Vehicle implements IVehicle {
     engineForce: number
     zeroVec = new Ammo.btVector3(0, 0, 0)
     checkpointPositionRotation: IPositionRotation = { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }
-    scene: IGameScene
+    scene: MyScene
 
     chaseCameraSpeed: number
     useChaseCamera: boolean
@@ -171,13 +172,14 @@ export class Vehicle implements IVehicle {
         }
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
 
-        if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
-            this.setColor(this.vehicleColor)
-        }
         this._updateVehicleSettings()
 
 
         if (vehicleSetup) {
+            if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
+                console.log("setting color", vehicleSetup.vehicleColor)
+                this.setColor(vehicleSetup.vehicleColor)
+            }
             if (vehicleSetup.vehicleType === this.vehicleType && !goingToReload) {
 
                 this.updateVehicleSetup(vehicleSetup)
@@ -286,13 +288,17 @@ export class Vehicle implements IVehicle {
     }
 
     constructor(config: IVehicleClassConfig) {
+        this.id = config.id
         this.vehicleType = config.vehicleType
-        this.vehicleSetup = { vehicleType: this.vehicleType }
+        this.vehicleSetup = config.vehicleSetup ?? {
+            vehicleType: this.vehicleType,
+            vehicleColor: defaultVehicleColorType
+        }
         this.vehicleNumber = config.vehicleNumber
         this.name = config.name
         this.useSoundEffects = config.useSoundEffects
         this.scene = config.scene
-        this.vehicleColor = config.vehicleColor
+
 
         this.vehicleConfig = this.getDefaultVehicleConfig()
         this.isReady = false

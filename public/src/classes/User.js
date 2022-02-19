@@ -13,7 +13,6 @@ exports.defaultVehicleSettings = {
     useChaseCamera: true,
     vehicleType: shared_stuff_1.defaultVehicleType,
     cameraZoom: 4,
-    vehicleColor: shared_stuff_1.vehicleColors[0].value,
     noSteerNumber: 1,
     useDynamicFOV: true
 };

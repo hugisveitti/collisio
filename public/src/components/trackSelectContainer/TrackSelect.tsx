@@ -22,6 +22,7 @@ import { ITokenData } from "../../shared-backend/medalFuncions";
 import {
   allCosts,
   AllOwnership,
+  getDefaultOwnership,
 } from "../../shared-backend/ownershipFunctions";
 import {
   allTrackNames,
@@ -29,6 +30,7 @@ import {
   ITrackInfo,
   TrackName,
 } from "../../shared-backend/shared-stuff";
+import { defaultItemsOwnership } from "../../shared-backend/vehicleItems";
 import { itemInArray } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import BuyItemComponent from "../garage/BuyItemComponent";
@@ -69,6 +71,8 @@ const TrackSelect = (props: ITrackSelect) => {
         .catch(() => {
           console.warn("Error getting ownership");
         });
+    } else {
+      setOwnership(getDefaultOwnership());
     }
   }, [user]);
 
@@ -118,6 +122,10 @@ const TrackSelect = (props: ITrackSelect) => {
   let largeImage = getTrackLargeImage(selectedTrack);
 
   const handleBuyTrack = (trackName: TrackName) => {
+    if (!user) {
+      toast.error("Only logged in players can buy tracks.");
+      return;
+    }
     setIsBuying(true);
     buyItem(user.uid, trackName).then((data) => {
       if (data.completed) {

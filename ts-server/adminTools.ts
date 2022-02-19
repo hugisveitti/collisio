@@ -15,6 +15,7 @@ export const adminFunctions = (app: any) => {
     const adminsRefPath = "admins"
     const roomDataPath = "roomData"
     const gameDataPath = "allGames"
+    const createdRoomsPath = "created-rooms"
 
     const getIsAdmin = async (userId: string, callback: (isAdmin: boolean) => void) => {
         const adminsRef = doc(firestore, adminsRefPath, userId)
@@ -65,6 +66,7 @@ export const adminFunctions = (app: any) => {
 
     interface IQueryParams {
         n?: number
+        useCreatedRooms?: boolean
     }
 
 
@@ -75,7 +77,9 @@ export const adminFunctions = (app: any) => {
             if (isAdmin) {
                 // const queries = createFirebaseQueries(queryParams)
                 // queries.push(orderByChild("date"))
-                const roomDataRef = collection(firestore, roomDataPath)
+                const path = queryParams.useCreatedRooms ? createdRoomsPath : roomDataPath
+                console.log("path", path)
+                const roomDataRef = collection(firestore, path)
                 let q = query(roomDataRef, orderBy("date", "desc"))
                 if (queryParams.n) {
                     q = query(q, limit(queryParams.n))
@@ -167,8 +171,10 @@ export const adminFunctions = (app: any) => {
 
 
     const getQueryParams = (req: Request): IQueryParams => {
-        const { n } = req.query
+        const { n, useCreatedRooms } = req.query
+        console.log("useCreatedRooms", useCreatedRooms)
         const queryParams = {
+            useCreatedRooms: eval(useCreatedRooms as string),
             n: n && !isNaN(+n) ? +n : undefined
         }
 
@@ -185,6 +191,7 @@ export const adminFunctions = (app: any) => {
         const { userTokenId } = data
 
         const queryParams = getQueryParams(req)
+        console.log("query params", queryParams)
 
 
         admin.auth().verifyIdToken(userTokenId).then((decodedToken: any) => {
@@ -198,6 +205,8 @@ export const adminFunctions = (app: any) => {
             res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
         })
     })
+
+
 
     /**
         * query params 

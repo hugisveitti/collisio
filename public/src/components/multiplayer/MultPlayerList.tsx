@@ -3,10 +3,11 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import React from "react";
 import { getStyledColors } from "../../providers/theme";
-import { IMultPlayerInfo } from "../../shared-backend/multiplayer-shared-stuff";
+import { IPlayerInfo } from "../../shared-backend/shared-stuff";
+import { getVehicleNameFromType } from "../../vehicles/VehicleConfigs";
 
 interface IMultPlayerList {
-  players: IMultPlayerInfo[];
+  players: IPlayerInfo[];
   userId: string;
 }
 
@@ -29,7 +30,7 @@ const MultPlayerList = (props: IMultPlayerList) => {
                 <span>{p.playerName}</span>
               )}
               <span style={{ marginLeft: 10, fontSize: 10 }}>
-                {p.vehicleType}
+                {getVehicleNameFromType(p.vehicleType)}
               </span>
               {p.isLeader && <i style={{ marginLeft: 12 }}> Leader</i>}
             </ListItem>

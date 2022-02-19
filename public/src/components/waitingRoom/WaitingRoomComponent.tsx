@@ -20,7 +20,7 @@ import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
-import CopyTextButton from "../inputs/CopyTextButton";
+
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import {
   gameRoomPath,

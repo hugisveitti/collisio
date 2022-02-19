@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Socket } from "socket.io-client";
 import { IGameSettings } from "../classes/localGameSettings";
 import { IFlattendBracketNode, ITournament } from "../classes/Tournament";
 import { IUserSettings } from "../classes/User";
@@ -12,7 +11,7 @@ import { VehiclesSetup } from "../vehicles/VehicleSetup";
 export interface IStore {
     roomId: string
     setRoomId: React.Dispatch<React.SetStateAction<string>>
-    players: IPlayerInfo[]
+    players: IPlayerInfo[] | []
     setPlayers: React.Dispatch<React.SetStateAction<IPlayerInfo[]>>
     player: IPlayerInfo
     setPlayer: React.Dispatch<React.SetStateAction<IPlayerInfo>>

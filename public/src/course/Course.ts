@@ -3,11 +3,14 @@ import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Euler, Group, MeshStandardMaterial, Object3D, RGBAFormat, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GameScene } from "../game/GameScene";
+import { MyScene } from "../game/MyScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
 import { itemInArray, shuffleArray, substrArrayInString } from "../utils/utilFunctions";
+import { GhostVehicle } from "../vehicles/GhostVehicle";
 import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
+import { Vehicle } from "../vehicles/Vehicle";
 import "./course.css";
 import { CourseItemsLoader, notSeeThroughObjects } from "./CourseItemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
@@ -18,7 +21,7 @@ import { courseManager, setLoaderProgress } from "./loadingManager";
 
 
 export class Course implements ICourse {
-    gameScene: GameScene
+    gameScene: MyScene
     trackName: TrackName
     ground: ExtendedObject3D
 
@@ -63,7 +66,7 @@ export class Course implements ICourse {
 
     ray = new Raycaster()
 
-    constructor(gameScene: GameScene, trackName: TrackName) {
+    constructor(gameScene: MyScene, trackName: TrackName) {
         this.gameScene = gameScene
         this.trackName = trackName
         this.gamePhysicsObjects = []
@@ -99,6 +102,41 @@ export class Course implements ICourse {
                 light.shadow.bias = 0.01
             }
         }
+    }
+
+    setToSpawnPostion(spawnPosition: number, vehicle: IVehicle) {
+
+        let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn" && !s.name.includes("align"))
+
+        let aPos: Vector3
+        if (this.sAlign) {
+            aPos = this.sAlign.position
+        } else if ("goal-align" in this.spawnAligners) {
+            aPos = this.spawnAligners["goal-align"].position
+        }
+
+        let sortedSpawns = usableSpawns
+        sortedSpawns.sort((a, b) => a.name < b.name ? -1 : 1)
+        let spawnAligns: { spawn: Vector3, align: Vector3 }[] = []
+        for (let i = 0; i < sortedSpawns.length; i++) {
+            const alignKey = `align${i + 1}`
+            spawnAligns.push({
+                spawn: sortedSpawns[i].position,
+                align: this.spawnAligners[alignKey]?.position ?? aPos.clone()
+            })
+        }
+
+
+        const p = spawnAligns[spawnPosition].spawn
+        const r = spawnAligns[spawnPosition].spawn
+
+        let aligner = spawnAligns[spawnPosition].align
+
+        let rotation = this.calcSpawnAngle(aligner, p)
+
+        vehicle.setCheckpointPositionRotation({ position: p, rotation });
+        vehicle.resetPosition();
+        vehicle.stop();
     }
 
     checkIfObjectOutOfBounds(pos: Vector3) {
@@ -180,8 +218,9 @@ export class Course implements ICourse {
             engineOffObject.body.on.collision((otherObject, e) => {
                 if (isVehicle(otherObject)) {
                     const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.gameScene.vehicles[vehicleNumber].setCanDrive(false)
-                    this.gameScene.vehicles[vehicleNumber].zeroEngineForce()
+                    const vehicles = this.gameScene.getVehicles()
+                    vehicles[vehicleNumber].setCanDrive(false)
+                    vehicles[vehicleNumber].zeroEngineForce()
 
                 }
             })
@@ -191,9 +230,10 @@ export class Course implements ICourse {
             breakBlock.body.on.collision((otherObject, e) => {
                 if (isVehicle(otherObject)) {
                     const vehicleNumber = getVehicleNumber(otherObject.name)
-                    this.gameScene.vehicles[vehicleNumber].setCanDrive(false)
-                    this.gameScene.vehicles[vehicleNumber].zeroEngineForce()
-                    this.gameScene.vehicles[vehicleNumber].break()
+                    const vehicles = this.gameScene.getVehicles()
+                    vehicles[vehicleNumber].setCanDrive(false)
+                    vehicles[vehicleNumber].zeroEngineForce()
+                    vehicles[vehicleNumber].break()
                 }
             })
         }
@@ -278,12 +318,10 @@ export class Course implements ICourse {
             let spawnAligns: { spawn: Vector3, align: Vector3 }[] = []
             for (let i = 0; i < sortedSpawns.length; i++) {
                 const alignKey = `align${i + 1}`
-                if (alignKey in this.spawnAligners) {
-                    aPos = this.spawnAligners[alignKey].position
-                }
+
                 spawnAligns.push({
                     spawn: sortedSpawns[i].position,
-                    align: aPos
+                    align: this.spawnAligners[alignKey]?.position ?? aPos.clone()
                 })
             }
             /**
@@ -301,13 +339,6 @@ export class Course implements ICourse {
             for (let i = 0; i < vehicles.length; i++) {
                 const p = spawnAligns[i].spawn
                 const r = spawnAligns[i].spawn
-
-                // this wont work if i randomize the spawns
-                // need to create objects which have their own aligns
-                // const alignKey = `align${i + 1}`
-                // if (alignKey in this.spawnAligners) {
-                //     aPos = this.spawnAligners[alignKey].position
-                // }
 
                 let aligner = spawnAligns[i].align ?? aPos
 

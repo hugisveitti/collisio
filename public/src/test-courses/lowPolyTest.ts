@@ -10,7 +10,7 @@ import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { allVehicleTypes, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { allVehicleTypes, defaultVehicleColorType, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { GhostVehicle, IGhostVehicle } from "../vehicles/GhostVehicle"
 import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
@@ -136,8 +136,8 @@ export class LowPolyTestScene extends GameScene {
         // in tag game
         this.isIt = 0
         this.ghostDriver = new GhostDriver(this.trackName, this.getNumberOfLaps(), this.vehicleType,)
-        this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd" })
-        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test", vehicleSetup: { vehicleType: "normal" } })
+        this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd", id: "ghost test" })
+        this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test", vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" } })
 
     }
 
@@ -289,7 +289,8 @@ export class LowPolyTestScene extends GameScene {
                 const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
                     this.ghostVehicle = new GhostVehicle({
-                        vehicleType: vt, color: "#10eedd"
+                        vehicleType: vt, color: "#10eedd",
+                        id: "ghost-test"
                     })
                     await this.ghostVehicle.loadModel()
                     this.ghostVehicle.addToScene(this)
@@ -444,6 +445,7 @@ export class LowPolyTestScene extends GameScene {
                         console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
                         this.vehicle.updateVehicleSetup({
                             vehicleType: this.vehicleType,
+                            vehicleColor: defaultVehicleColorType,
                             exhaust: vehicleItems[this.vehicleType]?.["exhaust1"] as ItemProperties,
                             wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
                             spoiler: vehicleItems[this.vehicleType]?.["spoiler1"] as ItemProperties,
@@ -471,6 +473,7 @@ export class LowPolyTestScene extends GameScene {
                         console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
                         this.vehicle.updateVehicleSetup({
                             vehicleType: this.vehicleType,
+                            vehicleColor: defaultVehicleColorType,
                             exhaust: vehicleItems[this.vehicleType]?.["exhaust4"] as ItemProperties,
                             //  wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
                             spoiler: vehicleItems[this.vehicleType]?.["spoiler2"] as ItemProperties,

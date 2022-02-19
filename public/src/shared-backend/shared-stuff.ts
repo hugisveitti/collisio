@@ -216,6 +216,8 @@ export const getColorNameFromType = (colorType: VehicleColorType) => {
     return "Unknown color"
 }
 
+export const defaultVehicleColorType: VehicleColorType = "#1d8a47"
+
 
 export const getItemName = (type: string) => {
     for (let v of vehicleColors) {
@@ -307,8 +309,6 @@ export class VehicleControls {
 
 export interface IPreGamePlayerInfo {
     playerName: string
-    teamName: string
-    teamNumber: number
     playerNumber: number
     id: string
     isAuthenticated: boolean
@@ -319,16 +319,13 @@ export interface IPreGamePlayerInfo {
 
 
 export interface IPlayerInfo extends IPreGamePlayerInfo {
-    mobileControls: MobileControls
-    vehicleControls?: VehicleControls
     isConnected: boolean,
     isLeader: boolean
 }
 
 export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGamePlayerInfo => {
     const { playerName,
-        teamName,
-        teamNumber,
+
         playerNumber,
         id,
         isAuthenticated,
@@ -337,14 +334,12 @@ export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGame
 
     return {
         playerName: playerName ?? "undefined",
-        teamName: teamName ?? "undefined",
-        teamNumber: teamNumber ?? -1,
         playerNumber: playerNumber ?? -1,
         id: id ?? "undefined",
         isAuthenticated: isAuthenticated ?? false,
         vehicleType: vehicleType ?? "test",
         photoURL: photoURL ?? "",
-        vehicleSetup: vehicleSetup ?? { vehicleType: "test" }
+        vehicleSetup: vehicleSetup ?? { vehicleType: "test", vehicleColor: defaultVehicleColorType }
     }
 }
 

@@ -49,7 +49,7 @@ export const startSocketTest = async (desktopSocket: Socket, mobileSockets: Sock
 
         const { players } = data as { players: IPlayerInfo[] }
         for (let i = 0; i < players.length; i++) {
-            if (players[i]?.mobileControls.f) {
+            if (mobileControllers[i]?.f) {
                 end = Date.now()
                 callback(end - start)
             }

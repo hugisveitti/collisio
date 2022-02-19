@@ -6,8 +6,8 @@
  * So this limits the .js to one file.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mts_quit_game = exports.std_quit_game = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = exports.getItemName = exports.getColorNameFromType = exports.vehicleColors = exports.defaultVehicleType = exports.allVehicleTypes = exports.getTrackInfos = exports.allTrackNames = exports.possibleTrackCategories = void 0;
-exports.MTS_SENDINTERVAL_MS = exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = void 0;
+exports.std_quit_game = exports.stmd_number_connected = exports.mdts_number_connected = exports.stm_player_info = exports.dts_back_to_waiting_room = exports.stmd_waiting_room_alert = exports.mts_connected_to_waiting_room = exports.std_player_disconnected = exports.stm_desktop_disconnected = exports.mdts_left_waiting_room = exports.dts_vehicles_ready = exports.std_ping_test_callback = exports.dts_ping_test = exports.stm_ping_test_callback = exports.mts_ping_test = exports.mts_user_settings_changed = exports.std_user_settings_changed = exports.std_game_data_info = exports.mts_game_data_info = exports.stm_game_finished = exports.dts_game_finished = exports.stm_player_finished = exports.dts_player_finished = exports.mts_controls = exports.std_controls = exports.stmd_game_starting = exports.std_start_game_callback = exports.mdts_start_game = exports.stm_player_connected_callback = exports.mts_player_connected = exports.stmd_players_in_room_callback = exports.mdts_players_in_room = exports.mdts_device_type = exports.dts_create_room = exports.std_room_created_callback = exports.dts_game_highscore = exports.stmd_socket_ready = exports.GameActions = exports.playerInfoToPreGamePlayerInfo = exports.VehicleControls = exports.MobileControls = exports.getItemName = exports.defaultVehicleColorType = exports.getColorNameFromType = exports.vehicleColors = exports.defaultVehicleType = exports.allVehicleTypes = exports.getTrackInfos = exports.allTrackNames = exports.possibleTrackCategories = void 0;
+exports.MTS_SENDINTERVAL_MS = exports.STD_SENDINTERVAL_MS = exports.std_send_game_actions = exports.mts_send_game_actions = exports.stm_game_settings_changed_callback = exports.dts_game_settings_changed_callback = exports.stmd_game_settings_changed = exports.mdts_game_settings_changed = exports.stm_back_to_waiting_room = exports.mts_quit_game = void 0;
 exports.possibleTrackCategories = [
     { category: "basic", name: "Basic" },
     { category: "long", name: "Long" },
@@ -137,6 +137,7 @@ var getColorNameFromType = function (colorType) {
     return "Unknown color";
 };
 exports.getColorNameFromType = getColorNameFromType;
+exports.defaultVehicleColorType = "#1d8a47";
 var getItemName = function (type) {
     for (var _i = 0, vehicleColors_2 = exports.vehicleColors; _i < vehicleColors_2.length; _i++) {
         var v = vehicleColors_2[_i];
@@ -191,17 +192,15 @@ var VehicleControls = /** @class */ (function () {
 }());
 exports.VehicleControls = VehicleControls;
 var playerInfoToPreGamePlayerInfo = function (playerInfo) {
-    var playerName = playerInfo.playerName, teamName = playerInfo.teamName, teamNumber = playerInfo.teamNumber, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL, vehicleSetup = playerInfo.vehicleSetup;
+    var playerName = playerInfo.playerName, playerNumber = playerInfo.playerNumber, id = playerInfo.id, isAuthenticated = playerInfo.isAuthenticated, vehicleType = playerInfo.vehicleType, photoURL = playerInfo.photoURL, vehicleSetup = playerInfo.vehicleSetup;
     return {
         playerName: playerName !== null && playerName !== void 0 ? playerName : "undefined",
-        teamName: teamName !== null && teamName !== void 0 ? teamName : "undefined",
-        teamNumber: teamNumber !== null && teamNumber !== void 0 ? teamNumber : -1,
         playerNumber: playerNumber !== null && playerNumber !== void 0 ? playerNumber : -1,
         id: id !== null && id !== void 0 ? id : "undefined",
         isAuthenticated: isAuthenticated !== null && isAuthenticated !== void 0 ? isAuthenticated : false,
         vehicleType: vehicleType !== null && vehicleType !== void 0 ? vehicleType : "test",
         photoURL: photoURL !== null && photoURL !== void 0 ? photoURL : "",
-        vehicleSetup: vehicleSetup !== null && vehicleSetup !== void 0 ? vehicleSetup : { vehicleType: "test" }
+        vehicleSetup: vehicleSetup !== null && vehicleSetup !== void 0 ? vehicleSetup : { vehicleType: "test", vehicleColor: exports.defaultVehicleColorType }
     };
 };
 exports.playerInfoToPreGamePlayerInfo = playerInfoToPreGamePlayerInfo;

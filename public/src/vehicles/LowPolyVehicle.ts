@@ -91,7 +91,7 @@ export class LowPolyVehicle extends Vehicle {
 
 
 
-    constructor(config: IVehicleClassConfig) { //scene: IGameScene, color: string | number | undefined, name: string, vehicleNumber: number, vehicleType: VehicleType, useSoundEffects?: boolean) {
+    constructor(config: IVehicleClassConfig) {
         super(config)
 
         this.maxSpeedTime = 0
@@ -139,7 +139,7 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicleBody.receiveShadow = false
         this.vehicleBody.castShadow = true
         this.modelsLoaded = true;
-        changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor] as VehicleColorType[])
+        changeVehicleBodyColor(this.vehicleBody, [this.vehicleSetup.vehicleColor] as VehicleColorType[])
 
         this.createVehicle()
     }

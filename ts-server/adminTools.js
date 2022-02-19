@@ -45,6 +45,7 @@ var adminFunctions = function (app) {
     var adminsRefPath = "admins";
     var roomDataPath = "roomData";
     var gameDataPath = "allGames";
+    var createdRoomsPath = "created-rooms";
     var getIsAdmin = function (userId, callback) { return __awaiter(void 0, void 0, void 0, function () {
         var adminsRef, data, e_1;
         return __generator(this, function (_a) {
@@ -97,12 +98,14 @@ var adminFunctions = function (app) {
     var getRoomData = function (userId, queryParams, callback) {
         /** first check if user is admin */
         getIsAdmin(userId, function (isAdmin) { return __awaiter(void 0, void 0, void 0, function () {
-            var roomDataRef, q, data, rooms_1, e_2;
+            var path, roomDataRef, q, data, rooms_1, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!isAdmin) return [3 /*break*/, 5];
-                        roomDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, roomDataPath);
+                        path = queryParams.useCreatedRooms ? createdRoomsPath : roomDataPath;
+                        console.log("path", path);
+                        roomDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, path);
                         q = (0, firestore_1.query)(roomDataRef, (0, firestore_1.orderBy)("date", "desc"));
                         if (queryParams.n) {
                             q = (0, firestore_1.query)(q, (0, firestore_1.limit)(queryParams.n));
@@ -198,8 +201,10 @@ var adminFunctions = function (app) {
         }); });
     };
     var getQueryParams = function (req) {
-        var n = req.query.n;
+        var _a = req.query, n = _a.n, useCreatedRooms = _a.useCreatedRooms;
+        console.log("useCreatedRooms", useCreatedRooms);
         var queryParams = {
+            useCreatedRooms: eval(useCreatedRooms),
             n: n && !isNaN(+n) ? +n : undefined
         };
         return queryParams;
@@ -212,6 +217,7 @@ var adminFunctions = function (app) {
         var data = req.params;
         var userTokenId = data.userTokenId;
         var queryParams = getQueryParams(req);
+        console.log("query params", queryParams);
         firebase_config_1.admin.auth().verifyIdToken(userTokenId).then(function (decodedToken) {
             getRoomData(decodedToken.uid, queryParams, (function (roomDataRes) {
                 res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));

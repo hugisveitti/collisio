@@ -24,7 +24,7 @@ export interface IGameRoomActions {
 
 export interface IGameSceneConfig {
     socket?: Socket
-    players: IPlayerInfo[]
+    players?: IPlayerInfo[]
     gameSettings: IGameSettings
     roomId?: string
     gameRoomActions: IGameRoomActions

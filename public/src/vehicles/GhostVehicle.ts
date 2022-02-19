@@ -10,6 +10,7 @@ import { vehicleConfigs } from "./VehicleConfigs";
 export interface IGhostVehicle {
     setPosition: (position: Vector3) => void
     setRotation: (rotation: Quaternion) => void
+    setSimpleRotation: (rotation: { x: number, z: number, y: number, w: number }) => void
     isReady: boolean
     //  vehicle: ExtendedObject3D
     loadModel: () => Promise<void>
@@ -17,11 +18,15 @@ export interface IGhostVehicle {
     removeFromScene: (scene: Scene3D) => void
     show: () => void
     hide: () => void
+    id: string
 }
 
-interface GhostVehicleConfig {
+export interface GhostVehicleConfig {
     vehicleType: VehicleType
     color: string
+    // in mutliplayer, has to be userId
+    id: string
+    notOpague?: boolean
 }
 
 export class GhostVehicle implements IGhostVehicle {
@@ -31,9 +36,10 @@ export class GhostVehicle implements IGhostVehicle {
     rotation: Quaternion
     isReady: boolean;
     vehicle: ExtendedObject3D
-
+    id: string
 
     constructor(config: GhostVehicleConfig) {
+        this.id = config.id
         this.config = config
         this.position = new Vector3(0, 0, 0)
         this.rotation = new Quaternion(0, 0, 0, 0)
@@ -49,7 +55,8 @@ export class GhostVehicle implements IGhostVehicle {
     }
 
     addToScene(scene: Scene3D) {
-
+        // start with no collision
+        // scene.physics.add.existing(this.vehicle, { mass: vehicleConfigs[this.config.vehicleType].mass, collisionFlags: 6, shape: "convex" })
         scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "box" })
         scene.scene.add(this.vehicle)
     }
@@ -65,13 +72,19 @@ export class GhostVehicle implements IGhostVehicle {
         this.vehicle.setRotationFromQuaternion(rotation)
     };
 
+    setSimpleRotation(r: { x: number, y: number, z: number, w: number }) {
+        if (!this.isReady) return
+        this.rotation.set(r.x, r.y, r.z, r.w)
+        this.vehicle.setRotationFromQuaternion(this.rotation)
+    }
+
     setPosition(position: Vector3) {
         if (!this.isReady) return
         this.position = position
-        // console.log("setting pos", position.x.toFixed(2), position.z.toFixed(2))
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
         this.vehicle.position.set(position.x, position.y, position.z)
+        this.vehicle.body.needUpdate = true
     };
 
     hide() {
@@ -96,7 +109,9 @@ export class GhostVehicle implements IGhostVehicle {
                 let opacity = 0.2
                 for (let child of gltf.scene.children) {
                     if (child.type === "Mesh" || child.type === "Group") {
-                        makeObjectOpague(child as ExtendedObject3D);
+                        if (!this.config.notOpague) {
+                            makeObjectOpague(child as ExtendedObject3D);
+                        }
 
 
                         if (child.name.includes("chassis")) {

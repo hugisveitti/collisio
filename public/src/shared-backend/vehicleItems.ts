@@ -1,4 +1,4 @@
-import { VehicleType } from "./shared-stuff"
+import { VehicleColorType, VehicleType } from "./shared-stuff"
 
 export type ItemType = "exhaust" | "spoiler" | "wheelGuards"
 export const possibleVehicleItemTypes: ItemType[] = ["exhaust", "spoiler", "wheelGuards"]
@@ -68,6 +68,7 @@ export const possibleVehicleMods: { name: string, type: VehicleProps, max: numbe
 
 export interface VehicleSetup {
     vehicleType: VehicleType
+    vehicleColor: VehicleColorType
     exhaust?: ItemProperties // filename or id
     spoiler?: ItemProperties
     wheelGuards?: ItemProperties

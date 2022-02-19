@@ -25,6 +25,7 @@ import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
 import ControlsRoomComponent from "../mobile/ControlsRoomComponent";
 import { UserContext } from "../providers/UserProvider";
 import {
+  defaultVehicleColorType,
   GameActions,
   IPlayerInfo,
   MobileControls,
@@ -176,7 +177,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
               ...newPlayer,
               isLeader: true,
               isConnected: true,
-              mobileControls: controller,
               vehicleSetup: setups[settings.vehicleSettings.vehicleType],
             };
             console.log("player", player);
@@ -202,8 +202,8 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         ...newPlayer,
         isLeader: true,
         isConnected: true,
-        mobileControls: controller,
         vehicleSetup: {
+          vehicleColor: defaultVehicleColorType,
           vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
         },
       };

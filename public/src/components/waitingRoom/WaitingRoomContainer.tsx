@@ -84,7 +84,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         gameSettings: toSaveGameSettings as IGameSettings,
         players: toSavePlayers.map(playerInfoToPreGamePlayerInfo),
         date: getDateNow(),
-        canceledGame: false,
+        canceledGame: window.location.href !== gameRoomPath,
       };
       saveRoom(roomInfo);
     }

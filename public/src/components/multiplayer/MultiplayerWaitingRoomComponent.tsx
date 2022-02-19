@@ -7,21 +7,26 @@ import { getLocalUid } from "../../classes/localStorage";
 import { IUser } from "../../classes/User";
 import { green4 } from "../../providers/theme";
 import {
-  IMultPlayerInfo,
   m_fs_game_settings_changed,
   m_fs_game_starting,
   m_fs_room_info,
-  m_fs_start_game_from_leader_callback,
+  m_ts_go_to_game_room_from_leader_callback,
   m_ts_game_settings_changed,
   m_ts_in_waiting_room,
-  m_ts_start_game_from_leader,
+  m_ts_go_to_game_room_from_leader,
 } from "../../shared-backend/multiplayer-shared-stuff";
+import {
+  IPlayerInfo,
+  mts_user_settings_changed,
+} from "../../shared-backend/shared-stuff";
 import { getSocket } from "../../utils/connectSocket";
+import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
 import CopyTextButton from "../inputs/CopyTextButton";
 import {
   getMultiplayerGameRoomPath,
+  getMultiplayerWaitingRoom,
   multiplayerConnectPagePath,
 } from "../Routes";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
@@ -40,22 +45,33 @@ const MultiplayerWaitingRoomComponent = (
   props: IMultiplayerWaitingRoomComponent
 ) => {
   const socket = getSocket();
-  const [players, setPlayers] = useState([] as IMultPlayerInfo[]);
+
   const [isLeader, setIsLeader] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
 
   const userId = props.user?.uid ?? getLocalUid();
   useEffect(() => {
+    const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
+    const vehicleSetup =
+      props.store.vehiclesSetup?.[vehicleType] ??
+      defaultVehiclesSetup[vehicleType];
+
+    socket.emit(mts_user_settings_changed, {
+      vehicleSetup,
+      userSettings: props.store.userSettings,
+    });
     socket.emit(m_ts_in_waiting_room, {});
     socket.on(m_fs_room_info, ({ players: _players, gameSettings }) => {
       if (Object.keys(gameSettings).length > 0) {
         props.store.setGameSettings(gameSettings);
       }
-      setPlayers(_players);
+      console.log("setting players", _players);
+      props.store.setPlayers(_players);
       for (let i = 0; i < _players.length; i++) {
         if (_players[i].id === userId) {
           setIsLeader(_players[i].isLeader);
+          props.store.setPlayer(_players[i]);
         }
       }
     });
@@ -76,13 +92,13 @@ const MultiplayerWaitingRoomComponent = (
 
     return () => {
       socket.off(m_fs_room_info);
-      socket.off(m_fs_start_game_from_leader_callback);
+      socket.off(m_ts_go_to_game_room_from_leader_callback);
     };
   }, []);
 
   const handleStartGame = () => {
-    socket.emit(m_ts_start_game_from_leader, {});
-    socket.once(m_fs_start_game_from_leader_callback, (res) => {
+    socket.emit(m_ts_go_to_game_room_from_leader, {});
+    socket.once(m_ts_go_to_game_room_from_leader_callback, (res) => {
       if (res.status === "error") {
         toast.error(res.message);
         return;
@@ -103,7 +119,12 @@ const MultiplayerWaitingRoomComponent = (
         </p>
       </Grid>
       <Grid item xs={12}>
-        <CopyTextButton infoText="Copy Room link" copyText="Link copied!" />
+        <CopyTextButton
+          infoText="Copy Room link"
+          copyText={
+            window.location.href + getMultiplayerWaitingRoom(props.store.roomId)
+          }
+        />
       </Grid>
 
       {isLeader && (
@@ -120,7 +141,7 @@ const MultiplayerWaitingRoomComponent = (
         </Grid>
       )}
       <Grid item xs={12}>
-        <MultPlayerList players={players} userId={userId} />
+        <MultPlayerList players={props.store.players} userId={userId} />
       </Grid>
 
       {isLeader ? (

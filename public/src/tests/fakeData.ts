@@ -1,5 +1,5 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { defaultGameSettings, getLocalGameSetting } from "../classes/localGameSettings";
+import { defaultGameSettings } from "../classes/localGameSettings";
 import { saveRaceData, saveRaceDataGame } from "../firebase/firestoreGameFunctions";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
@@ -83,7 +83,7 @@ export const createFakeHighscoreData = () => {
                 totalPing: -1,
                 totalPingsGotten: -1,
                 avgFps: -1,
-                vehicleSetup: { vehicleType: "normal" }
+                vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" }
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",
@@ -124,67 +124,51 @@ export const createFakeHighscoreData = () => {
 export const fakePlayer1: IPlayerInfo = {
     playerName: "1test tester testersen",
     isLeader: true,
-    teamName: "test",
     playerNumber: 0,
-    mobileControls: new MobileControls(),
-    vehicleControls: new VehicleControls(),
-    teamNumber: 0,
     id: "0",
     isAuthenticated: false,
     vehicleType: "future",
     isConnected: true,
     photoURL: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Bart_-_Good_Night.png/200px-Bart_-_Good_Night.png",
-    vehicleSetup: { vehicleType: "f1" }
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#bf923b" }
 };
 
 export const fakePlayer2: IPlayerInfo = {
     playerName: "2test2 tester testersen",
     isLeader: true,
-    teamName: "test",
     playerNumber: 1,
-    mobileControls: new MobileControls(),
-    vehicleControls: new VehicleControls(),
-    teamNumber: 0,
     id: "1",
     isAuthenticated: false,
     vehicleType: "f1",
     isConnected: true,
     photoURL: "",
-    vehicleSetup: { vehicleType: "f1" }
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" }
 
 };
 
 export const fakePlayer3: IPlayerInfo = {
     playerName: "3test3 tester testersen",
     isLeader: true,
-    teamName: "test",
     playerNumber: 2,
-    mobileControls: new MobileControls(),
-    vehicleControls: new VehicleControls(),
-    teamNumber: 0,
     id: "2",
     isAuthenticated: false,
     vehicleType: "f1",
     isConnected: true,
 
     photoURL: "",
-    vehicleSetup: { vehicleType: "f1" }
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" }
 
 };
 
 export const fakePlayer4: IPlayerInfo = {
     playerName: "4test4",
     isLeader: true,
-    teamName: "test",
     playerNumber: 3,
-    mobileControls: new MobileControls(),
-    vehicleControls: new VehicleControls(),
-    teamNumber: 0,
     id: "3",
     isAuthenticated: false,
     vehicleType: "future",
     isConnected: true,
     photoURL: "https://static3.srcdn.com/wordpress/wp-content/uploads/2016/12/The-Simpsons-Roasting-On-An-Open-Fire-Christmas.jpg?q=50&fit=crop&w=960&h=500&dpr=1.5"
     ,
-    vehicleSetup: { vehicleType: "future" }
+    vehicleSetup: { vehicleType: "future", vehicleColor: "#1d8a47" }
 };

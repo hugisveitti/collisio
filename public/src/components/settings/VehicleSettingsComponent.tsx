@@ -108,7 +108,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
-    socket.emit(mts_user_settings_changed, {
+    socket?.emit(mts_user_settings_changed, {
       userSettings: undefined,
       vehicleSetup,
     });
@@ -127,24 +127,34 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               store={props.store}
               value={vehicleSettings.vehicleType}
               excludedVehicles={nonactiveVehcileTypes}
-              vehicleColor={vehicleSettings.vehicleColor}
               onChange={(value) => {
                 updateVehicleSettings("vehicleType", value);
               }}
               onChangeColor={(color) => {
-                updateVehicleSettings("vehicleColor", color);
+                // updateVehicleSettings("vehicleColor", color);
+                const newVehicleSetup: VehicleSetup = {
+                  ...props.store.vehiclesSetup[vehicleSettings.vehicleType],
+                  vehicleColor: color,
+                };
+                const newVehiclesSetup = {
+                  ...props.store.vehiclesSetup,
+                };
+                newVehiclesSetup[vehicleSettings.vehicleType] = newVehicleSetup;
+                props.store.setVehiclesSetup(newVehiclesSetup);
+                sendVehicleSetupToServer(newVehicleSetup);
               }}
               onChangeVehicleItem={updateVehicleSetup}
               onUnequipAllItems={() => {
-                const newVehicleSetup = { ...props.store.vehiclesSetup };
+                const newVehiclesSetup = { ...props.store.vehiclesSetup };
 
                 for (let item of possibleVehicleItemTypes) {
-                  delete newVehicleSetup[vehicleSettings.vehicleType][item];
+                  delete newVehiclesSetup[vehicleSettings.vehicleType][item];
                 }
-                props.store.setVehiclesSetup(newVehicleSetup);
-                sendVehicleSetupToServer({
-                  vehicleType: vehicleSettings.vehicleType,
-                });
+
+                props.store.setVehiclesSetup(newVehiclesSetup);
+                sendVehicleSetupToServer(
+                  newVehiclesSetup[vehicleSettings.vehicleType]
+                );
               }}
               user={props.user}
             />

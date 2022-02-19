@@ -21,7 +21,7 @@ import {
   getSocket,
   ISocketCallback,
 } from "../../utils/connectSocket";
-import { getDeviceType } from "../../utils/settings";
+import { getDeviceType, inTestMode } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import { getMultiplayerWaitingRoom } from "../Routes";
@@ -43,7 +43,7 @@ const MultiplayerConnectRoomContainer = (
   const [isConnecting, setIsConnecting] = useState(!!socket);
   const [displayName, setDisplayName] = useState(getLocalDisplayName());
   const [roomId, setRoomId] = useState(
-    (getLocalStorageItem("roomId", "string") as string) ?? ""
+    "" //(getLocalStorageItem("roomId", "string") as string) ?? ""
   );
 
   const [creatingRoom, setCreatingRoom] = useState(!roomId);
@@ -80,6 +80,9 @@ const MultiplayerConnectRoomContainer = (
       ).then((_socket) => {
         socket = _socket;
         setIsConnecting(false);
+        if (inTestMode) {
+          handleConnectToRoom();
+        }
       });
     }
   }, [user]);

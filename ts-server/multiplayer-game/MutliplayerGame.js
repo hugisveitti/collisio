@@ -4,6 +4,19 @@ exports.handleMutliplayerSocket = void 0;
 var uuid_1 = require("uuid");
 var multiplayer_shared_stuff_1 = require("../../public/src/shared-backend/multiplayer-shared-stuff");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
+var shuffleArray = function (arr) {
+    var n = 4 * arr.length;
+    var j = 0;
+    while (j < n) {
+        for (var i = 0; i < arr.length; i++) {
+            var temp = arr[i];
+            var ri = Math.floor(Math.random() * arr.length);
+            arr[i] = arr[ri];
+            arr[ri] = temp;
+        }
+        j += 1;
+    }
+};
 var MultiplayerRoomMaster = /** @class */ (function () {
     function MultiplayerRoomMaster() {
         this.rooms = {};
@@ -62,6 +75,37 @@ var MultiplayerRoom = /** @class */ (function () {
         this.roomId = (0, uuid_1.v4)().slice(0, 4);
         this.addPlayer(leader);
         this.io = io;
+        this.startTime = 0;
+        this.isSendingVehicleInfo = false;
+        this.countdownStarted = false;
+        // in test mode 
+        if (false) {
+            var testConfig = {
+                displayName: "Test",
+                userId: "test",
+                isAuthenticated: false
+            };
+            var testPlayer = new MulitplayerPlayer(leader.desktopSocket, testConfig);
+            this.addPlayer(testPlayer);
+            var vehicleType = "tractor";
+            var testVehicleSettings = {
+                vehicleType: vehicleType,
+                steeringSensitivity: 1,
+                chaseCameraSpeed: 1,
+                cameraZoom: 1,
+                useChaseCamera: true,
+                useDynamicFOV: true,
+                noSteerNumber: 0
+            };
+            testPlayer.userSettings = {
+                vehicleSettings: testVehicleSettings
+            };
+            testPlayer.vehicleSetup = {
+                vehicleColor: "#61f72a",
+                vehicleType: vehicleType,
+            };
+            testPlayer.isReady = true;
+        }
     }
     MultiplayerRoom.prototype.setGameSettings = function (gameSettings) {
         this.gameSettings = gameSettings;
@@ -131,7 +175,7 @@ var MultiplayerRoom = /** @class */ (function () {
                 }
                 else if (this.players.length === 0) {
                     // destroy game
-                    this.deleteRoomCallback(this.roomId);
+                    this.deleteRoom();
                 }
             }
             this.sendRoomInfo();
@@ -146,9 +190,16 @@ var MultiplayerRoom = /** @class */ (function () {
                 }
             }
             if (everyoneDisconnected) {
-                this.deleteRoomCallback(this.roomId);
+                this.deleteRoom();
             }
         }
+    };
+    MultiplayerRoom.prototype.deleteRoom = function () {
+        var _a, _b;
+        this.isSendingVehicleInfo = false;
+        clearInterval((_a = this.gameInterval) === null || _a === void 0 ? void 0 : _a[Symbol.toPrimitive]());
+        clearTimeout((_b = this.countdownTimeout) === null || _b === void 0 ? void 0 : _b[Symbol.toPrimitive]());
+        this.deleteRoomCallback(this.roomId);
     };
     MultiplayerRoom.prototype.sendRoomInfo = function () {
         console.log("sending room info, player count:", this.players.length);
@@ -166,16 +217,92 @@ var MultiplayerRoom = /** @class */ (function () {
     /**
      * @returns true if can start game else false
      */
-    MultiplayerRoom.prototype.startGameFromLeader = function () {
+    MultiplayerRoom.prototype.goToGameRoomFromLeader = function () {
+        this.gameStarted = true;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var player = _a[_i];
-            player.sendGameStarting();
+            player.sendGoToGameRoom();
         }
         return true;
     };
     MultiplayerRoom.prototype.userSettingsChanged = function (data) {
         //  const data = { userId, vehicleSetup, userSettings }
         // send to other players?
+        console.log("user settings change");
+        this.sendRoomInfo();
+    };
+    MultiplayerRoom.prototype.getSpawnPosition = function () {
+        var arr = [];
+        for (var i = 0; i < this.players.length; i++) {
+            arr.push(i);
+        }
+        shuffleArray(arr);
+        var pos = {};
+        for (var i = 0; i < this.players.length; i++) {
+            pos[this.players[i].userId] = arr[i];
+        }
+        return pos;
+    };
+    MultiplayerRoom.prototype.startGameInterval = function () {
+        var _this = this;
+        if (this.isSendingVehicleInfo)
+            return;
+        this.isSendingVehicleInfo = true;
+        // dont do this if only one player
+        var obj = {};
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            obj[p.userId] = p.getVehicleInfo();
+        }
+        this.gameInterval = setInterval(function () {
+            // const arr = this.players.map(p => p.getVehicleInfo())
+            _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_vehicles_position_info, obj);
+        }, 1000 / 60); // how many times?
+    };
+    MultiplayerRoom.prototype.startGameCountDown = function () {
+        var _this = this;
+        if (this.countdownStarted)
+            return;
+        this.countdownStarted = true;
+        console.log("start game countdown");
+        var countdown = 4;
+        this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_starting, {
+            spawnPositions: this.getSpawnPosition(),
+            countdown: countdown
+        });
+        this.startGameInterval();
+        var countdownTimer = function () {
+            countdown -= 1;
+            _this.countdownTimeout = setTimeout(function () {
+                console.log("count down", countdown);
+                if (countdown > 0) {
+                    _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: countdown });
+                    countdownTimer();
+                }
+                else {
+                    console.log("countdown finished");
+                    _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: 0 });
+                    _this.countdownStarted = false;
+                    _this.startTime = Date.now();
+                }
+            }, 1000);
+        };
+        countdownTimer();
+    };
+    MultiplayerRoom.prototype.playerReady = function () {
+        // check if all players are ready
+        var everyoneReady = true;
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            if (!p.isReady) {
+                everyoneReady = false;
+            }
+        }
+        if (everyoneReady) {
+            // start game
+            console.log("every thing ready");
+            this.startGameCountDown();
+        }
     };
     return MultiplayerRoom;
 }());
@@ -190,39 +317,71 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.isAuthenticated = config.isAuthenticated;
         this.isLeader = false;
         this.isConnected = true;
+        this.isReady = false;
+        this.vehiclePositionInfo = new VehiclePositionInfo(this.userId);
         this.setupSocket();
     }
     MulitplayerPlayer.prototype.setupSocket = function () {
         this.setupDisconnectedListener();
         this.setupInWaitingRoomListener();
         this.setupUserSettingChangedListener();
+        this.setupPlayerReadyListener();
+        this.setupPingListener();
+        this.setupGetPosRotListener();
+    };
+    MulitplayerPlayer.prototype.setupPingListener = function () {
+        var _this = this;
+        this.desktopSocket.on(shared_stuff_1.dts_ping_test, function () {
+            _this.desktopSocket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
+        });
     };
     MulitplayerPlayer.prototype.setLeader = function () {
         this.isLeader = true;
         this.setupGameSettingsChangedListener();
         this.setupStartGameListener();
     };
+    MulitplayerPlayer.prototype.setupPlayerReadyListener = function () {
+        var _this = this;
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_player_ready, function () {
+            var _a;
+            console.log("player ready");
+            _this.isReady = true;
+            (_a = _this.room) === null || _a === void 0 ? void 0 : _a.playerReady();
+        });
+    };
+    MulitplayerPlayer.prototype.setupGetPosRotListener = function () {
+        var _this = this;
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_pos_rot, function (_a) {
+            var pos = _a.pos, rot = _a.rot, speed = _a.speed;
+            _this.vehiclePositionInfo.setData(pos, rot, speed);
+        });
+    };
+    MulitplayerPlayer.prototype.getVehicleInfo = function () {
+        return this.vehiclePositionInfo;
+    };
     MulitplayerPlayer.prototype.setupStartGameListener = function () {
         var _this = this;
-        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_start_game_from_leader, function () {
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_go_to_game_room_from_leader, function () {
             var _a;
-            var canStart = (_a = _this.room) === null || _a === void 0 ? void 0 : _a.startGameFromLeader();
+            var canStart = (_a = _this.room) === null || _a === void 0 ? void 0 : _a.goToGameRoomFromLeader();
             var status = "error";
             var message = "Cannot start game";
             if (canStart) {
                 status = "success";
                 message = "Can start game";
             }
-            _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_start_game_from_leader_callback, { status: status, message: message });
+            _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_ts_go_to_game_room_from_leader_callback, { status: status, message: message });
         });
     };
-    MulitplayerPlayer.prototype.sendGameStarting = function () {
+    MulitplayerPlayer.prototype.sendGoToGameRoom = function () {
         this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_starting, {});
     };
     MulitplayerPlayer.prototype.copyPlayer = function (player) {
         var _a, _b;
         console.log("copying player", player.toString());
         if (player.vehicleSetup) {
+            // @ts-ignore
+            this.vehicleSetup = {};
             for (var _i = 0, _c = Object.keys(player.vehicleSetup); _i < _c.length; _i++) {
                 var key = _c[_i];
                 // @ts-ignore
@@ -230,12 +389,16 @@ var MulitplayerPlayer = /** @class */ (function () {
             }
         }
         if (player.userSettings) {
+            // @ts-ignore
+            this.userSettings = {};
             for (var _d = 0, _e = Object.keys(player.userSettings); _d < _e.length; _d++) {
                 var key = _e[_d];
                 // @ts-ignore
                 this.userSettings[key] = player.userSettings[key];
             }
         }
+        // @ts-ignore
+        this.userSettings.vehicleSettings = {};
         for (var _f = 0, _g = Object.keys((_b = (_a = player.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings) !== null && _b !== void 0 ? _b : {}); _f < _g.length; _f++) {
             var key = _g[_f];
             // @ts-ignore
@@ -262,10 +425,11 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.on(shared_stuff_1.mts_user_settings_changed, function (_a) {
             var _b;
             var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
+            console.log("usersettings changed", vehicleSetup);
             if (userSettings) {
                 _this.userSettings = userSettings;
             }
-            if (_this.vehicleSetup) {
+            if (vehicleSetup) {
                 _this.vehicleSetup = vehicleSetup;
             }
             if (_this.vehicleSetup || _this.userSettings) {
@@ -330,3 +494,17 @@ var handleMutliplayerSocket = function (io, socket, userId) {
     roomMaster.addSocket(io, socket, userId);
 };
 exports.handleMutliplayerSocket = handleMutliplayerSocket;
+var VehiclePositionInfo = /** @class */ (function () {
+    function VehiclePositionInfo(userId) {
+        this.speed = 0;
+        this.userId = userId;
+        // this.pos = { x: 0, y: 0, z: 0 }
+        // this.rot = { x: 0, y: 0, z: 0, w: 0 }
+    }
+    VehiclePositionInfo.prototype.setData = function (pos, rot, speed) {
+        this.pos = pos;
+        this.rot = rot;
+        this.speed = speed;
+    };
+    return VehiclePositionInfo;
+}());

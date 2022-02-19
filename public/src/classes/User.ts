@@ -28,8 +28,6 @@ export interface IVehicleSettings {
 
     cameraZoom: number
 
-    vehicleColor: VehicleColorType
-
     noSteerNumber: number
 
     useDynamicFOV: boolean
@@ -41,7 +39,6 @@ export const defaultVehicleSettings = {
     useChaseCamera: true,
     vehicleType: defaultVehicleType,
     cameraZoom: 4,
-    vehicleColor: vehicleColors[0].value,
     noSteerNumber: 1,
     useDynamicFOV: true
 } as IVehicleSettings

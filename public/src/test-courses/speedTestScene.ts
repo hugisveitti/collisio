@@ -23,34 +23,44 @@ class SpeedTestScene extends GameScene {
         //const vehicleTypes: VehicleType[] = ["gokart", "future", "f1", "simpleSphere", "offRoader", "sportsCar", "tractor", "normal"]
         const vehicleTypes: VehicleType[] = ["f1", "f1", "f1", "f1", "f1", "f1", "f1"]
 
+        const sharedVehicleSetup: VehicleSetup = {
+            vehicleType: "f1",
+            vehicleColor: "#1d8a47"
+        }
         const vehicleSetups: VehicleSetup[] = [
             {
+                ...sharedVehicleSetup,
+                vehicleType: "f1",
+            },
+            {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
 
             },
             {
-                vehicleType: "f1",
-
-            },
-            {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
                 spoiler: vehicleItems["f1"]?.["spoiler1"]
             },
             {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
                 spoiler: vehicleItems["f1"]?.["spoiler2"],
                 exhaust: vehicleItems["f1"]?.["exhaust3"]
             },
             {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
                 exhaust: vehicleItems["f1"]?.["exhaust3"]
             }
             ,
             {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
                 exhaust: vehicleItems["f1"]?.["exhaust5"]
             },
             {
+                ...sharedVehicleSetup,
                 vehicleType: "f1",
                 exhaust: vehicleItems["f1"]?.["exhaust5"],
                 wheelGuards: vehicleItems["f1"]?.["wheelGuards2"],
@@ -62,12 +72,9 @@ class SpeedTestScene extends GameScene {
                 playerName: `name-${vehicleTypes[i]}`,
                 playerNumber: i,
                 vehicleType: vehicleTypes[i],
-                mobileControls: new MobileControls(),
                 photoURL: "",
                 isAuthenticated: false,
                 id: `speed-test${i}`,
-                teamName: "",
-                teamNumber: -1,
                 isLeader: i === 0,
                 isConnected: false,
                 vehicleSetup: vehicleSetups[i]

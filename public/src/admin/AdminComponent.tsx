@@ -19,6 +19,7 @@ import RoomDataTable from "./RoomDataTable";
 import AdminGameDataTable from "./AdminGameDataTable";
 import StressTestComponent from "../testMode/StressTestComponent";
 import { calculateGamesDataStats } from "./statisticsFunctions";
+import CreatedRoomsDataTable from "./CreatedRoomsDataTable";
 
 interface IAdminComponent {
   userTokenId: string;
@@ -27,8 +28,10 @@ interface IAdminComponent {
 
 const AdminComponent = (props: IAdminComponent) => {
   const [roomsInfo, setRoomsInfo] = useState([]);
+  const [createdRoomsInfo, setCreatedRoomsInfo] = useState([]);
   const [nRoomEntires, setNRoomEntires] = useState(5);
   const [roomCardOpen, setRoomCardOpen] = useState(false);
+  const [createdRoomsCardOpen, setCreatedRoomCardOpen] = useState(false);
 
   const [gamesData, setGamesData] = useState([] as IEndOfRaceInfoGame[]);
   const [gamesDataStats, setGamesDataStats] = useState([] as string[]);
@@ -40,13 +43,15 @@ const AdminComponent = (props: IAdminComponent) => {
 
   const [only24HourData, setOnly24HourData] = useState(false);
 
-  const handleGetRoomData = () => {
+  const handleGetRoomData = (useCreatedRooms?: boolean) => {
     auth.currentUser.getIdToken().then((userTokenId) => {
       const options = {
         method: "GET",
       };
 
-      fetch(`/room-data/${userTokenId}?n=${nRoomEntires}`, options)
+      let url = `/room-data/${userTokenId}?n=${nRoomEntires}&useCreatedRooms=${!!useCreatedRooms}`;
+
+      fetch(url, options)
         .then((res) => res.json())
         .then((resData) => {
           if (resData.statusCode === 200) {
@@ -58,10 +63,14 @@ const AdminComponent = (props: IAdminComponent) => {
               arr.push(data[key]);
             }
 
-            arr.sort((a: IEndOfRaceInfoGame, b: IEndOfRaceInfoGame) =>
-              a.date < b.date ? 1 : -1
-            );
-            setRoomsInfo(arr);
+            // arr.sort((a: IEndOfRaceInfoGame, b: IEndOfRaceInfoGame) =>
+            //   a.date < b.date ? 1 : -1
+            // );
+            if (useCreatedRooms) {
+              setCreatedRoomsInfo(arr);
+            } else {
+              setRoomsInfo(arr);
+            }
           } else if (resData.statusCode === 403) {
             toast.error("Unauthorized user");
             window.location.href = "/";
@@ -164,7 +173,7 @@ const AdminComponent = (props: IAdminComponent) => {
                   <Button
                     disableElevation
                     variant="contained"
-                    onClick={handleGetRoomData}
+                    onClick={() => handleGetRoomData(false)}
                   >
                     Get room data
                   </Button>
@@ -173,6 +182,61 @@ const AdminComponent = (props: IAdminComponent) => {
 
                 <Grid item xs={12}>
                   <RoomDataTable roomsInfo={roomsInfo} />
+                </Grid>
+              </Grid>
+            </Collapse>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            header="Created Rooms data"
+            title="Created Rooms data"
+            subheader="See data about the rooms"
+            action={
+              <IconButton
+                onClick={() => setCreatedRoomCardOpen(!createdRoomsCardOpen)}
+              >
+                {createdRoomsCardOpen ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+            }
+          />
+
+          <CardContent>
+            <Collapse in={createdRoomsCardOpen}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography>
+                    Created Rooms fetched: {createdRoomsInfo?.length ?? "-"}{" "}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4} sm={3}>
+                  <Typography>
+                    If not positive then will get all data
+                  </Typography>
+                </Grid>
+                <Grid item xs={4} sm={3}>
+                  <TextField
+                    type="number"
+                    value={nRoomEntires ? nRoomEntires : ""}
+                    onChange={(e) => setNRoomEntires(+e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={4} sm={3}>
+                  <Button
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleGetRoomData(true)}
+                  >
+                    Created rooms data
+                  </Button>
+                </Grid>
+                <Grid item xs={false} sm={3} />
+
+                <Grid item xs={12}>
+                  <CreatedRoomsDataTable roomsInfo={createdRoomsInfo} />
                 </Grid>
               </Grid>
             </Collapse>
