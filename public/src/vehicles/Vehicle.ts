@@ -453,7 +453,7 @@ export const changeVehicleBodyColor = (chassis: ExtendedObject3D, vehicleColors:
     // single material
     if (chassis.type === "Mesh") {
         (chassis.material as MeshStandardMaterial) = (chassis.material as MeshStandardMaterial).clone();
-        (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[0])
+        (chassis.material as MeshStandardMaterial).color = new Color(vehicleColors[0] ?? defaultVehicleColorType)
     } else {
         // Group
         // multiple materials found in children

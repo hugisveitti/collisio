@@ -24,7 +24,12 @@ import {
 import { getDeviceType, inTestMode } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
-import { getMultiplayerWaitingRoom } from "../Routes";
+import {
+  getMultiplayerControlsRoomPath,
+  getMultiplayerGameRoomPath,
+  getMultiplayerWaitingRoom,
+  multiplayerConnectPagePath,
+} from "../Routes";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
 import { getUserConfig } from "./multiplayerUtilFunctions";
@@ -63,7 +68,16 @@ const MultiplayerConnectRoomContainer = (
       }
       saveLocalStorageItem("roomId", res.data.roomId);
       props.store.setRoomId(res.data.roomId);
-      history.push(getMultiplayerWaitingRoom(res.data.roomId));
+      console.log("res", res);
+      if (res.data.gameStarted) {
+        if (onMobile) {
+          history.push(getMultiplayerControlsRoomPath(res.data.roomId));
+        } else {
+          history.push(getMultiplayerGameRoomPath(res.data.roomId));
+        }
+      } else {
+        history.push(getMultiplayerWaitingRoom(res.data.roomId));
+      }
     });
   };
 
@@ -88,7 +102,7 @@ const MultiplayerConnectRoomContainer = (
   }, [user]);
 
   return (
-    <BackdropContainer backgroundContainer>
+    <BackdropContainer backgroundContainer noMusic>
       <Grid container spacing={3}>
         {isConnecting ? (
           <>

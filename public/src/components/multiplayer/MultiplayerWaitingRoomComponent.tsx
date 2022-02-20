@@ -1,4 +1,10 @@
-import { CardContent, CardHeader, Grid, Typography } from "@mui/material";
+import {
+  CardContent,
+  CardHeader,
+  Collapse,
+  Grid,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
@@ -19,12 +25,14 @@ import {
   IPlayerInfo,
   mts_user_settings_changed,
 } from "../../shared-backend/shared-stuff";
-import { getSocket } from "../../utils/connectSocket";
+import { disconnectSocket, getSocket } from "../../utils/connectSocket";
+import { getDeviceType } from "../../utils/settings";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
 import CopyTextButton from "../inputs/CopyTextButton";
 import {
+  getMultiplayerControlsRoomPath,
   getMultiplayerGameRoomPath,
   getMultiplayerWaitingRoom,
   multiplayerConnectPagePath,
@@ -49,6 +57,8 @@ const MultiplayerWaitingRoomComponent = (
   const [isLeader, setIsLeader] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
+  const onMobile = getDeviceType() === "mobile";
+  const [moreInfo, setMoreInfo] = useState(false);
 
   const userId = props.user?.uid ?? getLocalUid();
   useEffect(() => {
@@ -82,8 +92,11 @@ const MultiplayerWaitingRoomComponent = (
 
     socket.on(m_fs_game_starting, () => {
       // go to game room
-
-      history.push(getMultiplayerGameRoomPath(props.store.roomId));
+      if (onMobile) {
+        history.push(getMultiplayerControlsRoomPath(props.store.roomId));
+      } else {
+        history.push(getMultiplayerGameRoomPath(props.store.roomId));
+      }
     });
 
     socket.on(m_fs_game_settings_changed, ({ gameSettings }) => {
@@ -112,7 +125,17 @@ const MultiplayerWaitingRoomComponent = (
 
   return (
     <>
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={4}>
+        <BackdropButton
+          link={multiplayerConnectPagePath}
+          onClick={() => {
+            disconnectSocket();
+          }}
+        >
+          Go back
+        </BackdropButton>
+      </Grid>
+      <Grid item xs={12} sm={8}>
         <p style={{ fontSize: 24 }}>
           Multiplayer waiting room{" "}
           <span style={{ backgroundColor: green4 }}>{props.store.roomId}</span>{" "}
@@ -122,7 +145,8 @@ const MultiplayerWaitingRoomComponent = (
         <CopyTextButton
           infoText="Copy Room link"
           copyText={
-            window.location.href + getMultiplayerWaitingRoom(props.store.roomId)
+            window.location.origin +
+            getMultiplayerWaitingRoom(props.store.roomId)
           }
         />
       </Grid>
@@ -140,6 +164,26 @@ const MultiplayerWaitingRoomComponent = (
           </BackdropButton>
         </Grid>
       )}
+      <Grid item xs={12}>
+        <p>
+          Use WASD or arrow keys to drive. If logged in then you can connect and
+          steer with your phone.
+        </p>
+        <BackdropButton onClick={() => setMoreInfo(!moreInfo)}>
+          {moreInfo ? "Less info" : "More info"}
+        </BackdropButton>
+      </Grid>
+      <Grid item xs={12}>
+        <Collapse in={moreInfo}>
+          <p>
+            To steer with your phone. Log in on the same account on your phone
+            and desktop. Then on your mobile, go to the same room as your
+            desktop and a small icon will appear next to your name in the
+            players list. When the game starts your phone will turn into a
+            controller!
+          </p>
+        </Collapse>
+      </Grid>
       <Grid item xs={12}>
         <MultPlayerList players={props.store.players} userId={userId} />
       </Grid>

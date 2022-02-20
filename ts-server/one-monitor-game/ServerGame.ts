@@ -34,7 +34,7 @@ import {
     IPlayerConnectedData,
     std_quit_game
 } from "../../public/src/shared-backend/shared-stuff";
-import { handleMutliplayerSocket } from "../multiplayer-game/MutliplayerGame";
+import { handleMutliplayerSocket } from "../multiplayer-game/MultiplayerGame";
 import { addCreatedRooms, removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
@@ -187,7 +187,7 @@ export default class RoomMaster {
 
             if (mode === "multiplayer") {
                 console.log("multiplayer socket")
-                handleMutliplayerSocket(this.io, socket, userId)
+                handleMutliplayerSocket(this.io, socket, deviceType)
                 return
             }
             if (isTestMode) {

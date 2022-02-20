@@ -315,6 +315,7 @@ export interface IPreGamePlayerInfo {
     vehicleType: VehicleType
     photoURL: string
     vehicleSetup: VehicleSetup
+    mobileConnected?: boolean
 }
 
 

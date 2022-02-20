@@ -86,18 +86,22 @@ export const addKeyboardControls = (vehicleControls: VehicleControls) => {
 
         switch (e.key) {
             case "w":
+            case "W":
             case "ArrowUp":
                 vehicleControls.f = isDown
                 break;
             case "d":
+            case "D":
             case "ArrowRight":
                 vehicleControls.right = isDown
                 break;
             case "a":
+            case "A":
             case "ArrowLeft":
                 vehicleControls.left = isDown
                 break;
             case "s":
+            case "S":
             case "ArrowDown":
             case " ":
                 vehicleControls.b = isDown

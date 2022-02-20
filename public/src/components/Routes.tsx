@@ -39,6 +39,7 @@ import BuyCoinsComponent from "./monitary/BuyCoinsComponent";
 import BuyPremiumComponent from "./monitary/BuyPremiumComponent";
 import PaymentCallbackContainer from "./monitary/PaymentCallbackContainer";
 import MultiplayerConnectRoomContainer from "./multiplayer/MultiplayerConnectRoomContainer";
+import MultiplayerControlsRoomContainer from "./multiplayer/MultiplayerControlsRoomContainer";
 import MultiplayerWaitingRoomContainer from "./multiplayer/MultiplayerWaitingRoomContainer";
 import MultiplayerGameRoom from "./multiplayerGameRoom/MuliplayerGameRoom";
 import NotFoundPage from "./NotFoundPage";
@@ -87,8 +88,14 @@ export const successfullPaymentPagePath = "/successfulpayment";
 export const cancelPaymentPagePath = "/cancelpayment";
 export const multiplayerConnectPagePath = "/multiplayer";
 export const multiplayerRoomIdPagePath = "/multiplayer/:roomId";
-export const multiplayerGameRoomIdPagePath = "/playmultiplayer/:roomId";
-const multiplayerGameRoomPagePath = "/playmultiplayer";
+export const multiplayerGameRoomIdPagePath = "/multiplayer/game/:roomId";
+const multiplayerControlsRoomIdPagePath = "/multiplayer/controls/:roomId";
+const multiplayerControlsPagePath = "/multiplayer/controls";
+
+const multiplayerGameRoomPagePath = "/multiplayer/game";
+
+export const getMultiplayerControlsRoomPath = (roomId: string) =>
+  `${multiplayerControlsPagePath}/${roomId}`;
 
 export const getMultiplayerGameRoomPath = (roomId: string) =>
   `${multiplayerGameRoomPagePath}/${roomId}`;
@@ -326,6 +333,17 @@ const Routes = () => {
           )}
         />
         <Route
+          path={[
+            multiplayerControlsRoomIdPagePath,
+            multiplayerControlsPagePath,
+          ]}
+          render={(props) => <MultiplayerControlsRoomContainer store={store} />}
+        />
+        <Route
+          path={[multiplayerGameRoomIdPagePath, multiplayerGameRoomPagePath]}
+          render={(props) => <MultiplayerGameRoom {...props} store={store} />}
+        />
+        <Route
           path={multiplayerRoomIdPagePath}
           render={(props) => (
             <MultiplayerWaitingRoomContainer {...props} store={store} />
@@ -337,10 +355,7 @@ const Routes = () => {
             <MultiplayerConnectRoomContainer {...props} store={store} />
           )}
         />
-        <Route
-          path={[multiplayerGameRoomIdPagePath, multiplayerGameRoomPagePath]}
-          render={(props) => <MultiplayerGameRoom {...props} store={store} />}
-        />
+
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />
       </Switch>
     </Router>

@@ -356,24 +356,6 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
             )}
           </div>
         </div>
-
-        {/* <div
-          id="orientation-info"
-          style={{
-            ...infoStyles,
-            display: "none",
-            transform: isPortrait ? "rotate(-90deg)" : "",
-            top: 0,
-          }}
-        >
-          Beta:{orientation.beta.toFixed(0)}
-          <br />
-          Gamma:{orientation.gamma.toFixed(0)}
-          <br />
-          Alpha:{orientation.alpha.toFixed(0)}
-          <br />
-          {getSteeringDirection()}
-        </div> */}
       </div>
     </React.Fragment>
   );

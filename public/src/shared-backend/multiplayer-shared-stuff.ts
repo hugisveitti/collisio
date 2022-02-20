@@ -48,4 +48,5 @@ export const m_ts_restart_game = "m_ts_restart_game"
 // if vehicle change or track change
 export const m_fs_reload_game = "m_fs_reload_game"
 
-
+export const m_fs_mobile_controls = "m_fs_mobile_controls"
+export const m_fs_mobile_controller_disconnected = "m_fs_mobile_controller_disconnected"

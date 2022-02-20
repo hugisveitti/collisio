@@ -126,15 +126,39 @@ export class Course implements ICourse {
             })
         }
 
+        console.log("usablespawns", usableSpawns)
+        let position: Vector3
+        let rotation: Quaternion
+        if (spawnPosition > usableSpawns.length - 1) {
+            console.log("spawn pos over useable spawns")
+            // need to find the largest spawn number it can use
+            // e.g. if there are 2 usable spawns and spawnPosition is 3 (index 2) then we find spawn 1 
+            // and the position will be behind spawn 1 relative to the aligner, plus offset
+            const usableSpawnIndex = usableSpawns.length === 1 ? 0 : usableSpawns.length - 2 + (spawnPosition % 2)
+            console.log("usablespawn index", usableSpawnIndex)
+            const usablePosition = spawnAligns[usableSpawnIndex].spawn
+            let aligner = spawnAligns[usableSpawnIndex].align
+            rotation = this.calcSpawnAngle(aligner, usablePosition)
+            const alpha = 2 * Math.asin(rotation.y)
+            const offSet = Math.floor(spawnPosition / 2 - 1) + 1
+            const offSetLength = 13
+            position = new Vector3(0, 0, 0)
+            position.set(
+                usablePosition.x - ((Math.sin(alpha) * (offSet * offSetLength)) * Math.sign(rotation.w)),
+                usablePosition.y,
+                usablePosition.z - ((Math.cos(alpha) * (offSet * offSetLength)))
+            )
+            console.log("position", position, "usablePosition", usablePosition)
+        } else {
+            position = spawnAligns[spawnPosition].spawn
+            let aligner = spawnAligns[spawnPosition].align
+            rotation = this.calcSpawnAngle(aligner, position)
+        }
 
-        const p = spawnAligns[spawnPosition].spawn
-        const r = spawnAligns[spawnPosition].spawn
 
-        let aligner = spawnAligns[spawnPosition].align
 
-        let rotation = this.calcSpawnAngle(aligner, p)
 
-        vehicle.setCheckpointPositionRotation({ position: p, rotation });
+        vehicle.setCheckpointPositionRotation({ position, rotation });
         vehicle.resetPosition();
         vehicle.stop();
     }
