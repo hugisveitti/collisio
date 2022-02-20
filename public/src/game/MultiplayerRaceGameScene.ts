@@ -259,8 +259,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
     setupMobileControlsListener() {
         this.socket.on(m_fs_mobile_controls, (mobileControls: MobileControls) => {
-            driveVehicle(mobileControls, this.vehicle)
-            this.usingMobileController = true
+            if (this.vehicle) {
+                driveVehicle(mobileControls, this.vehicle)
+                this.usingMobileController = true
+            }
         })
     }
 

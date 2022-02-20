@@ -24,6 +24,7 @@ import {
 import { getDeviceType, inTestMode } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
+import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import {
   getMultiplayerControlsRoomPath,
   getMultiplayerGameRoomPath,
@@ -115,6 +116,9 @@ const MultiplayerConnectRoomContainer = (
           </>
         ) : (
           <>
+            <Grid item xs={12}>
+              <ToFrontPageButton />
+            </Grid>
             <Grid item xs={12}>
               <Typography>Connect to multiplayer room</Typography>
             </Grid>

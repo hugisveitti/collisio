@@ -176,6 +176,9 @@ const TrackSelect = (props: ITrackSelect) => {
               <TokenComponent user={user} store={props.store} />
             </Grid>
             <Grid item xs={12}>
+              {renderOwnership()}
+            </Grid>
+            <Grid item xs={12}>
               <div>
                 {largeImage ? (
                   <img style={{ maxWidth: "100%" }} src={largeImage} />
@@ -183,9 +186,6 @@ const TrackSelect = (props: ITrackSelect) => {
                   <p>No preview available</p>
                 )}
               </div>
-            </Grid>
-            <Grid item xs={12}>
-              {renderOwnership()}
             </Grid>
           </Grid>
         </Grid>

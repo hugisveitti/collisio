@@ -21,6 +21,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.isFinished = false;
         this.mobileConnected = false;
         this.totalTime = 0;
+        this.isSendingMobileControls = false;
         this.mobileControls = {};
         this.setupSocket();
     }
@@ -196,13 +197,29 @@ var MulitplayerPlayer = /** @class */ (function () {
         if (!this.mobileSocket)
             return;
         console.log("turn off mobileSocket");
+        this.isSendingMobileControls = false;
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.mobileSocket.removeAllListeners();
         this.mobileSocket.disconnect();
     };
+    MulitplayerPlayer.prototype.setupGameActionsListener = function () {
+        var _this = this;
+        var _a;
+        (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(shared_stuff_1.mts_send_game_actions, function (gameActions) {
+            var _a;
+            if (gameActions === null || gameActions === void 0 ? void 0 : gameActions.restartGame) {
+                (_a = _this.room) === null || _a === void 0 ? void 0 : _a.restartGame();
+            }
+        });
+    };
     MulitplayerPlayer.prototype.setupMobileControler = function () {
         var _this = this;
         var _a;
+        if (this.isSendingMobileControls) {
+            console.log("is already sending controls", this.displayName);
+            return;
+        }
+        this.isSendingMobileControls = true;
         (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(shared_stuff_1.mts_controls, function (mobileControls) {
             _this.mobileControls = mobileControls;
             _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_mobile_controls, mobileControls);
@@ -213,6 +230,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         var _a;
         (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on("disconnect", function () {
             var _a;
+            _this.isSendingMobileControls = false;
             console.log("#####mobile socket disconnected");
             _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_mobile_controller_disconnected, {});
             _this.mobileSocket = undefined;

@@ -67,7 +67,7 @@ const MultiplayerControlsRoomComponent = (
         alpha,
       });
       // set fps
-    }, MTS_SENDINTERVAL_MS);
+    }, 1000 / 45);
 
     setSendControlsInterval(_sendControlsInterval);
   };
@@ -83,29 +83,30 @@ const MultiplayerControlsRoomComponent = (
   };
 
   const handleSendGameSettings = () => {
-    if (!props.store.player.isLeader) {
-      setSettingsModalOpen(false);
-      setGameSettingsLoading(false);
-      return;
-    }
+    // if (!props.store.player.isLeader) {
+    //   setSettingsModalOpen(false);
+    //   setGameSettingsLoading(false);
+    //   return;
+    // }
     socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
     });
-    setGameSettingsLoading(true);
+    sendGameActions();
+    // setGameSettingsLoading(true);
 
-    /** if the modal doesn't close, then just close it*/
-    const timout = setTimeout(() => {
-      setSettingsModalOpen(false);
-      setGameSettingsLoading(false);
-    }, 1000);
+    // /** if the modal doesn't close, then just close it*/
+    // const timout = setTimeout(() => {
+    //   setSettingsModalOpen(false);
+    //   setGameSettingsLoading(false);
+    // }, 1000);
 
-    socket.once(stm_game_settings_changed_callback, () => {
-      clearTimeout(timout);
-      setSettingsModalOpen(false);
-      setGameSettingsLoading(false);
-      //   gameActions.pause = false;
-      sendGameActions();
-    });
+    // socket.once(stm_game_settings_changed_callback, () => {
+    //   clearTimeout(timout);
+    //   setSettingsModalOpen(false);
+    //   setGameSettingsLoading(false);
+    //   //   gameActions.pause = false;
+    //   sendGameActions();
+    // });
   };
 
   const sendGameActions = () => {

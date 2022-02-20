@@ -1,7 +1,7 @@
 import { Socket } from "socket.io"
 import { IUserSettings } from "../../public/src/classes/User"
 import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_game_settings_changed, m_fs_game_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected } from "../../public/src/shared-backend/multiplayer-shared-stuff"
-import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls } from "../../public/src/shared-backend/shared-stuff"
+import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { MultiplayerRoom } from "./MultiplayerGame"
 
@@ -40,6 +40,7 @@ export class MulitplayerPlayer {
     totalTime: number
 
     mobileControls: MobileControls
+    isSendingMobileControls: boolean
 
     constructor(desktopSocket: Socket, config: MultiplayPlayerConfig) {
         this.desktopSocket = desktopSocket
@@ -58,6 +59,7 @@ export class MulitplayerPlayer {
         this.isFinished = false
         this.mobileConnected = false
         this.totalTime = 0
+        this.isSendingMobileControls = false
 
         this.mobileControls = {}
 
@@ -237,12 +239,27 @@ export class MulitplayerPlayer {
     turnOffMobileSocket() {
         if (!this.mobileSocket) return
         console.log("turn off mobileSocket")
+        this.isSendingMobileControls = false
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.mobileSocket.removeAllListeners()
         this.mobileSocket.disconnect()
     }
 
+    setupGameActionsListener() {
+        this.mobileSocket?.on(mts_send_game_actions, (gameActions) => {
+            if (gameActions?.restartGame) {
+                this.room?.restartGame()
+            }
+        })
+    }
+
     setupMobileControler() {
+        if (this.isSendingMobileControls) {
+            console.log("is already sending controls", this.displayName)
+            return
+        }
+        this.isSendingMobileControls = true
+
         this.mobileSocket?.on(mts_controls, (mobileControls) => {
             this.mobileControls = mobileControls
             this.desktopSocket.emit(m_fs_mobile_controls, mobileControls)
@@ -251,6 +268,7 @@ export class MulitplayerPlayer {
 
     setupMobileDisconnectedListener() {
         this.mobileSocket?.on("disconnect", () => {
+            this.isSendingMobileControls = false
             console.log("#####mobile socket disconnected")
             this.desktopSocket.emit(m_fs_mobile_controller_disconnected, {})
             this.mobileSocket = undefined
