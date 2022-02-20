@@ -98,8 +98,9 @@ const GarageComponent = (props: IGarageComponent) => {
       vehicleColor: defaultVehicleColorType,
     }
   );
+
   const [selectedVehicleColor, setSelectedVehicleColor] = useState(
-    selectedVehicleSetup.vehicleColor
+    selectedVehicleSetup?.vehicleColor ?? defaultVehicleColorType
   );
 
   const [selectedItem, setSelectedItem] = useState(

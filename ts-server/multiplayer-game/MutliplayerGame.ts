@@ -1,10 +1,11 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
 import { IUserSettings, IVehicleSettings } from "../../public/src/classes/User";
-import { m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_settings_changed, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room, m_ts_game_settings_changed, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_ts_in_waiting_room, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_race_info, m_fs_game_finished, m_ts_restart_game } from "../../public/src/shared-backend/multiplayer-shared-stuff";
+import { m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_settings_changed, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room, m_ts_game_settings_changed, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_ts_in_waiting_room, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_race_info, m_fs_game_finished, m_ts_restart_game, m_fs_reload_game } from "../../public/src/shared-backend/multiplayer-shared-stuff";
 import { dts_ping_test, IPlayerInfo, mts_user_settings_changed, std_ping_test_callback, stmd_socket_ready } from "../../public/src/shared-backend/shared-stuff";
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems";
 import { Player } from "../one-monitor-game/ServerPlayer";
+import { addCreatedRooms } from "../serverFirebaseFunctions";
 
 const shuffleArray = (arr: any[]) => {
     const n = 4 * arr.length;
@@ -83,6 +84,7 @@ class MultiplayerRoom {
     isSendingVehicleInfo: boolean
     countdownStarted: boolean;
     numberOfLaps: number
+    needsReload: boolean
 
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
@@ -97,9 +99,19 @@ class MultiplayerRoom {
         this.io = io
         this.startTime = 0
         this.isSendingVehicleInfo = false
+        let ip = leader.desktopSocket.handshake.headers['x-forwarded-for'] ?? leader.desktopSocket.conn.remoteAddress
+        if (Array.isArray(ip)) {
+            console.log("ip is a list", ip)
+            ip = ip.join("")
+        }
+        addCreatedRooms(ip, this.roomId, this.roomId, { multiplayer: true })
 
         this.numberOfLaps = -1
         this.countdownStarted = false
+        this.needsReload = false
+
+
+
         // in test mode 
         if (false) {
             const testConfig: PlayerConfig = {
@@ -130,17 +142,31 @@ class MultiplayerRoom {
         }
     }
 
+    setNeedsReload() {
+        this.needsReload = true
+    }
+
+    reloadGame() {
+        this.io.to(this.roomId).emit(m_fs_reload_game, {
+            players: this.getPlayersInfo(),
+            gameSettings: this.gameSettings
+        })
+    }
+
     setGameSettings(gameSettings: any) {
-        this.gameSettings = gameSettings
+        if (this.gameSettings.trackName !== gameSettings.trackName) {
+            this.gameSettings = gameSettings
+            this.setNeedsReload()
+        } else {
+            this.gameSettings = gameSettings
+        }
         // set number of laps when game starts
     }
 
     addPlayer(player: MulitplayerPlayer) {
         // check if player exists
         const idx = this.getPlayerIndex(player.userId)
-        console.log("idx", idx)
         if (idx !== undefined) {
-            console.log("player exists")
             player.copyPlayer(this.players[idx])
             // cannot disconnect here
             //this.players[idx].desktopSocket.disconnect()
@@ -163,7 +189,6 @@ class MultiplayerRoom {
 
 
         if (this.gameStarted) {
-            console.log("Game started, cannot add", player.displayName)
             player.desktopSocket.emit(m_fs_connect_to_room_callback, {
                 message: "Cannot join a game that has started",
                 status: "error",
@@ -195,7 +220,6 @@ class MultiplayerRoom {
     }
 
     playerDisconnected(userId: string) {
-        console.log("player disconnected in room", this.roomId)
         // check if all players have disconnected
         if (!this.gameStarted) {
             const idx = this.getPlayerIndex(userId)
@@ -233,7 +257,6 @@ class MultiplayerRoom {
     }
 
     sendRoomInfo() {
-        console.log("sending room info, player count:", this.players.length)
         this.io.to(this.roomId).emit(m_fs_room_info, { players: this.getPlayersInfo(), gameSettings: this.gameSettings })
     }
 
@@ -262,7 +285,6 @@ class MultiplayerRoom {
     userSettingsChanged(data: any) {
         //  const data = { userId, vehicleSetup, userSettings }
         // send to other players?
-        console.log("user settings change")
         this.sendRoomInfo()
 
     }
@@ -298,7 +320,6 @@ class MultiplayerRoom {
 
     startGame() {
         this.numberOfLaps = this.gameSettings.numberOfLaps
-        console.log("countdown finished")
         this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
         this.countdownStarted = false
         this.startTime = Date.now()
@@ -308,13 +329,17 @@ class MultiplayerRoom {
         for (let p of this.players) {
             p.restartGame()
         }
-        //  this.startGameCountDown()
+        if (this.needsReload) {
+            this.reloadGame()
+        } else {
+            this.startGameCountDown()
+        }
     }
 
     startGameCountDown() {
         if (this.countdownStarted) return
         this.countdownStarted = true
-        console.log("start game countdown")
+        this.needsReload = false
         let countdown = 4
 
         this.io.to(this.roomId).emit(m_fs_game_starting, {
@@ -327,7 +352,6 @@ class MultiplayerRoom {
         const countdownTimer = () => {
             countdown -= 1
             this.countdownTimeout = setTimeout(() => {
-                console.log("count down", countdown)
                 if (countdown > 0) {
                     this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown })
                     countdownTimer()
@@ -349,7 +373,6 @@ class MultiplayerRoom {
         }
         if (everyoneReady) {
             // start game
-            console.log("every thing ready")
             this.startGameCountDown()
         }
     }
@@ -481,7 +504,6 @@ class MulitplayerPlayer {
 
     setupPlayerReadyListener() {
         this.desktopSocket.on(m_ts_player_ready, () => {
-            console.log("player ready")
             this.isReady = true
             this.room?.playerReady()
         })
@@ -501,6 +523,10 @@ class MulitplayerPlayer {
         this.lapNumber = 0
         this.latestLapTime = 0
         this.isFinished = false
+    }
+
+    reloadGame() {
+        this.restartGame()
 
     }
 
@@ -530,7 +556,6 @@ class MulitplayerPlayer {
 
 
     copyPlayer(player: MulitplayerPlayer) {
-        console.log("copying player", player.toString())
         if (player.vehicleSetup) {
             // @ts-ignore
             this.vehicleSetup = {}
@@ -577,6 +602,9 @@ class MulitplayerPlayer {
             userSettings, vehicleSetup
         }) => {
             if (userSettings) {
+                if (this.userSettings?.vehicleSettings.vehicleType !== userSettings?.vehicleSettings.vehicleType) {
+                    this.room?.setNeedsReload()
+                }
                 this.userSettings = userSettings
             }
             if (vehicleSetup) {
@@ -585,6 +613,7 @@ class MulitplayerPlayer {
 
             if (this.vehicleSetup || this.userSettings) {
                 this.room?.userSettingsChanged({ userId: this.userId, vehicleSetup: this.vehicleSetup, userSettings: this.userSettings })
+
             }
         })
     }
@@ -638,6 +667,7 @@ class MulitplayerPlayer {
     }
 
     getPlayerInfo() {
+        console.log("sending player info", this.userSettings?.vehicleSettings.vehicleType)
         return {
             playerName: this.displayName,
             isLeader: this.isLeader,

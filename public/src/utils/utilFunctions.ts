@@ -71,6 +71,9 @@ export const numberScaler = (a: number, b: number, min: number, max: number, pre
     }
 }
 
+/**
+ * 
+ */
 export const logScaler = (a: number, min: number, max: number) => {
     return (num: number) => {
         return Math.min(Math.max(Math.log2((2 / a) * num), min), max)

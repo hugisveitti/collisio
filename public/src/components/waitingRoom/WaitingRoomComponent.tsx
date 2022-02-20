@@ -16,6 +16,7 @@ import {
   mdts_start_game,
   std_start_game_callback,
 } from "../../shared-backend/shared-stuff";
+import { stopMusic } from "../../sounds/gameSounds";
 import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";

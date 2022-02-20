@@ -11,6 +11,7 @@ import {
   m_ts_game_settings_changed,
   m_ts_restart_game,
 } from "../../shared-backend/multiplayer-shared-stuff";
+import { stopMusic } from "../../sounds/gameSounds";
 import { getSocket } from "../../utils/connectSocket";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
@@ -52,10 +53,14 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   }
 
   const handleEscPressed = () => {
+    console.log("Esc");
     setSettingsModalOpen(true);
   };
 
   useEffect(() => {
+    stopMusic();
+    clearBackdropCanvas();
+
     console.log("store", props.store);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
     const vehicleSetup =
@@ -76,8 +81,8 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
       gameObject = g;
     });
 
-    clearBackdropCanvas();
     return () => {
+      console.log("game room umounted");
       socket.disconnect();
       gameObject?.destroyGame();
     };
@@ -85,6 +90,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
     socket.emit(m_ts_game_settings_changed, { gameSettings: newGameSettings });
+    gameObject.setGameSettings(newGameSettings);
   };
 
   // gamesettings modal only for LEADEr?
@@ -118,6 +124,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
           socket.emit(m_ts_restart_game, {});
           setSettingsModalOpen(false);
         }}
+        showVehicleSettings
       />
     </React.Fragment>
   );

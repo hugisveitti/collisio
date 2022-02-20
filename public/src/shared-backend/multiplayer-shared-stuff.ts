@@ -45,3 +45,7 @@ export const m_fs_game_finished = "m_fs_game_finished"
 export const m_fs_race_info = "m_fs_race_info"
 export const m_ts_restart_game = "m_ts_restart_game"
 
+// if vehicle change or track change
+export const m_fs_reload_game = "m_fs_reload_game"
+
+

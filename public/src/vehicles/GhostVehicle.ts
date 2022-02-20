@@ -18,6 +18,7 @@ export interface IGhostVehicle {
     removeFromScene: (scene: Scene3D) => void
     show: () => void
     hide: () => void
+    changeColor: (color: VehicleColorType) => void
     id: string
 }
 
@@ -52,6 +53,11 @@ export class GhostVehicle implements IGhostVehicle {
             console.warn("Round betty not suported as ghost!")
             this.config.vehicleType = "normal"
         }
+    }
+
+    changeColor(color: VehicleColorType) {
+        this.config.color = color
+        changeVehicleBodyColor(this.vehicle, [this.config.color] as VehicleColorType[])
     }
 
     addToScene(scene: Scene3D) {

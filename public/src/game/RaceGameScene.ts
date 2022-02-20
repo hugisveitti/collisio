@@ -372,8 +372,6 @@ export class RaceGameScene extends GameScene {
             }
 
             const { position, rotation } = this.course.getCheckpointPositionRotation(checkpointNumber)
-
-
             this.vehicles[vehicleNumber].setCheckpointPositionRotation({ position: { x: position.x, y: position.y + 1, z: position.z }, rotation: rotation })
         }
     }

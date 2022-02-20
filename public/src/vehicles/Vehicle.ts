@@ -31,6 +31,7 @@ export interface IVehicleClassConfig {
     useSoundEffects?: boolean
     vehicleSetup?: VehicleSetup
     id: string
+    vehicleSettings?: IVehicleSettings
 }
 
 export class Vehicle implements IVehicle {
@@ -193,6 +194,7 @@ export class Vehicle implements IVehicle {
         console.log("this.isUpdatingVehicleSetup ", this.isUpdatingVehicleSetup)
         console.log("vehiclesetup", vehicleSetup.vehicleType, vehicleSetup.exhaust?.id, vehicleSetup.wheelGuards?.id, vehicleSetup.spoiler?.id)
         if (this.isUpdatingVehicleSetup) return
+        this.setColor(vehicleSetup.vehicleColor)
         if (vehicleSetup.vehicleType !== this.vehicleType) {
             console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
             return
@@ -305,11 +307,12 @@ export class Vehicle implements IVehicle {
         this.isPaused = false
         this._canDrive = false
 
-        this.vehicleSettings = defaultVehicleSettings
+        this.vehicleSettings = config.vehicleSettings ?? defaultVehicleSettings
 
+        this.useChaseCamera = this.vehicleSettings.useChaseCamera
 
-        this.useChaseCamera = false
-        this.chaseCameraSpeed = defaultVehicleSettings.chaseCameraSpeed
+        this.chaseCameraSpeed = this.vehicleSettings.chaseCameraSpeed
+
         this.chaseCameraTicks = 0
 
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)

@@ -1,12 +1,15 @@
 import { Socket } from "socket.io-client"
 import { MobileControls, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
 import { IVehicle } from "../vehicles/IVehicle"
+import { logScaler, numberScaler } from "./utilFunctions"
 
 
 let speed = 40
-let maxAngle = 0.4
+let maxAngle = 40
 let angle = 25
 let gameIsPaused = false
+const maxNumber = 100
+const steerScaler = numberScaler(0, 40, Math.log2(1), Math.log2(maxNumber), 3)
 
 export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) => {
 
@@ -54,7 +57,6 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket | u
 
 
     const keyAction = (e: KeyboardEvent, isDown: boolean) => {
-
         switch (e.key) {
             case "w":
                 vehicleControls.f = isDown
@@ -84,20 +86,22 @@ export const addKeyboardControls = (vehicleControls: VehicleControls) => {
 
         switch (e.key) {
             case "w":
+            case "ArrowUp":
                 vehicleControls.f = isDown
                 break;
             case "d":
+            case "ArrowRight":
                 vehicleControls.right = isDown
                 break;
             case "a":
+            case "ArrowLeft":
                 vehicleControls.left = isDown
                 break;
             case "s":
-                vehicleControls.b = isDown
-                break;
+            case "ArrowDown":
             case " ":
                 vehicleControls.b = isDown
-                break
+                break;
             default:
                 break;
         }
@@ -107,6 +111,19 @@ export const addKeyboardControls = (vehicleControls: VehicleControls) => {
 }
 
 
+
+let nSteerAngle = 0
+let steerAngle = 0
+
+const getSteering = () => {
+
+
+    const angle = steerScaler(Math.log2(steerAngle))
+    const nAngle = -steerScaler(Math.log2(-nSteerAngle))
+    return angle + nAngle
+}
+
+let dSteer = 1
 export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
 
     if (vehicleControls.f) {
@@ -118,12 +135,26 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
     }
 
 
-
     if (vehicleControls.left) {
+        steerAngle += (dSteer)
+        nSteerAngle += (dSteer * 2)
+        nSteerAngle = Math.min(nSteerAngle, -1)
+        steerAngle = Math.min(maxNumber, steerAngle)
+        const angle = getSteering()
         vehicle.turn(angle)
     } else if (vehicleControls.right) {
-        vehicle.turn(-angle)
+        nSteerAngle -= (dSteer * 2)
+        steerAngle -= (dSteer)
+        steerAngle = Math.max(steerAngle, 1)
+        nSteerAngle = Math.max(-maxNumber, nSteerAngle)
+        vehicle.turn(getSteering())
     } else {
-        vehicle.noTurn()
+
+        nSteerAngle += (dSteer * 4)
+        steerAngle -= (dSteer * 4)
+        steerAngle = Math.max(steerAngle, 1)
+        nSteerAngle = Math.min(-1, nSteerAngle)
+
+        vehicle.turn(getSteering())
     }
 }

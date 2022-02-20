@@ -36,7 +36,7 @@ var removeAvailableRoom = function (userId) {
     });
 };
 exports.removeAvailableRoom = removeAvailableRoom;
-var addCreatedRooms = function (ip, roomId, userId) {
+var addCreatedRooms = function (ip, roomId, userId, extraData) {
     if (firebase_config_1.onLocalHost) {
         console.log("on local host");
         return;
@@ -48,7 +48,8 @@ var addCreatedRooms = function (ip, roomId, userId) {
         roomId: roomId,
         userId: userId,
         geo: geo,
-        date: firestore_2.Timestamp.now()
+        date: firestore_2.Timestamp.now(),
+        extraData: extraData
     };
     var key;
     for (key in obj) {

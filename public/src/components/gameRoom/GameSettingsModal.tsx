@@ -13,6 +13,7 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 import { connectPagePath } from "../Routes";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
+import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
 
 interface IGameSettingsModal {
@@ -26,6 +27,7 @@ interface IGameSettingsModal {
   quitGame: (newPath: string) => void;
   user: IUser;
   restarBtnPressed: () => void;
+  showVehicleSettings?: boolean;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -55,7 +57,13 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           </Grid>
         )}
 
-        <Grid item xs={12}>
+        <Grid item xs={12} md={4}>
+          <BackdropButton color="white" onClick={props.restarBtnPressed}>
+            Reset game
+          </BackdropButton>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
           <BackdropButton
             color="white"
             onClick={() => {
@@ -65,6 +73,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             To waiting room
           </BackdropButton>
         </Grid>
+
         <Grid item xs={12}>
           <GameSettingsComponent
             gameSettings={props.store.gameSettings}
@@ -74,42 +83,43 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           />
         </Grid>
 
-        <Grid item xs={4}>
-          <BackdropButton color="white" onClick={props.restarBtnPressed}>
-            Reset game
-          </BackdropButton>
-        </Grid>
-        <Grid item xs={8} />
         {props.isTestMode && props.store.player && (
-          <React.Fragment>
-            <Grid item xs={4}>
-              <VehicleSelect
-                simpleSelect
-                user={props.user}
-                value={props.store.userSettings.vehicleSettings.vehicleType}
-                onChange={(vehicleType) => {
-                  const newVehicleSettings = {
-                    ...props.store.userSettings.vehicleSettings,
-                    vehicleType,
-                  };
+          <Grid item xs={12}>
+            <VehicleSelect
+              simpleSelect
+              user={props.user}
+              value={props.store.userSettings.vehicleSettings.vehicleType}
+              onChange={(vehicleType) => {
+                const newVehicleSettings = {
+                  ...props.store.userSettings.vehicleSettings,
+                  vehicleType,
+                };
 
-                  const newUserSettings = {
-                    ...props.store.userSettings,
-                    vehicleSettings: newVehicleSettings,
-                  };
-                  window.localStorage.setItem("vehicleType", vehicleType);
-                  /**
-                   * ONLY FOR TESTING
-                   */
+                const newUserSettings = {
+                  ...props.store.userSettings,
+                  vehicleSettings: newVehicleSettings,
+                };
+                window.localStorage.setItem("vehicleType", vehicleType);
+                /**
+                 * ONLY FOR TESTING
+                 */
 
-                  // @ts-ignore
-                  props.gameObject.vehicleType = vehicleType;
-                  props.gameObject.setNeedsReload(true);
-                  props.store.setUserSettings(newUserSettings);
-                }}
-              />
-            </Grid>
-          </React.Fragment>
+                // @ts-ignore
+                props.gameObject.vehicleType = vehicleType;
+                props.gameObject.setNeedsReload(true);
+                props.store.setUserSettings(newUserSettings);
+              }}
+            />
+          </Grid>
+        )}
+        {props.showVehicleSettings && (
+          <Grid item xs={12}>
+            <VehicleSettingsComponent
+              maxWidth={"100%"}
+              store={props.store}
+              user={props.user}
+            />
+          </Grid>
         )}
       </Grid>
     </BasicDesktopModal>

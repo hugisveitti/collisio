@@ -11,6 +11,7 @@ interface ICollabsibleCard {
   header: string;
   children: JSX.Element;
   color?: "black" | "white";
+  maxWidth?: number | string;
 }
 
 const CollabsibleCard = (props: ICollabsibleCard) => {
@@ -20,13 +21,12 @@ const CollabsibleCard = (props: ICollabsibleCard) => {
   const oppositeColor = color === "black" ? "white" : "black";
   const alphaColor =
     color === "black" ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.83)";
-
   return (
     <Card
       variant="outlined"
       style={{
         margin: "auto",
-        maxWidth: 600,
+        maxWidth: props.maxWidth ?? 600,
 
         backgroundColor: alphaColor,
         color: oppositeColor,

@@ -189,7 +189,11 @@ const MultiplayerWaitingRoomComponent = (
         </>
       )}
       <Grid item xs={12}>
-        <VehicleSettingsComponent store={props.store} user={props.user} />
+        <VehicleSettingsComponent
+          maxWidth="100%"
+          store={props.store}
+          user={props.user}
+        />
       </Grid>
     </>
   );

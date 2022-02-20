@@ -33,6 +33,7 @@ interface IVehicleSettingsComponent {
   previewVehicle?: boolean;
   // if true, then the vehicle select is a garage button
   linkToGarage?: boolean;
+  maxWidth?: string | number;
 }
 
 let userSettingsToSave: IUserSettings;
@@ -117,7 +118,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   const { color, backgroundColor } = getStyledColors("white");
 
   return (
-    <CollabsibleCard header="Vehicle settings">
+    <CollabsibleCard header="Vehicle settings" maxWidth={props.maxWidth}>
       <Grid container spacing={3}>
         <Grid item xs={12} lg={12} style={{}}>
           {props.linkToGarage ? (

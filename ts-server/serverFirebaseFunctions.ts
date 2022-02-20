@@ -23,9 +23,10 @@ interface ICreateRoom {
     ip?: string
     geo?: geoip.Lookup | null
     date?: Timestamp
+    extraData: any
 }
 
-export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
+export const addCreatedRooms = (ip: string, roomId: string, userId: string, extraData?: any) => {
     if (onLocalHost) {
         console.log("on local host")
         return
@@ -37,7 +38,8 @@ export const addCreatedRooms = (ip: string, roomId: string, userId: string) => {
         roomId,
         userId,
         geo,
-        date: Timestamp.now()
+        date: Timestamp.now(),
+        extraData
     }
     let key: keyof typeof obj
     for (key in obj) {

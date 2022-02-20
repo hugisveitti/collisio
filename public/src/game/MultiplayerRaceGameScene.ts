@@ -4,9 +4,10 @@ import { PerspectiveCamera } from "three";
 import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished } from "../shared-backend/multiplayer-shared-stuff";
-import { IPlayerInfo, VehicleControls } from "../shared-backend/shared-stuff";
+import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game } from "../shared-backend/multiplayer-shared-stuff";
+import { IPlayerInfo, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
+import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
 import { addKeyboardControls, driveVehicleWithKeyboard } from "../utils/controls";
 import { GhostVehicle, GhostVehicleConfig, IGhostVehicle } from "../vehicles/GhostVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
@@ -97,9 +98,16 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         // no pause possible, but leader can restart
         window.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
+                console.log("esc pressed", this.gameRoomActions)
                 if (this.gameRoomActions.escPressed) {
                     this.gameRoomActions.escPressed()
                 }
+            }
+        })
+
+        window.addEventListener("keypress", (e) => {
+            if (e.key === "r") {
+                this.vehicle?.resetPosition()
             }
         })
 
@@ -126,12 +134,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.otherVehicles = []
         await this.createVehicle()
         await this.createOtherVehicles()
+        addMusic(this.gameSettings.musicVolume, this.camera as PerspectiveCamera, "racing.mp3")
         this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
         console.log("everything created")
+
         this.sendPlayerReady()
     }
-
-
 
     async createVehicle() {
         return new Promise<void>(async (resolve, reject) => {
@@ -140,7 +148,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 reject()
                 return
             }
-            const vehicleType = this.config.userSettings.vehicleSettings.vehicleType
+            const vehicleType = this.config.player.vehicleType
             const vehicleConfig: IVehicleClassConfig = {
                 id: this.config.player.id,
                 scene: this,
@@ -148,8 +156,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 useSoundEffects: this.gameSettings.useSound,
                 name: this.config.player.playerName,
                 vehicleNumber: 0,
-                vehicleSetup: this.config.vehicleSetup
+                vehicleSetup: this.config.vehicleSetup,
+                vehicleSettings: this.config.userSettings.vehicleSettings
             }
+            console.log("createing car", vehicleConfig)
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
                 this.vehicle = new LowPolyVehicle(vehicleConfig)
             } else {
@@ -226,11 +236,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         if (!this.gameTime.crossedCheckpoint(checkpointNumber)) {
             this.gameTime.checkpointCrossed(checkpointNumber)
             this.showSecondaryInfo(`Checkpoint ${this.gameTime.getCurrentLapTime().toFixed(2)}`, true)
+            const { position, rotation } = this.course.getCheckpointPositionRotation(checkpointNumber)
+            this.vehicle.setCheckpointPositionRotation({ position: { x: position.x, y: position.y + 1, z: position.z }, rotation: rotation })
         }
     }
 
     setSocket(socket: Socket) {
-        console.log("setting soket")
+        console.log("!!!!!!!!!!!!!!!!!setting soket!!!!!!!!!!!!!!!!!!!!!")
         this.socket = socket
         this.socket.emit(m_ts_game_socket_ready, {})
         this.setupPlayersInfoListener()
@@ -238,6 +250,44 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupStartGameListener()
         this.setupVehiclesPositionInfo()
         this.setupRaceFinishedListener()
+        this.setupReloadGameListener()
+        this.setupUserSettingsChangedListener()
+    }
+
+    setupUserSettingsChangedListener() {
+        // this.socket.on(mts_user_settings_changed, (data: { userSettings: IUserSettings, vehicleSetup: VehicleSetup }) => {
+        //     const { userSettings, vehicleSetup } = data
+        //     console.log("usersettings changed", data)
+        //     this.vehicle.updateVehicleSettings(userSettings.vehicleSettings, vehicleSetup)
+        //     if (userSettings?.vehicleSettings.vehicleType) {
+        //         this.config.userSettings = userSettings
+
+        //         this.config.player.vehicleType = userSettings?.vehicleSettings.vehicleType
+        //     }
+        //     if (vehicleSetup) {
+
+        //         this.config.player.vehicleSetup = vehicleSetup
+        //     }
+        // })
+    }
+
+    setupReloadGameListener() {
+        this.socket.on(m_fs_reload_game, (data: { players: IPlayerInfo[], gameSettings: IGameSettings }) => {
+            const { players, gameSettings } = data
+            console.log("reload", players, gameSettings, data)
+            for (let p of players) {
+                if (p.id === this.config.player.id) {
+                    this.config.player = p
+                }
+            }
+            this.config.players = players
+            if (this.gameSettings) {
+                this.gameSettings = gameSettings
+                this.config.gameSettings = gameSettings
+            }
+
+            this.restartGame()
+        })
     }
 
     setupRaceFinishedListener() {
@@ -288,6 +338,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             // start count down?
             // or do the count down on the backend
             this.showImportantInfo(`Race starting in ${countdown} seconds`, true)
+            console.log("this.config.player.id", this.config.player.id)
             // the other vehicles simply set their positon them selvs and send us the position?
             this.course.setToSpawnPostion(spawnPositions[this.config.player.id], this.vehicle)
             this.vehicle.resetPosition()
@@ -297,8 +348,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         })
     }
 
-
-
     setupVehiclesPositionInfo() {
         this.socket.on(m_fs_vehicles_position_info, (info: any) => {
             this.vehiclesPositionInfo = info
@@ -306,24 +355,113 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setupPlayersInfoListener() {
-        this.socket.on(m_fs_room_info, ({ players, gameSettings }) => {
+        this.socket.on(m_fs_room_info, ({ players, gameSettings }: { players: IPlayerInfo[], gameSettings: IGameSettings }) => {
             // setup players
+            for (let p of players) {
+                if (p.id === this.config.player.id) {
+                    this.config.player = p
+                    console.log("updating player", p)
+                    this.vehicle.updateVehicleSetup(p.vehicleSetup)
+                } else {
+                    // change ghostColor 
+                    for (let g of this.otherVehicles) {
+                        if (g.id === p.id) {
+                            g.changeColor(p.vehicleSetup.vehicleColor)
+                        }
+                    }
+                }
+            }
 
-            console.log("got players info but not doing anything", players, gameSettings)
+            this.gameSettings = gameSettings
+            this.config.gameSettings = gameSettings
         })
     }
-
 
     setGameSceneConfig(gameSceneConfig: IMultiplayergameSceneConfig) {
         this.config = gameSceneConfig
         this.setSocket(this.config.socket)
         this.setGameSettings(this.config.gameSettings)
         this.currentNumberOfLaps = this.config.gameSettings.numberOfLaps
-        this.gameRoomActions = gameSceneConfig.gameRoomActions
+        console.log("setting game room action", this.config.gameRoomActions)
+        this.gameRoomActions = this.config.gameRoomActions
     }
 
-    restartGame() {
+    toggleUseSound() {
+        this.vehicle?.toggleSound(this.useSound)
+    }
+
+    startGameSong() {
+        // not use game song right now...
+        startMusic()
+    }
+
+    setGameSettings(gameSettings: IGameSettings) {
+
+        if (this.courseLoaded && (this.getTrackName() !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
+            this.setNeedsReload(true)
+            console.log("needs reaload")
+        }
+
+        this.gameSettings = gameSettings
+
+
+        for (let key of Object.keys(gameSettings)) {
+            if (gameSettings[key] !== undefined) {
+                this[key] = gameSettings[key]
+            }
+        }
+
+        this.timeOfDay = this.getTimeOfDay()
+        if (this.pLight && this.course) {
+            this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
+            this.pLight.shadow.bias = 0.1
+            this.course.toggleShadows(this.useShadows)
+        }
+
+        setMusicVolume(gameSettings.musicVolume)
+        if (this.isReady) {
+            this.toggleUseSound()
+
+            if (gameSettings.musicVolume > 0) {
+                this.startGameSong()
+            }
+        }
+
+        this.camera.far = this.getDrawDistance()
+
+        if (this.targetFPS) {
+            this.physics.config.fixedTimeStep = 1 / this.targetFPS
+        }
+    }
+
+    async restartGame() {
+        console.log("restart game")
         // restart game with sockets
+        this.clearImportantInfo()
+        this.clearSecondaryInfo()
+
+        this.isPaused = false
+        this.oldTime = 0
+        this.totalPing = 0
+        this.totalPingsGotten = 0
+        this.totalNumberOfFpsTicks = 0
+        this.totalFpsTicks = 0
+        if (this.gameRoomActions?.closeModals) {
+            this.gameRoomActions.closeModals()
+        }
+
+
+        this.courseLoaded = false
+        this.needsReload = false
+        /** I think I need to delete ammo vecs */
+
+        await this.vehicle.destroy()
+        for (let v of this.otherVehicles) {
+            v.removeFromScene(this)
+        }
+        this.restart().then(() => {
+        })
+
     }
 
     updateScoreTable(delta: number) {
@@ -353,6 +491,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         if (this.vehicle.isReady) {
             this.vehicle.update(delta)
             this.vehicle.cameraLookAt(this.camera, delta)
+        }
+    }
+    checkIfVehicleIsOffCourse() {
+        const p = this.vehicle.getPosition()
+        if (p.y < -20) {
+            this.vehicle.resetPosition()
         }
     }
 
@@ -389,11 +533,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.updateScoreTable(_delta)
 
         driveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
+        this.checkIfVehicleIsOffCourse()
     }
 
     async _destoryGame() {
         return new Promise<void>((resolve, reject) => {
-
+            console.log("destroying game")
             window.removeEventListener("resize", () => this.windowResize())
             resolve()
         })
