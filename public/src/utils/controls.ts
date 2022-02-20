@@ -155,6 +155,9 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
         steerAngle = Math.max(steerAngle, 1)
         nSteerAngle = Math.min(-1, nSteerAngle)
 
+        steerAngle = Math.min(steerAngle, maxNumber / 3)
+        nSteerAngle = Math.max(nSteerAngle, -maxNumber / 3)
+
         vehicle.turn(getSteering())
     }
 }
