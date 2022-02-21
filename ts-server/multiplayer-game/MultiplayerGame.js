@@ -139,8 +139,17 @@ var MultiplayerRoom = /** @class */ (function () {
         this.numberOfLaps = -1;
         this.countdownStarted = false;
         this.needsReload = false;
-        this.roomCreatedTime = Date.now();
-        this.numberOfRestarts = 0;
+        this.dataCollection = {
+            roomCreatedTime: Date.now(),
+            roomDeletedTime: 0,
+            numberOfReloads: 0,
+            numberOfGameSettingsChanges: 0,
+            numberOfGameStartCountdowns: 0,
+            numberOfPlayersReady: 0,
+            numberOfGamesFinshed: 0,
+            winners: [],
+            totalNumberOfPlayerDisconnects: 0
+        };
         // in test mode 
         if (false) {
             var testConfig = {
@@ -174,7 +183,7 @@ var MultiplayerRoom = /** @class */ (function () {
         this.needsReload = true;
     };
     MultiplayerRoom.prototype.reloadGame = function () {
-        this.numberOfRestarts += 1;
+        this.dataCollection.numberOfReloads += 1;
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings
@@ -267,6 +276,7 @@ var MultiplayerRoom = /** @class */ (function () {
         return undefined;
     };
     MultiplayerRoom.prototype.playerDisconnected = function (userId) {
+        this.dataCollection.totalNumberOfPlayerDisconnects += 1;
         // check if all players have disconnected
         if (!this.gameStarted) {
             var idx = this.getPlayerIndex(userId);
@@ -299,13 +309,13 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.deleteRoom = function () {
         var _a, _b, _c;
+        this.dataCollection.roomDeletedTime = Date.now();
         (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, this.leader.userId, {
             multiplayer: true,
-            roomCreatedDate: this.roomCreatedTime,
-            roomDeleteDate: Date.now(),
             startedGame: this.gameStarted,
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
             gameSettings: this.gameSettings,
+            dataCollection: this.dataCollection
         });
         this.gameIntervalStarted = false;
         clearInterval((_a = this.gameInterval) === null || _a === void 0 ? void 0 : _a[Symbol.toPrimitive]());
@@ -320,6 +330,7 @@ var MultiplayerRoom = /** @class */ (function () {
         return this.players.map(function (p) { return p.getPlayerInfo(); });
     };
     MultiplayerRoom.prototype.gameSettingsChanged = function () {
+        this.dataCollection.numberOfGameSettingsChanges += 1;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var p = _a[_i];
             p.sendGameSettingsChanged();
@@ -421,6 +432,7 @@ var MultiplayerRoom = /** @class */ (function () {
         var _this = this;
         if (this.countdownStarted)
             return;
+        this.dataCollection.numberOfGameStartCountdowns += 1;
         this.countdownStarted = true;
         this.needsReload = false;
         var countdown = 4;
@@ -444,6 +456,7 @@ var MultiplayerRoom = /** @class */ (function () {
         countdownTimer();
     };
     MultiplayerRoom.prototype.playerReady = function () {
+        this.dataCollection.numberOfPlayersReady += 1;
         // check if all players are ready
         var everyoneReady = true;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
@@ -458,19 +471,23 @@ var MultiplayerRoom = /** @class */ (function () {
         }
     };
     MultiplayerRoom.prototype.sendGameFinished = function () {
+        this.dataCollection.numberOfGamesFinshed += 1;
         var winner = {
             name: "",
-            totalTime: Infinity
+            totalTime: Infinity,
+            id: ""
         };
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var p = _a[_i];
             if (p.totalTime < winner.totalTime) {
                 winner = {
                     name: p.displayName,
-                    totalTime: p.totalTime
+                    totalTime: p.totalTime,
+                    id: p.userId
                 };
             }
         }
+        this.dataCollection.winners.push(winner);
         for (var _b = 0, _c = this.players; _b < _c.length; _b++) {
             var p = _c[_b];
             p.gameFinished({ raceData: this.getPlayersRaceData(), winner: winner });

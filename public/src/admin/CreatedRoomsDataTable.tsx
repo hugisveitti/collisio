@@ -18,6 +18,31 @@ import React, { useState } from "react";
 import { IRoomInfo } from "../classes/Game";
 import { getDateFromNumber } from "../utils/utilFunctions";
 
+interface IObjectDivDisplay {
+  obj: any;
+}
+
+const ObjectDivDisplay = (props: IObjectDivDisplay) => {
+  const pKeys = Object.keys(props.obj);
+  return (
+    <React.Fragment>
+      <div>
+        {pKeys.map((k) => {
+          if (typeof props.obj[k] === "object") {
+            return null;
+          }
+          return (
+            <span key={k + props.obj[k].toString()}>
+              <strong> {k}:</strong>{" "}
+              <span style={{ marginRight: 15 }}>{props.obj[k].toString()}</span>
+            </span>
+          );
+        })}
+      </div>
+    </React.Fragment>
+  );
+};
+
 interface ICreatedRoomInfo {
   userId: string;
   geo: {
@@ -39,6 +64,7 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   const keys = Object.keys(extraData);
   const multiplayer = extraData?.multiplayer;
   const players = extraData?.players ?? [];
+  const dataCollection = extraData.dataCollection ?? {};
   return (
     <>
       <TableRow>
@@ -63,6 +89,7 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open}>
+            <ObjectDivDisplay obj={dataCollection} />
             <List>
               {keys.map((k) => {
                 if (typeof extraData[k] === "object") {
@@ -80,24 +107,12 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
             </List>
             <Divider variant="middle" />
             {players.map((p: any) => {
-              const pKeys = Object.keys(p);
+              const pColl = { ...p.dataCollection, ...p.geo };
               return (
-                <React.Fragment key={p.id}>
-                  <div>
-                    {pKeys.map((k) => {
-                      if (typeof p[k] === "object") {
-                        return null;
-                      }
-                      return (
-                        <span key={k}>
-                          <strong> {k}:</strong>{" "}
-                          <span style={{ marginRight: 15 }}>
-                            {p[k].toString()}
-                          </span>
-                        </span>
-                      );
-                    })}
-                  </div>
+                <React.Fragment>
+                  <ObjectDivDisplay obj={p} key={p.id} />
+                  <div>Data collected</div>
+                  <ObjectDivDisplay obj={pColl} key={p.id + "coll"} />
                   <Divider variant="middle" />
                 </React.Fragment>
               );

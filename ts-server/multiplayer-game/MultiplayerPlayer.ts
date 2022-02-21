@@ -132,6 +132,7 @@ export class MulitplayerPlayer {
     }
 
     gameFinished(data: any) {
+        this.dataCollection.numberOfRacesFinished += 1
         this.desktopSocket.emit(m_fs_game_finished, data)
     }
 
@@ -240,6 +241,7 @@ export class MulitplayerPlayer {
 
     setupLapDoneListener() {
         this.desktopSocket.on(m_ts_lap_done, ({ totalTime, latestLapTime, lapNumber }) => {
+            this.dataCollection.totalNumberOfLapsDone += 1
             console.log("lap done")
             this.lapNumber = lapNumber
             this.latestLapTime = latestLapTime

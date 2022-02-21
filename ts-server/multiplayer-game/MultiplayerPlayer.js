@@ -82,6 +82,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.disconnect();
     };
     MulitplayerPlayer.prototype.gameFinished = function (data) {
+        this.dataCollection.numberOfRacesFinished += 1;
         this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_finished, data);
     };
     MulitplayerPlayer.prototype.sendGoToGameRoom = function () {
@@ -196,6 +197,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_lap_done, function (_a) {
             var _b, _c;
             var totalTime = _a.totalTime, latestLapTime = _a.latestLapTime, lapNumber = _a.lapNumber;
+            _this.dataCollection.totalNumberOfLapsDone += 1;
             console.log("lap done");
             _this.lapNumber = lapNumber;
             _this.latestLapTime = latestLapTime;

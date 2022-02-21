@@ -554,11 +554,11 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             const scoreRow = document.createElement("tr")
             tableB.appendChild(scoreRow)
             const nameInfo = document.createElement("td")
-            nameInfo.setAttribute("style", "margin-right:5px; with:75px;")
+            nameInfo.setAttribute("style", "margin-right:5px; with:120px;")
             scoreRow.appendChild(nameInfo)
             nameInfo.textContent = p.playerName.slice(0, 10)
             const scoreSpan = document.createElement("td")
-            scoreSpan.textContent = `-1 | ${1} / ${this.currentNumberOfLaps}`
+            scoreSpan.textContent = `- | ${1} / ${this.currentNumberOfLaps}`
             scoreRow.appendChild(scoreSpan)
             this.scoreSpans.push(scoreSpan)
         }
@@ -573,7 +573,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
      */
     updateScoreTable(raceData: any[]) {
         for (let i = 0; i < raceData.length; i++) {
-            this.scoreSpans[i].textContent = `${raceData[i].latestLapTime} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps}`
+            this.scoreSpans[i].textContent = `${raceData[i].latestLapTime} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps.toFixed(2)}`
         }
     }
 

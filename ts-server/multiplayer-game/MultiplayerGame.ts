@@ -87,6 +87,18 @@ export class MultiplayerRoomMaster {
     }
 }
 
+interface IGameDataCollection {
+    roomCreatedTime: number
+    numberOfReloads: number
+    numberOfGameStartCountdowns: number
+    roomDeletedTime: number
+    numberOfGameSettingsChanges: number
+    numberOfPlayersReady: number
+    numberOfGamesFinshed: number
+    winners: any[]
+    totalNumberOfPlayerDisconnects: number
+}
+
 export class MultiplayerRoom {
 
     players: MulitplayerPlayer[]
@@ -105,9 +117,9 @@ export class MultiplayerRoom {
     numberOfLaps: number
     needsReload: boolean
 
-    roomCreatedTime: number
-    numberOfRestarts: number
+
     raceInfoIntervalStarted: boolean
+    dataCollection: IGameDataCollection
 
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
@@ -127,8 +139,18 @@ export class MultiplayerRoom {
         this.numberOfLaps = -1
         this.countdownStarted = false
         this.needsReload = false
-        this.roomCreatedTime = Date.now()
-        this.numberOfRestarts = 0
+        this.dataCollection = {
+
+            roomCreatedTime: Date.now(),
+            roomDeletedTime: 0,
+            numberOfReloads: 0,
+            numberOfGameSettingsChanges: 0,
+            numberOfGameStartCountdowns: 0,
+            numberOfPlayersReady: 0,
+            numberOfGamesFinshed: 0,
+            winners: [],
+            totalNumberOfPlayerDisconnects: 0
+        }
 
 
         // in test mode 
@@ -166,7 +188,7 @@ export class MultiplayerRoom {
     }
 
     reloadGame() {
-        this.numberOfRestarts += 1
+        this.dataCollection.numberOfReloads += 1
         this.io.to(this.roomId).emit(m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings
@@ -268,6 +290,7 @@ export class MultiplayerRoom {
     }
 
     playerDisconnected(userId: string) {
+        this.dataCollection.totalNumberOfPlayerDisconnects += 1
         // check if all players have disconnected
         if (!this.gameStarted) {
             const idx = this.getPlayerIndex(userId)
@@ -299,14 +322,14 @@ export class MultiplayerRoom {
 
     deleteRoom() {
 
+        this.dataCollection.roomDeletedTime = Date.now()
         addCreatedRooms(this.roomId, this.leader.userId,
             {
                 multiplayer: true,
-                roomCreatedDate: this.roomCreatedTime,
-                roomDeleteDate: Date.now(),
                 startedGame: this.gameStarted,
                 players: this.players.map(p => p.getEndOfRoomInfo()),
                 gameSettings: this.gameSettings,
+                dataCollection: this.dataCollection
             }
         )
 
@@ -326,6 +349,7 @@ export class MultiplayerRoom {
     }
 
     gameSettingsChanged() {
+        this.dataCollection.numberOfGameSettingsChanges += 1
         for (let p of this.players) {
             p.sendGameSettingsChanged()
         }
@@ -410,6 +434,7 @@ export class MultiplayerRoom {
     // }
 
     startGame() {
+
         this.numberOfLaps = this.gameSettings.numberOfLaps
         this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
         this.countdownStarted = false
@@ -429,6 +454,7 @@ export class MultiplayerRoom {
 
     startGameCountDown() {
         if (this.countdownStarted) return
+        this.dataCollection.numberOfGameStartCountdowns += 1
         this.countdownStarted = true
         this.needsReload = false
         let countdown = 4
@@ -455,6 +481,7 @@ export class MultiplayerRoom {
     }
 
     playerReady() {
+        this.dataCollection.numberOfPlayersReady += 1
         // check if all players are ready
         let everyoneReady = true
         for (let p of this.players) {
@@ -469,18 +496,22 @@ export class MultiplayerRoom {
     }
 
     sendGameFinished() {
+        this.dataCollection.numberOfGamesFinshed += 1
         let winner = {
             name: "",
-            totalTime: Infinity
+            totalTime: Infinity,
+            id: ""
         }
         for (let p of this.players) {
             if (p.totalTime < winner.totalTime) {
                 winner = {
                     name: p.displayName,
-                    totalTime: p.totalTime
+                    totalTime: p.totalTime,
+                    id: p.userId
                 }
             }
         }
+        this.dataCollection.winners.push(winner)
 
         for (let p of this.players) {
             p.gameFinished({ raceData: this.getPlayersRaceData(), winner })
