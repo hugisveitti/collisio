@@ -237,6 +237,7 @@ var Player = /** @class */ (function () {
     Player.prototype.getEndOfRoomInfo = function () {
         var obj = __assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection });
         obj = (0, serverFirebaseFunctions_1.deleteUndefined)(obj);
+        return obj;
     };
     Player.prototype.getPlayerControls = function () {
         return { mobileControls: this.mobileControls, playerNumber: this.playerNumber };

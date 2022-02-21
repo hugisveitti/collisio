@@ -5,7 +5,7 @@ import { logScaler, numberScaler } from "./utilFunctions"
 
 
 let speed = 40
-let maxAngle = 40
+const maxAngle = 40
 let angle = 25
 let gameIsPaused = false
 const maxNumber = 100
@@ -110,6 +110,7 @@ export const addKeyboardControls = (vehicleControls: VehicleControls) => {
                 break;
         }
     }
+
     document.addEventListener("keydown", e => keyAction(e, true))
     document.addEventListener("keyup", e => keyAction(e, false))
 }
@@ -137,31 +138,42 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
     } else {
         vehicle.noForce()
     }
-
-
     if (vehicleControls.left) {
-        steerAngle += (dSteer)
-        nSteerAngle += (dSteer * 2)
-        nSteerAngle = Math.min(nSteerAngle, -1)
-        steerAngle = Math.min(maxNumber, steerAngle)
-        const angle = getSteering()
+        angle += 2.55
+        angle = Math.min(angle, maxAngle)
         vehicle.turn(angle)
     } else if (vehicleControls.right) {
-        nSteerAngle -= (dSteer * 2)
-        steerAngle -= (dSteer)
-        steerAngle = Math.max(steerAngle, 1)
-        nSteerAngle = Math.max(-maxNumber, nSteerAngle)
-        vehicle.turn(getSteering())
+        angle -= 2.5
+        angle = Math.max(angle, -maxAngle)
+        vehicle.turn(angle)
     } else {
-
-        nSteerAngle += (dSteer * 4)
-        steerAngle -= (dSteer * 4)
-        steerAngle = Math.max(steerAngle, 1)
-        nSteerAngle = Math.min(-1, nSteerAngle)
-
-        steerAngle = Math.min(steerAngle, maxNumber / 3)
-        nSteerAngle = Math.max(nSteerAngle, -maxNumber / 3)
-
-        vehicle.turn(getSteering())
+        angle = 0
+        vehicle.noTurn()
     }
+
+    // if (vehicleControls.left) {
+    //     steerAngle += (dSteer)
+    //     nSteerAngle += (dSteer * 2)
+    //     nSteerAngle = Math.min(nSteerAngle, -1)
+    //     steerAngle = Math.min(maxNumber, steerAngle)
+    //     const angle = getSteering()
+    //     vehicle.turn(angle)
+    // } else if (vehicleControls.right) {
+    //     nSteerAngle -= (dSteer * 2)
+    //     steerAngle -= (dSteer)
+    //     steerAngle = Math.max(steerAngle, 1)
+    //     nSteerAngle = Math.max(-maxNumber, nSteerAngle)
+    //     vehicle.turn(getSteering())
+    // } else {
+
+    //     nSteerAngle += (dSteer * 4)
+    //     steerAngle -= (dSteer * 4)
+    //     steerAngle = Math.max(steerAngle, 1)
+    //     nSteerAngle = Math.min(-1, nSteerAngle)
+
+    //     steerAngle = Math.min(steerAngle, maxNumber / 3)
+    //     nSteerAngle = Math.max(nSteerAngle, -maxNumber / 3)
+
+    //     vehicle.turn(getSteering())
+    // }
 }

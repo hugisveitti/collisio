@@ -30,6 +30,7 @@ import {
   howToPlayPagePath,
   loginPagePath,
   mobileOnlyWaitingRoomPath,
+  multiplayerConnectPagePath,
   privateProfilePagePath,
   tournamentPagePath,
   trackPagePath,
@@ -49,6 +50,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   }, []);
 
   const user = useContext(UserContext);
+  console.log("user", user);
   const onMobile = getDeviceType() === "mobile";
 
   const renderUserInfo = () => {
@@ -73,6 +75,9 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           </BackdropButton>
           <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
             Play mobile version
+          </BackdropButton>
+          <BackdropButton link={multiplayerConnectPagePath} width={btnWidth}>
+            Multiplayer
           </BackdropButton>
           <BackdropButton link={garagePagePath} width={btnWidth}>
             Garage

@@ -2,10 +2,13 @@ import { ExtendedObject3D } from "@enable3d/ammo-physics";
 import { Scene3D } from "enable3d";
 import { MeshStandardMaterial, Quaternion, Vector3, Object3D, Color, RGBAFormat } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
+import { possibleVehicleItemTypes, VehicleSetup } from "../shared-backend/vehicleItems";
 import { getStaticPath } from "../utils/settings";
 import { changeVehicleBodyColor } from "./Vehicle";
 import { vehicleConfigs } from "./VehicleConfigs";
+import { VehiclesSetup } from "./VehicleSetup";
 
 export interface IGhostVehicle {
     setPosition: (position: Vector3) => void
@@ -18,9 +21,11 @@ export interface IGhostVehicle {
     removeFromScene: (scene: Scene3D) => void
     show: () => void
     hide: () => void
+    saveCurrentPosition: () => void
     changeColor: (color: VehicleColorType) => void
     id: string
     setSpeed: (number: number, delta: number, alpha: number) => void
+    updateVehicleSetup: (vehicleSetup: VehicleSetup) => void
 }
 
 export interface GhostVehicleConfig {
@@ -49,7 +54,8 @@ export class GhostVehicle implements IGhostVehicle {
 
     // number of setPositions with out
 
-
+    vehicleItems: CurrentItemProps
+    isUpdatingVehicleSetup: boolean
     constructor(config: GhostVehicleConfig) {
         this.id = config.id
         this.config = config
@@ -59,6 +65,12 @@ export class GhostVehicle implements IGhostVehicle {
         this.isReady = false
         this._speed = 0
         this.alpha = 0
+        this.isUpdatingVehicleSetup = false
+        this.vehicleItems = {
+            exhaust: undefined,
+            spoiler: undefined,
+            wheelGuards: undefined
+        }
 
         this.vehicle = new ExtendedObject3D()
 
@@ -83,7 +95,8 @@ export class GhostVehicle implements IGhostVehicle {
     addToScene(scene: Scene3D) {
         // start with no collision
         // scene.physics.add.existing(this.vehicle, { mass: vehicleConfigs[this.config.vehicleType].mass, collisionFlags: 6, shape: "convex" })
-        scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "box" })
+        // having collision with ghost
+        scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "plane" })
         scene.scene.add(this.vehicle)
     }
 
@@ -102,11 +115,20 @@ export class GhostVehicle implements IGhostVehicle {
         if (!this.isReady) return
         this.rotation.set(r.x, r.y, r.z, r.w)
         this.vehicle.setRotationFromQuaternion(this.rotation)
+
+    }
+
+    saveCurrentPosition() {
+        this.position = this.vehicle.position
     }
 
     setPosition(position: Vector3) {
         if (!this.isReady) return
-        this.position.set(position.x, position.y, position.z)
+        this.position.set(
+            position.x,
+            position.y,
+            position.z
+        )
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
 
@@ -114,15 +136,18 @@ export class GhostVehicle implements IGhostVehicle {
 
             calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
             const nP = this.position.lerp(this.futurePosition, this.alpha)
+
+            // should probably do something like this
+            //  const nP = this.position.lerp(this.futurePosition, this.alpha)
+
             //  this.vehicle.position.set(this.futurePosition.x, this.futurePosition.y, this.futurePosition.z)
+            //   console.log("np", nP.x.toFixed(2), ", pos:", position.x.toFixed(2), ", futur pos:", this.futurePosition.x.toFixed(2))
             this.vehicle.position.set(nP.x, nP.y, nP.z)
 
         } else {
             this.vehicle.position.set(position.x, position.y, position.z)
         }
         this.vehicle.body.needUpdate = true
-
-
     };
 
     hide() {
@@ -133,6 +158,56 @@ export class GhostVehicle implements IGhostVehicle {
     show() {
         if (!this.vehicle) return
         this.vehicle.visible = true
+    }
+
+    async updateVehicleSetup(vehicleSetup: VehicleSetup) {
+        // add vehiclesetup
+        return new Promise<void>((resolve, reject) => {
+
+            if (this.isUpdatingVehicleSetup) return
+            this.isUpdatingVehicleSetup = true
+            changeVehicleBodyColor(this.vehicle, [vehicleSetup.vehicleColor])
+
+            for (let item in this.vehicleItems) {
+                if (this.vehicleItems[item]?.model) {
+                    this.vehicle.remove(this.vehicleItems[item].model)
+                }
+            }
+            for (let itemType of possibleVehicleItemTypes) {
+                if (vehicleSetup[itemType]?.path) {
+                    this.loadItem(vehicleSetup[itemType]?.path).then(model => {
+                        this.vehicleItems[itemType] = {
+                            model,
+                            props: undefined
+                        }
+                    })
+                }
+            }
+            this.isUpdatingVehicleSetup = false
+            resolve()
+        })
+    }
+
+    loadItem(itemPath: string) {
+        return new Promise<ExtendedObject3D>((resolve, reject) => {
+
+            if (!this.vehicle) {
+
+                console.warn("No vehiclebody to add items to")
+                reject()
+                return
+            }
+            const loader = new GLTFLoader()
+            loader.load(getStaticPath(`models/${this.config.vehicleType}/${itemPath}.glb`), (gltf: GLTF) => {
+                for (let child of gltf.scene.children) {
+                    if (child.type === "Mesh") {
+                        //   child.position.set(child.position.x, child.position.y + this.vehicleConfig.centerOfMassOffset, child.position.z)
+                        this.vehicle.add(child)
+                        resolve(child as ExtendedObject3D)
+                    }
+                }
+            })
+        })
     }
 
     async loadModel() {

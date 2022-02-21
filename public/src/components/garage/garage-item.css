@@ -11,5 +11,5 @@
 
 .garage__item--not-owned {
   filter: opacity(0.5);
-  border-color: gray;
+  border-color: #808080;
 }

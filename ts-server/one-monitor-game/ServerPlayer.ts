@@ -292,7 +292,7 @@ export class Player {
             dataCollection: this.dataCollection
         }
         obj = deleteUndefined(obj)
-
+        return obj
     }
 
     getPlayerControls() {

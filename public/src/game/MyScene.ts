@@ -1,4 +1,5 @@
 import { Scene3D } from "enable3d";
+import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
@@ -13,6 +14,7 @@ import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 const fadeSecs = 2
 
+let wakeLock = null
 export class MyScene extends Scene3D {
 
     socket?: Socket
@@ -68,6 +70,15 @@ export class MyScene extends Scene3D {
 
     constructor() {
         super()
+        // wake lock
+
+        wakeLock = navigator["wakeLock"]?.request('screen').then(w => {
+            wakeLock = w
+            console.log('Wake Lock is active!');
+        }).catch(err => {
+            console.warn("Error setting wakelock " + err.name + ": " + err.message)
+        })
+
         this.gameSettings = defaultGameSettings
 
         this.totalPing = 0
@@ -395,6 +406,13 @@ export class MyScene extends Scene3D {
 
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
+            if (wakeLock) {
+
+                wakeLock.release()
+                    .then(() => {
+                        wakeLock = null;
+                    });
+            }
             stopMusic()
 
             document.body.removeChild(this.gameInfoDiv)

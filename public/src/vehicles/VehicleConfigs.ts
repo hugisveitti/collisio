@@ -349,7 +349,7 @@ export const vehicleConfigs = {
         mass: 300,
         engineForce: 8500,
         breakingForce: 200,
-        maxSteeringAngle: 25,
+        maxSteeringAngle: 25 * degToRad,
         suspensionRestLength: .87,
         is4x4: false,
         centerOfMassOffset: .75

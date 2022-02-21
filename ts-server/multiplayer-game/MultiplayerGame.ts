@@ -98,14 +98,16 @@ export class MultiplayerRoom {
     deleteRoomCallback
     startTime: number
     gameInterval?: NodeJS.Timer
+    raceInfoInterval?: NodeJS.Timer
     countdownTimeout?: NodeJS.Timeout
-    isSendingVehicleInfo: boolean
+    gameIntervalStarted: boolean
     countdownStarted: boolean;
     numberOfLaps: number
     needsReload: boolean
 
     roomCreatedTime: number
     numberOfRestarts: number
+    raceInfoIntervalStarted: boolean
 
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
@@ -119,7 +121,8 @@ export class MultiplayerRoom {
         this.addPlayer(leader)
         this.io = io
         this.startTime = 0
-        this.isSendingVehicleInfo = false
+        this.gameIntervalStarted = false
+        this.raceInfoIntervalStarted = false
 
         this.numberOfLaps = -1
         this.countdownStarted = false
@@ -296,12 +299,6 @@ export class MultiplayerRoom {
 
     deleteRoom() {
 
-        let ip = this.leader.desktopSocket.handshake.headers['x-forwarded-for'] ?? this.leader.desktopSocket.conn.remoteAddress
-        if (Array.isArray(ip)) {
-            console.log("ip is a list", ip)
-            ip = ip.join("")
-        }
-
         addCreatedRooms(this.roomId, this.leader.userId,
             {
                 multiplayer: true,
@@ -313,9 +310,10 @@ export class MultiplayerRoom {
             }
         )
 
-        this.isSendingVehicleInfo = false
+        this.gameIntervalStarted = false
         clearInterval(this.gameInterval?.[Symbol.toPrimitive]())
         clearTimeout(this.countdownTimeout?.[Symbol.toPrimitive]())
+        clearTimeout(this.raceInfoInterval?.[Symbol.toPrimitive]())
         this.deleteRoomCallback(this.roomId)
     }
 
@@ -366,20 +364,50 @@ export class MultiplayerRoom {
         return pos
     }
 
-    startGameInterval() {
-        if (this.isSendingVehicleInfo) return
-        this.isSendingVehicleInfo = true
+    async startGameInterval() {
+        if (this.gameIntervalStarted) return
+        this.gameIntervalStarted = true
         // dont do this if only one player
+
         const obj: { [userId: string]: IVehiclePositionInfo } = {}
         for (let p of this.players) {
             obj[p.userId] = p.getVehicleInfo()
         }
+
         this.gameInterval = setInterval(() => {
 
             // const arr = this.players.map(p => p.getVehicleInfo())
-            this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
-        }, 1000 / 25) // how many times?
+            if (this.hasAnyPosChanged()) {
+
+                this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
+                this.setPosChanged(false)
+            }
+
+        }, 1000 / 60) // how many times?
     }
+
+    setPosChanged(value: boolean) {
+        for (let p of this.players) {
+            p.posChanged = false
+        }
+    }
+
+    hasAnyPosChanged() {
+        for (let p of this.players) {
+            if (p.posChanged) return true
+        }
+        return false
+    }
+
+    // async startRaceInfoInterval() {
+    //     if (this.raceInfoIntervalStarted) return
+    //     this.raceInfoIntervalStarted = true
+    //     this.raceInfoInterval = setInterval(() => {
+
+    //         // const arr = this.players.map(p => p.getVehicleInfo())
+    //         this.sendRaceInfo()
+    //     }, 1000 / 2) // how many times?
+    // }
 
     startGame() {
         this.numberOfLaps = this.gameSettings.numberOfLaps

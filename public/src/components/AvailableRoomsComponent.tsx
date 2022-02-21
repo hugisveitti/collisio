@@ -33,7 +33,6 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
   const [gettingRooms, setGettingRooms] = useState(true);
 
   const handleGetAllAvailableRooms = async () => {
-    setGettingRooms(true);
     const p = getAllAvailableRooms(props.userId)
       .then((allRooms) => {
         setAvailRoomIds(allRooms);
@@ -47,6 +46,7 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
 
   useEffect(() => {
     if (!props.userId) return;
+    setGettingRooms(true);
     handleGetAllAvailableRooms();
   }, [props.userId]);
 
@@ -56,7 +56,10 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
         <Grid container spacing={1}>
           <Grid item xs={12}>
             <BackdropButton
-              onClick={() => handleGetAllAvailableRooms()}
+              onClick={() => {
+                setGettingRooms(true);
+                handleGetAllAvailableRooms();
+              }}
               startIcon={<Refresh />}
               disabled={gettingRooms}
             >

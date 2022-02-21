@@ -136,7 +136,7 @@ const AdminComponent = (props: IAdminComponent) => {
         </ul>
       </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Card>
           <CardHeader
             header="Room data"
@@ -187,7 +187,7 @@ const AdminComponent = (props: IAdminComponent) => {
             </Collapse>
           </CardContent>
         </Card>
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={12}>
         <Card>

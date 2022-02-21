@@ -57,7 +57,7 @@ const MultiplayerWaitingRoomComponent = (
   const [isLeader, setIsLeader] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
-  const onMobile = getDeviceType() === "mobile";
+  const onMobile = getDeviceType() !== "desktop";
   const [moreInfo, setMoreInfo] = useState(false);
 
   const userId = props.user?.uid ?? getLocalUid();

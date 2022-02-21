@@ -80,3 +80,16 @@
     font-size: 24px;
   }
 }
+
+.score-table {
+  text-align: left;
+  width: 200px;
+  background-color: white;
+  color: black;
+  padding: 10px;
+}
+
+.score-table:nth-child(odd) {
+  background-color: #eee;
+  border-bottom: 1px solid black;
+}

@@ -12,6 +12,8 @@ interface IGarageItem {
 }
 
 const GarageItem = (props: IGarageItem) => {
+  const outlineColor = props.owned ? (props.selected ? "#ddd" : "#505050") : "";
+  console.log("outline color", outlineColor);
   return (
     <div
       className={createClassNames(
@@ -20,7 +22,9 @@ const GarageItem = (props: IGarageItem) => {
       )}
       style={{
         ...props.style,
-        outline: props.selected ? "4px solid" : "1px solid",
+        outline: props.selected
+          ? `5px solid ${outlineColor}`
+          : `1px solid ${outlineColor}`,
       }}
       onClick={props.onClick}
     >

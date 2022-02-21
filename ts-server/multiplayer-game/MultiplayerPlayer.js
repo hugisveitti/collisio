@@ -29,7 +29,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.isConnected = true;
         this.isReady = false;
         this.vehiclePositionInfo = new VehiclePositionInfo(this.userId);
-        this.lapNumber = 0;
+        this.lapNumber = 1;
         this.latestLapTime = 0;
         this.isFinished = false;
         this.mobileConnected = false;
@@ -43,6 +43,7 @@ var MulitplayerPlayer = /** @class */ (function () {
             numberOfReconnects: 0,
             numberOfRacesFinished: 0
         };
+        this.posChanged = false;
         this.setupSocket();
     }
     MulitplayerPlayer.prototype.setLeader = function () {
@@ -54,7 +55,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         return this.vehiclePositionInfo;
     };
     MulitplayerPlayer.prototype.restartGame = function () {
-        this.lapNumber = 0;
+        this.lapNumber = 1;
         this.latestLapTime = 0;
         this.isFinished = false;
     };
@@ -121,6 +122,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         var _this = this;
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_pos_rot, function (_a) {
             var pos = _a.pos, rot = _a.rot, speed = _a.speed;
+            _this.posChanged = true;
             _this.vehiclePositionInfo.setData(pos, rot, speed);
         });
     };
@@ -192,13 +194,15 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.setupLapDoneListener = function () {
         var _this = this;
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_lap_done, function (_a) {
-            var _b;
+            var _b, _c;
             var totalTime = _a.totalTime, latestLapTime = _a.latestLapTime, lapNumber = _a.lapNumber;
+            console.log("lap done");
             _this.lapNumber = lapNumber;
             _this.latestLapTime = latestLapTime;
             // dont know if total time should come from player or server
             _this.totalTime = totalTime;
-            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.playerFinishedLap(_this);
+            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.sendRaceInfo();
+            (_c = _this.room) === null || _c === void 0 ? void 0 : _c.playerFinishedLap(_this);
         });
     };
     /** Mobile socket functions */
@@ -298,7 +302,8 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.getPlayerRaceData = function () {
         return {
             playerName: this.displayName,
-            lapNumber: this.lapNumber
+            lapNumber: this.lapNumber,
+            latestLapTime: this.latestLapTime
         };
     };
     MulitplayerPlayer.prototype.getPlayerInfo = function () {

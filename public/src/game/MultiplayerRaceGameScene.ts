@@ -1,10 +1,10 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { PerspectiveCamera, Clock } from "three";
+import { PerspectiveCamera, Clock, Vector3 } from "three";
 import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected } from "../shared-backend/multiplayer-shared-stuff";
+import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info } from "../shared-backend/multiplayer-shared-stuff";
 import { IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
@@ -61,11 +61,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
      * number of updates of other vehicles without updating the position from server 
      */
     numNoUpdate: number
+    scoreSpans: HTMLSpanElement[]
 
     constructor() {
         super()
         this.updateClock = new Clock(false)
-        this.lastOVUpdate = 0
+        this.lastOVUpdate = 0.0
         this.numNoUpdate = 0
         this.currentNumberOfLaps = 2
         this.isReady = false
@@ -84,6 +85,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             transform: translate(-50%, 0);
             font-size:24px;
         `)
+        this.scoreSpans = []
 
         this.lapsInfo = document.createElement("span")
         this.gameInfoDiv.appendChild(this.lapsInfo)
@@ -152,6 +154,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         const { position, rotation } = this.course.getGoalCheckpoint()
 
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
+        this.vehicle.setCanDrive(true)
+        this.vehicle.resetPosition()
+        this.vehicle.addCamera(this.camera)
+        this.showSecondaryInfo("waiting for other players")
 
         this.sendPlayerReady()
     }
@@ -190,7 +196,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 })
             }
 
-            this.vehicle.addCamera(this.camera)
+
+            const p = this.vehicle.getPosition()
+            this.vehicle.setPosition(p.x, p.y + 5, p.z)
+
             resolve()
         })
     }
@@ -209,6 +218,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                     const ghost = new GhostVehicle(config)
                     batch.push(ghost.loadModel())
                     this.otherVehicles.push(ghost)
+                    ghost.updateVehicleSetup(p.vehicleSetup)
                 }
             }
             Promise.all(batch).then(() => {
@@ -216,7 +226,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                     console.log("adding ghost to scene")
                     ghost.addToScene(this)
                     ghost.show()
+                    // put in air to hide haha
+                    ghost.setPosition(new Vector3(100, 100, 100))
                 }
+
                 resolve()
             })
         })
@@ -269,6 +282,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupUserSettingsChangedListener()
         this.setupMobileControlsListener()
         this.setupMobileControllerDisconnectedListener()
+        this.setupRaceInfoListener()
     }
 
     setupMobileControlsListener() {
@@ -362,10 +376,17 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.vehicle.setCanDrive(true)
     }
 
+    setupRaceInfoListener() {
+        this.socket.on(m_fs_race_info, (data: any) => {
+            this.updateScoreTable(data.raceData)
+        })
+    }
+
     setupStartGameListener() {
         // spawnPosition is a {[userId:string]:number}
         // countdown is a number
         this.socket.on(m_fs_game_starting, ({ spawnPositions, countdown }) => {
+            this.clearSecondaryInfo()
             this.updateClock.start()
             console.log("start game", spawnPositions, countdown)
             this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
@@ -387,7 +408,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.socket.on(m_fs_vehicles_position_info, (info: any) => {
             this.vehiclesPositionInfo = info
             this.lastOVUpdate = this.updateClock.getDelta()
+
+            //   this.lastOVUpdate = Math.max(0.01, this.lastOVUpdate)
             this.numNoUpdate = 0
+            for (let o of this.otherVehicles) {
+                o.saveCurrentPosition()
+            }
         })
     }
 
@@ -421,6 +447,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.currentNumberOfLaps = this.config.gameSettings.numberOfLaps
         console.log("setting game room action", this.config.gameRoomActions)
         this.gameRoomActions = this.config.gameRoomActions
+        this.createScoreTable()
     }
 
     toggleUseSound() {
@@ -501,9 +528,62 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
     }
 
-    updateScoreTable(delta: number) {
+    createScoreTable() {
+        const table = document.createElement("table")
+        this.gameInfoDiv.appendChild(table)
+        table.classList.add("score-table")
+        table.setAttribute("style", `
+            position:absolute;
+            bottom:0;
+            left:0;
+        `)
+        this.scoreSpans = []
+
+        const head = document.createElement("thead")
+        table.appendChild(head)
+        const th1 = document.createElement("th")
+        th1.textContent = "Player"
+        head.appendChild(th1)
+        const th2 = document.createElement("th")
+        th2.textContent = "LT | Lap"
+        head.appendChild(th2)
+        const tableB = document.createElement("tbody")
+        table.appendChild(tableB)
+
+        for (let p of this.config.players) {
+            const scoreRow = document.createElement("tr")
+            tableB.appendChild(scoreRow)
+            const nameInfo = document.createElement("td")
+            nameInfo.setAttribute("style", "margin-right:5px; with:75px;")
+            scoreRow.appendChild(nameInfo)
+            nameInfo.textContent = p.playerName.slice(0, 10)
+            const scoreSpan = document.createElement("td")
+            scoreSpan.textContent = `-1 | ${1} / ${this.currentNumberOfLaps}`
+            scoreRow.appendChild(scoreSpan)
+            this.scoreSpans.push(scoreSpan)
+        }
+    }
+    /**
+     * 
+     * @param raceData 
+     * { playerName,
+     *       lapNumber,
+      *      latestLapTime
+     *       }
+     */
+    updateScoreTable(raceData: any[]) {
+        for (let i = 0; i < raceData.length; i++) {
+            this.scoreSpans[i].textContent = `${raceData[i].latestLapTime} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps}`
+        }
+    }
+
+    updatePlayerRaceInfo(delta: number) {
         this.totalTimeDiv.textContent = this.gameTime.getTotalTime().toFixed(2)
-        this.kmhInfo.textContent = `${this.vehicle.getCurrentSpeedKmHour(delta).toFixed(0)} km/h`
+        let kmh = this.vehicle.getCurrentSpeedKmHour(delta)
+        if (kmh > -1) {
+            kmh = Math.abs(kmh)
+        }
+        this.kmhInfo.textContent = `${kmh.toFixed(0)} km/h`
         this.lapsInfo.textContent = `${this.gameTime.lapNumber} / ${this.currentNumberOfLaps}`
     }
 
@@ -539,10 +619,14 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
     updateOtherVehicles() {
         // alpha must be atleast the ping
+        //  console.log("(this.lastPing / 1000)", (this.lastPing / 1000))
+        //console.log("alpha calc", "(((1000 / this.targetFPS) / 1000)", (1000 / this.targetFPS) / 1000, " this.numNoUpdate", this.numNoUpdate, " this.lastOVUpdate", this.lastOVUpdate, "sum ", ((((1000 / this.targetFPS) / 1000) * this.numNoUpdate)) / this.lastOVUpdate)
 
-        let alpha = (((this.targetFPS / 1000) * this.numNoUpdate) + (this.lastPing / 1000)) / this.lastOVUpdate
+        let alpha = this.lastOVUpdate === 0 || this.numNoUpdate === 0 ?
+            0 ://  this.lastPing / 1000 :
+            ((((1000 / this.targetFPS) / 1000) * this.numNoUpdate)) / this.lastOVUpdate
+        // console.log("alpha", alpha)
         if (alpha > 1) {
-            console.warn("alpha bigger than 1", alpha)
             alpha = 1
         }
         for (let v of this.otherVehicles) {
@@ -555,8 +639,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                     v.setPosition(info.pos)
                     v.setSimpleRotation(info.rot)
 
-                } else {
-                    console.log("no info pos", info)
                 }
             }
         }
@@ -577,7 +659,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.sendPosition()
         // }
         this.updateOtherVehicles()
-        this.updateScoreTable(_delta)
+        this.updatePlayerRaceInfo(_delta)
 
         if (!this.usingMobileController) {
             driveVehicleWithKeyboard(this.vehicle, this.vehicleControls)

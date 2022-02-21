@@ -54,6 +54,7 @@ export class MulitplayerPlayer {
 
     dataCollection: IPlayerDataCollection
     geoIp: { ip: string, geo: any }
+    posChanged: boolean
 
     constructor(desktopSocket: Socket, config: MultiplayPlayerConfig) {
         this.desktopSocket = desktopSocket
@@ -68,7 +69,7 @@ export class MulitplayerPlayer {
         this.isConnected = true
         this.isReady = false
         this.vehiclePositionInfo = new VehiclePositionInfo(this.userId)
-        this.lapNumber = 0
+        this.lapNumber = 1
         this.latestLapTime = 0
         this.isFinished = false
         this.mobileConnected = false
@@ -84,6 +85,7 @@ export class MulitplayerPlayer {
             numberOfReconnects: 0,
             numberOfRacesFinished: 0
         }
+        this.posChanged = false
 
         this.setupSocket()
     }
@@ -99,7 +101,7 @@ export class MulitplayerPlayer {
     }
 
     restartGame() {
-        this.lapNumber = 0
+        this.lapNumber = 1
         this.latestLapTime = 0
         this.isFinished = false
     }
@@ -169,6 +171,7 @@ export class MulitplayerPlayer {
 
     setupGetPosRotListener() {
         this.desktopSocket.on(m_ts_pos_rot, ({ pos, rot, speed }) => {
+            this.posChanged = true
             this.vehiclePositionInfo.setData(pos, rot, speed)
         })
     }
@@ -237,10 +240,12 @@ export class MulitplayerPlayer {
 
     setupLapDoneListener() {
         this.desktopSocket.on(m_ts_lap_done, ({ totalTime, latestLapTime, lapNumber }) => {
+            console.log("lap done")
             this.lapNumber = lapNumber
             this.latestLapTime = latestLapTime
             // dont know if total time should come from player or server
             this.totalTime = totalTime
+            this.room?.sendRaceInfo()
             this.room?.playerFinishedLap(this)
         })
     }
@@ -337,7 +342,8 @@ export class MulitplayerPlayer {
     getPlayerRaceData() {
         return {
             playerName: this.displayName,
-            lapNumber: this.lapNumber
+            lapNumber: this.lapNumber,
+            latestLapTime: this.latestLapTime
         }
     }
 

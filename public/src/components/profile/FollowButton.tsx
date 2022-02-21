@@ -11,6 +11,7 @@ import {
 import IconButton from "@mui/material/IconButton";
 import { Unsubscribe } from "firebase/firestore";
 import BackdropButton from "../button/BackdropButton";
+import { CircularProgress } from "@mui/material";
 
 interface IFollowButton {
   userData: IFollower;
@@ -20,27 +21,33 @@ interface IFollowButton {
 
 const FollowButton = (props: IFollowButton) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setIsLoading] = useState(true);
 
   const handleButtonClick = () => {
     if (isFollowing) {
-      removeFollow(props.userData.uid, props.otherUserData.uid);
+      removeFollow(props.userData.uid, props.otherUserData.uid).then(() => {
+        setIsLoading(false);
+      });
     } else {
       addFollow(
         props.userData.uid,
         props.userData,
         props.otherUserData.uid,
         props.otherUserData
-      );
+      ).then(() => {
+        setIsLoading(false);
+      });
     }
   };
 
   useEffect(() => {
     let isFollowingUnsub: Unsubscribe;
-    if (props.userData && props.otherUserData) {
+    if (props.userData?.uid && props.otherUserData) {
       isFollowingUnsub = isUserFollower(
         props.userData.uid,
         props.otherUserData.uid,
         (_isFollowing) => {
+          setIsLoading(false);
           setIsFollowing(_isFollowing);
         }
       );
@@ -53,15 +60,28 @@ const FollowButton = (props: IFollowButton) => {
   }, [props.userData, props.otherUserData]);
 
   if (
-    !props.userData ||
+    !props.userData?.uid ||
     !props.otherUserData ||
     props.userData.uid === props.otherUserData.uid
   )
     return null;
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <CircularProgress />
+      </div>
+    );
+  }
+
   if (props.onlyIcon) {
     return (
-      <IconButton onClick={handleButtonClick}>
+      <IconButton
+        onClick={() => {
+          setIsLoading(true);
+          handleButtonClick();
+        }}
+      >
         {!isFollowing ? <PersonAddIcon /> : <PersonRemoveIcon />}
       </IconButton>
     );

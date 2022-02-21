@@ -25,6 +25,7 @@ interface ICreatedRoomInfo {
   };
   date: Timestamp;
   roomId: string;
+  extraData: any;
 }
 
 interface IRoomInfoRow {
@@ -34,8 +35,10 @@ interface IRoomInfoRow {
 const RoomInfoRow = (props: IRoomInfoRow) => {
   const [open, setOpen] = useState(false);
 
-  const keys = Object.keys(props.roomInfo);
-
+  const extraData = props.roomInfo?.extraData ?? {};
+  const keys = Object.keys(extraData);
+  const multiplayer = extraData?.multiplayer;
+  const players = extraData?.players ?? [];
   return (
     <>
       <TableRow>
@@ -50,28 +53,55 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         </TableCell>
         <TableCell>{props.roomInfo.userId}</TableCell>
         <TableCell>
-          {props.roomInfo.geo?.country ?? "unknown country"}
+          {multiplayer
+            ? extraData.players?.[0]?.geo?.country ?? "unknown country"
+            : extraData.geoIp?.geo?.country ?? "unknown country"}
         </TableCell>
+        <TableCell>{extraData.players?.length ?? 0}</TableCell>
+        <TableCell>{multiplayer ? "Multiplayer" : "Split screen"}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open}>
             <List>
               {keys.map((k) => {
-                if (typeof props.roomInfo[k] === "object") {
+                if (typeof extraData[k] === "object") {
                   return null;
                 }
                 return (
                   <ListItem key={k}>
                     <ListItemText
                       secondary={k}
-                      primary={props.roomInfo[k].toString()}
+                      primary={extraData[k].toString()}
                     />
                   </ListItem>
                 );
               })}
             </List>
             <Divider variant="middle" />
+            {players.map((p: any) => {
+              const pKeys = Object.keys(p);
+              return (
+                <React.Fragment key={p.id}>
+                  <div>
+                    {pKeys.map((k) => {
+                      if (typeof p[k] === "object") {
+                        return null;
+                      }
+                      return (
+                        <span key={k}>
+                          <strong> {k}:</strong>{" "}
+                          <span style={{ marginRight: 15 }}>
+                            {p[k].toString()}
+                          </span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <Divider variant="middle" />
+                </React.Fragment>
+              );
+            })}
           </Collapse>
         </TableCell>
       </TableRow>
@@ -84,6 +114,7 @@ interface ICreatedRoomsDataTable {
 }
 
 const CreatedRoomsDataTable = (props: ICreatedRoomsDataTable) => {
+  console.log("props", props);
   return (
     <TableContainer
       component={Paper}
@@ -100,11 +131,13 @@ const CreatedRoomsDataTable = (props: ICreatedRoomsDataTable) => {
             <TableCell>Date</TableCell>
             <TableCell>UserId</TableCell>
             <TableCell>Country</TableCell>
+            <TableCell>Number of player</TableCell>
+            <TableCell>Mutliplayer</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.roomsInfo.map((info) => (
-            <RoomInfoRow roomInfo={info} key={info.roomId} />
+          {props.roomsInfo.map((info, i) => (
+            <RoomInfoRow roomInfo={info} key={`${info.roomId}-${i}`} />
           ))}
         </TableBody>
       </Table>

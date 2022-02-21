@@ -39,7 +39,7 @@ export const addCreatedRooms = (roomId: string, userId: string, extraData?: any)
         extraData
     }
     obj = deleteUndefined(obj)
-
+    console.log("saving obj", obj)
     try {
 
         ref.set(obj).then(() => {
@@ -61,10 +61,11 @@ export const deleteUndefined = (obj: Object) => {
     let key: keyof typeof obj
     for (key in obj) {
         if (obj[key] === undefined || obj[key] === null) {
-            console.log("deleting key", key)
+            console.log("deleting key", key, "value", obj[key])
             delete obj[key]
         }
         if (typeof obj[key] === "object") {
+            console.log("recurse", key)
             obj[key] = deleteUndefined(obj[key]) as any
         }
     }
