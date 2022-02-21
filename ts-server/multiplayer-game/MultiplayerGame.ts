@@ -104,6 +104,9 @@ export class MultiplayerRoom {
     numberOfLaps: number
     needsReload: boolean
 
+    roomCreatedTime: number
+    numberOfRestarts: number
+
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
         this.gameSettings = gameSettings
@@ -117,17 +120,12 @@ export class MultiplayerRoom {
         this.io = io
         this.startTime = 0
         this.isSendingVehicleInfo = false
-        let ip = leader.desktopSocket.handshake.headers['x-forwarded-for'] ?? leader.desktopSocket.conn.remoteAddress
-        if (Array.isArray(ip)) {
-            console.log("ip is a list", ip)
-            ip = ip.join("")
-        }
-        addCreatedRooms(ip, this.roomId, leader.userId, { multiplayer: true })
 
         this.numberOfLaps = -1
         this.countdownStarted = false
         this.needsReload = false
-
+        this.roomCreatedTime = Date.now()
+        this.numberOfRestarts = 0
 
 
         // in test mode 
@@ -165,6 +163,7 @@ export class MultiplayerRoom {
     }
 
     reloadGame() {
+        this.numberOfRestarts += 1
         this.io.to(this.roomId).emit(m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings
@@ -197,7 +196,10 @@ export class MultiplayerRoom {
                 message: "Successfully reconnected",
                 status: "success",
                 data: {
-                    roomId: this.roomId
+                    roomId: this.roomId,
+                    gameStarted: this.gameStarted,
+                    players: this.getPlayersInfo(),
+                    gameSettings: this.gameSettings
                 }
             })
             return
@@ -245,7 +247,9 @@ export class MultiplayerRoom {
                 status: "success",
                 data: {
                     roomId: this.roomId,
-                    gameStarted: this.gameStarted
+                    gameStarted: this.gameStarted,
+                    players: this.getPlayersInfo(),
+                    gameSettings: this.gameSettings
                 }
             })
         }
@@ -291,6 +295,24 @@ export class MultiplayerRoom {
     }
 
     deleteRoom() {
+
+        let ip = this.leader.desktopSocket.handshake.headers['x-forwarded-for'] ?? this.leader.desktopSocket.conn.remoteAddress
+        if (Array.isArray(ip)) {
+            console.log("ip is a list", ip)
+            ip = ip.join("")
+        }
+
+        addCreatedRooms(this.roomId, this.leader.userId,
+            {
+                multiplayer: true,
+                roomCreatedDate: this.roomCreatedTime,
+                roomDeleteDate: Date.now(),
+                startedGame: this.gameStarted,
+                players: this.players.map(p => p.getEndOfRoomInfo()),
+                gameSettings: this.gameSettings,
+            }
+        )
+
         this.isSendingVehicleInfo = false
         clearInterval(this.gameInterval?.[Symbol.toPrimitive]())
         clearTimeout(this.countdownTimeout?.[Symbol.toPrimitive]())
@@ -356,7 +378,7 @@ export class MultiplayerRoom {
 
             // const arr = this.players.map(p => p.getVehicleInfo())
             this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
-        }, 1000 / this.gameSettings.targetFPS ?? 45) // how many times?
+        }, 1000 / 25) // how many times?
     }
 
     startGame() {

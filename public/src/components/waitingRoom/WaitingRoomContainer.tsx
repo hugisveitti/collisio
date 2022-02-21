@@ -11,7 +11,6 @@ import { getLocalUid, saveLocalStorageItem } from "../../classes/localStorage";
 import {
   addToAvailableRooms,
   removeFromAvailableRooms,
-  saveRoom,
 } from "../../firebase/firestoreFunctions";
 import { UserContext } from "../../providers/UserProvider";
 import {
@@ -48,6 +47,7 @@ import {
 } from "../Routes";
 import { IStore } from "../store";
 import DeviceOrientationPermissionComponent from "./DeviceOrientationPermissionComponent";
+import HowToConnectComponent from "./HowToConnectComponent";
 import WaitingRoomComponent from "./WaitingRoomComponent";
 
 interface IWaitingRoomProps {
@@ -62,7 +62,6 @@ interface WaitParamType {
  * since variables created with useState behave weird with useEffect
  */
 let toSavePlayers = [];
-let toSaveRoomId = "";
 let toSaveGameSettings = {};
 
 const WaitingRoomContainer = (props: IWaitingRoomProps) => {
@@ -74,21 +73,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   const socket = getSocket();
   // have to have socket to get in
-
-  const handleSaveRoomInfo = () => {
-    if (toSaveRoomId) {
-      const roomInfo: IRoomInfo = {
-        desktopId: user?.uid ?? getLocalUid(),
-        desktopAuthenticated: !!user,
-        roomId: toSaveRoomId,
-        gameSettings: toSaveGameSettings as IGameSettings,
-        players: toSavePlayers.map(playerInfoToPreGamePlayerInfo),
-        date: getDateNow(),
-        canceledGame: window.location.href !== gameRoomPath,
-      };
-      saveRoom(roomInfo);
-    }
-  };
 
   const getPlayersInRoom = () => {
     socket.emit(mdts_players_in_room, { roomId });
@@ -120,11 +104,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
-      if (!onMobile) {
-        /** save on unmount only if no gameRoom */
-
-        handleSaveRoomInfo();
-      }
       props.store.setPreviousPage(waitingRoomPath);
     };
   }, []);
@@ -220,7 +199,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
 
   useEffect(() => {
     if (!onMobile && props.store.roomId) {
-      toSaveRoomId = props.store.roomId ?? roomId;
       if (user) {
         addToAvailableRooms(user.uid, {
           roomId: props.store.roomId,
@@ -264,9 +242,9 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
               user={user}
               roomId={roomId}
             />
+            <HowToConnectComponent roomId={props.store.roomId} />
           </React.Fragment>
         )}
-
         <DeviceOrientationPermissionComponent
           onMobile={onMobile}
           onIphone={isIphone()}

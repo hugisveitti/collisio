@@ -99,7 +99,6 @@ var RoomMaster = /** @class */ (function () {
             console.log("ip is a list", ip);
             ip = ip.join("");
         }
-        (0, serverFirebaseFunctions_1.addCreatedRooms)(ip, roomId, userId);
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
         if (numberOfRoomsSendingControls > 25) {
             console.warn("Too many rooms, so not creating room");
@@ -204,7 +203,9 @@ var Room = /** @class */ (function () {
         this.gameStarted = false;
         this.sendingControls = false;
         this.desktopUserId = undefined;
+        this.geoIp = (0, serverFirebaseFunctions_1.getGeoInfo)(socket);
         this.isConnected = true;
+        this.roomCreatedDate = Date.now();
         this.deleteRoomCallback = deleteRoomCallback;
         this.setSocket(socket);
         var dataKeys = Object.keys(data);
@@ -245,9 +246,27 @@ var Room = /** @class */ (function () {
                     var player = _a[_i];
                     player.desktopDisconnected();
                 }
-                _this.deleteRoomCallback();
+                _this.deleteRoom();
             }
         });
+    };
+    Room.prototype.deleteRoom = function () {
+        var _a;
+        var extraData = {
+            geoIp: (0, serverFirebaseFunctions_1.deleteUndefined)(this.geoIp),
+            roomDeleteDate: Date.now(),
+            roomCreatedDate: this.roomCreatedDate,
+            gameSettings: this.gameSettings,
+            multiplayer: false,
+            players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
+            gameStarted: this.gameStarted
+        };
+        extraData = (0, serverFirebaseFunctions_1.deleteUndefined)(extraData);
+        (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, (_a = this.desktopUserId) !== null && _a !== void 0 ? _a : "undef", extraData);
+        this.deleteRoomCallback();
+        if (this.desktopUserId) {
+            (0, serverFirebaseFunctions_1.removeAvailableRoom)(this.desktopUserId);
+        }
     };
     Room.prototype.setupLeftWebsiteListener = function () {
         var _this = this;
@@ -257,10 +276,7 @@ var Room = /** @class */ (function () {
                 var player = _a[_i];
                 player.desktopDisconnected();
             }
-            _this.deleteRoomCallback();
-            if (_this.desktopUserId) {
-                (0, serverFirebaseFunctions_1.removeAvailableRoom)(_this.desktopUserId);
-            }
+            _this.deleteRoom();
         });
     };
     Room.prototype.setupVechilesReadyListener = function () {

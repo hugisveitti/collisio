@@ -37,9 +37,9 @@ const BackdropButton = (props: IBackdropButton) => {
         }
       }}
       style={{
-        ...props.style,
         margin: props.center ? "auto" : "",
         width: props.width,
+        ...props.style,
       }}
     >
       {props.loading ? (

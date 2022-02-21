@@ -1,6 +1,6 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { PerspectiveCamera } from "three";
+import { PerspectiveCamera, Clock } from "three";
 import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
@@ -54,9 +54,19 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
     currentNumberOfLaps: number
     usingMobileController: boolean
+    updateClock: Clock
+    // last other vehicles update
+    lastOVUpdate: number
+    /**
+     * number of updates of other vehicles without updating the position from server 
+     */
+    numNoUpdate: number
 
     constructor() {
         super()
+        this.updateClock = new Clock(false)
+        this.lastOVUpdate = 0
+        this.numNoUpdate = 0
         this.currentNumberOfLaps = 2
         this.isReady = false
         this.vehiclesPositionInfo = {}
@@ -138,6 +148,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         addMusic(this.gameSettings.musicVolume, this.camera as PerspectiveCamera, "racing.mp3")
         this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
         console.log("everything created")
+
+        const { position, rotation } = this.course.getGoalCheckpoint()
+
+        this.vehicle.setCheckpointPositionRotation({ position, rotation })
 
         this.sendPlayerReady()
     }
@@ -312,13 +326,18 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.socket.on(m_fs_game_finished, (data) => {
             const { winner, raceData } = data
             this.showImportantInfo(`Race finished, ${winner.name} is the winner with total time ${winner.totalTime.toFixed(2)}`)
+            // save race, get coins
         })
     }
 
     sendPlayerReady() {
-        console.log("sending ready")
-        this.isReady = true
-        this.socket.emit(m_ts_player_ready, {})
+        // just wait a little...
+        setTimeout(() => {
+
+            console.log("sending ready")
+            this.isReady = true
+            this.socket.emit(m_ts_player_ready, {})
+        }, 500)
     }
 
     setupCountdownListener() {
@@ -347,6 +366,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         // spawnPosition is a {[userId:string]:number}
         // countdown is a number
         this.socket.on(m_fs_game_starting, ({ spawnPositions, countdown }) => {
+            this.updateClock.start()
             console.log("start game", spawnPositions, countdown)
             this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
 
@@ -366,6 +386,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     setupVehiclesPositionInfo() {
         this.socket.on(m_fs_vehicles_position_info, (info: any) => {
             this.vehiclesPositionInfo = info
+            this.lastOVUpdate = this.updateClock.getDelta()
+            this.numNoUpdate = 0
         })
     }
 
@@ -516,19 +538,29 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     updateOtherVehicles() {
+        // alpha must be atleast the ping
+
+        let alpha = (((this.targetFPS / 1000) * this.numNoUpdate) + (this.lastPing / 1000)) / this.lastOVUpdate
+        if (alpha > 1) {
+            console.warn("alpha bigger than 1", alpha)
+            alpha = 1
+        }
         for (let v of this.otherVehicles) {
             if (v.isReady) {
 
                 const info = this.vehiclesPositionInfo[v.id]
 
                 if (info?.pos) {
+                    v.setSpeed(info.speed, this.lastOVUpdate, alpha)
                     v.setPosition(info.pos)
                     v.setSimpleRotation(info.rot)
+
                 } else {
                     console.log("no info pos", info)
                 }
             }
         }
+        this.numNoUpdate += 1
     }
 
     update(_time: number, _delta: number): void {

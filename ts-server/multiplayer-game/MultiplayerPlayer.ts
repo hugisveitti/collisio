@@ -3,7 +3,17 @@ import { IUserSettings } from "../../public/src/classes/User"
 import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_game_settings_changed, m_fs_game_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected } from "../../public/src/shared-backend/multiplayer-shared-stuff"
 import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
+import { deleteUndefined, getGeoInfo } from "../serverFirebaseFunctions"
 import { MultiplayerRoom } from "./MultiplayerGame"
+
+export interface IPlayerDataCollection {
+    numberOfReconnects: number
+    numberOfVehicleChanges: number
+    numberOfMobileConnections: number
+    totalNumberOfLapsDone: number
+    numberOfRacesFinished: number
+
+}
 
 export interface MultiplayPlayerConfig {
     userId: string
@@ -42,8 +52,12 @@ export class MulitplayerPlayer {
     mobileControls: MobileControls
     isSendingMobileControls: boolean
 
+    dataCollection: IPlayerDataCollection
+    geoIp: { ip: string, geo: any }
+
     constructor(desktopSocket: Socket, config: MultiplayPlayerConfig) {
         this.desktopSocket = desktopSocket
+        this.geoIp = getGeoInfo(this.desktopSocket)
         this.config = config
         this.userId = config.userId
         this.displayName = config.displayName
@@ -62,6 +76,14 @@ export class MulitplayerPlayer {
         this.isSendingMobileControls = false
 
         this.mobileControls = {}
+
+        this.dataCollection = {
+            numberOfMobileConnections: 0,
+            numberOfVehicleChanges: 0,
+            totalNumberOfLapsDone: 0,
+            numberOfReconnects: 0,
+            numberOfRacesFinished: 0
+        }
 
         this.setupSocket()
     }
@@ -171,6 +193,7 @@ export class MulitplayerPlayer {
         }) => {
             if (userSettings) {
                 if (this.userSettings?.vehicleSettings.vehicleType !== userSettings?.vehicleSettings.vehicleType) {
+                    this.dataCollection.numberOfVehicleChanges += 1
                     this.room?.setNeedsReload()
                 }
                 this.userSettings = userSettings
@@ -199,6 +222,8 @@ export class MulitplayerPlayer {
             this.isConnected = false
             console.log("muliplayer player disconencted", this.userId)
             this.room?.playerDisconnected(this.userId)
+            // always disconnect mobile ?
+            this.mobileSocket?.disconnect()
         })
     }
 
@@ -224,6 +249,7 @@ export class MulitplayerPlayer {
 
     addMobileSocket(socket: Socket) {
         console.log("added mobile socket")
+        this.dataCollection.numberOfMobileConnections += 1
         this.turnOffMobileSocket()
         this.mobileConnected = true
         this.mobileSocket = socket
@@ -316,7 +342,6 @@ export class MulitplayerPlayer {
     }
 
     getPlayerInfo() {
-        console.log("sending player info", this.userSettings?.vehicleSettings.vehicleType)
         return {
             playerName: this.displayName,
             isLeader: this.isLeader,
@@ -330,7 +355,19 @@ export class MulitplayerPlayer {
         } as IPlayerInfo
     }
 
+    // data to collect
+    getEndOfRoomInfo() {
+        let obj: any = {
+            ...this.getPlayerInfo(),
+            dataCollection: this.dataCollection,
+            ...this.geoIp
+        }
+        obj = deleteUndefined(obj)
+        return obj
+    }
+
     copyPlayer(player: MulitplayerPlayer) {
+        player.dataCollection.numberOfReconnects += 1
         if (player.vehicleSetup) {
             // @ts-ignore
             this.vehicleSetup = {}
@@ -357,10 +394,19 @@ export class MulitplayerPlayer {
             this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key]
         }
 
+        let key: keyof typeof player.dataCollection
+        for (key in player.dataCollection) {
+            this.dataCollection[key] = player.dataCollection[key]
+        }
+
         // only primative types? otherwise shallow copy
         this.playerNumber = player.playerNumber
         if (player.isLeader) {
             this.setLeader()
+        }
+        if (player.mobileConnected) {
+            this.mobileConnected = true
+            this.mobileSocket = player.mobileSocket
         }
 
         player.turnOffSocket()

@@ -1,11 +1,24 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MulitplayerPlayer = void 0;
 var multiplayer_shared_stuff_1 = require("../../public/src/shared-backend/multiplayer-shared-stuff");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
+var serverFirebaseFunctions_1 = require("../serverFirebaseFunctions");
 var MulitplayerPlayer = /** @class */ (function () {
     function MulitplayerPlayer(desktopSocket, config) {
         this.desktopSocket = desktopSocket;
+        this.geoIp = (0, serverFirebaseFunctions_1.getGeoInfo)(this.desktopSocket);
         this.config = config;
         this.userId = config.userId;
         this.displayName = config.displayName;
@@ -23,6 +36,13 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.totalTime = 0;
         this.isSendingMobileControls = false;
         this.mobileControls = {};
+        this.dataCollection = {
+            numberOfMobileConnections: 0,
+            numberOfVehicleChanges: 0,
+            totalNumberOfLapsDone: 0,
+            numberOfReconnects: 0,
+            numberOfRacesFinished: 0
+        };
         this.setupSocket();
     }
     MulitplayerPlayer.prototype.setLeader = function () {
@@ -126,6 +146,7 @@ var MulitplayerPlayer = /** @class */ (function () {
             var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
             if (userSettings) {
                 if (((_b = _this.userSettings) === null || _b === void 0 ? void 0 : _b.vehicleSettings.vehicleType) !== (userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings.vehicleType)) {
+                    _this.dataCollection.numberOfVehicleChanges += 1;
                     (_c = _this.room) === null || _c === void 0 ? void 0 : _c.setNeedsReload();
                 }
                 _this.userSettings = userSettings;
@@ -150,10 +171,12 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.setupDisconnectedListener = function () {
         var _this = this;
         this.desktopSocket.on("disconnect", function () {
-            var _a;
+            var _a, _b;
             _this.isConnected = false;
             console.log("muliplayer player disconencted", _this.userId);
             (_a = _this.room) === null || _a === void 0 ? void 0 : _a.playerDisconnected(_this.userId);
+            // always disconnect mobile ?
+            (_b = _this.mobileSocket) === null || _b === void 0 ? void 0 : _b.disconnect();
         });
     };
     MulitplayerPlayer.prototype.setupGameSettingsChangedListener = function () {
@@ -182,6 +205,7 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.addMobileSocket = function (socket) {
         var _a;
         console.log("added mobile socket");
+        this.dataCollection.numberOfMobileConnections += 1;
         this.turnOffMobileSocket();
         this.mobileConnected = true;
         this.mobileSocket = socket;
@@ -278,38 +302,44 @@ var MulitplayerPlayer = /** @class */ (function () {
         };
     };
     MulitplayerPlayer.prototype.getPlayerInfo = function () {
-        var _a, _b;
-        console.log("sending player info", (_a = this.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings.vehicleType);
+        var _a;
         return {
             playerName: this.displayName,
             isLeader: this.isLeader,
             playerNumber: this.playerNumber,
             id: this.userId,
             isAuthenticated: this.isAuthenticated,
-            vehicleType: (_b = this.userSettings) === null || _b === void 0 ? void 0 : _b.vehicleSettings.vehicleType,
+            vehicleType: (_a = this.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings.vehicleType,
             isConnected: this.isConnected,
             vehicleSetup: this.vehicleSetup,
             mobileConnected: this.mobileConnected
         };
     };
+    // data to collect
+    MulitplayerPlayer.prototype.getEndOfRoomInfo = function () {
+        var obj = __assign(__assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection }), this.geoIp);
+        obj = (0, serverFirebaseFunctions_1.deleteUndefined)(obj);
+        return obj;
+    };
     MulitplayerPlayer.prototype.copyPlayer = function (player) {
         var _a, _b;
+        player.dataCollection.numberOfReconnects += 1;
         if (player.vehicleSetup) {
             // @ts-ignore
             this.vehicleSetup = {};
             for (var _i = 0, _c = Object.keys(player.vehicleSetup); _i < _c.length; _i++) {
-                var key = _c[_i];
+                var key_1 = _c[_i];
                 // @ts-ignore
-                this.vehicleSetup[key] = player.vehicleSetup[key];
+                this.vehicleSetup[key_1] = player.vehicleSetup[key_1];
             }
         }
         if (player.userSettings) {
             // @ts-ignore
             this.userSettings = {};
             for (var _d = 0, _e = Object.keys(player.userSettings); _d < _e.length; _d++) {
-                var key = _e[_d];
+                var key_2 = _e[_d];
                 // @ts-ignore
-                this.userSettings[key] = player.userSettings[key];
+                this.userSettings[key_2] = player.userSettings[key_2];
             }
         }
         else {
@@ -319,14 +349,22 @@ var MulitplayerPlayer = /** @class */ (function () {
         // @ts-ignore
         this.userSettings.vehicleSettings = {};
         for (var _f = 0, _g = Object.keys((_b = (_a = player.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings) !== null && _b !== void 0 ? _b : {}); _f < _g.length; _f++) {
-            var key = _g[_f];
+            var key_3 = _g[_f];
             // @ts-ignore
-            this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key];
+            this.userSettings.vehicleSettings[key_3] = player.userSettings.vehicleSettings[key_3];
+        }
+        var key;
+        for (key in player.dataCollection) {
+            this.dataCollection[key] = player.dataCollection[key];
         }
         // only primative types? otherwise shallow copy
         this.playerNumber = player.playerNumber;
         if (player.isLeader) {
             this.setLeader();
+        }
+        if (player.mobileConnected) {
+            this.mobileConnected = true;
+            this.mobileSocket = player.mobileSocket;
         }
         player.turnOffSocket();
     };

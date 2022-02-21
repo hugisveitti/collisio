@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
+exports.getGeoInfo = exports.deleteUndefined = exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
 var firestore_1 = require("@firebase/firestore");
 var firebase_config_1 = require("./firebase-config");
 var geoip = __importStar(require("geoip-lite"));
@@ -36,35 +36,58 @@ var removeAvailableRoom = function (userId) {
     });
 };
 exports.removeAvailableRoom = removeAvailableRoom;
-var addCreatedRooms = function (ip, roomId, userId, extraData) {
+var addCreatedRooms = function (roomId, userId, extraData) {
     if (firebase_config_1.onLocalHost) {
         console.log("on local host");
         return;
     }
     var ref = firebase_config_1.adminFirestore.collection(createdRoomsPath).doc();
-    var geo = geoip.lookup(ip);
     var obj = {
-        ip: ip,
         roomId: roomId,
         userId: userId,
-        geo: geo,
         date: firestore_2.Timestamp.now(),
         extraData: extraData
     };
+    obj = (0, exports.deleteUndefined)(obj);
+    try {
+        ref.set(obj).then(function () {
+            console.log("Saved created room");
+        }).catch(function (err) {
+            console.warn("Error saving created room", err);
+        });
+    }
+    catch (err) {
+        console.log("ERROR SAVING ROOM", err);
+    }
+};
+exports.addCreatedRooms = addCreatedRooms;
+/**
+ * recursively delete all undefined
+ * @param obj
+ * @returns obj with all undefined or null removed
+ */
+var deleteUndefined = function (obj) {
     var key;
     for (key in obj) {
-        if (!obj[key]) {
+        if (obj[key] === undefined || obj[key] === null) {
             console.log("deleting key", key);
             delete obj[key];
         }
+        if (typeof obj[key] === "object") {
+            obj[key] = (0, exports.deleteUndefined)(obj[key]);
+        }
     }
-    if (!geo) {
-        console.log("No geo for ip:", ip);
-    }
-    ref.set(obj).then(function () {
-        console.log("Saved created room");
-    }).catch(function (err) {
-        console.warn("Error saving created room", err);
-    });
+    return obj;
 };
-exports.addCreatedRooms = addCreatedRooms;
+exports.deleteUndefined = deleteUndefined;
+var getGeoInfo = function (socket) {
+    var _a;
+    var ip = (_a = socket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : socket.conn.remoteAddress;
+    if (Array.isArray(ip)) {
+        console.log("ip is a list", ip);
+        ip = ip.join("");
+    }
+    var geo = geoip.lookup(ip);
+    return { geo: geo, ip: ip };
+};
+exports.getGeoInfo = getGeoInfo;

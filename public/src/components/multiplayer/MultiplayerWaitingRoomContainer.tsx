@@ -15,7 +15,12 @@ import {
 } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
-import { multiplayerConnectPagePath } from "../Routes";
+import {
+  getMultiplayerControlsRoomPath,
+  getMultiplayerGameRoomPath,
+  getMultiplayerWaitingRoom,
+  multiplayerConnectPagePath,
+} from "../Routes";
 import { IStore } from "../store";
 import { getUserConfig } from "./multiplayerUtilFunctions";
 import MultiplayerWaitingRoomComponent from "./MultiplayerWaitingRoomComponent";
@@ -31,16 +36,21 @@ interface WaitParamType {
 const MultiplayerWaitingRoomContainer = (
   props: IMultiplayerWaitingRoomContainer
 ) => {
+  const onMobile = getDeviceType() !== "desktop";
   const user = useContext(UserContext);
   const history = useHistory();
   const params = useParams<WaitParamType>();
-  const roomId = params?.roomId;
+  let roomId = params?.roomId;
   let socket = getSocket();
   const [isConnecting, setIsConnecting] = useState(!socket);
 
   const handleConnectToRoom = () => {
-    props.store.setRoomId(roomId);
-    // create a socket, try to connect to this room, or create it
+    if (roomId !== "create") {
+      props.store.setRoomId(roomId);
+      // create a socket, try to connect to this room, or create it
+    } else {
+      roomId = "";
+    }
     const config = getUserConfig(props.store, user);
     console.log("sending connect to room", roomId);
     socket.emit(m_ts_connect_to_room, { roomId, config });
@@ -49,6 +59,28 @@ const MultiplayerWaitingRoomContainer = (
       if (res.status === "error") {
         history.push(multiplayerConnectPagePath);
         return;
+      }
+      if (res.data.gameStarted) {
+        // also have res.data.gameSettings, res.data.players
+        props.store.setGameSettings(res.data.gameSettings);
+        props.store.setPlayers(res.data.players);
+        console.log("got players", res.data.players);
+        const userId = user?.uid ?? getLocalUid();
+        console.log("userid", userId);
+        for (let i = 0; i < res.data.players.length; i++) {
+          if (res.data.players[i].id === userId) {
+            console.log("setting player");
+            props.store.setPlayer(res.data.players[i]);
+          }
+        }
+        if (onMobile) {
+          history.push(getMultiplayerControlsRoomPath(res.data.roomId));
+        } else {
+          history.push(getMultiplayerGameRoomPath(res.data.roomId));
+        }
+      } else if (roomId === "") {
+        console.log("change route");
+        history.push(getMultiplayerWaitingRoom(res.data.roomId));
       }
       setIsConnecting(false);
       saveLocalStorageItem("roomId", res.data.roomId);

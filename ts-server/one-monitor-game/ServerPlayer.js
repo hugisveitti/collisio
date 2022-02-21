@@ -1,8 +1,20 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var firebaseCoinFunctions_1 = require("../firebaseCoinFunctions");
+var serverFirebaseFunctions_1 = require("../serverFirebaseFunctions");
 var Player = /** @class */ (function () {
     function Player(socket, playerName, id, isAuthenticated, photoURL, userSettings, vehicleSetup) {
         var _a, _b;
@@ -13,6 +25,13 @@ var Player = /** @class */ (function () {
         this.id = id;
         this.isAuthenticated = isAuthenticated;
         this.isLeader = false;
+        this.dataCollection = {
+            numberOfMobileConnections: 0,
+            numberOfVehicleChanges: 0,
+            totalNumberOfLapsDone: 0,
+            numberOfReconnects: 0,
+            numberOfRacesFinished: 0
+        };
         this.mobileControls = new shared_stuff_1.MobileControls();
         this.VehicleControls = new shared_stuff_1.VehicleControls();
         this.isConnected = true;
@@ -21,20 +40,25 @@ var Player = /** @class */ (function () {
         this.setSocket(socket);
     }
     Player.prototype.copyPlayer = function (player) {
+        player.dataCollection.numberOfReconnects += 1;
         for (var _i = 0, _a = Object.keys(player.vehicleSetup); _i < _a.length; _i++) {
-            var key = _a[_i];
+            var key_1 = _a[_i];
             // @ts-ignore
-            this.vehicleSetup[key] = player.vehicleSetup[key];
+            this.vehicleSetup[key_1] = player.vehicleSetup[key_1];
         }
         for (var _b = 0, _c = Object.keys(player.userSettings); _b < _c.length; _b++) {
-            var key = _c[_b];
+            var key_2 = _c[_b];
             // @ts-ignore
-            this.userSettings[key] = player.userSettings[key];
+            this.userSettings[key_2] = player.userSettings[key_2];
         }
         for (var _d = 0, _e = Object.keys(player.userSettings.vehicleSettings); _d < _e.length; _d++) {
-            var key = _e[_d];
+            var key_3 = _e[_d];
             // @ts-ignore
-            this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key];
+            this.userSettings.vehicleSettings[key_3] = player.userSettings.vehicleSettings[key_3];
+        }
+        var key;
+        for (key in player.dataCollection) {
+            this.dataCollection[key] = player.dataCollection[key];
         }
         // only primative types? otherwise shallow copy
         this.playerNumber = player.playerNumber;
@@ -210,6 +234,10 @@ var Player = /** @class */ (function () {
             vehicleSetup: this.vehicleSetup
         };
     };
+    Player.prototype.getEndOfRoomInfo = function () {
+        var obj = __assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection });
+        obj = (0, serverFirebaseFunctions_1.deleteUndefined)(obj);
+    };
     Player.prototype.getPlayerControls = function () {
         return { mobileControls: this.mobileControls, playerNumber: this.playerNumber };
     };
@@ -221,13 +249,16 @@ var Player = /** @class */ (function () {
     Player.prototype.setupUserSettingsListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mts_user_settings_changed, function (_a) {
-            var _b, _c, _d;
+            var _b, _c, _d, _e, _f;
             var userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
             if (userSettings) {
+                if (((_b = userSettings.vehicleSettings) === null || _b === void 0 ? void 0 : _b.vehicleType) !== ((_c = _this.userSettings.vehicleSettings) === null || _c === void 0 ? void 0 : _c.vehicleType)) {
+                    _this.dataCollection.numberOfVehicleChanges += 1;
+                }
                 _this.userSettings = userSettings;
             }
             if (vehicleSetup) {
-                console.log("vehiclesetup changed", vehicleSetup.vehicleType, (_b = vehicleSetup.exhaust) === null || _b === void 0 ? void 0 : _b.id, (_c = vehicleSetup.wheelGuards) === null || _c === void 0 ? void 0 : _c.id, (_d = vehicleSetup.spoiler) === null || _d === void 0 ? void 0 : _d.id);
+                console.log("vehiclesetup changed", vehicleSetup.vehicleType, (_d = vehicleSetup.exhaust) === null || _d === void 0 ? void 0 : _d.id, (_e = vehicleSetup.wheelGuards) === null || _e === void 0 ? void 0 : _e.id, (_f = vehicleSetup.spoiler) === null || _f === void 0 ? void 0 : _f.id);
                 _this.vehicleSetup = vehicleSetup;
             }
             // TODO: check if user owns vehicleType
@@ -261,6 +292,7 @@ var Player = /** @class */ (function () {
     };
     // data: IEndOfRaceInfoPlayer
     Player.prototype.playerFinished = function (data) {
+        this.dataCollection.numberOfRacesFinished += 1;
         this.socket.emit(shared_stuff_1.stm_player_finished, data);
         (0, firebaseCoinFunctions_1.updatePlayersTokens)(data);
     };

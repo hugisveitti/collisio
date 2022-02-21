@@ -25,6 +25,8 @@ import {
 } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { updatePlayersTokens } from "../firebaseCoinFunctions"
+import { IPlayerDataCollection } from "../multiplayer-game/MultiplayerPlayer"
+import { deleteUndefined } from "../serverFirebaseFunctions"
 import { Room } from "./ServerGame"
 
 
@@ -50,6 +52,8 @@ export class Player {
     userSettings: IUserSettings
     vehicleSetup
 
+    dataCollection: IPlayerDataCollection
+
     constructor(socket: Socket, playerName: string, id: string, isAuthenticated: boolean, photoURL: string, userSettings: IUserSettings, vehicleSetup: VehicleSetup) {
 
         this.playerName = playerName
@@ -59,6 +63,13 @@ export class Player {
         this.id = id
         this.isAuthenticated = isAuthenticated
         this.isLeader = false
+        this.dataCollection = {
+            numberOfMobileConnections: 0,
+            numberOfVehicleChanges: 0,
+            totalNumberOfLapsDone: 0,
+            numberOfReconnects: 0,
+            numberOfRacesFinished: 0
+        }
 
         this.mobileControls = new MobileControls()
         this.VehicleControls = new VehicleControls()
@@ -70,7 +81,7 @@ export class Player {
     }
 
     copyPlayer(player: Player) {
-
+        player.dataCollection.numberOfReconnects += 1
         for (let key of Object.keys(player.vehicleSetup)) {
             // @ts-ignore
             this.vehicleSetup[key] = player.vehicleSetup[key]
@@ -83,6 +94,13 @@ export class Player {
             // @ts-ignore
             this.userSettings.vehicleSettings[key] = player.userSettings.vehicleSettings[key]
         }
+
+
+        let key: keyof typeof player.dataCollection
+        for (key in player.dataCollection) {
+            this.dataCollection[key] = player.dataCollection[key]
+        }
+
 
         // only primative types? otherwise shallow copy
         this.playerNumber = player.playerNumber
@@ -268,6 +286,15 @@ export class Player {
         } as IPlayerInfo
     }
 
+    getEndOfRoomInfo() {
+        let obj: any = {
+            ...this.getPlayerInfo(),
+            dataCollection: this.dataCollection
+        }
+        obj = deleteUndefined(obj)
+
+    }
+
     getPlayerControls() {
         return { mobileControls: this.mobileControls, playerNumber: this.playerNumber }
 
@@ -282,6 +309,9 @@ export class Player {
     setupUserSettingsListener() {
         this.socket.on(mts_user_settings_changed, ({ userSettings, vehicleSetup }) => {
             if (userSettings) {
+                if (userSettings.vehicleSettings?.vehicleType !== this.userSettings.vehicleSettings?.vehicleType) {
+                    this.dataCollection.numberOfVehicleChanges += 1
+                }
                 this.userSettings = userSettings
             }
             if (vehicleSetup) {
@@ -322,6 +352,7 @@ export class Player {
 
     // data: IEndOfRaceInfoPlayer
     playerFinished(data: any) {
+        this.dataCollection.numberOfRacesFinished += 1
         this.socket.emit(stm_player_finished, data)
         updatePlayersTokens(data)
     }

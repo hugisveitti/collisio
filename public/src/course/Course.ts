@@ -134,8 +134,12 @@ export class Course implements ICourse {
             // need to find the largest spawn number it can use
             // e.g. if there are 2 usable spawns and spawnPosition is 3 (index 2) then we find spawn 1 
             // and the position will be behind spawn 1 relative to the aligner, plus offset
-            const usableSpawnIndex = usableSpawns.length === 1 ? 0 : usableSpawns.length - 2 + (spawnPosition % 2)
+            let usableSpawnIndex = usableSpawns.length === 1 ? 0 : usableSpawns.length - 2 + (spawnPosition % 2)
             console.log("usablespawn index", usableSpawnIndex)
+            if (usableSpawnIndex < 0 || usableSpawnIndex > usableSpawns.length) {
+                console.warn("Usable spawn index wrong, usableSpawnIndex", usableSpawnIndex, ", number of spawns", usableSpawns.length)
+                usableSpawnIndex = 0
+            }
             const usablePosition = spawnAligns[usableSpawnIndex].spawn
             let aligner = spawnAligns[usableSpawnIndex].align
             rotation = this.calcSpawnAngle(aligner, usablePosition)

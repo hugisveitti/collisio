@@ -87,7 +87,6 @@ var MultiplayerRoomMaster = /** @class */ (function () {
 exports.MultiplayerRoomMaster = MultiplayerRoomMaster;
 var MultiplayerRoom = /** @class */ (function () {
     function MultiplayerRoom(io, leader, gameSettings, deleteRoomCallback) {
-        var _a;
         this.players = [];
         this.gameSettings = gameSettings;
         this.deleteRoomCallback = deleteRoomCallback;
@@ -100,15 +99,11 @@ var MultiplayerRoom = /** @class */ (function () {
         this.io = io;
         this.startTime = 0;
         this.isSendingVehicleInfo = false;
-        var ip = (_a = leader.desktopSocket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : leader.desktopSocket.conn.remoteAddress;
-        if (Array.isArray(ip)) {
-            console.log("ip is a list", ip);
-            ip = ip.join("");
-        }
-        (0, serverFirebaseFunctions_1.addCreatedRooms)(ip, this.roomId, leader.userId, { multiplayer: true });
         this.numberOfLaps = -1;
         this.countdownStarted = false;
         this.needsReload = false;
+        this.roomCreatedTime = Date.now();
+        this.numberOfRestarts = 0;
         // in test mode 
         if (false) {
             var testConfig = {
@@ -142,6 +137,7 @@ var MultiplayerRoom = /** @class */ (function () {
         this.needsReload = true;
     };
     MultiplayerRoom.prototype.reloadGame = function () {
+        this.numberOfRestarts += 1;
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings
@@ -172,7 +168,10 @@ var MultiplayerRoom = /** @class */ (function () {
                 message: "Successfully reconnected",
                 status: "success",
                 data: {
-                    roomId: this.roomId
+                    roomId: this.roomId,
+                    gameStarted: this.gameStarted,
+                    players: this.getPlayersInfo(),
+                    gameSettings: this.gameSettings
                 }
             });
             return;
@@ -215,7 +214,9 @@ var MultiplayerRoom = /** @class */ (function () {
                 status: "success",
                 data: {
                     roomId: this.roomId,
-                    gameStarted: this.gameStarted
+                    gameStarted: this.gameStarted,
+                    players: this.getPlayersInfo(),
+                    gameSettings: this.gameSettings
                 }
             });
         }
@@ -260,10 +261,23 @@ var MultiplayerRoom = /** @class */ (function () {
         }
     };
     MultiplayerRoom.prototype.deleteRoom = function () {
-        var _a, _b;
+        var _a, _b, _c;
+        var ip = (_a = this.leader.desktopSocket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : this.leader.desktopSocket.conn.remoteAddress;
+        if (Array.isArray(ip)) {
+            console.log("ip is a list", ip);
+            ip = ip.join("");
+        }
+        (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, this.leader.userId, {
+            multiplayer: true,
+            roomCreatedDate: this.roomCreatedTime,
+            roomDeleteDate: Date.now(),
+            startedGame: this.gameStarted,
+            players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
+            gameSettings: this.gameSettings,
+        });
         this.isSendingVehicleInfo = false;
-        clearInterval((_a = this.gameInterval) === null || _a === void 0 ? void 0 : _a[Symbol.toPrimitive]());
-        clearTimeout((_b = this.countdownTimeout) === null || _b === void 0 ? void 0 : _b[Symbol.toPrimitive]());
+        clearInterval((_b = this.gameInterval) === null || _b === void 0 ? void 0 : _b[Symbol.toPrimitive]());
+        clearTimeout((_c = this.countdownTimeout) === null || _c === void 0 ? void 0 : _c[Symbol.toPrimitive]());
         this.deleteRoomCallback(this.roomId);
     };
     MultiplayerRoom.prototype.sendRoomInfo = function () {
@@ -308,20 +322,19 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.startGameInterval = function () {
         var _this = this;
-        var _a;
         if (this.isSendingVehicleInfo)
             return;
         this.isSendingVehicleInfo = true;
         // dont do this if only one player
         var obj = {};
-        for (var _i = 0, _b = this.players; _i < _b.length; _i++) {
-            var p = _b[_i];
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
             obj[p.userId] = p.getVehicleInfo();
         }
         this.gameInterval = setInterval(function () {
             // const arr = this.players.map(p => p.getVehicleInfo())
             _this.io.to(_this.roomId).emit(multiplayer_shared_stuff_1.m_fs_vehicles_position_info, obj);
-        }, (_a = 1000 / this.gameSettings.targetFPS) !== null && _a !== void 0 ? _a : 45); // how many times?
+        }, 1000 / 25); // how many times?
     };
     MultiplayerRoom.prototype.startGame = function () {
         this.numberOfLaps = this.gameSettings.numberOfLaps;

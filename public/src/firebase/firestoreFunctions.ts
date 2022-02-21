@@ -165,20 +165,6 @@ export const getUserSocials = async (userId: string, followersCallback: (followe
     getUserFollowings(userId, (followings) => followingsCallback(followings))
 }
 
-/**
- * Save data about game that is started
- * So we can keep track of games started and not finished
- * @param gameInfo 
- */
-export const saveRoom = (roomInfo: IRoomInfo) => {
-    const roomKey = uuid()
-    const roomRef = doc(firestore, roomDataRefPath, roomKey)
-    setDoc(roomRef, roomInfo).catch(err => {
-        console.warn("Error saving room:", err)
-    })
-}
-
-
 export interface AvailableRoomsFirebaseObject {
     roomId: string
     displayName: string

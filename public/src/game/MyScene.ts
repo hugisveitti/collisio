@@ -33,6 +33,7 @@ export class MyScene extends Scene3D {
 
 
     pingTimeout: NodeJS.Timeout
+    lastPing: number
     totalPing: number
     totalPingsGotten: number
     fpsTick: number
@@ -70,6 +71,7 @@ export class MyScene extends Scene3D {
         this.gameSettings = defaultGameSettings
 
         this.totalPing = 0
+        this.lastPing = 0
         this.totalPingsGotten = 0
         this.time = 0
         this.fpsTick = 0
@@ -305,9 +307,9 @@ export class MyScene extends Scene3D {
         this.socket?.emit(dts_ping_test)
         this.socket?.once(std_ping_test_callback, () => {
             clearTimeout(this.pingTimeout)
-            const ping = Date.now() - start
-            this.pingInfo.textContent = `ping ${ping}ms`
-            this.totalPing += ping
+            this.lastPing = Date.now() - start
+            this.pingInfo.textContent = `ping ${this.lastPing}ms`
+            this.totalPing += this.lastPing
             this.totalPingsGotten += 1
         })
         this.pingTimeout = setTimeout(() => {

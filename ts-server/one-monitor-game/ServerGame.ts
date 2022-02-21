@@ -35,7 +35,7 @@ import {
     std_quit_game
 } from "../../public/src/shared-backend/shared-stuff";
 import { handleMutliplayerSocket } from "../multiplayer-game/MultiplayerGame";
-import { addCreatedRooms, removeAvailableRoom } from "../serverFirebaseFunctions";
+import { addCreatedRooms, deleteUndefined, getGeoInfo, removeAvailableRoom } from "../serverFirebaseFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
 
@@ -143,7 +143,7 @@ export default class RoomMaster {
             ip = ip.join("")
         }
 
-        addCreatedRooms(ip, roomId, userId)
+
 
         const { numberOfRoomsSendingControls } = this.getStats()
         if (numberOfRoomsSendingControls > 25) {
@@ -255,7 +255,6 @@ export class Room {
     socket!: Socket
     gameStarted: boolean
 
-
     gameSettings
     isConnected
     deleteRoomCallback
@@ -264,6 +263,9 @@ export class Room {
     sendControlsInterval?: NodeJS.Timer
 
     sendingControls: boolean
+    geoIp: { geo: any, ip: string }
+
+    roomCreatedDate: number
 
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
@@ -273,8 +275,9 @@ export class Room {
         this.gameStarted = false
         this.sendingControls = false
         this.desktopUserId = undefined
-
+        this.geoIp = getGeoInfo(socket)
         this.isConnected = true
+        this.roomCreatedDate = Date.now()
         this.deleteRoomCallback = deleteRoomCallback
 
         this.setSocket(socket)
@@ -317,9 +320,27 @@ export class Room {
                 for (let player of this.players) {
                     player.desktopDisconnected()
                 }
-                this.deleteRoomCallback()
+                this.deleteRoom()
             }
         })
+    }
+
+    deleteRoom() {
+        let extraData: any = {
+            geoIp: deleteUndefined(this.geoIp),
+            roomDeleteDate: Date.now(),
+            roomCreatedDate: this.roomCreatedDate,
+            gameSettings: this.gameSettings,
+            multiplayer: false,
+            players: this.players.map(p => p.getEndOfRoomInfo()),
+            gameStarted: this.gameStarted
+        }
+        extraData = deleteUndefined(extraData)
+        addCreatedRooms(this.roomId, this.desktopUserId ?? "undef", extraData)
+        this.deleteRoomCallback()
+        if (this.desktopUserId) {
+            removeAvailableRoom(this.desktopUserId)
+        }
     }
 
     setupLeftWebsiteListener() {
@@ -329,10 +350,7 @@ export class Room {
             for (let player of this.players) {
                 player.desktopDisconnected()
             }
-            this.deleteRoomCallback()
-            if (this.desktopUserId) {
-                removeAvailableRoom(this.desktopUserId)
-            }
+            this.deleteRoom()
         })
     }
 
