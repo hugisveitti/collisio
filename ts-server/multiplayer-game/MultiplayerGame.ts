@@ -407,7 +407,7 @@ export class MultiplayerRoom {
                 this.setPosChanged(false)
             }
 
-        }, 1000 / 60) // how many times?
+        }, 1000 / 30) // how many times?
     }
 
     setPosChanged(value: boolean) {
@@ -489,7 +489,7 @@ export class MultiplayerRoom {
                 everyoneReady = false
             }
         }
-        if (everyoneReady) {
+        if (everyoneReady && !this.gameStarted) {
             // start game
             this.startGameCountDown()
         }

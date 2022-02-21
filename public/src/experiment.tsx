@@ -15,7 +15,11 @@ import {
 } from "./classes/User";
 import { IStore } from "./components/store";
 import UserProvider, { UserContext } from "./providers/UserProvider";
-import { IPlayerInfo, VehicleType } from "./shared-backend/shared-stuff";
+import {
+  defaultVehicleType,
+  IPlayerInfo,
+  VehicleType,
+} from "./shared-backend/shared-stuff";
 import MobileGameExperiment from "./testMode/MobileGameExperiment";
 import SpeedTestContainer from "./testMode/SpeedTestContainer";
 import TestContainer from "./testMode/TestContainer";
@@ -55,7 +59,8 @@ const TestApp = () => {
 
   useEffect(() => {
     const vehicleType: VehicleType =
-      (window.localStorage.getItem("vehicleType") as VehicleType) ?? "normal2";
+      (window.localStorage.getItem("vehicleType") as VehicleType) ??
+      defaultVehicleType;
 
     const newVehicleSettings: IVehicleSettings = {
       ...userSettings.vehicleSettings,

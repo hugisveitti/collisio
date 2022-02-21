@@ -1,4 +1,4 @@
-import { defaultVehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
+import { defaultVehicleColorType, defaultVehicleType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 
 /**
@@ -11,7 +11,7 @@ import { VehicleSetup } from "../shared-backend/vehicleItems";
 
 export const defaultVehicleSetup: VehicleSetup = {
     vehicleColor: defaultVehicleColorType,
-    vehicleType: "normal2",
+    vehicleType: defaultVehicleType,
 }
 
 
@@ -20,7 +20,7 @@ export type VehiclesSetup = {
 }
 
 const sharedVehicleSetup: VehicleSetup = {
-    vehicleType: "normal",
+    vehicleType: "f1",
     vehicleColor: defaultVehicleColorType
 }
 

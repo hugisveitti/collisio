@@ -120,11 +120,13 @@ const MultiplayerConnectRoomContainer = (
             <Grid item xs={12} sm={6}>
               <ToFrontPageButton />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <BackdropButton style={{ float: "right" }} link={loginPagePath}>
-                Login
-              </BackdropButton>
-            </Grid>
+            {!user && (
+              <Grid item xs={12} sm={6}>
+                <BackdropButton style={{ float: "right" }} link={loginPagePath}>
+                  Login
+                </BackdropButton>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <Typography>Connect to multiplayer room</Typography>
             </Grid>

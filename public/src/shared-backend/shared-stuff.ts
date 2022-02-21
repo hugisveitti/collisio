@@ -164,7 +164,7 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
 ]
 
-export const defaultVehicleType: VehicleType = "normal2"
+export const defaultVehicleType: VehicleType = Math.random() < .5 ? "normal2" : "f1"
 
 export type GameType = "ball" | "race" | "tag" | "story"
 

@@ -20,6 +20,7 @@ import VehicleSelect from "../inputs/VehicleSelect";
 import MyTextField from "../textField/MyTextField";
 import EditGlobalTournamentComponent from "./globalTournament/EditGlocalTournament";
 import EditLocalTournamentComponent from "./localTournament/EditLocalTournamentComponent";
+import { defaultVehicleType } from "../../shared-backend/shared-stuff";
 
 interface IEditTournamentComponent<V> {
   user: IUser;
@@ -77,7 +78,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
             value={
               onlyAllowSpecificVechileType
                 ? props.tournament.vehicleType
-                : "normal2"
+                : defaultVehicleType
             }
             onChange={(vehicleType) => {
               updateTournament("vehicleType", vehicleType);
@@ -119,7 +120,7 @@ const EditTournamentComponent: <T extends LocalTournament | GlobalTournament>(
           onChange={() => {
             setOnlyAllowSpecificVechileType(!onlyAllowSpecificVechileType);
             if (!onlyAllowSpecificVechileType) {
-              updateTournament("vehicleType", "normal2");
+              updateTournament("vehicleType", defaultVehicleType);
             } else {
               // will give bug
               updateTournament("vehicleType", false);

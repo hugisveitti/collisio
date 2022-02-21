@@ -21,7 +21,8 @@ import {
     stm_ping_test_callback,
     stm_player_finished,
     stm_player_info,
-    VehicleControls
+    VehicleControls,
+    defaultVehicleType
 } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { updatePlayersTokens } from "../firebaseCoinFunctions"
@@ -58,7 +59,7 @@ export class Player {
 
         this.playerName = playerName
         this.teamNumber = 1
-        this.vehicleType = userSettings?.vehicleSettings?.vehicleType ?? "normal2"
+        this.vehicleType = userSettings?.vehicleSettings?.vehicleType ?? defaultVehicleType
         this.vehicleSetup = vehicleSetup
         this.id = id
         this.isAuthenticated = isAuthenticated
