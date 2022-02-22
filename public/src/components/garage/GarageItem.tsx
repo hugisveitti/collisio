@@ -13,7 +13,6 @@ interface IGarageItem {
 
 const GarageItem = (props: IGarageItem) => {
   const outlineColor = props.owned ? (props.selected ? "#ddd" : "#505050") : "";
-  console.log("outline color", outlineColor);
   return (
     <div
       className={createClassNames(

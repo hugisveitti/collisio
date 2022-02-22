@@ -46,13 +46,16 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.userSettings.vehicleSettings
   );
 
-  const sendUserSettingsToServer = (newUserSettings: IUserSettings) => {
+  const sendUserSettingsToServer = (
+    newUserSettings: IUserSettings,
+    vehicleSetup
+  ) => {
     // if (user) {
     //   setDBUserSettings(user.uid, newUserSettings);
     //   if (socket) {
     socket?.emit(mts_user_settings_changed, {
       userSettings: newUserSettings,
-      vehicleSetup: undefined,
+      vehicleSetup,
     });
 
     // }
@@ -92,8 +95,13 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     setVehicleSettings(newVehicleSettings);
     userSettingsToSave = newUserSettings;
 
+    let vehicleSetup = undefined;
+    if (key === "vehicleType") {
+      vehicleSetup = props.store.vehiclesSetup[value];
+    }
+
     if (!notEmit) {
-      sendUserSettingsToServer(newUserSettings);
+      sendUserSettingsToServer(newUserSettings, vehicleSetup);
     }
   };
 

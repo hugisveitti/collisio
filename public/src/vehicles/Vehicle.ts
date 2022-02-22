@@ -178,7 +178,6 @@ export class Vehicle implements IVehicle {
 
         if (vehicleSetup) {
             if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
-                console.log("setting color", vehicleSetup.vehicleColor)
                 this.setColor(vehicleSetup.vehicleColor)
             }
             if (vehicleSetup.vehicleType === this.vehicleType && !goingToReload) {
@@ -191,8 +190,6 @@ export class Vehicle implements IVehicle {
     };
 
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
-        console.log("this.isUpdatingVehicleSetup ", this.isUpdatingVehicleSetup)
-        console.log("vehiclesetup", vehicleSetup.vehicleType, vehicleSetup.exhaust?.id, vehicleSetup.wheelGuards?.id, vehicleSetup.spoiler?.id)
         if (this.isUpdatingVehicleSetup) return
         this.setColor(vehicleSetup.vehicleColor)
         if (vehicleSetup.vehicleType !== this.vehicleType) {
@@ -226,7 +223,6 @@ export class Vehicle implements IVehicle {
 
             for (let mod of possibleVehicleMods) {
                 if (vehicleSetup?.[item]?.[mod.type]) {
-                    console.log("this.vehicleConfig[mod.type] , Math.floor(vehicleSetup?.[item]?.[mod.type])", mod.type, this.vehicleConfig[mod.type], Math.floor(vehicleSetup?.[item]?.[mod.type]))
                     this.vehicleConfig[mod.type] += Math.floor(vehicleSetup?.[item]?.[mod.type])
                 }
             }

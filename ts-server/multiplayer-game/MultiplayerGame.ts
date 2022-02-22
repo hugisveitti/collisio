@@ -429,7 +429,7 @@ export class MultiplayerRoom {
     }
 
     startGame() {
-
+        this.gameStarted = true
         this.numberOfLaps = this.gameSettings.numberOfLaps
         this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
         this.countdownStarted = false
@@ -437,6 +437,7 @@ export class MultiplayerRoom {
     }
 
     restartGame() {
+        this.gameStarted = false
         for (let p of this.players) {
             p.restartGame()
         }
@@ -454,10 +455,14 @@ export class MultiplayerRoom {
         this.needsReload = false
         let countdown = 4
 
+
+
         this.io.to(this.roomId).emit(m_fs_game_starting, {
             spawnPositions: this.getSpawnPosition(),
             countdown
         })
+
+        this.sendRaceInfo()
 
         this.startGameInterval()
 
@@ -486,7 +491,7 @@ export class MultiplayerRoom {
         }
         if (everyoneReady && !this.gameStarted) {
             // start game
-            this.gameStarted = true
+
             this.startGameCountDown()
         }
     }

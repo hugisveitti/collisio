@@ -325,7 +325,9 @@ export class LowPolyVehicle extends Vehicle {
 
             this.updateVehicleSetup(this.vehicleSetup)
         }
-        //  this.vehicleBody.body.setCcdMotionThreshold(1)
+        // think I need this, going through walls in multiplayer
+
+        this.vehicleBody.body.setCcdMotionThreshold(1)
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {

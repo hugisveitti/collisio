@@ -409,12 +409,14 @@ var MultiplayerRoom = /** @class */ (function () {
         return false;
     };
     MultiplayerRoom.prototype.startGame = function () {
+        this.gameStarted = true;
         this.numberOfLaps = this.gameSettings.numberOfLaps;
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: 0 });
         this.countdownStarted = false;
         this.startTime = Date.now();
     };
     MultiplayerRoom.prototype.restartGame = function () {
+        this.gameStarted = false;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var p = _a[_i];
             p.restartGame();
@@ -438,6 +440,7 @@ var MultiplayerRoom = /** @class */ (function () {
             spawnPositions: this.getSpawnPosition(),
             countdown: countdown
         });
+        this.sendRaceInfo();
         this.startGameInterval();
         var countdownTimer = function () {
             countdown -= 1;
@@ -465,7 +468,6 @@ var MultiplayerRoom = /** @class */ (function () {
         }
         if (everyoneReady && !this.gameStarted) {
             // start game
-            this.gameStarted = true;
             this.startGameCountDown();
         }
     };

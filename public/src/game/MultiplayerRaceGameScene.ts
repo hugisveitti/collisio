@@ -111,7 +111,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         // no pause possible, but leader can restart
         window.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
-                console.log("esc pressed", this.gameRoomActions)
                 if (this.gameRoomActions.escPressed) {
                     this.gameRoomActions.escPressed()
                 }
@@ -154,9 +153,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         const { position, rotation } = this.course.getGoalCheckpoint()
 
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
-        this.vehicle.setCanDrive(true)
         this.vehicle.resetPosition()
         this.vehicle.addCamera(this.camera)
+
+        this.vehicle.setCanDrive(true)
         this.showSecondaryInfo("waiting for other players")
 
         this.sendPlayerReady()
@@ -590,9 +590,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.kmhInfo.textContent = `${kmh.toFixed(0)} km/h`
         this.lapsInfo.textContent = `${this.gameTime.lapNumber} / ${this.currentNumberOfLaps}`
     }
-
-    around(x: number) {
-        return +x.toFixed(1)
+    //pres is presision
+    around(x: number, pres: number = 1) {
+        return +x.toFixed(pres)
     }
 
     sendPosition() {
@@ -607,9 +607,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         const r = this.vehicle.getRotation()
         const rot = {
             x: this.around(r.x),
-            y: this.around(r.y),
+            y: this.around(r.y, 2),
             z: this.around(r.z),
-            w: this.around(r.w),
+            w: this.around(r.w, 2),
         }
         const speed = this.around(this.vehicle.getCurrentSpeedKmHour())
         this.socket.emit(m_ts_pos_rot, { pos, rot, speed })

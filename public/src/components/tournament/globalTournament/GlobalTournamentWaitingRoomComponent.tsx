@@ -81,7 +81,6 @@ const GlobalTournamentWaitingRoomComponent = (
               onClick={() => {
                 if (editing) {
                   const res = validateCreateTournament(editTournament);
-                  console.log("res", res);
                   if (res.status === "error") {
                     toast.error(res.message);
                   } else {
