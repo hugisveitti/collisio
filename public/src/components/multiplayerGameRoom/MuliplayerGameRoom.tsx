@@ -98,6 +98,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   return (
     <React.Fragment>
       <GameSettingsModal
+        multiplayer
         gameObject={gameObject}
         open={settingsModalOpen}
         onClose={() => {

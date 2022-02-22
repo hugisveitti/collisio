@@ -420,7 +420,7 @@ export class MyScene extends Scene3D {
 
 
             await this.stop()
-            document.body.setAttribute("style", "")
+            document.body.setAttribute("style", "overflow:auto;")
             await this._destroyGame()
             resolve()
         })

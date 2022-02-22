@@ -13,11 +13,13 @@ import { useHistory } from "react-router";
 import { auth, signOut } from "../../firebase/firebaseInit";
 import { setFirestorePublicUser } from "../../firebase/firestoreFunctions";
 import { UserContext } from "../../providers/UserProvider";
+import { getDeviceType } from "../../utils/settings";
 import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import VolumeInput from "../inputs/VolumeInput";
 import {
   frontPagePath,
   getUserPagePath,
@@ -35,6 +37,7 @@ interface IPrivateProfilePage {
 const PrivateProfilePage = (props: IPrivateProfilePage) => {
   const history = useHistory();
   const user = useContext(UserContext);
+  const onMobile = getDeviceType() === "mobile";
   const [inEditMode, setInEditMode] = useState(false);
   const [editUser, setEditUser] = useState(undefined);
 
@@ -175,6 +178,11 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 </>
               )}
             </Grid>
+            {!onMobile && (
+              <Grid item xs={12}>
+                <VolumeInput store={props.store} />
+              </Grid>
+            )}
 
             {user && (
               <Grid item xs={12}>
@@ -195,7 +203,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
             >
               <GameDataComponent userId={user.uid} />
             </Grid>
-            <Grid item xs={3} style={{ textAlign: "left" }}>
+            <Grid item xs={6} md={3} style={{ textAlign: "left" }}>
               <BackdropButton
                 onClick={() =>
                   signOut(() => {
@@ -206,7 +214,7 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
                 Logout
               </BackdropButton>
             </Grid>
-            <Grid item xs={3} style={{ textAlign: "left" }}>
+            <Grid item xs={6} md={3} style={{ textAlign: "left" }}>
               <BackdropButton
                 onClick={() => history.push(privateProfileTournamentsPagePath)}
               >

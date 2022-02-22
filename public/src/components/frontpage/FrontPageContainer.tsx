@@ -1,11 +1,6 @@
-import VolumeDown from "@mui/icons-material/VolumeDown";
-import VolumeUp from "@mui/icons-material/VolumeUp";
-import { CircularProgress, Grid, IconButton } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-import {
-  IGameSettings,
-  setLocalGameSetting,
-} from "../../classes/localGameSettings";
+import { setLocalGameSetting } from "../../classes/localGameSettings";
 import { UserContext } from "../../providers/UserProvider";
 import { setMusicVolume } from "../../sounds/gameSounds";
 import {
@@ -16,13 +11,12 @@ import {
 } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
-import MySlider from "../inputs/slider/MySlider";
+import VolumeInput from "../inputs/VolumeInput";
 import AdSense from "../monitary/AdSense";
 import MyRadio from "../radio/MyRadio";
 import {
   aboutPagePath,
   buyCoinsPagePath,
-  buyPremiumPagePath,
   connectPagePath,
   frontPagePath,
   garagePagePath,
@@ -50,17 +44,24 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   }, []);
 
   const user = useContext(UserContext);
-  console.log("user", user);
   const onMobile = getDeviceType() === "mobile";
 
   const renderUserInfo = () => {
+    if (user === null) {
+      return (
+        <div style={{ marginTop: 15, margin: "auto", textAlign: "center" }}>
+          <CircularProgress />
+        </div>
+      );
+    }
+
     return user ? (
-      <>
+      <div>
         <TokenComponent user={user} store={props.store} showInfo />
         <BackdropButton link={privateProfilePagePath} style={{ fontSize: 32 }}>
           <i>{user.displayName}</i> logged in
         </BackdropButton>
-      </>
+      </div>
     ) : (
       <BackdropButton link={loginPagePath}>Login</BackdropButton>
     );
@@ -69,16 +70,24 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
   return (
     <BackdropContainer store={props.store}>
       <Grid container spacing={3}>
+        {onMobile && (
+          <Grid item xs={12}>
+            {renderUserInfo()}
+          </Grid>
+        )}
         <Grid item xs={12} lg={6}>
           <BackdropButton link={connectPagePath} width={btnWidth}>
             {onMobile ? "Join a game" : "Create a game"}
           </BackdropButton>
-          <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
-            Play mobile version
-          </BackdropButton>
+          {onMobile && (
+            <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
+              Play mobile version
+            </BackdropButton>
+          )}
           <BackdropButton link={multiplayerConnectPagePath} width={btnWidth}>
             Multiplayer
           </BackdropButton>
+          <br />
           <BackdropButton link={garagePagePath} width={btnWidth}>
             Garage
           </BackdropButton>
@@ -88,6 +97,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           <BackdropButton link={buyCoinsPagePath} width={btnWidth}>
             Buy coins
           </BackdropButton>
+          <br />
           <BackdropButton
             disabled={!user}
             link={privateProfilePagePath}
@@ -118,63 +128,10 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             float: "right",
           }}
         >
-          <>
-            {user === null ? (
-              <div
-                style={{ marginTop: 15, margin: "auto", textAlign: "center" }}
-              >
-                <CircularProgress />
-              </div>
-            ) : (
-              <div>{renderUserInfo()}</div>
-            )}
-            {!onMobile && (
-              <div style={{ marginTop: 15 }} className="background">
-                <MySlider
-                  startIcon={
-                    <IconButton
-                      style={{ color: "white" }}
-                      onClick={() => {
-                        const newGameSettings: IGameSettings = {
-                          ...props.store.gameSettings,
-                          musicVolume: 0 as number,
-                        };
-                        props.store.setGameSettings(newGameSettings);
-                        setLocalGameSetting("musicVolume", 0);
-                        setMusicVolume(0);
-                      }}
-                    >
-                      <VolumeDown />
-                    </IconButton>
-                  }
-                  endIcon={<VolumeUp />}
-                  label="Music volume"
-                  onChangeCommitted={(newVal) => {
-                    const newGameSettings: IGameSettings = {
-                      ...props.store.gameSettings,
-                      musicVolume: newVal as number,
-                    };
-                    props.store.setGameSettings(newGameSettings);
-                    setLocalGameSetting("musicVolume", newVal as number);
-                  }}
-                  onChange={(newVal) => {
-                    setMusicVolume(newVal as number);
-                    const newGameSettings: IGameSettings = {
-                      ...props.store.gameSettings,
-                      musicVolume: newVal as number,
-                    };
-                    props.store.setGameSettings(newGameSettings);
-                  }}
-                  value={props.store.gameSettings.musicVolume}
-                  step={0.01}
-                  max={1}
-                  min={0}
-                  color="white"
-                />
-              </div>
-            )}
-          </>
+          {!onMobile && renderUserInfo()}
+          {!onMobile && <VolumeInput store={props.store} />}
         </Grid>
+
         <Grid item xs={12}>
           <p>
             <i>Pre alpha</i>

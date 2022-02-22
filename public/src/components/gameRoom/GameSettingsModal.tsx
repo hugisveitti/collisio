@@ -29,6 +29,7 @@ interface IGameSettingsModal {
   restarBtnPressed: () => void;
   showVehicleSettings?: boolean;
   onlyLeaderCanSeeGameSettings?: boolean;
+  multiplayer?: boolean;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -87,6 +88,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               onChange={props.updateGameSettings}
               inTestMode={props.isTestMode}
               store={props.store}
+              multiplayer={props.multiplayer}
             />
           </Grid>
         )}

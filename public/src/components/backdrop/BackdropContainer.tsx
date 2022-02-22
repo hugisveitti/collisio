@@ -28,6 +28,7 @@ interface IBackdropContainer {
   autoEnter?: boolean;
 }
 
+let _pressedStartGame = false;
 const BackdropContainer = (props: IBackdropContainer) => {
   const history = useHistory();
 
@@ -35,7 +36,9 @@ const BackdropContainer = (props: IBackdropContainer) => {
 
   const [camPosNum, setCamPosNum] = useState(0);
 
-  const [pressedStartGame, setPressedStartGame] = useState(props.autoEnter);
+  const [pressedStartGame, setPressedStartGame] = useState(
+    !_pressedStartGame || props.autoEnter
+  );
   const [ratioLoaded, setRatioLoaded] = useState(0);
 
   const volume = props.noMusic
@@ -49,6 +52,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
     });
 
     if (alreadyExisted) {
+      _pressedStartGame = true;
       setPressedStartGame(alreadyExisted);
       let num = 1;
 
@@ -94,6 +98,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
           }}
           onClick={() => {
             handleChangeCameraPos();
+            _pressedStartGame = true;
             setPressedStartGame(true);
           }}
           color="black"

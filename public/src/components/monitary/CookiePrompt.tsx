@@ -3,6 +3,7 @@ import Slide from "@mui/material/Slide";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
+import BackdropButton from "../button/BackdropButton";
 
 /**
  * TODO:
@@ -20,7 +21,7 @@ const CookiePrompt = () => {
   }, []);
 
   if (!showPrompt) return null;
-
+  // maybe save that people have accepted cookies?
   return (
     <Slide in={showPrompt} direction="up">
       <Grid
@@ -41,19 +42,16 @@ const CookiePrompt = () => {
           <Typography>This website uses cookies</Typography>
         </Grid>
         <Grid item xs={12} style={{ textAlign: "center" }}>
-          <Button
-            variant="contained"
-            style={{
-              backgroundColor: "#02075d",
-              color: "white",
-            }}
+          <BackdropButton
+            color="white"
+            style={{ margin: "auto" }}
             onClick={() => {
               setShowPrompt(false);
               window.localStorage.setItem("cookiePrompt", true + "");
             }}
           >
             I Understand
-          </Button>
+          </BackdropButton>
         </Grid>
       </Grid>
     </Slide>

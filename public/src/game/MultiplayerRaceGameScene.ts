@@ -576,6 +576,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
      *       }
      */
     updateScoreTable(raceData: any[]) {
+        if (this.scoreSpans.length === 0) return
         for (let i = 0; i < raceData.length; i++) {
             this.scoreSpans[i].textContent = `${raceData[i].latestLapTime.toFixed(2)} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps}`
         }
@@ -682,6 +683,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     async _destoryGame() {
         return new Promise<void>((resolve, reject) => {
             console.log("destroying game")
+            this.vehicle.destroy()
+            for (let o of this.otherVehicles) {
+                o.removeFromScene(this)
+            }
             window.removeEventListener("resize", () => this.windowResize())
             resolve()
         })

@@ -44,7 +44,7 @@ export const possibleTrackCategories: { category: TrackCategory, name: string }[
 
 ]
 
-
+type TrackDifficulty = "easy" | "medium" | "hard"
 export type TimeOfDay = "day" | "evening"
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
@@ -56,71 +56,72 @@ export interface ITrackInfo {
     category: TrackCategory
     timeOfDay?: TimeOfDay
     hemisphereRadius?: number
+    difficulty: TrackDifficulty
 }
 
 export const allTrackNames: ITrackInfo[] = [
     {
-        name: "Test", type: "test-course", gameType: "race", category: "basic"
+        name: "Test", type: "test-course", gameType: "race", category: "basic", difficulty: "easy"
     },
     {
-        name: "Farm track", type: "farm-track", gameType: "race", category: "short"
+        name: "Farm track", type: "farm-track", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Basic track", type: "basic-track1", gameType: "race", category: "basic"
+        name: "Basic track", type: "basic-track1", gameType: "race", category: "basic", difficulty: "easy"
     },
     {
-        name: "Basic track 2", type: "basic-track2", gameType: "race", category: "basic"
+        name: "Basic track 2", type: "basic-track2", gameType: "race", category: "basic", difficulty: "easy"
     },
     {
-        name: "Basic track 3", type: "basic-track3", gameType: "race", category: "basic"
+        name: "Basic track 3", type: "basic-track3", gameType: "race", category: "basic", difficulty: "easy"
     },
     {
-        name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic"
+        name: "Basic track 4", type: "basic-track4", gameType: "race", category: "basic", difficulty: "medium"
     },
     {
-        name: "Basic track 5", type: "basic-track5", gameType: "race", category: "basic"
+        name: "Basic track 5", type: "basic-track5", gameType: "race", category: "basic", difficulty: "medium"
     },
     {
-        name: "German track", type: "nurn-track", gameType: "race", category: "short"
+        name: "German track", type: "nurn-track", gameType: "race", category: "short", difficulty: "easy"
     },
     {
-        name: "F1 track", type: "f1-track", gameType: "race", category: "short"
+        name: "F1 track", type: "f1-track", gameType: "race", category: "short", difficulty: "hard"
     },
     {
-        name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short"
+        name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long"
+        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium"
     },
     {
-        name: "Town track", type: "town-track", gameType: "race", category: "long"
+        name: "Town track", type: "town-track", gameType: "race", category: "long", difficulty: "easy"
     },
     {
-        name: "Monaco track", type: "monaco-track", gameType: "race", category: "long"
+        name: "Monaco track", type: "monaco-track", gameType: "race", category: "long", difficulty: "easy"
     },
     {
-        name: "Mountain track", type: "russia-track", gameType: "race", category: "short"
+        name: "Mountain track", type: "russia-track", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long"
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long"
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard"
     },
     {
-        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long"
+        name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long", difficulty: "hard"
     },
     {
-        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000, category: "long"
+        name: "Farmers little helper", type: "farmers-little-helper-map", gameType: "story", hemisphereRadius: 2000, category: "long", difficulty: "hard"
     },
     {
-        name: "Small track", type: "small-track", gameType: "race", category: "short"
+        name: "Small track", type: "small-track", gameType: "race", category: "short", difficulty: "hard"
     },
     {
-        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short"
+        name: "Tag course", type: "simple-tag-course", gameType: "tag", category: "short", difficulty: "easy"
     },
     {
-        name: "Basic tag course", type: "basic-tag-course", gameType: "tag", category: "basic"
+        name: "Basic tag course", type: "basic-tag-course", gameType: "tag", category: "basic", difficulty: "easy"
     },
 ]
 

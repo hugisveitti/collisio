@@ -1,4 +1,5 @@
 import VolumeDown from "@mui/icons-material/VolumeDown";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import {
   default as VolumeUp,
@@ -8,6 +9,7 @@ import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Slider from "@mui/material/Slider";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import {
@@ -45,7 +47,7 @@ interface IGameSettingsComponent {
   onChange: (gameSettings: IGameSettings) => void;
   inTestMode?: boolean;
   store: IStore;
-  onlyRace?: boolean;
+  multiplayer?: boolean;
 }
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
@@ -61,7 +63,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const [gettingGhost, setGettingGhost] = useState(false);
 
   useEffect(() => {
-    if (props.onlyRace) {
+    if (props.multiplayer) {
       if (gameSettings.gameType !== "race") {
         const newGameSettings: IGameSettings = {
           ...gameSettings,
@@ -199,7 +201,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
   return (
     <Grid container spacing={3}>
-      {!props.onlyRace && (
+      {!props.multiplayer && (
         <Grid item xs={12} lg={4}>
           <MyRadio<GameType>
             label="Type of game"
@@ -369,6 +371,14 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                   updateGameSettings("useGhost", !props.gameSettings.useGhost);
                 }}
               />
+              <Tooltip
+                style={{ color: backgroundColor }}
+                title="Ghost are previously recorded session. So you can race againt the ghost of another player."
+              >
+                <IconButton>
+                  <HelpOutlineIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
 
             <Grid item xs={12}>

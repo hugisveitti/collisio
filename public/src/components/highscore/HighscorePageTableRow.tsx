@@ -64,8 +64,8 @@ const HighscorePageTableRow = (props: IProps) => {
             {playerData.playerName}
           </span>
         </TableCell>
-        <TableCell>{playerData.totalTime}</TableCell>
-        <TableCell>{playerData.bestLapTime}</TableCell>
+        <TableCell>{playerData.totalTime.toFixed(2)}</TableCell>
+        <TableCell>{playerData.bestLapTime.toFixed(2)}</TableCell>
         {props.includeTrackAndNumLaps && (
           <>
             <TableCell>{getTrackNameFromType(playerData.trackName)}</TableCell>
@@ -114,7 +114,7 @@ const HighscorePageTableRow = (props: IProps) => {
                       marginLeft: 15,
                     }}
                   >
-                    {lap}
+                    {lap.toFixed(2)}
                   </span>
                 );
               })}

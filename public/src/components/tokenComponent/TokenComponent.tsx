@@ -8,6 +8,7 @@ import { getSizePrefix, getXPInfo } from "../../utils/utilFunctions";
 import Progress from "../inputs/progress/Progress";
 import { IStore } from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
+import { getDeviceType } from "../../utils/settings";
 
 interface ITokenComponent {
   user: IUser;
@@ -16,6 +17,7 @@ interface ITokenComponent {
 }
 
 const TokenComponent = (props: ITokenComponent) => {
+  const onMobile = getDeviceType() === "mobile";
   useEffect(() => {
     if (props.user?.uid && !props.store.tokenData) {
       getUserTokens(props.user.uid)
@@ -60,7 +62,7 @@ const TokenComponent = (props: ITokenComponent) => {
         {pointsFinishedInThisLevel + pointsToNextLevel}
       </span>
       <Progress value={ratioOfLevelFinished} max={1} />
-      {props.showInfo && (
+      {props.showInfo && !onMobile && (
         <>
           <br />
           <span>

@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import {
   activeRaceTrackNames,
   activeTagTrackNames,
+  getTrackInfo,
   getTrackNameFromType,
 } from "../../classes/Game";
 import {
@@ -152,12 +153,22 @@ const TrackSelect = (props: ITrackSelect) => {
 
   const renderOwnership = () => {
     if (!ownership) return null;
+
+    const trackInfo = getTrackInfo(selectedTrack);
+
     return (
       <BuyItemComponent
         notAfford={allCosts[selectedTrack] > props.store.tokenData?.coins}
         loading={isBuying}
         cost={allCosts[selectedTrack]}
-        label={getTrackNameFromType(selectedTrack)}
+        label={
+          <div>
+            <div style={{ fontSize: 20, marginBottom: 10 }}>
+              {trackInfo.name}
+            </div>
+            <span>Difficulty {trackInfo.difficulty}</span>
+          </div>
+        }
         onBuy={() => {
           handleBuyTrack(selectedTrack);
         }}

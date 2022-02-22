@@ -201,7 +201,7 @@ const MultiplayerWaitingRoomComponent = (
               />
               <CardContent>
                 <GameSettingsComponent
-                  onlyRace
+                  multiplayer
                   gameSettings={props.store.gameSettings}
                   onChange={(newGameSettings) => {
                     props.store.setGameSettings(newGameSettings);

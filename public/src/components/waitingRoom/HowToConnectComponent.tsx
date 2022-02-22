@@ -1,6 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Divider,
   IconButton,
   Step,
   StepContent,
@@ -96,7 +97,25 @@ const HowToConnectComponent = (props: IHowToConnectComponent) => {
           <Grid item xs={12}>
             <span style={{ fontSize: 24 }}>How to connect your mobile</span>
           </Grid>
-          <Grid item xs={12}>
+
+          {steps.map((step, index) => {
+            return (
+              <React.Fragment key={step.label}>
+                <Grid item xs={12}>
+                  <strong>{step.label}</strong>
+                  <Typography>{step.description(props.roomId)}</Typography>
+                  <img src={step.image} style={{ width: 300 }} />
+                </Grid>
+                {index !== steps.length && (
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                )}
+              </React.Fragment>
+            );
+          })}
+
+          {/* <Grid item xs={12}>
             <Stepper activeStep={activeStep} orientation="vertical">
               {steps.map((step, index) => (
                 <Step key={step.label}>
@@ -133,7 +152,7 @@ const HowToConnectComponent = (props: IHowToConnectComponent) => {
                 </Step>
               ))}
             </Stepper>
-          </Grid>
+          </Grid> */}
         </Grid>
       </BasicDesktopModal>
     </React.Fragment>

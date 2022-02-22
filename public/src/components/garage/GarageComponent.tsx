@@ -249,7 +249,12 @@ const GarageComponent = (props: IGarageComponent) => {
   const handleChangeVehicle = (value: any) => {
     setSelectedVehicleType(value);
 
-    setSelectedVehicleSetup(props.store.vehiclesSetup?.[value]);
+    setSelectedVehicleSetup(
+      props.store.vehiclesSetup?.[value] ?? {
+        vehicleType: value,
+        vehicleColor: defaultVehicleColorType,
+      }
+    );
 
     if (ownership && ownership[value]) {
       _vehicleType = value as VehicleType;

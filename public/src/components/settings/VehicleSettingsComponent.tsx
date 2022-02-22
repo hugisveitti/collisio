@@ -200,7 +200,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                   <MySlider
                     color="black"
                     label="Chase camera speed"
-                    min={0.01}
+                    min={0.05}
                     max={1}
                     step={0.01}
                     value={vehicleSettings.chaseCameraSpeed}
@@ -227,7 +227,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                 <MySlider
                   label="Steering sensitivity"
                   color={color}
-                  min={0.01}
+                  min={0.1}
                   max={1}
                   //      valueLabelDisplay="auto"
                   step={0.01}

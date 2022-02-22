@@ -4,7 +4,7 @@ import "./garage-item.css";
 
 interface IGarageItem {
   thumbnail?: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
   onClick: () => void;
   selected?: boolean;
   style?: React.CSSProperties;

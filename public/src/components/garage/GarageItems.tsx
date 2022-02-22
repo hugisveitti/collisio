@@ -45,8 +45,16 @@ const GarageItems = (props: IGarageItems) => {
           return (
             <Grid key={key} item xs={12} md={6} lg={4}>
               <GarageItem
+                style={{
+                  height: 100,
+                  paddingTop: 7,
+                }}
                 owned={props.ownership?.[item.path]}
-                label={`${item.name} the ${item.type}`}
+                label={
+                  <div style={{ marginTop: 5 }}>
+                    {item.name} the {item.type}
+                  </div>
+                }
                 onClick={() => {
                   props.onChange(item);
                 }}
@@ -58,7 +66,7 @@ const GarageItems = (props: IGarageItems) => {
                         fontSize: 10,
                       }}
                     >
-                      <span>$ {getSizePrefix(item.cost)}</span>
+                      <span>Coins {getSizePrefix(item.cost)}</span>
                     </div>
                     {possibleVehicleMods.map((p) => {
                       if (item[p.type]) {

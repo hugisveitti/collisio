@@ -314,12 +314,6 @@ export class LowPolyVehicle extends Vehicle {
         this.isReady = true
         /** don't start the vehicle until race */
         this.stop()
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "z") {
-                this.useSoundEffects = !this.useSoundEffects
-                this.toggleSound(this.useSoundEffects)
-            }
-        })
 
         if (this.vehicleSetup) {
 

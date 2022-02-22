@@ -57,6 +57,7 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket | u
 
 
     const keyAction = (e: KeyboardEvent, isDown: boolean) => {
+
         switch (e.key) {
             case "w":
                 vehicleControls.f = isDown
@@ -83,7 +84,9 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket | u
 
 export const addKeyboardControls = (vehicleControls: VehicleControls) => {
     const keyAction = (e: KeyboardEvent, isDown: boolean) => {
+        // console.log("e key", e.key, e.isComposing)
 
+        e.preventDefault()
         switch (e.key) {
             case "w":
             case "W":
@@ -141,14 +144,21 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
     if (vehicleControls.left) {
         angle += 2.5
         angle = Math.min(angle, maxAngle)
-        if (!isFinite(angle) || angle <= 2.5) {
+        if (!isFinite(angle)) {
+            console.warn("Non fitite angle", angle)
+            angle = 20
+        }
+        if (angle <= 2.5) {
             angle = 2.5
         }
         vehicle.turn(angle)
     } else if (vehicleControls.right) {
         angle -= 2.5
         angle = Math.max(angle, -maxAngle)
-        if (!isFinite(angle) || angle >= -2.5) {
+        if (!isFinite(angle)) {
+            angle = -20
+        }
+        if (angle >= -2.5) {
             angle = -2.5
         }
         vehicle.turn(angle)

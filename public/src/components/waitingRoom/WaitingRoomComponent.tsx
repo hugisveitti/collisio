@@ -180,6 +180,12 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               color="white"
               center
               width={200}
+              style={{
+                height: 80,
+                lineHeight: 80,
+                textAlign: "center",
+                fontSize: 24,
+              }}
             >
               Start game
             </BackdropButton>
