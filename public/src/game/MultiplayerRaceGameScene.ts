@@ -5,7 +5,7 @@ import { IGameSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
 import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info } from "../shared-backend/multiplayer-shared-stuff";
-import { IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
+import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
 import { addKeyboardControls, driveVehicle, driveVehicleWithKeyboard } from "../utils/controls";
@@ -169,7 +169,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 reject()
                 return
             }
-            const vehicleType = this.config.player.vehicleType
+            // need some backup of the vehicle type, if it doesnt load
+            const vehicleType = this.config.player?.vehicleType ?? defaultVehicleType
             const vehicleConfig: IVehicleClassConfig = {
                 id: this.config.player.id,
                 scene: this,
@@ -209,9 +210,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             const batch = []
             for (let p of this.config.players) {
                 if (p.id !== this.config.player.id) {
+
                     const config: GhostVehicleConfig = {
-                        vehicleType: p.vehicleType,
-                        color: p.vehicleSetup.vehicleColor,
+                        vehicleType: p?.vehicleType ?? defaultVehicleType,
+                        color: p.vehicleSetup?.vehicleColor ?? defaultVehicleColorType,
                         id: p.id,
                         notOpague: true
                     }
@@ -546,6 +548,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         head.appendChild(th1)
         const th2 = document.createElement("th")
         th2.textContent = "LT | Lap"
+        th2.setAttribute("style", "float:right;")
         head.appendChild(th2)
         const tableB = document.createElement("tbody")
         table.appendChild(tableB)
@@ -558,6 +561,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             scoreRow.appendChild(nameInfo)
             nameInfo.textContent = p.playerName.slice(0, 10)
             const scoreSpan = document.createElement("td")
+            scoreSpan.setAttribute("style", "float:right;")
             scoreSpan.textContent = `- | ${1} / ${this.currentNumberOfLaps}`
             scoreRow.appendChild(scoreSpan)
             this.scoreSpans.push(scoreSpan)
@@ -573,7 +577,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
      */
     updateScoreTable(raceData: any[]) {
         for (let i = 0; i < raceData.length; i++) {
-            this.scoreSpans[i].textContent = `${raceData[i].latestLapTime} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps.toFixed(2)}`
+            this.scoreSpans[i].textContent = `${raceData[i].latestLapTime.toFixed(2)} | ${raceData[i].lapNumber} / ${this.currentNumberOfLaps}`
         }
     }
 
@@ -587,19 +591,27 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.lapsInfo.textContent = `${this.gameTime.lapNumber} / ${this.currentNumberOfLaps}`
     }
 
+    around(x: number) {
+        return +x.toFixed(1)
+    }
 
     sendPosition() {
         if (!this.isReady) return
-        const pos = this.vehicle.getPosition()
+        const p = this.vehicle.getPosition()
+        const pos = {
 
+            x: this.around(p.x),
+            y: this.around(p.y),
+            z: this.around(p.z),
+        }
         const r = this.vehicle.getRotation()
         const rot = {
-            x: r.x,
-            y: r.y,
-            z: r.z,
-            w: r.w
+            x: this.around(r.x),
+            y: this.around(r.y),
+            z: this.around(r.z),
+            w: this.around(r.w),
         }
-        const speed = this.vehicle.getCurrentSpeedKmHour()
+        const speed = this.around(this.vehicle.getCurrentSpeedKmHour())
         this.socket.emit(m_ts_pos_rot, { pos, rot, speed })
     }
 

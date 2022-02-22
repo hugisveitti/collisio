@@ -30,7 +30,7 @@ export const defaultGameSettings: IGameSettings = {
     useSound: true,
     musicVolume: .2,
     numberOfLaps: 1,
-    trackName: "farm-track",
+    trackName: "nurn-track",
     gameType: "race",
     tagGameLength: 2,
     graphics: "high",

@@ -20,7 +20,7 @@ var Player = /** @class */ (function () {
         var _a, _b;
         this.playerName = playerName;
         this.teamNumber = 1;
-        this.vehicleType = (_b = (_a = userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings) === null || _a === void 0 ? void 0 : _a.vehicleType) !== null && _b !== void 0 ? _b : "normal2";
+        this.vehicleType = (_b = (_a = userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings) === null || _a === void 0 ? void 0 : _a.vehicleType) !== null && _b !== void 0 ? _b : shared_stuff_1.defaultVehicleType;
         this.vehicleSetup = vehicleSetup;
         this.id = id;
         this.isAuthenticated = isAuthenticated;

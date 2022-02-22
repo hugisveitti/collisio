@@ -96,12 +96,12 @@ export class GhostVehicle implements IGhostVehicle {
         // start with no collision
         // scene.physics.add.existing(this.vehicle, { mass: vehicleConfigs[this.config.vehicleType].mass, collisionFlags: 6, shape: "convex" })
         // having collision with ghost
-        scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "plane" })
+        //   scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "plane" })
         scene.scene.add(this.vehicle)
     }
 
     removeFromScene(scene: Scene3D) {
-        scene.physics.destroy(this.vehicle)
+        //     scene.physics.destroy(this.vehicle)
         scene.scene.remove(this.vehicle)
     }
 
@@ -147,7 +147,7 @@ export class GhostVehicle implements IGhostVehicle {
         } else {
             this.vehicle.position.set(position.x, position.y, position.z)
         }
-        this.vehicle.body.needUpdate = true
+        // this.vehicle.body.needUpdate = true
     };
 
     hide() {

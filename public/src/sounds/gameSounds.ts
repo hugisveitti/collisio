@@ -85,6 +85,7 @@ export const setMusicVolume = (volume: number) => {
 }
 
 export const stopMusic = () => {
+    if (!music) return
     music?.stop()
 }
 

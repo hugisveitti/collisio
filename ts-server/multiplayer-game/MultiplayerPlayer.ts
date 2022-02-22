@@ -1,7 +1,7 @@
 import { Socket } from "socket.io"
 import { IUserSettings } from "../../public/src/classes/User"
-import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_game_settings_changed, m_fs_game_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected } from "../../public/src/shared-backend/multiplayer-shared-stuff"
-import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions } from "../../public/src/shared-backend/shared-stuff"
+import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_game_settings_changed, m_fs_game_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_vehicles_position_info } from "../../public/src/shared-backend/multiplayer-shared-stuff"
+import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions, defaultVehicleType } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { deleteUndefined, getGeoInfo } from "../serverFirebaseFunctions"
 import { MultiplayerRoom } from "./MultiplayerGame"
@@ -242,7 +242,6 @@ export class MulitplayerPlayer {
     setupLapDoneListener() {
         this.desktopSocket.on(m_ts_lap_done, ({ totalTime, latestLapTime, lapNumber }) => {
             this.dataCollection.totalNumberOfLapsDone += 1
-            console.log("lap done")
             this.lapNumber = lapNumber
             this.latestLapTime = latestLapTime
             // dont know if total time should come from player or server
@@ -337,6 +336,10 @@ export class MulitplayerPlayer {
         this.room = room
     }
 
+    sendPosInfo(data: any) {
+        this.desktopSocket.emit(m_fs_vehicles_position_info, data)
+    }
+
     sendGameSettingsChanged() {
         this.desktopSocket.emit(m_fs_game_settings_changed, { gameSettings: this.room?.gameSettings })
     }
@@ -356,7 +359,7 @@ export class MulitplayerPlayer {
             playerNumber: this.playerNumber,
             id: this.userId,
             isAuthenticated: this.isAuthenticated,
-            vehicleType: this.userSettings?.vehicleSettings.vehicleType,
+            vehicleType: this.userSettings?.vehicleSettings.vehicleType ?? defaultVehicleType,
             isConnected: this.isConnected,
             vehicleSetup: this.vehicleSetup,
             mobileConnected: this.mobileConnected

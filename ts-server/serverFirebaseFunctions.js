@@ -49,7 +49,6 @@ var addCreatedRooms = function (roomId, userId, extraData) {
         extraData: extraData
     };
     obj = (0, exports.deleteUndefined)(obj);
-    console.log("saving obj", obj);
     try {
         ref.set(obj).then(function () {
             console.log("Saved created room");
@@ -71,11 +70,9 @@ var deleteUndefined = function (obj) {
     var key;
     for (key in obj) {
         if (obj[key] === undefined || obj[key] === null) {
-            console.log("deleting key", key, "value", obj[key]);
             delete obj[key];
         }
         if (typeof obj[key] === "object") {
-            console.log("recurse", key);
             obj[key] = (0, exports.deleteUndefined)(obj[key]);
         }
     }
@@ -86,7 +83,6 @@ var getGeoInfo = function (socket) {
     var _a;
     var ip = (_a = socket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : socket.conn.remoteAddress;
     if (Array.isArray(ip)) {
-        console.log("ip is a list", ip);
         ip = ip.join("");
     }
     var geo = geoip.lookup(ip);

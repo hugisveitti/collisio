@@ -104,6 +104,7 @@ export class MultiplayerRoom {
     players: MulitplayerPlayer[]
     leader: MulitplayerPlayer
     gameStarted: boolean
+    enteredGameRoom: boolean
     roomId: string
     io: Socket
     gameSettings
@@ -128,6 +129,7 @@ export class MultiplayerRoom {
         this.leader = leader
         this.leader.setLeader()
         this.leader.setRoom(this)
+        this.enteredGameRoom = false
         this.gameStarted = false
         this.roomId = uuid().slice(0, 4)
         this.addPlayer(leader)
@@ -222,7 +224,7 @@ export class MultiplayerRoom {
                 status: "success",
                 data: {
                     roomId: this.roomId,
-                    gameStarted: this.gameStarted,
+                    gameStarted: this.enteredGameRoom,
                     players: this.getPlayersInfo(),
                     gameSettings: this.gameSettings
                 }
@@ -233,7 +235,7 @@ export class MultiplayerRoom {
         }
 
 
-        if (this.gameStarted) {
+        if (this.enteredGameRoom) {
             player.desktopSocket.emit(m_fs_connect_to_room_callback, {
                 message: "Cannot join a game that has started",
                 status: "error",
@@ -272,7 +274,7 @@ export class MultiplayerRoom {
                 status: "success",
                 data: {
                     roomId: this.roomId,
-                    gameStarted: this.gameStarted,
+                    gameStarted: this.enteredGameRoom,
                     players: this.getPlayersInfo(),
                     gameSettings: this.gameSettings
                 }
@@ -292,7 +294,7 @@ export class MultiplayerRoom {
     playerDisconnected(userId: string) {
         this.dataCollection.totalNumberOfPlayerDisconnects += 1
         // check if all players have disconnected
-        if (!this.gameStarted) {
+        if (!this.enteredGameRoom) {
             const idx = this.getPlayerIndex(userId)
             if (idx !== undefined) {
                 const isLeader = this.players[idx].isLeader
@@ -326,10 +328,11 @@ export class MultiplayerRoom {
         addCreatedRooms(this.roomId, this.leader.userId,
             {
                 multiplayer: true,
-                startedGame: this.gameStarted,
+                startedGame: this.enteredGameRoom,
                 players: this.players.map(p => p.getEndOfRoomInfo()),
                 gameSettings: this.gameSettings,
-                dataCollection: this.dataCollection
+                dataCollection: this.dataCollection,
+                enteredGameRoom: this.enteredGameRoom
             }
         )
 
@@ -359,7 +362,7 @@ export class MultiplayerRoom {
      * @returns true if can start game else false
      */
     goToGameRoomFromLeader(): boolean {
-        this.gameStarted = true
+        this.enteredGameRoom = true
         for (let player of this.players) {
             player.sendGoToGameRoom()
         }
@@ -402,8 +405,10 @@ export class MultiplayerRoom {
 
             // const arr = this.players.map(p => p.getVehicleInfo())
             if (this.hasAnyPosChanged()) {
-
-                this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
+                for (let p of this.players) {
+                    p.sendPosInfo(obj)
+                }
+                //  this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
                 this.setPosChanged(false)
             }
 
@@ -422,16 +427,6 @@ export class MultiplayerRoom {
         }
         return false
     }
-
-    // async startRaceInfoInterval() {
-    //     if (this.raceInfoIntervalStarted) return
-    //     this.raceInfoIntervalStarted = true
-    //     this.raceInfoInterval = setInterval(() => {
-
-    //         // const arr = this.players.map(p => p.getVehicleInfo())
-    //         this.sendRaceInfo()
-    //     }, 1000 / 2) // how many times?
-    // }
 
     startGame() {
 
@@ -491,6 +486,7 @@ export class MultiplayerRoom {
         }
         if (everyoneReady && !this.gameStarted) {
             // start game
+            this.gameStarted = true
             this.startGameCountDown()
         }
     }

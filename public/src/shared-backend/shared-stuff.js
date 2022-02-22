@@ -103,7 +103,7 @@ exports.allVehicleTypes = [
     { name: "Round Betty", type: "simpleSphere", vehicleClass: "Sphere" },
     { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
 ];
-exports.defaultVehicleType = "normal2";
+exports.defaultVehicleType = Math.random() < .3 ? "normal2" : "f1";
 exports.vehicleColors = [
     {
         name: "Olive", value: "#1d8a47",

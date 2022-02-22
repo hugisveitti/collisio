@@ -139,12 +139,18 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: Veh
         vehicle.noForce()
     }
     if (vehicleControls.left) {
-        angle += 2.55
+        angle += 2.5
         angle = Math.min(angle, maxAngle)
+        if (!isFinite(angle) || angle <= 2.5) {
+            angle = 2.5
+        }
         vehicle.turn(angle)
     } else if (vehicleControls.right) {
         angle -= 2.5
         angle = Math.max(angle, -maxAngle)
+        if (!isFinite(angle) || angle >= -2.5) {
+            angle = -2.5
+        }
         vehicle.turn(angle)
     } else {
         angle = 0

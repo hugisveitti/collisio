@@ -39,7 +39,7 @@ export const addCreatedRooms = (roomId: string, userId: string, extraData?: any)
         extraData
     }
     obj = deleteUndefined(obj)
-    console.log("saving obj", obj)
+
     try {
 
         ref.set(obj).then(() => {
@@ -61,11 +61,11 @@ export const deleteUndefined = (obj: Object) => {
     let key: keyof typeof obj
     for (key in obj) {
         if (obj[key] === undefined || obj[key] === null) {
-            console.log("deleting key", key, "value", obj[key])
+
             delete obj[key]
         }
         if (typeof obj[key] === "object") {
-            console.log("recurse", key)
+
             obj[key] = deleteUndefined(obj[key]) as any
         }
     }
@@ -75,7 +75,7 @@ export const deleteUndefined = (obj: Object) => {
 export const getGeoInfo = (socket: Socket) => {
     let ip = socket.handshake.headers['x-forwarded-for'] ?? socket.conn.remoteAddress
     if (Array.isArray(ip)) {
-        console.log("ip is a list", ip)
+
         ip = ip.join("")
     }
     const geo = geoip.lookup(ip)

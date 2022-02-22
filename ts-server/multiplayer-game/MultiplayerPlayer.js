@@ -198,7 +198,6 @@ var MulitplayerPlayer = /** @class */ (function () {
             var _b, _c;
             var totalTime = _a.totalTime, latestLapTime = _a.latestLapTime, lapNumber = _a.lapNumber;
             _this.dataCollection.totalNumberOfLapsDone += 1;
-            console.log("lap done");
             _this.lapNumber = lapNumber;
             _this.latestLapTime = latestLapTime;
             // dont know if total time should come from player or server
@@ -297,6 +296,9 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.setRoom = function (room) {
         this.room = room;
     };
+    MulitplayerPlayer.prototype.sendPosInfo = function (data) {
+        this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_vehicles_position_info, data);
+    };
     MulitplayerPlayer.prototype.sendGameSettingsChanged = function () {
         var _a;
         this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_settings_changed, { gameSettings: (_a = this.room) === null || _a === void 0 ? void 0 : _a.gameSettings });
@@ -309,14 +311,14 @@ var MulitplayerPlayer = /** @class */ (function () {
         };
     };
     MulitplayerPlayer.prototype.getPlayerInfo = function () {
-        var _a;
+        var _a, _b;
         return {
             playerName: this.displayName,
             isLeader: this.isLeader,
             playerNumber: this.playerNumber,
             id: this.userId,
             isAuthenticated: this.isAuthenticated,
-            vehicleType: (_a = this.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings.vehicleType,
+            vehicleType: (_b = (_a = this.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings.vehicleType) !== null && _b !== void 0 ? _b : shared_stuff_1.defaultVehicleType,
             isConnected: this.isConnected,
             vehicleSetup: this.vehicleSetup,
             mobileConnected: this.mobileConnected

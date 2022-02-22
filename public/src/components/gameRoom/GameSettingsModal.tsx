@@ -28,10 +28,16 @@ interface IGameSettingsModal {
   user: IUser;
   restarBtnPressed: () => void;
   showVehicleSettings?: boolean;
+  onlyLeaderCanSeeGameSettings?: boolean;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
   if (!props.gameObject) return null;
+
+  const showGameSettings = !props.onlyLeaderCanSeeGameSettings
+    ? true
+    : props.store.player?.isLeader;
+
   return (
     <BasicDesktopModal open={props.open} onClose={props.onClose}>
       <Grid container spacing={3}>
@@ -74,14 +80,16 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           </BackdropButton>
         </Grid>
 
-        <Grid item xs={12}>
-          <GameSettingsComponent
-            gameSettings={props.store.gameSettings}
-            onChange={props.updateGameSettings}
-            inTestMode={props.isTestMode}
-            store={props.store}
-          />
-        </Grid>
+        {showGameSettings && (
+          <Grid item xs={12}>
+            <GameSettingsComponent
+              gameSettings={props.store.gameSettings}
+              onChange={props.updateGameSettings}
+              inTestMode={props.isTestMode}
+              store={props.store}
+            />
+          </Grid>
+        )}
 
         {props.isTestMode && props.store.player && (
           <Grid item xs={12}>

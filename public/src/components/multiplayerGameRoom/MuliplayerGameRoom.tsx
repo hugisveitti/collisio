@@ -89,6 +89,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   }, []);
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
+    console.log("update game settings", newGameSettings);
     socket.emit(m_ts_game_settings_changed, { gameSettings: newGameSettings });
     gameObject.setGameSettings(newGameSettings);
   };
@@ -108,6 +109,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
         store={props.store}
         userId={user?.uid}
         user={user}
+        onlyLeaderCanSeeGameSettings
         isTestMode={false}
         updateGameSettings={updateGameSettings}
         quitGame={(newPath: string) => {
