@@ -191,6 +191,9 @@ export class MultiplayerRoom {
 
     reloadGame() {
         this.dataCollection.numberOfReloads += 1
+        for (let p of this.players) {
+            p.isReady = false
+        }
         this.io.to(this.roomId).emit(m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings

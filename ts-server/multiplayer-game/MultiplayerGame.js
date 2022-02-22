@@ -185,6 +185,10 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.reloadGame = function () {
         this.dataCollection.numberOfReloads += 1;
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var p = _a[_i];
+            p.isReady = false;
+        }
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_reload_game, {
             players: this.getPlayersInfo(),
             gameSettings: this.gameSettings

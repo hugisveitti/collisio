@@ -150,6 +150,8 @@ var MulitplayerPlayer = /** @class */ (function () {
             if (userSettings) {
                 if (((_b = _this.userSettings) === null || _b === void 0 ? void 0 : _b.vehicleSettings.vehicleType) !== (userSettings === null || userSettings === void 0 ? void 0 : userSettings.vehicleSettings.vehicleType)) {
                     _this.dataCollection.numberOfVehicleChanges += 1;
+                    // I think this is the place
+                    _this.isReady = false;
                     (_c = _this.room) === null || _c === void 0 ? void 0 : _c.setNeedsReload();
                 }
                 _this.userSettings = userSettings;
@@ -326,7 +328,7 @@ var MulitplayerPlayer = /** @class */ (function () {
     };
     // data to collect
     MulitplayerPlayer.prototype.getEndOfRoomInfo = function () {
-        var obj = __assign(__assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection }), this.geoIp);
+        var obj = __assign(__assign(__assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection }), this.geoIp), { isReady: this.isReady });
         obj = (0, serverFirebaseFunctions_1.deleteUndefined)(obj);
         return obj;
     };

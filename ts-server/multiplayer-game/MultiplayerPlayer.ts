@@ -198,6 +198,8 @@ export class MulitplayerPlayer {
             if (userSettings) {
                 if (this.userSettings?.vehicleSettings.vehicleType !== userSettings?.vehicleSettings.vehicleType) {
                     this.dataCollection.numberOfVehicleChanges += 1
+                    // I think this is the place
+                    this.isReady = false
                     this.room?.setNeedsReload()
                 }
                 this.userSettings = userSettings
@@ -371,7 +373,8 @@ export class MulitplayerPlayer {
         let obj: any = {
             ...this.getPlayerInfo(),
             dataCollection: this.dataCollection,
-            ...this.geoIp
+            ...this.geoIp,
+            isReady: this.isReady
         }
         obj = deleteUndefined(obj)
         return obj
