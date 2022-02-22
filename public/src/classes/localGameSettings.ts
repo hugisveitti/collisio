@@ -33,8 +33,8 @@ export const defaultGameSettings: IGameSettings = {
     trackName: "nurn-track",
     gameType: "race",
     tagGameLength: 2,
-    graphics: "high",
-    drawDistance: 7500,
+    graphics: "low",
+    drawDistance: 3000,
     record: false,
     useGhost: false,
     targetFPS: 30

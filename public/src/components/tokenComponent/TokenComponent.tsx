@@ -22,7 +22,6 @@ const TokenComponent = (props: ITokenComponent) => {
     if (props.user?.uid && !props.store.tokenData) {
       getUserTokens(props.user.uid)
         .then((data) => {
-          console.log("got token data", data);
           props.store.setTokenData(data);
         })
         .catch(() => {

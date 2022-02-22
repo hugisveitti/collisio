@@ -181,8 +181,8 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               center
               width={200}
               style={{
-                height: 80,
-                lineHeight: 80,
+                height: 40,
+
                 textAlign: "center",
                 fontSize: 24,
               }}
