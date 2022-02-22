@@ -316,7 +316,6 @@ export class Player {
                 this.userSettings = userSettings
             }
             if (vehicleSetup) {
-                console.log("vehiclesetup changed", vehicleSetup.vehicleType, vehicleSetup.exhaust?.id, vehicleSetup.wheelGuards?.id, vehicleSetup.spoiler?.id)
 
                 this.vehicleSetup = vehicleSetup
             }
@@ -375,7 +374,7 @@ export class Player {
     }
 
     toString() {
-        return `${this.playerName}: number: ${this.teamNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetupString()}`
+        return `${this.playerName}: number: ${this.playerNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetupString()}`
     }
 }
 

@@ -417,7 +417,7 @@ var Room = /** @class */ (function () {
         this.socket.once(shared_stuff_1.mdts_start_game, function () {
             if (_this.players.length === 0) {
                 _this.socket.emit(shared_stuff_1.std_start_game_callback, {
-                    message: "No players connected, cannot start game",
+                    message: "No mobile controller connected, cannot start game.",
                     status: errorStatus
                 });
                 setTimeout(function () {

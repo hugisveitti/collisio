@@ -504,7 +504,7 @@ export class Room {
         this.socket.once(mdts_start_game, () => {
             if (this.players.length === 0) {
                 this.socket.emit(std_start_game_callback, {
-                    message: "No players connected, cannot start game",
+                    message: "No mobile controller connected, cannot start game.",
                     status: errorStatus
                 })
                 setTimeout(() => {
