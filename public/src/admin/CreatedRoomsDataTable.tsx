@@ -75,7 +75,10 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         </TableCell>
         <TableCell>{props.roomInfo.roomId}</TableCell>
         <TableCell>
-          {getDateFromNumber(props.roomInfo.date.seconds * 1000)}
+          {getDateFromNumber(extraData?.roomCreatedTime ?? 0)}
+        </TableCell>
+        <TableCell>
+          {getDateFromNumber(extraData?.roomDeletedTime ?? 0)}
         </TableCell>
         <TableCell>{props.roomInfo.userId}</TableCell>
         <TableCell>
@@ -143,7 +146,8 @@ const CreatedRoomsDataTable = (props: ICreatedRoomsDataTable) => {
           <TableRow>
             <TableCell />
             <TableCell>RoomId</TableCell>
-            <TableCell>Date</TableCell>
+            <TableCell>Date created</TableCell>
+            <TableCell>Date ended</TableCell>
             <TableCell>UserId</TableCell>
             <TableCell>Country</TableCell>
             <TableCell>Number of player</TableCell>
