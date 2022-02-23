@@ -13,6 +13,7 @@ import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
+import { IVehicleClassConfig } from "../vehicles/Vehicle";
 import { getVehicleClassFromType } from '../vehicles/VehicleConfigs';
 import { getWagonNumber, Wagon } from "../vehicles/Wagon";
 import { WagonType } from "../vehicles/WagonConfigs";
@@ -290,14 +291,15 @@ export class GameScene extends MyScene implements IGameScene {
                 const vehicleColor = vehicleColors[(chassisColOffset + i) % vehicleColors.length]?.value ?? "red"
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
-                const config = {
+                const config: IVehicleClassConfig = {
                     scene: this,
                     name: this.players[i].playerName,
                     vehicleNumber: i,
                     vehicleType,
                     useSoundEffects: this.useSound,
                     vehicleSetup: this.players[i].vehicleSetup,
-                    id: this.players[i].id
+                    id: this.players[i].id,
+                    vehicleSettings: this.players[i].vehicleSettings
                 }
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
                     newVehicle = new LowPolyVehicle(config)
@@ -863,7 +865,6 @@ export class GameScene extends MyScene implements IGameScene {
         this.socket?.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
             if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
                 if (this.vehicles.length >= data.playerNumber - 1) {
-                    console.log("user settings changed", data)
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
                     */
@@ -986,7 +987,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     }
 
-    async destroyGame() {
+    async _destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
             stopMusic()
             window.removeEventListener("resize", () => this.handleResizeWindow())
@@ -994,16 +995,14 @@ export class GameScene extends MyScene implements IGameScene {
             if (this.mobileOnlyControllerInterval) {
                 clearInterval(this.mobileOnlyControllerInterval)
             }
+            this.clearTimeouts()
             this.socket?.off(std_controls)
             this.socket?.off(std_user_settings_changed)
 
-            document.body.removeChild(this.gameInfoDiv)
-            document.body.removeChild(this.canvas)
-
             await this.destroyVehicles()
 
-            await this.stop()
-            document.body.setAttribute("style", "")
+
+            //   document.body.setAttribute("style", "")
             resolve()
         })
     }

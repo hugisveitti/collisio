@@ -124,12 +124,13 @@ const ConnectToWaitingRoomComponent = (
     playerName: string,
     socket: Socket
   ) => {
-    console.log("set connecting to room");
     setConnectingToRoom(true);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
     const vehicleSetup = props.store.vehiclesSetup?.[vehicleType] ?? {
       vehicleType,
     };
+    console.log("vehicle setup", vehicleSetup);
+    console.log("user settings", props.store.userSettings);
     socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
@@ -141,7 +142,6 @@ const ConnectToWaitingRoomComponent = (
     } as IPlayerConnectedData);
 
     socket.once(stm_player_connected_callback, (response: ISocketCallback) => {
-      console.log("unset connecting to room");
       setConnectingToRoom(false);
       if (response.status === "error") {
         const { message } = response;

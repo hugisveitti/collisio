@@ -313,7 +313,7 @@ var MulitplayerPlayer = /** @class */ (function () {
         };
     };
     MulitplayerPlayer.prototype.getPlayerInfo = function () {
-        var _a, _b;
+        var _a, _b, _c;
         return {
             playerName: this.displayName,
             isLeader: this.isLeader,
@@ -323,7 +323,8 @@ var MulitplayerPlayer = /** @class */ (function () {
             vehicleType: (_b = (_a = this.userSettings) === null || _a === void 0 ? void 0 : _a.vehicleSettings.vehicleType) !== null && _b !== void 0 ? _b : shared_stuff_1.defaultVehicleType,
             isConnected: this.isConnected,
             vehicleSetup: this.vehicleSetup,
-            mobileConnected: this.mobileConnected
+            mobileConnected: this.mobileConnected,
+            vehicleSettings: (_c = this.userSettings) === null || _c === void 0 ? void 0 : _c.vehicleSettings
         };
     };
     // data to collect

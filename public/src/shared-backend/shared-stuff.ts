@@ -5,7 +5,7 @@
  * So this limits the .js to one file.
  */
 
-import { IUserSettings } from "../classes/User"
+import { IUserSettings, IVehicleSettings } from "../classes/User"
 
 import { getMedal as _getMedal } from "./medalFuncions"
 import { VehicleSetup } from "./vehicleItems"
@@ -169,8 +169,6 @@ export const defaultVehicleType: VehicleType = Math.random() < .3 ? "normal2" : 
 
 export type GameType = "ball" | "race" | "tag" | "story"
 
-
-
 export type VehicleColorType =
     "#1d8a47"
     | "#8b0000"
@@ -317,6 +315,9 @@ export interface IPreGamePlayerInfo {
     photoURL: string
     vehicleSetup: VehicleSetup
     mobileConnected?: boolean
+
+    // need this for splitscreen
+    vehicleSettings: IVehicleSettings
 }
 
 
@@ -324,28 +325,6 @@ export interface IPlayerInfo extends IPreGamePlayerInfo {
     isConnected: boolean,
     isLeader: boolean
 }
-
-export const playerInfoToPreGamePlayerInfo = (playerInfo: IPlayerInfo): IPreGamePlayerInfo => {
-    const { playerName,
-
-        playerNumber,
-        id,
-        isAuthenticated,
-        vehicleType,
-        photoURL, vehicleSetup } = playerInfo
-
-    return {
-        playerName: playerName ?? "undefined",
-        playerNumber: playerNumber ?? -1,
-        id: id ?? "undefined",
-        isAuthenticated: isAuthenticated ?? false,
-        vehicleType: vehicleType ?? "test",
-        photoURL: photoURL ?? "",
-        vehicleSetup: vehicleSetup ?? { vehicleType: "test", vehicleColor: defaultVehicleColorType }
-    }
-}
-
-
 
 /**
  * these actions are sent from mobile to server to desktop

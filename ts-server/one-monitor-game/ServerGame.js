@@ -132,11 +132,9 @@ var RoomMaster = /** @class */ (function () {
         //   this.allSocketIds.push(socket.id)
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode, userId = _a.userId;
-            console.log("socket connected", deviceType, ", mode", mode);
             isTestMode = mode === "test";
             onMobile = deviceType === "mobile";
             if (mode === "multiplayer") {
-                console.log("multiplayer socket");
                 (0, MultiplayerGame_1.handleMutliplayerSocket)(_this.io, socket, deviceType);
                 return;
             }
@@ -151,7 +149,6 @@ var RoomMaster = /** @class */ (function () {
             else {
                 if (deviceType === "desktop") {
                     socket.on(shared_stuff_1.dts_create_room, function (req) {
-                        console.log("creating room");
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = (0, uuid_1.v4)().slice(0, 4);

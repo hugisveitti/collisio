@@ -231,7 +231,8 @@ var Player = /** @class */ (function () {
             vehicleType: this.vehicleType,
             photoURL: this.photoURL,
             isConnected: this.isConnected,
-            vehicleSetup: this.vehicleSetup
+            vehicleSetup: this.vehicleSetup,
+            vehicleSettings: this.userSettings.vehicleSettings
         };
     };
     Player.prototype.getEndOfRoomInfo = function () {

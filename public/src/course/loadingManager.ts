@@ -9,8 +9,9 @@ const loadDiv = document.createElement("div")
 const loadDivText = document.createElement("div")
 const loadingBarContainer = document.createElement("div")
 const loadingBarInner = document.createElement("div")
-if (getDeviceType() === "desktop") {
 
+
+if (getDeviceType() === "desktop") {
 
     // loadImage.src = "https://imgur.com/rpPch3m.jpg"
     // loadImage.setAttribute("id", "load-image")
@@ -28,6 +29,7 @@ if (getDeviceType() === "desktop") {
 
     loadDivText.classList.add("loading-screen__text")
 
+    loadDivText.innerHTML = "Loading game files"
 
     loadingBarContainer.classList.add("loading-bar__container")
 
@@ -35,8 +37,9 @@ if (getDeviceType() === "desktop") {
 
     loadingBarContainer.appendChild(loadingBarInner)
     loadDiv.appendChild(loadingBarContainer)
-
 }
+
+
 export const courseManager = new LoadingManager()
 
 let dotTimeout: NodeJS.Timeout

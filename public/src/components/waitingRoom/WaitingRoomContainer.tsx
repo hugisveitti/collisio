@@ -2,12 +2,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import React, { useContext, useEffect } from "react";
 import { useHistory, useParams } from "react-router";
 import { toast } from "react-toastify";
-import { IRoomInfo } from "../../classes/Game";
-import {
-  IGameSettings,
-  setLocalGameSetting,
-} from "../../classes/localGameSettings";
-import { getLocalUid, saveLocalStorageItem } from "../../classes/localStorage";
+import { setLocalGameSetting } from "../../classes/localGameSettings";
+import { saveLocalStorageItem } from "../../classes/localStorage";
 import {
   addToAvailableRooms,
   removeFromAvailableRooms,
@@ -18,7 +14,6 @@ import {
   mdts_left_waiting_room,
   mdts_players_in_room,
   mts_connected_to_waiting_room,
-  playerInfoToPreGamePlayerInfo,
   std_player_disconnected,
   stmd_game_settings_changed,
   stmd_game_starting,
@@ -35,7 +30,6 @@ import {
   ISocketCallback,
 } from "../../utils/connectSocket";
 import { getDeviceType, inTestMode, isIphone } from "../../utils/settings";
-import { getDateNow } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import {
   connectPagePath,
@@ -80,13 +74,14 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       if (response.status === "error") {
         toast.error(response.message);
       } else {
-        props.store.setPlayers(response.data.players);
+        if (response.data.players) {
+          props.store.setPlayers(response.data.players);
+        }
       }
     });
   };
 
   useEffect(() => {
-    console.log("socket", socket);
     if (!socket?.connected && !inTestMode) {
       let path = roomId ? getConnectPagePath(roomId) : connectPagePath;
       history.push(path);
@@ -152,7 +147,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       });
 
       socket.on(stm_desktop_disconnected, () => {
-        console.log("desktop disconnected");
         toast.error("Game disconnected");
         disconnectSocket();
         history.push(frontPagePath);
@@ -165,7 +159,6 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
     }
 
     return () => {
-      console.log("removing all socket listeners");
       socket?.emit(mdts_left_waiting_room, {});
       socket.off(stmd_game_starting);
       socket.off(stm_desktop_disconnected);

@@ -127,21 +127,25 @@ export class LowPolyVehicle extends Vehicle {
         }
     }
 
-    addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
-        this.tires = []
-        for (let tire of tires) {
-            tire.receiveShadow = false
-            tire.castShadow = true
-            this.tires.push(tire.clone())
-        }
+    async addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
+        return new Promise<void>(async (resolve, reject) => {
 
-        this.vehicleBody = chassis.clone()
-        this.vehicleBody.receiveShadow = false
-        this.vehicleBody.castShadow = true
-        this.modelsLoaded = true;
-        changeVehicleBodyColor(this.vehicleBody, [this.vehicleSetup.vehicleColor] as VehicleColorType[])
+            this.tires = []
+            for (let tire of tires) {
+                tire.receiveShadow = false
+                tire.castShadow = true
+                this.tires.push(tire.clone())
+            }
 
-        this.createVehicle()
+            this.vehicleBody = chassis.clone()
+            this.vehicleBody.receiveShadow = false
+            this.vehicleBody.castShadow = true
+            this.modelsLoaded = true;
+            changeVehicleBodyColor(this.vehicleBody, [this.vehicleSetup.vehicleColor] as VehicleColorType[])
+
+            await this.createVehicle()
+            resolve()
+        })
     }
 
 
@@ -204,124 +208,128 @@ export class LowPolyVehicle extends Vehicle {
             wheelAxisPosition: wheelAxisBackPosition
         }
 
-
         return obj
     }
 
-    createVehicle() {
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        if (this.vehicleBody.type === "Mesh") {
+    async createVehicle() {
+        return new Promise<void>(async (resolve, reject) => {
 
-            this.scene.add.existing(this.vehicleBody)
-        } else {
-            this.scene.add.existing(this.vehicleBody)
-        }
+            this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
+            if (this.vehicleBody.type === "Mesh") {
 
-        this.changeCenterOfMass()
+                this.scene.add.existing(this.vehicleBody)
+            } else {
+                this.scene.add.existing(this.vehicleBody)
+            }
 
-        this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
+            this.changeCenterOfMass()
 
-        this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+            this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
 
-        this.vehicleBody.body.setBounciness(0)
-        this.vehicleBody.body.setRestitution(0)
-        this.vehicleBodyPosition.set(this.vehicleBody.position.x, this.vehicleBody.position.y + this.vehicleConfig.centerOfMassOffset, this.vehicleBody.position.z)
-        // how to lower center of mass
+            this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
 
-        this.tuning = new Ammo.btVehicleTuning()
+            this.vehicleBody.body.setBounciness(0)
+            this.vehicleBody.body.setRestitution(0)
+            this.vehicleBodyPosition.set(this.vehicleBody.position.x, this.vehicleBody.position.y + this.vehicleConfig.centerOfMassOffset, this.vehicleBody.position.z)
+            // how to lower center of mass
 
-        this.tuning.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness);
-        this.tuning.set_m_suspensionCompression(this.vehicleConfig.suspensionCompression);
-        this.tuning.set_m_suspensionDamping(this.vehicleConfig.suspensionDamping);
-        this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
-        this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
-        this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
-        this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
+            this.tuning = new Ammo.btVehicleTuning()
 
-        this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
+            this.tuning.set_m_suspensionStiffness(this.vehicleConfig.suspensionStiffness);
+            this.tuning.set_m_suspensionCompression(this.vehicleConfig.suspensionCompression);
+            this.tuning.set_m_suspensionDamping(this.vehicleConfig.suspensionDamping);
+            this.tuning.set_m_maxSuspensionTravelCm(this.vehicleConfig.maxSuspensionTravelCm);
+            this.tuning.set_m_frictionSlip(this.vehicleConfig.frictionSlip);
+            this.tuning.set_m_maxSuspensionForce(this.vehicleConfig.maxSuspensionForce);
+            this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
 
-
-
-        this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
-        this.vehicleBody.body.skipUpdate = true
-        this.vehicle.setCoordinateSystem(0, 1, 2)
-
-
-        this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
-        this.vehicleBody.name = "vehicle-" + this.vehicleNumber
-
-        this.scene.physics.physicsWorld.addAction(this.vehicle)
-
-        this.wheelMeshes = []
-
-        const wheelAxisBackPosition = this.vehicleConfig.wheelAxisBackPosition
-        const wheelRadiusBack = this.vehicleConfig.wheelRadiusBack
-        const wheelHalfTrackBack = this.vehicleConfig.wheelHalfTrackBack
-        const wheelAxisHeightBack = this.vehicleConfig.wheelAxisHeightBack
-
-        const wheelAxisFrontPosition = this.vehicleConfig.wheelAxisFrontPosition
-        const wheelRadiusFront = this.vehicleConfig.wheelRadiusFront
-        const wheelHalfTrackFront = this.vehicleConfig.wheelHalfTrackFront
-        const wheelAxisHeightFront = this.vehicleConfig.wheelAxisHeightFront
-
-        this.vector.setValue(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
-
-        this.addWheel(
-            true,
-            this.vector,
-            wheelRadiusFront,
-            FRONT_RIGHT
-        )
+            this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
 
 
 
-        this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
-        this.addWheel(
-            true,
-            this.vector,
-            wheelRadiusFront,
-            FRONT_LEFT
-        )
+            this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+            this.vehicleBody.body.skipUpdate = true
+            this.vehicle.setCoordinateSystem(0, 1, 2)
 
-        this.vector.setValue(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
-        this.addWheel(
-            false,
-            this.vector,
-            wheelRadiusBack,
-            BACK_RIGHT
-        )
 
-        this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
-        this.addWheel(
-            false,
-            this.vector,
-            wheelRadiusBack,
-            BACK_LEFT
-        )
+            this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
+            this.vehicleBody.name = "vehicle-" + this.vehicleNumber
 
-        // not sure what to have the gravity, the auto is -20
-        this.vector.setValue(0, -30, 0)
-        this.vehicle.getRigidBody().setGravity(this.vector)
-        this.vehicle.getRigidBody().setFriction(3.0)
-        // I suspect that 0 means infinity, so 0 inertia is actually inf intertia, and the vehicle cannot move on that axis
+            this.scene.physics.physicsWorld.addAction(this.vehicle)
 
-        /** setting inertia */
-        const { x, y, z } = this.vehicleConfig.inertia
-        this.vector.setValue(x, y, z)
-        this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, this.vector)
-        this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.vehicleConfig.mass, this.vector)
+            this.wheelMeshes = []
 
-        this.isReady = true
-        /** don't start the vehicle until race */
-        this.stop()
+            const wheelAxisBackPosition = this.vehicleConfig.wheelAxisBackPosition
+            const wheelRadiusBack = this.vehicleConfig.wheelRadiusBack
+            const wheelHalfTrackBack = this.vehicleConfig.wheelHalfTrackBack
+            const wheelAxisHeightBack = this.vehicleConfig.wheelAxisHeightBack
 
-        if (this.vehicleSetup) {
+            const wheelAxisFrontPosition = this.vehicleConfig.wheelAxisFrontPosition
+            const wheelRadiusFront = this.vehicleConfig.wheelRadiusFront
+            const wheelHalfTrackFront = this.vehicleConfig.wheelHalfTrackFront
+            const wheelAxisHeightFront = this.vehicleConfig.wheelAxisHeightFront
 
-            this.updateVehicleSetup(this.vehicleSetup)
-        }
-        // think I need this, going through walls in multiplayer
+            this.vector.setValue(wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
 
-        this.vehicleBody.body.setCcdMotionThreshold(1)
+            this.addWheel(
+                true,
+                this.vector,
+                wheelRadiusFront,
+                FRONT_RIGHT
+            )
+
+
+
+            this.vector.setValue(-wheelHalfTrackFront, wheelAxisHeightFront, wheelAxisFrontPosition)
+            this.addWheel(
+                true,
+                this.vector,
+                wheelRadiusFront,
+                FRONT_LEFT
+            )
+
+            this.vector.setValue(wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
+            this.addWheel(
+                false,
+                this.vector,
+                wheelRadiusBack,
+                BACK_RIGHT
+            )
+
+            this.vector.setValue(-wheelHalfTrackBack, wheelAxisHeightBack, wheelAxisBackPosition)
+            this.addWheel(
+                false,
+                this.vector,
+                wheelRadiusBack,
+                BACK_LEFT
+            )
+
+            // not sure what to have the gravity, the auto is -20
+            this.vector.setValue(0, -30, 0)
+            this.vehicle.getRigidBody().setGravity(this.vector)
+            this.vehicle.getRigidBody().setFriction(3.0)
+            // I suspect that 0 means infinity, so 0 inertia is actually inf intertia, and the vehicle cannot move on that axis
+
+            /** setting inertia */
+            const { x, y, z } = this.vehicleConfig.inertia
+            this.vector.setValue(x, y, z)
+            this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, this.vector)
+            this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.vehicleConfig.mass, this.vector)
+
+            this.isReady = true
+            /** don't start the vehicle until race */
+            this.stop()
+
+            if (this.vehicleSetup) {
+
+                await this.updateVehicleSetup(this.vehicleSetup)
+            }
+
+            // think I need this, going through walls in multiplayer
+
+            this.vehicleBody.body.setCcdMotionThreshold(1)
+            resolve()
+        })
     }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
@@ -1037,7 +1045,6 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     updateMaxSpeed() {
-        console.log("updating maxspeed", this.vehicleConfig.maxSpeed)
         this.extraSpeedScaler = numberScaler(0, this.vehicleConfig.maxSpeed, Math.log2(1), Math.log2(800), 2)
     }
 

@@ -16,7 +16,6 @@ export const getSocket = () => {
 }
 
 export const disconnectSocket = () => {
-    console.log("calling disconnect socket")
     socket?.disconnect()
     socket = undefined
 }
@@ -50,7 +49,7 @@ export const createSocket = (deviceType: string, userId?: string, mode: SocketMo
             if (!window.DeviceMotionEvent) {
                 toast("Device motion not supported in the browser, please use Firefox or Chrome")
             } else {
-                console.log("device motion supported")
+                //   console.log("device motion supported")
             }
         }
 

@@ -1,6 +1,7 @@
 import { PhysicsLoader, Project, Scene3D } from "enable3d";
 import { PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { defaultVehicleSettings } from "../classes/User";
 import { Course } from "../course/Course";
 import { ICourse } from "../course/ICourse";
 import { GameScene } from "../game/GameScene";
@@ -77,7 +78,8 @@ class SpeedTestScene extends GameScene {
                 id: `speed-test${i}`,
                 isLeader: i === 0,
                 isConnected: false,
-                vehicleSetup: vehicleSetups[i]
+                vehicleSetup: vehicleSetups[i],
+                vehicleSettings: defaultVehicleSettings
             })
         }
         this.course = new Course(this, this.trackName)

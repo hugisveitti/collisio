@@ -11,17 +11,16 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { IUser } from "../../classes/User";
 import { checkIfCanStartGame } from "../../functions/validationFunctions";
+import vehicleSelectImg from "../../images/how-to-connect/vehicle_select.png";
 import { green4, orange2 } from "../../providers/theme";
 import {
   mdts_start_game,
   std_start_game_callback,
 } from "../../shared-backend/shared-stuff";
-import { stopMusic } from "../../sounds/gameSounds";
 import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
-
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import {
   gameRoomPath,
@@ -219,7 +218,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <GameSettingsComponent store={props.store} />
       )}
 
-      {onMobile && (
+      {onMobile ? (
         <Grid item xs={12}>
           <VehicleSettingsComponent
             store={props.store}
@@ -236,6 +235,13 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
               });
             }}
           />
+        </Grid>
+      ) : (
+        <Grid item xs={12}>
+          <div className="background">
+            <Typography>You can change vehicles on your phone. </Typography>
+          </div>
+          <img src={vehicleSelectImg} style={{ width: 300 }} alt="" />
         </Grid>
       )}
 

@@ -124,7 +124,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       window.clearInterval(sendControlsInterval);
       disconnectSocket();
       props.store.setPlayer(undefined);
-      props.store.setPlayers(undefined);
+      props.store.setPlayers([]);
       props.store.setRoomId(undefined);
     };
   }, []);
@@ -139,17 +139,21 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   }, [settingsModalOpen]);
 
   useEffect(() => {
-    setTimeout(() => {
-      // still need to send the stuff to the server
-      // hacky way
-      // should have some emit from the game to the devices telling them to send info such as userSettings
-      // 5000 ms then send it is hackkkky
-      const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
-      socket.emit(mts_user_settings_changed, {
-        userSettings: props.store.userSettings,
-        vehicleSetup: props.store.vehiclesSetup?.[vehicleType],
-      });
-    }, 1000);
+    // setTimeout(() => {
+    //   // still need to send the stuff to the server
+    //   // hacky way
+    //   // should have some emit from the game to the devices telling them to send info such as userSettings
+    //   // 5000 ms then send it is hackkkky
+    //   const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
+    //   console.log(
+    //     "props.store.vehiclesSetup?.[vehicleType]",
+    //     props.store.vehiclesSetup?.[vehicleType]
+    //   );
+    //   socket.emit(mts_user_settings_changed, {
+    //     userSettings: props.store.userSettings,
+    //     vehicleSetup: props.store.vehiclesSetup?.[vehicleType],
+    //   });
+    // }, 1000);
 
     socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       const md = getMedalAndTokens(

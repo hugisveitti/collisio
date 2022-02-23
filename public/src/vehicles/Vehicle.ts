@@ -29,7 +29,7 @@ export interface IVehicleClassConfig {
     vehicleType: VehicleType
     scene: MyScene
     useSoundEffects?: boolean
-    vehicleSetup?: VehicleSetup
+    vehicleSetup: VehicleSetup
     id: string
     vehicleSettings?: IVehicleSettings
 }
@@ -92,6 +92,41 @@ export class Vehicle implements IVehicle {
 
     currentFov: number
     delta: number = 0
+
+    constructor(config: IVehicleClassConfig) {
+        this.id = config.id
+        this.vehicleType = config.vehicleType
+        this.vehicleSetup = config.vehicleSetup ?? {
+            vehicleType: this.vehicleType,
+            vehicleColor: defaultVehicleColorType
+        }
+        this.vehicleNumber = config.vehicleNumber
+        this.name = config.name
+        this.useSoundEffects = config.useSoundEffects
+        this.scene = config.scene
+
+
+        this.vehicleConfig = this.getDefaultVehicleConfig()
+        this.isReady = false
+        this.isPaused = false
+        this._canDrive = false
+
+        this.vehicleSettings = config.vehicleSettings ?? defaultVehicleSettings
+        this.useChaseCamera = this.vehicleSettings.useChaseCamera
+        this.chaseCameraSpeed = this.vehicleSettings.chaseCameraSpeed
+
+        this.chaseCameraTicks = 0
+
+        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
+
+        this.oldPos = new Vector3(0, 0, 0)
+        this.currentFov = 55
+        this.vehicleItems = {
+            exhaust: undefined,
+            spoiler: undefined,
+            wheelGuards: undefined
+        }
+    }
 
     getCanDrive() {
         return this._canDrive
@@ -201,9 +236,7 @@ export class Vehicle implements IVehicle {
         this.vehicleConfig = this.getDefaultVehicleConfig()
         // not load if already loaded?
         this.vehicleSetup = vehicleSetup
-        console.log("updating vehicle setup in Vehicle.ts, vehiclesetup:", vehicleSetup, "vehicleItems", this.vehicleItems)
         for (let item of possibleVehicleItemTypes) {
-            console.log("possible item", item)
             if (this.vehicleItems[item]?.props?.id !== vehicleSetup[item]?.id) {
                 if (this.vehicleItems[item]?.model) {
                     this.vehicleBody.remove(this.vehicleItems[item].model)
@@ -285,42 +318,7 @@ export class Vehicle implements IVehicle {
         return JSON.parse(JSON.stringify(vehicleConfigs[this.vehicleType]))
     }
 
-    constructor(config: IVehicleClassConfig) {
-        this.id = config.id
-        this.vehicleType = config.vehicleType
-        this.vehicleSetup = config.vehicleSetup ?? {
-            vehicleType: this.vehicleType,
-            vehicleColor: defaultVehicleColorType
-        }
-        this.vehicleNumber = config.vehicleNumber
-        this.name = config.name
-        this.useSoundEffects = config.useSoundEffects
-        this.scene = config.scene
 
-
-        this.vehicleConfig = this.getDefaultVehicleConfig()
-        this.isReady = false
-        this.isPaused = false
-        this._canDrive = false
-
-        this.vehicleSettings = config.vehicleSettings ?? defaultVehicleSettings
-
-        this.useChaseCamera = this.vehicleSettings.useChaseCamera
-
-        this.chaseCameraSpeed = this.vehicleSettings.chaseCameraSpeed
-
-        this.chaseCameraTicks = 0
-
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-
-        this.oldPos = new Vector3(0, 0, 0)
-        this.currentFov = 55
-        this.vehicleItems = {
-            exhaust: undefined,
-            spoiler: undefined,
-            wheelGuards: undefined
-        }
-    }
 
     getTowPivot() {
         return vehicleConfigs[this.vehicleType].towPosition

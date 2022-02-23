@@ -1,5 +1,6 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
 import { defaultGameSettings } from "../classes/localGameSettings";
+import { defaultVehicleSettings } from "../classes/User";
 import { saveRaceData, saveRaceDataGame } from "../firebase/firestoreGameFunctions";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
 import { getDateNow } from "../utils/utilFunctions";
@@ -120,6 +121,10 @@ export const createFakeHighscoreData = () => {
         saveRaceData(playerData[0].playerId, playerData[0]).then(([setPersonalBest, gameDataInfo]) => console.log("info about race", gameDataInfo))
     }
 }
+const vehicleSettings = {
+    ...defaultVehicleSettings,
+    vehilceType: "f1",
+}
 
 export const fakePlayer1: IPlayerInfo = {
     playerName: "1test tester testersen",
@@ -130,9 +135,9 @@ export const fakePlayer1: IPlayerInfo = {
     vehicleType: "future",
     isConnected: true,
     photoURL: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Bart_-_Good_Night.png/200px-Bart_-_Good_Night.png",
-    vehicleSetup: { vehicleType: "f1", vehicleColor: "#bf923b" }
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#bf923b" },
+    vehicleSettings
 };
-
 export const fakePlayer2: IPlayerInfo = {
     playerName: "2test2 tester testersen",
     isLeader: true,
@@ -142,7 +147,8 @@ export const fakePlayer2: IPlayerInfo = {
     vehicleType: "f1",
     isConnected: true,
     photoURL: "",
-    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" }
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" },
+    vehicleSettings
 
 };
 
@@ -154,10 +160,9 @@ export const fakePlayer3: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "f1",
     isConnected: true,
-
     photoURL: "",
-    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" }
-
+    vehicleSetup: { vehicleType: "f1", vehicleColor: "#61f72a" },
+    vehicleSettings
 };
 
 export const fakePlayer4: IPlayerInfo = {
@@ -168,7 +173,7 @@ export const fakePlayer4: IPlayerInfo = {
     isAuthenticated: false,
     vehicleType: "future",
     isConnected: true,
-    photoURL: "https://static3.srcdn.com/wordpress/wp-content/uploads/2016/12/The-Simpsons-Roasting-On-An-Open-Fire-Christmas.jpg?q=50&fit=crop&w=960&h=500&dpr=1.5"
-    ,
-    vehicleSetup: { vehicleType: "future", vehicleColor: "#1d8a47" }
+    photoURL: "https://static3.srcdn.com/wordpress/wp-content/uploads/2016/12/The-Simpsons-Roasting-On-An-Open-Fire-Christmas.jpg?q=50&fit=crop&w=960&h=500&dpr=1.5",
+    vehicleSetup: { vehicleType: "future", vehicleColor: "#1d8a47" },
+    vehicleSettings
 };

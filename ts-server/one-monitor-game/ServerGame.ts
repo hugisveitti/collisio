@@ -181,12 +181,10 @@ export default class RoomMaster {
         //   this.allSocketIds.push(socket.id)
 
         socket.once(mdts_device_type, ({ deviceType, mode, userId }) => {
-            console.log("socket connected", deviceType, ", mode", mode)
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
 
             if (mode === "multiplayer") {
-                console.log("multiplayer socket")
                 handleMutliplayerSocket(this.io, socket, deviceType)
                 return
             }
@@ -200,7 +198,6 @@ export default class RoomMaster {
 
                 if (deviceType === "desktop") {
                     socket.on(dts_create_room, (req: any) => {
-                        console.log("creating room")
                         // increadably unlikly two games get same uuid
                         // one room can play many games
                         roomId = uuid().slice(0, 4)

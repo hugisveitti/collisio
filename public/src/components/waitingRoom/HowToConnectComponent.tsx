@@ -18,9 +18,10 @@ import {
 import { getDeviceType } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
 import BasicModal from "../modal/BasicModal";
-import step1Img from "../../images/how-to-connect/1.jpg";
-import step2Img from "../../images/how-to-connect/2.jpg";
-import step3Img from "../../images/how-to-connect/3.jpg";
+import step1Img from "../../images/how-to-connect/1.png";
+import step2Img from "../../images/how-to-connect/2.png";
+import step3Img from "../../images/how-to-connect/3.png";
+import step4Img from "../../images/how-to-connect/4.png";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 
 const steps = [
@@ -41,6 +42,12 @@ const steps = [
     description: () =>
       "After connecting you will appear in the players list, both on the desktop and on your phone",
     image: step3Img,
+  },
+  {
+    label: "Pro tip",
+    description: () =>
+      "Since you steer with your phone, it is recommended to lock the orientation",
+    image: step4Img,
   },
 ];
 

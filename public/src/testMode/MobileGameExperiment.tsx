@@ -9,6 +9,7 @@ import {
   IGameSettings,
   setAllLocalGameSettings,
 } from "../classes/localGameSettings";
+import { defaultVehicleSettings } from "../classes/User";
 import EndOfGameModal from "../components/gameRoom/EndOfGameModal";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
@@ -178,6 +179,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
               isLeader: true,
               isConnected: true,
               vehicleSetup: setups[settings.vehicleSettings.vehicleType],
+              vehicleSettings: props.store.userSettings.vehicleSettings,
             };
             console.log("player", player);
 
@@ -206,6 +208,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
           vehicleColor: defaultVehicleColorType,
           vehicleType: props.store.userSettings.vehicleSettings.vehicleType,
         },
+        vehicleSettings: defaultVehicleSettings,
       };
       console.log("player", player);
 

@@ -283,7 +283,8 @@ export class Player {
             vehicleType: this.vehicleType,
             photoURL: this.photoURL,
             isConnected: this.isConnected,
-            vehicleSetup: this.vehicleSetup
+            vehicleSetup: this.vehicleSetup,
+            vehicleSettings: this.userSettings.vehicleSettings
         } as IPlayerInfo
     }
 

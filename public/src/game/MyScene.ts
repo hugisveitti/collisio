@@ -74,7 +74,6 @@ export class MyScene extends Scene3D {
 
         wakeLock = navigator["wakeLock"]?.request('screen').then(w => {
             wakeLock = w
-            console.log('Wake Lock is active!');
         }).catch(err => {
             console.warn("Error setting wakelock " + err.name + ": " + err.message)
         })
@@ -135,8 +134,7 @@ export class MyScene extends Scene3D {
 
         this.gameInfoDiv.appendChild(this.pingInfo)
         this.gameInfoDiv.appendChild(this.fpsInfo)
-
-        document.body.setAttribute("style", "overflow:hidden;")
+        //    document.body.setAttribute("style", "overflow:hidden;")
     }
 
 
@@ -153,7 +151,6 @@ export class MyScene extends Scene3D {
         this.physics.config.maxSubSteps = 1 + 1
 
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
-        console.log("Fixed time step", this.physics.config.fixedTimeStep)
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -402,6 +399,8 @@ export class MyScene extends Scene3D {
         return []
     }
 
+
+
     async _destroyGame() { }
 
     async destroyGame() {
@@ -420,8 +419,10 @@ export class MyScene extends Scene3D {
 
 
             await this.stop()
-            document.body.setAttribute("style", "overflow:auto;")
             await this._destroyGame()
+            // for some reason not wokring
+            //  document.body.setAttribute("style", "")
+            await this.stop()
             resolve()
         })
     }

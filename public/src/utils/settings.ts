@@ -78,7 +78,7 @@ export const testGameSettings: IGameSettings = {
     record: false,
     useGhost: true,
     ghostFilename: "LdEGkMu2r2QCdJ8wMerp1bkRrqd2/sea-side-track/2",
-    musicVolume: .5,
+    musicVolume: .05,
     targetFPS: 60
 }
 

@@ -1,12 +1,8 @@
 import Collapse from "@mui/material/Collapse";
 import Grid from "@mui/material/Grid";
-import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { IUser, IUserSettings, IVehicleSettings } from "../../classes/User";
-import CollabsibleCard from "../inputs/CollapsibleCard";
-import VehicleSelect from "../inputs/VehicleSelect";
-import { IStore } from "../store";
 import { setDBUserSettings } from "../../firebase/firestoreFunctions";
 import { setDBVehiclesSetup } from "../../firebase/firestoreOwnershipFunctions";
 import { getStyledColors } from "../../providers/theme";
@@ -16,14 +12,16 @@ import {
   possibleVehicleItemTypes,
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
+import { getSocket } from "../../utils/connectSocket";
 import { nonactiveVehcileTypes } from "../../vehicles/VehicleConfigs";
 import { VehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
+import CollabsibleCard from "../inputs/CollapsibleCard";
 import MySlider from "../inputs/slider/MySlider";
+import VehicleSelect from "../inputs/VehicleSelect";
 import MyRadio from "../radio/MyRadio";
 import { garagePagePath } from "../Routes";
-import { getSocket } from "../../utils/connectSocket";
-import { propsToClassKey } from "@mui/styles";
+import { IStore } from "../store";
 
 interface IVehicleSettingsComponent {
   store: IStore;

@@ -364,7 +364,8 @@ export class MulitplayerPlayer {
             vehicleType: this.userSettings?.vehicleSettings.vehicleType ?? defaultVehicleType,
             isConnected: this.isConnected,
             vehicleSetup: this.vehicleSetup,
-            mobileConnected: this.mobileConnected
+            mobileConnected: this.mobileConnected,
+            vehicleSettings: this.userSettings?.vehicleSettings
         } as IPlayerInfo
     }
 

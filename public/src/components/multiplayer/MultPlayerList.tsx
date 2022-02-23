@@ -26,7 +26,6 @@ const MultPlayerList = (props: IMultPlayerList) => {
   }
 
   const { color, backgroundColor } = getStyledColors("white");
-  console.log("players", props.players);
   return (
     <List style={{ color, backgroundColor }}>
       {props.players.map((p, i) => {
