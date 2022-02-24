@@ -377,6 +377,9 @@ var MultiplayerRoom = /** @class */ (function () {
                 if (this.gameIntervalStarted)
                     return [2 /*return*/];
                 this.gameIntervalStarted = true;
+                // dont do this if only one player
+                if (this.players.length < 2)
+                    return [2 /*return*/];
                 obj = {};
                 for (_i = 0, _a = this.players; _i < _a.length; _i++) {
                     p = _a[_i];

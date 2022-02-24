@@ -399,11 +399,13 @@ export class MultiplayerRoom {
         if (this.gameIntervalStarted) return
         this.gameIntervalStarted = true
         // dont do this if only one player
+        if (this.players.length < 2) return
 
         const obj: { [userId: string]: IVehiclePositionInfo } = {}
         for (let p of this.players) {
             obj[p.userId] = p.getVehicleInfo()
         }
+
 
         this.gameInterval = setInterval(() => {
 
