@@ -416,7 +416,7 @@ export class MultiplayerRoom {
                 this.setPosChanged(false)
             }
 
-        }, 1000 / 30) // how many times?
+        }, 1000 / 5) // how many times?
     }
 
     setPosChanged(value: boolean) {

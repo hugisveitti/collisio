@@ -558,6 +558,7 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     addCamera(camera: PerspectiveCamera) {
+        console.log("adding camera to", this.name)
         if (!this.vehicleBody) return
         const c = this.vehicleBody.getObjectByName(camera.name)
         this.camera = camera

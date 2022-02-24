@@ -21,7 +21,7 @@ export interface IGhostVehicle {
     removeFromScene: (scene: Scene3D) => void
     show: () => void
     hide: () => void
-    saveCurrentPosition: () => void
+    saveCurrentPosition: (p: Vector3) => void
     changeColor: (color: VehicleColorType) => void
     id: string
     setSpeed: (number: number, delta: number, alpha: number) => void
@@ -41,6 +41,8 @@ export class GhostVehicle implements IGhostVehicle {
     config: GhostVehicleConfig
     position: Vector3
     futurePosition: Vector3
+    prevPosition: Vector3 | undefined
+
     rotation: Quaternion
     isReady: boolean;
     vehicle: ExtendedObject3D
@@ -61,6 +63,7 @@ export class GhostVehicle implements IGhostVehicle {
         this.config = config
         this.position = new Vector3(0, 0, 0)
         this.futurePosition = new Vector3(0, 0, 0)
+        this.prevPosition = undefined // new Vector3(0, 0, 0)
         this.rotation = new Quaternion(0, 0, 0, 0)
         this.isReady = false
         this._speed = 0
@@ -94,14 +97,16 @@ export class GhostVehicle implements IGhostVehicle {
 
     addToScene(scene: Scene3D) {
         // start with no collision
-        // scene.physics.add.existing(this.vehicle, { mass: vehicleConfigs[this.config.vehicleType].mass, collisionFlags: 6, shape: "convex" })
+        // collisionFlags: 2 for Kinematic, 6 for kinnetic Kinematic
+        // these flags allow us to move the body with position.set, remember body.needsUpdate = true
+        //      scene.physics.add.existing(this.vehicle, { mass: vehicleConfigs[this.config.vehicleType].mass, collisionFlags: 2, shape: "convex" })
         // having collision with ghost
-        //   scene.physics.add.existing(this.vehicle, { mass: 0, collisionFlags: 6, shape: "plane" })
+
         scene.scene.add(this.vehicle)
     }
 
     removeFromScene(scene: Scene3D) {
-        //     scene.physics.destroy(this.vehicle)
+        //   scene.physics.destroy(this.vehicle)
         scene.scene.remove(this.vehicle)
     }
 
@@ -118,36 +123,42 @@ export class GhostVehicle implements IGhostVehicle {
 
     }
 
-    saveCurrentPosition() {
-        this.position = this.vehicle.position
+    saveCurrentPosition(p: Vector3) {
+        if (!p) return
+        // this.prevPosition = this.position.clone()
+        this.position.set(p.x, p.y, p.z)
+        this.prevPosition = this.vehicle.position.clone()
+        calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
     }
 
     setPosition(position: Vector3) {
         if (!this.isReady) return
-        this.position.set(
-            position.x,
-            position.y,
-            position.z
-        )
+        // this.position.set(
+        //     position.x,
+        //     position.y,
+        //     position.z
+        // )
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
 
         if (this._speed && this.delta) {
 
-            calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
-            const nP = this.position.lerp(this.futurePosition, this.alpha)
+            //   calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
+            //  calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.vehicle.position)
 
-            // should probably do something like this
-            //  const nP = this.position.lerp(this.futurePosition, this.alpha)
+            // this.vehicle.position.lerpVectors(this.position, this.futurePosition, this.alpha)
+            // dont do anything if change is very little
+            if (this.vehicle.position.distanceTo(this.futurePosition) > 2) {
 
-            //  this.vehicle.position.set(this.futurePosition.x, this.futurePosition.y, this.futurePosition.z)
-            //   console.log("np", nP.x.toFixed(2), ", pos:", position.x.toFixed(2), ", futur pos:", this.futurePosition.x.toFixed(2))
-            this.vehicle.position.set(nP.x, nP.y, nP.z)
+                this.vehicle.position.lerpVectors(this.prevPosition, this.futurePosition, this.alpha)
+
+            }
+
 
         } else {
             this.vehicle.position.set(position.x, position.y, position.z)
         }
-        // this.vehicle.body.needUpdate = true
+        //   this.vehicle.body.needUpdate = true
     };
 
     hide() {

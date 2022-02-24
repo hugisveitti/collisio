@@ -392,7 +392,7 @@ var MultiplayerRoom = /** @class */ (function () {
                         //  this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
                         _this.setPosChanged(false);
                     }
-                }, 1000 / 30); // how many times?
+                }, 1000 / 5); // how many times?
                 return [2 /*return*/];
             });
         });

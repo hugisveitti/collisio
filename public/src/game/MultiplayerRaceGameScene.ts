@@ -116,13 +116,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                     this.gameRoomActions.escPressed()
                 }
             }
-        })
-
-        window.addEventListener("keypress", (e) => {
-            if (e.key === "r") {
+            else if (e.key === "r") {
+                console.log("reset position")
                 this.vehicle?.resetPosition()
             }
         })
+
+
 
         window.addEventListener("resize", () => this.windowResize())
     }
@@ -154,7 +154,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         const { position, rotation } = this.course.getGoalCheckpoint()
 
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
+        console.log("resetting pos of vehicle", position, rotation)
         this.vehicle.resetPosition()
+
         this.vehicle.addCamera(this.camera)
 
         this.vehicle.setCanDrive(true)
@@ -423,7 +425,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             //   this.lastOVUpdate = Math.max(0.01, this.lastOVUpdate)
             this.numNoUpdate = 0
             for (let o of this.otherVehicles) {
-                o.saveCurrentPosition()
+                //  console.log("saving pos", info[o.id].pos)
+
+                o.saveCurrentPosition(info[o.id].pos)
             }
         })
     }
