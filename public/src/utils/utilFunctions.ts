@@ -224,13 +224,13 @@ export const getPitchRollYawFromQuaternion = (q: Quaternion) => {
 }
 
 const prefixSizes = {
-    3: "K",
-    6: "M",
-    9: "G",
+    3: "Thousand",
+    6: "Million",
+    9: "Billion",
     12: "T"
 }
 
-export const getSizePrefix = (num: number) => {
+export const getSizeAbbr = (num: number) => {
     if (!num) return "0"
     const str = num.toFixed(0)
     const l = str.length
@@ -250,7 +250,7 @@ export const getSizePrefix = (num: number) => {
 
 // this is semi random right now
 const XPtoNextLevel = [
-    30, 50, 80, 90, 120, 130, 150, 170, 190, 200, 205, 210, 220, 220, 220, 230, 230, 240, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260
+    30, 50, 80, 90, 120, 130, 150, 170, 190, 200, 205, 210, 220, 220, 220, 230, 230, 240, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260
 ]
 
 /**

@@ -217,7 +217,6 @@ var adminFunctions = function (app) {
         var data = req.params;
         var userTokenId = data.userTokenId;
         var queryParams = getQueryParams(req);
-        console.log("query params", queryParams);
         firebase_config_1.admin.auth().verifyIdToken(userTokenId).then(function (decodedToken) {
             getRoomData(decodedToken.uid, queryParams, (function (roomDataRes) {
                 res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));

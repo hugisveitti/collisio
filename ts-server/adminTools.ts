@@ -191,7 +191,6 @@ export const adminFunctions = (app: any) => {
         const { userTokenId } = data
 
         const queryParams = getQueryParams(req)
-        console.log("query params", queryParams)
 
 
         admin.auth().verifyIdToken(userTokenId).then((decodedToken: any) => {

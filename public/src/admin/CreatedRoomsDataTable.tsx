@@ -65,6 +65,7 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   const multiplayer = extraData?.multiplayer;
   const players = extraData?.players ?? [];
   const dataCollection = extraData.dataCollection ?? {};
+  console.log("extraData", extraData);
   return (
     <>
       <TableRow>
@@ -75,10 +76,10 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         </TableCell>
         <TableCell>{props.roomInfo.roomId}</TableCell>
         <TableCell>
-          {getDateFromNumber(extraData?.roomCreatedTime ?? 0)}
+          {getDateFromNumber(extraData?.roomCreatedDate ?? 0)}
         </TableCell>
         <TableCell>
-          {getDateFromNumber(extraData?.roomDeletedTime ?? 0)}
+          {getDateFromNumber(extraData?.roomDeletedDate ?? 0)}
         </TableCell>
         <TableCell>{props.roomInfo.userId}</TableCell>
         <TableCell>

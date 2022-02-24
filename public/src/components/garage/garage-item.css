@@ -7,9 +7,19 @@
   text-align: center;
   vertical-align: baseline;
   transition: 0.2s;
+  position: relative;
 }
 
 .garage__item--not-owned {
   filter: opacity(0.5);
   border-color: #808080;
+}
+
+.garage__item__not-loged-in {
+  position: absolute;
+  background-color: white;
+  color: black;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

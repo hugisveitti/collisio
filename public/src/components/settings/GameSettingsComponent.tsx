@@ -64,14 +64,21 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
 
   useEffect(() => {
     if (props.multiplayer) {
+      const newGameSettings: IGameSettings = {
+        ...gameSettings,
+      };
       if (gameSettings.gameType !== "race") {
-        const newGameSettings: IGameSettings = {
-          ...gameSettings,
-          gameType: "race",
-        };
-        setGameSettings(newGameSettings);
-        props.onChange(newGameSettings);
+        newGameSettings.gameType = "race";
       }
+      if (gameSettings.useGhost) {
+        newGameSettings.useGhost = false;
+      }
+      if (gameSettings.record) {
+        newGameSettings.record = false;
+      }
+
+      setGameSettings(newGameSettings);
+      props.onChange(newGameSettings);
     }
   }, []);
 
@@ -354,76 +361,83 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 value={gameSettings.targetFPS}
               />
             </Grid>
-            <Grid item xs={12}>
-              <MyCheckbox
-                label="Record session?"
-                checked={props.gameSettings.record}
-                onChange={() => {
-                  updateGameSettings("record", !props.gameSettings.record);
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <MyCheckbox
-                label="Use ghost?"
-                checked={props.gameSettings.useGhost}
-                onChange={() => {
-                  updateGameSettings("useGhost", !props.gameSettings.useGhost);
-                }}
-              />
-              <Tooltip
-                style={{ color: backgroundColor }}
-                title="Ghost are previously recorded session. So you can race againt the ghost of another player."
-              >
-                <IconButton>
-                  <HelpOutlineIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Collapse in={props.gameSettings.useGhost}>
-                <MyTextField
-                  value={props.gameSettings.ghostFilename}
-                  label="Ghost filename"
-                  disabled={!!props.gameSettings.tournamentId}
-                  onChange={(e) =>
-                    updateGameSettings("ghostFilename", e.target.value)
-                  }
-                  onBlur={() => {
-                    const { trackName, numberOfLaps } =
-                      DriveRecorder.GetTrackNameNumberOfLapsFromFilename(
-                        props.gameSettings.ghostFilename
+            {!props.multiplayer && (
+              <React.Fragment>
+                <Grid item xs={12}>
+                  <MyCheckbox
+                    label="Record session?"
+                    checked={props.gameSettings.record}
+                    onChange={() => {
+                      updateGameSettings("record", !props.gameSettings.record);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <MyCheckbox
+                    label="Use ghost?"
+                    checked={props.gameSettings.useGhost}
+                    onChange={() => {
+                      updateGameSettings(
+                        "useGhost",
+                        !props.gameSettings.useGhost
                       );
+                    }}
+                  />
+                  <Tooltip
+                    style={{ color: backgroundColor }}
+                    title="Ghost are previously recorded session. So you can race againt the ghost of another player."
+                  >
+                    <IconButton>
+                      <HelpOutlineIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
 
-                    if (trackName && numberOfLaps) {
-                      updateGameSettingsBatch(
-                        ["trackName", "numberOfLaps"],
-                        [trackName, numberOfLaps]
-                      );
-                      //   updateGameSettings("numberOfLaps", numberOfLaps, true);
-                    }
-                  }}
-                />
-                <br />
-                <BackdropButton
-                  onClick={async () => {
-                    // updateGameSettings("useGhost", true);
-                    setGettingGhost(true);
-                    handleGetFastestGhost(gameSettings);
-                  }}
-                  disabled={gettingGhost}
-                  loading={gettingGhost}
-                >
-                  Find quickest ghost
-                </BackdropButton>
-                <InfoButton
-                  infoText={`Click the button to play against the fastest player that recorded their try playing ${getTrackNameFromType(
-                    props.gameSettings.trackName
-                  )} for ${props.gameSettings.numberOfLaps} laps.`}
-                />
-              </Collapse>
-            </Grid>
+                <Grid item xs={12}>
+                  <Collapse in={props.gameSettings.useGhost}>
+                    <MyTextField
+                      value={props.gameSettings.ghostFilename}
+                      label="Ghost filename"
+                      disabled={!!props.gameSettings.tournamentId}
+                      onChange={(e) =>
+                        updateGameSettings("ghostFilename", e.target.value)
+                      }
+                      onBlur={() => {
+                        const { trackName, numberOfLaps } =
+                          DriveRecorder.GetTrackNameNumberOfLapsFromFilename(
+                            props.gameSettings.ghostFilename
+                          );
+
+                        if (trackName && numberOfLaps) {
+                          updateGameSettingsBatch(
+                            ["trackName", "numberOfLaps"],
+                            [trackName, numberOfLaps]
+                          );
+                          //   updateGameSettings("numberOfLaps", numberOfLaps, true);
+                        }
+                      }}
+                    />
+                    <br />
+                    <BackdropButton
+                      onClick={async () => {
+                        // updateGameSettings("useGhost", true);
+                        setGettingGhost(true);
+                        handleGetFastestGhost(gameSettings);
+                      }}
+                      disabled={gettingGhost}
+                      loading={gettingGhost}
+                    >
+                      Find quickest ghost
+                    </BackdropButton>
+                    <InfoButton
+                      infoText={`Click the button to play against the fastest player that recorded their try playing ${getTrackNameFromType(
+                        props.gameSettings.trackName
+                      )} for ${props.gameSettings.numberOfLaps} laps.`}
+                    />
+                  </Collapse>
+                </Grid>
+              </React.Fragment>
+            )}
           </Grid>
         </CollabsibleCard>
       </Grid>

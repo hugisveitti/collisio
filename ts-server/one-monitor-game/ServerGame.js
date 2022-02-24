@@ -8,6 +8,7 @@ var uuid_1 = require("uuid");
 var shared_stuff_1 = require("../../public/src/shared-backend/shared-stuff");
 var MultiplayerGame_1 = require("../multiplayer-game/MultiplayerGame");
 var serverFirebaseFunctions_1 = require("../serverFirebaseFunctions");
+var helperFunctions_1 = require("../utils/helperFunctions");
 var ServerPlayer_1 = require("./ServerPlayer");
 var TestRoom_1 = __importDefault(require("./TestRoom"));
 var successStatus = "success";
@@ -33,6 +34,7 @@ var RoomMaster = /** @class */ (function () {
     RoomMaster.prototype.getStatsString = function () {
         var _a = this.getStats(), numberOfRooms = _a.numberOfRooms, numberOfPlayers = _a.numberOfPlayers, numberOfRoomsNotSendingControls = _a.numberOfRoomsNotSendingControls, numberOfRoomsSendingControls = _a.numberOfRoomsSendingControls;
         var stats = [];
+        (0, helperFunctions_1.printMemoryInfo)();
         stats.push("Stats begin: " + new Date().toISOString());
         stats.push("Number of rooms " + numberOfRooms);
         stats.push("Number of players in game " + numberOfPlayers);
@@ -67,7 +69,7 @@ var RoomMaster = /** @class */ (function () {
         console.log("setting player connected listener", mobileSocket.id);
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest, userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
-            console.log("connecting to room", roomId, playerName);
+            console.log("connecting to room", mobileSocket.id, roomId, playerName);
             if (!_this.roomExists(roomId)) {
                 console.log("room does not exist", roomId, mobileSocket.id, shared_stuff_1.stm_player_connected_callback);
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
@@ -92,13 +94,6 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.createRoom = function (socket, roomId, data, userId) {
         var _this = this;
-        var _a;
-        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress, socket.handshake.headers['x-forwarded-for']);
-        var ip = (_a = socket.handshake.headers['x-forwarded-for']) !== null && _a !== void 0 ? _a : socket.conn.remoteAddress;
-        if (Array.isArray(ip)) {
-            console.log("ip is a list", ip);
-            ip = ip.join("");
-        }
         var numberOfRoomsSendingControls = this.getStats().numberOfRoomsSendingControls;
         if (numberOfRoomsSendingControls > 25) {
             console.warn("Too many rooms, so not creating room");
@@ -251,7 +246,7 @@ var Room = /** @class */ (function () {
         var _a;
         var extraData = {
             geoIp: (0, serverFirebaseFunctions_1.deleteUndefined)(this.geoIp),
-            roomDeleteDate: Date.now(),
+            roomDeletedDate: Date.now(),
             roomCreatedDate: this.roomCreatedDate,
             gameSettings: this.gameSettings,
             multiplayer: false,
@@ -322,11 +317,9 @@ var Room = /** @class */ (function () {
         }
         if (this.gameStarted) {
             if (!playerExists) {
-                console.log("game started and player does not exist");
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." });
             }
             else {
-                console.log("Player reconnected", player.playerName);
                 player.socket.emit(shared_stuff_1.stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings, gameStarted: true } });
                 // player.socket.emit(stmd_game_starting)
                 this.playerReconnected();
@@ -495,7 +488,6 @@ var Room = /** @class */ (function () {
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 if (player.id === data.playerId) {
-                    console.log("player found!");
                     player.playerFinished(data);
                 }
             }

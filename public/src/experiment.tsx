@@ -2,14 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { Socket } from "socket.io-client";
 import {
   defaultGameSettings,
   getAllLocalGameSettings,
 } from "./classes/localGameSettings";
 import {
   defaultUserSettings,
-  defaultVehicleSettings,
   IUserSettings,
   IVehicleSettings,
 } from "./classes/User";

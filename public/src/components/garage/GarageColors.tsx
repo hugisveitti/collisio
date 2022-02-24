@@ -10,6 +10,7 @@ interface IGarageColors {
   onChange: (newColor: VehicleColorType) => void;
   selected: string;
   ownership: { [key: string]: boolean };
+  loggedIn: boolean;
 }
 
 const GarageColors = (props: IGarageColors) => {
@@ -21,6 +22,7 @@ const GarageColors = (props: IGarageColors) => {
         return (
           <Grid key={color.name} item xs={12} md={6} lg={4}>
             <GarageItem
+              loggedIn={props.loggedIn}
               owned={props.ownership?.[color.value]}
               label={color.name}
               onClick={() => {

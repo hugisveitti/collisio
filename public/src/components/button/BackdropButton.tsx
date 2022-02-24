@@ -13,7 +13,7 @@ interface IBackdropButton {
   startIcon?: JSX.Element;
   color?: "white" | "black";
   center?: boolean;
-  width?: number;
+  width?: number | string;
   loading?: boolean;
 }
 

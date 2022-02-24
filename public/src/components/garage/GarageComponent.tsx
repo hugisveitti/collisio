@@ -368,9 +368,11 @@ const GarageComponent = (props: IGarageComponent) => {
   const renderOwnershipComponent = () => {
     if (!user) {
       return (
-        <div>
+        <div className="background">
           <span>Only logged in players can buy items.</span>
-          <BackdropButton link={loginPagePath}>Login</BackdropButton>
+          <BackdropButton link={loginPagePath} color="white">
+            Login
+          </BackdropButton>
         </div>
       );
     }
@@ -522,6 +524,7 @@ const GarageComponent = (props: IGarageComponent) => {
               label: "Cars",
               renderElement: () => (
                 <GarageCars
+                  loggedIn={!!user}
                   ownership={ownership}
                   selected={selectedVehicleType}
                   onChange={(v) => {
@@ -535,6 +538,7 @@ const GarageComponent = (props: IGarageComponent) => {
               label: "Colors",
               renderElement: () => (
                 <GarageColors
+                  loggedIn={!!user}
                   ownership={ownership}
                   selected={selectedVehicleColor}
                   onChange={(color) => {
@@ -548,6 +552,7 @@ const GarageComponent = (props: IGarageComponent) => {
               renderElement: () => {
                 return (
                   <GarageItems
+                    loggedIn={!!user}
                     ownership={itemOwnership[selectedVehicleType]}
                     vehicleType={selectedVehicleType}
                     onChange={(item: ItemProperties) => {

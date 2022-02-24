@@ -202,6 +202,7 @@ const TrackSelect = (props: ITrackSelect) => {
         </Grid>
         <Grid item xs={12} md={6}>
           <TrackItems
+            loggedIn={!!user}
             ownership={ownership}
             tracks={
               props.gameType === "race"

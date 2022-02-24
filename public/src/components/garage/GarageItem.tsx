@@ -9,6 +9,7 @@ interface IGarageItem {
   selected?: boolean;
   style?: React.CSSProperties;
   owned: boolean;
+  loggedIn: boolean;
 }
 
 const GarageItem = (props: IGarageItem) => {
@@ -27,6 +28,9 @@ const GarageItem = (props: IGarageItem) => {
       }}
       onClick={props.onClick}
     >
+      {!props.loggedIn && (
+        <div className="garage__item__not-loged-in">You need to login.</div>
+      )}
       {props.thumbnail}
       {props.label}
     </div>

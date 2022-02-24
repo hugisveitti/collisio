@@ -145,6 +145,7 @@ interface ITrackItems {
   onChange: (newTrack: TrackName) => void;
   selectedTrack: TrackName;
   ownership: { [key: string]: boolean };
+  loggedIn: boolean;
 }
 
 const TrackItems = (props: ITrackItems) => {
@@ -160,6 +161,7 @@ const TrackItems = (props: ITrackItems) => {
           return (
             <Grid key={track.type} item xs={12} md={6} lg={4}>
               <GarageItem
+                loggedIn={props.loggedIn}
                 owned={props.ownership?.[track.type]}
                 selected={track.type === props.selectedTrack}
                 label={track.name}

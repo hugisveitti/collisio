@@ -10,7 +10,7 @@ import {
   vehicleItems,
   VehicleSetup,
 } from "../../shared-backend/vehicleItems";
-import { getSizePrefix } from "../../utils/utilFunctions";
+import { getSizeAbbr } from "../../utils/utilFunctions";
 import MyTabs from "../tabs/MyTabs";
 import GarageItem from "./GarageItem";
 
@@ -19,6 +19,7 @@ interface IGarageItems {
   onChange: (newItem: ItemProperties) => void;
   vehicleSetup: VehicleSetup;
   ownership: { [key: string]: boolean };
+  loggedIn: boolean;
 }
 
 const GarageItems = (props: IGarageItems) => {
@@ -66,7 +67,7 @@ const GarageItems = (props: IGarageItems) => {
                         fontSize: 10,
                       }}
                     >
-                      <span>Coins {getSizePrefix(item.cost)}</span>
+                      <span>Coins {getSizeAbbr(item.cost)}</span>
                     </div>
                     {possibleVehicleMods.map((p) => {
                       if (item[p.type]) {
@@ -89,6 +90,7 @@ const GarageItems = (props: IGarageItems) => {
                   </div>
                 }
                 selected={isSelected(item)}
+                loggedIn={props.loggedIn}
               />
             </Grid>
           );

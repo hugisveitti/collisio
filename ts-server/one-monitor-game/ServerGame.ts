@@ -36,6 +36,7 @@ import {
 } from "../../public/src/shared-backend/shared-stuff";
 import { handleMutliplayerSocket } from "../multiplayer-game/MultiplayerGame";
 import { addCreatedRooms, deleteUndefined, getGeoInfo, removeAvailableRoom } from "../serverFirebaseFunctions";
+import { printMemoryInfo } from "../utils/helperFunctions";
 import { Player } from "./ServerPlayer";
 import TestRoom from "./TestRoom";
 
@@ -67,6 +68,7 @@ export default class RoomMaster {
         } = this.getStats()
 
         const stats: string[] = []
+        printMemoryInfo()
         stats.push(`Stats begin: ${new Date().toISOString()}`)
         stats.push(`Number of rooms ${numberOfRooms}`)
         stats.push(`Number of players in game ${numberOfPlayers}`)
@@ -112,7 +114,7 @@ export default class RoomMaster {
     setupPlayerConnectedListener(mobileSocket: Socket) {
         console.log("setting player connected listener", mobileSocket.id)
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings, vehicleSetup }: IPlayerConnectedData) => {
-            console.log("connecting to room", roomId, playerName)
+            console.log("connecting to room", mobileSocket.id, roomId, playerName)
             if (!this.roomExists(roomId)) {
                 console.log("room does not exist", roomId, mobileSocket.id, stm_player_connected_callback)
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
@@ -136,15 +138,6 @@ export default class RoomMaster {
     }
 
     createRoom(socket: Socket, roomId: string, data: any, userId: string) {
-        console.log("Creating room", roomId, socket.handshake.address, socket.conn.remoteAddress, socket.handshake.headers['x-forwarded-for'])
-        let ip = socket.handshake.headers['x-forwarded-for'] ?? socket.conn.remoteAddress
-        if (Array.isArray(ip)) {
-            console.log("ip is a list", ip)
-            ip = ip.join("")
-        }
-
-
-
         const { numberOfRoomsSendingControls } = this.getStats()
         if (numberOfRoomsSendingControls > 25) {
             console.warn("Too many rooms, so not creating room")
@@ -325,7 +318,7 @@ export class Room {
     deleteRoom() {
         let extraData: any = {
             geoIp: deleteUndefined(this.geoIp),
-            roomDeleteDate: Date.now(),
+            roomDeletedDate: Date.now(),
             roomCreatedDate: this.roomCreatedDate,
             gameSettings: this.gameSettings,
             multiplayer: false,
@@ -399,10 +392,9 @@ export class Room {
 
         if (this.gameStarted) {
             if (!playerExists) {
-                console.log("game started and player does not exist")
                 player.socket.emit(stm_player_connected_callback, { status: errorStatus, message: "The game you are trying to connect to has already started." })
             } else {
-                console.log("Player reconnected", player.playerName)
+
                 player.socket.emit(stm_player_connected_callback, { status: successStatus, message: "You have been reconnected!", data: { player: player.getPlayerInfo(), players: this.getPlayersInfo(), roomId: this.roomId, gameSettings: this.gameSettings, gameStarted: true } })
                 // player.socket.emit(stmd_game_starting)
                 this.playerReconnected()
@@ -595,7 +587,6 @@ export class Room {
             for (let player of this.players) {
 
                 if (player.id === data.playerId) {
-                    console.log("player found!")
                     player.playerFinished(data)
                 }
             }

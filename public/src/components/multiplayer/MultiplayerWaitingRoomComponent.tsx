@@ -16,15 +16,12 @@ import {
   m_fs_game_settings_changed,
   m_fs_game_starting,
   m_fs_room_info,
-  m_ts_go_to_game_room_from_leader_callback,
   m_ts_game_settings_changed,
-  m_ts_in_waiting_room,
   m_ts_go_to_game_room_from_leader,
+  m_ts_go_to_game_room_from_leader_callback,
+  m_ts_in_waiting_room,
 } from "../../shared-backend/multiplayer-shared-stuff";
-import {
-  IPlayerInfo,
-  mts_user_settings_changed,
-} from "../../shared-backend/shared-stuff";
+import { mts_user_settings_changed } from "../../shared-backend/shared-stuff";
 import { disconnectSocket, getSocket } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";

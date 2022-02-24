@@ -1,6 +1,6 @@
 import { CardContent, CircularProgress, Typography } from "@mui/material";
 import React from "react";
-import { getSizePrefix } from "../../utils/utilFunctions";
+import { getSizeAbbr } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
 import { buyCoinsPagePath } from "../Routes";
@@ -32,7 +32,7 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
     if (props.notAfford) {
       return (
         <>
-          <Typography>Cost {getSizePrefix(props.cost)}</Typography>
+          <Typography>Cost {getSizeAbbr(props.cost)}</Typography>
           <Typography>You don't have enough coins</Typography>
           <BackdropButton link={buyCoinsPagePath}>Buy coins</BackdropButton>
         </>
@@ -41,7 +41,7 @@ const BuyItemComponent = (props: IBuyItemComponent) => {
 
     return (
       <>
-        <Typography>Cost {getSizePrefix(props.cost)}</Typography>
+        <Typography>Cost {getSizeAbbr(props.cost)}</Typography>
         <BackdropButton onClick={props.onBuy}>
           Buy {props.buyButtonText ?? "item"}
         </BackdropButton>

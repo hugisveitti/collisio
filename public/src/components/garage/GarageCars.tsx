@@ -27,6 +27,7 @@ interface IGarageCars {
   onChange: (newVehicle: VehicleType) => void;
   selected: VehicleType;
   ownership: { [key: string]: boolean };
+  loggedIn: boolean;
 }
 
 const GarageCars = (props: IGarageCars) => {
@@ -36,6 +37,7 @@ const GarageCars = (props: IGarageCars) => {
         return (
           <Grid key={v.type} item xs={12} md={6} lg={6} xl={4}>
             <GarageItem
+              loggedIn={props.loggedIn}
               owned={props.ownership?.[v.type]}
               label={v.name}
               onClick={() => props.onChange(v.type)}

@@ -28,9 +28,9 @@ export interface IGameSettings {
 export const defaultGameSettings: IGameSettings = {
     useShadows: false,
     useSound: true,
-    musicVolume: .15,
+    musicVolume: .1,
     numberOfLaps: 1,
-    trackName: "nurn-track",
+    trackName: "basic-track1",
     gameType: "race",
     tagGameLength: 2,
     graphics: "low",

@@ -239,7 +239,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
       ) : (
         <Grid item xs={12}>
           <div className="background">
-            <Typography>You can change vehicles on your phone. </Typography>
+            <Typography>
+              You can change vehicles on your phone. You need to be logged in on
+              your phone!{" "}
+            </Typography>
           </div>
           <img src={vehicleSelectImg} style={{ width: 300 }} alt="" />
         </Grid>

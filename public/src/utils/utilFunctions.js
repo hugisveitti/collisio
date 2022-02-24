@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getXPInfo = exports.getSizePrefix = exports.getPitchRollYawFromQuaternion = exports.getSteerAngleFromBeta = exports.createClassNames = exports.substrArrayInString = exports.get2DAngleBetweenPoints = exports.isBetweenAngles = exports.isBetweenNumbers = exports.getDateString = exports.dictToArray = exports.arrayToDict = exports.radToDeg = exports.degToRad = exports.getDateFromNumber = exports.getDateNow = exports.logScaler = exports.numberScaler = exports.removeUndefinedFromObject = exports.shuffleArray = exports.itemInArray = void 0;
+exports.getXPInfo = exports.getSizeAbbr = exports.getPitchRollYawFromQuaternion = exports.getSteerAngleFromBeta = exports.createClassNames = exports.substrArrayInString = exports.get2DAngleBetweenPoints = exports.isBetweenAngles = exports.isBetweenNumbers = exports.getDateString = exports.dictToArray = exports.arrayToDict = exports.radToDeg = exports.degToRad = exports.getDateFromNumber = exports.getDateNow = exports.logScaler = exports.numberScaler = exports.removeUndefinedFromObject = exports.shuffleArray = exports.itemInArray = void 0;
 var firestore_1 = require("@firebase/firestore");
 function itemInArray(st, arr) {
     for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
@@ -222,7 +222,7 @@ var prefixSizes = {
     9: "G",
     12: "T"
 };
-var getSizePrefix = function (num) {
+var getSizeAbbr = function (num) {
     if (!num)
         return "0";
     var str = num.toFixed(0);
@@ -239,7 +239,7 @@ var getSizePrefix = function (num) {
     var prefixString = (num / (Math.pow(10, (prefixSize)))).toFixed(2) + " " + prefix;
     return prefixString;
 };
-exports.getSizePrefix = getSizePrefix;
+exports.getSizeAbbr = getSizeAbbr;
 // this is semi random right now
 var XPtoNextLevel = [
     30, 50, 80, 90, 120, 130, 150, 170, 190, 200, 205, 210, 220, 220, 220, 230, 230, 240, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260, 260

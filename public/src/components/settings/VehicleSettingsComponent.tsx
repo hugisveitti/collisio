@@ -170,14 +170,14 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
         <Grid item xs={12}>
           <CollabsibleCard header="More vehicle settings">
             <Grid container spacing={1}>
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={6}>
                 {props.resetOrientation && (
                   <BackdropButton onClick={props.resetOrientation}>
                     Reset orientation
                   </BackdropButton>
                 )}
               </Grid>
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={6}>
                 <BackdropButton
                   onClick={() => {
                     updateVehicleSettings(

@@ -14,7 +14,7 @@ import {
 } from "../../firebase/firebaseBuyCoinsFunctions";
 
 import { UserContext } from "../../providers/UserProvider";
-import { getSizePrefix } from "../../utils/utilFunctions";
+import { getSizeAbbr } from "../../utils/utilFunctions";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
@@ -117,7 +117,7 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
                           });
                       }}
                     >
-                      Buy {getSizePrefix(option.coins)} coins
+                      Buy {getSizeAbbr(option.coins)} coins
                     </BackdropButton>
                   </CardActions>
                 </MyCard>

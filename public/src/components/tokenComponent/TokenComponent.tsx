@@ -4,7 +4,7 @@ import StarsIcon from "@mui/icons-material/Stars";
 import { IUser } from "../../classes/User";
 import { getUserTokens } from "../../firebase/firestoreFunctions";
 import { defaultTokenData } from "../../shared-backend/medalFuncions";
-import { getSizePrefix, getXPInfo } from "../../utils/utilFunctions";
+import { getSizeAbbr, getXPInfo } from "../../utils/utilFunctions";
 import Progress from "../inputs/progress/Progress";
 import { IStore } from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -40,7 +40,7 @@ const TokenComponent = (props: ITokenComponent) => {
     );
   }
 
-  let coinsString = getSizePrefix(props.store.tokenData.coins);
+  let coinsString = getSizeAbbr(props.store.tokenData.coins);
 
   const {
     currentLevel,

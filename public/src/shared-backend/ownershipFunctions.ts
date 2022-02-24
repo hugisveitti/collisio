@@ -51,7 +51,8 @@ const defaultOwnedTracks: TrackName[] = [
     "nurn-track",
     "f1-track",
     "sea-side-track",
-    "simple-tag-course"
+    "simple-tag-course",
+    "basic-track1",
 ]
 
 type TrackOwnership = { [trackName in TrackName]: boolean }
@@ -72,7 +73,7 @@ export const getDefaultTrackOwnership = () => {
 const trackCosts: { [trackName in TrackName]: number } = {
     "farm-track": 0,
     "basic-track1": 0,
-    "basic-track2": 100,
+    "basic-track2": 5,
     "basic-track3": 5000,
     "basic-track4": 10000,
     "basic-track5": 40000,
