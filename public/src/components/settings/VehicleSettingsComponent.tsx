@@ -44,6 +44,8 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     props.store.userSettings.vehicleSettings
   );
 
+  const [anythingChanged, setAnythingChanged] = useState(false);
+
   const sendUserSettingsToServer = (
     newUserSettings: IUserSettings,
     vehicleSetup
@@ -112,6 +114,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     vehiclesSetupToSave = newVehiclesSetup;
 
     sendVehicleSetupToServer(newVehiclesSetup[vehicleSettings.vehicleType]);
+    setAnythingChanged(true);
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
@@ -126,6 +129,12 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   return (
     <CollabsibleCard header="Vehicle settings" maxWidth={props.maxWidth}>
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Collapse in={!props.notInGame && anythingChanged}>
+            <Typography>Restart the game to confirm changes.</Typography>
+          </Collapse>
+        </Grid>
+
         <Grid item xs={12} lg={12} style={{}}>
           {props.linkToGarage ? (
             <BackdropButton link={garagePagePath}>Go to garage</BackdropButton>
@@ -135,6 +144,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
               value={vehicleSettings.vehicleType}
               excludedVehicles={nonactiveVehcileTypes}
               onChange={(value) => {
+                setAnythingChanged(true);
                 updateVehicleSettings("vehicleType", value);
               }}
               onChangeColor={(color) => {
@@ -162,6 +172,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                 sendVehicleSetupToServer(
                   newVehiclesSetup[vehicleSettings.vehicleType]
                 );
+                setAnythingChanged(true);
               }}
               user={props.user}
             />

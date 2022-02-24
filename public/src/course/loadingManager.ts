@@ -42,50 +42,10 @@ if (getDeviceType() === "desktop") {
 
 export const courseManager = new LoadingManager()
 
-let dotTimeout: NodeJS.Timeout
-
-let numDots = 0
-
-
 const loadingScreenTips = ["Lock the orientation of your mobile phone.", "The leader can change tracks, using the settings on the mobile.", "The leader can restart a game from the mobile.", "If the game is lagging, plug in your computer and close all other tabs."]
 let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 
-const setLoadingDivText = async (text: string) => {
-    return
-    window.clearTimeout(dotTimeout)
-    // loadImage.classList.remove("hide")
-    const createText = () => {
 
-        let dotText = text + "<br>" + `Pro tip: ${loadingScreenTips[tipIndex]}` + "<br>"
-
-        for (let i = 0; i < numDots; i++) {
-            dotText += "."
-        }
-
-        //    loadDivText.innerHTML = dotText
-
-        dotTimeout = setTimeout(async () => {
-            numDots += 1
-            if (numDots === 4) {
-                numDots = 1
-            }
-            createText()
-        }, 350)
-    }
-    createText()
-}
-
-const clearLoadingDivText = () => {
-    return
-    // loadDiv.classList.add("hide")
-    //  loadDivText.innerHTML = ""
-    window.clearTimeout(dotTimeout)
-}
-
-courseManager.onStart = (url: string, loaded: number, itemsTotal: number) => {
-    return
-    setLoadingDivText("Started loading files " + loaded + " / " + itemsTotal)
-}
 
 let progressRatio = 0
 export const setLoaderProgress = (ratio: number) => {
@@ -98,15 +58,5 @@ export const setLoaderProgress = (ratio: number) => {
     if (ratio >= 1) {
         loadDiv.classList.remove("show")
     }
-}
-
-courseManager.onProgress = (url: string, loaded: number, itemsTotal: number) => {
-    return
-    setLoadingDivText("Loading files " + loaded + " / " + itemsTotal)
-}
-
-courseManager.onLoad = () => {
-    return
-    clearLoadingDivText()
 }
 

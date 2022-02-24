@@ -426,7 +426,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 if (p.id === this.config.player.id) {
                     this.config.player = p
                     console.log("updating player", p)
-                    this.vehicle.updateVehicleSetup(p.vehicleSetup)
+                    this.vehicle.updateVehicleSettings(p.vehicleSettings, p.vehicleSetup)
+
                 } else {
                     // change ghostColor 
                     for (let g of this.otherVehicles) {

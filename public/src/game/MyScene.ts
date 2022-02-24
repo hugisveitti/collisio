@@ -5,6 +5,7 @@ import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, 
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
 import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
+import { setLoaderProgress } from "../course/loadingManager";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
 import { stopMusic } from "../sounds/gameSounds";
 import { IVehicle } from "../vehicles/IVehicle";
@@ -135,6 +136,7 @@ export class MyScene extends Scene3D {
         this.gameInfoDiv.appendChild(this.pingInfo)
         this.gameInfoDiv.appendChild(this.fpsInfo)
         //    document.body.setAttribute("style", "overflow:hidden;")
+        setLoaderProgress(0)
     }
 
 

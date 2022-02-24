@@ -329,6 +329,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 // style={{
                 //   width: "90%",
                 // }}
+                color="black"
                 min={50}
                 max={7500}
                 step={50}
@@ -348,6 +349,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             </Grid>
             <Grid item xs={12}>
               <MySlider
+                color="black"
                 label="Target FPS"
                 max={60}
                 min={25} // becomes very unstable at 20 and less
