@@ -238,8 +238,14 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
       return;
     }
+    console.log(
+      "sending game settings",
+      props.store.gameSettings,
+      props.store.roomSettings
+    );
     socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
+      roomSettings: props.store.roomSettings,
     });
     setGameSettingsLoading(true);
     if (inTestMode) {
@@ -281,8 +287,8 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       <ControlsRoomComponent
         handlePausePressed={() => {
           if (props.store.player.isLeader) {
-            gameActions.pause = true;
-            sendGameActions();
+            //   gameActions.pause = true;
+            // sendGameActions();
           }
           setSettingsModalOpen(true);
         }}

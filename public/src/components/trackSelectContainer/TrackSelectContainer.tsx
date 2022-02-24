@@ -7,6 +7,7 @@ import { IStore } from "../store";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import Grid from "@mui/material/Grid";
 import MyRadio from "../radio/MyRadio";
+import { IRoomSettings } from "../../classes/localGameSettings";
 
 interface ITrackSelectContainer {
   store: IStore;
@@ -22,13 +23,13 @@ const TrackSelectContainer = (props: ITrackSelectContainer) => {
         <Grid item xs={6}>
           <MyRadio<GameType>
             label="Type of game"
-            checked={props.store.gameSettings.gameType}
+            checked={props.store.roomSettings.gameType}
             onChange={(newType) => {
-              const newGameSettings = {
-                ...props.store.gameSettings,
+              const newRoomSettings: IRoomSettings = {
+                ...props.store.roomSettings,
                 gameType: newType,
               };
-              props.store.setGameSettings(newGameSettings);
+              props.store.setRoomSettings(newRoomSettings);
             }}
             options={[
               { label: "Race", value: "race" },
@@ -38,15 +39,15 @@ const TrackSelectContainer = (props: ITrackSelectContainer) => {
         </Grid>
         <Grid item xs={12}>
           <TrackSelect
-            gameType={props.store.gameSettings.gameType}
+            gameType={props.store.roomSettings.gameType}
             excludedTracks={nonActiveTrackNames}
-            value={props.store.gameSettings.trackName}
+            value={props.store.roomSettings.trackName}
             onChange={(trackName: TrackName) => {
-              const gameSettings = {
-                ...props.store.gameSettings,
+              const roomSettings: IRoomSettings = {
+                ...props.store.roomSettings,
                 trackName,
               };
-              props.store.setGameSettings(gameSettings);
+              props.store.setRoomSettings(roomSettings);
             }}
             store={props.store}
           />

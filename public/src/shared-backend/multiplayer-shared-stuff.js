@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.m_fs_mobile_controller_disconnected = exports.m_fs_mobile_controls = exports.m_fs_reload_game = exports.m_ts_restart_game = exports.m_fs_race_info = exports.m_fs_game_finished = exports.m_ts_lap_done = exports.m_fs_vehicles_position_info = exports.m_ts_pos_rot = exports.m_fs_game_countdown = exports.m_fs_go_to_game_room = exports.m_ts_player_ready = exports.m_ts_game_socket_ready = exports.m_fs_game_settings_changed = exports.m_ts_game_settings_changed = exports.m_fs_game_starting = exports.m_ts_go_to_game_room_from_leader_callback = exports.m_ts_go_to_game_room_from_leader = exports.m_ts_in_waiting_room = exports.m_fs_room_info = exports.m_fs_connect_to_room_callback = exports.m_ts_connect_to_room = void 0;
+exports.m_fs_mobile_controller_disconnected = exports.m_fs_mobile_controls = exports.m_fs_reload_game = exports.m_ts_restart_game = exports.m_fs_race_info = exports.m_fs_game_finished = exports.m_ts_lap_done = exports.m_fs_vehicles_position_info = exports.m_ts_pos_rot = exports.m_fs_game_countdown = exports.m_fs_go_to_game_room = exports.m_ts_player_ready = exports.m_ts_game_socket_ready = exports.m_ts_left_waiting_room = exports.m_fs_game_settings_changed = exports.m_ts_game_settings_changed = exports.m_fs_room_settings_changed = exports.m_ts_room_settings_changed = exports.m_fs_game_starting = exports.m_ts_go_to_game_room_from_leader_callback = exports.m_ts_go_to_game_room_from_leader = exports.m_ts_in_waiting_room = exports.m_fs_room_info = exports.m_fs_connect_to_room_callback = exports.m_ts_connect_to_room = void 0;
 /**
  * Multiplayer stuff
  * m_ denotes that this is for multiplayer
@@ -14,8 +14,12 @@ exports.m_ts_in_waiting_room = "m_ts_in_waiting_room";
 exports.m_ts_go_to_game_room_from_leader = "m_ts_go_to_game_room_from_leader";
 exports.m_ts_go_to_game_room_from_leader_callback = "m_ts_go_to_game_room_from_leader_callback";
 exports.m_fs_game_starting = "m_fs_game_starting";
+exports.m_ts_room_settings_changed = "m_ts_room_settings_changed";
+exports.m_fs_room_settings_changed = "m_fs_room_settings_changed";
+/** only send between mobile and player */
 exports.m_ts_game_settings_changed = "m_ts_game_settings_changed";
 exports.m_fs_game_settings_changed = "m_fs_game_settings_changed";
+exports.m_ts_left_waiting_room = "m_ts_left_waiting_room";
 // when this is emitted, we send info, like userSetting and vehicleSetup and we can send stuff
 exports.m_ts_game_socket_ready = "m_ts_game_socket_ready";
 // send this when player has loaded models

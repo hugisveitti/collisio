@@ -14,6 +14,7 @@ export const getUserConfig = (store: IStore, user: IUser | undefined) => {
         //     store.userSettings.vehicleSettings.vehicleType
         //     ],
         isAuthenticated: !!user,
-        gameSettings: store.gameSettings
+        gameSettings: store.gameSettings,
+        roomSettings: store.roomSettings
     };
 }

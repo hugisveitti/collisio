@@ -178,13 +178,13 @@ var Player = /** @class */ (function () {
             }
             else {
                 if (_this.game) {
-                    _this.game.sendGameSettings(data.gameSettings);
+                    _this.game.sendGameSettings(data.gameSettings, data.roomSettings);
                 }
             }
         });
     };
-    Player.prototype.sendGameSettings = function (gameSettings) {
-        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings });
+    Player.prototype.sendGameSettings = function (gameSettings, roomSettings) {
+        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings, roomSettings: roomSettings });
     };
     Player.prototype.setupDisconnectListener = function () {
         var _this = this;

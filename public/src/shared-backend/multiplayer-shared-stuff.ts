@@ -23,8 +23,14 @@ export const m_ts_go_to_game_room_from_leader = "m_ts_go_to_game_room_from_leade
 export const m_ts_go_to_game_room_from_leader_callback = "m_ts_go_to_game_room_from_leader_callback"
 
 export const m_fs_game_starting = "m_fs_game_starting"
+export const m_ts_room_settings_changed = "m_ts_room_settings_changed"
+export const m_fs_room_settings_changed = "m_fs_room_settings_changed"
+
+/** only send between mobile and player */
 export const m_ts_game_settings_changed = "m_ts_game_settings_changed"
 export const m_fs_game_settings_changed = "m_fs_game_settings_changed"
+
+export const m_ts_left_waiting_room = "m_ts_left_waiting_room"
 
 // when this is emitted, we send info, like userSetting and vehicleSetup and we can send stuff
 export const m_ts_game_socket_ready = "m_ts_game_socket_ready"

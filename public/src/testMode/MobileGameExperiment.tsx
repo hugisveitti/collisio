@@ -124,18 +124,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
     }
   };
 
-  const updateGameSettings = (newGameSettings: IGameSettings) => {
-    // this wont change right away so next if statement is okey
-    props.store.setGameSettings({ ...newGameSettings });
-    setAllLocalGameSettings(newGameSettings);
-
-    if (props.store.gameSettings.gameType !== newGameSettings.gameType) {
-      toast("Not supported changing game type");
-    } else {
-      gameObject.setGameSettings(newGameSettings);
-    }
-  };
-
   const resetDeviceOrientationListener = () => {
     toast("Resetting orientation");
     setShowPermissionModal(true);
@@ -219,7 +207,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   useEffect(() => {
     console.log("store", props.store);
     if (!props.store.player) return;
-    const CurrGameScene = getGameSceneClass(props.store.gameSettings.gameType);
+    const CurrGameScene = getGameSceneClass(props.store.roomSettings.gameType);
 
     startGame(
       CurrGameScene,
@@ -227,6 +215,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         socket: socket,
         players: [props.store.player],
         gameSettings: props.store.gameSettings,
+        roomSettings: props.store.roomSettings,
         roomId: props.store.roomId,
         gameRoomActions: {
           escPressed: handleEscPressed,

@@ -85,11 +85,10 @@ var MultiplayerRoomMaster = /** @class */ (function () {
                 }
             }
             else {
-                console.log("on connect to room", roomId);
                 var player = new MultiplayerPlayer_1.MulitplayerPlayer(socket, config);
                 if (!roomId) {
-                    var newRoom = new MultiplayerRoom(io, player, config.gameSettings, function (roomId) { return _this.deleteRoomCallback(roomId); });
-                    console.log("creating room", newRoom.roomId);
+                    var newRoom = new MultiplayerRoom(io, player, config.gameSettings, config.roomSettings, function (roomId) { return _this.deleteRoomCallback(roomId); });
+                    console.log("creating multiplayer room", newRoom.roomId);
                     _this.rooms[newRoom.roomId] = newRoom;
                     return;
                 }
@@ -122,9 +121,10 @@ var MultiplayerRoomMaster = /** @class */ (function () {
 }());
 exports.MultiplayerRoomMaster = MultiplayerRoomMaster;
 var MultiplayerRoom = /** @class */ (function () {
-    function MultiplayerRoom(io, leader, gameSettings, deleteRoomCallback) {
+    function MultiplayerRoom(io, leader, gameSettings, roomSettings, deleteRoomCallback) {
         this.players = [];
         this.gameSettings = gameSettings;
+        this.roomSettings = roomSettings;
         this.deleteRoomCallback = deleteRoomCallback;
         this.leader = leader;
         this.leader.setLeader();
@@ -144,7 +144,7 @@ var MultiplayerRoom = /** @class */ (function () {
             roomCreatedTime: Date.now(),
             roomDeletedTime: 0,
             numberOfReloads: 0,
-            numberOfGameSettingsChanges: 0,
+            numberOfRoomSettingsChanges: 0,
             numberOfGameStartCountdowns: 0,
             numberOfPlayersReady: 0,
             numberOfGamesFinshed: 0,
@@ -156,7 +156,8 @@ var MultiplayerRoom = /** @class */ (function () {
             var testConfig = {
                 displayName: "Test",
                 userId: "test",
-                isAuthenticated: false
+                isAuthenticated: false,
+                gameSettings: {}
             };
             var testPlayer = new MultiplayerPlayer_1.MulitplayerPlayer(leader.desktopSocket, testConfig);
             this.addPlayer(testPlayer);
@@ -191,16 +192,13 @@ var MultiplayerRoom = /** @class */ (function () {
         }
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_reload_game, {
             players: this.getPlayersInfo(),
-            gameSettings: this.gameSettings
+            roomSettings: this.roomSettings
         });
     };
-    MultiplayerRoom.prototype.setGameSettings = function (gameSettings) {
-        if (this.gameSettings.trackName !== gameSettings.trackName) {
-            this.gameSettings = gameSettings;
+    MultiplayerRoom.prototype.setRoomSettings = function (roomSettings) {
+        this.roomSettings = roomSettings;
+        if (this.roomSettings.trackName !== roomSettings.trackName) {
             this.setNeedsReload();
-        }
-        else {
-            this.gameSettings = gameSettings;
         }
         // set number of laps when game starts
     };
@@ -320,6 +318,7 @@ var MultiplayerRoom = /** @class */ (function () {
             startedGame: this.enteredGameRoom,
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
             gameSettings: this.gameSettings,
+            roomSettings: this.roomSettings,
             dataCollection: this.dataCollection,
             enteredGameRoom: this.enteredGameRoom
         });
@@ -330,16 +329,16 @@ var MultiplayerRoom = /** @class */ (function () {
         this.deleteRoomCallback(this.roomId);
     };
     MultiplayerRoom.prototype.sendRoomInfo = function () {
-        this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_room_info, { players: this.getPlayersInfo(), gameSettings: this.gameSettings });
+        this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_room_info, { players: this.getPlayersInfo(), roomSettings: this.roomSettings });
     };
     MultiplayerRoom.prototype.getPlayersInfo = function () {
         return this.players.map(function (p) { return p.getPlayerInfo(); });
     };
-    MultiplayerRoom.prototype.gameSettingsChanged = function () {
-        this.dataCollection.numberOfGameSettingsChanges += 1;
+    MultiplayerRoom.prototype.roomSettingsChanged = function () {
+        this.dataCollection.numberOfRoomSettingsChanges += 1;
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var p = _a[_i];
-            p.sendGameSettingsChanged();
+            p.sendRoomSettingsChanged();
         }
     };
     /**

@@ -20,8 +20,10 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket = desktopSocket;
         this.geoIp = (0, serverFirebaseFunctions_1.getGeoInfo)(this.desktopSocket);
         this.config = config;
+        this.gameSettings = config.gameSettings;
         this.userId = config.userId;
         this.displayName = config.displayName;
+        this.gameSettings = {};
         // this.vehicleSetup = config.vehicleSetup
         // this.userSettings = config.userSettings
         this.isAuthenticated = config.isAuthenticated;
@@ -48,7 +50,7 @@ var MulitplayerPlayer = /** @class */ (function () {
     }
     MulitplayerPlayer.prototype.setLeader = function () {
         this.isLeader = true;
-        this.setupGameSettingsChangedListener();
+        this.setupRoomSettingsChangedListener();
         this.setupStartGameListener();
     };
     MulitplayerPlayer.prototype.getVehicleInfo = function () {
@@ -72,14 +74,26 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.setupGetPosRotListener();
         this.setupLapDoneListener();
         this.setupRestartGameListener();
+        this.setupLeftWaitingRoom();
     };
     MulitplayerPlayer.prototype.turnOffSocket = function () {
         if (!this.desktopSocket)
             return;
-        console.log("turn off socket");
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.desktopSocket.removeAllListeners();
         this.desktopSocket.disconnect();
+    };
+    MulitplayerPlayer.prototype.setupLeftWaitingRoom = function () {
+        var _this = this;
+        var _a;
+        (_a = this.desktopSocket) === null || _a === void 0 ? void 0 : _a.on(multiplayer_shared_stuff_1.m_ts_left_waiting_room, function () {
+            var _a, _b;
+            console.log("left waiting room multiplayer");
+            if (!((_a = _this.room) === null || _a === void 0 ? void 0 : _a.enteredGameRoom)) {
+                _this.turnOffSocket();
+            }
+            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.playerDisconnected(_this.userId);
+        });
     };
     MulitplayerPlayer.prototype.gameFinished = function (data) {
         this.dataCollection.numberOfRacesFinished += 1;
@@ -168,9 +182,8 @@ var MulitplayerPlayer = /** @class */ (function () {
         var _this = this;
         // need more than once?
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_in_waiting_room, function () {
-            var _a, _b;
-            console.log("In waiting room", _this.displayName, (_a = _this.room) === null || _a === void 0 ? void 0 : _a.roomId);
-            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.sendRoomInfo();
+            var _a;
+            (_a = _this.room) === null || _a === void 0 ? void 0 : _a.sendRoomInfo();
         });
     };
     MulitplayerPlayer.prototype.setupDisconnectedListener = function () {
@@ -178,20 +191,18 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.desktopSocket.on("disconnect", function () {
             var _a, _b;
             _this.isConnected = false;
-            console.log("muliplayer player disconencted", _this.userId);
             (_a = _this.room) === null || _a === void 0 ? void 0 : _a.playerDisconnected(_this.userId);
             // always disconnect mobile ?
             (_b = _this.mobileSocket) === null || _b === void 0 ? void 0 : _b.disconnect();
         });
     };
-    MulitplayerPlayer.prototype.setupGameSettingsChangedListener = function () {
+    MulitplayerPlayer.prototype.setupRoomSettingsChangedListener = function () {
         var _this = this;
-        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_game_settings_changed, function (_a) {
+        this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_room_settings_changed, function (_a) {
             var _b, _c;
-            var gameSettings = _a.gameSettings;
-            console.log("new game settings");
-            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.setGameSettings(gameSettings);
-            (_c = _this.room) === null || _c === void 0 ? void 0 : _c.gameSettingsChanged();
+            var roomSettings = _a.roomSettings;
+            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.setRoomSettings(roomSettings);
+            (_c = _this.room) === null || _c === void 0 ? void 0 : _c.roomSettingsChanged();
         });
     };
     MulitplayerPlayer.prototype.setupLapDoneListener = function () {
@@ -211,7 +222,6 @@ var MulitplayerPlayer = /** @class */ (function () {
     /** Mobile socket functions */
     MulitplayerPlayer.prototype.addMobileSocket = function (socket) {
         var _a;
-        console.log("added mobile socket");
         this.dataCollection.numberOfMobileConnections += 1;
         this.turnOffMobileSocket();
         this.mobileConnected = true;
@@ -220,6 +230,8 @@ var MulitplayerPlayer = /** @class */ (function () {
         this.setupMobileInWaitingRoomListener();
         this.setupMobileStartGameListener();
         this.setupMobileDisconnectedListener();
+        this.setupMobileLeftWaitingRoom();
+        this.setupMobileGameSettingsChangedListener();
         if ((_a = this.room) === null || _a === void 0 ? void 0 : _a.gameStarted) {
             this.setupMobileControler();
         }
@@ -227,11 +239,20 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.turnOffMobileSocket = function () {
         if (!this.mobileSocket)
             return;
-        console.log("turn off mobileSocket");
         this.isSendingMobileControls = false;
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.mobileSocket.removeAllListeners();
         this.mobileSocket.disconnect();
+    };
+    MulitplayerPlayer.prototype.setupMobileLeftWaitingRoom = function () {
+        var _this = this;
+        var _a;
+        (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(multiplayer_shared_stuff_1.m_ts_left_waiting_room, function () {
+            var _a;
+            if (!((_a = _this.room) === null || _a === void 0 ? void 0 : _a.enteredGameRoom)) {
+                _this.turnOffMobileSocket();
+            }
+        });
     };
     MulitplayerPlayer.prototype.setupGameActionsListener = function () {
         var _this = this;
@@ -243,11 +264,22 @@ var MulitplayerPlayer = /** @class */ (function () {
             }
         });
     };
+    MulitplayerPlayer.prototype.setupMobileGameSettingsChangedListener = function () {
+        var _this = this;
+        var _a;
+        (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(multiplayer_shared_stuff_1.m_ts_game_settings_changed, function (_a) {
+            var gameSettings = _a.gameSettings;
+            if ((gameSettings === null || gameSettings === void 0 ? void 0 : gameSettings.graphics) !== _this.gameSettings.graphics) {
+                _this.isReady = false;
+            }
+            _this.gameSettings = gameSettings;
+            _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_settings_changed, { gameSettings: gameSettings });
+        });
+    };
     MulitplayerPlayer.prototype.setupMobileControler = function () {
         var _this = this;
         var _a;
         if (this.isSendingMobileControls) {
-            console.log("is already sending controls", this.displayName);
             return;
         }
         this.isSendingMobileControls = true;
@@ -262,7 +294,6 @@ var MulitplayerPlayer = /** @class */ (function () {
         (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on("disconnect", function () {
             var _a;
             _this.isSendingMobileControls = false;
-            console.log("#####mobile socket disconnected");
             _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_mobile_controller_disconnected, {});
             _this.mobileSocket = undefined;
             _this.mobileConnected = false;
@@ -274,9 +305,8 @@ var MulitplayerPlayer = /** @class */ (function () {
         var _a;
         // need more than once?
         (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(multiplayer_shared_stuff_1.m_ts_in_waiting_room, function () {
-            var _a, _b;
-            console.log("In waiting room", _this.displayName, (_a = _this.room) === null || _a === void 0 ? void 0 : _a.roomId);
-            (_b = _this.room) === null || _b === void 0 ? void 0 : _b.sendRoomInfo();
+            var _a;
+            (_a = _this.room) === null || _a === void 0 ? void 0 : _a.sendRoomInfo();
         });
     };
     MulitplayerPlayer.prototype.setupMobileStartGameListener = function () {
@@ -301,9 +331,9 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.sendPosInfo = function (data) {
         this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_vehicles_position_info, data);
     };
-    MulitplayerPlayer.prototype.sendGameSettingsChanged = function () {
+    MulitplayerPlayer.prototype.sendRoomSettingsChanged = function () {
         var _a;
-        this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_settings_changed, { gameSettings: (_a = this.room) === null || _a === void 0 ? void 0 : _a.gameSettings });
+        this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_room_settings_changed, { roomSettings: (_a = this.room) === null || _a === void 0 ? void 0 : _a.roomSettings });
     };
     MulitplayerPlayer.prototype.getPlayerRaceData = function () {
         return {
@@ -329,7 +359,7 @@ var MulitplayerPlayer = /** @class */ (function () {
     };
     // data to collect
     MulitplayerPlayer.prototype.getEndOfRoomInfo = function () {
-        var obj = __assign(__assign(__assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection }), this.geoIp), { isReady: this.isReady });
+        var obj = __assign(__assign(__assign(__assign({}, this.getPlayerInfo()), { dataCollection: this.dataCollection }), this.geoIp), { isReady: this.isReady, gameSettings: this.gameSettings });
         obj = (0, serverFirebaseFunctions_1.deleteUndefined)(obj);
         return obj;
     };

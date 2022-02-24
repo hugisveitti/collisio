@@ -1,10 +1,10 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
 import { PerspectiveCamera, Clock, Vector3 } from "three";
-import { IGameSettings } from "../classes/localGameSettings";
+import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info } from "../shared-backend/multiplayer-shared-stuff";
+import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed } from "../shared-backend/multiplayer-shared-stuff";
 import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
@@ -22,6 +22,7 @@ import { MyScene } from "./MyScene";
 export interface IMultiplayergameSceneConfig {
     socket: Socket
     gameSettings: IGameSettings
+    roomSettings: IRoomSettings
     userSettings: IUserSettings
     vehicleSetup: VehicleSetup
     player: IPlayerInfo
@@ -137,7 +138,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     async preload() {
-        this.course = new RaceCourse(this, this.config.gameSettings.trackName, (v) => this.handleGoalCrossed(v), (v, num) => this.handleCheckpointCrossed(v, num))
+        this.course = new RaceCourse(this, this.config.roomSettings.trackName, (v) => this.handleGoalCrossed(v), (v, num) => this.handleCheckpointCrossed(v, num))
         await this.course.createCourse()
         this.addLights()
         this.camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
@@ -146,8 +147,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.otherVehicles = []
         await this.createVehicle()
         await this.createOtherVehicles()
-        addMusic(this.gameSettings.musicVolume, this.camera as PerspectiveCamera, "racing.mp3")
-        this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
+        addMusic(this.gameSettings?.musicVolume ?? 0, this.camera as PerspectiveCamera, "racing.mp3")
+        this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
         console.log("everything created")
 
         const { position, rotation } = this.course.getGoalCheckpoint()
@@ -282,6 +283,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupRaceFinishedListener()
         this.setupReloadGameListener()
         this.setupUserSettingsChangedListener()
+        this.setupGamesSettingsChangedListener()
         this.setupMobileControlsListener()
         this.setupMobileControllerDisconnectedListener()
         this.setupRaceInfoListener()
@@ -299,6 +301,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     setupMobileControllerDisconnectedListener() {
         this.socket.on(m_fs_mobile_controller_disconnected, () => {
             this.usingMobileController = false
+        })
+    }
+
+    setupGamesSettingsChangedListener() {
+        this.socket.on(m_fs_game_settings_changed, ({ gameSettings }) => {
+            this.setGameSettings(gameSettings)
         })
     }
 
@@ -320,18 +328,19 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setupReloadGameListener() {
-        this.socket.on(m_fs_reload_game, (data: { players: IPlayerInfo[], gameSettings: IGameSettings }) => {
-            const { players, gameSettings } = data
-            console.log("reload", players, gameSettings, data)
+        this.socket.on(m_fs_reload_game, (data: { players: IPlayerInfo[], roomSettings: IRoomSettings }) => {
+            const { players, roomSettings } = data
+            console.log("reload", players, roomSettings)
             for (let p of players) {
                 if (p.id === this.config.player.id) {
                     this.config.player = p
                 }
             }
             this.config.players = players
-            if (this.gameSettings) {
-                this.gameSettings = gameSettings
-                this.config.gameSettings = gameSettings
+
+            if (this.roomSettings) {
+                this.roomSettings = roomSettings
+                this.config.roomSettings = roomSettings
             }
 
             this.restartGame()
@@ -391,7 +400,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             this.clearSecondaryInfo()
             this.updateClock.start()
             console.log("start game", spawnPositions, countdown)
-            this.gameTime = new GameTime(this.gameSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
+            this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
 
             // start count down?
             // or do the count down on the backend
@@ -420,7 +429,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setupPlayersInfoListener() {
-        this.socket.on(m_fs_room_info, ({ players, gameSettings }: { players: IPlayerInfo[], gameSettings: IGameSettings }) => {
+        this.socket.on(m_fs_room_info, ({ players, roomSettings }: { players: IPlayerInfo[], roomSettings: IRoomSettings }) => {
             // setup players
             for (let p of players) {
                 if (p.id === this.config.player.id) {
@@ -438,8 +447,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 }
             }
 
-            this.gameSettings = gameSettings
-            this.config.gameSettings = gameSettings
+            this.roomSettings = roomSettings
+            this.config.roomSettings = roomSettings
         })
     }
 
@@ -447,7 +456,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.config = gameSceneConfig
         this.setSocket(this.config.socket)
         this.setGameSettings(this.config.gameSettings)
-        this.currentNumberOfLaps = this.config.gameSettings.numberOfLaps
+        this.setRoomSettings(this.config.roomSettings)
+        this.currentNumberOfLaps = this.config.roomSettings.numberOfLaps
         console.log("setting game room action", this.config.gameRoomActions)
         this.gameRoomActions = this.config.gameRoomActions
         this.createScoreTable()
@@ -462,9 +472,21 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         startMusic()
     }
 
+    setRoomSettings(roomSettings: IRoomSettings) {
+        if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
+            this.setNeedsReload(true)
+        }
+        this.roomSettings = roomSettings
+        for (let key of Object.keys(roomSettings)) {
+            if (roomSettings[key] !== undefined) {
+                this[key] = roomSettings[key]
+            }
+        }
+    }
+
     setGameSettings(gameSettings: IGameSettings) {
 
-        if (this.courseLoaded && (this.getTrackName() !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
+        if (this.courseLoaded && (this.gameSettings.graphics !== gameSettings.graphics)) {
             this.setNeedsReload(true)
             console.log("needs reaload")
         }

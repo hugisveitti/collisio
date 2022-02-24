@@ -35,7 +35,7 @@ const GarageCars = (props: IGarageCars) => {
     <Grid container spacing={3} style={{ marginTop: 10 }}>
       {activeVehicleTypes.map((v) => {
         return (
-          <Grid key={v.type} item xs={12} md={6} lg={6} xl={4}>
+          <Grid key={v.type} item xs={12} md={6} lg={6} xl={6}>
             <GarageItem
               loggedIn={props.loggedIn}
               owned={props.ownership?.[v.type]}

@@ -27,7 +27,7 @@ import {
   getConnectPagePath,
   tournamentPagePath,
 } from "../Routes";
-import GameSettingsComponent from "../settings/GameSettingsContainer";
+import GameSettingsComponent from "../settings/RoomAndGameSettingsContainer";
 import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
 import FindActiveTournamentsComponent from "../tournament/inputs/FindActiveTournamentsComponent";
@@ -207,9 +207,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         <WaitingRoomPlayerList
           players={props.store.players}
           playerId={props.store.player?.id}
-          trackName={props.store.gameSettings.trackName}
-          numberOfLaps={props.store.gameSettings.numberOfLaps}
-          gameType={props.store.gameSettings.gameType}
+          trackName={props.store.roomSettings.trackName}
+          numberOfLaps={props.store.roomSettings.numberOfLaps}
+          gameType={props.store.roomSettings.gameType}
           user={user}
         />
       </Grid>

@@ -8,7 +8,9 @@ import {
 } from "../../classes/Game";
 import {
   IGameSettings,
+  IRoomSettings,
   setAllLocalGameSettings,
+  setAllLocalRoomSettings,
 } from "../../classes/localGameSettings";
 import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
 import { startGame } from "../../game/GameScene";
@@ -104,10 +106,18 @@ const GameRoom = React.memo((props: IGameRoom) => {
     props.store.setGameSettings({ ...newGameSettings });
     setAllLocalGameSettings(newGameSettings);
 
-    if (props.store.gameSettings.gameType !== newGameSettings.gameType) {
+    gameObject.setGameSettings(newGameSettings);
+  };
+
+  const updateRoomSettings = (newRoomSettings: IRoomSettings) => {
+    // this wont change right away so next if statement is okey
+    props.store.setRoomSettings({ ...newRoomSettings });
+    setAllLocalRoomSettings(newRoomSettings);
+
+    if (props.store.roomSettings.gameType !== newRoomSettings.gameType) {
       toast("Not supported changing game type");
     } else {
-      gameObject.setGameSettings(newGameSettings);
+      gameObject.setRoomSettings(newRoomSettings);
     }
   };
 
@@ -148,7 +158,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
     props.store.setPreviousPage(gameRoomPath);
 
-    const CurrGameScene = getGameSceneClass(props.store.gameSettings.gameType);
+    const CurrGameScene = getGameSceneClass(props.store.roomSettings.gameType);
 
     startGame(
       CurrGameScene,
@@ -156,6 +166,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         socket: socket,
         players: props.store.players,
         gameSettings: props.store.gameSettings,
+        roomSettings: props.store.roomSettings,
         roomId: props.store.roomId,
         gameRoomActions: {
           escPressed: handleEscPressed,
@@ -223,12 +234,19 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
   const gameObjectCreated = () => {
     socket.on(stmd_game_settings_changed, (data) => {
-      props.store.setGameSettings(data.gameSettings);
       if (data.gameSettings) {
+        props.store.setGameSettings(data.gameSettings);
         setAllLocalGameSettings(data.gameSettings);
       }
       if (gameObject) {
         gameObject.setGameSettings(data.gameSettings);
+      }
+      if (data.roomSettings) {
+        props.store.setRoomSettings(data.roomSettings);
+        setAllLocalRoomSettings(data.roomSettings);
+      }
+      if (gameObject) {
+        gameObject.setRoomSettings(data.roomSettings);
       }
     });
 
@@ -245,13 +263,14 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
   useEffect(() => {
     if (gameObject) {
-      if (gameActions.pause) {
-        setSettingsModalOpen(true);
-        gameObject.pauseGame();
-      } else {
-        setSettingsModalOpen(false);
-        gameObject.unpauseGame();
-      }
+      // never pause from phone
+      // if (gameActions.pause) {
+      //   setSettingsModalOpen(true);
+      //   gameObject.pauseGame();
+      // } else {
+      //   setSettingsModalOpen(false);
+      //   gameObject.unpauseGame();
+      // }
       if (gameActions.restart) {
         gameObject.restartGame();
         handleCloseModals();
@@ -275,6 +294,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         user={user}
         isTestMode={props.isTestMode}
         updateGameSettings={updateGameSettings}
+        updateRoomSettings={updateRoomSettings}
         quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
             socket.disconnect();

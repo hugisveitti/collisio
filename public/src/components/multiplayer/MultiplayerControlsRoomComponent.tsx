@@ -90,6 +90,7 @@ const MultiplayerControlsRoomComponent = (
     // }
     socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
+      roomSettings: props.store.roomSettings,
     });
     sendGameActions();
     // setGameSettingsLoading(true);

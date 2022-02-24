@@ -1,7 +1,6 @@
-import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { IGameSettings } from "../../../classes/localGameSettings";
+import { IRoomSettings } from "../../../classes/localGameSettings";
 import {
   BracketTree,
   ITournament,
@@ -52,9 +51,9 @@ const FindActiveTournamentComponent = (
   };
 
   useEffect(() => {
-    if (props.store.gameSettings.tournamentId !== props.store.tournament?.id) {
-      if (props.store.gameSettings.tournamentId) {
-        getTournamentWithId(props.store.gameSettings.tournamentId).then(
+    if (props.store.roomSettings.tournamentId !== props.store.tournament?.id) {
+      if (props.store.roomSettings.tournamentId) {
+        getTournamentWithId(props.store.roomSettings.tournamentId).then(
           (tournament) => {
             console.log("new tournament gotten", tournament);
             props.store.setTournament(tournament);
@@ -68,31 +67,31 @@ const FindActiveTournamentComponent = (
         props.store.setActiveBracketNode(undefined);
       }
     }
-  }, [props.store.gameSettings]);
+  }, [props.store.roomSettings]);
 
   const handleChangeSettings = (tournament: ITournament) => {
-    const newGameSettings: IGameSettings = {
-      ...props.store.gameSettings,
+    const newRoomSettings: IRoomSettings = {
+      ...props.store.roomSettings,
       tournamentId: tournament?.id,
     };
     if (!tournament || tournament?.id === "undefined") {
-      delete newGameSettings.tournamentId;
+      delete newRoomSettings.tournamentId;
       props.store.setTournament(undefined);
       props.store.setActiveBracketNode(undefined);
     } else {
-      newGameSettings.numberOfLaps = tournament.numberOfLaps;
-      newGameSettings.trackName = tournament.trackName;
+      newRoomSettings.numberOfLaps = tournament.numberOfLaps;
+      newRoomSettings.trackName = tournament.trackName;
       // compete in other than race ?
-      newGameSettings.gameType = "race";
+      newRoomSettings.gameType = "race";
 
       props.store.setTournament(tournament);
       handleGetBracketNode(tournament);
     }
-    console.log("new game settings", newGameSettings);
+    console.log("new room settings", newRoomSettings);
 
-    props.store.setGameSettings(newGameSettings);
+    props.store.setRoomSettings(newRoomSettings);
     socket.emit(mdts_game_settings_changed, {
-      gameSettings: newGameSettings,
+      roomSettings: newRoomSettings,
     });
   };
 
@@ -135,7 +134,7 @@ const FindActiveTournamentComponent = (
 
       <TournamentSelect
         tournaments={activeTournaments}
-        selectedId={props.store.gameSettings.tournamentId}
+        selectedId={props.store.roomSettings.tournamentId}
         selectedName={props.store.tournament?.name}
         onChange={(tournament) => {
           handleChangeSettings(tournament);

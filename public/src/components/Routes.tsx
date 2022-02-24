@@ -7,7 +7,9 @@ import {
 } from "../classes/Game";
 import {
   defaultGameSettings,
+  defaultRoomSettings,
   getAllLocalGameSettings,
+  getAllLocalRoomSettings,
 } from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
 import PrivayPolicyComponent from "../extra/PrivacyPolicyComponent";
@@ -26,7 +28,12 @@ import {
   fakePlayer4,
 } from "../tests/fakeData";
 import { createSocket, getSocket } from "../utils/connectSocket";
-import { getDeviceType, inTestMode, testGameSettings } from "../utils/settings";
+import {
+  getDeviceType,
+  inTestMode,
+  testGameSettings,
+  testRoomSettings,
+} from "../utils/settings";
 import AboutPageComponent from "./AboutPageComponent";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
 import GameRoom from "./gameRoom/GameRoom";
@@ -131,6 +138,11 @@ const Routes = () => {
   const [gameSettings, setGameSettings] = useState(
     inTestMode ? testGameSettings : defaultGameSettings
   );
+
+  const [roomSettings, setRoomSettings] = useState(
+    inTestMode ? testRoomSettings : defaultRoomSettings
+  );
+
   const [activeBracketNode, setActiveBracketNode] = useState(undefined);
 
   // not sure how to implement tournaments
@@ -143,16 +155,19 @@ const Routes = () => {
 
   useEffect(() => {
     if (!inTestMode) {
-      const _gameSettings = getAllLocalGameSettings();
+      const _roomSettings = getAllLocalRoomSettings();
 
       if (
-        _gameSettings.gameType !==
-        getGameTypeFromTrackName(_gameSettings.trackName)
+        _roomSettings.gameType !==
+        getGameTypeFromTrackName(_roomSettings.trackName)
       ) {
-        _gameSettings.trackName = getDefaultTrackFromGameType(
-          _gameSettings.gameType
+        _roomSettings.trackName = getDefaultTrackFromGameType(
+          _roomSettings.gameType
         );
       }
+      store.setRoomSettings(_roomSettings);
+
+      const _gameSettings = getAllLocalGameSettings();
       store.setGameSettings(_gameSettings);
     }
 
@@ -179,6 +194,8 @@ const Routes = () => {
     setUserSettings,
     gameSettings,
     setGameSettings,
+    roomSettings,
+    setRoomSettings,
     tournament,
     setTournament,
     activeBracketNode,

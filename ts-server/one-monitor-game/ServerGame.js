@@ -190,6 +190,7 @@ var Room = /** @class */ (function () {
     function Room(roomId, io, socket, data, deleteRoomCallback) {
         this.players = [];
         this.gameSettings = {};
+        this.roomSettings = {};
         this.roomId = roomId;
         this.io = io;
         this.gameStarted = false;
@@ -251,7 +252,8 @@ var Room = /** @class */ (function () {
             gameSettings: this.gameSettings,
             multiplayer: false,
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
-            gameStarted: this.gameStarted
+            gameStarted: this.gameStarted,
+            roomSettings: this.roomSettings
         };
         extraData = (0, serverFirebaseFunctions_1.deleteUndefined)(extraData);
         (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, (_a = this.desktopUserId) !== null && _a !== void 0 ? _a : "undef", extraData);
@@ -347,11 +349,18 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupGameSettingsListener = function () {
         var _this = this;
-        this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (data) {
-            _this.gameSettings = data.gameSettings;
-            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
-                var player = _a[_i];
-                player.sendGameSettings(_this.gameSettings);
+        this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (_a) {
+            var gameSettings = _a.gameSettings, roomSettings = _a.roomSettings;
+            console.log("room game settings change", roomSettings, gameSettings);
+            if (gameSettings) {
+                _this.gameSettings = gameSettings;
+            }
+            if (roomSettings) {
+                _this.roomSettings = roomSettings;
+            }
+            for (var _i = 0, _b = _this.players; _i < _b.length; _i++) {
+                var player = _b[_i];
+                player.sendGameSettings(_this.gameSettings, _this.roomSettings);
             }
         });
         this.socket.on(shared_stuff_1.dts_game_settings_changed_callback, function () {
@@ -370,15 +379,20 @@ var Room = /** @class */ (function () {
     Room.prototype.sendGameActions = function (data) {
         this.socket.emit(shared_stuff_1.std_send_game_actions, data);
     };
-    Room.prototype.sendGameSettings = function (gameSettings) {
-        this.gameSettings = gameSettings;
+    Room.prototype.sendGameSettings = function (gameSettings, roomSettings) {
+        if (gameSettings) {
+            this.gameSettings = gameSettings;
+        }
+        if (roomSettings) {
+            this.roomSettings = roomSettings;
+        }
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var player = _a[_i];
             if (!player.isLeader) {
-                player.sendGameSettings(this.gameSettings);
+                player.sendGameSettings(this.gameSettings, this.roomSettings);
             }
         }
-        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings });
+        this.socket.emit(shared_stuff_1.stmd_game_settings_changed, { gameSettings: gameSettings, roomSettings: roomSettings });
     };
     Room.prototype.setupControlsListener = function () {
         var _this = this;

@@ -1,4 +1,4 @@
-import { IGameSettings } from "../classes/localGameSettings";
+import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 
 type DeviceType = "desktop" | "mobile"
 
@@ -67,10 +67,7 @@ export const inTestMode = false
 
 
 export const testGameSettings: IGameSettings = {
-    gameType: "race",
-    numberOfLaps: 2,
-    trackName: "sea-side-track",
-    tagGameLength: 2,
+
     useShadows: true,
     useSound: false,
     graphics: "high",
@@ -80,6 +77,12 @@ export const testGameSettings: IGameSettings = {
     ghostFilename: "LdEGkMu2r2QCdJ8wMerp1bkRrqd2/sea-side-track/2",
     musicVolume: .05,
     targetFPS: 60
+}
+export const testRoomSettings: IRoomSettings = {
+    gameType: "race",
+    numberOfLaps: 2,
+    trackName: "sea-side-track",
+    tagGameLength: 2
 }
 
 

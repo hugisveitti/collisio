@@ -318,7 +318,7 @@ export interface TournamentFinishedResponse {
 }
 
 export const saveTournamentRaceGame = (gameInfo: IEndOfRaceInfoGame, activeBracketNode: IFlattendBracketNode | undefined, callback: (res: TournamentFinishedResponse) => void) => {
-    if (!gameInfo.gameSettings.tournamentId) {
+    if (!gameInfo.roomSettings.tournamentId) {
         callback({
             isFinished: false,
             message: "No tournament",
@@ -350,7 +350,7 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
         callback({ isFinished: false, message: "Wrong amount of players.", status: "error" })
         return
     }
-    const tournament = await getTournamentWithId(gameInfo.gameSettings.tournamentId) as LocalTournament
+    const tournament = await getTournamentWithId(gameInfo.roomSettings.tournamentId) as LocalTournament
     if (tournament.tournamentType !== "local") {
         console.warn("Incorrect tournament type", tournament)
         callback({ isFinished: false, message: "Corrupted tounament type.", status: "error" })

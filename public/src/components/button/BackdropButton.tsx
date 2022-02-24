@@ -8,6 +8,7 @@ interface IBackdropButton {
   children: React.ReactNode;
   link?: string;
   onClick?: () => void;
+  beforeClick?: () => void;
   style?: React.CSSProperties;
   disabled?: boolean;
   startIcon?: JSX.Element;
@@ -30,6 +31,9 @@ const BackdropButton = (props: IBackdropButton) => {
       )}
       onClick={() => {
         if (props.disabled) return;
+        if (props.beforeClick) {
+          props.beforeClick();
+        }
         if (props.link) {
           history.push(props.link);
         } else if (props.onClick) {

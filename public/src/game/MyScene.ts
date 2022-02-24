@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
-import { defaultGameSettings, IGameSettings } from '../classes/localGameSettings';
+import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
@@ -20,6 +20,7 @@ export class MyScene extends Scene3D {
 
     socket?: Socket
     gameSettings: IGameSettings
+    roomSettings: IRoomSettings
     timeOfDay: TimeOfDay
     useSound: boolean
     useShadows: boolean
@@ -80,6 +81,7 @@ export class MyScene extends Scene3D {
         })
 
         this.gameSettings = defaultGameSettings
+        this.roomSettings = defaultRoomSettings
 
         this.totalPing = 0
         this.lastPing = 0
@@ -200,7 +202,7 @@ export class MyScene extends Scene3D {
 
 
     getTrackName() {
-        return this.gameSceneConfig?.tournament?.trackName ?? this.gameSettings.trackName
+        return this.gameSceneConfig?.tournament?.trackName ?? this.roomSettings.trackName
     }
 
     getGraphicsType() {

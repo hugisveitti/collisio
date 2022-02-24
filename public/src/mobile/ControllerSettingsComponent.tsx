@@ -10,9 +10,11 @@ import { useHistory } from "react-router";
 import { Socket } from "socket.io-client";
 import { IUser } from "../classes/User";
 import BackdropButton from "../components/button/BackdropButton";
+import CollabsibleCard from "../components/inputs/CollapsibleCard";
 import FullscreenButton from "../components/inputs/FullscreenButton";
 import { frontPagePath } from "../components/Routes";
 import GameSettingsComponent from "../components/settings/GameSettingsComponent";
+import RoomSettingsComponent from "../components/settings/RoomSettingsComponent";
 import VehicleSettingsComponent from "../components/settings/VehicleSettingsComponent";
 import { IStore } from "../components/store";
 import { GameActions, mts_quit_game } from "../shared-backend/shared-stuff";
@@ -75,14 +77,27 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
               Restart Game
             </BackdropButton>
           </Grid>
+
           <Grid item xs={12}>
-            <GameSettingsComponent
-              gameSettings={props.store.gameSettings}
-              onChange={(newGameSettings) => {
-                props.store.setGameSettings(newGameSettings);
+            <RoomSettingsComponent
+              roomSettings={props.store.roomSettings}
+              onChange={(newRoomSettings) => {
+                props.store.setRoomSettings(newRoomSettings);
               }}
               store={props.store}
             />
+          </Grid>
+
+          <Grid item xs={12}>
+            <CollabsibleCard header="Game Settings">
+              <GameSettingsComponent
+                gameSettings={props.store.gameSettings}
+                onChange={(newGameSettings) => {
+                  props.store.setGameSettings(newGameSettings);
+                }}
+                store={props.store}
+              />
+            </CollabsibleCard>
           </Grid>
         </>
       )}

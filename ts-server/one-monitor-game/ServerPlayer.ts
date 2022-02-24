@@ -225,14 +225,15 @@ export class Player {
             } else {
 
                 if (this.game) {
-                    this.game.sendGameSettings(data.gameSettings)
+                    this.game.sendGameSettings(data.gameSettings, data.roomSettings)
                 }
             }
         })
     }
 
-    sendGameSettings(gameSettings: any) {
-        this.socket.emit(stmd_game_settings_changed, { gameSettings })
+    sendGameSettings(gameSettings: any, roomSettings: any) {
+
+        this.socket.emit(stmd_game_settings_changed, { gameSettings, roomSettings })
     }
 
     setupDisconnectListener() {

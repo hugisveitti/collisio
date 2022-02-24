@@ -5,7 +5,7 @@ import { TagGameScene } from "../game/TagGameScene";
 import { TrackName, GameType, VehicleType, IPreGamePlayerInfo, allTrackNames, TimeOfDay } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { itemInArray } from "../utils/utilFunctions";
-import { IGameSettings } from "./localGameSettings";
+import { IGameSettings, IRoomSettings } from "./localGameSettings";
 
 
 export const numberOfLapsPossibilities = [1, 2, 3, 5, 7, 13]
@@ -223,6 +223,7 @@ export interface IEndOfRaceInfoGame {
     roomId: string
     date: number
     gameSettings: IGameSettings
+    roomSettings: IRoomSettings
     roomTicks: number
     gameTicks: number
     avgPing: number
@@ -256,6 +257,7 @@ export interface IRoomInfo {
     roomId: string
     players: IPreGamePlayerInfo[]
     gameSettings: IGameSettings
+    roomSettings: IRoomSettings
     desktopId: string
     desktopAuthenticated: boolean
     date: number,

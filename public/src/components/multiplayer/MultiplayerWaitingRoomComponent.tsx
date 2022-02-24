@@ -13,13 +13,15 @@ import { getLocalUid } from "../../classes/localStorage";
 import { IUser } from "../../classes/User";
 import { green4 } from "../../providers/theme";
 import {
-  m_fs_game_settings_changed,
+  m_fs_room_settings_changed,
   m_fs_game_starting,
   m_fs_room_info,
-  m_ts_game_settings_changed,
+  m_ts_room_settings_changed,
   m_ts_go_to_game_room_from_leader,
   m_ts_go_to_game_room_from_leader_callback,
   m_ts_in_waiting_room,
+  m_ts_game_settings_changed,
+  m_ts_left_waiting_room,
 } from "../../shared-backend/multiplayer-shared-stuff";
 import { mts_user_settings_changed } from "../../shared-backend/shared-stuff";
 import { disconnectSocket, getSocket } from "../../utils/connectSocket";
@@ -27,6 +29,7 @@ import { getDeviceType } from "../../utils/settings";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import BackdropButton from "../button/BackdropButton";
 import MyCard from "../card/MyCard";
+import CollabsibleCard from "../inputs/CollapsibleCard";
 import CopyTextButton from "../inputs/CopyTextButton";
 import {
   getMultiplayerControlsRoomPath,
@@ -35,6 +38,7 @@ import {
   multiplayerConnectPagePath,
 } from "../Routes";
 import GameSettingsComponent from "../settings/GameSettingsComponent";
+import RoomSettingsComponent from "../settings/RoomSettingsComponent";
 import VehicleSettingsComponent from "../settings/VehicleSettingsComponent";
 import { IStore } from "../store";
 import MultPlayerList from "./MultPlayerList";
@@ -69,9 +73,9 @@ const MultiplayerWaitingRoomComponent = (
       userSettings: props.store.userSettings,
     });
     socket.emit(m_ts_in_waiting_room, {});
-    socket.on(m_fs_room_info, ({ players: _players, gameSettings }) => {
-      if (Object.keys(gameSettings).length > 0) {
-        props.store.setGameSettings(gameSettings);
+    socket.on(m_fs_room_info, ({ players: _players, roomSettings }) => {
+      if (Object.keys(roomSettings).length > 0) {
+        props.store.setRoomSettings(roomSettings);
       }
       console.log("setting players", _players);
       props.store.setPlayers(_players);
@@ -96,11 +100,13 @@ const MultiplayerWaitingRoomComponent = (
       }
     });
 
-    socket.on(m_fs_game_settings_changed, ({ gameSettings }) => {
-      props.store.setGameSettings(gameSettings);
+    socket.on(m_fs_room_settings_changed, ({ roomSettings }) => {
+      console.log("new room sett", roomSettings);
+      props.store.setRoomSettings(roomSettings);
     });
 
     return () => {
+      socket.emit(m_ts_left_waiting_room, {});
       socket.off(m_fs_room_info);
       socket.off(m_ts_go_to_game_room_from_leader_callback);
     };
@@ -121,7 +127,7 @@ const MultiplayerWaitingRoomComponent = (
   };
 
   return (
-    <>
+    <React.Fragment>
       <Grid item xs={12} sm={4}>
         <BackdropButton
           link={multiplayerConnectPagePath}
@@ -184,51 +190,54 @@ const MultiplayerWaitingRoomComponent = (
       <Grid item xs={12}>
         <MultPlayerList players={props.store.players} userId={userId} />
       </Grid>
-
       {isLeader ? (
-        <>
-          <Grid item xs={12}>
-            <MyCard>
-              <CardHeader
-                title="Game Settings"
-                subheader=""
-                subheaderTypographyProps={{
-                  color: "#eee",
-                }}
-              />
-              <CardContent>
-                <GameSettingsComponent
-                  multiplayer
-                  gameSettings={props.store.gameSettings}
-                  onChange={(newGameSettings) => {
-                    props.store.setGameSettings(newGameSettings);
-                    socket.emit(m_ts_game_settings_changed, {
-                      gameSettings: newGameSettings,
-                    });
-                  }}
-                  store={props.store}
-                />
-              </CardContent>
-            </MyCard>
-          </Grid>
-        </>
+        <RoomSettingsComponent
+          multiplayer
+          roomSettings={props.store.roomSettings}
+          onChange={(newRoomSettings) => {
+            props.store.setRoomSettings(newRoomSettings);
+            socket.emit(m_ts_room_settings_changed, {
+              roomSettings: newRoomSettings,
+            });
+          }}
+          store={props.store}
+        />
       ) : (
-        <>
-          <Grid item xs={6}>
+        <React.Fragment>
+          <Grid item xs={12} lg={4}>
             <Typography>
-              Track: {getTrackNameFromType(props.store.gameSettings.trackName)}
+              Track: {getTrackNameFromType(props.store.roomSettings.trackName)}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid item xs={12} lg={4}>
             <Typography>
-              Number of laps: {props.store.gameSettings.numberOfLaps}
+              Number of laps: {props.store.roomSettings.numberOfLaps}
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+
+          <Grid item xs={12} lg={4}>
             <Typography>Waiting for leader to start game</Typography>
           </Grid>
-        </>
+        </React.Fragment>
       )}
+
+      <Grid item xs={12}>
+        <CollabsibleCard header="Game Settings">
+          <GameSettingsComponent
+            multiplayer
+            gameSettings={props.store.gameSettings}
+            onChange={(newGameSettings) => {
+              props.store.setGameSettings(newGameSettings);
+              socket.emit(m_ts_game_settings_changed, {
+                gameSettings: newGameSettings,
+              });
+            }}
+            store={props.store}
+          />
+        </CollabsibleCard>
+      </Grid>
+
       <Grid item xs={12}>
         <VehicleSettingsComponent
           maxWidth="100%"
@@ -236,7 +245,7 @@ const MultiplayerWaitingRoomComponent = (
           user={props.user}
         />
       </Grid>
-    </>
+    </React.Fragment>
   );
 };
 

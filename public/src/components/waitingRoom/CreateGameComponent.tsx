@@ -37,7 +37,7 @@ const CreateGameComponent = (props: ICreateGameComponent) => {
       <Grid item xs={12}></Grid>
       <Grid item xs={12} md={6}>
         <BackdropButton link={connectPagePath} width="100%" style={btnStyles}>
-          {onMobile ? "Join Splitscreen" : "Play Splitscreen"}
+          {onMobile ? "Join Splitscreen" : "Play Splitscreen/Singleplayer"}
         </BackdropButton>
       </Grid>
       <Grid item xs={12} md={6}>

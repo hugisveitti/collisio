@@ -18,6 +18,7 @@ import {
 } from "../../shared-backend/multiplayer-shared-stuff";
 import {
   createSocket,
+  disconnectSocket,
   getSocket,
   ISocketCallback,
 } from "../../utils/connectSocket";
@@ -118,7 +119,11 @@ const MultiplayerConnectRoomContainer = (
         ) : (
           <>
             <Grid item xs={12} sm={6}>
-              <ToFrontPageButton />
+              <ToFrontPageButton
+                beforeClick={() => {
+                  disconnectSocket();
+                }}
+              />
             </Grid>
             {!user && (
               <Grid item xs={12} sm={6}>

@@ -1,6 +1,6 @@
 import { Socket } from "socket.io"
 import { IUserSettings } from "../../public/src/classes/User"
-import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_game_settings_changed, m_fs_game_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_vehicles_position_info } from "../../public/src/shared-backend/multiplayer-shared-stuff"
+import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_room_settings_changed, m_fs_room_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_vehicles_position_info, m_fs_game_settings_changed, m_ts_game_settings_changed, m_ts_left_waiting_room } from "../../public/src/shared-backend/multiplayer-shared-stuff"
 import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions, defaultVehicleType } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { deleteUndefined, getGeoInfo } from "../serverFirebaseFunctions"
@@ -19,6 +19,7 @@ export interface MultiplayPlayerConfig {
     userId: string
     displayName: string
     isAuthenticated: boolean
+    gameSettings: any
     // userSettings: IUserSettings
     // vehicleSetup: VehicleSetup
 }
@@ -55,13 +56,16 @@ export class MulitplayerPlayer {
     dataCollection: IPlayerDataCollection
     geoIp: { ip: string, geo: any }
     posChanged: boolean
+    gameSettings: any
 
     constructor(desktopSocket: Socket, config: MultiplayPlayerConfig) {
         this.desktopSocket = desktopSocket
         this.geoIp = getGeoInfo(this.desktopSocket)
         this.config = config
+        this.gameSettings = config.gameSettings
         this.userId = config.userId
         this.displayName = config.displayName
+        this.gameSettings = {}
         // this.vehicleSetup = config.vehicleSetup
         // this.userSettings = config.userSettings
         this.isAuthenticated = config.isAuthenticated
@@ -92,7 +96,7 @@ export class MulitplayerPlayer {
 
     setLeader() {
         this.isLeader = true
-        this.setupGameSettingsChangedListener()
+        this.setupRoomSettingsChangedListener()
         this.setupStartGameListener()
     }
 
@@ -121,14 +125,24 @@ export class MulitplayerPlayer {
         this.setupGetPosRotListener()
         this.setupLapDoneListener()
         this.setupRestartGameListener()
+        this.setupLeftWaitingRoom()
     }
 
     turnOffSocket() {
         if (!this.desktopSocket) return
-        console.log("turn off socket")
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.desktopSocket.removeAllListeners()
         this.desktopSocket.disconnect()
+    }
+
+    setupLeftWaitingRoom() {
+        this.desktopSocket?.on(m_ts_left_waiting_room, () => {
+            console.log("left waiting room multiplayer")
+            if (!this.room?.enteredGameRoom) {
+                this.turnOffSocket()
+            }
+            this.room?.playerDisconnected(this.userId)
+        })
     }
 
     gameFinished(data: any) {
@@ -218,7 +232,6 @@ export class MulitplayerPlayer {
     setupInWaitingRoomListener() {
         // need more than once?
         this.desktopSocket.on(m_ts_in_waiting_room, () => {
-            console.log("In waiting room", this.displayName, this.room?.roomId)
             this.room?.sendRoomInfo()
         })
     }
@@ -226,20 +239,19 @@ export class MulitplayerPlayer {
     setupDisconnectedListener() {
         this.desktopSocket.on("disconnect", () => {
             this.isConnected = false
-            console.log("muliplayer player disconencted", this.userId)
             this.room?.playerDisconnected(this.userId)
             // always disconnect mobile ?
             this.mobileSocket?.disconnect()
         })
     }
 
-    setupGameSettingsChangedListener() {
-        this.desktopSocket.on(m_ts_game_settings_changed, ({ gameSettings }) => {
-            console.log("new game settings")
-            this.room?.setGameSettings(gameSettings)
-            this.room?.gameSettingsChanged()
+    setupRoomSettingsChangedListener() {
+        this.desktopSocket.on(m_ts_room_settings_changed, ({ roomSettings }) => {
+            this.room?.setRoomSettings(roomSettings)
+            this.room?.roomSettingsChanged()
         })
     }
+
 
     setupLapDoneListener() {
         this.desktopSocket.on(m_ts_lap_done, ({ totalTime, latestLapTime, lapNumber }) => {
@@ -256,7 +268,6 @@ export class MulitplayerPlayer {
     /** Mobile socket functions */
 
     addMobileSocket(socket: Socket) {
-        console.log("added mobile socket")
         this.dataCollection.numberOfMobileConnections += 1
         this.turnOffMobileSocket()
         this.mobileConnected = true
@@ -265,6 +276,8 @@ export class MulitplayerPlayer {
         this.setupMobileInWaitingRoomListener()
         this.setupMobileStartGameListener()
         this.setupMobileDisconnectedListener()
+        this.setupMobileLeftWaitingRoom()
+        this.setupMobileGameSettingsChangedListener()
         if (this.room?.gameStarted) {
             this.setupMobileControler()
         }
@@ -272,11 +285,18 @@ export class MulitplayerPlayer {
 
     turnOffMobileSocket() {
         if (!this.mobileSocket) return
-        console.log("turn off mobileSocket")
         this.isSendingMobileControls = false
         // this.desktopSocket.emit(stm_desktop_disconnected, {})
         this.mobileSocket.removeAllListeners()
         this.mobileSocket.disconnect()
+    }
+
+    setupMobileLeftWaitingRoom() {
+        this.mobileSocket?.on(m_ts_left_waiting_room, () => {
+            if (!this.room?.enteredGameRoom) {
+                this.turnOffMobileSocket()
+            }
+        })
     }
 
     setupGameActionsListener() {
@@ -287,9 +307,19 @@ export class MulitplayerPlayer {
         })
     }
 
+    setupMobileGameSettingsChangedListener() {
+        this.mobileSocket?.on(m_ts_game_settings_changed, ({ gameSettings }) => {
+            if (gameSettings?.graphics !== this.gameSettings.graphics) {
+                this.isReady = false
+            }
+            this.gameSettings = gameSettings
+            this.desktopSocket.emit(m_fs_game_settings_changed, { gameSettings })
+        })
+    }
+
+
     setupMobileControler() {
         if (this.isSendingMobileControls) {
-            console.log("is already sending controls", this.displayName)
             return
         }
         this.isSendingMobileControls = true
@@ -303,7 +333,6 @@ export class MulitplayerPlayer {
     setupMobileDisconnectedListener() {
         this.mobileSocket?.on("disconnect", () => {
             this.isSendingMobileControls = false
-            console.log("#####mobile socket disconnected")
             this.desktopSocket.emit(m_fs_mobile_controller_disconnected, {})
             this.mobileSocket = undefined
             this.mobileConnected = false
@@ -314,7 +343,6 @@ export class MulitplayerPlayer {
     setupMobileInWaitingRoomListener() {
         // need more than once?
         this.mobileSocket?.on(m_ts_in_waiting_room, () => {
-            console.log("In waiting room", this.displayName, this.room?.roomId)
             this.room?.sendRoomInfo()
         })
     }
@@ -342,8 +370,8 @@ export class MulitplayerPlayer {
         this.desktopSocket.emit(m_fs_vehicles_position_info, data)
     }
 
-    sendGameSettingsChanged() {
-        this.desktopSocket.emit(m_fs_game_settings_changed, { gameSettings: this.room?.gameSettings })
+    sendRoomSettingsChanged() {
+        this.desktopSocket.emit(m_fs_room_settings_changed, { roomSettings: this.room?.roomSettings })
     }
 
     getPlayerRaceData() {
@@ -375,7 +403,8 @@ export class MulitplayerPlayer {
             ...this.getPlayerInfo(),
             dataCollection: this.dataCollection,
             ...this.geoIp,
-            isReady: this.isReady
+            isReady: this.isReady,
+            gameSettings: this.gameSettings
         }
         obj = deleteUndefined(obj)
         return obj

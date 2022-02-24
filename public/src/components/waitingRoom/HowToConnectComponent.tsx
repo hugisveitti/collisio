@@ -28,7 +28,7 @@ const steps = [
   {
     label: "Open Collisio on your phone",
     description: (extra: string) =>
-      "Go to https://collisio.club on your phone and press 'Join a Game'",
+      "Go to https://collisio.club on your phone and press 'Start game' and then 'Join splitscreen'",
     image: step1Img,
   },
   {

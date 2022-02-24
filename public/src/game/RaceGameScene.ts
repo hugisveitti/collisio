@@ -93,7 +93,7 @@ export class RaceGameScene extends GameScene {
             }
 
             this.ghostDriver = new GhostDriver(this.getTrackName(), this.getNumberOfLaps(), this.players[0].vehicleType)
-            this.ghostDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.gameSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
+            this.ghostDriver.loadDriveInstructions(this.gameSettings.ghostFilename ?? this.roomSettings.tournamentId, !!this.gameSceneConfig?.tournament?.id).then(async () => {
 
                 const vt = this.ghostDriver.getVehicleType()
                 if (vt) {
@@ -120,7 +120,7 @@ export class RaceGameScene extends GameScene {
         return new Promise<void>(async (resolve, reject) => {
             this._clearTimeouts()
             if (this.gameSceneConfig?.tournament?.tournamentType === "global" || this.gameSettings.record) {
-                if (this.gameSettings.useGhost && (this.gameSettings.tournamentId || this.gameSettings.ghostFilename)) {
+                if (this.gameSettings.useGhost && (this.roomSettings.tournamentId || this.gameSettings.ghostFilename)) {
                     await this.createGhostVehicle()
                 }
                 this.driverRecorder = new DriveRecorder({
@@ -208,7 +208,7 @@ export class RaceGameScene extends GameScene {
     }
 
     getNumberOfLaps() {
-        return this.gameSceneConfig?.tournament?.numberOfLaps ?? this.gameSettings.numberOfLaps
+        return this.gameSceneConfig?.tournament?.numberOfLaps ?? this.roomSettings.numberOfLaps
     }
 
     _resetVehicles() {
@@ -518,15 +518,15 @@ export class RaceGameScene extends GameScene {
         }
 
         // need to do it this way because firestore cannot have undefined
-        if (this.gameSettings.tournamentId) {
-            playerData.tournamentId = this.gameSettings.tournamentId
+        if (this.roomSettings.tournamentId) {
+            playerData.tournamentId = this.roomSettings.tournamentId
         }
 
         if (this.gameRoomActions.playerFinished) {
             this.gameRoomActions.playerFinished(playerData)
         }
 
-        if (i === 0 && this.driverRecorder && this.gameSettings?.tournamentId) {
+        if (i === 0 && this.driverRecorder && this.roomSettings?.tournamentId) {
             this.driverRecorder.saveTournamentRecording(+this.gameTimers[i].getTotalTime().toFixed(2), this.players[i].playerName, this.players[i].id,)
         }
 
@@ -555,6 +555,7 @@ export class RaceGameScene extends GameScene {
         const endOfRaceInfo: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
             gameSettings: this.gameSettings,
+            roomSettings: this.roomSettings,
             gameId: this.gameId,
             roomId: this.roomId,
             date: getDateNow(),

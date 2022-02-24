@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { IGameSettings } from "../../classes/localGameSettings";
+import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
 import {
   createMultiplayerGameScene,
   IMultiplayergameSceneConfig,
@@ -8,7 +8,7 @@ import {
 } from "../../game/MultiplayerRaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
-  m_ts_game_settings_changed,
+  m_ts_room_settings_changed,
   m_ts_restart_game,
 } from "../../shared-backend/multiplayer-shared-stuff";
 import { stopMusic } from "../../sounds/gameSounds";
@@ -68,6 +68,7 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
       defaultVehiclesSetup[vehicleType];
     const config: IMultiplayergameSceneConfig = {
       gameSettings: props.store.gameSettings,
+      roomSettings: props.store.roomSettings,
       socket,
       player: props.store.player,
       userSettings: props.store.userSettings,
@@ -90,8 +91,14 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
     console.log("update game settings", newGameSettings);
-    socket.emit(m_ts_game_settings_changed, { gameSettings: newGameSettings });
+
     gameObject.setGameSettings(newGameSettings);
+  };
+
+  const updateRoomSettings = (newRoomSettings: IRoomSettings) => {
+    console.log("update room settings", newRoomSettings);
+    socket.emit(m_ts_room_settings_changed, { roomSettings: newRoomSettings });
+    gameObject.setRoomSettings(newRoomSettings);
   };
 
   // gamesettings modal only for LEADEr?
@@ -110,9 +117,10 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
         store={props.store}
         userId={user?.uid}
         user={user}
-        onlyLeaderCanSeeGameSettings
+        onlyLeaderCanSeeRoomSettings
         isTestMode={false}
         updateGameSettings={updateGameSettings}
+        updateRoomSettings={updateRoomSettings}
         quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
             socket.disconnect();

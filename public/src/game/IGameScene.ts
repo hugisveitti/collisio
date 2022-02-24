@@ -2,7 +2,7 @@
 import { Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
-import { GraphicsType, IGameSettings } from "../classes/localGameSettings";
+import { GraphicsType, IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
@@ -26,6 +26,7 @@ export interface IGameSceneConfig {
     socket?: Socket
     players?: IPlayerInfo[]
     gameSettings: IGameSettings
+    roomSettings: IRoomSettings
     roomId?: string
     gameRoomActions: IGameRoomActions
     onlyMobile?: boolean
@@ -38,6 +39,7 @@ export interface IGameScene extends Scene3D {
     pauseGame: () => void
     unpauseGame: () => void
     setGameSettings: (gameSettings: IGameSettings) => void
+    setRoomSettings: (roomSettings: IRoomSettings) => void
     restartGame: () => void
     changeVehicle?: (vehicleNumber: number, vehicleType: VehicleType) => void
     changeTrack?: (trackName: TrackName) => void

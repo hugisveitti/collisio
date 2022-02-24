@@ -41,9 +41,9 @@ const GameInfoRow = (props: IGameInfoRow) => {
         <TableCell>{props.gameData.playersInfo?.length ?? "-"}</TableCell>
         <TableCell>{props.gameData.roomTicks ?? "-"}</TableCell>
         <TableCell>{props.gameData.gameTicks ?? "-"}</TableCell>
-        <TableCell>{props.gameData.gameSettings?.trackName ?? "-"}</TableCell>
+        <TableCell>{props.gameData.roomSettings?.trackName ?? "-"}</TableCell>
         <TableCell>
-          {props.gameData.gameSettings?.numberOfLaps ?? "-"}
+          {props.gameData.roomSettings?.numberOfLaps ?? "-"}
         </TableCell>
         <TableCell>
           {props.gameData.avgPing ? props.gameData.avgPing.toFixed(2) : "-"}

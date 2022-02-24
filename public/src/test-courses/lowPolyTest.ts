@@ -355,7 +355,7 @@ export class LowPolyTestScene extends GameScene {
             this.createController()
 
             this.canStartUpdate = true
-            if (this.gameSettings.gameType === "tag") {
+            if (this.roomSettings.gameType === "tag") {
 
                 this.vehicle.vehicleBody.body.on.collision((otherObject: ExtendedObject3D, e: any) => {
                     if (isVehicle(otherObject)) {

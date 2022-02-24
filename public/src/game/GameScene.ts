@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import { Audio, AudioListener, Color, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
-import { IGameSettings } from '../classes/localGameSettings';
+import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
@@ -660,9 +660,24 @@ export class GameScene extends MyScene implements IGameScene {
         console.warn("Save drive recording not implemented")
     }
 
+    _setRoomSettings() { }
+
+    setRoomSettings(roomSettings: IRoomSettings) {
+        if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
+            this.setNeedsReload(true)
+        }
+        this.roomSettings = roomSettings
+        for (let key of Object.keys(roomSettings)) {
+            if (roomSettings[key] !== undefined) {
+                this[key] = roomSettings[key]
+            }
+        }
+        this._setRoomSettings()
+    }
+
     setGameSettings(gameSettings: IGameSettings) {
 
-        if (this.courseLoaded && (this.getTrackName() !== gameSettings.trackName || this.gameSettings.graphics !== gameSettings.graphics)) {
+        if (this.courseLoaded && (this.gameSettings.graphics !== gameSettings.graphics)) {
             this.setNeedsReload(true)
         }
 
@@ -965,6 +980,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.gameSceneConfig = config
         this.setSocket(config.socket)
         this.setGameSettings(config.gameSettings)
+        this.setRoomSettings(config.roomSettings)
         this.setPlayers(config.players)
         this.roomId = config.roomId
         this.setGameRoomActions(config.gameRoomActions)

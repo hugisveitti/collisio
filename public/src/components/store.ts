@@ -1,6 +1,6 @@
 
 import React from "react";
-import { IGameSettings } from "../classes/localGameSettings";
+import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { IFlattendBracketNode, ITournament } from "../classes/Tournament";
 import { IUserSettings } from "../classes/User";
 import { ITokenData } from "../shared-backend/medalFuncions";
@@ -17,6 +17,8 @@ export interface IStore {
     setPlayer: React.Dispatch<React.SetStateAction<IPlayerInfo>>
     gameSettings: IGameSettings
     setGameSettings: React.Dispatch<React.SetStateAction<IGameSettings>>
+    roomSettings: IRoomSettings
+    setRoomSettings: React.Dispatch<React.SetStateAction<IRoomSettings>>
     userSettings: IUserSettings
     setUserSettings: React.Dispatch<React.SetStateAction<IUserSettings>>
     // socket: Socket | undefined

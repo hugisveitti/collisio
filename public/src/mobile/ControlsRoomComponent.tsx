@@ -2,7 +2,7 @@
  * this component steers the MobileControls class
  */
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import PauseIcon from "@mui/icons-material/Pause";
+import SettingsIcon from "@mui/icons-material/Settings";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import StarsIcon from "@mui/icons-material/Stars";
 import React, { useEffect, useState } from "react";
@@ -311,7 +311,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
           }}
         >
           <span style={rotateText}>
-            <PauseIcon fontSize="large" />
+            <SettingsIcon fontSize="large" />
           </span>
         </div>
         <div

@@ -52,11 +52,10 @@ export class MultiplayerRoomMaster {
                 }
             } else {
 
-                console.log("on connect to room", roomId)
                 const player = new MulitplayerPlayer(socket, config)
                 if (!roomId) {
-                    const newRoom = new MultiplayerRoom(io, player, config.gameSettings, (roomId) => this.deleteRoomCallback(roomId))
-                    console.log("creating room", newRoom.roomId)
+                    const newRoom = new MultiplayerRoom(io, player, config.gameSettings, config.roomSettings, (roomId) => this.deleteRoomCallback(roomId))
+                    console.log("creating multiplayer room", newRoom.roomId)
                     this.rooms[newRoom.roomId] = newRoom
                     return
                 }
@@ -92,7 +91,7 @@ interface IGameDataCollection {
     numberOfReloads: number
     numberOfGameStartCountdowns: number
     roomDeletedTime: number
-    numberOfGameSettingsChanges: number
+    numberOfRoomSettingsChanges: number
     numberOfPlayersReady: number
     numberOfGamesFinshed: number
     winners: any[]
@@ -108,6 +107,7 @@ export class MultiplayerRoom {
     roomId: string
     io: Socket
     gameSettings
+    roomSettings
     deleteRoomCallback
     startTime: number
     gameInterval?: NodeJS.Timer
@@ -122,9 +122,10 @@ export class MultiplayerRoom {
     raceInfoIntervalStarted: boolean
     dataCollection: IGameDataCollection
 
-    constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, deleteRoomCallback: (roomId: string) => void) {
+    constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, roomSettings: any, deleteRoomCallback: (roomId: string) => void) {
         this.players = []
         this.gameSettings = gameSettings
+        this.roomSettings = roomSettings
         this.deleteRoomCallback = deleteRoomCallback
         this.leader = leader
         this.leader.setLeader()
@@ -146,7 +147,7 @@ export class MultiplayerRoom {
             roomCreatedTime: Date.now(),
             roomDeletedTime: 0,
             numberOfReloads: 0,
-            numberOfGameSettingsChanges: 0,
+            numberOfRoomSettingsChanges: 0,
             numberOfGameStartCountdowns: 0,
             numberOfPlayersReady: 0,
             numberOfGamesFinshed: 0,
@@ -160,7 +161,8 @@ export class MultiplayerRoom {
             const testConfig: MultiplayPlayerConfig = {
                 displayName: "Test",
                 userId: "test",
-                isAuthenticated: false
+                isAuthenticated: false,
+                gameSettings: {}
             }
             const testPlayer = new MulitplayerPlayer(leader.desktopSocket, testConfig)
             this.addPlayer(testPlayer)
@@ -196,16 +198,14 @@ export class MultiplayerRoom {
         }
         this.io.to(this.roomId).emit(m_fs_reload_game, {
             players: this.getPlayersInfo(),
-            gameSettings: this.gameSettings
+            roomSettings: this.roomSettings
         })
     }
 
-    setGameSettings(gameSettings: any) {
-        if (this.gameSettings.trackName !== gameSettings.trackName) {
-            this.gameSettings = gameSettings
+    setRoomSettings(roomSettings: any) {
+        this.roomSettings = roomSettings
+        if (this.roomSettings.trackName !== roomSettings.trackName) {
             this.setNeedsReload()
-        } else {
-            this.gameSettings = gameSettings
         }
         // set number of laps when game starts
     }
@@ -334,6 +334,7 @@ export class MultiplayerRoom {
                 startedGame: this.enteredGameRoom,
                 players: this.players.map(p => p.getEndOfRoomInfo()),
                 gameSettings: this.gameSettings,
+                roomSettings: this.roomSettings,
                 dataCollection: this.dataCollection,
                 enteredGameRoom: this.enteredGameRoom
             }
@@ -347,17 +348,17 @@ export class MultiplayerRoom {
     }
 
     sendRoomInfo() {
-        this.io.to(this.roomId).emit(m_fs_room_info, { players: this.getPlayersInfo(), gameSettings: this.gameSettings })
+        this.io.to(this.roomId).emit(m_fs_room_info, { players: this.getPlayersInfo(), roomSettings: this.roomSettings })
     }
 
     getPlayersInfo() {
         return this.players.map(p => p.getPlayerInfo())
     }
 
-    gameSettingsChanged() {
-        this.dataCollection.numberOfGameSettingsChanges += 1
+    roomSettingsChanged() {
+        this.dataCollection.numberOfRoomSettingsChanges += 1
         for (let p of this.players) {
-            p.sendGameSettingsChanged()
+            p.sendRoomSettingsChanged()
         }
     }
 

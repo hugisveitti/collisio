@@ -1,5 +1,5 @@
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../classes/Game";
-import { defaultGameSettings } from "../classes/localGameSettings";
+import { defaultGameSettings, defaultRoomSettings } from "../classes/localGameSettings";
 import { defaultVehicleSettings } from "../classes/User";
 import { saveRaceData, saveRaceDataGame } from "../firebase/firestoreGameFunctions";
 import { IPlayerInfo, MobileControls, TrackName, VehicleControls } from "../shared-backend/shared-stuff";
@@ -101,6 +101,7 @@ export const createFakeHighscoreData = () => {
         const gameData: IEndOfRaceInfoGame = {
             playersInfo: playerGameInfos,
             gameSettings: defaultGameSettings,
+            roomSettings: defaultRoomSettings,
             gameId,
             roomId,
 

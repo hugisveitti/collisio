@@ -1,5 +1,6 @@
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { Typography } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
@@ -36,6 +37,7 @@ import { itemInArray } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import BuyItemComponent from "../garage/BuyItemComponent";
 import "../inputs/select.css";
+import { loginPagePath } from "../Routes";
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
 import TrackItems, { getTrackLargeImage } from "./TrackItems";
@@ -184,7 +186,16 @@ const TrackSelect = (props: ITrackSelect) => {
         <Grid item xs={12} md={6}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <TokenComponent user={user} store={props.store} />
+              {!!user ? (
+                <TokenComponent user={user} store={props.store} />
+              ) : (
+                <div className="background">
+                  <Typography>
+                    You need to be logged in to buy tracks.
+                  </Typography>
+                  <BackdropButton link={loginPagePath}>Login</BackdropButton>
+                </div>
+              )}
             </Grid>
             <Grid item xs={12}>
               {renderOwnership()}

@@ -212,7 +212,7 @@ export class Vehicle implements IVehicle {
 
 
         if (vehicleSetup) {
-            if (this.scene.gameSceneConfig?.gameSettings?.gameType === "race") {
+            if (this.scene.gameSceneConfig?.roomSettings?.gameType === "race") {
                 this.setColor(vehicleSetup.vehicleColor)
             }
             if (vehicleSetup.vehicleType === this.vehicleType && !goingToReload) {
@@ -360,7 +360,7 @@ export class Vehicle implements IVehicle {
     createCarSounds() {
         const listener = new AudioListener()
         this.camera.add(listener)
-        let volume = 0.3
+
         this.engineSound = new Audio(listener)
         const batch = []
 
@@ -369,7 +369,7 @@ export class Vehicle implements IVehicle {
             loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
                 this.engineSound.setBuffer(engineSoundBuffer)
                 this.engineSound.setLoop(true)
-                this.engineSound.setVolume(volume)
+                this.engineSound.setVolume(0.3)
                 this.engineSound.setLoopEnd(2.5)
 
 

@@ -62,7 +62,7 @@ const getStatsOnGames = (gamesData: IEndOfRaceInfoGame[]): string[] => {
                 vehicleTypeD[vT] += 1
             }
         }
-        const numLaps = game.gameSettings.numberOfLaps
+        const numLaps = game.roomSettings.numberOfLaps
         if (!(numLaps in numberOfLapsD)) {
             numberOfLapsD[numLaps] = 1
         } else {
@@ -71,7 +71,7 @@ const getStatsOnGames = (gamesData: IEndOfRaceInfoGame[]): string[] => {
 
 
 
-        const trackName = game.gameSettings.trackName
+        const trackName = game.roomSettings.trackName
         if (!(trackName in trackNameD)) {
             trackNameD[trackName] = 1
         } else {
@@ -91,7 +91,7 @@ const getStatsOnGames = (gamesData: IEndOfRaceInfoGame[]): string[] => {
             gamesWithRoomId[roomId] += 1
         }
 
-        const gameType = game.gameSettings.gameType
+        const gameType = game.roomSettings.gameType
         if (!(gameType in gameTypeD)) {
             gameTypeD[gameType] = 1
         } else {

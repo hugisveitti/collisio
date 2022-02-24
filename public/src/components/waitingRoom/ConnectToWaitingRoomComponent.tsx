@@ -67,6 +67,7 @@ const ConnectToWaitingRoomComponent = (
     socket.emit(dts_create_room, {
       data: {
         gameSettings: props.store.gameSettings,
+        roomSettings: props.store.roomSettings,
         desktopUserId: user?.uid,
       },
     });

@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import {
   defaultGameSettings,
+  defaultRoomSettings,
   getAllLocalGameSettings,
+  getAllLocalRoomSettings,
 } from "./classes/localGameSettings";
 import {
   defaultUserSettings,
@@ -36,6 +38,7 @@ const TestApp = () => {
   const [player, setPlayer] = useState(undefined as IPlayerInfo | undefined);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
   const [gameSettings, setGameSettings] = useState(defaultGameSettings);
+  const [roomSettings, setRoomSettings] = useState(defaultRoomSettings);
   const [tokenData, setTokenData] = useState(undefined);
   const [activeBracketNode, setActiveBracketNode] = useState(undefined);
 
@@ -53,6 +56,8 @@ const TestApp = () => {
     });
     const _gameSettings = getAllLocalGameSettings();
     store.setGameSettings(_gameSettings);
+    const _roomSettings = getAllLocalRoomSettings();
+    store.setRoomSettings(_roomSettings);
   }, []);
 
   useEffect(() => {
@@ -82,6 +87,8 @@ const TestApp = () => {
     setPlayer,
     gameSettings,
     setGameSettings,
+    roomSettings,
+    setRoomSettings,
     userSettings,
     setUserSettings,
     tournament,

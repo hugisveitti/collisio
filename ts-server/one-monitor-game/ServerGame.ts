@@ -236,8 +236,6 @@ export default class RoomMaster {
 }
 
 
-
-
 export class Room {
     players: Player[]
     roomId: string
@@ -246,6 +244,7 @@ export class Room {
     gameStarted: boolean
 
     gameSettings
+    roomSettings
     isConnected
     deleteRoomCallback
 
@@ -260,6 +259,7 @@ export class Room {
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
         this.gameSettings = {}
+        this.roomSettings = {}
         this.roomId = roomId
         this.io = io
         this.gameStarted = false
@@ -323,7 +323,8 @@ export class Room {
             gameSettings: this.gameSettings,
             multiplayer: false,
             players: this.players.map(p => p.getEndOfRoomInfo()),
-            gameStarted: this.gameStarted
+            gameStarted: this.gameStarted,
+            roomSettings: this.roomSettings
         }
         extraData = deleteUndefined(extraData)
         addCreatedRooms(this.roomId, this.desktopUserId ?? "undef", extraData)
@@ -428,22 +429,29 @@ export class Room {
     }
 
     setupGameSettingsListener() {
-        this.socket.on(mdts_game_settings_changed, (data: any) => {
-            this.gameSettings = data.gameSettings
+        this.socket.on(mdts_game_settings_changed, ({ gameSettings, roomSettings }: any) => {
+            console.log("room game settings change", roomSettings, gameSettings)
+            if (gameSettings) {
+                this.gameSettings = gameSettings
+            }
+            if (roomSettings) {
+                this.roomSettings = roomSettings
+            }
             for (let player of this.players) {
-                player.sendGameSettings(this.gameSettings)
+                player.sendGameSettings(this.gameSettings, this.roomSettings)
             }
         })
 
         this.socket.on(dts_game_settings_changed_callback, () => {
             for (let player of this.players) {
                 if (player.isLeader) {
-
                     player.gameSettingsChangedCallback()
                 }
             }
         })
     }
+
+
 
     startGameFromLeader() {
         this.startGame()
@@ -454,14 +462,21 @@ export class Room {
         this.socket.emit(std_send_game_actions, data)
     }
 
-    sendGameSettings(gameSettings: any) {
-        this.gameSettings = gameSettings
+    sendGameSettings(gameSettings: any, roomSettings: any) {
+        if (gameSettings) {
+
+            this.gameSettings = gameSettings
+        }
+        if (roomSettings) {
+
+            this.roomSettings = roomSettings
+        }
         for (let player of this.players) {
             if (!player.isLeader) {
-                player.sendGameSettings(this.gameSettings)
+                player.sendGameSettings(this.gameSettings, this.roomSettings)
             }
         }
-        this.socket.emit(stmd_game_settings_changed, { gameSettings })
+        this.socket.emit(stmd_game_settings_changed, { gameSettings, roomSettings })
     }
 
 
