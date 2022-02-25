@@ -89,8 +89,14 @@ export const setMusicVolume = (volume: number) => {
 }
 
 export const stopMusic = () => {
-    if (!music) return
-    music?.stop()
+    console.log("stopping music")
+    if (!music || !music.isPlaying) return
+    try {
+
+        music?.stop()
+    } catch (err) {
+        console.log("error when stopping music", err)
+    }
 }
 
 export const removeMusic = () => {
