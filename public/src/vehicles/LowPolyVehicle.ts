@@ -938,6 +938,18 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicleBodyPosition.set(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
         this.p.setValue(x ?? this.p.x(), (y ?? this.p.y()) + wheelY, z ?? this.p.z())
         this.tm.setOrigin(this.p)
+
+        for (let i = 0; i < 4; i++) {
+            this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
+            this.p0[i] = this.tm.getOrigin()
+            this.q = this.tm.getRotation()
+
+
+
+            this.wheelMeshes[i].position.set(this.p0[i].x(), this.p0[i].y(), this.p0[i].z())
+            this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+            this.vehicle.updateWheelTransform(i, false)
+        }
     };
 
     getPosition() {

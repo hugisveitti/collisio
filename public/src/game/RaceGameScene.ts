@@ -74,6 +74,8 @@ export class RaceGameScene extends GameScene {
         this.courseLoaded = true
 
         await this.createVehicles()
+        await this.createBot()
+
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
         // adds font to vehicles, which displays names
@@ -105,6 +107,16 @@ export class RaceGameScene extends GameScene {
             loadLowPolyVehicleModels(this.bot.vehicleType, false).then(([tires, chassis]) => {
                 this.bot.addModels(tires, chassis)
                 this.bot.setCanDrive(true)
+
+                const { position, rotation } = this.course.getGoalCheckpoint()
+
+                this.bot.setCheckpointPositionRotation({ position, rotation })
+                this.bot.getNextDir()
+                if (this.bot.vehicleBody?.body) {
+                    this.bot.resetPosition()
+                    this.bot.update(0.1)
+                }
+
                 resolve()
             })
         })
@@ -166,7 +178,7 @@ export class RaceGameScene extends GameScene {
                 })
             }
 
-            await this.createBot()
+
             this.createViews()
             this.createController()
             this.resetVehicles()
@@ -277,6 +289,7 @@ export class RaceGameScene extends GameScene {
             this.bot.setCheckpointPositionRotation(posRot)
             this.bot.resetPosition()
             this.bot.restartBot()
+            this.bot.update(0.1)
         }
 
 

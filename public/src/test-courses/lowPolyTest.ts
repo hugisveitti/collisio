@@ -345,12 +345,19 @@ export class LowPolyTestScene extends GameScene {
             await this.course.createCourse()
             if (this.course instanceof RaceCourse) {
                 this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
-                const { position, rotation } = this.course.getGoalCheckpoint()
-                this.bot.setCheckpointPositionRotation({ position, rotation })
-                if (this.bot.vehicleBody?.body) {
-                    this.bot.resetPosition()
-                }
-                this.bot.getNextDir()
+
+                loadLowPolyVehicleModels(this.bot.vehicleType, false).then(([tires, chassis]) => {
+                    this.bot.addModels(tires, chassis)
+
+                    const { position, rotation } = (this.course as RaceCourse).getGoalCheckpoint()
+                    this.bot.setCheckpointPositionRotation({ position, rotation })
+                    if (this.bot.vehicleBody?.body) {
+                        this.bot.resetPosition()
+                        this.bot.update(0.1)
+                    }
+                    this.bot.getNextDir()
+
+                })
             }
 
 
