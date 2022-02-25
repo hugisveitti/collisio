@@ -381,6 +381,7 @@ export class Vehicle implements IVehicle {
                     this.engineSound.setBuffer(engineSoundBuffer)
                     this.engineSound.setLoop(true)
                     this.engineSound.setVolume(0.3)
+                    console.log("changing when loop ends")
                     //  this.engineSound.setLoopEnd(2.5)
                     this.engineSound.hasPlaybackControl = true
                 } catch (err) {
