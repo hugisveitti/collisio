@@ -114,7 +114,7 @@ export class RaceGameScene extends GameScene {
                 this.bot.getNextDir()
                 if (this.bot.vehicleBody?.body) {
                     this.bot.resetPosition()
-                    this.bot.update(0.1)
+                    //      this.bot.update(0.1)
                 }
 
                 resolve()
@@ -129,8 +129,8 @@ export class RaceGameScene extends GameScene {
 
             const { trackName, numberOfLaps } = DriveRecorder.GetTrackNameNumberOfLapsFromFilename(this.gameSettings.ghostFilename)
 
-            if (trackName !== this.getTrackName() || numberOfLaps !== this.getNumberOfLaps()) {
-                console.warn("Track name or number of laps of ghost don't match game settings, gamesettings::", this.gameSettings)
+            if (trackName && numberOfLaps && (trackName !== this.getTrackName() || numberOfLaps !== this.getNumberOfLaps())) {
+                console.warn("Track name or number of laps of ghost don't match race settings, roomsettings:", this.roomSettings)
                 resolve()
                 return
             }
@@ -287,9 +287,8 @@ export class RaceGameScene extends GameScene {
         if (this.bot) {
             const posRot = this.course.getGoalCheckpoint()
             this.bot.setCheckpointPositionRotation(posRot)
-            this.bot.resetPosition()
+
             this.bot.restartBot()
-            this.bot.update(0.1)
         }
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
@@ -514,9 +513,12 @@ export class RaceGameScene extends GameScene {
     }
 
     updateBot(delta: number) {
-        if (this.bot && this.gameStarted) {
-            this.bot.driveBot()
+        if (this.bot) {
+
             this.bot.update(delta)
+            if (this.gameStarted) {
+                this.bot.driveBot()
+            }
         }
     }
 

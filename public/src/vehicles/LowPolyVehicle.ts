@@ -451,7 +451,7 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicle.applyEngineForce(eF, BACK_RIGHT)
     };
 
-    noForce() {
+    noForce(stop?: boolean) {
         this.decreaseMaxSpeedTicks()
 
         this.break(true)
@@ -460,6 +460,9 @@ export class LowPolyVehicle extends Vehicle {
         slowBreakForce *= -Math.sign(kmh)
         if (Math.abs(kmh) < 5) slowBreakForce = 0
 
+        if (stop) {
+            slowBreakForce = 0
+        }
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(slowBreakForce, FRONT_LEFT)
@@ -884,6 +887,10 @@ export class LowPolyVehicle extends Vehicle {
 
             this.updateFov()
         }
+
+        if (this.vehicleBody.position.y < -20) {
+            this.resetPosition()
+        }
     };
 
 
@@ -1017,6 +1024,7 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     resetPosition() {
+        console.log("resetting", this.name)
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation

@@ -70,8 +70,13 @@ export class BotVehicle extends LowPolyVehicle {
     }
 
     restartBot() {
+        console.log("restarting bot")
         this.resetPosition()
+
+        this.noForce(true)
+        this.noTurn()
         this.dirNum = 0
+        this.targetReached = false
         this.getNextDir()
     }
 

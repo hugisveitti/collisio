@@ -57,7 +57,7 @@ export interface IVehicle {
 
     goForward: () => void
     goBackward: (speed?: number) => void
-    noForce: () => void
+    noForce: (stop?: boolean) => void
 
     noTurn: () => void
     turn: (angle: number) => void

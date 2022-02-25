@@ -142,7 +142,7 @@ export class Vehicle implements IVehicle {
 
     goForward() { };
     goBackward(speed?: number) { };
-    noForce() { };
+    noForce(stop?: boolean) { };
 
     noTurn() { };
     turn(angle: number) { };

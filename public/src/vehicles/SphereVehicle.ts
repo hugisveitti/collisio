@@ -77,7 +77,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         }
     }
 
-    noForce(): void {
+    noForce(stop?: boolean): void {
         if (this.zVel < - this.dVel * 10) {
             this.zVel += this.dVel
         } else if (this.zVel > this.dVel * 10) {
