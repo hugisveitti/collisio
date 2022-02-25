@@ -338,6 +338,7 @@ export class Vehicle implements IVehicle {
 
     stopEngineSound() {
         if (this.engineSound && this.engineSound.source && this.engineSound.isPlaying) {
+
             this.engineSound.stop()
         }
     }
@@ -455,9 +456,13 @@ export class Vehicle implements IVehicle {
             } else {
                 this.skidSound.isPlaying
             }
-        } else if (this.skidSound.isPlaying) {
+        } else if (this.skidSound && this.skidSound.isPlaying) {
             this.skidVolume = 0
-            this.skidSound?.stop()
+            try {
+                this.skidSound?.stop()
+            } catch (err) {
+                console.warn("Error when trying to stop skid sound:", err)
+            }
         }
     }
 }
