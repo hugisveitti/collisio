@@ -1,3 +1,4 @@
+import { bios } from "systeminformation";
 import { AudioLoader, Audio, AudioListener, PerspectiveCamera } from "three";
 import { getDeviceType, getStaticPath } from "../utils/settings";
 
@@ -25,6 +26,7 @@ export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
     return new Promise<AudioBuffer>((resolve, reject) => {
         audioLoader.load(getStaticPath("sound/skid5.ogg"), (buffer: AudioBuffer) => {
             //  engineBuffer = buffer
+
             resolve(buffer)
         }, () => { }, (err) => {
             console.warn("Error loading skid sound.")

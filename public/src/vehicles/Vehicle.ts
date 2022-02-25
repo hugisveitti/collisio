@@ -346,13 +346,13 @@ export class Vehicle implements IVehicle {
     startEngineSound() {
         if (this.isPaused) return
 
-        if (!this.engineSound?.isPlaying && this.useSoundEffects) {
+        if (this.engineSound && !this.engineSound?.isPlaying && this.useSoundEffects) {
             this.engineSound.play()
         }
     }
 
     updateEngineSound() {
-        if (!!this.engineSound && this.useSoundEffects) {
+        if (!!this.engineSound && this.useSoundEffects && this.engineSound.isPlaying) {
             const playbackRate = +soundScaler(Math.abs(this.getCurrentSpeedKmHour()))
             if (!isFinite(playbackRate)) {
                 console.warn("Playback rate is non fitite", playbackRate)
@@ -364,56 +364,59 @@ export class Vehicle implements IVehicle {
 
     createCarSounds() {
         console.log("creating car sounds")
-        try {
-
-            const listener = new AudioListener()
-            this.camera.add(listener)
-
-            this.engineSound = new Audio(listener)
-            const batch = []
-
-            batch.push(
-
-                loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
-                    try {
-
-                        this.engineSound.setBuffer(engineSoundBuffer)
-                        this.engineSound.setLoop(true)
-                        this.engineSound.setVolume(0.3)
-                        this.engineSound.setLoopEnd(2.5)
-                    } catch (err) {
-                        console.warn("Error setting engine sound:", err)
-                    }
 
 
-                    /**
-                     * some bug here
-                     * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
-                     */
-                    //         this.stopEngineSound()
-                })
-            )
+        const listener = new AudioListener()
+        this.camera.add(listener)
 
-            this.skidSound = new Audio(listener)
-            batch.push(
-                loadSkidSoundBuffer().then(buffer => {
-                    try {
-                        this.skidSound.setBuffer(buffer)
-                        this.skidSound.setLoop(false)
-                        this.skidSound.setVolume(0)
-                        this.skidVolume = 0
-                    } catch (err) {
-                        console.warn("Error setting skid sound:", err)
-                    }
-                })
-            )
+        this.engineSound = new Audio(listener)
+        const batch = []
 
-            Promise.all(batch).then(() => {
-                this.engineSoundLoaded = true
+        batch.push(
+
+            loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
+                console.log("engine sound loader")
+                try {
+
+                    this.engineSound.setBuffer(engineSoundBuffer)
+                    this.engineSound.setLoop(true)
+                    this.engineSound.setVolume(0.3)
+                    //  this.engineSound.setLoopEnd(2.5)
+                    this.engineSound.hasPlaybackControl = true
+                } catch (err) {
+                    console.warn("Error setting engine sound:", err)
+                }
+
+
+                /**
+                 * some bug here
+                 * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
+                 */
+                //         this.stopEngineSound()
             })
-        } catch (err) {
-            console.warn("Error adding vehicle sound:", err)
-        }
+        )
+
+        this.skidSound = new Audio(listener)
+        batch.push(
+            loadSkidSoundBuffer().then(buffer => {
+                console.log("skid sound loaded")
+                try {
+                    this.skidSound.setBuffer(buffer)
+                    this.skidSound.setLoop(false)
+                    this.skidSound.setVolume(0)
+                    this.skidVolume = 0
+                } catch (err) {
+                    console.warn("Error setting skid sound:", err)
+                }
+            }).catch((err) => {
+                console.warn("Error loading skid sound")
+            })
+        )
+
+        Promise.all(batch).then(() => {
+            this.engineSoundLoaded = true
+        })
+
     }
 
     addDownForce() {
