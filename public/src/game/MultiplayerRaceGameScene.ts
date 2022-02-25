@@ -1,10 +1,10 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { PerspectiveCamera, Clock, Vector3 } from "three";
+import { PerspectiveCamera, Clock, Vector3, Quaternion } from "three";
 import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed } from "../shared-backend/multiplayer-shared-stuff";
+import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed, m_fs_already_started } from "../shared-backend/multiplayer-shared-stuff";
 import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
@@ -122,7 +122,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             }
         })
 
-
+        this.otherVehicles = []
 
         window.addEventListener("resize", () => this.windowResize())
     }
@@ -227,6 +227,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 }
             }
             Promise.all(batch).then(() => {
+
                 for (let ghost of this.otherVehicles) {
                     console.log("adding ghost to scene")
                     ghost.addToScene(this)
@@ -289,6 +290,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupMobileControlsListener()
         this.setupMobileControllerDisconnectedListener()
         this.setupRaceInfoListener()
+        // for reconnects
+        this.setupGameStartedListener()
     }
 
     setupMobileControlsListener() {
@@ -297,6 +300,27 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 driveVehicle(mobileControls, this.vehicle)
                 this.usingMobileController = true
             }
+        })
+    }
+
+    setupGameStartedListener() {
+        this.socket.once(m_fs_already_started, ({ players, msDone }) => {
+            this.gameTime.start(msDone)
+            console.log("player", players, msDone)
+            this.showSecondaryInfo("Reconnected", true)
+            const player = players[this.vehicle.id]
+            console.log("vhielc id", this.vehicle.id, player.id)
+
+            this.vehicle.setPosition(player.pos.x, player.pos.y, player.z)
+            this.vehicle.setRotation(new Quaternion(player.rot.x, player.rot.y, player.rot.z, player.rot.w))
+            this.vehicle.setCanDrive(true)
+            this.vehicle.unpause()
+            this.vehicle.start()
+            this.isPaused = false
+            this.isReady = true
+            console.log("vehicle", this.vehicle)
+
+
         })
     }
 
@@ -687,7 +711,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
     update(_time: number, _delta: number): void {
         this.time = _time
-        this.renderer.render(this.scene, this.camera)
+        this.renderer?.render(this.scene, this.camera)
         this.updateVehicle(_delta)
 
         this.updateFps(_time)

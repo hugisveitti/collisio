@@ -56,3 +56,5 @@ export const m_fs_reload_game = "m_fs_reload_game"
 
 export const m_fs_mobile_controls = "m_fs_mobile_controls"
 export const m_fs_mobile_controller_disconnected = "m_fs_mobile_controller_disconnected"
+
+export const m_fs_already_started = "m_fs_already_started"

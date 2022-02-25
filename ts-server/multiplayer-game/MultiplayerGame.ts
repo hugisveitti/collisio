@@ -103,15 +103,17 @@ export class MultiplayerRoom {
     players: MulitplayerPlayer[]
     leader: MulitplayerPlayer
     gameStarted: boolean
+    gameStartTime: number
     enteredGameRoom: boolean
     roomId: string
     io: Socket
     gameSettings
     roomSettings
     deleteRoomCallback
-    startTime: number
+
+    vehiclesPosition?: { [userId: string]: IVehiclePositionInfo }
+
     gameInterval?: NodeJS.Timer
-    raceInfoInterval?: NodeJS.Timer
     countdownTimeout?: NodeJS.Timeout
     gameIntervalStarted: boolean
     countdownStarted: boolean;
@@ -119,7 +121,6 @@ export class MultiplayerRoom {
     needsReload: boolean
 
 
-    raceInfoIntervalStarted: boolean
     dataCollection: IGameDataCollection
 
     constructor(io: Socket, leader: MulitplayerPlayer, gameSettings: any, roomSettings: any, deleteRoomCallback: (roomId: string) => void) {
@@ -135,9 +136,9 @@ export class MultiplayerRoom {
         this.roomId = uuid().slice(0, 4)
         this.addPlayer(leader)
         this.io = io
-        this.startTime = 0
+
+        this.gameStartTime = 0
         this.gameIntervalStarted = false
-        this.raceInfoIntervalStarted = false
 
         this.numberOfLaps = -1
         this.countdownStarted = false
@@ -215,6 +216,11 @@ export class MultiplayerRoom {
         const idx = this.getPlayerIndex(player.userId)
         if (idx !== undefined) {
             player.copyPlayer(this.players[idx])
+            if (this.vehiclesPosition) {
+                player.vehiclePositionInfo.pos = this.vehiclesPosition[player.userId].pos
+                player.vehiclePositionInfo.rot = this.vehiclesPosition[player.userId].rot
+                this.vehiclesPosition[player.userId] = player.getVehicleInfo()
+            }
             // cannot disconnect here
             //this.players[idx].desktopSocket.disconnect()
             delete this.players[idx]
@@ -229,7 +235,8 @@ export class MultiplayerRoom {
                     roomId: this.roomId,
                     gameStarted: this.enteredGameRoom,
                     players: this.getPlayersInfo(),
-                    gameSettings: this.gameSettings
+                    gameSettings: this.gameSettings,
+                    roomSettings: this.roomSettings
                 }
             })
             return
@@ -343,7 +350,6 @@ export class MultiplayerRoom {
         this.gameIntervalStarted = false
         clearInterval(this.gameInterval?.[Symbol.toPrimitive]())
         clearTimeout(this.countdownTimeout?.[Symbol.toPrimitive]())
-        clearTimeout(this.raceInfoInterval?.[Symbol.toPrimitive]())
         this.deleteRoomCallback(this.roomId)
     }
 
@@ -401,9 +407,9 @@ export class MultiplayerRoom {
         // dont do this if only one player
         if (this.players.length < 2) return
 
-        const obj: { [userId: string]: IVehiclePositionInfo } = {}
+        this.vehiclesPosition = {}
         for (let p of this.players) {
-            obj[p.userId] = p.getVehicleInfo()
+            this.vehiclesPosition[p.userId] = p.getVehicleInfo()
         }
 
 
@@ -412,13 +418,13 @@ export class MultiplayerRoom {
             // const arr = this.players.map(p => p.getVehicleInfo())
             if (this.hasAnyPosChanged()) {
                 for (let p of this.players) {
-                    p.sendPosInfo(obj)
+                    p.sendPosInfo(this.vehiclesPosition)
                 }
                 //  this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
                 this.setPosChanged(false)
             }
 
-        }, 1000 / 5) // how many times?
+        }, 1000 / 10) // how many times?
     }
 
     setPosChanged(value: boolean) {
@@ -436,10 +442,10 @@ export class MultiplayerRoom {
 
     startGame() {
         this.gameStarted = true
+        this.gameStartTime = Date.now()
         this.numberOfLaps = this.gameSettings.numberOfLaps
         this.io.to(this.roomId).emit(m_fs_game_countdown, { countdown: 0 })
         this.countdownStarted = false
-        this.startTime = Date.now()
     }
 
     restartGame() {
@@ -495,9 +501,13 @@ export class MultiplayerRoom {
                 everyoneReady = false
             }
         }
+        if (this.enteredGameRoom && this.gameStarted) {
+            // if player reconnects then game is started and they are in game room
+            return true
+        }
+
         if (everyoneReady && !this.gameStarted) {
             // start game
-
             this.startGameCountDown()
         }
     }

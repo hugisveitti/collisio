@@ -62,7 +62,8 @@ const MultiplayerWaitingRoomContainer = (
       }
       if (res.data.gameStarted) {
         // also have res.data.gameSettings, res.data.players
-        props.store.setGameSettings(res.data.gameSettings);
+        //  props.store.setGameSettings(res.data.gameSettings);
+        props.store.setRoomSettings(res.data.roomSettings);
         props.store.setPlayers(res.data.players);
         console.log("got players", res.data.players);
         const userId = user?.uid ?? getLocalUid();

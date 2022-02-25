@@ -56,6 +56,8 @@ const MultiplayerConnectRoomContainer = (
 
   const [creatingRoom, setCreatingRoom] = useState(!roomId);
 
+  const userId = user?.uid ?? getLocalUid();
+
   const handleConnectToRoom = () => {
     props.store.setRoomId(roomId);
     setLocalDisplayName(displayName);
@@ -71,8 +73,18 @@ const MultiplayerConnectRoomContainer = (
       }
       saveLocalStorageItem("roomId", res.data.roomId);
       props.store.setRoomId(res.data.roomId);
+
       console.log("res", res);
       if (res.data.gameStarted) {
+        if (res.data.roomSettings) {
+          props.store.setRoomSettings(res.data.roomSettings);
+        }
+        props.store.setPlayers(res.data.players);
+        for (let p of res.data.players) {
+          if (p.id === userId) {
+            props.store.setPlayer(p);
+          }
+        }
         if (onMobile) {
           history.push(getMultiplayerControlsRoomPath(res.data.roomId));
         } else {

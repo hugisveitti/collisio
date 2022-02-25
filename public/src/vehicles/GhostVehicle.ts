@@ -127,7 +127,7 @@ export class GhostVehicle implements IGhostVehicle {
         if (!p) return
         // this.prevPosition = this.position.clone()
         this.position.set(p.x, p.y, p.z)
-        this.prevPosition = this.vehicle.position.clone()
+        this.prevPosition = this.position.clone() // this.vehicle.position.clone()
         calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
     }
 

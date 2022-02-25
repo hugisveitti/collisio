@@ -3,12 +3,12 @@ import { AudioLoader, Audio, AudioListener, PerspectiveCamera } from "three";
 import { getDeviceType, getStaticPath } from "../utils/settings";
 
 
-const audioLoader = new AudioLoader();
 
 
 //let engineBuffer: AudioBuffer
 
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
+    const audioLoader = new AudioLoader();
     console.log("load engine sound buffer")
     return new Promise((resolve, reject) => {
         audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
@@ -23,12 +23,14 @@ export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
 
 export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
     console.log("load skid sound buffer")
+    const audioLoader = new AudioLoader();
     return new Promise<AudioBuffer>((resolve, reject) => {
-        audioLoader.load(getStaticPath("sound/skid5.ogg"), (buffer: AudioBuffer) => {
+        audioLoader.loadAsync(getStaticPath("sound/skid5.ogg")).then((buffer: AudioBuffer) => {
             //  engineBuffer = buffer
+            console.log("skid5 loaded")
 
             resolve(buffer)
-        }, () => { }, (err) => {
+        }).catch((err) => {
             console.warn("Error loading skid sound.")
             reject()
         })
@@ -36,6 +38,7 @@ export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
 }
 
 export const getBeep = async (path: string, listener: AudioListener, callback: (beep: Audio) => void) => {
+    const audioLoader = new AudioLoader();
     audioLoader.load(path, (buffer: AudioBuffer) => {
         const sound = new Audio(listener)
         sound.setBuffer(buffer)
@@ -46,11 +49,14 @@ export const getBeep = async (path: string, listener: AudioListener, callback: (
 }
 
 export const loadMusic = (file: string): Promise<AudioBuffer> => {
+    const audioLoader = new AudioLoader();
     return new Promise<AudioBuffer>((resolve, reject) => {
-        audioLoader.load(getStaticPath(`music/${file}`), (buffer: AudioBuffer) => {
+        console.log("loading async")
+        audioLoader.loadAsync(getStaticPath(`music/${file}`)).then((buffer: AudioBuffer) => {
             //      engineBuffer = buffer
+
             resolve(buffer)
-        }, () => { }, (err) => {
+        }).catch((err) => {
             console.warn("Error loading music sound.", file)
             reject()
         })

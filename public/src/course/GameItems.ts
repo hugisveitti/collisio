@@ -279,11 +279,7 @@ export const gameItems = {
         objectName: "botDirections",
         notVisible: true
     }
-
-
-
 } as { [key: string]: IGameItem }
-
 
 
 export const keyNameMatch = (key: string, name: string) => {

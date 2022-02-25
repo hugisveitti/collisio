@@ -134,9 +134,8 @@ var MultiplayerRoom = /** @class */ (function () {
         this.roomId = (0, uuid_1.v4)().slice(0, 4);
         this.addPlayer(leader);
         this.io = io;
-        this.startTime = 0;
+        this.gameStartTime = 0;
         this.gameIntervalStarted = false;
-        this.raceInfoIntervalStarted = false;
         this.numberOfLaps = -1;
         this.countdownStarted = false;
         this.needsReload = false;
@@ -207,6 +206,11 @@ var MultiplayerRoom = /** @class */ (function () {
         var idx = this.getPlayerIndex(player.userId);
         if (idx !== undefined) {
             player.copyPlayer(this.players[idx]);
+            if (this.vehiclesPosition) {
+                player.vehiclePositionInfo.pos = this.vehiclesPosition[player.userId].pos;
+                player.vehiclePositionInfo.rot = this.vehiclesPosition[player.userId].rot;
+                this.vehiclesPosition[player.userId] = player.getVehicleInfo();
+            }
             // cannot disconnect here
             //this.players[idx].desktopSocket.disconnect()
             delete this.players[idx];
@@ -220,7 +224,8 @@ var MultiplayerRoom = /** @class */ (function () {
                     roomId: this.roomId,
                     gameStarted: this.enteredGameRoom,
                     players: this.getPlayersInfo(),
-                    gameSettings: this.gameSettings
+                    gameSettings: this.gameSettings,
+                    roomSettings: this.roomSettings
                 }
             });
             return;
@@ -311,7 +316,7 @@ var MultiplayerRoom = /** @class */ (function () {
         }
     };
     MultiplayerRoom.prototype.deleteRoom = function () {
-        var _a, _b, _c;
+        var _a, _b;
         this.dataCollection.roomDeletedTime = Date.now();
         (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, this.leader.userId, {
             multiplayer: true,
@@ -325,7 +330,6 @@ var MultiplayerRoom = /** @class */ (function () {
         this.gameIntervalStarted = false;
         clearInterval((_a = this.gameInterval) === null || _a === void 0 ? void 0 : _a[Symbol.toPrimitive]());
         clearTimeout((_b = this.countdownTimeout) === null || _b === void 0 ? void 0 : _b[Symbol.toPrimitive]());
-        clearTimeout((_c = this.raceInfoInterval) === null || _c === void 0 ? void 0 : _c[Symbol.toPrimitive]());
         this.deleteRoomCallback(this.roomId);
     };
     MultiplayerRoom.prototype.sendRoomInfo = function () {
@@ -371,7 +375,7 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.startGameInterval = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var obj, _i, _a, p;
+            var _i, _a, p;
             var _this = this;
             return __generator(this, function (_b) {
                 if (this.gameIntervalStarted)
@@ -380,22 +384,22 @@ var MultiplayerRoom = /** @class */ (function () {
                 // dont do this if only one player
                 if (this.players.length < 2)
                     return [2 /*return*/];
-                obj = {};
+                this.vehiclesPosition = {};
                 for (_i = 0, _a = this.players; _i < _a.length; _i++) {
                     p = _a[_i];
-                    obj[p.userId] = p.getVehicleInfo();
+                    this.vehiclesPosition[p.userId] = p.getVehicleInfo();
                 }
                 this.gameInterval = setInterval(function () {
                     // const arr = this.players.map(p => p.getVehicleInfo())
                     if (_this.hasAnyPosChanged()) {
                         for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                             var p = _a[_i];
-                            p.sendPosInfo(obj);
+                            p.sendPosInfo(_this.vehiclesPosition);
                         }
                         //  this.io.to(this.roomId).emit(m_fs_vehicles_position_info, obj)
                         _this.setPosChanged(false);
                     }
-                }, 1000 / 5); // how many times?
+                }, 1000 / 10); // how many times?
                 return [2 /*return*/];
             });
         });
@@ -416,10 +420,10 @@ var MultiplayerRoom = /** @class */ (function () {
     };
     MultiplayerRoom.prototype.startGame = function () {
         this.gameStarted = true;
+        this.gameStartTime = Date.now();
         this.numberOfLaps = this.gameSettings.numberOfLaps;
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_countdown, { countdown: 0 });
         this.countdownStarted = false;
-        this.startTime = Date.now();
     };
     MultiplayerRoom.prototype.restartGame = function () {
         this.gameStarted = false;
@@ -471,6 +475,10 @@ var MultiplayerRoom = /** @class */ (function () {
             if (!p.isReady) {
                 everyoneReady = false;
             }
+        }
+        if (this.enteredGameRoom && this.gameStarted) {
+            // if player reconnects then game is started and they are in game room
+            return true;
         }
         if (everyoneReady && !this.gameStarted) {
             // start game

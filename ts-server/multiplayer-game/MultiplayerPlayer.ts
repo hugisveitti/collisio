@@ -1,6 +1,6 @@
 import { Socket } from "socket.io"
 import { IUserSettings } from "../../public/src/classes/User"
-import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_room_settings_changed, m_fs_room_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_vehicles_position_info, m_fs_game_settings_changed, m_ts_game_settings_changed, m_ts_left_waiting_room } from "../../public/src/shared-backend/multiplayer-shared-stuff"
+import { m_ts_restart_game, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_fs_game_finished, m_ts_go_to_game_room_from_leader, m_ts_go_to_game_room_from_leader_callback, m_fs_game_starting, m_ts_lap_done, m_ts_in_waiting_room, m_ts_room_settings_changed, m_fs_room_settings_changed, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_vehicles_position_info, m_fs_game_settings_changed, m_ts_game_settings_changed, m_ts_left_waiting_room, m_fs_already_started } from "../../public/src/shared-backend/multiplayer-shared-stuff"
 import { dts_ping_test, std_ping_test_callback, mts_user_settings_changed, IPlayerInfo, mts_controls, mts_send_game_actions, GameActions, defaultVehicleType } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { deleteUndefined, getGeoInfo } from "../serverFirebaseFunctions"
@@ -180,7 +180,17 @@ export class MulitplayerPlayer {
     setupPlayerReadyListener() {
         this.desktopSocket.on(m_ts_player_ready, () => {
             this.isReady = true
-            this.room?.playerReady()
+            const alreadyInGameRoom = this.room?.playerReady()
+            if (alreadyInGameRoom && this.room) {
+                const obj: { [userId: string]: IVehiclePositionInfo } = {}
+                for (let p of this.room.players) {
+                    obj[p.userId] = p.getVehicleInfo()
+                }
+                this.desktopSocket.emit(m_fs_already_started, {
+                    players: obj,
+                    msDone: Date.now() - (this.room?.gameStartTime ?? Date.now())
+                })
+            }
         })
     }
 

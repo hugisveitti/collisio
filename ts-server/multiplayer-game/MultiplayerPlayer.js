@@ -128,9 +128,20 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.setupPlayerReadyListener = function () {
         var _this = this;
         this.desktopSocket.on(multiplayer_shared_stuff_1.m_ts_player_ready, function () {
-            var _a;
+            var _a, _b, _c;
             _this.isReady = true;
-            (_a = _this.room) === null || _a === void 0 ? void 0 : _a.playerReady();
+            var alreadyInGameRoom = (_a = _this.room) === null || _a === void 0 ? void 0 : _a.playerReady();
+            if (alreadyInGameRoom && _this.room) {
+                var obj = {};
+                for (var _i = 0, _d = _this.room.players; _i < _d.length; _i++) {
+                    var p = _d[_i];
+                    obj[p.userId] = p.getVehicleInfo();
+                }
+                _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_already_started, {
+                    players: obj,
+                    msDone: Date.now() - ((_c = (_b = _this.room) === null || _b === void 0 ? void 0 : _b.gameStartTime) !== null && _c !== void 0 ? _c : Date.now())
+                });
+            }
         });
     };
     MulitplayerPlayer.prototype.setupGetPosRotListener = function () {

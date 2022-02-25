@@ -217,7 +217,7 @@ export class Course implements ICourse {
                         this.gameScene.physics.destroy(spawn as ExtendedObject3D)
                     }
                 }
-                console.log("bot dirs", this.botDirections)
+
 
                 resolve()
             })

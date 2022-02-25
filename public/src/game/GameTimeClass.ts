@@ -20,9 +20,12 @@ export class GameTime {
     hasSendRaceData: boolean
     // for each checkpoint there are lap times
     checkpointTimes: number[][]
+    // if player starts when game has started
+    offset: number
 
     constructor(totalNumberOfLaps: number, numberOfCheckpoints: number) {
         this.totalNumberOfLaps = totalNumberOfLaps
+        this.offset = 0
         this.lapNumber = 1
         this.bestLapTime = Infinity
         this.clock = new Clock(false)
@@ -53,7 +56,10 @@ export class GameTime {
         return this.lapTimes[this.lapTimes.length - 1]
     }
 
-    start() {
+    start(offset?: number) {
+        if (offset) {
+            this.offset = offset / 1000
+        }
         this.isPaused = false
         this.clock.start()
     }
@@ -66,12 +72,13 @@ export class GameTime {
 
     getCurrentLapTime() {
         if (this.isPaused) return this.currentLapTime
-        return (this.currentLapTime + this.clock.getElapsedTime())
+        return (this.currentLapTime + this.clock.getElapsedTime() + this.offset)
     }
 
     lapDone() {
         if (this.finished()) return
         const lapTime = this.getCurrentLapTime()
+        this.offset = 0
         this.lapTimes.push(lapTime)
         this.totalTime += lapTime
         this.bestLapTime = Math.min(lapTime, this.bestLapTime)
