@@ -3,16 +3,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import "react-toastify/dist/ReactToastify.css";
 import { getLocalGameSetting } from "../../classes/localGameSettings";
-import { addMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds";
 import { createClassNames } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
+import CookiePrompt from "../monitary/CookiePrompt";
 import { gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import {
-  changeCameraPosition,
-  clearBackdropCanvas,
-  createBackdropRenderer,
-} from "./backdropCanvas";
+import { changeCameraPosition, createBackdropRenderer } from "./backdropCanvas";
 import BlackLoadingPage from "./BlackLoadingPage";
 
 interface IBackdropContainer {
@@ -110,43 +106,46 @@ const BackdropContainer = (props: IBackdropContainer) => {
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "monospace",
-        textAlign: props.center ? "center" : "left",
-      }}
-    >
-      {!pressedStartGame ? (
-        renderEnterGameButton()
-      ) : (
-        <div
-          id="backdrop-container"
-          className={createClassNames(
-            "container",
-            props.backgroundContainer ? "background" : ""
-          )}
-          style={
-            {
-              // maxHeight: `${(screen?.availHeight ?? window.innerHeight) * 0.9}px`,
+    <React.Fragment>
+      <div
+        style={{
+          fontFamily: "monospace",
+          textAlign: props.center ? "center" : "left",
+        }}
+      >
+        {!pressedStartGame ? (
+          renderEnterGameButton()
+        ) : (
+          <div
+            id="backdrop-container"
+            className={createClassNames(
+              "container",
+              props.backgroundContainer ? "background" : ""
+            )}
+            style={
+              {
+                // maxHeight: `${(screen?.availHeight ?? window.innerHeight) * 0.9}px`,
+              }
             }
-          }
-        >
-          {props.loading ? (
-            <div
-              style={{
-                marginTop: 25,
-                textAlign: "center",
-              }}
-            >
-              <CircularProgress />
-            </div>
-          ) : (
-            props.children
-          )}
-        </div>
-      )}
-      <div ref={canvasWrapperRef}></div>
-    </div>
+          >
+            {props.loading ? (
+              <div
+                style={{
+                  marginTop: 25,
+                  textAlign: "center",
+                }}
+              >
+                <CircularProgress />
+              </div>
+            ) : (
+              props.children
+            )}
+          </div>
+        )}
+        <div ref={canvasWrapperRef}></div>
+      </div>
+      {pressedStartGame && <CookiePrompt />}
+    </React.Fragment>
   );
 };
 

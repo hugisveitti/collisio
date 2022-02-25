@@ -252,8 +252,8 @@ export class LowPolyVehicle extends Vehicle {
             this.vehicle.setCoordinateSystem(0, 1, 2)
 
 
-            this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
-            this.vehicleBody.name = "vehicle-" + this.vehicleNumber
+            this.vehicleBody.body.name = this.isBot ? "bot" : "vehicle-" + this.vehicleNumber
+            this.vehicleBody.name = this.isBot ? "bot" : "vehicle-" + this.vehicleNumber
 
             this.scene.physics.physicsWorld.addAction(this.vehicle)
 

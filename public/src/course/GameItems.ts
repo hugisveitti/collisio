@@ -269,6 +269,14 @@ export const gameItems = {
         notAddPhysics: true,
         isCourseObjectArray: true,
         objectName: "wagons"
+    },
+    // bot directions
+    "dir": {
+        shape: "concave",
+        collisionFlags: 6,
+        notAddPhysics: true,
+        isCourseObjectArray: true,
+        objectName: "botDirections"
     }
 
 

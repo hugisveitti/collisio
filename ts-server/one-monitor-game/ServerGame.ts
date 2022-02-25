@@ -430,7 +430,6 @@ export class Room {
 
     setupGameSettingsListener() {
         this.socket.on(mdts_game_settings_changed, ({ gameSettings, roomSettings }: any) => {
-            console.log("room game settings change", roomSettings, gameSettings)
             if (gameSettings) {
                 this.gameSettings = gameSettings
             }

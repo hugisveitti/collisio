@@ -5,13 +5,14 @@ import { getDeviceType, getStaticPath } from "../utils/settings";
 const audioLoader = new AudioLoader();
 
 
-let engineBuffer: AudioBuffer
+//let engineBuffer: AudioBuffer
 
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
+    console.log("load engine sound buffer")
     return new Promise((resolve, reject) => {
         audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
-            engineBuffer = buffer
-            resolve(engineBuffer)
+            //   engineBuffer = buffer
+            resolve(buffer)
         }, () => { }, (err) => {
             console.warn("Error loading engine sound.")
             reject()
@@ -20,10 +21,11 @@ export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
 }
 
 export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
+    console.log("load skid sound buffer")
     return new Promise<AudioBuffer>((resolve, reject) => {
         audioLoader.load(getStaticPath("sound/skid5.ogg"), (buffer: AudioBuffer) => {
-            engineBuffer = buffer
-            resolve(engineBuffer)
+            //  engineBuffer = buffer
+            resolve(buffer)
         }, () => { }, (err) => {
             console.warn("Error loading skid sound.")
             reject()
@@ -44,8 +46,8 @@ export const getBeep = async (path: string, listener: AudioListener, callback: (
 export const loadMusic = (file: string): Promise<AudioBuffer> => {
     return new Promise<AudioBuffer>((resolve, reject) => {
         audioLoader.load(getStaticPath(`music/${file}`), (buffer: AudioBuffer) => {
-            engineBuffer = buffer
-            resolve(engineBuffer)
+            //      engineBuffer = buffer
+            resolve(buffer)
         }, () => { }, (err) => {
             console.warn("Error loading music sound.", file)
             reject()

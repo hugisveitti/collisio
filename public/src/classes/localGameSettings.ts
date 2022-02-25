@@ -1,5 +1,14 @@
 import { GameType, TrackName } from "../shared-backend/shared-stuff"
 
+export type BotDifficulty = "easy" | "medium" | "hard" | "none"
+export const botDifficultyOptions: { name: string, value: BotDifficulty }[] = [
+    { name: "No bot", value: "none" },
+    { name: "Easy", value: "easy" },
+    { name: "Medium", value: "medium" },
+    { name: "Hard", value: "hard" },
+]
+
+
 export type GraphicsType = "low" | "high"
 
 /**
@@ -29,6 +38,7 @@ export interface IGameSettings {
     targetFPS: number
     record: boolean
     useGhost: boolean
+    botDifficulty: BotDifficulty
 }
 
 
@@ -40,7 +50,8 @@ export const defaultGameSettings: IGameSettings = {
     drawDistance: 3000,
     record: false,
     useGhost: false,
-    targetFPS: 30
+    targetFPS: 30,
+    botDifficulty: "none"
 }
 export const defaultRoomSettings: IRoomSettings = {
     numberOfLaps: 1,

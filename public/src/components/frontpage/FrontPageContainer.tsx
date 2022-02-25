@@ -32,6 +32,7 @@ import {
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
 import CreateGameComponent from "../waitingRoom/CreateGameComponent";
+import TutorialComponent from "../waitingRoom/TutorialComponent";
 
 interface IFrontPageContainer {
   store: IStore;
@@ -164,6 +165,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
           </Grid>
         </Grid>
       )}
+      <TutorialComponent />
     </BackdropContainer>
   );
 };

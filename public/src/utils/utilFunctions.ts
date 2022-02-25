@@ -1,5 +1,13 @@
 import { Timestamp } from "@firebase/firestore";
-import { Vector3, Quaternion } from "three";
+import { Vector3, Quaternion, Euler } from "three";
+
+
+export const angleBetweenVectors = (_p2: Vector3, _p1: Vector3) => {
+    const p1 = _p1.clone()
+    const p2 = _p2.clone()
+    const angle = Math.atan2(p2.x - p1.x, p2.z - p1.z)
+    return angle
+}
 
 
 export function itemInArray<Type>(st: Type, arr: Type[]) {

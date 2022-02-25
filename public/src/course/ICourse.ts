@@ -20,6 +20,7 @@ export interface ICourse {
 
     // make intersections transparent
     seeObject: (cameraPos: Vector3, objectPos: Vector3) => void
+    nextBotDir: (currentDirNum: number) => undefined | { pos: Vector3, nextNum: number, goSlow: boolean | number }
 }
 
 export interface IRaceCourse extends ICourse {

@@ -65,6 +65,7 @@ export class Course implements ICourse {
     cloudSpeed: number[]
 
     ray = new Raycaster()
+    botDirections: Object3D[]
 
     constructor(gameScene: MyScene, trackName: TrackName) {
         this.gameScene = gameScene
@@ -83,6 +84,7 @@ export class Course implements ICourse {
         this.courseItemsLoader = new CourseItemsLoader(this)
         this.isReady = false
         this.clouds = []
+        this.botDirections = []
     }
 
 
@@ -215,11 +217,52 @@ export class Course implements ICourse {
                         this.gameScene.physics.destroy(spawn as ExtendedObject3D)
                     }
                 }
+                console.log("bot dirs", this.botDirections)
+
                 resolve()
             })
         })
+    }
 
+    /**
+     * 
+     * @param currentDirNum, we have reached a dir with this num, also applies for first dir, then we input 0 
+     * @returns pos, nextNum, goSlow
+     * goSlow is true for corners and such
+     */
+    nextBotDir(currentDirNum: number) {
+        if (this.botDirections.length === 0) {
+            console.warn("No bot directions")
+            return undefined
+        }
 
+        let nextDirNum = currentDirNum + 1
+        // names are like dir-1, dir-2, dir-3-slow,
+        // indexed at 1
+        if (nextDirNum > this.botDirections.length) {
+            nextDirNum = 1
+        }
+
+        for (let dir of this.botDirections) {
+            const dNameSplit = dir.name.split("-")
+            const dirNum = +dNameSplit[1]
+            let goSlow = false as boolean | number
+            if (dNameSplit.length > 2 && dNameSplit[2] === "slow") {
+                goSlow = true
+                if (dNameSplit.length > 3) {
+                    goSlow = +dNameSplit[3] / 100
+                }
+            }
+            if (dirNum === nextDirNum) {
+                return {
+                    pos: dir.position,
+                    nextNum: dirNum,
+                    goSlow
+                }
+            }
+        }
+
+        return undefined
     }
 
     createPossibleIntersectObjectArray() {

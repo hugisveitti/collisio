@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import BackdropButton from "../button/BackdropButton";
+import { privacyPolicyPage } from "../Routes";
 
 /**
  * TODO:
@@ -17,7 +18,7 @@ const CookiePrompt = () => {
     setTimeout(() => {
       const hasShownPrompt = window.localStorage.getItem("cookiePrompt");
       setShowPrompt(!eval(hasShownPrompt));
-    }, 2000);
+    }, 3000);
   }, []);
 
   if (!showPrompt) return null;
@@ -39,7 +40,13 @@ const CookiePrompt = () => {
         }}
       >
         <Grid item xs={12} style={{ textAlign: "center" }}>
-          <Typography>This website uses cookies</Typography>
+          <Typography>This website uses cookies.</Typography>
+          <Typography>
+            Read our{" "}
+            <a style={{ color: "gray" }} href={privacyPolicyPage}>
+              Privacy Policy
+            </a>
+          </Typography>
         </Grid>
         <Grid item xs={12} style={{ textAlign: "center" }}>
           <BackdropButton

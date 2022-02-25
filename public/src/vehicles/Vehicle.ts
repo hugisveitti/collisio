@@ -32,6 +32,7 @@ export interface IVehicleClassConfig {
     vehicleSetup: VehicleSetup
     id: string
     vehicleSettings?: IVehicleSettings
+    isBot?: boolean
 }
 
 export class Vehicle implements IVehicle {
@@ -92,6 +93,7 @@ export class Vehicle implements IVehicle {
 
     currentFov: number
     delta: number = 0
+    isBot: boolean
 
     constructor(config: IVehicleClassConfig) {
         this.id = config.id
@@ -104,6 +106,7 @@ export class Vehicle implements IVehicle {
         this.name = config.name
         this.useSoundEffects = config.useSoundEffects
         this.scene = config.scene
+        this.isBot = config.isBot
 
 
         this.vehicleConfig = this.getDefaultVehicleConfig()
@@ -256,7 +259,7 @@ export class Vehicle implements IVehicle {
 
             for (let mod of possibleVehicleMods) {
                 if (vehicleSetup?.[item]?.[mod.type]) {
-                    this.vehicleConfig[mod.type] += Math.floor(vehicleSetup?.[item]?.[mod.type])
+                    this.vehicleConfig[mod.type] += (vehicleSetup?.[item]?.[mod.type])
                 }
             }
         }
@@ -370,27 +373,36 @@ export class Vehicle implements IVehicle {
             batch.push(
 
                 loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
-                    this.engineSound.setBuffer(engineSoundBuffer)
-                    this.engineSound.setLoop(true)
-                    this.engineSound.setVolume(0.3)
-                    this.engineSound.setLoopEnd(2.5)
+                    try {
+
+                        this.engineSound.setBuffer(engineSoundBuffer)
+                        this.engineSound.setLoop(true)
+                        this.engineSound.setVolume(0.3)
+                        this.engineSound.setLoopEnd(2.5)
+                    } catch (err) {
+                        console.warn("Error setting engine sound:", err)
+                    }
 
 
                     /**
                      * some bug here
                      * AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.
                      */
-                    this.stopEngineSound()
+                    //         this.stopEngineSound()
                 })
             )
 
             this.skidSound = new Audio(listener)
             batch.push(
                 loadSkidSoundBuffer().then(buffer => {
-                    this.skidSound.setBuffer(buffer)
-                    this.skidSound.setLoop(false)
-                    this.skidSound.setVolume(0)
-                    this.skidVolume = 0
+                    try {
+                        this.skidSound.setBuffer(buffer)
+                        this.skidSound.setLoop(false)
+                        this.skidSound.setVolume(0)
+                        this.skidVolume = 0
+                    } catch (err) {
+                        console.warn("Error setting skid sound:", err)
+                    }
                 })
             )
 

@@ -3,16 +3,19 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import React from "react";
+import { BotDifficulty } from "../../classes/localGameSettings";
 
-interface IOption {
-  value: any;
+interface IOption<V> {
+  value: V;
   name: string;
 }
 
-interface IAnySelect {
-  selectedValue: IOption;
-  onChange: (val: any) => void;
-  options: IOption[];
+type AnySelectType = BotDifficulty | string;
+
+interface IAnySelect<AnySelectType> {
+  selectedValue: AnySelectType;
+  onChange: (val: AnySelectType) => void;
+  options: IOption<AnySelectType>[];
   fullWidth?: boolean;
   title: string;
   minWidth?: number;
@@ -20,7 +23,9 @@ interface IAnySelect {
   disabled?: boolean;
 }
 
-const AnySelect = (props: IAnySelect) => {
+const AnySelect: <AnySelectType>(
+  p: IAnySelect<AnySelectType>
+) => React.ReactElement<IAnySelect<AnySelectType>> = (props) => {
   return (
     <FormControl
       disabled={props.disabled}
@@ -28,17 +33,17 @@ const AnySelect = (props: IAnySelect) => {
       style={{ minWidth: props.minWidth ?? 200, textAlign: "left" }}
     >
       <InputLabel id="vehicle-select">{props.title}</InputLabel>
-      <Select
+      <Select<AnySelectType>
         style={props.style}
         label={props.title}
         name={props.title}
-        value={props.selectedValue.value}
+        value={props.selectedValue as any}
         onChange={(e) => {
-          props.onChange(e.target.value);
+          props.onChange(e.target.value as any);
         }}
       >
         {props.options.map((option) => (
-          <MenuItem key={option.name} value={option.value}>
+          <MenuItem key={option.name} value={option.value as any}>
             {option.name}
           </MenuItem>
         ))}

@@ -67,7 +67,7 @@ export const inTestMode = false
 
 
 export const testGameSettings: IGameSettings = {
-
+    botDifficulty: "medium",
     useShadows: true,
     useSound: false,
     graphics: "high",

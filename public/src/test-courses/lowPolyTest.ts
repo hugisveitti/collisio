@@ -10,7 +10,7 @@ import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { allVehicleTypes, defaultVehicleColorType, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { allVehicleTypes, defaultVehicleColorType, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
 import { GhostVehicle, IGhostVehicle } from "../vehicles/GhostVehicle"
 import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
@@ -25,6 +25,8 @@ import { DriveRecorder, GhostDriver } from "./GhostDriver"
 import { createTestVehicleInputs } from "./testVehicleInputs"
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User"
 import { ItemProperties, vehicleItems } from "../shared-backend/vehicleItems"
+import { BotVehicle } from "../vehicles/BotVehicle"
+import { IVehicleClassConfig } from "../vehicles/Vehicle"
 
 const vechicleFov = 60
 
@@ -75,7 +77,7 @@ export class LowPolyTestScene extends GameScene {
     vehicleColorNumber = 0
 
     otherVehicles: ITestVehicle[] // LowPolyTestVehicle[]
-    numberOfOtherVehicles = 1
+    numberOfOtherVehicles = 0
 
     isIt: number
 
@@ -87,6 +89,8 @@ export class LowPolyTestScene extends GameScene {
 
     otherDrivers: GhostDriver[]
     ghostVehicle: IGhostVehicle
+
+    bot: BotVehicle
 
     constructor() {
         super()
@@ -139,6 +143,22 @@ export class LowPolyTestScene extends GameScene {
         this.ghostVehicle = new GhostVehicle({ vehicleType: "f1", color: "#10eedd", id: "ghost test" })
         this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test", vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" } })
 
+
+        const botVehicleType = "normal2"
+        const botConfig: IVehicleClassConfig = {
+            vehicleNumber: 9,
+            vehicleType: botVehicleType,
+            vehicleSetup: {
+                vehicleColor: "#ff00ff" as VehicleColorType,
+                vehicleType: botVehicleType
+            },
+            scene: this,
+            name: "Bot Tamy",
+            id: "bot-id"
+        }
+        this.bot = new BotVehicle("hard", botConfig)
+
+
     }
 
     getNumberOfLaps() {
@@ -171,6 +191,7 @@ export class LowPolyTestScene extends GameScene {
             if (e.key === "r") {
 
                 this.resetPlayer(0)
+                this.bot.resetPosition()
             } else if (e.key === "t") {
 
             } else if (e.key === "p") {
@@ -324,7 +345,14 @@ export class LowPolyTestScene extends GameScene {
             await this.course.createCourse()
             if (this.course instanceof RaceCourse) {
                 this.gameTime = new GameTime(3, this.course.getNumberOfCheckpoints())
+                const { position, rotation } = this.course.getGoalCheckpoint()
+                this.bot.setCheckpointPositionRotation({ position, rotation })
+                if (this.bot.vehicleBody?.body) {
+                    this.bot.resetPosition()
+                }
+                this.bot.getNextDir()
             }
+
 
 
             this.courseLoaded = true
@@ -595,6 +623,8 @@ export class LowPolyTestScene extends GameScene {
         this.renderer.clear()
         this.renderer.shadowMap.needsUpdate = true
         this.renderer.render(this.scene, this.camera)
+        this.bot.driveBot()
+        this.bot.update(delta)
     }
 
     _updateChild(time: number, delta: number) {

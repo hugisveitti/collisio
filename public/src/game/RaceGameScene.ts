@@ -3,13 +3,15 @@ import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInfo } from "../classes/Game";
 import { IRaceCourse } from "../course/ICourse";
 import { RaceCourse } from "../course/RaceCourse";
-import { VehicleControls } from '../shared-backend/shared-stuff';
+import { VehicleColorType, VehicleControls } from '../shared-backend/shared-stuff';
 import { DriveRecorder, GhostDriver } from "../test-courses/GhostDriver";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
 import { getDateNow } from "../utils/utilFunctions";
+import { BotVehicle } from "../vehicles/BotVehicle";
 import { GhostVehicle } from "../vehicles/GhostVehicle";
-import { getVehicleNumber } from "../vehicles/LowPolyVehicle";
+import { getVehicleNumber, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle";
+import { IVehicleClassConfig } from "../vehicles/Vehicle";
 import { GameScene } from "./GameScene";
 import { GameTime } from "./GameTimeClass";
 
@@ -42,6 +44,7 @@ export class RaceGameScene extends GameScene {
     ghostVehicle: GhostVehicle
     driverRecorder: DriveRecorder
 
+    bot: BotVehicle
 
 
     constructor() {
@@ -77,6 +80,34 @@ export class RaceGameScene extends GameScene {
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
+    }
+
+    async createBot() {
+        return new Promise<void>((resolve, reject) => {
+
+            if (this.gameSettings.botDifficulty === "none") {
+                resolve()
+                return
+            }
+            const botConfig: IVehicleClassConfig = {
+                name: "Bot Tamy",
+                id: "bot-id",
+                vehicleType: "normal2", //doesnt matter,
+                vehicleSetup: {
+                    vehicleColor: "#ff00ee" as VehicleColorType,
+                    vehicleType: "normal2"
+                },
+                scene: this,
+                vehicleNumber: -1,
+                isBot: true
+            }
+            this.bot = new BotVehicle(this.gameSettings.botDifficulty, botConfig)
+            loadLowPolyVehicleModels(this.bot.vehicleType, false).then(([tires, chassis]) => {
+                this.bot.addModels(tires, chassis)
+                this.bot.setCanDrive(true)
+                resolve()
+            })
+        })
     }
 
     async createGhostVehicle() {
@@ -134,6 +165,8 @@ export class RaceGameScene extends GameScene {
                     vehicleSetup: this.vehicles[0].vehicleSetup
                 })
             }
+
+            await this.createBot()
             this.createViews()
             this.createController()
             this.resetVehicles()
@@ -238,6 +271,15 @@ export class RaceGameScene extends GameScene {
     }
 
     async _restartGame() {
+
+        if (this.bot) {
+            const posRot = this.course.getGoalCheckpoint()
+            this.bot.setCheckpointPositionRotation(posRot)
+            this.bot.resetPosition()
+            this.bot.restartBot()
+        }
+
+
 
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
@@ -461,6 +503,13 @@ export class RaceGameScene extends GameScene {
         }
     }
 
+    updateBot(delta: number) {
+        if (this.bot && this.gameStarted) {
+            this.bot.driveBot()
+            this.bot.update(delta)
+        }
+    }
+
 
     _updateChild(time: number, delta: number) {
         this.time = time
@@ -469,6 +518,7 @@ export class RaceGameScene extends GameScene {
 
         if (this.everythingReady()) {
             this.course.updateCourse()
+            this.updateBot(delta)
 
             if (inTestMode) {
                 driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)

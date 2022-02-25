@@ -11,6 +11,8 @@ import {
   getTrackNameFromType,
 } from "../../classes/Game";
 import {
+  BotDifficulty,
+  botDifficultyOptions,
   GraphicsType,
   IGameSettings,
   setLocalGameSetting,
@@ -27,6 +29,7 @@ import MySlider from "../inputs/slider/MySlider";
 import MyRadio from "../radio/MyRadio";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
+import AnySelect from "../inputs/AnySelect";
 
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;
@@ -166,6 +169,9 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               style={{ color: "black" }}
               onClick={() => {
                 updateGameSettings("musicVolume", 0);
+                if (!onMobile) {
+                  setMusicVolume(0 as number);
+                }
               }}
             >
               <VolumeDownIcon />
@@ -229,6 +235,16 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             updateGameSettings("targetFPS", newVal, undefined, true);
           }}
           value={gameSettings.targetFPS}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <AnySelect<BotDifficulty>
+          title="Bot difficulty"
+          selectedValue={gameSettings.botDifficulty}
+          onChange={(newDiff) => {
+            updateGameSettings("botDifficulty", newDiff);
+          }}
+          options={botDifficultyOptions}
         />
       </Grid>
       {!props.multiplayer && (
