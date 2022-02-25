@@ -96,6 +96,7 @@ export class Vehicle implements IVehicle {
     isBot: boolean
 
     constructor(config: IVehicleClassConfig) {
+        this.skidVolume = 0
         this.id = config.id
         this.vehicleType = config.vehicleType
         this.vehicleSetup = config.vehicleSetup ?? {

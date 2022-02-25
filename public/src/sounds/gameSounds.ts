@@ -68,6 +68,7 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
             if (!isFinite(volume)) {
                 console.warn("volume not finite", volume)
                 volume = 0
+                return
             }
             music.setVolume(volume)
             if (!notAutoStart) {
@@ -82,6 +83,7 @@ export const setMusicVolume = (volume: number) => {
         volume = 0
         console.warn("volume not finite", volume)
         music?.stop()
+        return
     }
     music?.setVolume(volume)
 }

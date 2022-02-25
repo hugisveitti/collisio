@@ -37,6 +37,7 @@ export class BotVehicle extends LowPolyVehicle {
     speedMult: number
     slowMult: number
     turnAngle: number
+    targetReached: boolean
 
     constructor(botDifficulty: BotDifficulty, config: IVehicleClassConfig) {
         super({ ...config, vehicleType: getVehicleType(botDifficulty), vehicleSetup: { ...config.vehicleSetup, vehicleType: getVehicleType(botDifficulty) } })
@@ -46,6 +47,7 @@ export class BotVehicle extends LowPolyVehicle {
         this.botSpeed = 100
         this.speedMult = 1
         this.turnAngle = 0
+        this.targetReached = false
 
         if (botDifficulty === "easy") {
             this.botSpeed = 120
@@ -64,24 +66,26 @@ export class BotVehicle extends LowPolyVehicle {
 
             //  this.loadModels()
         }
+        this.setCanDrive(true)
     }
 
     restartBot() {
-        console.log("restarting bot")
         this.resetPosition()
         this.dirNum = 0
         this.getNextDir()
     }
 
     getNextDir() {
+        if (!this.targetReached) {
+            this.dirNum -= 1
+            this.dirNum = Math.max(0, this.dirNum)
+        }
         const info = this.scene.course.nextBotDir(this.dirNum)
-
-        console.log("got next dir", info)
+        this.targetReached = false
         if (info) {
             this.dirNum = info.nextNum
             this.direction = info.pos
             this.goSlow = info.goSlow
-            console.log("go slow", this.goSlow)
             if (typeof this.goSlow === "number") {
                 this.speedMult = this.goSlow
             } else if (this.goSlow) {
@@ -97,7 +101,7 @@ export class BotVehicle extends LowPolyVehicle {
         const p = this.getPosition()
 
         if (p.distanceTo(this.direction) < 20) {
-
+            this.targetReached = true
             this.getNextDir()
         }
     }
@@ -127,22 +131,14 @@ export class BotVehicle extends LowPolyVehicle {
             turn = turn % Math.PI
         }
 
-        // this.turnAngle = (this.turnAngle - ((this.turnAngle - turn) * .2))
-        // if (this.dirNum === 7) {
-
-        //     console.log("turn angle", this.turnAngle.toFixed(2), "turn:", turn.toFixed(2), "y:", y.toFixed(2), "angel:", angle.toFixed(2))
-        // }
-        //if (Math.abs(this.turnAngle) < Math.PI / 8) return 0
         return turn
-        return this.turnAngle
-
     }
 
     checkIfStuck() {
         if (this.prevPosition.distanceTo(this.vehicleBody.position) < 4) {
             this.stuckTicks += 1
             this.stuckTicks = Math.min(this.stuckTicks, 170)
-            // console.log("stuck")
+
         } else {
             this.prevPosition = this.vehicleBody.position.clone()
             this.stuckTicks = 0
@@ -153,9 +149,9 @@ export class BotVehicle extends LowPolyVehicle {
     driveBot() {
         if (!this.vehicleBody || !this.direction) return
         const angle = this.getTurnDir()
-        // console.log("angle", angle)
+
         const deg = angle * radToDeg
-        //console.log("deg", deg)
+
         this.turn(deg)
 
         if (this.stuckTicks > 70) {

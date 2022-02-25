@@ -351,7 +351,6 @@ var Room = /** @class */ (function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (_a) {
             var gameSettings = _a.gameSettings, roomSettings = _a.roomSettings;
-            console.log("room game settings change", roomSettings, gameSettings);
             if (gameSettings) {
                 _this.gameSettings = gameSettings;
             }

@@ -147,7 +147,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.otherVehicles = []
         await this.createVehicle()
         await this.createOtherVehicles()
-        addMusic(this.gameSettings?.musicVolume ?? 0, this.camera as PerspectiveCamera, "racing.mp3")
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, "racing.mp3")
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
         console.log("everything created")
 

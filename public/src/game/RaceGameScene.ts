@@ -292,9 +292,6 @@ export class RaceGameScene extends GameScene {
             this.bot.update(0.1)
         }
 
-
-
-
         this.currentNumberOfLaps = this.getNumberOfLaps()
 
         this._clearTimeouts()

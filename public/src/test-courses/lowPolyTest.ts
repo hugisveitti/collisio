@@ -3,7 +3,7 @@ import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { getGameTypeFromTrackName } from "../classes/Game"
-import { defaultGameSettings, IGameSettings } from "../classes/localGameSettings"
+import { BotDifficulty, defaultGameSettings, getLocalGameSetting, IGameSettings } from "../classes/localGameSettings"
 import { RaceCourse } from "../course/RaceCourse"
 import { StoryCourse } from "../course/StoryCourse"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
@@ -144,19 +144,6 @@ export class LowPolyTestScene extends GameScene {
         this.driverRecorder = new DriveRecorder({ tournamentId: "low poly test", active: recording, trackName: this.getTrackName(), vehicleType: this.vehicleType, numberOfLaps: this.getNumberOfLaps(), playerId: "test", playerName: "test", vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" } })
 
 
-        const botVehicleType = "normal2"
-        const botConfig: IVehicleClassConfig = {
-            vehicleNumber: 9,
-            vehicleType: botVehicleType,
-            vehicleSetup: {
-                vehicleColor: "#ff00ff" as VehicleColorType,
-                vehicleType: botVehicleType
-            },
-            scene: this,
-            name: "Bot Tamy",
-            id: "bot-id"
-        }
-        this.bot = new BotVehicle("hard", botConfig)
 
 
     }
@@ -191,7 +178,13 @@ export class LowPolyTestScene extends GameScene {
             if (e.key === "r") {
 
                 this.resetPlayer(0)
-                this.bot.resetPosition()
+                if (this.course instanceof RaceCourse) {
+
+                    const { position, rotation } = this.course.getGoalCheckpoint()
+                    this.bot.setCheckpointPositionRotation({ rotation, position: { x: position.x + 5, z: position.z + 5, y: position.y, } })
+                    this.bot.resetPosition()
+                    this.bot.restartBot()
+                }
             } else if (e.key === "t") {
 
             } else if (e.key === "p") {
@@ -282,6 +275,21 @@ export class LowPolyTestScene extends GameScene {
     }
 
     initVehicles() {
+
+        const botVehicleType = "normal2"
+        const botConfig: IVehicleClassConfig = {
+            vehicleNumber: 9,
+            vehicleType: botVehicleType,
+            vehicleSetup: {
+                vehicleColor: "#ff00ff" as VehicleColorType,
+                vehicleType: botVehicleType
+            },
+            scene: this,
+            name: "Bot Tamy",
+            id: "bot-id"
+        }
+        this.bot = new BotVehicle(getLocalGameSetting("botDifficulty", "string") as BotDifficulty ?? "hard", botConfig)
+
         this.otherVehicles = []
         //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
         if (getVehicleClassFromType(this.vehicleType) === "LowPoly") {
@@ -355,6 +363,7 @@ export class LowPolyTestScene extends GameScene {
                         this.bot.resetPosition()
                         this.bot.update(0.1)
                     }
+                    this.bot.restartBot()
                     this.bot.getNextDir()
 
                 })

@@ -276,7 +276,8 @@ export const gameItems = {
         collisionFlags: 6,
         notAddPhysics: true,
         isCourseObjectArray: true,
-        objectName: "botDirections"
+        objectName: "botDirections",
+        notVisible: true
     }
 
 

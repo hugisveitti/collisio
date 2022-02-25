@@ -9,6 +9,7 @@ interface IBasicDesktopModal {
   children: JSX.Element;
   outline?: boolean;
   color?: "white" | "black";
+  style?: React.CSSProperties;
 }
 
 const BasicDesktopModal = (props: IBasicDesktopModal) => {
@@ -30,6 +31,7 @@ const BasicDesktopModal = (props: IBasicDesktopModal) => {
             outline: props.outline ? "1px white" : 0,
             overflowY: "auto",
             maxHeight: "75%",
+            ...props.style,
           }}
         >
           {props.children}

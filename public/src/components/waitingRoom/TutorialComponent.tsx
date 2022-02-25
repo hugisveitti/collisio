@@ -26,6 +26,7 @@ const TutorialComponent = () => {
 
   return (
     <BasicDesktopModal
+      style={{ maxWidth: "90%" }}
       open={!hide}
       onClose={() => {
         saveLocalStorageItem(tutorialKey, true + "");
@@ -33,10 +34,10 @@ const TutorialComponent = () => {
       }}
     >
       <Grid container spacing={3}>
-        <Grid item xs={11}>
+        <Grid item xs={8}>
           <Typography>Welcome to Collisio</Typography>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={4}>
           <IconButton
             style={{ float: "right", color: "white" }}
             onClick={() => {
@@ -53,7 +54,11 @@ const TutorialComponent = () => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <img src={handsGIF} alt="steer with your phone" />
+          <img
+            style={{ maxWidth: "90%" }}
+            src={handsGIF}
+            alt="steer with your phone"
+          />
         </Grid>
       </Grid>
     </BasicDesktopModal>
