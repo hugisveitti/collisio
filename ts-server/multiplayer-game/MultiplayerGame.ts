@@ -448,6 +448,7 @@ export class MultiplayerRoom {
             p.restartGame()
         }
         if (this.needsReload) {
+            this.needsReload = false
             this.reloadGame()
         } else {
             this.startGameCountDown()
@@ -458,9 +459,8 @@ export class MultiplayerRoom {
         if (this.countdownStarted) return
         this.dataCollection.numberOfGameStartCountdowns += 1
         this.countdownStarted = true
-        this.needsReload = false
-        let countdown = 4
 
+        let countdown = 4
 
 
         this.io.to(this.roomId).emit(m_fs_game_starting, {

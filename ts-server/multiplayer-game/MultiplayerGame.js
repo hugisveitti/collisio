@@ -428,6 +428,7 @@ var MultiplayerRoom = /** @class */ (function () {
             p.restartGame();
         }
         if (this.needsReload) {
+            this.needsReload = false;
             this.reloadGame();
         }
         else {
@@ -440,7 +441,6 @@ var MultiplayerRoom = /** @class */ (function () {
             return;
         this.dataCollection.numberOfGameStartCountdowns += 1;
         this.countdownStarted = true;
-        this.needsReload = false;
         var countdown = 4;
         this.io.to(this.roomId).emit(multiplayer_shared_stuff_1.m_fs_game_starting, {
             spawnPositions: this.getSpawnPosition(),
