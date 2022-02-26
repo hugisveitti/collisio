@@ -124,7 +124,6 @@ export default class RoomMaster {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings, vehicleSetup)
                 this.rooms[roomId].addPlayer(player)
             }
-
         })
     }
 

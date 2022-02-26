@@ -137,7 +137,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.addLights()
         removeMusic()
 
-        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, "racing.mp3")
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong())
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
 
@@ -808,6 +808,7 @@ export class GameScene extends MyScene implements IGameScene {
             this.gameRoomActions.closeModals()
         }
         if (this.needsReload) {
+            stopMusic()
             this.socket?.off(std_controls)
             this._everythingReady = false
             this.gameStarted = false

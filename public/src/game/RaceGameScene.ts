@@ -59,7 +59,7 @@ export class RaceGameScene extends GameScene {
         this.hasShowStartAnimation = false
         this.raceFinished = false
 
-        this.raceCountdownTime = 7
+        this.raceCountdownTime = 6
     }
 
 

@@ -7,7 +7,7 @@ import { RaceCourse } from "../course/RaceCourse";
 import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed, m_fs_already_started } from "../shared-backend/multiplayer-shared-stuff";
 import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
-import { addMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
+import { addMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addKeyboardControls, driveVehicle, driveVehicleWithKeyboard } from "../utils/controls";
 import { GhostVehicle, GhostVehicleConfig, IGhostVehicle } from "../vehicles/GhostVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
@@ -147,7 +147,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.otherVehicles = []
         await this.createVehicle()
         await this.createOtherVehicles()
-        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, "racing.mp3")
+
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong())
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
         console.log("everything created")
 
@@ -384,6 +385,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     sendPlayerReady() {
         // just wait a little...
         setTimeout(() => {
+            if (this.config?.gameSettings.musicVolume > 0) {
+                this.startGameSong()
+            }
 
             console.log("sending ready")
             this.isReady = true
@@ -576,6 +580,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         for (let v of this.otherVehicles) {
             v.removeFromScene(this)
         }
+        stopMusic()
         this.restart().then(() => {
         })
 

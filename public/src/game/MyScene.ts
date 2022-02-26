@@ -2,7 +2,7 @@ import { Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
-import { getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
+import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
@@ -211,6 +211,10 @@ export class MyScene extends Scene3D {
 
     getTimeOfDay() {
         return this.gameSettings.graphics === "low" ? "day" : getTimeOfDay(this.getTrackName())
+    }
+
+    getRaceSong() {
+        return getRaceSong(this.roomSettings.trackName)
     }
 
     setNeedsReload(needsReload: boolean) {

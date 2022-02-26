@@ -50,7 +50,7 @@ let tipIndex = Math.floor(Math.random() * loadingScreenTips.length)
 let progressRatio = 0
 export const setLoaderProgress = (ratio: number) => {
     progressRatio = ratio
-    if (ratio > 0 && ratio < 1) {
+    if (ratio => 0 && ratio < 1) {
         loadDivText.innerHTML = "Loading game files"
         loadDiv.classList.add("show")
         loadingBarInner.setAttribute("style", `width:${progressRatio * 200}px`)

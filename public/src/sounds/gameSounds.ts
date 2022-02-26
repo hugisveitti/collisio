@@ -51,7 +51,7 @@ export const getBeep = async (path: string, listener: AudioListener, callback: (
 export const loadMusic = (file: string): Promise<AudioBuffer> => {
     const audioLoader = new AudioLoader();
     return new Promise<AudioBuffer>((resolve, reject) => {
-        console.log("loading async")
+        console.log("loading async music", file)
         audioLoader.loadAsync(getStaticPath(`music/${file}`)).then((buffer: AudioBuffer) => {
             //      engineBuffer = buffer
 
@@ -66,6 +66,10 @@ export const loadMusic = (file: string): Promise<AudioBuffer> => {
 let music: Audio
 
 export const addMusic = async (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
+    if (music && music.isPlaying) {
+        music.stop()
+        music = undefined
+    }
     if (camera && getDeviceType() === "desktop" && !music) {
         const listener = new AudioListener()
         camera.add(listener)

@@ -46,6 +46,10 @@ export const possibleTrackCategories: { category: TrackCategory, name: string }[
 
 type TrackDifficulty = "easy" | "medium" | "hard"
 export type TimeOfDay = "day" | "evening"
+
+
+export type RaceSong = "desert.mp3" | "racing.mp3"
+
 /** change name to map
  * since a racetrack is a map and the tag courses are also maps but not tracks....
  */
@@ -57,6 +61,7 @@ export interface ITrackInfo {
     timeOfDay?: TimeOfDay
     hemisphereRadius?: number
     difficulty: TrackDifficulty
+    song?: RaceSong
 }
 
 export const allTrackNames: ITrackInfo[] = [
@@ -91,7 +96,8 @@ export const allTrackNames: ITrackInfo[] = [
         name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium"
+        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium",
+        song: "desert.mp3"
     },
     {
         name: "Town track", type: "town-track", gameType: "race", category: "long", difficulty: "easy"
@@ -103,10 +109,12 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Mountain track", type: "russia-track", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard"
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard",
+        song: "desert.mp3"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard"
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard",
+        song: "desert.mp3"
     },
     {
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long", difficulty: "hard"

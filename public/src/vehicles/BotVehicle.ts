@@ -56,7 +56,7 @@ export class BotVehicle extends LowPolyVehicle {
             this.botSpeed = 210
             this.slowMult = 0.8
         } else if (botDifficulty === "hard") {
-            this.botSpeed = 500
+            this.botSpeed = 400
             this.slowMult = .5
         }
 
@@ -159,7 +159,7 @@ export class BotVehicle extends LowPolyVehicle {
 
         this.turn(deg)
 
-        if (this.stuckTicks > 70) {
+        if (this.stuckTicks > 90) {
             this.turn(0)
             this.goBackward()
             this.stuckTicks -= 1

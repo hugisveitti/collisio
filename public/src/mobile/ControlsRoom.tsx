@@ -5,6 +5,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
+import { getUserTokens } from "../firebase/firestoreFunctions";
 import { saveRaceData } from "../firebase/firestoreGameFunctions";
 import { UserContext } from "../providers/UserProvider";
 import {
@@ -162,13 +163,22 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         data.totalTime
       );
       setRaceMedalData(md);
-      const newTokenData: ITokenData = {
-        ...tokenData,
-        coins: tokenData.coins + md.coins,
-        XP: tokenData.XP + md.XP,
-      };
-      newTokenData[md.medal] += 1;
-      props.store.setTokenData(newTokenData);
+      if (user?.uid) {
+        getUserTokens(user.uid)
+          .then((data) => {
+            props.store.setTokenData(data);
+          })
+          .catch(() => {
+            props.store.setTokenData(defaultTokenData);
+          });
+      }
+      // const newTokenData: ITokenData = {
+      //   ...tokenData,
+      //   coins: tokenData.coins + md.coins,
+      //   XP: tokenData.XP + md.XP,
+      // };
+      // newTokenData[md.medal] += 1;
+      // props.store.setTokenData(newTokenData);
 
       const medalDiv = document.getElementById("medal-data");
       medalDiv.classList.remove("hide");

@@ -2,7 +2,7 @@ import { GameScene } from "../game/GameScene";
 import { RaceGameScene } from "../game/RaceGameScene";
 import { StoryGameScene } from "../game/StoryGameScene";
 import { TagGameScene } from "../game/TagGameScene";
-import { TrackName, GameType, VehicleType, IPreGamePlayerInfo, allTrackNames, TimeOfDay } from "../shared-backend/shared-stuff";
+import { TrackName, GameType, VehicleType, IPreGamePlayerInfo, allTrackNames, TimeOfDay, RaceSong } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { itemInArray } from "../utils/utilFunctions";
 import { IGameSettings, IRoomSettings } from "./localGameSettings";
@@ -46,6 +46,13 @@ export const getTimeOfDay = (trackName: TrackName) => {
         if (trackName === t.type) return t.timeOfDay ?? "day"
     }
     return "day"
+}
+
+export const getRaceSong = (trackName: TrackName): RaceSong => {
+    for (let t of allTrackNames) {
+        if (trackName === t.type) return t.song ?? "racing.mp3"
+    }
+    return "racing.mp3"
 }
 
 interface ITimeOfDayColors {
