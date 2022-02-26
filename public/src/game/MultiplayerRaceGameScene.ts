@@ -484,6 +484,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             this.vehicle.setCanDrive(false)
             this.vehicle.stop()
             this.vehicle.start()
+            this.gameStarted = false
             if (this.bot) {
 
                 this.bot.restartBot()
