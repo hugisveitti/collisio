@@ -142,7 +142,7 @@ export class BotVehicle extends LowPolyVehicle {
     checkIfStuck() {
         if (this.prevPosition.distanceTo(this.vehicleBody.position) < 4) {
             this.stuckTicks += 1
-            this.stuckTicks = Math.min(this.stuckTicks, 170)
+            this.stuckTicks = Math.min(this.stuckTicks, 190)
 
         } else {
             this.prevPosition = this.vehicleBody.position.clone()
@@ -159,8 +159,8 @@ export class BotVehicle extends LowPolyVehicle {
 
         this.turn(deg)
 
-        if (this.stuckTicks > 90) {
-            this.turn(0)
+        if (this.stuckTicks > 60) {
+            this.turn(-deg)
             this.goBackward()
             this.stuckTicks -= 1
         } else if (this.getCurrentSpeedKmHour() < this.botSpeed * this.speedMult) {
