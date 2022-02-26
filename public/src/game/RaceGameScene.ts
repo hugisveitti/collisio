@@ -44,8 +44,6 @@ export class RaceGameScene extends GameScene {
     ghostVehicle: GhostVehicle
     driverRecorder: DriveRecorder
 
-    bot: BotVehicle
-
 
     constructor() {
         super()
@@ -116,7 +114,6 @@ export class RaceGameScene extends GameScene {
                     this.bot.resetPosition()
                     //      this.bot.update(0.1)
                 }
-
                 resolve()
             })
         })

@@ -8,6 +8,7 @@ import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
 import { stopMusic } from "../sounds/gameSounds";
+import { BotVehicle } from "../vehicles/BotVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
 import "./game-styles.css";
 import { IGameRoomActions, IGameSceneConfig } from "./IGameScene";
@@ -69,6 +70,8 @@ export class MyScene extends Scene3D {
     needsReload: boolean
 
     gameRoomActions: IGameRoomActions
+
+    bot: BotVehicle
 
     constructor() {
         super()
@@ -201,6 +204,8 @@ export class MyScene extends Scene3D {
     }
 
 
+
+
     getTrackName() {
         return this.gameSceneConfig?.tournament?.trackName ?? this.roomSettings.trackName
     }
@@ -316,6 +321,7 @@ export class MyScene extends Scene3D {
 
     updatePing() {
 
+        if (this.gameSceneConfig?.onlyMobile) return
         const start = Date.now()
 
         this.socket?.off(std_ping_test_callback)
@@ -424,7 +430,7 @@ export class MyScene extends Scene3D {
 
             document.body.removeChild(this.gameInfoDiv)
             document.body.removeChild(this.canvas)
-
+            this.bot?.destroy()
 
             await this.stop()
             await this._destroyGame()

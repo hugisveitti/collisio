@@ -28,6 +28,7 @@ const GameInfoRow = (props: IGameInfoRow) => {
   const playersInfo = props.gameData.playersInfo;
 
   const gameSettings = props.gameData.gameSettings;
+  const roomSettings = props.gameData.roomSettings;
   return (
     <>
       <TableRow>

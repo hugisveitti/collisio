@@ -789,6 +789,8 @@ export class GameScene extends MyScene implements IGameScene {
                 wagon.destroy()
             }
 
+
+
             this.wagons = []
             resolve()
         })

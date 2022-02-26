@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React from "react";
 import { getDeviceType } from "../../utils/settings";
@@ -35,12 +36,12 @@ const CreateGameComponent = (props: ICreateGameComponent) => {
         <BackdropButton onClick={props.onBack}>&lt; Back</BackdropButton>
       </Grid>
       <Grid item xs={12}></Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} sm={6} md={6}>
         <BackdropButton link={connectPagePath} width="100%" style={btnStyles}>
           {onMobile ? "Join Splitscreen" : "Play Splitscreen/Singleplayer"}
         </BackdropButton>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} sm={6} md={6}>
         <BackdropButton
           link={multiplayerConnectPagePath}
           width="100%"
@@ -49,7 +50,27 @@ const CreateGameComponent = (props: ICreateGameComponent) => {
           {onMobile ? "Join Multiplayer" : "Play Multiplayer"}
         </BackdropButton>
       </Grid>
-      <Grid item xs={12} md={6}>
+      {!onMobile && (
+        <React.Fragment>
+          <Grid item xs={12} sm={6} md={6}>
+            <Typography>
+              Splitscreen/Singleplayer uses the mobile phone as a remote
+              controller, where you steer like you would steer a car. You can
+              play agains a bot.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <Typography>
+              The multiplayer allows you to connect and play with friends
+              online, using a keyboard or optinally the mobile controller. You
+              can also play single player with the keyboard and against a bot.
+              Currently you can only earn XP and coins through playing with the
+              mobile controller.
+            </Typography>
+          </Grid>
+        </React.Fragment>
+      )}
+      <Grid item xs={12} sm={6} md={6}>
         {onMobile && (
           <BackdropButton
             link={mobileOnlyWaitingRoomPath}

@@ -128,16 +128,13 @@ export class Course implements ICourse {
             })
         }
 
-        console.log("usablespawns", usableSpawns)
         let position: Vector3
         let rotation: Quaternion
         if (spawnPosition > usableSpawns.length - 1) {
-            console.log("spawn pos over useable spawns")
             // need to find the largest spawn number it can use
             // e.g. if there are 2 usable spawns and spawnPosition is 3 (index 2) then we find spawn 1 
             // and the position will be behind spawn 1 relative to the aligner, plus offset
             let usableSpawnIndex = usableSpawns.length === 1 ? 0 : usableSpawns.length - 2 + (spawnPosition % 2)
-            console.log("usablespawn index", usableSpawnIndex)
             if (usableSpawnIndex < 0 || usableSpawnIndex > usableSpawns.length) {
                 console.warn("Usable spawn index wrong, usableSpawnIndex", usableSpawnIndex, ", number of spawns", usableSpawns.length)
                 usableSpawnIndex = 0
@@ -154,7 +151,6 @@ export class Course implements ICourse {
                 usablePosition.y,
                 usablePosition.z - ((Math.cos(alpha) * (offSet * offSetLength)))
             )
-            console.log("position", position, "usablePosition", usablePosition)
         } else {
             position = spawnAligns[spawnPosition].spawn
             let aligner = spawnAligns[spawnPosition].align

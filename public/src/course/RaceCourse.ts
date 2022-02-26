@@ -1,13 +1,11 @@
 import { CollisionEvent } from "@enable3d/common/dist/types";
-import { ExtendedObject3D, Scene3D } from "enable3d";
-import { IVehicle } from "../vehicles/IVehicle";
-import { IRaceCourse } from "./ICourse";
-import { TrackName } from '../shared-backend/shared-stuff';
-import { Course } from './Course';
-import { shuffleArray } from "../utils/utilFunctions";
-import { GameScene } from "../game/GameScene";
+import { ExtendedObject3D } from "enable3d";
+import { Quaternion, Euler } from "three";
 import { MyScene } from "../game/MyScene";
-
+import { TrackName } from '../shared-backend/shared-stuff';
+import { IVehicle } from "../vehicles/IVehicle";
+import { Course } from './Course';
+import { IRaceCourse } from "./ICourse";
 
 export class RaceCourse extends Course implements IRaceCourse {
 
@@ -92,6 +90,7 @@ export class RaceCourse extends Course implements IRaceCourse {
             const q = this.calcSpawnAngle(aPos, pos)
             return { position: pos, rotation: q }
         }
-        return { position: pos, rotation: { x: 0, y: this.goalSpawn.rotation.y, z: 0 } }
+        const q = new Quaternion().setFromEuler(new Euler(0, this.goalSpawn.rotation.y, 0))
+        return { position: pos, rotation: q }
     }
 }

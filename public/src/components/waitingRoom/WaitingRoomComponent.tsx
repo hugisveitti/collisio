@@ -199,7 +199,12 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
 
       <Grid item xs={12}>
         <Typography variant="h6" component="div">
-          Players in room {props.store.roomId}
+          Players in room {props.store.roomId}.{" "}
+          {props.store.gameSettings.botDifficulty === "none" ? (
+            <span>No bot</span>
+          ) : (
+            <span>Bot difficulty {props.store.gameSettings.botDifficulty}</span>
+          )}
         </Typography>
       </Grid>
 

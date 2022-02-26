@@ -1024,7 +1024,6 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     resetPosition() {
-        console.log("resetting", this.name)
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
