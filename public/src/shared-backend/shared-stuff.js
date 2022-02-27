@@ -45,7 +45,8 @@ exports.allTrackNames = [
         name: "F1 track-2", type: "f1-track-2", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium"
+        name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium",
+        song: "desert.mp3"
     },
     {
         name: "Town track", type: "town-track", gameType: "race", category: "long", difficulty: "easy"
@@ -57,10 +58,12 @@ exports.allTrackNames = [
         name: "Mountain track", type: "russia-track", gameType: "race", category: "short", difficulty: "medium"
     },
     {
-        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard"
+        name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard",
+        song: "desert.mp3"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard"
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard",
+        song: "desert.mp3"
     },
     {
         name: "Ski map", type: "skii-map", gameType: "race", timeOfDay: "day", category: "long", difficulty: "hard"

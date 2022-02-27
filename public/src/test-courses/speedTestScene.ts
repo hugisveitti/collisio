@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { defaultVehicleSettings } from "../classes/User";
 import { Course } from "../course/Course";
 import { ICourse } from "../course/ICourse";
+import { hideLoadDiv } from "../course/loadingManager";
 import { GameScene } from "../game/GameScene";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { vehicleItems, VehicleSetup } from "../shared-backend/vehicleItems";
@@ -122,6 +123,7 @@ class SpeedTestScene extends GameScene {
         console.log("camera", this.camera)
         await this.course.createCourse()
         this.courseLoaded = true
+        hideLoadDiv()
 
 
     }

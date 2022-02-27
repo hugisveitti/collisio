@@ -82,42 +82,52 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket | u
     document.addEventListener("keyup", e => keyAction(e, false))
 }
 
-export const addKeyboardControls = (vehicleControls: VehicleControls) => {
-    const keyAction = (e: KeyboardEvent, isDown: boolean) => {
-        // console.log("e key", e.key, e.isComposing)
+const vehicleControls: VehicleControls = new VehicleControls()
 
-        e.preventDefault()
-        switch (e.key) {
-            case "w":
-            case "W":
-            case "ArrowUp":
-                vehicleControls.f = isDown
-                break;
-            case "d":
-            case "D":
-            case "ArrowRight":
-                vehicleControls.right = isDown
-                break;
-            case "a":
-            case "A":
-            case "ArrowLeft":
-                vehicleControls.left = isDown
-                break;
-            case "s":
-            case "S":
-            case "ArrowDown":
-            case " ":
-                vehicleControls.b = isDown
-                break;
-            default:
-                break;
-        }
+const keyAction = (e: KeyboardEvent, isDown: boolean) => {
+    // console.log("e key", e.key, e.isComposing)
+
+    switch (e.key) {
+        case "w":
+        case "W":
+        case "ArrowUp":
+            e.preventDefault()
+            vehicleControls.f = isDown
+            break;
+        case "d":
+        case "D":
+        case "ArrowRight":
+            e.preventDefault()
+            vehicleControls.right = isDown
+            break;
+        case "a":
+        case "A":
+        case "ArrowLeft":
+            e.preventDefault()
+            vehicleControls.left = isDown
+            break;
+        case "s":
+        case "S":
+        case "ArrowDown":
+        case " ":
+            e.preventDefault()
+            vehicleControls.b = isDown
+            break;
+        default:
+            break;
     }
+}
 
+export const addKeyboardControls = () => {
+    console.log("ADDING KEYBOARD CONTROLS")
     document.addEventListener("keydown", e => keyAction(e, true))
     document.addEventListener("keyup", e => keyAction(e, false))
 }
 
+export const removeKeyboardControls = () => {
+    document.removeEventListener("keydown", e => keyAction(e, true))
+    document.removeEventListener("keyup", e => keyAction(e, false))
+}
 
 
 let nSteerAngle = 0
@@ -132,7 +142,9 @@ const getSteering = () => {
 }
 
 let dSteer = 1
-export const driveVehicleWithKeyboard = (vehicle: IVehicle, vehicleControls: VehicleControls) => {
+export const driveVehicleWithKeyboard = (vehicle: IVehicle) => {
+
+
 
     if (vehicleControls.f) {
         vehicle.goForward()

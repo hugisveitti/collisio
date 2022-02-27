@@ -56,7 +56,10 @@ export const setLoaderProgress = (ratio: number) => {
         loadingBarInner.setAttribute("style", `width:${progressRatio * 200}px`)
     }
     if (ratio >= 1) {
-        loadDiv.classList.remove("show")
+
     }
 }
 
+export const hideLoadDiv = () => {
+    loadDiv.classList.remove("show")
+}

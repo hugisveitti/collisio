@@ -815,24 +815,16 @@ export class LowPolyVehicle extends Vehicle {
         this.setPosition(undefined, groundY, undefined)
     }
 
-
-
     update(delta: number) {
         if (!this.isReady) return
         this.delta = delta
         const usingJitter = false //  this.useChaseCamera && this.detectJitter(delta)
 
         for (let i = 0; i < 4; i++) {
-
-
-
             this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
             this.p0[i] = this.tm.getOrigin()
             this.q = this.tm.getRotation()
-
-
             if (i < 4) {
-
                 this.wheelMeshes[i].position.set(this.p0[i].x(), this.p0[i].y(), this.p0[i].z())
                 this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
                 this.vehicle.updateWheelTransform(i, usingJitter)
@@ -876,16 +868,17 @@ export class LowPolyVehicle extends Vehicle {
 
             // have these calls optional, since they are quite heavy for the machine, or maybe only perform every other tick?
             // only use vehicle assist if more than 30 fps
-            if (delta < 33.5) {
+            if (delta < 33.5 && !this.isBot) {
 
                 this.checkIfSpinning()
                 this.vehicleAssist(false)
             }
-            this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
 
-            this.updateEngineSound()
-
-            this.updateFov()
+            if (!this.isBot) {
+                this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
+                this.updateEngineSound()
+                this.updateFov()
+            }
         }
 
         if (this.vehicleBody.position.y < -20) {

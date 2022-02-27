@@ -240,6 +240,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
     //   vehi
     // }
     if (gameObject) {
+      gameObject.setRoomSettings(props.store.roomSettings);
       gameObject.setGameSettings(props.store.gameSettings);
       gameObject.setVehicleSettings(
         0,

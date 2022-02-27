@@ -67,6 +67,7 @@ let music: Audio
 
 export const addMusic = async (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
     if (music && music.isPlaying) {
+        console.log("removing music")
         music.stop()
         music = undefined
     }
@@ -83,7 +84,11 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
                 return
             }
             music.setVolume(volume)
-            if (!notAutoStart) {
+            console.log("music:", music, " isPlaying", music.isPlaying, "notAutostart:", notAutoStart, "volume:", volume)
+            if (!notAutoStart && volume > 0) {
+                if (music.isPlaying) {
+                    music?.stop()
+                }
                 music.play()
             }
         })
@@ -91,27 +96,32 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
 }
 
 export const setMusicVolume = (volume: number) => {
+    if (!music) return
     if (!isFinite(volume)) {
         volume = 0
         console.warn("volume not finite", volume)
         music?.stop()
         return
     }
+
     music?.setVolume(volume)
-}
-
-export const stopMusic = () => {
-    console.log("stopping music")
-    if (!music || !music.isPlaying) return
-    try {
-
-        music?.stop()
-    } catch (err) {
-        console.log("error when stopping music", err)
+    if (!music?.isPlaying) {
+        music.play()
+    } else if (volume === 0) {
+        music.stop()
     }
 }
 
+export const stopMusic = () => {
+    console.log("stopping music", "music", music, "isplaying", music?.isPlaying)
+    if (!music || !music.isPlaying) return
+
+    music?.stop()
+
+}
+
 export const removeMusic = () => {
+    if (!music) return
     music?.stop()
     music = undefined
 }

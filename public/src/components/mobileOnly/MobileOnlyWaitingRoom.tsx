@@ -7,8 +7,12 @@ import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import FullscreenButton from "../inputs/FullscreenButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import RoomAndGameSettingsContainer from "../settings/RoomAndGameSettingsContainer";
+import { IStore } from "../store";
 
-interface IMobileOnlyWaitingRoom {}
+interface IMobileOnlyWaitingRoom {
+  store: IStore;
+}
 
 const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
   const onMobile = getDeviceType() === "mobile";
@@ -69,6 +73,9 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
         </Grid>
         <Grid item xs={12}>
           <img style={{ maxWidth: "80%", width: 400 }} src={settingsImage} />
+        </Grid>
+        <Grid item xs={12}>
+          <RoomAndGameSettingsContainer store={props.store} />
         </Grid>
       </Grid>
     </BackdropContainer>

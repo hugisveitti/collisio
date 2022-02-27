@@ -50,7 +50,7 @@ export class BotVehicle extends LowPolyVehicle {
         this.targetReached = false
 
         if (botDifficulty === "easy") {
-            this.botSpeed = 120
+            this.botSpeed = 200
             this.slowMult = 1
         } else if (botDifficulty === "medium") {
             this.botSpeed = 210
@@ -61,7 +61,6 @@ export class BotVehicle extends LowPolyVehicle {
         }
 
         if (botDifficulty === "none") {
-            console.log("No bot difficulty selected")
         } else {
 
             //  this.loadModels()
@@ -70,7 +69,6 @@ export class BotVehicle extends LowPolyVehicle {
     }
 
     restartBot() {
-        console.log("restarting bot")
         this.resetPosition()
 
         this.noForce(true)

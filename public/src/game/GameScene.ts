@@ -137,7 +137,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.addLights()
         removeMusic()
 
-        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong())
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
 
@@ -170,7 +170,7 @@ export class GameScene extends MyScene implements IGameScene {
             }
         })
 
-        window.addEventListener("resize", () => this.handleResizeWindow())
+
         await this.loadAssets()
 
         this.renderer.clear()
@@ -531,10 +531,8 @@ export class GameScene extends MyScene implements IGameScene {
         }
     }
 
-    handleResizeWindow() {
-
+    _handleResizeWindow() {
         const n = this.viewDivs.length
-
         for (let i = 0; i < this.viewDivs.length; i++) {
             const viewHeight = n > 2 ? .5 : 1.0
             let viewWidth: number
@@ -561,12 +559,11 @@ export class GameScene extends MyScene implements IGameScene {
             `)
         }
 
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     startGameSong() {
         // not use game song right now...
-        if ((!this.songIsPlaying) && !this.isPaused) {
+        if ((!this.songIsPlaying) && !this.isPaused && this.gameSettings.musicVolume > 0) {
             this.songIsPlaying = true
             startMusic()
         }
@@ -576,13 +573,10 @@ export class GameScene extends MyScene implements IGameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-
-
     pauseGame() {
         this.isPaused = true
         if (!this.gameStarted) return
         pauseMusic()
-
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicles[i].isReady) {
@@ -607,7 +601,6 @@ export class GameScene extends MyScene implements IGameScene {
     }
 
     togglePauseGame() {
-
         if (!this.everythingReady()) return
 
         if (!this.gameStarted) return
@@ -638,8 +631,6 @@ export class GameScene extends MyScene implements IGameScene {
             this.clearViewImportantInfo(i)
         }
     }
-
-
 
     everythingReady(): boolean {
         if (!this.courseLoaded) {
@@ -784,12 +775,9 @@ export class GameScene extends MyScene implements IGameScene {
             }
 
             this.extraVehicles = []
-
             for (let wagon of this.wagons) {
                 wagon.destroy()
             }
-
-
 
             this.wagons = []
             resolve()
@@ -1008,8 +996,8 @@ export class GameScene extends MyScene implements IGameScene {
 
     async _destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
-            stopMusic()
-            window.removeEventListener("resize", () => this.handleResizeWindow())
+            removeMusic()
+
 
             if (this.mobileOnlyControllerInterval) {
                 clearInterval(this.mobileOnlyControllerInterval)
@@ -1019,8 +1007,6 @@ export class GameScene extends MyScene implements IGameScene {
             this.socket?.off(std_user_settings_changed)
 
             await this.destroyVehicles()
-
-
             //   document.body.setAttribute("style", "")
             resolve()
         })

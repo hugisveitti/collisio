@@ -107,7 +107,6 @@ export class Course implements ICourse {
     }
 
     setToSpawnPostion(spawnPosition: number, vehicle: IVehicle) {
-        console.log("spawnPosition", spawnPosition)
         let usableSpawns = this.spawns.filter(s => !s.name.includes("checkpoint-spawn") && s.name !== "goal-spawn" && !s.name.includes("align"))
 
         let aPos: Vector3

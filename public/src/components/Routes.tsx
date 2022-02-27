@@ -315,7 +315,7 @@ const Routes = () => {
         />
         <Route
           path={mobileOnlyWaitingRoomPath}
-          render={(props) => <MobileOnlyWaitingRoom {...props} />}
+          render={(props) => <MobileOnlyWaitingRoom {...props} store={store} />}
         />
         <Route
           path={privacyPolicyPage}

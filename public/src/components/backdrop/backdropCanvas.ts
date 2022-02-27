@@ -2,7 +2,7 @@ import { AmbientLight, Audio, AudioListener, BackSide, Color, Fog, HemisphereLig
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { getTimeOfDayColors } from "../../classes/Game";
 import { skydomeFragmentShader, skydomeVertexShader } from "../../game/shaders";
-import { addMusic, loadMusic, stopMusic } from "../../sounds/gameSounds";
+import { addMusic, loadMusic, removeMusic, stopMusic } from "../../sounds/gameSounds";
 import { getDeviceType, getStaticPath } from "../../utils/settings";
 import "./backdrop.css";
 
@@ -80,7 +80,6 @@ export const changeCameraPosition = (posNum: number, volume: number) => {
     }
 
     if (camera) {
-
         const pos = cameraPositions[posNum % cameraPositions.length]
         cameraTargetPos = pos
         reachedTarget = false
@@ -265,7 +264,7 @@ export const clearBackdropCanvas = () => {
         clearTimeout(animateTimeout)
     }
     window.removeEventListener("resize", handleWindowResize)
-    stopMusic()
+    removeMusic()
 
     renderer?.clear()
     scene?.clear()

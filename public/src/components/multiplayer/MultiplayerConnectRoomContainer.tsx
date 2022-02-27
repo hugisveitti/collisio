@@ -26,6 +26,7 @@ import { getDeviceType, inTestMode } from "../../utils/settings";
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import VolumeInput from "../inputs/VolumeInput";
 import {
   getMultiplayerControlsRoomPath,
   getMultiplayerGameRoomPath,
@@ -117,7 +118,7 @@ const MultiplayerConnectRoomContainer = (
   }, [user]);
 
   return (
-    <BackdropContainer backgroundContainer noMusic>
+    <BackdropContainer backgroundContainer>
       <Grid container spacing={3}>
         {isConnecting ? (
           <>
@@ -185,6 +186,9 @@ const MultiplayerConnectRoomContainer = (
             </Grid>
           </>
         )}
+        <Grid item xs={12} sm={6}>
+          <VolumeInput store={props.store} />
+        </Grid>
       </Grid>
     </BackdropContainer>
   );

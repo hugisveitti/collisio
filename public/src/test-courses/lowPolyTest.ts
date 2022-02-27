@@ -27,6 +27,7 @@ import { defaultVehicleSettings, IVehicleSettings } from "../classes/User"
 import { ItemProperties, vehicleItems } from "../shared-backend/vehicleItems"
 import { BotVehicle } from "../vehicles/BotVehicle"
 import { IVehicleClassConfig } from "../vehicles/Vehicle"
+import { hideLoadDiv } from "../course/loadingManager"
 
 const vechicleFov = 60
 
@@ -369,16 +370,17 @@ export class LowPolyTestScene extends GameScene {
                 })
             }
 
-
-
             this.courseLoaded = true
             await this.createOtherVehicles()
             await this.createTestVehicle()
             this.vehicle.useBadRotationTicks = false
 
+
             const allVehicles = this.otherVehicles.concat(this.vehicle)
             this.vehicles = allVehicles
             await this.createGhostVehicle()
+            hideLoadDiv()
+
 
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {

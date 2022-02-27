@@ -3,11 +3,12 @@ import { Socket } from "socket.io-client";
 import { PerspectiveCamera, Clock, Vector3, Quaternion } from "three";
 import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
+import { hideLoadDiv } from "../course/loadingManager";
 import { RaceCourse } from "../course/RaceCourse";
 import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed, m_fs_already_started } from "../shared-backend/multiplayer-shared-stuff";
 import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleColorType, VehicleControls } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
-import { addMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
+import { addMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addKeyboardControls, driveVehicle, driveVehicleWithKeyboard } from "../utils/controls";
 import { BotVehicle } from "../vehicles/BotVehicle";
 import { GhostVehicle, GhostVehicleConfig, IGhostVehicle } from "../vehicles/GhostVehicle";
@@ -78,8 +79,8 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.currentNumberOfLaps = 2
         this.isReady = false
         this.vehiclesPositionInfo = {}
-        this.vehicleControls = new VehicleControls()
-        addKeyboardControls(this.vehicleControls)
+        //   this.vehicleControls = new VehicleControls()
+        addKeyboardControls()
         this.gameTime = new GameTime(2, 2)
         this.usingMobileController = false
         this.kmhInfo = document.createElement("span")
@@ -129,10 +130,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
         this.otherVehicles = []
 
-        window.addEventListener("resize", () => this.windowResize())
+
     }
 
-    windowResize() {
+    _handleResizeWindow() {
         this.kmhInfo.setAttribute("style", `
         position:absolute;
         bottom: 30px;
@@ -153,8 +154,12 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         await this.createVehicle()
         await this.createOtherVehicles()
         await this.createBot()
+        this.renderer.render(this.scene, this.camera)
+        hideLoadDiv()
 
-        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong())
+        console.log("adding music", "volume", this.gameSettings?.musicVolume, "song:", this.getRaceSong())
+
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
 
         const { position, rotation } = this.course.getGoalCheckpoint()
@@ -545,8 +550,9 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     startGameSong() {
-        // not use game song right now...
-        startMusic()
+        if (this.gameSettings.musicVolume > 0) {
+            startMusic()
+        }
     }
 
     setRoomSettings(roomSettings: IRoomSettings) {
@@ -562,13 +568,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setGameSettings(gameSettings: IGameSettings) {
-
         if (this.courseLoaded && (this.gameSettings.graphics !== gameSettings.graphics)) {
             this.setNeedsReload(true)
         }
-
         this.gameSettings = gameSettings
-
 
         for (let key of Object.keys(gameSettings)) {
             if (gameSettings[key] !== undefined) {
@@ -583,13 +586,10 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             this.course.toggleShadows(this.useShadows)
         }
 
-        setMusicVolume(gameSettings.musicVolume)
+        setMusicVolume(this.gameSettings.musicVolume)
         if (this.isReady) {
             this.toggleUseSound()
-
-            if (gameSettings.musicVolume > 0) {
-                this.startGameSong()
-            }
+            this.startGameSong()
         }
 
         this.camera.far = this.getDrawDistance()
@@ -625,7 +625,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         for (let v of this.otherVehicles) {
             v.removeFromScene(this)
         }
-        stopMusic()
+        removeMusic()
         this.restart().then(() => {
         })
 
@@ -782,19 +782,19 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.updatePlayerRaceInfo(_delta)
 
         if (!this.usingMobileController) {
-            driveVehicleWithKeyboard(this.vehicle, this.vehicleControls)
+            driveVehicleWithKeyboard(this.vehicle)
         }
         this.updateBot(_delta)
         this.checkIfVehicleIsOffCourse()
     }
 
-    async _destoryGame() {
+    async _destroyGame() {
         return new Promise<void>((resolve, reject) => {
             this.vehicle.destroy()
             for (let o of this.otherVehicles) {
                 o.removeFromScene(this)
             }
-            window.removeEventListener("resize", () => this.windowResize())
+
             resolve()
         })
     }

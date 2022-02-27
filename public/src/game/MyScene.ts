@@ -7,7 +7,8 @@ import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings 
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
-import { stopMusic } from "../sounds/gameSounds";
+import { removeMusic, stopMusic } from "../sounds/gameSounds";
+import { removeKeyboardControls } from "../utils/controls";
 import { BotVehicle } from "../vehicles/BotVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
 import "./game-styles.css";
@@ -142,10 +143,16 @@ export class MyScene extends Scene3D {
         this.gameInfoDiv.appendChild(this.fpsInfo)
         //    document.body.setAttribute("style", "overflow:hidden;")
         setLoaderProgress(0)
+
+        window.addEventListener("resize", () => this.handleResizeWindow())
     }
 
+    _handleResizeWindow() { }
 
-
+    handleResizeWindow() {
+        this._handleResizeWindow()
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
     public async start(key?: string, data?: any) {
 
@@ -202,9 +209,6 @@ export class MyScene extends Scene3D {
 
         }
     }
-
-
-
 
     getTrackName() {
         return this.gameSceneConfig?.tournament?.trackName ?? this.roomSettings.trackName
@@ -320,7 +324,6 @@ export class MyScene extends Scene3D {
     }
 
     updatePing() {
-
         if (this.gameSceneConfig?.onlyMobile) return
         const start = Date.now()
 
@@ -419,6 +422,8 @@ export class MyScene extends Scene3D {
 
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
+            window.removeEventListener("resize", () => this.handleResizeWindow())
+
             if (wakeLock) {
 
                 wakeLock.release()
@@ -426,17 +431,18 @@ export class MyScene extends Scene3D {
                         wakeLock = null;
                     });
             }
-            stopMusic()
+            removeMusic()
 
             document.body.removeChild(this.gameInfoDiv)
             document.body.removeChild(this.canvas)
             this.bot?.destroy()
 
-            await this.stop()
+
             await this._destroyGame()
             // for some reason not wokring
             //  document.body.setAttribute("style", "")
             await this.stop()
+            removeKeyboardControls()
             resolve()
         })
     }

@@ -58,7 +58,6 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   };
 
   useEffect(() => {
-    stopMusic();
     clearBackdropCanvas();
 
     console.log("store", props.store);

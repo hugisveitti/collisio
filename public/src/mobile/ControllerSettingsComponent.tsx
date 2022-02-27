@@ -115,7 +115,7 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           color="white"
           onClick={() => {
             console.log("quit game button");
-            socket.emit(mts_quit_game, {});
+            socket?.emit(mts_quit_game, {});
             disconnectSocket();
             history.push(frontPagePath);
           }}

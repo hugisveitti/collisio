@@ -3,6 +3,7 @@ import { CollisionEvent } from "@enable3d/common/dist/types";
 import { Clock } from "three";
 import { ITagScoreInfo } from "../classes/Game";
 import { ITagCourse } from "../course/ICourse";
+import { hideLoadDiv } from "../course/loadingManager";
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
@@ -69,6 +70,7 @@ export class TagGameScene extends GameScene {
         for (let vehicle of this.vehicles) {
             vehicle.useBadRotationTicks = false
         }
+        hideLoadDiv()
 
         this.createViews()
         this.createController()
@@ -263,7 +265,7 @@ export class TagGameScene extends GameScene {
         if (this.everythingReady()) {
 
             if (inTestMode) {
-                driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
+                driveVehicleWithKeyboard(this.vehicles[0])
             }
             this.updateScoreTable()
             this.updateVehicles(delta)

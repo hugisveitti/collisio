@@ -1,6 +1,3 @@
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import React, { useEffect } from "react";
 import {
@@ -13,16 +10,14 @@ import {
   mdts_game_settings_changed,
   stmd_game_settings_changed,
 } from "../../shared-backend/shared-stuff";
-import { IStore } from "../store";
-import setGameSettingsComponent from "./GameSettingsComponent";
-import TagRulesComponent from "../waitingRoom/TagRulesComponent";
-import { getDeviceType } from "../../utils/settings";
 import { setMusicVolume } from "../../sounds/gameSounds";
 import { getSocket } from "../../utils/connectSocket";
-import RoomSettingsComponent from "./RoomSettingsComponent";
-import MyCard from "../card/MyCard";
-import GameSettingsComponent from "./GameSettingsComponent";
+import { getDeviceType } from "../../utils/settings";
 import CollabsibleCard from "../inputs/CollapsibleCard";
+import { IStore } from "../store";
+import TagRulesComponent from "../waitingRoom/TagRulesComponent";
+import GameSettingsComponent from "./GameSettingsComponent";
+import RoomSettingsComponent from "./RoomSettingsComponent";
 
 interface IRoomAndGameSettingsContainer {
   store: IStore;
@@ -34,7 +29,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
   const socket = getSocket();
 
   useEffect(() => {
-    socket.on(
+    socket?.on(
       stmd_game_settings_changed,
       (data: { gameSettings: IGameSettings; roomSettings: IRoomSettings }) => {
         console.log("settings change", data);
@@ -53,7 +48,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
       }
     );
     return () => {
-      socket.off(stmd_game_settings_changed);
+      socket?.off(stmd_game_settings_changed);
     };
   }, []);
 
@@ -63,7 +58,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
         roomSettings={props.store.roomSettings}
         onChange={(newRoomSettings) => {
           props.store.setRoomSettings(newRoomSettings);
-          socket.emit(mdts_game_settings_changed, {
+          socket?.emit(mdts_game_settings_changed, {
             roomSettings: newRoomSettings,
           });
         }}
@@ -75,7 +70,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
             gameSettings={props.store.gameSettings}
             onChange={(newGameSettings) => {
               props.store.setGameSettings(newGameSettings);
-              socket.emit(mdts_game_settings_changed, {
+              socket?.emit(mdts_game_settings_changed, {
                 gameSettings: newGameSettings,
               });
             }}

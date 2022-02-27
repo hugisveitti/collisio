@@ -2,6 +2,7 @@ import { ExtendedObject3D } from "enable3d";
 import { v4 as uuid } from "uuid";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInfo } from "../classes/Game";
 import { IRaceCourse } from "../course/ICourse";
+import { hideLoadDiv } from "../course/loadingManager";
 import { RaceCourse } from "../course/RaceCourse";
 import { VehicleColorType, VehicleControls } from '../shared-backend/shared-stuff';
 import { DriveRecorder, GhostDriver } from "../test-courses/GhostDriver";
@@ -73,6 +74,8 @@ export class RaceGameScene extends GameScene {
 
         await this.createVehicles()
         await this.createBot()
+        hideLoadDiv()
+        this.updateVehicles(0.1)
 
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
@@ -284,7 +287,6 @@ export class RaceGameScene extends GameScene {
         if (this.bot) {
             const posRot = this.course.getGoalCheckpoint()
             this.bot.setCheckpointPositionRotation(posRot)
-
             this.bot.restartBot()
         }
 
@@ -530,7 +532,7 @@ export class RaceGameScene extends GameScene {
             this.updateBot(delta)
 
             if (inTestMode) {
-                driveVehicleWithKeyboard(this.vehicles[0], this.vehicleControls)
+                driveVehicleWithKeyboard(this.vehicles[0])
             }
             this.updateScoreTable(time, delta)
 
