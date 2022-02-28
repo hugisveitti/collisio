@@ -220,7 +220,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     async createBot() {
         return new Promise<void>((resolve, reject) => {
             if (this.gameSettings.botDifficulty === "none" || this.config.players.length > 1) {
-                console.log("Not creating bot", " num players", this.config.players.length)
                 resolve()
                 return
             }
@@ -297,11 +296,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             this.vehicle.setCheckpointPositionRotation({ position, rotation })
 
             if (this.gameTime.finished()) {
-                console.log("finished race!")
                 this.gameStarted = false
+                this.showSecondaryInfo(`You finished with time ${this.gameTime.getTotalTime().toFixed(2)}!`)
+                // TODO: vehicle stop, some celebration sound, camera angle change, maybe some confetti
+            } else {
+                this.showSecondaryInfo(`Lap time: ${cLapTime.toFixed(2)}`, true)
             }
             this.sendLapDone()
-            this.showSecondaryInfo(`Lap time: ${cLapTime.toFixed(2)}`, true)
         }
     }
 
@@ -389,7 +390,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     setupReloadGameListener() {
         this.socket.on(m_fs_reload_game, (data: { players: IPlayerInfo[], roomSettings: IRoomSettings }) => {
             const { players, roomSettings } = data
-            console.log("reload", players, roomSettings)
             for (let p of players) {
                 if (p.id === this.config.player.id) {
                     this.config.player = p
@@ -605,7 +605,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.clearSecondaryInfo()
         this.gameStarted = false
 
-        this.isPaused = false
+        this.isPaused = true
         this.oldTime = 0
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -615,17 +615,19 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             this.gameRoomActions.closeModals()
         }
 
-        this.bot?.destroy()
-
+        await this.bot?.destroy()
+        this.bot = null
         this.courseLoaded = false
         this.needsReload = false
         /** I think I need to delete ammo vecs */
 
         await this.vehicle.destroy()
+        this.vehicle = null
         for (let v of this.otherVehicles) {
             v.removeFromScene(this)
         }
         removeMusic()
+        this.renderer.setAnimationLoop(null)
         this.restart().then(() => {
         })
 

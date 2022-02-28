@@ -279,9 +279,11 @@ var MulitplayerPlayer = /** @class */ (function () {
         var _this = this;
         var _a;
         (_a = this.mobileSocket) === null || _a === void 0 ? void 0 : _a.on(multiplayer_shared_stuff_1.m_ts_game_settings_changed, function (_a) {
+            var _b;
             var gameSettings = _a.gameSettings;
-            if ((gameSettings === null || gameSettings === void 0 ? void 0 : gameSettings.graphics) !== _this.gameSettings.graphics) {
+            if ((gameSettings === null || gameSettings === void 0 ? void 0 : gameSettings.graphics) !== _this.gameSettings.graphics || _this.gameSettings.botDifficulty !== gameSettings.botDifficulty) {
                 _this.isReady = false;
+                (_b = _this.room) === null || _b === void 0 ? void 0 : _b.setNeedsReload();
             }
             _this.gameSettings = gameSettings;
             _this.desktopSocket.emit(multiplayer_shared_stuff_1.m_fs_game_settings_changed, { gameSettings: gameSettings });

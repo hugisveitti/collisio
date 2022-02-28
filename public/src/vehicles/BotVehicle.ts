@@ -69,6 +69,7 @@ export class BotVehicle extends LowPolyVehicle {
     }
 
     restartBot() {
+        if (!this.vehicleBody) return
         this.resetPosition()
 
         this.noForce(true)

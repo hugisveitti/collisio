@@ -444,7 +444,7 @@ export class Vehicle implements IVehicle {
     }
 
     playSkidSound(skid: number) {
-        if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this._canDrive) return
+        if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this._canDrive) return false
         if (skid < 0.8) {
 
             this.skidVolume += 0.01
@@ -468,7 +468,9 @@ export class Vehicle implements IVehicle {
                 console.warn("Error when trying to stop skid sound:", err)
             }
         }
+        return true
     }
+
 }
 
 export const changeVehicleBodyColor = (chassis: ExtendedObject3D, vehicleColors: VehicleColorType[]) => {

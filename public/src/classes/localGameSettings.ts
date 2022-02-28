@@ -51,7 +51,7 @@ export const defaultGameSettings: IGameSettings = {
     record: false,
     useGhost: false,
     targetFPS: 30,
-    botDifficulty: "none"
+    botDifficulty: "easy"
 }
 export const defaultRoomSettings: IRoomSettings = {
     numberOfLaps: 1,

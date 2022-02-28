@@ -266,5 +266,5 @@ exports.stm_game_settings_changed_callback = "stm_game_settings_changed_callback
 exports.mts_send_game_actions = "mts_send_game_actions";
 exports.std_send_game_actions = "std_send_game_actions";
 /** FPS on emit */
-exports.STD_SENDINTERVAL_MS = 1000 / 60;
+exports.STD_SENDINTERVAL_MS = 1000 / 45;
 exports.MTS_SENDINTERVAL_MS = 1000 / 60;

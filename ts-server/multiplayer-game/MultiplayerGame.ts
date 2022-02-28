@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
 import { IVehicleSettings } from "../../public/src/classes/User";
-import { IVehiclePositionInfo, m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_starting, m_fs_race_info, m_fs_reload_game, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room } from "../../public/src/shared-backend/multiplayer-shared-stuff";
+import { IVehiclePositionInfo, m_fs_connect_to_room_callback, m_fs_game_countdown, m_fs_game_starting, m_fs_race_info, m_fs_reload_game, m_fs_room_info, m_fs_vehicles_position_info, m_ts_connect_to_room, m_ts_game_settings_changed } from "../../public/src/shared-backend/multiplayer-shared-stuff";
 import { stmd_socket_ready } from "../../public/src/shared-backend/shared-stuff";
 import { addCreatedRooms } from "../serverFirebaseFunctions";
 import { MulitplayerPlayer, MultiplayPlayerConfig } from "./MultiplayerPlayer";
@@ -119,6 +119,7 @@ export class MultiplayerRoom {
     countdownStarted: boolean;
     numberOfLaps: number
     needsReload: boolean
+    roomCreatedDate: number
 
 
     dataCollection: IGameDataCollection
@@ -137,6 +138,7 @@ export class MultiplayerRoom {
         this.addPlayer(leader)
         this.io = io
 
+        this.roomCreatedDate = Date.now()
         this.gameStartTime = 0
         this.gameIntervalStarted = false
 
@@ -204,10 +206,10 @@ export class MultiplayerRoom {
     }
 
     setRoomSettings(roomSettings: any) {
-        this.roomSettings = roomSettings
         if (this.roomSettings.trackName !== roomSettings.trackName) {
             this.setNeedsReload()
         }
+        this.roomSettings = roomSettings
         // set number of laps when game starts
     }
 
@@ -338,12 +340,14 @@ export class MultiplayerRoom {
         addCreatedRooms(this.roomId, this.leader.userId,
             {
                 multiplayer: true,
-                startedGame: this.enteredGameRoom,
+                gameStarted: this.gameStarted,
                 players: this.players.map(p => p.getEndOfRoomInfo()),
                 gameSettings: this.gameSettings,
                 roomSettings: this.roomSettings,
                 dataCollection: this.dataCollection,
-                enteredGameRoom: this.enteredGameRoom
+                enteredGameRoom: this.enteredGameRoom,
+                roomCreatedDate: this.roomCreatedDate,
+                roomDeletedDate: Date.now(),
             }
         )
 

@@ -101,7 +101,6 @@ const MultiplayerWaitingRoomComponent = (
     });
 
     socket.on(m_fs_room_settings_changed, ({ roomSettings }) => {
-      console.log("new room sett", roomSettings);
       props.store.setRoomSettings(roomSettings);
     });
 
@@ -121,7 +120,6 @@ const MultiplayerWaitingRoomComponent = (
       } else {
         // go to game room
         // m_fs_game_starting will probably reach first
-        console.log("Go to mul game room", res);
       }
     });
   };
@@ -162,6 +160,7 @@ const MultiplayerWaitingRoomComponent = (
               setIsLoading(true);
               handleStartGame();
             }}
+            color="white"
           >
             Start Game
           </BackdropButton>

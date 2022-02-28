@@ -37,7 +37,6 @@ export class MyScene extends Scene3D {
     pingInfo: HTMLSpanElement
     fpsInfo: HTMLSpanElement
 
-
     pingTimeout: NodeJS.Timeout
     lastPing: number
     totalPing: number
@@ -100,7 +99,7 @@ export class MyScene extends Scene3D {
         this.gameTicks = 0
 
         this.timeOfDay = this.timeOfDay
-        this.isPaused = false
+        this.isPaused = true
         this.needsReload = false
 
         this.gameRoomActions = {}
@@ -154,6 +153,10 @@ export class MyScene extends Scene3D {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    async init(data) { }
+    async preload() { }
+    async create() { }
+
     public async start(key?: string, data?: any) {
 
         await this.init?.(data)
@@ -165,6 +168,8 @@ export class MyScene extends Scene3D {
         this.physics.config.maxSubSteps = 1 + 1
 
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
+
+        this.isPaused = false
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()

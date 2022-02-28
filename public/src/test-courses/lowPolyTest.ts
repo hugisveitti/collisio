@@ -28,6 +28,7 @@ import { ItemProperties, vehicleItems } from "../shared-backend/vehicleItems"
 import { BotVehicle } from "../vehicles/BotVehicle"
 import { IVehicleClassConfig } from "../vehicles/Vehicle"
 import { hideLoadDiv } from "../course/loadingManager"
+import { driveVehicleWithKeyboard } from "../utils/controls"
 
 const vechicleFov = 60
 
@@ -636,6 +637,7 @@ export class LowPolyTestScene extends GameScene {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
             this.camera.updateProjectionMatrix()
+            //      driveVehicleWithKeyboard(this.vehicle)
         }
         this.renderer.info.reset()
         this.renderer.clear()

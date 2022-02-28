@@ -479,6 +479,7 @@ export class Room {
 
 
     setupControlsListener() {
+        if (this.sendingControls) return
         this.sendingControls = true
         this.sendControlsInterval = setInterval(() => {
             this.socket.emit(std_controls, { players: this.getPlayersControls() })

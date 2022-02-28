@@ -10,8 +10,10 @@ import { getDeviceType, getStaticPath } from "../utils/settings";
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
     const audioLoader = new AudioLoader();
     console.log("load engine sound buffer")
+    let engineSoundPath = "engine.mp3"
+    //   let engineSoundPath = "f1engine2.mp3" // "engine.mp3"
     return new Promise((resolve, reject) => {
-        audioLoader.load(getStaticPath("sound/engine.mp3"), (buffer: AudioBuffer) => {
+        audioLoader.load(getStaticPath(`sound/${engineSoundPath}`), (buffer: AudioBuffer) => {
             //   engineBuffer = buffer
             resolve(buffer)
         }, () => { }, (err) => {
@@ -121,7 +123,7 @@ export const stopMusic = () => {
 }
 
 export const removeMusic = () => {
-    if (!music) return
+    if (!music || !music.isPlaying) return
     music?.stop()
     music = undefined
 }

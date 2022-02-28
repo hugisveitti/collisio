@@ -1,5 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
+import { Euler, PerspectiveCamera, TextureLoader, FlatShading, MeshLambertMaterial, IcosahedronGeometry, Quaternion, Mesh, MeshPhongMaterial, PlaneGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -41,9 +41,6 @@ export class LowPolyVehicle extends Vehicle {
 
     is4x4: boolean
 
-    transformCam: Ammo.btTransform
-    chassisWorldTransfrom: Ammo.btTransform
-    forwardTicks = 0
 
     /** 
      * if player is holding down forward then the vehicle gets to the maxspeed (300km/h)
@@ -87,14 +84,17 @@ export class LowPolyVehicle extends Vehicle {
     jitterX: number = 0
     jitterZ: number = 0
 
+    smokeParticles: { model: Mesh, frames: 0 }[]
+    smokeIndex: number
     extraSpeedScaler: (time: number) => number
-
-
 
     constructor(config: IVehicleClassConfig) {
         super(config)
+        console.log("creating vehicle", this.name)
 
         this.maxSpeedTime = 0
+        this.smokeParticles = []
+        this.smokeIndex = 0
 
         this.engineForce = this.vehicleConfig.engineForce
         this.breakingForce = this.vehicleConfig.breakingForce
@@ -114,9 +114,7 @@ export class LowPolyVehicle extends Vehicle {
         this.vector2 = new Ammo.btVector3(0, 0, 0)
         this.rayer = new Ammo.ClosestRayResultCallback(this.vector, this.vector2);
         this.quaternion = new Ammo.btQuaternion(0, 0, 0, 0)
-        this.transformCam = new Ammo.btTransform()
 
-        this.chassisWorldTransfrom = new Ammo.btTransform()
         this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
         this.delta = 0
 
@@ -125,6 +123,7 @@ export class LowPolyVehicle extends Vehicle {
         if (config.vehicleSetup) {
             this.vehicleSetup = config.vehicleSetup
         }
+        this.createTireSmokeParticles()
     }
 
     async addModels(tires: ExtendedObject3D[], chassis: ExtendedObject3D) {
@@ -148,6 +147,66 @@ export class LowPolyVehicle extends Vehicle {
         })
     }
 
+    async createTireSmokeParticles() {
+
+        const geometry = new IcosahedronGeometry(.3, 0);
+        const material = new MeshPhongMaterial({
+            color: 'gray', transparent: true
+        });
+
+        for (let i = 0; i < 60; i++) {
+
+            const part = new Mesh(geometry, material)
+            part.visible = false
+            this.scene.scene.add(part)
+            this.smokeParticles.push({ model: part, frames: 0 })
+        }
+    }
+
+    async addTireSmoke() {
+
+        const leftPart = this.smokeParticles[this.smokeIndex]
+        const rightPart = this.smokeParticles[this.smokeIndex + 1]
+
+        const pRight = this.wheelMeshes[BACK_RIGHT].position
+        const pLeft = this.wheelMeshes[BACK_LEFT].position
+
+        leftPart.model.position.set(pLeft.x, pLeft.y - this.vehicleConfig.wheelRadiusBack, pLeft.z)
+        leftPart.model.visible = true;
+        //   (leftPart.model.material as MeshPhongMaterial).opacity = 1
+        leftPart.model.rotateX(Math.random());
+        let scale = [(Math.random() * .6) + 1, (Math.random() * .6) + 1, (Math.random() * .6) + 1]
+        leftPart.model.scale.set(scale[0], scale[1], scale[2])
+        leftPart.frames = 0
+
+        rightPart.model.position.set(pRight.x, pRight.y - this.vehicleConfig.wheelRadiusBack, pRight.z)
+        rightPart.model.visible = true
+        rightPart.model.rotateZ(Math.random());
+        scale = [(Math.random() * .6) + 1, (Math.random() * .6) + 1, (Math.random() * .6) + 1]
+        rightPart.model.scale.set(scale[0], scale[1], scale[2])
+        rightPart.frames = 0
+
+        this.smokeIndex += 2
+        if (this.smokeIndex >= this.smokeParticles.length) {
+            this.smokeIndex = 0
+        }
+    }
+
+    updateTireSmoke() {
+        for (let s of this.smokeParticles) {
+            if (s.model.visible) {
+
+                s.model.position.y += 0.03
+                s.model.scale.multiplyScalar(0.95)
+                s.frames += 1
+                if (s.frames > 30) {
+                    s.model.visible = false;
+                    //     (s.model.material as MeshPhongMaterial).opacity -= .1
+                    s.frames = 0
+                }
+            }
+        }
+    }
 
 
     changeCenterOfMass() {
@@ -169,7 +228,6 @@ export class LowPolyVehicle extends Vehicle {
         //  this.vehicleBody.updateWorldMatrix(true, true)
         this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
         this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
-
     }
 
     getWheelInfos(): { [number: string]: { wheelHalfTrack: number, wheelAxisHeight: number, wheelAxisPosition: number } } {
@@ -368,6 +426,8 @@ export class LowPolyVehicle extends Vehicle {
         this.scene.scene.add(t)
         return t
     }
+
+
 
     decreaseMaxSpeedTicks() {
         if (this.maxSpeedTime > 1) {
@@ -875,11 +935,16 @@ export class LowPolyVehicle extends Vehicle {
             }
 
             if (!this.isBot) {
-                this.playSkidSound(this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo())
+                const skid = this.vehicle.getWheelInfo(BACK_LEFT).get_m_skidInfo()
+                const skidding = this.playSkidSound(skid)
+                if (skid < 0.8 && this.scene.gameSettings.graphics === "high") {
+                    this.addTireSmoke()
+                }
                 this.updateEngineSound()
                 this.updateFov()
             }
         }
+        this.updateTireSmoke()
 
         if (this.vehicleBody.position.y < -20) {
             this.resetPosition()
@@ -1118,7 +1183,7 @@ export class LowPolyVehicle extends Vehicle {
 
     async destroy() {
         new Promise<void>(async (resolve, reject) => {
-
+            console.log("destorying vehilce!", this.name)
 
             this.destroyAmmo(this.zeroVec, "this.zeroVec")
             /** dont know if I need to check */
@@ -1133,9 +1198,15 @@ export class LowPolyVehicle extends Vehicle {
 
             this.destroyAmmo(this.rayer, "this.rayer")
             this.destroyAmmo(this.quaternion, "this.quaternion")
-            this.destroyAmmo(this.transformCam, "this.transformCam")
-            this.destroyAmmo(this.chassisWorldTransfrom, "this.chassisWorldTransfrom")
 
+
+            for (let i = 0; i < 4; i++) {
+                const wheel = this.vehicle.getWheelInfo(i)
+                Ammo.destroy(wheel)
+            }
+            // this.destroyAmmo(this.vehicle, "vehicle ridged body")
+            //    this.destroyAmmo(this.vehicle, "this.vehicle")
+            // this.vehicle = null
 
 
             this.isReady = false

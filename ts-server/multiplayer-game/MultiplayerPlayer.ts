@@ -319,8 +319,9 @@ export class MulitplayerPlayer {
 
     setupMobileGameSettingsChangedListener() {
         this.mobileSocket?.on(m_ts_game_settings_changed, ({ gameSettings }) => {
-            if (gameSettings?.graphics !== this.gameSettings.graphics) {
+            if (gameSettings?.graphics !== this.gameSettings.graphics || this.gameSettings.botDifficulty !== gameSettings.botDifficulty) {
                 this.isReady = false
+                this.room?.setNeedsReload()
             }
             this.gameSettings = gameSettings
             this.desktopSocket.emit(m_fs_game_settings_changed, { gameSettings })

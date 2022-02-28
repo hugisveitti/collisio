@@ -134,6 +134,7 @@ var MultiplayerRoom = /** @class */ (function () {
         this.roomId = (0, uuid_1.v4)().slice(0, 4);
         this.addPlayer(leader);
         this.io = io;
+        this.roomCreatedDate = Date.now();
         this.gameStartTime = 0;
         this.gameIntervalStarted = false;
         this.numberOfLaps = -1;
@@ -195,10 +196,10 @@ var MultiplayerRoom = /** @class */ (function () {
         });
     };
     MultiplayerRoom.prototype.setRoomSettings = function (roomSettings) {
-        this.roomSettings = roomSettings;
         if (this.roomSettings.trackName !== roomSettings.trackName) {
             this.setNeedsReload();
         }
+        this.roomSettings = roomSettings;
         // set number of laps when game starts
     };
     MultiplayerRoom.prototype.addPlayer = function (player) {
@@ -320,12 +321,14 @@ var MultiplayerRoom = /** @class */ (function () {
         this.dataCollection.roomDeletedTime = Date.now();
         (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, this.leader.userId, {
             multiplayer: true,
-            startedGame: this.enteredGameRoom,
+            gameStarted: this.gameStarted,
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
             gameSettings: this.gameSettings,
             roomSettings: this.roomSettings,
             dataCollection: this.dataCollection,
-            enteredGameRoom: this.enteredGameRoom
+            enteredGameRoom: this.enteredGameRoom,
+            roomCreatedDate: this.roomCreatedDate,
+            roomDeletedDate: Date.now(),
         });
         this.gameIntervalStarted = false;
         clearInterval((_a = this.gameInterval) === null || _a === void 0 ? void 0 : _a[Symbol.toPrimitive]());

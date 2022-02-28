@@ -395,6 +395,8 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupControlsListener = function () {
         var _this = this;
+        if (this.sendingControls)
+            return;
         this.sendingControls = true;
         this.sendControlsInterval = setInterval(function () {
             _this.socket.emit(shared_stuff_1.std_controls, { players: _this.getPlayersControls() });

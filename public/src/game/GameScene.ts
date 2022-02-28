@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
-import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff";
+import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
@@ -61,7 +61,7 @@ export class GameScene extends MyScene implements IGameScene {
     views: IView[]
     songIsPlaying: boolean
 
-    vehicleControls: VehicleControls
+
 
 
     gameStarted: boolean
@@ -91,12 +91,9 @@ export class GameScene extends MyScene implements IGameScene {
 
     hasAskedToLowerSettings: boolean
 
-
     extraVehicles: IVehicle[]
     wagons: Wagon[]
     mobileOnlyControllerInterval: NodeJS.Timer
-
-
 
     constructor() {
         super()
@@ -668,7 +665,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     setGameSettings(gameSettings: IGameSettings) {
 
-        if (this.courseLoaded && (this.gameSettings.graphics !== gameSettings.graphics)) {
+        if (this.courseLoaded && (this.gameSettings.graphics !== gameSettings.graphics || this.gameSettings.botDifficulty !== gameSettings.botDifficulty)) {
             this.setNeedsReload(true)
         }
 
@@ -766,7 +763,7 @@ export class GameScene extends MyScene implements IGameScene {
                 }
             }
             for (let i = 0; i < this.vehicles.length; i++) {
-                delete this.vehicles[0]
+                delete this.vehicles[i]
             }
             this.vehicles = []
 
@@ -777,6 +774,10 @@ export class GameScene extends MyScene implements IGameScene {
             this.extraVehicles = []
             for (let wagon of this.wagons) {
                 wagon.destroy()
+            }
+            if (this.bot) {
+                await this.bot.destroy()
+                this.bot = null
             }
 
             this.wagons = []
@@ -799,6 +800,7 @@ export class GameScene extends MyScene implements IGameScene {
         }
         if (this.needsReload) {
             stopMusic()
+            this.isPaused = true
             this.socket?.off(std_controls)
             this._everythingReady = false
             this.gameStarted = false
@@ -852,11 +854,7 @@ export class GameScene extends MyScene implements IGameScene {
                 console.warn("not able to drive")
             }
         } else {
-
-
-            /** Vehicle controls is only for testing */
-            this.vehicleControls = new VehicleControls()
-            addControls(this.vehicleControls, this.socket, this.vehicles)
+            addControls(this.socket, this.vehicles)
         }
     }
 

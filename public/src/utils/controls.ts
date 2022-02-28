@@ -39,7 +39,7 @@ export const driveVehicle = (mobileControls: MobileControls, vehicle: IVehicle) 
 
 
 
-export const addControls = (vehicleControls: VehicleControls, socket: Socket | undefined, vehicles: IVehicle[]) => {
+export const addControls = (socket: Socket | undefined, vehicles: IVehicle[]) => {
 
     /** I currently have 2 setIntervals that deal with the controls
      * 
@@ -52,34 +52,6 @@ export const addControls = (vehicleControls: VehicleControls, socket: Socket | u
             driveVehicle(players[i].mobileControls, vehicles[players[i].playerNumber])
         }
     })
-
-
-
-
-    const keyAction = (e: KeyboardEvent, isDown: boolean) => {
-
-        switch (e.key) {
-            case "w":
-                vehicleControls.f = isDown
-                break;
-            case "d":
-                vehicleControls.right = isDown
-                break;
-            case "a":
-                vehicleControls.left = isDown
-                break;
-            case "s":
-                vehicleControls.b = isDown
-                break;
-            case " ":
-                vehicleControls.b = isDown
-                break
-            default:
-                break;
-        }
-    }
-    document.addEventListener("keydown", e => keyAction(e, true))
-    document.addEventListener("keyup", e => keyAction(e, false))
 }
 
 const vehicleControls: VehicleControls = new VehicleControls()

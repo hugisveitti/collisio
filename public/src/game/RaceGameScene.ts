@@ -4,7 +4,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo, IRaceTimeInf
 import { IRaceCourse } from "../course/ICourse";
 import { hideLoadDiv } from "../course/loadingManager";
 import { RaceCourse } from "../course/RaceCourse";
-import { VehicleColorType, VehicleControls } from '../shared-backend/shared-stuff';
+import { VehicleColorType } from '../shared-backend/shared-stuff';
 import { DriveRecorder, GhostDriver } from "../test-courses/GhostDriver";
 import { driveVehicleWithKeyboard } from "../utils/controls";
 import { inTestMode } from "../utils/settings";
@@ -18,8 +18,6 @@ import { GameTime } from "./GameTimeClass";
 
 
 export class RaceGameScene extends GameScene {
-
-    vehicleControls!: VehicleControls
 
     winner: string
     winTime: number
@@ -207,6 +205,7 @@ export class RaceGameScene extends GameScene {
             for (let vehicle of this.vehicles) {
                 //      vehicle.setToGround()
                 vehicle.start()
+                vehicle.zeroEngineForce()
                 vehicle.setCanDrive(false)
             }
         }, (.5) * 1000)
@@ -302,6 +301,7 @@ export class RaceGameScene extends GameScene {
         this.driverRecorder?.reset()
         this.ghostDriver?.reset()
 
+        // hasn't this already been created
         await this.createGhostVehicle()
 
         this.resetVehicles()

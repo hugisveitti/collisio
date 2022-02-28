@@ -447,5 +447,5 @@ export const std_send_game_actions = "std_send_game_actions"
 
 /** FPS on emit */
 
-export const STD_SENDINTERVAL_MS = 1000 / 60
+export const STD_SENDINTERVAL_MS = 1000 / 45
 export const MTS_SENDINTERVAL_MS = 1000 / 60
