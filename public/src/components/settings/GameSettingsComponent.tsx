@@ -41,7 +41,7 @@ interface IGameSettingsComponent {
 
 const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const onMobile = getDeviceType() === "mobile";
-  const [gameSettings, setGameSettings] = useState(props.gameSettings);
+  //const [props.gameSettings, setGameSettings] = useState(props.gameSettings);
 
   const { color, backgroundColor } = getStyledColors("black");
 
@@ -50,23 +50,26 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   useEffect(() => {
     if (props.multiplayer) {
       const newGameSettings: IGameSettings = {
-        ...gameSettings,
+        ...props.gameSettings,
       };
 
-      if (gameSettings.useGhost) {
+      if (props.gameSettings.useGhost) {
         newGameSettings.useGhost = false;
       }
-      if (gameSettings.record) {
+      if (props.gameSettings.record) {
         newGameSettings.record = false;
       }
 
-      setGameSettings(newGameSettings);
+      props.store.setGameSettings(newGameSettings);
       props.onChange(newGameSettings);
     }
   }, []);
 
   useEffect(() => {
-    setGameSettings(props.gameSettings);
+    // setGameSettings({
+    //   ...props.gameSettings,
+    //   ..._props.gameSettings,
+    // });
   }, [props.gameSettings]);
 
   // const updateGameSettingsBatch = (
@@ -106,12 +109,12 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
   const updateGameSettings = (
     key: keyof IGameSettings,
     value: any,
-    _gameSettings?: IGameSettings,
+    _newGameSettings?: IGameSettings,
     notEmit?: boolean
   ) => {
-    const newGameSettings = _gameSettings
+    const newGameSettings = _newGameSettings
       ? {
-          ..._gameSettings,
+          ..._newGameSettings,
         }
       : {
           ...props.gameSettings,
@@ -120,8 +123,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
     newGameSettings[key] = value;
 
     setLocalGameSetting(key, value);
-
-    setGameSettings(newGameSettings);
+    props.store.setGameSettings(newGameSettings);
     if (!notEmit) {
       props.onChange(newGameSettings);
     }
@@ -134,10 +136,10 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
         <IconButton
           style={{ color: backgroundColor }}
           onClick={() => {
-            updateGameSettings("useSound", !gameSettings.useSound);
+            updateGameSettings("useSound", !props.gameSettings.useSound);
           }}
         >
-          {gameSettings.useSound ? <VolumeUpIcon /> : <VolumeOffIcon />}
+          {props.gameSettings.useSound ? <VolumeUpIcon /> : <VolumeOffIcon />}
         </IconButton>
       </Grid>
       <Grid item xs={6} sm={4}>
@@ -147,14 +149,14 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
             { label: "Off", value: false },
             { label: "On", value: true },
           ]}
-          checked={gameSettings.useShadows}
+          checked={props.gameSettings.useShadows}
           onChange={(newVal) => updateGameSettings("useShadows", newVal)}
         />
       </Grid>
       <Grid item xs={12} sm={4}>
         <MyRadio<GraphicsType>
           label="Graphics"
-          checked={gameSettings.graphics}
+          checked={props.gameSettings.graphics}
           options={[
             { label: "Low", value: "low" },
             { label: "High", value: "high" },
@@ -188,7 +190,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
               setMusicVolume(newVal as number);
             }
           }}
-          value={gameSettings.musicVolume}
+          value={props.gameSettings.musicVolume}
           step={0.01}
           max={1}
           min={0}
@@ -207,7 +209,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           min={50}
           max={7500}
           step={50}
-          value={gameSettings.drawDistance}
+          value={props.gameSettings.drawDistance}
           onChange={(value) => {
             updateGameSettings(
               "drawDistance",
@@ -234,13 +236,13 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           onChange={(newVal) => {
             updateGameSettings("targetFPS", newVal, undefined, true);
           }}
-          value={gameSettings.targetFPS}
+          value={props.gameSettings.targetFPS}
         />
       </Grid>
       <Grid item xs={12}>
         <AnySelect<BotDifficulty>
           title="Bot difficulty"
-          selectedValue={gameSettings.botDifficulty}
+          selectedValue={props.gameSettings.botDifficulty}
           onChange={(newDiff) => {
             updateGameSettings("botDifficulty", newDiff);
           }}
@@ -304,7 +306,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
                 onClick={async () => {
                   // updateGameSettings("useGhost", true);
                   setGettingGhost(true);
-                  handleGetFastestGhost(gameSettings);
+                  handleGetFastestGhost(props.gameSettings);
                 }}
                 disabled={gettingGhost}
                 loading={gettingGhost}

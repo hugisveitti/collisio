@@ -231,30 +231,42 @@ export class Course implements ICourse {
             return undefined
         }
 
-        let nextDirNum = currentDirNum + 1
-        // names are like dir-1, dir-2, dir-3-slow,
-        // indexed at 1
-        if (nextDirNum > this.botDirections.length) {
-            nextDirNum = 1
+        const getNextDir = (num: number) => {
+
+            let nextDirNum = num + 1
+            // names are like dir-1, dir-2, dir-3-slow,
+            // indexed at 1
+            if (nextDirNum > this.botDirections.length) {
+                nextDirNum = 1
+            }
+
+            for (let dir of this.botDirections) {
+                const dNameSplit = dir.name.split("-")
+                const dirNum = +dNameSplit[1]
+                let goSlow = false as boolean | number
+                if (dNameSplit.length > 2 && dNameSplit[2] === "slow") {
+                    goSlow = true
+                    if (dNameSplit.length > 3) {
+                        goSlow = +dNameSplit[3] / 100
+                    }
+                }
+                if (dirNum === nextDirNum) {
+                    return {
+                        pos: dir.position,
+                        nextNum: dirNum,
+                        goSlow
+                    }
+                }
+            }
+            return undefined
         }
 
-        for (let dir of this.botDirections) {
-            const dNameSplit = dir.name.split("-")
-            const dirNum = +dNameSplit[1]
-            let goSlow = false as boolean | number
-            if (dNameSplit.length > 2 && dNameSplit[2] === "slow") {
-                goSlow = true
-                if (dNameSplit.length > 3) {
-                    goSlow = +dNameSplit[3] / 100
-                }
-            }
-            if (dirNum === nextDirNum) {
-                return {
-                    pos: dir.position,
-                    nextNum: dirNum,
-                    goSlow
-                }
-            }
+        const { pos, nextNum, goSlow } = getNextDir(currentDirNum)
+        if (pos) {
+
+            const { pos: nextPos, nextNum: nextNextNum } = getNextDir(nextNum)
+
+            return { pos, nextNextNum, goSlow, nextPos, nextNum }
         }
 
         return undefined

@@ -1,11 +1,12 @@
 import { GameType, TrackName } from "../shared-backend/shared-stuff"
 
-export type BotDifficulty = "easy" | "medium" | "hard" | "none"
+export type BotDifficulty = "easy" | "medium" | "hard" | "extreme" | "none"
 export const botDifficultyOptions: { name: string, value: BotDifficulty }[] = [
     { name: "No bot", value: "none" },
     { name: "Easy", value: "easy" },
     { name: "Medium", value: "medium" },
     { name: "Hard", value: "hard" },
+    { name: "Extreme", value: "extreme" },
 ]
 
 

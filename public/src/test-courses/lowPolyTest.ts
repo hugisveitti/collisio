@@ -290,7 +290,7 @@ export class LowPolyTestScene extends GameScene {
             name: "Bot Tamy",
             id: "bot-id"
         }
-        this.bot = new BotVehicle(getLocalGameSetting("botDifficulty", "string") as BotDifficulty ?? "hard", botConfig)
+        this.bot = new BotVehicle(getLocalGameSetting("botDifficulty", "string") as BotDifficulty ?? "extreme", botConfig)
 
         this.otherVehicles = []
         //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
@@ -414,6 +414,9 @@ export class LowPolyTestScene extends GameScene {
                 })
             }
             this.vehicle.addCamera(this.camera as THREE.PerspectiveCamera)
+            // this.bot.useChaseCamera = true
+            // this.bot.addCamera(this.camera as THREE.PerspectiveCamera)
+            // this.camera.position.set(0, 10, -25)
 
 
             await this.ghostVehicle.loadModel()
@@ -636,6 +639,7 @@ export class LowPolyTestScene extends GameScene {
     _upd(delta: number) {
         if (this.canStartUpdate && this.everythingReady() && this.vehicle) {
             this.vehicle.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
+            // this.bot.cameraLookAt(this.camera as THREE.PerspectiveCamera, delta)
             this.camera.updateProjectionMatrix()
             //      driveVehicleWithKeyboard(this.vehicle)
         }

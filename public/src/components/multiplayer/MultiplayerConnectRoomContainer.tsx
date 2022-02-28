@@ -180,6 +180,7 @@ const MultiplayerConnectRoomContainer = (
                   setIsConnecting(true);
                   handleConnectToRoom();
                 }}
+                color="white"
               >
                 {creatingRoom ? "Create room" : "Connect to room"}
               </BackdropButton>

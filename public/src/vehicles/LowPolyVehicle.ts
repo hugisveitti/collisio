@@ -303,8 +303,6 @@ export class LowPolyVehicle extends Vehicle {
 
             this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
 
-
-
             this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
             this.vehicleBody.body.skipUpdate = true
             this.vehicle.setCoordinateSystem(0, 1, 2)
@@ -379,16 +377,15 @@ export class LowPolyVehicle extends Vehicle {
             this.stop()
 
             if (this.vehicleSetup) {
-
                 await this.updateVehicleSetup(this.vehicleSetup)
             }
-
             // think I need this, going through walls in multiplayer
-
             this.vehicleBody.body.setCcdMotionThreshold(1)
+            this._createVehicle()
             resolve()
         })
     }
+    _createVehicle() { }
 
     addWheel(isFront: boolean, pos: Ammo.btVector3, radius: number, index: number) {
         /**
@@ -1200,10 +1197,10 @@ export class LowPolyVehicle extends Vehicle {
             this.destroyAmmo(this.quaternion, "this.quaternion")
 
 
-            for (let i = 0; i < 4; i++) {
-                const wheel = this.vehicle.getWheelInfo(i)
-                Ammo.destroy(wheel)
-            }
+            // for (let i = 0; i < 4; i++) {
+            //     const wheel = this.vehicle.getWheelInfo(i)
+            //     Ammo.destroy(wheel)
+            // }
             // this.destroyAmmo(this.vehicle, "vehicle ridged body")
             //    this.destroyAmmo(this.vehicle, "this.vehicle")
             // this.vehicle = null

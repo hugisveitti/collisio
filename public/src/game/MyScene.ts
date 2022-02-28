@@ -1,7 +1,7 @@
 import { Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { AmbientLight, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { AmbientLight, PerspectiveCamera, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
@@ -151,6 +151,7 @@ export class MyScene extends Scene3D {
     handleResizeWindow() {
         this._handleResizeWindow()
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        (this.camera as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
     }
 
     async init(data) { }
