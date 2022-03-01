@@ -190,7 +190,6 @@ export class Vehicle implements IVehicle {
         }
     }
 
-
     updateVehicleSettings(vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) {
         this.vehicleSettings =
         {
@@ -230,6 +229,11 @@ export class Vehicle implements IVehicle {
 
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
         if (this.isUpdatingVehicleSetup) return
+        if (this.isReady) {
+            console.log("Cannot change vehicle setup if vehicle is ready")
+            this.scene.setNeedsReload(true)
+            return
+        }
         this.setColor(vehicleSetup.vehicleColor)
         if (vehicleSetup.vehicleType !== this.vehicleType) {
             console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)

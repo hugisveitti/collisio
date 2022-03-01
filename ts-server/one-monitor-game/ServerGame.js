@@ -66,7 +66,7 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
-        console.log("setting player connected listener", mobileSocket.id);
+        console.log("setting player connected listener, socketId:", mobileSocket.id);
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest, userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
             console.log("connecting to room", mobileSocket.id, roomId, playerName);
@@ -81,6 +81,9 @@ var RoomMaster = /** @class */ (function () {
                 var player = new ServerPlayer_1.Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings, vehicleSetup);
                 _this.rooms[roomId].addPlayer(player);
             }
+        });
+        mobileSocket.on("disconnect", function () {
+            console.log("mobile socket disconnected , socketId:", mobileSocket.id);
         });
     };
     RoomMaster.prototype.socketHasRoom = function (socket) {

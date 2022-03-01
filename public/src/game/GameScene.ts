@@ -175,6 +175,7 @@ export class GameScene extends MyScene implements IGameScene {
         //  this.renderer.capabilities.precision = "lowp"
         this.renderer.autoClear = false
         this.renderer.shadowMap.autoUpdate = false
+        this.handleResizeWindow()
 
     }
 
@@ -285,9 +286,9 @@ export class GameScene extends MyScene implements IGameScene {
 
             const batches = []
             for (let i = 0; i < this.players.length; i++) {
-                const vehicleColor = vehicleColors[(chassisColOffset + i) % vehicleColors.length]?.value ?? "red"
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
+                console.log("this.players[i].vehicleSetup", this.players[i].vehicleSetup)
                 const config: IVehicleClassConfig = {
                     scene: this,
                     name: this.players[i].playerName,
@@ -872,6 +873,12 @@ export class GameScene extends MyScene implements IGameScene {
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType
                     */
+                    if (data.userSettings?.vehicleSettings) {
+                        this.players[data.playerNumber].vehicleSettings = data.userSettings.vehicleSettings
+                    }
+                    if (data.vehicleSetup) {
+                        this.players[data.playerNumber].vehicleSetup = data.vehicleSetup
+                    }
                     this.setVehicleSettings(data.playerNumber, data.userSettings?.vehicleSettings, data.vehicleSetup)
                     //   this.vehicles[data.playerNumber].updateVehicleSettings(data.userSettings.vehicleSettings)
                 }

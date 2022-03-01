@@ -72,20 +72,20 @@ var itemTransactionsPath = "items";
  */
 var isValidRace = function (run) {
     if (run.gameTicks < 10) {
-        console.log("not valid race, gameTicks:", run.gameTicks);
+        console.warn("not valid race, gameTicks:", run.gameTicks);
         return false;
     }
     if (run.roomTicks < 10) {
-        console.log("not valid race, roomTicks:", run.roomTicks);
+        console.warn("not valid race, roomTicks:", run.roomTicks);
         return false;
     }
     if (run.numberOfLaps !== run.lapTimes.length) {
-        console.log("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length);
+        console.warn("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length);
         return false;
     }
     // no map can be beat under 10 sec?
     if (run.totalTime < 4) {
-        console.log("Total time under 4 seconds", run.totalTime);
+        console.warn("Total time under 4 seconds", run.totalTime);
         return false;
     }
     for (var _i = 0, _a = run.lapTimes; _i < _a.length; _i++) {
@@ -111,7 +111,7 @@ var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, me
     update[trackName][numberOfLaps] = {};
     update[trackName][numberOfLaps][medal] = firestore_1.FieldValue.increment(1);
     ref.set(update, { merge: true }).then(function () {
-        console.log("updated medals");
+        console.log("updated medals! userId:", userId);
     }).catch(function (err) {
         console.warn("Error updating medals", err);
     });
@@ -120,10 +120,11 @@ var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, me
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
  */
 var updatePlayersTokens = function (data) {
-    console.log("is valid race", isValidRace(data));
+    if (!isValidRace(data)) {
+        console.warn("Not vaild race:", data);
+    }
     if (isValidRace(data)) {
         var _a = (0, medalFuncions_1.getMedalAndTokens)(data.trackName, data.numberOfLaps, data.totalTime), medal_1 = _a.medal, XP_1 = _a.XP, coins_1 = _a.coins;
-        console.log("medal", medal_1, "XP:", XP_1, "coins:", coins_1);
         updateTrackNumberOfLapsMedal(data.playerId, data.trackName, data.numberOfLaps, medal_1);
         var ref_1 = firebase_config_1.adminFirestore.doc(tokenRefPath + "/" + data.playerId); //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
         ref_1.get().then(function (snap) {
@@ -138,7 +139,6 @@ var updatePlayersTokens = function (data) {
                 update = __assign(__assign({}, medalFuncions_1.defaultTokenData), { XP: XP_1, coins: coins_1 });
                 update[medal_1] = 1;
             }
-            console.log("update", update);
             // at least 10 secs later then the last update
             if (!update.lastUpdate || Date.now() > update.lastUpdate + (1000 * 10)) {
                 update.lastUpdate = Date.now();
@@ -189,7 +189,6 @@ var buyItem = function (userId, item, vehicleType) {
                     itemName = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].name : (0, shared_stuff_1.getItemName)(item);
                     itemId = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].id : item;
                     itemCost = vehicleType ? vehicleItems_1.vehicleItems[vehicleType][item].cost : ownershipFunctions_1.allCosts[item];
-                    console.log("item cost", itemCost);
                     if (itemCost === undefined) {
                         resolve({
                             completed: false,
@@ -231,7 +230,6 @@ var buyItem = function (userId, item, vehicleType) {
                         batch.update(ownershipRef, ownership);
                     }
                     else {
-                        console.log("owner ship does not exist");
                         batch.set(ownershipRef, ownership);
                     }
                     if (tokensRes.exists) {

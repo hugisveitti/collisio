@@ -112,7 +112,7 @@ export default class RoomMaster {
 
 
     setupPlayerConnectedListener(mobileSocket: Socket) {
-        console.log("setting player connected listener", mobileSocket.id)
+        console.log("setting player connected listener, socketId:", mobileSocket.id)
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings, vehicleSetup }: IPlayerConnectedData) => {
             console.log("connecting to room", mobileSocket.id, roomId, playerName)
             if (!this.roomExists(roomId)) {
@@ -124,6 +124,9 @@ export default class RoomMaster {
                 const player = new Player(mobileSocket, playerName, playerId, isAuthenticated, photoURL, userSettings, vehicleSetup)
                 this.rooms[roomId].addPlayer(player)
             }
+        })
+        mobileSocket.on("disconnect", () => {
+            console.log("mobile socket disconnected , socketId:", mobileSocket.id)
         })
     }
 

@@ -372,7 +372,6 @@ export class LowPolyVehicle extends Vehicle {
             this.vehicle.getRigidBody().setMassProps(this.vehicleConfig.mass, this.vector)
             this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(this.vehicleConfig.mass, this.vector)
 
-            this.isReady = true
             /** don't start the vehicle until race */
             this.stop()
 
@@ -382,6 +381,7 @@ export class LowPolyVehicle extends Vehicle {
             // think I need this, going through walls in multiplayer
             this.vehicleBody.body.setCcdMotionThreshold(1)
             this._createVehicle()
+            this.isReady = true
             resolve()
         })
     }

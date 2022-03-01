@@ -54,7 +54,7 @@ export const addControls = (socket: Socket | undefined, vehicles: IVehicle[]) =>
     })
 }
 
-const vehicleControls: VehicleControls = new VehicleControls()
+let vehicleControls: VehicleControls = new VehicleControls()
 
 const keyAction = (e: KeyboardEvent, isDown: boolean) => {
     // console.log("e key", e.key, e.isComposing)
@@ -92,11 +92,14 @@ const keyAction = (e: KeyboardEvent, isDown: boolean) => {
 
 export const addKeyboardControls = () => {
     console.log("ADDING KEYBOARD CONTROLS")
+    removeKeyboardControls()
+    vehicleControls = new VehicleControls()
     document.addEventListener("keydown", e => keyAction(e, true))
     document.addEventListener("keyup", e => keyAction(e, false))
 }
 
 export const removeKeyboardControls = () => {
+    console.log("removing keyboard controls")
     document.removeEventListener("keydown", e => keyAction(e, true))
     document.removeEventListener("keyup", e => keyAction(e, false))
 }
@@ -115,9 +118,6 @@ const getSteering = () => {
 
 let dSteer = 1
 export const driveVehicleWithKeyboard = (vehicle: IVehicle) => {
-
-
-
     if (vehicleControls.f) {
         vehicle.goForward()
     } else if (vehicleControls.b) {

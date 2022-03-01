@@ -144,14 +144,19 @@ export class MyScene extends Scene3D {
         setLoaderProgress(0)
 
         window.addEventListener("resize", () => this.handleResizeWindow())
+
     }
 
     _handleResizeWindow() { }
 
     handleResizeWindow() {
         this._handleResizeWindow()
+        console.log("resize window", this.renderer)
+
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
         (this.camera as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix()
     }
 
     async init(data) { }
@@ -171,6 +176,7 @@ export class MyScene extends Scene3D {
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
 
         this.isPaused = false
+        console.log("physics items", this.physics.rigidBodies)
 
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
@@ -243,6 +249,10 @@ export class MyScene extends Scene3D {
     setGameRoomActions(gameRoomActions: IGameRoomActions) {
         this.gameRoomActions = gameRoomActions
     }
+
+    // vehicleSettingsChangedCallback(playerNumber:number, vehicleSettings:U){
+
+    // }
 
     async addLights() {
 

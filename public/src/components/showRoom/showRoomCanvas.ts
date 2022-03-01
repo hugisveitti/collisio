@@ -232,7 +232,7 @@ export const createShowRoomCanvas = (vehicleType: VehicleType, chassisNum: numbe
             renderer.clear()
         }
 
-        if (!stopSpinCamera) {
+        if (!stopSpinCamera && camera) {
 
             ry += .01 * 3
             // camera.rotateY(ry)

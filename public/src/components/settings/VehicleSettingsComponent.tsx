@@ -172,6 +172,7 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
                 sendVehicleSetupToServer(
                   newVehiclesSetup[vehicleSettings.vehicleType]
                 );
+                vehiclesSetupToSave = newVehiclesSetup;
                 setAnythingChanged(true);
               }}
               user={props.user}

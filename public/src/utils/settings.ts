@@ -57,7 +57,7 @@ export const isIphone = () => {
 }
 
 // this will only work on my network
-export const inDevelopment = window.location.href.includes("127.0.0.1") || window.location.href.includes("localhost") || window.location.href.includes("192.168")
+export const inDevelopment = false// window.location.href.includes("127.0.0.1") || window.location.href.includes("localhost") || window.location.href.includes("192.168")
 
 /** test mode means:
  * Not being redirected from pages
@@ -76,7 +76,7 @@ export const testGameSettings: IGameSettings = {
     useGhost: true,
     ghostFilename: "LdEGkMu2r2QCdJ8wMerp1bkRrqd2/sea-side-track/2",
     musicVolume: .05,
-    targetFPS: 60
+    targetFPS: 45
 }
 export const testRoomSettings: IRoomSettings = {
     gameType: "race",

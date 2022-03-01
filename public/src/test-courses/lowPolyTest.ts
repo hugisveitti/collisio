@@ -694,8 +694,8 @@ export class LowPolyTestScene extends GameScene {
 
                 this.ghostDriver.setPlace(this.ghostVehicle, this.gameTime.getTotalTime(), delta)
 
-                lapTimeDiv.textContent = this.gameTime.getCurrentLapTime() + ""
-                bestLapTimeDiv.textContent = this.gameTime.getBestLapTime() + ""
+                lapTimeDiv.textContent = this.gameTime.getCurrentLapTime().toFixed(2) + ""
+                bestLapTimeDiv.textContent = this.gameTime.getBestLapTime().toFixed(2) + ""
             }
         }
 

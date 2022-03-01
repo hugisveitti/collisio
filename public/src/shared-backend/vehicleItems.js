@@ -89,7 +89,7 @@ var sportsCarItems = {
         type: "exhaust",
         name: "Sad Charlie",
         engineForce: 380,
-        frictionSlip: -1,
+        frictionSlip: -0.5,
         maxSpeed: -1,
         mass: 100,
         cost: 200000
@@ -100,7 +100,7 @@ var sportsCarItems = {
         type: "spoiler",
         name: "Steve",
         cost: 150,
-        frictionSlip: 2,
+        frictionSlip: .5,
         mass: 100,
         engineForce: -100,
         maxSpeed: -15
@@ -111,7 +111,7 @@ var sportsCarItems = {
         type: "spoiler",
         name: "Summer",
         cost: 500,
-        frictionSlip: 3.2,
+        frictionSlip: 0.8,
         mass: -120,
         engineForce: -100,
         maxSpeed: -10
@@ -122,7 +122,7 @@ var sportsCarItems = {
         type: "spoiler",
         name: "Sonja",
         cost: 500,
-        frictionSlip: 2.3,
+        frictionSlip: 0.7,
         mass: -130,
         engineForce: -80,
         maxSpeed: 2
@@ -133,7 +133,7 @@ var sportsCarItems = {
         type: "spoiler",
         name: "Sarah",
         cost: 2500,
-        frictionSlip: 3,
+        frictionSlip: 0.8,
         mass: 230,
         engineForce: -120,
         maxSpeed: -2
@@ -144,7 +144,7 @@ var sportsCarItems = {
         type: "spoiler",
         name: "Sylvester",
         cost: 5000,
-        frictionSlip: 3,
+        frictionSlip: 0.8,
         mass: 80,
         engineForce: 150,
     },
@@ -154,7 +154,7 @@ var sportsCarItems = {
         type: "wheelGuards",
         name: "Willis",
         cost: 2500,
-        frictionSlip: 2,
+        frictionSlip: 0.8,
         mass: -75,
         engineForce: -50,
         suspensionRestLength: .2
@@ -217,7 +217,7 @@ var f1Items = {
         type: "spoiler",
         name: "Steve",
         cost: 150,
-        frictionSlip: 2,
+        frictionSlip: 0.7,
         mass: 100
     },
     spoiler2: {
@@ -226,7 +226,7 @@ var f1Items = {
         type: "spoiler",
         name: "Summer",
         cost: 500,
-        frictionSlip: 2.2,
+        frictionSlip: 0.7,
         mass: 120
     },
     spoiler3: {
@@ -235,7 +235,7 @@ var f1Items = {
         type: "spoiler",
         name: "Sonja",
         cost: 500,
-        frictionSlip: 2.3,
+        frictionSlip: 0.7,
         mass: 130
     },
     spoiler4: {
@@ -244,7 +244,7 @@ var f1Items = {
         type: "spoiler",
         name: "Sarah",
         cost: 2500,
-        frictionSlip: 3,
+        frictionSlip: 0.7,
         mass: 230,
         engineForce: 250
     },
@@ -254,7 +254,7 @@ var f1Items = {
         type: "wheelGuards",
         name: "Willis",
         cost: 2500,
-        frictionSlip: 1,
+        frictionSlip: 0.7,
         mass: -75,
         engineForce: -50,
         suspensionRestLength: .2
@@ -265,7 +265,7 @@ var f1Items = {
         type: "wheelGuards",
         name: "Wendy",
         cost: 20000,
-        frictionSlip: 1.5,
+        frictionSlip: 0.7,
         mass: -100,
         engineForce: 25,
         suspensionRestLength: .2
@@ -334,7 +334,7 @@ var normal2Items = {
         type: "spoiler",
         name: "Steve",
         cost: 150,
-        frictionSlip: 2,
+        frictionSlip: 0.7,
         mass: 100,
         engineForce: -1000
     },
@@ -344,7 +344,7 @@ var normal2Items = {
         type: "spoiler",
         name: "Summer",
         cost: 500,
-        frictionSlip: 3.2,
+        frictionSlip: 0.8,
         mass: -120,
         engineForce: -1500
     },
@@ -354,7 +354,7 @@ var normal2Items = {
         type: "spoiler",
         name: "Sonja",
         cost: 500,
-        frictionSlip: 2.3,
+        frictionSlip: 0.7,
         mass: 130
     },
     spoiler4: {
@@ -363,7 +363,7 @@ var normal2Items = {
         type: "spoiler",
         name: "Spike",
         cost: 40000,
-        frictionSlip: 3.3,
+        frictionSlip: 0.7,
         engineForce: 100,
         maxSpeed: 10,
         mass: 50
@@ -385,7 +385,7 @@ var normal2Items = {
         type: "wheelGuards",
         cost: 20000,
         name: "Wonkie",
-        frictionSlip: 3,
+        frictionSlip: 0.8,
         engineForce: 1000,
         mass: -50
     },
@@ -405,7 +405,7 @@ var normal2Items = {
         type: "wheelGuards",
         cost: 35000,
         name: "Schlonkie",
-        frictionSlip: 3.8,
+        frictionSlip: 0.97,
         engineForce: 1500,
         mass: 120,
         suspensionRestLength: .1,
@@ -419,7 +419,7 @@ var offRoaderItems = {
         type: "spoiler",
         name: "Steve",
         cost: 150,
-        frictionSlip: 2,
+        frictionSlip: 0.7,
         mass: 10,
         engineForce: 100
     },
@@ -429,7 +429,7 @@ var offRoaderItems = {
         type: "spoiler",
         name: "Fry",
         cost: 500,
-        frictionSlip: 2.5,
+        frictionSlip: 0.7,
         mass: 20,
         engineForce: 120
     },
@@ -506,7 +506,7 @@ var gokartItems = {
         type: "spoiler",
         name: "Steve",
         cost: 150,
-        frictionSlip: 2,
+        frictionSlip: 0.7,
         mass: 10,
         engineForce: 100
     },
@@ -516,7 +516,7 @@ var gokartItems = {
         type: "spoiler",
         name: "Fry",
         cost: 500,
-        frictionSlip: 2.5,
+        frictionSlip: 0.7,
         mass: 20,
         engineForce: 120
     },
@@ -562,7 +562,7 @@ var gokartItems = {
         type: "wheelGuards",
         name: "Willis",
         cost: 2500,
-        frictionSlip: 1,
+        frictionSlip: 0.5,
         mass: -75,
         engineForce: -50,
         suspensionRestLength: .2
@@ -573,7 +573,7 @@ var gokartItems = {
         type: "wheelGuards",
         name: "Billis",
         cost: 2500,
-        frictionSlip: 1,
+        frictionSlip: 0.5,
         mass: -75,
         engineForce: -50,
         suspensionRestLength: .2
@@ -597,7 +597,7 @@ var futureItems = {
         cost: 1000,
         mass: 5,
         maxSpeed: 5,
-        frictionSlip: 2,
+        frictionSlip: 0.7,
         engineForce: 100
     },
     spoiler2: {
@@ -608,7 +608,7 @@ var futureItems = {
         cost: 20000,
         mass: 25,
         maxSpeed: 15,
-        frictionSlip: 2.2,
+        frictionSlip: 0.7,
         engineForce: 150
     },
     wheelGuards1: {
@@ -617,7 +617,7 @@ var futureItems = {
         type: "wheelGuards",
         name: "Wendy",
         cost: 2500,
-        frictionSlip: 1,
+        frictionSlip: 0.7,
         mass: -75,
         engineForce: 50,
         suspensionRestLength: .2,
@@ -629,7 +629,7 @@ var futureItems = {
         type: "wheelGuards",
         name: "Wonkie",
         cost: 10000,
-        frictionSlip: 1.1,
+        frictionSlip: 0.7,
         mass: -100,
         engineForce: -50,
         maxSpeed: 10,
@@ -642,7 +642,7 @@ var futureItems = {
         type: "wheelGuards",
         name: "Wromby",
         cost: 20000,
-        frictionSlip: 1.1,
+        frictionSlip: 0.7,
         mass: -120,
         engineForce: 80,
         maxSpeed: -10,
@@ -655,7 +655,7 @@ var futureItems = {
         type: "wheelGuards",
         name: "Whip",
         cost: 20000,
-        frictionSlip: 1.5,
+        frictionSlip: 0.7,
         mass: -130,
         engineForce: 50,
         maxSpeed: 25,

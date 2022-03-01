@@ -36,21 +36,21 @@ interface IEndOfRaceInfoPlayerServer {
  */
 const isValidRace = (run: IEndOfRaceInfoPlayerServer): boolean => {
     if (run.gameTicks < 10) {
-        console.log("not valid race, gameTicks:", run.gameTicks)
+        console.warn("not valid race, gameTicks:", run.gameTicks)
         return false
     }
     if (run.roomTicks < 10) {
-        console.log("not valid race, roomTicks:", run.roomTicks)
+        console.warn("not valid race, roomTicks:", run.roomTicks)
 
         return false
     }
     if (run.numberOfLaps !== run.lapTimes.length) {
-        console.log("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length)
+        console.warn("not run.numberOfLaps and lapTimes don't match:", run.numberOfLaps, run.lapTimes.length)
         return false
     }
     // no map can be beat under 10 sec?
     if (run.totalTime < 4) {
-        console.log("Total time under 4 seconds", run.totalTime)
+        console.warn("Total time under 4 seconds", run.totalTime)
         return false
     }
 
@@ -86,7 +86,7 @@ const updateTrackNumberOfLapsMedal = (userId: string, trackName: string, numberO
 
     ref.set(update, { merge: true }
     ).then(() => {
-        console.log("updated medals")
+        console.log("updated medals! userId:", userId)
     }).catch((err) => {
         console.warn("Error updating medals", err)
     })
@@ -96,10 +96,12 @@ const updateTrackNumberOfLapsMedal = (userId: string, trackName: string, numberO
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
  */
 export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
-    console.log("is valid race", isValidRace(data))
+    if (!isValidRace(data)) {
+        console.warn("Not vaild race:", data)
+    }
     if (isValidRace(data)) {
         const { medal, XP, coins } = getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
-        console.log("medal", medal, "XP:", XP, "coins:", coins)
+
 
         updateTrackNumberOfLapsMedal(data.playerId, data.trackName, data.numberOfLaps, medal)
         const ref = adminFirestore.doc(tokenRefPath + "/" + data.playerId) //doc(firestore, tokenRefPath, data.playerId) as FirebaseFirestore.DocumentReference<any>
@@ -125,7 +127,6 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
                 update[medal] = 1
             }
 
-            console.log("update", update)
             // at least 10 secs later then the last update
             if (!update.lastUpdate || Date.now() > update.lastUpdate + (1000 * 10)) {
                 update.lastUpdate = Date.now()
@@ -183,7 +184,7 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         const itemId = vehicleType ? vehicleItems[vehicleType][item].id : item
         const itemCost = vehicleType ? vehicleItems[vehicleType][item].cost : allCosts[item]
 
-        console.log("item cost", itemCost)
+
         if (itemCost === undefined) {
             resolve({
                 completed: false,
@@ -236,7 +237,6 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
         if (owned.exists) {
             batch.update(ownershipRef, ownership)
         } else {
-            console.log("owner ship does not exist")
             batch.set(ownershipRef, ownership)
         }
 
