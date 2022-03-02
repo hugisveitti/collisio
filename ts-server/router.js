@@ -154,6 +154,8 @@ var router = function (app) {
     app.get("/cancelpayment", sendIndexHTML);
     app.get("/multiplayer", sendIndexHTML);
     app.get("/multiplayer/*", sendIndexHTML);
+    app.get("/cookies", sendIndexHTML);
+    app.get("/termsOfUse", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {
         res.sendFile(path.join(__dirname, adminHTMLPath));

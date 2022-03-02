@@ -152,6 +152,8 @@ const router = (app: any) => {
     app.get("/cancelpayment", sendIndexHTML);
     app.get("/multiplayer", sendIndexHTML);
     app.get("/multiplayer/*", sendIndexHTML);
+    app.get("/cookies", sendIndexHTML);
+    app.get("/termsOfUse", sendIndexHTML);
 
 
 
