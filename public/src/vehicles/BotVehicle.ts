@@ -90,7 +90,8 @@ export class BotVehicle extends LowPolyVehicle {
         if (!this.vehicleBody) return
         this.resetPosition()
 
-        this.noForce(true)
+        this.zeroBreakForce()
+        this.break(true)
         this.noTurn()
         this.dirNum = 0
         this.targetReached = false

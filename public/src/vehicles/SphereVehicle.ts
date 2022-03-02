@@ -38,29 +38,38 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.prevPosition = new Vector3(0, 0, 0)
     }
 
-    addModels(tires: ExtendedObject3D[], body: ExtendedObject3D): void {
-        this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
-        this.isReady = false
-        this.vehicleBody = body.clone()
+    async addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) {
+        return new Promise<void>(async (resolve, reject) => {
 
-        this.scene.physics.add.existing(this.vehicleBody, this.physicsConfig)
-        this.scene.add.existing(this.vehicleBody, this.physicsConfig)
+            this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
+            this.isReady = false
+            this.vehicleBody = body.clone()
 
-        this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
-        this.vehicleBody.name = "vehicle-" + this.vehicleNumber
+            this.scene.physics.add.existing(this.vehicleBody, this.physicsConfig)
+            this.scene.add.existing(this.vehicleBody, this.physicsConfig)
 
-        this.vehicleBody.receiveShadow = false
-        this.vehicleBody.castShadow = true
-        this.modelsLoaded = true;
+            this.vehicleBody.body.name = "vehicle-" + this.vehicleNumber
+            this.vehicleBody.name = "vehicle-" + this.vehicleNumber
 
-        changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor] as VehicleColorType[])
+            this.vehicleBody.receiveShadow = false
+            this.vehicleBody.castShadow = true
+            this.modelsLoaded = true;
 
-        this.vehicleBody.body.setAngularFactor(0, 1, 0)
-        this.vehicleBody.body.setFriction(1)
-        this.vehicleBody.body.setCollisionFlags(0)
-        this.vehicleBody.body.setBounciness(0.4)
-        this.isReady = true
-        this._canDrive = true
+            changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor] as VehicleColorType[])
+
+            this.vehicleBody.body.setAngularFactor(0, 1, 0)
+            this.vehicleBody.body.setFriction(1)
+            this.vehicleBody.body.setCollisionFlags(0)
+            this.vehicleBody.body.setBounciness(0.4)
+            this.isReady = true
+            this._canDrive = true
+            if (this.vehicleSetup) {
+                console.log("setting vehicle setup", this.name)
+                await this.updateVehicleSetup(this.vehicleSetup)
+            }
+
+            resolve()
+        })
     };
 
     goForward(): void {
@@ -270,11 +279,15 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     // set to default vehicle config
     _updateVehicleSetup() {
-        this.items = []
-        this.updateMass(this.vehicleConfig.mass)
-        for (let child of this.vehicleBody.children) {
-            this.items.push(child)
-        }
+        return new Promise<void>((resolve, reject) => {
+
+            this.items = []
+            this.updateMass(this.vehicleConfig.mass)
+            for (let child of this.vehicleBody.children) {
+                this.items.push(child)
+            }
+            resolve()
+        })
     }
     updateMass(mass: number) {
         this.vehicleConfig.mass = mass
@@ -304,8 +317,8 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     }
 }
 
-export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boolean): Promise<ExtendedObject3D> => {
-    const promise = new Promise<ExtendedObject3D>((resolve, reject) => {
+export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boolean): Promise<[ExtendedObject3D[], ExtendedObject3D]> => {
+    const promise = new Promise<[ExtendedObject3D[], ExtendedObject3D]>((resolve, reject) => {
 
         const loader = new GLTFLoader()
 
@@ -327,7 +340,7 @@ export const loadSphereModel = async (vehicleType: VehicleType, onlyLoad?: boole
                     }
                 }
             }
-            resolve(sphere)
+            resolve([[], sphere])
         })
     })
     return promise

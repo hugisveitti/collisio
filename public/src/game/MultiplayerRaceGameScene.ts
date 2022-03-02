@@ -129,8 +129,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         })
 
         this.otherVehicles = []
-
-
     }
 
     _handleResizeWindow() {
@@ -200,13 +198,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
                 this.vehicle = new SphereVehicle(vehicleConfig)
             }
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                await loadLowPolyVehicleModels(vehicleType, false).then(([tires, chassis]) => {
-                    this.vehicle.addModels(tires, chassis)
-                })
+                const [tires, chassis] = await loadLowPolyVehicleModels(vehicleType, false)//.then(([tires, chassis]) => {
+                this.vehicle.addModels(tires, chassis)
+                //    })
             } else {
-                await loadSphereModel(vehicleType, false).then((body) => {
-                    this.vehicle.addModels([], body)
-                })
+                const [tires, chassis] = await loadSphereModel(vehicleType, false) //.then(([_, body]) => {
+                this.vehicle.addModels(tires, chassis)
+
             }
 
 

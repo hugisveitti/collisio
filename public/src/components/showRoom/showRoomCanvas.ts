@@ -18,7 +18,7 @@ const addVehicle = (vehicleType: VehicleType, chassisNum: number, scene: Scene, 
         currentVehicleType = vehicleType
 
         if (vehicleType === "simpleSphere") {
-            loadSphereModel(vehicleType, true).then((chassis) => {
+            loadSphereModel(vehicleType, true).then(([_, chassis]) => {
                 if (vehicleType !== currentVehicleType) {
                     console.warn("vehicle type changed after load",)
                     // if vehicle type changes before the load completes

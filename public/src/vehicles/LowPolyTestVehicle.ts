@@ -161,10 +161,8 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
     }
 
     updateMaxSpeed(speed?: number) {
-        console.log("this.vehicleConfig.maxSpeed.", this.vehicleConfig.maxSpeed)
         speed = speed ?? this.vehicleConfig.maxSpeed
         this.setLocalStorage("maxSpeed", speed)
-        console.log("speed", speed)
         this.vehicleConfig.maxSpeed = speed
         this.vehicleConfig.maxSpeed = speed
         this.setVehicleConfigKey("maxSpeed", speed)
@@ -219,8 +217,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
             const obj = this.closestRaycaster.getCollisionObject()
             if (log) {
                 const normal = this.closestRaycaster.getHitNormalWorld()
-                console.log("normal", normal)
-                console.log("forward hit", obj,)
+
             }
         }
 
@@ -232,23 +229,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
             p.z + ((Math.cos(r.y + right) * lineLenght) * Math.sign(Math.cos(r.z)))
         )
 
-        //this.lineRight.geometry.setFromPoints([this.l1, this.l3])
 
-        // this.closestRaycaster.setRayFromWorld(p.x, p.y, p.z)
-        // this.closestRaycaster.setRayToWorld(this.l3.x, this.l3.y, this.l3.z)
-
-        // this.closestRaycaster.rayTest()
-        // if (this.closestRaycaster.hasHit()) {
-        //     //  const { x, y, z } = this.closestRaycaster.getHitPointWorld()
-        //     const obj = this.closestRaycaster.getCollisionObject()
-        //     if (log) {
-        //         const normal = this.closestRaycaster.getHitNormalWorld()
-        //         const hitPoint = this.closestRaycaster.getHitPointWorld()
-        //         console.log("normal", normal)
-        //         console.log("hitpoint", hitPoint)
-        //         console.log("right hit", obj,)
-        //     }
-        // }
 
         const left = Math.PI / 4
         this.l4.set(
@@ -268,8 +249,7 @@ export class LowPolyTestVehicle extends LowPolyVehicle implements ITestVehicle {
             const obj = this.closestRaycaster.getCollisionObject()
             if (log) {
                 const normal = this.closestRaycaster.getHitNormalWorld()
-                console.log("normal", normal)
-                console.log("left hit", obj,)
+
             }
         }
     }

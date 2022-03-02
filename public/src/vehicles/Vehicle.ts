@@ -111,6 +111,7 @@ export class Vehicle implements IVehicle {
 
 
         this.vehicleConfig = this.getDefaultVehicleConfig()
+
         this.isReady = false
         this.isPaused = false
         this._canDrive = false
@@ -228,51 +229,64 @@ export class Vehicle implements IVehicle {
     };
 
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
-        if (this.isUpdatingVehicleSetup) return
-        if (this.isReady) {
-            console.log("Cannot change vehicle setup if vehicle is ready")
-            this.scene.setNeedsReload(true)
-            return
-        }
-        this.setColor(vehicleSetup.vehicleColor)
-        if (vehicleSetup.vehicleType !== this.vehicleType) {
-            console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
-            return
-        }
-        this.isUpdatingVehicleSetup = true
 
-        this.vehicleConfig = this.getDefaultVehicleConfig()
-        // not load if already loaded?
-        this.vehicleSetup = vehicleSetup
-        for (let item of possibleVehicleItemTypes) {
-            if (this.vehicleItems[item]?.props?.id !== vehicleSetup[item]?.id) {
-                if (this.vehicleItems[item]?.model) {
-                    this.vehicleBody.remove(this.vehicleItems[item].model)
-                    this.vehicleItems[item] = undefined
-                }
-                if (vehicleSetup[item]) {
-                    await this.addItemToVehicle(vehicleSetup[item].path).then(model => {
+        return new Promise<void>(async (resolve, reject) => {
 
-                        this.vehicleItems[item] = {
-                            props: vehicleSetup[item], model
-                        }
-                    }).catch(() => {
+            if (this.isUpdatingVehicleSetup) return
+            if (this.isReady) {
+
+                this.scene.setNeedsReload(true)
+                resolve()
+                return
+            }
+            this.setColor(vehicleSetup.vehicleColor)
+            if (vehicleSetup.vehicleType !== this.vehicleType) {
+                console.warn("Vehicle setup doesn't match vehicleType", "setupType", vehicleSetup.vehicleType, "this vehicleType:", this.vehicleType)
+                resolve()
+                return
+            }
+            this.isUpdatingVehicleSetup = true
+
+            this.vehicleConfig = this.getDefaultVehicleConfig()
+            // not load if already loaded?
+            this.vehicleSetup = vehicleSetup
+            for (let item of possibleVehicleItemTypes) {
+                if (this.vehicleItems[item]?.props?.id !== vehicleSetup[item]?.id) {
+                    if (this.vehicleItems[item]?.model) {
+                        this.vehicleBody.remove(this.vehicleItems[item].model)
                         this.vehicleItems[item] = undefined
-                    })
-                }
-            }
+                    }
+                    if (vehicleSetup[item]) {
+                        let model = await this.addItemToVehicle(vehicleSetup[item].path)
 
-            for (let mod of possibleVehicleMods) {
-                if (vehicleSetup?.[item]?.[mod.type]) {
-                    this.vehicleConfig[mod.type] += (vehicleSetup?.[item]?.[mod.type])
+                        if (model) {
+                            this.vehicleItems[item] = {
+                                props: vehicleSetup[item], model
+                            }
+                        } else {
+                            this.vehicleItems[item] = undefined
+                        }
+                    }
+                }
+
+                for (let mod of possibleVehicleMods) {
+                    if (vehicleSetup?.[item]?.[mod.type]) {
+                        this.vehicleConfig[mod.type] += (vehicleSetup?.[item]?.[mod.type])
+                    }
                 }
             }
-        }
-        this.isUpdatingVehicleSetup = false
-        this._updateVehicleSetup()
+            await this._updateVehicleSetup()
+            this.isUpdatingVehicleSetup = false
+            resolve()
+        })
     }
 
-    _updateVehicleSetup() { }
+    async _updateVehicleSetup() {
+        return new Promise<void>((resolve, reject) => {
+            resolve()
+        })
+
+    }
 
     _updateVehicleSettings() { }
 
@@ -286,16 +300,20 @@ export class Vehicle implements IVehicle {
             resolve()
         })
     };
-    addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) { };
+    addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) {
+
+        return new Promise<void>((resolve, reject) => {
+            resolve()
+        })
+    };
 
     addItemToVehicle(itemPath: string) {
-        return new Promise<ExtendedObject3D>((resolve, reject) => {
+        return new Promise<ExtendedObject3D | undefined>((resolve, reject) => {
             const itemProperties = vehicleItems[this.vehicleType][itemPath]
-            console.log("item props", itemProperties)
             if (!this.vehicleBody) {
 
                 console.warn("No vehiclebody to add items to")
-                reject()
+                resolve(undefined)
                 return
             }
             const loader = new GLTFLoader()
@@ -307,7 +325,7 @@ export class Vehicle implements IVehicle {
 
                         if (itemProperties?.physicalObject) {
                             // this.scene.physics.destroy(this.vehicleBody)
-                            console.log("is physical object")
+
                             this.scene.physics.add.existing(child as ExtendedObject3D, { mass: 1, collisionFlags: 1, shape: "convex", autoCenter: false })
                             this.vehicleBody.add(child)
 
@@ -367,7 +385,7 @@ export class Vehicle implements IVehicle {
     }
 
     createCarSounds() {
-        console.log("creating car sounds")
+
 
 
         const listener = new AudioListener()
@@ -379,13 +397,13 @@ export class Vehicle implements IVehicle {
         batch.push(
 
             loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
-                console.log("engine sound loader")
+
                 try {
 
                     this.engineSound.setBuffer(engineSoundBuffer)
                     this.engineSound.setLoop(true)
                     this.engineSound.setVolume(0.3)
-                    console.log("changing when loop ends")
+
                     //  this.engineSound.setLoopEnd(2.5)
                     this.engineSound.hasPlaybackControl = true
                 } catch (err) {
@@ -404,7 +422,7 @@ export class Vehicle implements IVehicle {
         this.skidSound = new Audio(listener)
         batch.push(
             loadSkidSoundBuffer().then(buffer => {
-                console.log("skid sound loaded")
+
                 try {
                     this.skidSound.setBuffer(buffer)
                     this.skidSound.setLoop(false)

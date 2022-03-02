@@ -33,7 +33,7 @@ import { driveVehicleWithKeyboard } from "../utils/controls"
 const vechicleFov = 60
 
 let tA = 0
-
+let numRestarts = 0
 const scoreTable = document.createElement("div")
 const lapTimeDiv = document.createElement("div")
 const bestLapTimeDiv = document.createElement("div")
@@ -79,7 +79,7 @@ export class LowPolyTestScene extends GameScene {
     vehicleColorNumber = 0
 
     otherVehicles: ITestVehicle[] // LowPolyTestVehicle[]
-    numberOfOtherVehicles = 0
+    numberOfOtherVehicles = 1
 
     isIt: number
 
@@ -155,159 +155,178 @@ export class LowPolyTestScene extends GameScene {
     }
 
     async preload() {
-        if (this.usingDebug) {
-            this.physics.debug?.enable()
-            //    this.physics.debug?.mode(2048 + 4096)
-        }
-        await this.warpSpeed('-ground', "-light", "-sky")
+        return new Promise<void>(async (resolve, reject) => {
 
-
-        // this could do something for the jitter of the vehicle
-        // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
-        //  this.physics.config.maxSubSteps = 10
-        // downsides to this?
-        // The downside is that if we are under 60 fps then the game is slower 
-        //  this.physics.config.fixedTimeStep = 1 / 120
-        // this.__config.fixedTimeStep =  1 / 120
-        //  this.physics.config.maxSubSteps = 1
-
-        this.addLights()
-
-        const controls = new OrbitControls(this.camera, this.renderer.domElement);
-        window.addEventListener("resize", () => this.onWindowResize())
-
-        document.addEventListener("keypress", (e) => {
-            if (e.key === "r") {
-
-                this.resetPlayer(0)
-                if (this.course instanceof RaceCourse) {
-
-                    const { position, rotation } = this.course.getGoalCheckpoint()
-                    this.bot.setCheckpointPositionRotation({ rotation, position: { x: position.x + 5, z: position.z + 5, y: position.y, } })
-                    this.bot.resetPosition()
-                    this.bot.restartBot()
-                }
-            } else if (e.key === "t") {
-
-            } else if (e.key === "p") {
-                if (this.vehicle.isPaused) {
-                    this.vehicle.unpause()
-                    this.gameTime.start()
-                } else {
-                    this.vehicle.pause()
-                    this.gameTime.stop()
-
-                }
-            } else if (e.key === "o") {
-                this.vehicle.setPosition(0, 4, 0)
-                this.vehicle.setRotation(Math.PI, 0, 0)
-            } else if (e.key === "h") {
-                this.vehicle.stop()
-                this.vehicle.start()
-                this.vehicle.setPosition(4, 15, 0)
-                this.vehicle.setRotation(0, 0, Math.PI)
-            } else if (e.key === "u") {
-                this.vehicle.stop()
-                this.vehicle.start()
-                const p = this.vehicle.getPosition()
-                this.vehicle.setPosition(p.x, p.y + 5, p.z)
-                this.vehicle.setRotation(0, 0, 0)
+            if (this.usingDebug) {
+                this.physics.debug?.enable()
+                //    this.physics.debug?.mode(2048 + 4096)
             }
-            else if (e.key === "i") {
-                this.vehicle.stop()
-                this.vehicle.start()
-                const p = this.vehicle.getPosition()
-                const r = this.vehicle.getRotation()
-
-                this.vehicle.setPosition(p.x, p.y, p.z)
-                tA = tA + Math.PI / 20
-                tA = tA % (Math.PI * 2)
-
-                // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
-
-                this.vehicle.setRotation(0, tA, 0)
+            await this.warpSpeed('-ground', "-light", "-sky")
 
 
-            }
+            // this could do something for the jitter of the vehicle
+            // how the physics are updated:https://github.com/enable3d/enable3d/blob/master/packages/ammoPhysics/src/physics.ts
+            //  this.physics.config.maxSubSteps = 10
+            // downsides to this?
+            // The downside is that if we are under 60 fps then the game is slower 
+            //  this.physics.config.fixedTimeStep = 1 / 120
+            // this.__config.fixedTimeStep =  1 / 120
+            //  this.physics.config.maxSubSteps = 1
 
-            else if (e.key === "y") {
-                this.vehicle.stop()
-                this.vehicle.start()
-                const p = this.vehicle.getPosition()
-                const r = this.vehicle.getRotation()
+            this.addLights()
 
-                this.vehicle.setPosition(p.x, p.y, p.z)
-                tA = tA + Math.PI / 20
-                tA = tA % (Math.PI * 2)
+            const controls = new OrbitControls(this.camera, this.renderer.domElement);
+            window.addEventListener("resize", () => this.onWindowResize())
 
-                // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
+            document.addEventListener("keypress", (e) => {
+                if (e.key === "r") {
 
-                this.vehicle.setRotation(0, tA, tA)
+                    this.resetPlayer(0)
+                    if (this.course instanceof RaceCourse) {
 
-            } else if (e.key === "l") {
-                const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
-                this.vehicle.setRotation(q)
-            } else if (e.key === "m") {
-                for (let wagon of this.wagons) {
-                    if (wagon.isConnectedToVehicle(this.vehicle)) {
-                        wagon.removeConnection()
+                        const { position, rotation } = this.course.getGoalCheckpoint()
+                        this.bot.setCheckpointPositionRotation({ rotation, position: { x: position.x + 5, z: position.z + 5, y: position.y, } })
+                        this.bot.resetPosition()
+                        this.bot.restartBot()
+                    }
+                } else if (e.key === "t") {
+
+                } else if (e.key === "p") {
+                    if (this.vehicle.isPaused) {
+                        this.vehicle.unpause()
+                        this.gameTime.start()
+                    } else {
+                        this.vehicle.pause()
+                        this.gameTime.stop()
+
+                    }
+                } else if (e.key === "o") {
+                    this.vehicle.setPosition(0, 4, 0)
+                    this.vehicle.setRotation(Math.PI, 0, 0)
+                } else if (e.key === "h") {
+                    this.vehicle.stop()
+                    this.vehicle.start()
+                    this.vehicle.setPosition(4, 15, 0)
+                    this.vehicle.setRotation(0, 0, Math.PI)
+                } else if (e.key === "u") {
+                    this.vehicle.stop()
+                    this.vehicle.start()
+                    const p = this.vehicle.getPosition()
+                    this.vehicle.setPosition(p.x, p.y + 5, p.z)
+                    this.vehicle.setRotation(0, 0, 0)
+                }
+                else if (e.key === "i") {
+                    this.vehicle.stop()
+                    this.vehicle.start()
+                    const p = this.vehicle.getPosition()
+                    const r = this.vehicle.getRotation()
+
+                    this.vehicle.setPosition(p.x, p.y, p.z)
+                    tA = tA + Math.PI / 20
+                    tA = tA % (Math.PI * 2)
+
+                    // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
+
+                    this.vehicle.setRotation(0, tA, 0)
+
+
+                }
+
+                else if (e.key === "y") {
+                    this.vehicle.stop()
+                    this.vehicle.start()
+                    const p = this.vehicle.getPosition()
+                    const r = this.vehicle.getRotation()
+
+                    this.vehicle.setPosition(p.x, p.y, p.z)
+                    tA = tA + Math.PI / 20
+                    tA = tA % (Math.PI * 2)
+
+                    // const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, tA, 0, "XYZ"))
+
+                    this.vehicle.setRotation(0, tA, tA)
+
+                } else if (e.key === "l") {
+                    const q = new THREE.Quaternion(0, 0.97602, 0, .217668135)
+                    this.vehicle.setRotation(q)
+                } else if (e.key === "m") {
+                    for (let wagon of this.wagons) {
+                        if (wagon.isConnectedToVehicle(this.vehicle)) {
+                            wagon.removeConnection()
+                        }
                     }
                 }
-            }
-        })
+            })
 
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-                this.escPress()
-                this.togglePauseGame()
-            }
-        })
-        console.log("lo polu test")
-        setTimeout(() => {
-            // console.log("calling add item to vehicle")
-            //     this.vehicle.addItemToVehicle("")
-        }, 1000)
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    this.escPress()
+                    this.togglePauseGame()
+                }
+            })
 
-        this.renderer.clear()
-        this.renderer.info.autoReset = false
-        //  this.renderer.capabilities.precision = "lowp"
-        this.renderer.autoClear = false
-        this.renderer.shadowMap.autoUpdate = false
-        this.initVehicles()
+
+            this.renderer.clear()
+            this.renderer.info.autoReset = false
+            //  this.renderer.capabilities.precision = "lowp"
+            this.renderer.autoClear = false
+            this.renderer.shadowMap.autoUpdate = false
+            await this.initVehicles()
+            if (numRestarts < 0) {
+                numRestarts++
+                setTimeout(() => {
+                    this.setNeedsReload(true)
+                    this.restartGame()
+                    // if (this.numberOfOtherVehicles > 0) {
+                    //     this.otherVehicles[0].destroy()
+                    //     this.otherVehicles = []
+                    //     this.vehicles = [this.vehicle]
+                    // }
+                }, 3000)
+            }
+
+            resolve()
+        })
     }
 
-    initVehicles() {
+    async initVehicles() {
 
-        const botVehicleType = "normal2"
-        const botConfig: IVehicleClassConfig = {
-            vehicleNumber: 9,
-            vehicleType: botVehicleType,
-            vehicleSetup: {
-                vehicleColor: "#ff00ff" as VehicleColorType,
-                vehicleType: botVehicleType
-            },
-            scene: this,
-            name: "Bot Tamy",
-            id: "bot-id"
-        }
-        this.bot = new BotVehicle(getLocalGameSetting("botDifficulty", "string") as BotDifficulty ?? "extreme", botConfig)
+        return new Promise<void>(async (resolve, reject) => {
 
-        this.otherVehicles = []
-        //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
-        if (getVehicleClassFromType(this.vehicleType) === "LowPoly") {
-            this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
 
-        } else {
+            const botVehicleType = "normal2"
+            const botConfig: IVehicleClassConfig = {
+                vehicleNumber: 9,
+                vehicleType: botVehicleType,
+                vehicleSetup: {
+                    vehicleColor: "#ff00ff" as VehicleColorType,
+                    vehicleType: botVehicleType
+                },
+                scene: this,
+                name: "Bot Tamy",
+                id: "bot-id"
+            }
+            this.bot = new BotVehicle(getLocalGameSetting("botDifficulty", "string") as BotDifficulty ?? "extreme", botConfig)
 
-            this.vehicle = new SphereTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
-        }
-        for (let i = 0; i < this.numberOfOtherVehicles; i++) {
-            const vehicleType = allVehicleTypes[i % allVehicleTypes.length].type
-            this.otherVehicles.push(
-                new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
-            )
-            this.otherDrivers.push(new GhostDriver(this.getTrackName(), 1, vehicleType))
-        }
+            this.otherVehicles = []
+            //  this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+            if (getVehicleClassFromType(this.vehicleType) === "LowPoly") {
+                this.vehicle = new LowPolyTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+
+            } else {
+
+                this.vehicle = new SphereTestVehicle(this, itColor, "test hugi", 0, this.vehicleType, true)
+            }
+            for (let i = 0; i < this.numberOfOtherVehicles; i++) {
+                const vehicleType = allVehicleTypes[i % allVehicleTypes.length].type
+                this.otherVehicles.push(
+                    new LowPolyTestVehicle(this, notItColor, "test" + (i + 1), i + 1, vehicleType, false)
+                )
+                this.otherDrivers.push(new GhostDriver(this.getTrackName(), 1, vehicleType))
+            }
+
+            resolve()
+        })
     }
 
     async createGhostVehicle() {
@@ -326,12 +345,11 @@ export class LowPolyTestScene extends GameScene {
                     await this.ghostVehicle.loadModel()
                     this.ghostVehicle.addToScene(this)
 
-                } else {
-                    console.warn("no vt", vt)
                 }
+
                 resolve()
             }).catch(() => {
-                console.log("No ghost since there is no recording")
+
                 resolve()
             })
         })
@@ -339,10 +357,7 @@ export class LowPolyTestScene extends GameScene {
 
     async create() {
         return new Promise<void>(async (resolve, reject) => {
-
-
             if (this.getGameType() === "race") {
-
                 this.course = new RaceCourse(this, this.trackName, (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
             } else if (this.getGameType() === "tag") {
                 this.course = new TagCourse(this, this.trackName, (name, coin) => this.handleCoinCollided(name, coin))
@@ -422,9 +437,6 @@ export class LowPolyTestScene extends GameScene {
             await this.ghostVehicle.loadModel()
 
             this.ghostVehicle.addToScene(this)
-
-
-            console.log("camera", this.camera)
             resolve()
         })
     }
@@ -480,7 +492,7 @@ export class LowPolyTestScene extends GameScene {
         const promise = new Promise<void>((resolve, reject) => {
             const vehicleClass = getVehicleClassFromType(this.vehicleType)
             if (vehicleClass === "Sphere") {
-                loadSphereModel(this.vehicleType, false).then((sphere) => {
+                loadSphereModel(this.vehicleType, false).then(([_, sphere]) => {
                     this.vehicle.addModels([sphere], sphere)
 
                     const useChaseCamera = window.localStorage.getItem("useChaseCamera")
@@ -491,17 +503,7 @@ export class LowPolyTestScene extends GameScene {
                     this.camera.position.set(0, 10, -25)
                     // this.loadFont()
                     this.vehicle.unpause()
-                    setTimeout(() => {
-                        console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
-                        this.vehicle.updateVehicleSetup({
-                            vehicleType: this.vehicleType,
-                            vehicleColor: defaultVehicleColorType,
-                            exhaust: vehicleItems[this.vehicleType]?.["exhaust1"] as ItemProperties,
-                            wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
-                            spoiler: vehicleItems[this.vehicleType]?.["spoiler1"] as ItemProperties,
-                        })
 
-                    }, 1000)
                     resolve()
                 })
             } else {
@@ -517,19 +519,6 @@ export class LowPolyTestScene extends GameScene {
                     this.vehicle.resetPosition()
                     // this.dirLight.target = this.vehicle.chassisMesh
                     this.camera.position.set(0, 10, -25)
-
-
-                    setTimeout(() => {
-                        console.log("exha", vehicleItems[this.vehicleType]?.["exhaust1"])
-                        this.vehicle.updateVehicleSetup({
-                            vehicleType: this.vehicleType,
-                            vehicleColor: defaultVehicleColorType,
-                            exhaust: vehicleItems[this.vehicleType]?.["exhaust4"] as ItemProperties,
-                            //  wheelGuards: vehicleItems[this.vehicleType]?.["wheelGuards1"] as ItemProperties,
-                            spoiler: vehicleItems[this.vehicleType]?.["spoiler2"] as ItemProperties,
-                        })
-
-                    }, 1000)
 
                     const createVehicleInputButtons = () => {
                         createTestVehicleInputs(this, vehicleInputsContainer)
@@ -552,6 +541,7 @@ export class LowPolyTestScene extends GameScene {
 
 
     handleGoalCrossed(o: ExtendedObject3D) {
+        if (getVehicleNumber(o.name) !== 0) return
         if (!this.goalCrossed) {
             if (getVehicleNumber(o.name) === 0 && recording && this.checkpointCrossed) {
                 this.driverRecorder.goalCrossed()
@@ -571,7 +561,7 @@ export class LowPolyTestScene extends GameScene {
     }
 
     handleCheckpointCrossed(o: ExtendedObject3D, checkpointNumber: number) {
-
+        if (getVehicleNumber(o.name) !== 0) return
         // if (!this.checkpointCrossed) {
         if (!this.gameTime.crossedCheckpoint(checkpointNumber)) {
             this.gameTime.checkpointCrossed(checkpointNumber)
@@ -633,7 +623,7 @@ export class LowPolyTestScene extends GameScene {
 
     // this.vehicle isnt appart of allVehicles in GameScene class
     updateVehicles(delta: number) {
-        this.vehicle.update(delta)
+        this.vehicle?.update(delta)
     }
 
     _upd(delta: number) {
@@ -773,26 +763,22 @@ export class LowPolyTestScene extends GameScene {
 
 
 export const startLowPolyTest = (socket: Socket, gameSettings: IGameSettings, escPress: () => void, callback: (gameObject: LowPolyTestScene) => void) => {
-    try {
 
-        const config = { scenes: [LowPolyTestScene], antialias: true }
-        PhysicsLoader("./ammo", () => {
-            const project = new Project(config)
+    const config = { scenes: [LowPolyTestScene], antialias: true }
+    PhysicsLoader("./ammo", () => {
+        const project = new Project(config)
 
-            const key = project.scenes.keys().next().value;
+        const key = project.scenes.keys().next().value;
 
-            const gameObject = (project.scenes.get(key) as LowPolyTestScene)
-            // hacky way to get the project's scene
-            gameObject.setSocket(socket);
-            // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
-            gameObject.setTestGameSettings(gameSettings, escPress);
-            callback(gameObject)
+        const gameObject = (project.scenes.get(key) as LowPolyTestScene)
+        // hacky way to get the project's scene
+        gameObject.setSocket(socket);
+        // (project.scenes.get(key) as LowPolyTestScene).createVehicle();
+        gameObject.setTestGameSettings(gameSettings, escPress);
+        callback(gameObject)
 
-            return project
-        })
-    } catch (err) {
-        console.warn("Low poly test failed", err)
-        toast("Game failed")
-    }
+        return project
+    })
+
 
 }

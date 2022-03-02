@@ -33,9 +33,14 @@ export const uploadTournamentGhost = (tournamentId: string, ghostRecording: stri
 
 export const downloadGhost = (filename: string) => {
     return new Promise<string[] | undefined>((resolve, reject) => {
+        if (!filename) {
+            reject("No ghost filename")
+            return
+        }
 
         const storageRef = ref(storage, ghostRef + "/" + filename)
         console.log("downloading ghost", filename)
+
         getBlob(storageRef).then(async (resBlob) => {
             console.log("Got ghost", resBlob)
             const text = await (new Response(resBlob)).text()

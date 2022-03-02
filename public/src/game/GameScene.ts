@@ -61,9 +61,6 @@ export class GameScene extends MyScene implements IGameScene {
     views: IView[]
     songIsPlaying: boolean
 
-
-
-
     gameStarted: boolean
 
 
@@ -98,7 +95,6 @@ export class GameScene extends MyScene implements IGameScene {
     constructor() {
         super()
 
-
         this.players = []
         this.vehicles = []
         this.views = []
@@ -120,7 +116,6 @@ export class GameScene extends MyScene implements IGameScene {
 
         this.playerInfosContainer = document.createElement("div")
         this.playerInfosContainer.setAttribute("style", "position:relative;")
-
 
         this.hasAskedToLowerSettings = eval(window.localStorage.getItem("hasAskedToLowerSettings")) ?? false
 
@@ -167,7 +162,6 @@ export class GameScene extends MyScene implements IGameScene {
             }
         })
 
-
         await this.loadAssets()
 
         this.renderer.clear()
@@ -175,8 +169,6 @@ export class GameScene extends MyScene implements IGameScene {
         //  this.renderer.capabilities.precision = "lowp"
         this.renderer.autoClear = false
         this.renderer.shadowMap.autoUpdate = false
-        this.handleResizeWindow()
-
     }
 
     async loadAssets() { }
@@ -185,12 +177,9 @@ export class GameScene extends MyScene implements IGameScene {
         // need to do some test with performance and the draw distance
         this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
         this.setPixelRatio()
-
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -9.82, 0)
-
-
     }
 
 
@@ -266,17 +255,23 @@ export class GameScene extends MyScene implements IGameScene {
             }
             this.vehicles.push(newVehicle)
             if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                await loadLowPolyVehicleModels(vehicleType, false).then(([tires, chassis]) => {
-                    newVehicle.addModels(tires, chassis)
-                })
+                const [tires, chassis] = await loadLowPolyVehicleModels(vehicleType, false)//.then(([tires, chassis]) => {
+                newVehicle.addModels(tires, chassis)
+                //    })
             } else {
-                await loadSphereModel(vehicleType, false).then((body) => {
-                    newVehicle.addModels([], body)
-                })
+                const [tires, chassis] = await loadSphereModel(vehicleType, false) //.then(([_, body]) => {
+                newVehicle.addModels(tires, chassis)
+
             }
             resolve(newVehicle)
         })
     }
+
+    // async loadVehicleModels(){
+    //     return new Promise<void>((resolve,reject) => {
+
+    //     })
+    // }
 
     async createVehicles(): Promise<void> {
         const promise = new Promise<void>((topresolve, reject) => {
@@ -284,11 +279,10 @@ export class GameScene extends MyScene implements IGameScene {
             // get random color of chassis
             let chassisColOffset = Math.floor(Math.random() * vehicleColors.length)
 
-            const batches = []
+            const batches: Promise<[ExtendedObject3D[], ExtendedObject3D]>[] = []
             for (let i = 0; i < this.players.length; i++) {
                 let newVehicle: IVehicle
                 const vehicleType = this.gameSceneConfig?.tournament?.vehicleType ? this.gameSceneConfig.tournament?.vehicleType : this.players[i].vehicleType
-                console.log("this.players[i].vehicleSetup", this.players[i].vehicleSetup)
                 const config: IVehicleClassConfig = {
                     scene: this,
                     name: this.players[i].playerName,
@@ -308,17 +302,16 @@ export class GameScene extends MyScene implements IGameScene {
                 }
                 this.vehicles.push(newVehicle)
                 if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                    batches.push(
-                        loadLowPolyVehicleModels(vehicleType, false).then(([tires, chassis]) => {
-                            this.vehicles[i].addModels(tires, chassis)
-                        }))
+                    batches.push(loadLowPolyVehicleModels(vehicleType, false))
                 } else {
-                    batches.push(loadSphereModel(vehicleType, false).then((body) => {
-                        this.vehicles[i].addModels([], body)
-                    }))
+                    batches.push(loadSphereModel(vehicleType, false))
                 }
             }
-            Promise.all(batches).then(content => {
+            Promise.all(batches).then(async (content) => {
+                for (let i = 0; i < this.players.length; i++) {
+                    await this.vehicles[i].addModels(content[i][0], content[i][1])
+                }
+
                 this.emitVehiclesReady()
                 topresolve()
             })
@@ -420,7 +413,7 @@ export class GameScene extends MyScene implements IGameScene {
 
 
             this.vehicles[i].addCamera(view.camera)
-            this.vehicles[i].isReady = true
+            //    this.vehicles[i].isReady = true
             this.views.push(view)
 
             const width = viewWidth * window.innerWidth
@@ -541,8 +534,8 @@ export class GameScene extends MyScene implements IGameScene {
             }
             const left = viewLefts[i % 2] * (window.innerWidth)
             const bottom = viewBottoms[i] * window.innerHeight
-            const viewDivWidth = viewWidth * window.innerWidth
-            const viewDivHeight = viewHeight * window.innerHeight
+            const viewDivWidth = Math.floor(viewWidth * window.innerWidth)
+            const viewDivHeight = Math.floor(viewHeight * window.innerHeight)
 
             this.viewDivs[i].setAttribute("style", `
                 position:absolute;
@@ -555,6 +548,14 @@ export class GameScene extends MyScene implements IGameScene {
                 width:${viewDivWidth}px;
                 height:${viewDivHeight}px;
             `)
+        }
+
+        for (let i = 0; i < this.views.length; i++) {
+            const width = Math.floor(window.innerWidth * this.views[i].width);
+            const height = Math.floor(window.innerHeight * this.views[i].height);
+            this.views[i].camera.aspect = width / height;
+
+            this.views[i].camera.updateProjectionMatrix();
         }
 
     }
@@ -631,6 +632,7 @@ export class GameScene extends MyScene implements IGameScene {
     }
 
     everythingReady(): boolean {
+        return this.isReady
         if (!this.courseLoaded) {
             this._everythingReady = false
             return false
@@ -652,6 +654,7 @@ export class GameScene extends MyScene implements IGameScene {
     _setRoomSettings() { }
 
     setRoomSettings(roomSettings: IRoomSettings) {
+        console.log("set room settings", this.courseLoaded, this.getTrackName(), roomSettings)
         if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
             this.setNeedsReload(true)
         }
@@ -791,6 +794,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.clearViewsImportantInfo()
 
         this.isPaused = false
+        this.gameStarted = false
         this.oldTime = 0
         this.totalPing = 0
         this.totalPingsGotten = 0
@@ -801,19 +805,33 @@ export class GameScene extends MyScene implements IGameScene {
         }
         if (this.needsReload) {
             stopMusic()
+            this.views = []
             this.isPaused = true
             this.socket?.off(std_controls)
             this._everythingReady = false
-            this.gameStarted = false
             this.courseLoaded = false
             this.needsReload = false
             /** I think I need to delete ammo vecs */
+            this.isReady = false
 
             await this.destroyVehicles()
+            while (this.physics.rigidBodies.length > 0) {
+                const b = this.physics.rigidBodies[0]
+
+                this.physics.destroy(b)
+            }
+
+            while (this.scene.children.length > 0) {
+                const child = this.scene.children[0]
+                this.scene.remove(child)
+            }
+            this.physics.rigidBodies
+
+            this.physics.update(16)
             this.restart().then(() => {
             })
         } else {
-            this.gameStarted = false
+
             this.resetVehicles()
             this._restartGame()
         }
@@ -948,9 +966,9 @@ export class GameScene extends MyScene implements IGameScene {
             this.renderer.setClearColor(new Color(255, 255, 255))
 
 
-            this.views[i].camera.aspect = width / height;
+            // this.views[i].camera.aspect = width / height;
 
-            this.views[i].camera.updateProjectionMatrix();
+            // this.views[i].camera.updateProjectionMatrix();
 
             if (i === this.views.length - 1) {
                 //     this.renderer.shadowMap.needsUpdate = true
@@ -961,14 +979,7 @@ export class GameScene extends MyScene implements IGameScene {
                 //       this.renderer.compile(this.scene, this.views[i].camera);
             }
             this.renderer.render(this.scene, this.views[i].camera);
-
-
-
-            if (this.gameStarted) {
-                //     this.checkVehicleOutOfBounds(i)
-
-                this.viewsKmhInfo[i].textContent = `${Math.ceil(this.vehicles[i].getCurrentSpeedKmHour(delta)).toFixed(0)} km/h`
-            }
+            this.viewsKmhInfo[i].textContent = `${Math.ceil(this.vehicles[i].getCurrentSpeedKmHour(delta)).toFixed(0)} km/h`
         }
     }
 

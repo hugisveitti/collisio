@@ -88,12 +88,14 @@ export class LowPolyVehicle extends Vehicle {
     smokeIndex: number
     extraSpeedScaler: (time: number) => number
 
+    wheelInfos: Ammo.btWheelInfo[]
+
     constructor(config: IVehicleClassConfig) {
         super(config)
-        console.log("creating vehicle", this.name)
 
         this.maxSpeedTime = 0
         this.smokeParticles = []
+        this.wheelInfos = []
         this.smokeIndex = 0
 
         this.engineForce = this.vehicleConfig.engineForce
@@ -225,7 +227,6 @@ export class LowPolyVehicle extends Vehicle {
             this.vehicleBody.children[i].updateWorldMatrix(true, true)
         }
 
-        //  this.vehicleBody.updateWorldMatrix(true, true)
         this.vehicleConfig.wheelAxisHeightBack += this.vehicleConfig.centerOfMassOffset
         this.vehicleConfig.wheelAxisHeightFront += this.vehicleConfig.centerOfMassOffset
     }
@@ -376,6 +377,7 @@ export class LowPolyVehicle extends Vehicle {
             this.stop()
 
             if (this.vehicleSetup) {
+                console.log("setting vehicle setup", this.name)
                 await this.updateVehicleSetup(this.vehicleSetup)
             }
             // think I need this, going through walls in multiplayer
@@ -410,6 +412,7 @@ export class LowPolyVehicle extends Vehicle {
         wheelInfo.set_m_wheelsDampingCompression(this.vehicleConfig.suspensionDamping)
         wheelInfo.set_m_frictionSlip(this.vehicleConfig.frictionSlip)
         wheelInfo.set_m_rollInfluence(this.vehicleConfig.rollInfluence)
+        this.wheelInfos.push(wheelInfo)
         this.vehicle.updateSuspension(0)
 
         this.wheelMeshes.push(this.createWheelMesh(index))
@@ -559,6 +562,9 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     break(notBreak?: boolean) {
+
+
+
         let breakForce = !!notBreak ? 0 : this.breakingForce
         if (!this._canDrive) breakForce = 500
 
@@ -618,7 +624,6 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     addCamera(camera: PerspectiveCamera) {
-        console.log("adding camera to", this.name)
         if (!this.vehicleBody) return
         const c = this.vehicleBody.getObjectByName(camera.name)
         this.camera = camera
@@ -925,7 +930,7 @@ export class LowPolyVehicle extends Vehicle {
 
             // have these calls optional, since they are quite heavy for the machine, or maybe only perform every other tick?
             // only use vehicle assist if more than 30 fps
-            if (delta < 33.5 && !this.isBot) {
+            if (delta < 25 && !this.isBot) {
 
                 this.checkIfSpinning()
                 this.vehicleAssist(false)
@@ -1112,11 +1117,16 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     // set to default vehicle config
-    _updateVehicleSetup() {
-        console.log("updated vehilce config", this.vehicleConfig)
-        this.updateMass(this.vehicleConfig.mass)
-        this.updateWheelsSuspension()
-        this.updateMaxSpeed()
+    async _updateVehicleSetup() {
+        return new Promise<void>((resolve, reject) => {
+
+            console.log("updated vehicle config", this.name, this.vehicleConfig)
+
+            this.updateMass(this.vehicleConfig.mass)
+            this.updateWheelsSuspension()
+            this.updateMaxSpeed()
+            resolve()
+        })
     }
 
     updateMaxSpeed() {
@@ -1126,6 +1136,10 @@ export class LowPolyVehicle extends Vehicle {
     updateMass(mass: number) {
         this.vehicleConfig.mass = mass
 
+        if (!this.vehicleBody.body) {
+            console.warn("No body when updating mass, name:", this.name)
+            return
+        }
         this.vector.setValue(this.vehicleConfig.inertia.x, this.vehicleConfig.inertia.y, this.vehicleConfig.inertia.z)
         this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vector)
 
@@ -1169,18 +1183,40 @@ export class LowPolyVehicle extends Vehicle {
 
 
     destroyAmmo(obj: any, name?: string) {
-        try {
-            Ammo.destroy(obj)
-        } catch (err) {
-            console.warn("Error destorying:", name)
-        }
+        return new Promise<void>((resolve, reject) => {
+
+            try {
+                Ammo.destroy(obj)
+                console.log("Destroyed ammo:", name)
+                resolve()
+            } catch (err) {
+
+                console.warn("Error destorying:", name, "err:", err)
+                resolve()
+                // setTimeout(() => {
+                //     this.destroyAmmo(obj, name)
+                // }, 100)
+            }
+        })
     }
 
 
+    removeTireSmoke() {
+        for (let s of this.smokeParticles) {
+            this.scene.scene.remove(s.model)
+        }
+        this.smokeParticles = []
+    }
 
     async destroy() {
         new Promise<void>(async (resolve, reject) => {
-            console.log("destorying vehilce!", this.name)
+            this.stop()
+            const p = this.getPosition()
+            //this.setPosition(p.x, p.y + 30, p.z)
+            //this.update(16)
+            this.removeTireSmoke()
+
+
 
             this.destroyAmmo(this.zeroVec, "this.zeroVec")
             /** dont know if I need to check */
@@ -1197,27 +1233,31 @@ export class LowPolyVehicle extends Vehicle {
             this.destroyAmmo(this.quaternion, "this.quaternion")
 
 
-            // for (let i = 0; i < 4; i++) {
-            //     const wheel = this.vehicle.getWheelInfo(i)
-            //     Ammo.destroy(wheel)
-            // }
-            // this.destroyAmmo(this.vehicle, "vehicle ridged body")
-            //    this.destroyAmmo(this.vehicle, "this.vehicle")
-            // this.vehicle = null
+
+            for (let i = 0; i < 4; i++) {
+                const wheel = this.vehicle.getWheelInfo(i)
+                this.destroyAmmo(wheel, "wheel" + i)
+                await this.destroyAmmo(this.wheelInfos[i], "wheel " + i)
+            }
 
 
             this.isReady = false
             this._canDrive = false
             this.stopEngineSound()
             this.scene.scene.remove(this.engineSound)
-            if (this.scene && this.vehicleBody?.body) {
-                this.scene.destroy(this.vehicleBody)
-            }
+            this.scene.scene.remove(this.skidSound)
+
             for (let tire of this.tires) {
                 if (this.scene?.scene && tire) {
                     this.scene.scene.remove(tire)
                 }
             }
+
+            // removeAction is very important
+            // it removes the wheels or something
+            this.scene.physics.physicsWorld.removeAction(this.vehicle)
+            this.scene.physics.physicsWorld.removeRigidBody(this.vehicle.getRigidBody())
+
             resolve()
         })
     }

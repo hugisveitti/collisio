@@ -88,7 +88,7 @@ export interface IVehicle {
     setColor: (color: string | number) => void
     toggleSound: (useSound: boolean) => void
 
-    addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => void
+    addModels: (tires: ExtendedObject3D[], body: ExtendedObject3D) => Promise<void>
 
     getTowPivot: () => Vector3
 

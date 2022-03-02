@@ -50,7 +50,7 @@ const MultiplayerConnectRoomContainer = (
   const user = useContext(UserContext);
   let socket = getSocket();
   const [isConnecting, setIsConnecting] = useState(!!socket);
-  const [displayName, setDisplayName] = useState(getLocalDisplayName());
+  const [displayName, setDisplayName] = useState(getLocalDisplayName() ?? "");
   const [roomId, setRoomId] = useState(
     "" //(getLocalStorageItem("roomId", "string") as string) ?? ""
   );
@@ -173,7 +173,7 @@ const MultiplayerConnectRoomContainer = (
             <Grid item xs={12}>
               <BackdropButton
                 onClick={() => {
-                  if (displayName === "") {
+                  if (!displayName || displayName === "") {
                     toast.error("Name cannot be empty");
                     return;
                   }

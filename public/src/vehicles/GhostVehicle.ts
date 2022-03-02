@@ -42,6 +42,7 @@ export class GhostVehicle implements IGhostVehicle {
     position: Vector3
     futurePosition: Vector3
     prevPosition: Vector3 | undefined
+    prevRotation: Quaternion | undefined
 
     rotation: Quaternion
     isReady: boolean;
@@ -119,7 +120,13 @@ export class GhostVehicle implements IGhostVehicle {
     setSimpleRotation(r: { x: number, y: number, z: number, w: number }) {
         if (!this.isReady) return
         this.rotation.set(r.x, r.y, r.z, r.w)
-        this.vehicle.setRotationFromQuaternion(this.rotation)
+        //  this.vehicle.setRotationFromQuaternion(this.rotation)
+        if (this.prevRotation) {
+
+            this.vehicle.quaternion.slerpQuaternions(this.prevRotation, this.rotation, this.alpha)
+        } else {
+            this.vehicle.setRotationFromQuaternion(this.rotation)
+        }
 
     }
 
@@ -127,6 +134,8 @@ export class GhostVehicle implements IGhostVehicle {
         if (!p) return
         // this.prevPosition = this.position.clone()
         this.position.set(p.x, p.y, p.z)
+        //   this.prevPosition = this.vehicle.position.clone()
+        this.prevRotation = this.vehicle.quaternion.clone()
         this.prevPosition = this.position.clone() // this.vehicle.position.clone()
         calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
     }
@@ -141,18 +150,19 @@ export class GhostVehicle implements IGhostVehicle {
         // the ghost vehicle seems to be going back and forth
         // but according to this the vehicle just goes forth
 
-        if (this._speed && this.delta) {
+        if (this._speed && this.delta && this.prevPosition && this.futurePosition && this.vehicle.position.distanceTo(this.futurePosition) > 2) {
 
             //   calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.futurePosition)
             //  calcExpectedPos(this.position, this.vehicle.quaternion, this._speed, this.delta, this.vehicle.position)
 
             // this.vehicle.position.lerpVectors(this.position, this.futurePosition, this.alpha)
             // dont do anything if change is very little
-            if (this.vehicle.position.distanceTo(this.futurePosition) > 2) {
 
-                this.vehicle.position.lerpVectors(this.prevPosition, this.futurePosition, this.alpha)
 
-            }
+            this.vehicle.position.lerpVectors(this.prevPosition, this.futurePosition, this.alpha)
+            // this.vehicle.position.lerpVectors(this.prevPosition, this.position, this.alpha)
+
+
 
 
         } else {

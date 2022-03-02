@@ -56,6 +56,7 @@ export class MyScene extends Scene3D {
     updateDelta = 0
 
     isPaused: boolean
+    isReady: boolean
 
     /**
   * all spans and divs become children of this element to easily delete
@@ -101,6 +102,7 @@ export class MyScene extends Scene3D {
         this.timeOfDay = this.timeOfDay
         this.isPaused = true
         this.needsReload = false
+        this.isReady = false
 
         this.gameRoomActions = {}
 
@@ -151,9 +153,9 @@ export class MyScene extends Scene3D {
 
     handleResizeWindow() {
         this._handleResizeWindow()
-        console.log("resize window", this.renderer)
-
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        //  this.renderer.domElement.setAttribute("style", "width:100%;");
 
         (this.camera as PerspectiveCamera).aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix()
@@ -168,6 +170,7 @@ export class MyScene extends Scene3D {
         await this.init?.(data)
         await this.preload()
         await this.create()
+        this.isReady = true
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
@@ -176,8 +179,9 @@ export class MyScene extends Scene3D {
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
 
         this.isPaused = false
-        console.log("physics items", this.physics.rigidBodies)
-
+        setTimeout(() => {
+            this.handleResizeWindow()
+        }, 3000)
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
         })
@@ -187,7 +191,7 @@ export class MyScene extends Scene3D {
         const currDelta = this.clock.getDelta()
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
-        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused) {
+        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused && this.isReady) {
             const time = this.clock.getElapsedTime()
             let delta = (this.updateDelta * 1000)
 
@@ -200,8 +204,12 @@ export class MyScene extends Scene3D {
 
             this.gameTicks += 1
             this.roomTicks += 1
+            // try {
             this.physics?.update(delta)
             this.physics?.updateDebugger()
+            // } catch (err) {
+            //     console.log("Error updating physics", err)
+            // }
 
             this.update?.(+(time.toFixed(8)), delta)
 
@@ -239,7 +247,9 @@ export class MyScene extends Scene3D {
     }
 
     setNeedsReload(needsReload: boolean) {
-        this.needsReload = needsReload
+        if (this.isReady) {
+            this.needsReload = needsReload
+        }
     }
 
     getDrawDistance() {
@@ -432,8 +442,6 @@ export class MyScene extends Scene3D {
         return []
     }
 
-
-
     async _destroyGame() { }
 
     async destroyGame() {
@@ -462,6 +470,4 @@ export class MyScene extends Scene3D {
             resolve()
         })
     }
-
-
 }
