@@ -45,6 +45,7 @@ export class MultiplayerRoomMaster {
                 if (room) {
                     room.addPlayerMobileSocket(socket, config.userId)
                 } else {
+                    console.log("All splitscreen rooms", Object.keys(this.rooms))
                     socket.emit(m_fs_connect_to_room_callback, {
                         message: "Room does not exists",
                         status: "error"
