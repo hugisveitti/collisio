@@ -237,6 +237,12 @@ export default class RoomMaster {
     }
 }
 
+interface IRoomDataCollection {
+    totalPing: number
+    totalPingsGotten: number
+    gameTicks: number
+    roomTicks: number
+}
 
 export class Room {
     players: Player[]
@@ -257,6 +263,7 @@ export class Room {
     geoIp: { geo: any, ip: string }
 
     roomCreatedDate: number
+    dataCollection: IRoomDataCollection
 
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
@@ -275,6 +282,13 @@ export class Room {
         this.setSocket(socket)
 
         const dataKeys = Object.keys(data)
+
+        this.dataCollection = {
+            totalPing: 0,
+            totalPingsGotten: 0,
+            gameTicks: 0,
+            roomTicks: 0,
+        }
 
         for (let key of dataKeys) {
             // @ts-ignore
@@ -326,7 +340,8 @@ export class Room {
             multiplayer: false,
             players: this.players.map(p => p.getEndOfRoomInfo()),
             gameStarted: this.gameStarted,
-            roomSettings: this.roomSettings
+            roomSettings: this.roomSettings,
+            dataCollection: this.dataCollection
         }
         extraData = deleteUndefined(extraData)
         addCreatedRooms(this.roomId, this.desktopUserId ?? "undef", extraData)
@@ -358,7 +373,11 @@ export class Room {
     }
 
     setupPingListener() {
-        this.socket.on(dts_ping_test, () => {
+        this.socket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
+            this.dataCollection.roomTicks += roomTicks
+            this.dataCollection.gameTicks += gameTicks
+            this.dataCollection.totalPing += totalPing
+            this.dataCollection += totalPingsGotten
             this.socket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

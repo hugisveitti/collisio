@@ -69,7 +69,11 @@ export class Player {
             numberOfVehicleChanges: 0,
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
-            numberOfRacesFinished: 0
+            numberOfRacesFinished: 0,
+            totalPing: 0,
+            totalPingsGotten: 0,
+            gameTicks: 0,
+            roomTicks: 0,
         }
 
         this.mobileControls = new MobileControls()

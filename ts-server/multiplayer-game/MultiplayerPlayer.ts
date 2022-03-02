@@ -12,6 +12,10 @@ export interface IPlayerDataCollection {
     numberOfMobileConnections: number
     totalNumberOfLapsDone: number
     numberOfRacesFinished: number
+    totalPing: number
+    totalPingsGotten: number
+    gameTicks: number
+    roomTicks: number
 
 }
 
@@ -87,7 +91,11 @@ export class MulitplayerPlayer {
             numberOfVehicleChanges: 0,
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
-            numberOfRacesFinished: 0
+            numberOfRacesFinished: 0,
+            totalPing: 0,
+            totalPingsGotten: 0,
+            gameTicks: 0,
+            roomTicks: 0,
         }
         this.posChanged = false
 
@@ -172,7 +180,12 @@ export class MulitplayerPlayer {
     }
 
     setupPingListener() {
-        this.desktopSocket.on(dts_ping_test, () => {
+        this.desktopSocket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
+
+            this.dataCollection.roomTicks += roomTicks
+            this.dataCollection.gameTicks += gameTicks
+            this.dataCollection.totalPing += totalPing
+            this.dataCollection += totalPingsGotten
             this.desktopSocket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

@@ -12,7 +12,9 @@ import {
   getAllLocalRoomSettings,
 } from "../classes/localGameSettings";
 import { defaultUserSettings } from "../classes/User";
+import CookiesInfoPage from "../extra/CookiesInfoPage";
 import PrivayPolicyComponent from "../extra/PrivacyPolicyComponent";
+import TermsOfUse from "../extra/TermsOfUsePage";
 import {
   getDBUserSettings,
   setDBUserSettings,
@@ -98,6 +100,8 @@ export const multiplayerRoomIdPagePath = "/multiplayer/:roomId";
 export const multiplayerGameRoomIdPagePath = "/multiplayer/game/:roomId";
 const multiplayerControlsRoomIdPagePath = "/multiplayer/controls/:roomId";
 const multiplayerControlsPagePath = "/multiplayer/controls";
+export const cookiesInfoPagePath = "/cookies";
+export const termsOfUsePagePath = "/termsOfUse";
 
 const multiplayerGameRoomPagePath = "/multiplayer/game";
 
@@ -371,6 +375,15 @@ const Routes = () => {
           render={(props) => (
             <MultiplayerConnectRoomContainer {...props} store={store} />
           )}
+        />
+        <Route
+          path={cookiesInfoPagePath}
+          render={(props) => <CookiesInfoPage {...props} />}
+        />
+
+        <Route
+          path={termsOfUsePagePath}
+          render={(props) => <TermsOfUse {...props} />}
         />
 
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />

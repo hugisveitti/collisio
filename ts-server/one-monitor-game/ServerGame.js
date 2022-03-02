@@ -205,6 +205,12 @@ var Room = /** @class */ (function () {
         this.deleteRoomCallback = deleteRoomCallback;
         this.setSocket(socket);
         var dataKeys = Object.keys(data);
+        this.dataCollection = {
+            totalPing: 0,
+            totalPingsGotten: 0,
+            gameTicks: 0,
+            roomTicks: 0,
+        };
         for (var _i = 0, dataKeys_1 = dataKeys; _i < dataKeys_1.length; _i++) {
             var key = dataKeys_1[_i];
             // @ts-ignore
@@ -256,7 +262,8 @@ var Room = /** @class */ (function () {
             multiplayer: false,
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
             gameStarted: this.gameStarted,
-            roomSettings: this.roomSettings
+            roomSettings: this.roomSettings,
+            dataCollection: this.dataCollection
         };
         extraData = (0, serverFirebaseFunctions_1.deleteUndefined)(extraData);
         (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, (_a = this.desktopUserId) !== null && _a !== void 0 ? _a : "undef", extraData);
@@ -289,7 +296,12 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.setupPingListener = function () {
         var _this = this;
-        this.socket.on(shared_stuff_1.dts_ping_test, function () {
+        this.socket.on(shared_stuff_1.dts_ping_test, function (_a) {
+            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten;
+            _this.dataCollection.roomTicks += roomTicks;
+            _this.dataCollection.gameTicks += gameTicks;
+            _this.dataCollection.totalPing += totalPing;
+            _this.dataCollection += totalPingsGotten;
             _this.socket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
         });
     };

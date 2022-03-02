@@ -43,7 +43,11 @@ var MulitplayerPlayer = /** @class */ (function () {
             numberOfVehicleChanges: 0,
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
-            numberOfRacesFinished: 0
+            numberOfRacesFinished: 0,
+            totalPing: 0,
+            totalPingsGotten: 0,
+            gameTicks: 0,
+            roomTicks: 0,
         };
         this.posChanged = false;
         this.setupSocket();
@@ -121,7 +125,12 @@ var MulitplayerPlayer = /** @class */ (function () {
     };
     MulitplayerPlayer.prototype.setupPingListener = function () {
         var _this = this;
-        this.desktopSocket.on(shared_stuff_1.dts_ping_test, function () {
+        this.desktopSocket.on(shared_stuff_1.dts_ping_test, function (_a) {
+            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten;
+            _this.dataCollection.roomTicks += roomTicks;
+            _this.dataCollection.gameTicks += gameTicks;
+            _this.dataCollection.totalPing += totalPing;
+            _this.dataCollection += totalPingsGotten;
             _this.desktopSocket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
         });
     };

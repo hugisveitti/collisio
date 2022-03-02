@@ -8,7 +8,12 @@ import BackdropContainer from "./backdrop/BackdropContainer";
 import BackdropButton from "./button/BackdropButton";
 import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import DonateButton from "./monitary/DonateButton";
-import { buyCoinsPagePath, privacyPolicyPage } from "./Routes";
+import {
+  buyCoinsPagePath,
+  cookiesInfoPagePath,
+  privacyPolicyPage,
+  termsOfUsePagePath,
+} from "./Routes";
 
 interface IAboutPageComponent {}
 
@@ -28,6 +33,21 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
             <a style={{ color: "gray" }} href={privacyPolicyPage}>
               Privacy Policy
             </a>
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            Read about how we use{" "}
+            <a style={{ color: "gray" }} href={cookiesInfoPagePath}>
+              cookies
+            </a>
+          </Typography>
+          <Typography>
+            By playing you are accepting our{" "}
+            <a style={{ color: "gray" }} href={termsOfUsePagePath}>
+              terms of use
+            </a>
+            .
           </Typography>
         </Grid>
         <Grid item xs={12}>
