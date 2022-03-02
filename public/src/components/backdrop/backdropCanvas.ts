@@ -164,46 +164,50 @@ export const createBackdropRenderer = (loaderProgressCallback: (completed: numbe
     const targetFPS = 20
 
     const animate = () => {
-        // controls.update();
-        if (renderer) {
-            const now = Date.now()
-            const delta = now - time
-            renderer.render(scene, camera);
-            time = now
+
+        if (camera) {
+
+            // controls.update();
+            if (renderer) {
+                const now = Date.now()
+                const delta = now - time
+                renderer.render(scene, camera);
+                time = now
+
+            }
+
+            // camera.rotateY(ry)
+            if (reachedTarget) {
+                sinOff += dSin
+                if (Math.abs(sinOff) > sinOffMax) {
+                    dSin = -dSin
+                }
+
+                cosOff += dCos
+                if (Math.abs(cosOff) > cosOffMax) {
+                    dCos = -dCos
+                }
+
+                camera.position.setX(posX + Math.sin(sinOff) + Math.cos(cosOff))
+                camera.position.setZ(posZ + Math.sin(sinOff) + Math.cos(cosOff))
+                camera.position.setY(posY + Math.sin(sinOff) + Math.cos(cosOff))
+            } else {
+
+                const newPos = camera.position.clone().sub(camera.position.clone().sub(cameraTargetPos).multiplyScalar(cameraMoveSpeed))
+                camera.position.set(newPos.x, newPos.y, newPos.z)
+
+                if (newPos.distanceTo(cameraTargetPos) < 0.1) {
+                    reachedTarget = true
+                    sinOff = 0
+                    cosOff = Math.PI / 2
+                    //   camera.position.set(cameraTargetPos.x + Math.cos(yOff), cameraTargetPos.y, cameraTargetPos.z + Math.sin(yOff))
+                    setPosXZ()
+                }
+
+            }
+            camera.lookAt(cameraLookAtPos.clone())
 
         }
-
-        // camera.rotateY(ry)
-        if (reachedTarget) {
-            sinOff += dSin
-            if (Math.abs(sinOff) > sinOffMax) {
-                dSin = -dSin
-            }
-
-            cosOff += dCos
-            if (Math.abs(cosOff) > cosOffMax) {
-                dCos = -dCos
-            }
-
-            camera.position.setX(posX + Math.sin(sinOff) + Math.cos(cosOff))
-            camera.position.setZ(posZ + Math.sin(sinOff) + Math.cos(cosOff))
-            camera.position.setY(posY + Math.sin(sinOff) + Math.cos(cosOff))
-        } else {
-
-            const newPos = camera.position.clone().sub(camera.position.clone().sub(cameraTargetPos).multiplyScalar(cameraMoveSpeed))
-            camera.position.set(newPos.x, newPos.y, newPos.z)
-
-            if (newPos.distanceTo(cameraTargetPos) < 0.1) {
-                reachedTarget = true
-                sinOff = 0
-                cosOff = Math.PI / 2
-                //   camera.position.set(cameraTargetPos.x + Math.cos(yOff), cameraTargetPos.y, cameraTargetPos.z + Math.sin(yOff))
-                setPosXZ()
-            }
-
-        }
-        camera.lookAt(cameraLookAtPos.clone())
-
         animateTimeout = setTimeout(() => {
 
             requestAnimationFrame(animate);

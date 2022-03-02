@@ -93,3 +93,7 @@
   background-color: #eee;
   border-bottom: 1px solid black;
 }
+
+.hidden-overflow {
+  overflow: hidden;
+}

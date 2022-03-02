@@ -1187,15 +1187,12 @@ export class LowPolyVehicle extends Vehicle {
 
             try {
                 Ammo.destroy(obj)
-                console.log("Destroyed ammo:", name)
                 resolve()
             } catch (err) {
 
                 console.warn("Error destorying:", name, "err:", err)
                 resolve()
-                // setTimeout(() => {
-                //     this.destroyAmmo(obj, name)
-                // }, 100)
+
             }
         })
     }

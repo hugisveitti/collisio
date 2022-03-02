@@ -142,10 +142,14 @@ export class MyScene extends Scene3D {
 
         this.gameInfoDiv.appendChild(this.pingInfo)
         this.gameInfoDiv.appendChild(this.fpsInfo)
-        //    document.body.setAttribute("style", "overflow:hidden;")
+
+
         setLoaderProgress(0)
 
         window.addEventListener("resize", () => this.handleResizeWindow())
+
+        document.body.classList.add("hidden-overflow")
+
 
     }
 
@@ -181,7 +185,7 @@ export class MyScene extends Scene3D {
         this.isPaused = false
         setTimeout(() => {
             this.handleResizeWindow()
-        }, 3000)
+        }, 10)
         this.renderer.setAnimationLoop(() => {
             this._myupdate()
         })
@@ -447,7 +451,7 @@ export class MyScene extends Scene3D {
     async destroyGame() {
         return new Promise<void>(async (resolve, reject) => {
             window.removeEventListener("resize", () => this.handleResizeWindow())
-
+            document.body.classList.remove("hidden-overflow")
             if (wakeLock) {
 
                 wakeLock.release()
