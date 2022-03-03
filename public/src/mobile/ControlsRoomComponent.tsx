@@ -71,7 +71,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     }
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
-    controller.beta = Math.round(beta) * -Math.sign(gamma);
+    controller.beta = Math.round(beta) * Math.sign(gamma);
   };
 
   const getSteeringDirection = () => {
