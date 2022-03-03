@@ -50,12 +50,14 @@ import PaymentCallbackContainer from "./monitary/PaymentCallbackContainer";
 import MultiplayerConnectRoomContainer from "./multiplayer/MultiplayerConnectRoomContainer";
 import MultiplayerControlsRoomContainer from "./multiplayer/MultiplayerControlsRoomContainer";
 import MultiplayerWaitingRoomContainer from "./multiplayer/MultiplayerWaitingRoomContainer";
-import MultiplayerGameRoom from "./multiplayerGameRoom/MuliplayerGameRoom";
+import MultiplayerGameRoom from "./multiplayerGameRoom/MultiplayerGameRoom";
 import NotFoundPage from "./NotFoundPage";
 import PrivateProfileAllTournamentsList from "./profile/PrivateProfileAllTournamentsList";
 import PrivateProfilePage from "./profile/PrivateProfilePage";
 import PublicProfilePageContainer from "./profile/PublicProfilePageContainer";
 import ShowRoomContainer from "./showRoom/ShowRoomContainer";
+import SinglePlayerGameRoom from "./singleplayer/SinglePlayerGameRoom";
+import SinglePlayerWaitingRoom from "./SinglePlayerWaitingRoom";
 import { IStore } from "./store";
 import CreateTournamentContainer from "./tournament/CreateTournamentContainer";
 import TournamentPageContainer from "./tournament/TournamentOverviewContainer";
@@ -102,6 +104,8 @@ const multiplayerControlsRoomIdPagePath = "/multiplayer/controls/:roomId";
 const multiplayerControlsPagePath = "/multiplayer/controls";
 export const cookiesInfoPagePath = "/cookies";
 export const termsOfUsePagePath = "/termsOfUse";
+export const singlePlayerWaitingRoomPath = "/singleplayer";
+export const singlePlayerGameRoomPath = "/singleplayer/game";
 
 const multiplayerGameRoomPagePath = "/multiplayer/game";
 
@@ -384,6 +388,16 @@ const Routes = () => {
         <Route
           path={termsOfUsePagePath}
           render={(props) => <TermsOfUse {...props} />}
+        />
+        <Route
+          path={singlePlayerGameRoomPath}
+          render={(props) => <SinglePlayerGameRoom {...props} store={store} />}
+        />
+        <Route
+          path={singlePlayerWaitingRoomPath}
+          render={(props) => (
+            <SinglePlayerWaitingRoom {...props} store={store} />
+          )}
         />
 
         <Route path={"/*"} render={(props) => <NotFoundPage {...props} />} />

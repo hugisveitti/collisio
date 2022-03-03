@@ -32,6 +32,8 @@ interface IVehicleSettingsComponent {
   // if true, then the vehicle select is a garage button
   linkToGarage?: boolean;
   maxWidth?: string | number;
+  onVehicleSettingsChange?: (vehicleSettings: IVehicleSettings) => void;
+  onVehicleSetupChange?: (vehicleSetup: VehicleSetup) => void;
 }
 
 let userSettingsToSave: IUserSettings;
@@ -100,6 +102,10 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
       vehicleSetup = props.store.vehiclesSetup[value];
     }
 
+    if (props.onVehicleSettingsChange) {
+      props.onVehicleSettingsChange(newUserSettings.vehicleSettings);
+    }
+
     if (!notEmit) {
       sendUserSettingsToServer(newUserSettings, vehicleSetup);
     }
@@ -114,6 +120,9 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     vehiclesSetupToSave = newVehiclesSetup;
 
     sendVehicleSetupToServer(newVehiclesSetup[vehicleSettings.vehicleType]);
+    if (props.onVehicleSetupChange) {
+      props.onVehicleSetupChange(newVehiclesSetup[vehicleSettings.vehicleType]);
+    }
 
     setAnythingChanged(true);
   };

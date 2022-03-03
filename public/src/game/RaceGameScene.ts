@@ -206,7 +206,6 @@ export class RaceGameScene extends GameScene {
             this.showImportantInfo(`Race starting in ${this.raceCountdownTime} seconds`, true)
         }
 
-
         /** hacky way to make vehicles stopp
          * TODO: not this, find a way to make vechicles reliably start on the ground paused..
          */
@@ -229,7 +228,6 @@ export class RaceGameScene extends GameScene {
             }
 
             this.showViewsImportantInfo(this.raceCountdownTime + "")
-
             if (this.raceCountdownTime > 0) {
 
                 // await this.nSecWait(1)
@@ -246,7 +244,6 @@ export class RaceGameScene extends GameScene {
             this.raceCountdownTime -= 1
             // }
         }, 1000)
-
     }
 
     _togglePauseGame(wasPaused: boolean) {

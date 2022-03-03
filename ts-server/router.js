@@ -20,8 +20,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPortLocalhost = void 0;
+var geoip_lite_1 = require("geoip-lite");
 var os = __importStar(require("os"));
 var path = __importStar(require("path"));
+var europe_1 = require("./europe");
 var firebaseCoinFunctions_1 = require("./firebaseCoinFunctions");
 /** toDO fix this shit */
 var express = require("express");
@@ -64,6 +66,24 @@ var router = function (app) {
                 completed: false
             });
         }
+    });
+    app.get("/country", function (req, res) {
+        var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        console.log(ip); // ip address of the user
+        if (Array.isArray(ip)) {
+            ip = ip.join("");
+        }
+        var inEurope = false;
+        var country = "unknown";
+        if (ip) {
+            var geo = (0, geoip_lite_1.lookup)(ip);
+            console.log(geo); // location of the user
+            if (geo) {
+                country = geo === null || geo === void 0 ? void 0 : geo.country;
+                inEurope = country ? country in europe_1.europeArray : false;
+            }
+        }
+        res.send(JSON.stringify({ inEurope: inEurope, country: country }));
     });
     // app.post("/buyvehicleitem", (req: Request, res: Response) => {
     //     const { userId, item, vehicleType } = req.body
@@ -156,6 +176,7 @@ var router = function (app) {
     app.get("/multiplayer/*", sendIndexHTML);
     app.get("/cookies", sendIndexHTML);
     app.get("/termsOfUse", sendIndexHTML);
+    app.get("/singleplayer/*", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {
         res.sendFile(path.join(__dirname, adminHTMLPath));

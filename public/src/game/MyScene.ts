@@ -1,14 +1,15 @@
 import { Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { AmbientLight, PerspectiveCamera, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { Audio, AudioListener, AmbientLight, PerspectiveCamera, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
-import { removeMusic, stopMusic } from "../sounds/gameSounds";
+import { getBeep, removeMusic, stopMusic } from "../sounds/gameSounds";
 import { removeKeyboardControls } from "../utils/controls";
+import { getStaticPath } from "../utils/settings";
 import { BotVehicle } from "../vehicles/BotVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
 import "./game-styles.css";
@@ -16,6 +17,7 @@ import { IGameRoomActions, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 const fadeSecs = 2
+const vechicleFov = 60
 
 let wakeLock = null
 export class MyScene extends Scene3D {
@@ -73,6 +75,9 @@ export class MyScene extends Scene3D {
     gameRoomActions: IGameRoomActions
 
     bot: BotVehicle
+
+    beepE4: Audio
+    beepC4: Audio
 
     constructor() {
         super()
@@ -151,6 +156,7 @@ export class MyScene extends Scene3D {
         document.body.classList.add("hidden-overflow")
 
 
+
     }
 
     _handleResizeWindow() { }
@@ -165,9 +171,45 @@ export class MyScene extends Scene3D {
         this.camera.updateProjectionMatrix()
     }
 
-    async init(data) { }
+    async init(data) {
+        // need to do some test with performance and the draw distance
+        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
+        this.setPixelRatio()
+        // this gravity seems to work better
+        // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
+        this.physics.setGravity(0, -9.82, 0)
+
+        const listener = new AudioListener()
+        this.camera.add(listener)
+
+        getBeep(getStaticPath("sound/beepC4.mp3"), listener, (beepC4) => {
+            this.beepC4 = beepC4
+        })
+
+        getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
+            this.beepE4 = beepE4
+        })
+
+
+    }
+
+
     async preload() { }
     async create() { }
+
+
+
+    setPixelRatio() {
+        const lowGraphics = this.gameSettings.graphics === "low"
+        this.renderer.capabilities.precision = lowGraphics ? "lowp" : "highp"
+        // let ratio = lowGraphics ? 4 : 1
+
+        // if (window.devicePixelRatio < ratio && lowGraphics) {
+        //     ratio = Math.floor(window.devicePixelRatio)
+        // }
+        this.renderer.setPixelRatio(1)
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+    }
 
     public async start(key?: string, data?: any) {
 
@@ -178,7 +220,7 @@ export class MyScene extends Scene3D {
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
-        this.physics.config.maxSubSteps = 1 + 1
+        this.physics.config.maxSubSteps = 1 + 1 + 2
 
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
 
@@ -231,6 +273,21 @@ export class MyScene extends Scene3D {
             this.postRender()
         } else {
 
+        }
+    }
+
+    playCountdownBeep() {
+        if (this.useSound) {
+            this.beepC4?.play()
+            setTimeout(() => {
+                this.beepC4?.stop()
+            }, 250)
+        }
+    }
+
+    playStartBeep() {
+        if (this.useSound) {
+            this.beepE4?.play()
         }
     }
 

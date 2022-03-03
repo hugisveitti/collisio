@@ -1,5 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Euler, PerspectiveCamera, TextureLoader, FlatShading, MeshLambertMaterial, IcosahedronGeometry, Quaternion, Mesh, MeshPhongMaterial, PlaneGeometry, Vector3 } from "three";
+import { Euler, PerspectiveCamera, TextureLoader, FlatShading, MeshLambertMaterial, MeshStandardMaterial, IcosahedronGeometry, Quaternion, Mesh, MeshPhongMaterial, PlaneGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -102,7 +102,7 @@ export class LowPolyVehicle extends Vehicle {
         this.breakingForce = this.vehicleConfig.breakingForce
         this.is4x4 = this.vehicleConfig.is4x4
 
-        this.currentEngineForce = 0
+        this.currentEngineForce = this.vehicleConfig.engineForce
         this.spinCameraAroundVehicle = false
         this.p0 = [
             new Ammo.btVector3(0, 0, 0),
@@ -276,19 +276,27 @@ export class LowPolyVehicle extends Vehicle {
             this.staticCameraPos = getStaticCameraPos(this.vehicleSettings.cameraZoom)
             if (this.vehicleBody.type === "Mesh") {
 
-                this.scene.add.existing(this.vehicleBody)
+                this.scene.add.existing(this.vehicleBody,)
             } else {
                 this.scene.add.existing(this.vehicleBody)
             }
+            //  (this.vehicleBody.material as MeshStandardMaterial).wireframe = true;
+            //    (this.vehicleBody.material as MeshStandardMaterial).visible = false;
+
+
+            // box.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+            // box.body.skipUpdate = true
+
 
             this.changeCenterOfMass()
-
             this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
+            // this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: "box", autoCenter: false, width: 2, depth: 6, height: 1.5, y: 2 })
 
-            this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+            // this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+            const bounce = .5
 
-            this.vehicleBody.body.setBounciness(0)
-            this.vehicleBody.body.setRestitution(0)
+            this.vehicleBody.body.setBounciness(bounce)
+            this.vehicleBody.body.setRestitution(bounce)
             this.vehicleBodyPosition.set(this.vehicleBody.position.x, this.vehicleBody.position.y + this.vehicleConfig.centerOfMassOffset, this.vehicleBody.position.z)
             // how to lower center of mass
 
@@ -303,8 +311,9 @@ export class LowPolyVehicle extends Vehicle {
             this.raycaster = new Ammo.btDefaultVehicleRaycaster(this.scene.physics.physicsWorld)
 
             this.vehicle = new Ammo.btRaycastVehicle(this.tuning, this.vehicleBody.body.ammo, this.raycaster)
+            //   this.vehicle = new Ammo.btRaycastVehicle(this.tuning, box.body.ammo, this.raycaster)
 
-            this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
+
             this.vehicleBody.body.skipUpdate = true
             this.vehicle.setCoordinateSystem(0, 1, 2)
 
@@ -462,7 +471,9 @@ export class LowPolyVehicle extends Vehicle {
 
         let abs = 1000
 
-        let possibleEf = this.currentEngineForce + ((eF - this.currentEngineForce) * .05)
+        const mult = (60 / 1000) * this.delta * 0.05
+
+        let possibleEf = this.currentEngineForce + ((eF - this.currentEngineForce) * mult)
         if (Math.abs(this.currentEngineForce - eF) > abs) {
             //   console.warn("big diff", this.currentEngineForce - eF)
             this.currentEngineForce = this.currentEngineForce - (abs * Math.sign(this.currentEngineForce - eF))
@@ -471,7 +482,6 @@ export class LowPolyVehicle extends Vehicle {
         }
 
         eF = this.currentEngineForce
-
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -1084,6 +1094,7 @@ export class LowPolyVehicle extends Vehicle {
     }
 
     resetPosition() {
+        this.currentEngineForce = this.vehicleConfig.engineForce
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
@@ -1119,9 +1130,9 @@ export class LowPolyVehicle extends Vehicle {
     // set to default vehicle config
     async _updateVehicleSetup() {
         return new Promise<void>((resolve, reject) => {
-
             console.log("updated vehicle config", this.name, this.vehicleConfig)
 
+            this.currentEngineForce = this.vehicleConfig.engineForce
             this.updateMass(this.vehicleConfig.mass)
             this.updateWheelsSuspension()
             this.updateMaxSpeed()

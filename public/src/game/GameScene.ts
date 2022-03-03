@@ -1,15 +1,14 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { Audio, AudioListener, Color, PerspectiveCamera } from "three";
+import { Color, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
 import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
-import { addMusic, getBeep, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
+import { addMusic, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
-import { getStaticPath } from '../utils/settings';
 import { IVehicle } from "../vehicles/IVehicle";
 import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
@@ -18,7 +17,7 @@ import { getVehicleClassFromType } from '../vehicles/VehicleConfigs';
 import { getWagonNumber, Wagon } from "../vehicles/Wagon";
 import { WagonType } from "../vehicles/WagonConfigs";
 import "./game-styles.css";
-import { IGameRoomActions, IGameScene, IGameSceneConfig } from "./IGameScene";
+import { IGameScene, IGameSceneConfig } from "./IGameScene";
 import { MyScene } from "./MyScene";
 
 
@@ -83,8 +82,7 @@ export class GameScene extends MyScene implements IGameScene {
      */
 
 
-    beepE4: Audio
-    beepC4: Audio
+
 
     hasAskedToLowerSettings: boolean
 
@@ -133,15 +131,8 @@ export class GameScene extends MyScene implements IGameScene {
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
 
-        const listener = new AudioListener()
-        this.camera.add(listener)
-        getBeep(getStaticPath("sound/beepC4.mp3"), listener, (beepC4) => {
-            this.beepC4 = beepC4
-        })
 
-        getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
-            this.beepE4 = beepE4
-        })
+
 
         document.addEventListener("keypress", (e) => {
             if (e.key === "r") {
@@ -173,14 +164,6 @@ export class GameScene extends MyScene implements IGameScene {
 
     async loadAssets() { }
 
-    async init(data: any) {
-        // need to do some test with performance and the draw distance
-        this.camera = new PerspectiveCamera(vechicleFov, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
-        this.setPixelRatio()
-        // this gravity seems to work better
-        // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
-        this.physics.setGravity(0, -9.82, 0)
-    }
 
 
     createWagons(wagonTypes: WagonType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
@@ -323,18 +306,6 @@ export class GameScene extends MyScene implements IGameScene {
         return this.vehicles
     }
 
-
-    setPixelRatio() {
-        const lowGraphics = this.gameSettings.graphics === "low"
-        this.renderer.capabilities.precision = lowGraphics ? "lowp" : "highp"
-        // let ratio = lowGraphics ? 4 : 1
-
-        // if (window.devicePixelRatio < ratio && lowGraphics) {
-        //     ratio = Math.floor(window.devicePixelRatio)
-        // }
-        this.renderer.setPixelRatio(1)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-    }
 
     /**
      * 
@@ -703,21 +674,6 @@ export class GameScene extends MyScene implements IGameScene {
     toggleUseSound() {
         for (let vehicle of this.vehicles) {
             vehicle.toggleSound(this.useSound)
-        }
-    }
-
-    playCountdownBeep() {
-        if (this.useSound) {
-            this.beepC4?.play()
-            setTimeout(() => {
-                this.beepC4?.stop()
-            }, 250)
-        }
-    }
-
-    playStartBeep() {
-        if (this.useSound) {
-            this.beepE4?.play()
         }
     }
 

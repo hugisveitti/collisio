@@ -46,7 +46,7 @@ export class BotVehicle extends LowPolyVehicle {
     targetReached: boolean
 
     constructor(botDifficulty: BotDifficulty, config: IVehicleClassConfig) {
-        super({ ...config, vehicleType: getVehicleType(botDifficulty), vehicleSetup: { ...config.vehicleSetup, vehicleType: getVehicleType(botDifficulty), exhaust: vehicleItems[getVehicleType(botDifficulty)]["exhaust1"], spoiler: vehicleItems[getVehicleType(botDifficulty)]["spoiler1"] } })
+        super({ ...config, vehicleType: getVehicleType(botDifficulty), vehicleSetup: { ...config.vehicleSetup, vehicleType: getVehicleType(botDifficulty), exhaust: vehicleItems[getVehicleType(botDifficulty)]["exhaust1"], spoiler: vehicleItems[getVehicleType(botDifficulty)]["spoiler1"] }, isBot: true })
         this.stuckTicks = 0
 
 
@@ -180,6 +180,7 @@ export class BotVehicle extends LowPolyVehicle {
             this.stuckTicks -= 1
         } else if (this.getCurrentSpeedKmHour() < this.botSpeed * this.speedMult) {
             this.goForward()
+
         } else {
             this.noForce()
         }

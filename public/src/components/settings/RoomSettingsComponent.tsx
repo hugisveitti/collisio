@@ -32,23 +32,21 @@ interface IRoomSettingsComponent {
 }
 
 const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
-  const [roomSettings, setRoomSettings] = useState(props.roomSettings);
-
   const onMobile = getDeviceType() === "mobile";
 
   const { color, backgroundColor } = getStyledColors("black");
 
-  const disableInputs = !!roomSettings.tournamentId;
+  const disableInputs = !!props.roomSettings.tournamentId;
 
   useEffect(() => {
     if (props.multiplayer) {
       const newRoomSettings: IRoomSettings = {
-        ...roomSettings,
+        ...props.roomSettings,
       };
-      if (roomSettings.gameType !== "race") {
+      if (props.roomSettings.gameType !== "race") {
         newRoomSettings.gameType = "race";
       }
-      setRoomSettings(newRoomSettings);
+      //    setRoomSettings(newRoomSettings);
       props.onChange(newRoomSettings);
     }
   }, []);
@@ -81,15 +79,10 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
 
     setLocalRoomSetting(key, value);
 
-    setRoomSettings(newRoomSettings);
     if (!notEmit) {
       props.onChange(newRoomSettings);
     }
   };
-
-  useEffect(() => {
-    setRoomSettings(props.roomSettings);
-  }, [props.roomSettings]);
 
   const renderGameTypeInputs = () => {
     if (props.roomSettings.gameType === "race") {
@@ -99,7 +92,7 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
             <NumberSelect
               disabled={disableInputs}
               title="No. of laps"
-              value={roomSettings.numberOfLaps}
+              value={props.roomSettings.numberOfLaps}
               numbers={numberOfLapsPossibilities}
               onChange={(val) => {
                 updateRoomSettings("numberOfLaps", val);
@@ -121,7 +114,9 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
               type="number"
               label="Tag game length in minutes"
               value={
-                roomSettings.tagGameLength ? roomSettings.tagGameLength : ""
+                props.roomSettings.tagGameLength
+                  ? props.roomSettings.tagGameLength
+                  : ""
               }
               onChange={(ev) => {
                 updateRoomSettings("tagGameLength", +ev.target.value);
@@ -141,7 +136,7 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
         <Grid item xs={12} lg={4}>
           <MyRadio<GameType>
             label="Type of game"
-            checked={roomSettings.gameType}
+            checked={props.roomSettings.gameType}
             onChange={(newType) => updateRoomSettings("gameType", newType)}
             options={[
               { label: "Race", value: "race" },
@@ -164,18 +159,18 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
             }}
           >
             {" "}
-            {getTrackNameFromType(roomSettings.trackName)}
+            {getTrackNameFromType(props.roomSettings.trackName)}
           </strong>
         </p>
       </Grid>
       <Grid item xs={12}>
         <TrackSelect
           disabled={disableInputs}
-          gameType={roomSettings.gameType}
+          gameType={props.roomSettings.gameType}
           excludedTracks={
             props.inTestMode || inTestMode ? [] : nonActiveTrackNames
           }
-          value={roomSettings.trackName}
+          value={props.roomSettings.trackName}
           onChange={(newTrackName) => {
             updateRoomSettings("trackName", newTrackName);
           }}

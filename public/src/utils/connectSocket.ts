@@ -20,6 +20,8 @@ export const disconnectSocket = () => {
     socket = undefined
 }
 
+
+
 type SocketMode = "test" | "not-test" | "multiplayer"
 
 export const createSocket = (deviceType: string, userId?: string, mode: SocketMode = "not-test") => {
@@ -61,4 +63,17 @@ export const createSocket = (deviceType: string, userId?: string, mode: SocketMo
     })
 
 
+}
+
+interface ICountryInfo {
+    inEurope: boolean
+    country: string
+}
+
+export const getCountryInfo = (): Promise<ICountryInfo> => {
+    return new Promise<ICountryInfo>((resolve, reject) => {
+        fetch("/country").then((res) => res.json()).then(data => {
+            resolve(data as ICountryInfo)
+        })
+    })
 }

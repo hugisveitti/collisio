@@ -128,6 +128,8 @@ var RoomMaster = /** @class */ (function () {
         var isTestMode = false;
         var onMobile;
         //   this.allSocketIds.push(socket.id)
+        var inEurope = (0, serverFirebaseFunctions_1.getGeoInfo)(socket).inEurope;
+        console.log("in europe", inEurope);
         socket.once(shared_stuff_1.mdts_device_type, function (_a) {
             var deviceType = _a.deviceType, mode = _a.mode, userId = _a.userId;
             isTestMode = mode === "test";
@@ -158,11 +160,11 @@ var RoomMaster = /** @class */ (function () {
                             delete _this.rooms[roomId];
                         }
                     });
-                    socket.emit(shared_stuff_1.stmd_socket_ready, {});
+                    socket.emit(shared_stuff_1.stmd_socket_ready, { inEurope: inEurope });
                 }
                 else {
                     _this.setupPlayerConnectedListener(socket);
-                    socket.emit(shared_stuff_1.stmd_socket_ready, {});
+                    socket.emit(shared_stuff_1.stmd_socket_ready, { inEurope: inEurope });
                 }
                 socket.on(shared_stuff_1.mdts_players_in_room, function (_a) {
                     var roomId = _a.roomId;

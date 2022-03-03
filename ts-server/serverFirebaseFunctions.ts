@@ -2,11 +2,12 @@
  * Here should only be functions that cannot be executed on the client for some reason
  */
 
-import { deleteDoc, doc, setDoc } from "@firebase/firestore"
-import { adminFirestore, firestore, onLocalHost } from "./firebase-config"
-import * as geoip from "geoip-lite"
+import { deleteDoc, doc } from "@firebase/firestore"
 import { Timestamp } from "firebase-admin/firestore"
+import * as geoip from "geoip-lite"
 import { Socket } from "socket.io"
+import { europeArray } from "./europe"
+import { adminFirestore, firestore, onLocalHost } from "./firebase-config"
 
 const availableRoomsRefPath = "availableRooms"
 const createdRoomsPath = "created-rooms"
@@ -79,6 +80,8 @@ export const getGeoInfo = (socket: Socket) => {
         ip = ip.join("")
     }
     const geo = geoip.lookup(ip)
-    return { geo, ip }
+
+    const inEurope = geo?.country ? geo?.country in europeArray : false
+    return { geo, ip, inEurope }
 }
 

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { lookup } from "geoip-lite";
 import * as os from "os";
 import * as path from "path";
+import { europeArray } from "./europe";
 import { buyItem } from "./firebaseCoinFunctions";
 /** toDO fix this shit */
 const express = require("express")
@@ -54,6 +56,27 @@ const router = (app: any) => {
                 completed: false
             })
         }
+    })
+
+    app.get("/country", (req: Request, res: Response) => {
+        let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        console.log(ip); // ip address of the user
+        if (Array.isArray(ip)) {
+
+            ip = ip.join("")
+        }
+        let inEurope = false
+        let country = "unknown"
+        if (ip) {
+            const geo = lookup(ip)
+            console.log(geo); // location of the user
+            if (geo) {
+
+                country = geo?.country
+                inEurope = country ? country in europeArray : false
+            }
+        }
+        res.send(JSON.stringify({ inEurope, country }))
     })
     // app.post("/buyvehicleitem", (req: Request, res: Response) => {
     //     const { userId, item, vehicleType } = req.body
@@ -154,6 +177,7 @@ const router = (app: any) => {
     app.get("/multiplayer/*", sendIndexHTML);
     app.get("/cookies", sendIndexHTML);
     app.get("/termsOfUse", sendIndexHTML);
+    app.get("/singleplayer/*", sendIndexHTML);
 
 
 

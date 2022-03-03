@@ -1,14 +1,14 @@
 import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
 import { Socket } from "socket.io-client";
-import { PerspectiveCamera, Clock, Vector3, Quaternion } from "three";
+import { Clock, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { IUserSettings } from "../classes/User";
 import { hideLoadDiv } from "../course/loadingManager";
 import { RaceCourse } from "../course/RaceCourse";
-import { m_fs_game_countdown, m_fs_game_starting, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_player_ready, m_ts_pos_rot, IVehiclePositionInfo, m_ts_lap_done, m_fs_game_finished, m_fs_reload_game, m_fs_mobile_controls, m_fs_mobile_controller_disconnected, m_fs_race_info, m_fs_game_settings_changed, m_fs_already_started } from "../shared-backend/multiplayer-shared-stuff";
-import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, mts_user_settings_changed, VehicleColorType, VehicleControls } from "../shared-backend/shared-stuff";
+import { IVehiclePositionInfo, m_fs_already_started, m_fs_game_countdown, m_fs_game_finished, m_fs_game_settings_changed, m_fs_game_starting, m_fs_mobile_controller_disconnected, m_fs_mobile_controls, m_fs_race_info, m_fs_reload_game, m_fs_room_info, m_fs_vehicles_position_info, m_ts_game_socket_ready, m_ts_lap_done, m_ts_player_ready, m_ts_pos_rot } from "../shared-backend/multiplayer-shared-stuff";
+import { defaultVehicleColorType, defaultVehicleType, IPlayerInfo, MobileControls, VehicleColorType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
-import { addMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
+import { addMusic, removeMusic, setMusicVolume, startMusic } from "../sounds/gameSounds";
 import { addKeyboardControls, driveVehicle, driveVehicleWithKeyboard } from "../utils/controls";
 import { BotVehicle } from "../vehicles/BotVehicle";
 import { GhostVehicle, GhostVehicleConfig, IGhostVehicle } from "../vehicles/GhostVehicle";
@@ -35,7 +35,6 @@ export interface IMultiplayergameSceneConfig {
 export interface IMultiplayerRaceGameScene {
     restartGame: () => void
     setNeedsReload: (b: boolean) => void
-
 }
 
 export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRaceGameScene {
@@ -47,7 +46,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     isReady: boolean
 
     vehiclesPositionInfo: { [userId: string]: IVehiclePositionInfo }
-    vehicleControls: VehicleControls
+
     // everyone at least keeps their own time
     gameTime: GameTime
     course: RaceCourse
@@ -79,7 +78,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.currentNumberOfLaps = 2
         this.isReady = false
         this.vehiclesPositionInfo = {}
-        //   this.vehicleControls = new VehicleControls()
+
         addKeyboardControls()
         this.gameTime = new GameTime(2, 2)
         this.usingMobileController = false
@@ -138,6 +137,13 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         left:${window.innerWidth / 2}px;
         transform: translate(-50%, 0);
         font-size:24px;
+    `)
+        const fontSize = window.innerWidth < 1500 ? 32 : 82
+        this.lapsInfo.setAttribute("style", `
+        position:absolute;
+        right:0;
+        bottom:0;
+        font-size:${fontSize}px;
     `)
     }
 
@@ -204,10 +210,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             } else {
                 const [tires, chassis] = await loadSphereModel(vehicleType, false) //.then(([_, body]) => {
                 this.vehicle.addModels(tires, chassis)
-
             }
-
-
             const p = this.vehicle.getPosition()
             this.vehicle.setPosition(p.x, p.y + 5, p.z)
 

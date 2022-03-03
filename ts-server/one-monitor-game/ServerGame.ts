@@ -1,38 +1,19 @@
 import { Socket } from "socket.io";
 import { v4 as uuid } from 'uuid';
 import {
-    dts_create_room,
-    dts_game_finished,
-    mdts_game_settings_changed,
-    mdts_left_waiting_room,
-    dts_ping_test,
+    dts_back_to_waiting_room, dts_create_room,
+    dts_game_finished, dts_game_settings_changed_callback, dts_ping_test,
     dts_player_finished,
-    dts_vehicles_ready,
-    IPlayerInfo,
-    mdts_device_type,
-    mdts_players_in_room,
-    mts_player_connected,
+    dts_vehicles_ready, IPlayerConnectedData, IPlayerInfo,
+    mdts_device_type, mdts_game_settings_changed,
+    mdts_left_waiting_room, mdts_players_in_room, mdts_start_game, mts_player_connected,
     std_controls,
     std_game_data_info,
     std_ping_test_callback,
-    std_player_disconnected,
-    std_room_created_callback,
-    std_start_game_callback,
-    std_user_settings_changed,
-    stmd_players_in_room_callback,
+    std_player_disconnected, std_quit_game, std_room_created_callback, STD_SENDINTERVAL_MS, std_send_game_actions, std_start_game_callback,
+    std_user_settings_changed, stmd_game_settings_changed, stmd_game_starting, stmd_players_in_room_callback,
     stmd_socket_ready,
-    stmd_waiting_room_alert,
-    stmd_game_starting,
-    stm_player_connected_callback,
-    stmd_game_settings_changed,
-    mdts_start_game,
-    std_send_game_actions,
-    dts_game_settings_changed_callback,
-    stm_game_settings_changed_callback,
-    dts_back_to_waiting_room,
-    STD_SENDINTERVAL_MS,
-    IPlayerConnectedData,
-    std_quit_game
+    stmd_waiting_room_alert, stm_player_connected_callback
 } from "../../public/src/shared-backend/shared-stuff";
 import { handleMutliplayerSocket } from "../multiplayer-game/MultiplayerGame";
 import { addCreatedRooms, deleteUndefined, getGeoInfo, removeAvailableRoom } from "../serverFirebaseFunctions";
@@ -175,9 +156,12 @@ export default class RoomMaster {
 
         //   this.allSocketIds.push(socket.id)
 
+        const { inEurope } = getGeoInfo(socket)
+        console.log("in europe", inEurope)
         socket.once(mdts_device_type, ({ deviceType, mode, userId }) => {
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
+
 
             if (mode === "multiplayer") {
                 handleMutliplayerSocket(this.io, socket, deviceType)
@@ -205,11 +189,11 @@ export default class RoomMaster {
                             delete this.rooms[roomId]
                         }
                     })
-                    socket.emit(stmd_socket_ready, {})
+                    socket.emit(stmd_socket_ready, { inEurope })
                 } else {
 
                     this.setupPlayerConnectedListener(socket)
-                    socket.emit(stmd_socket_ready, {})
+                    socket.emit(stmd_socket_ready, { inEurope })
                 }
 
                 socket.on(mdts_players_in_room, ({ roomId }) => {

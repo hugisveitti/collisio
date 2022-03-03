@@ -4,9 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
-import { IUser } from "../../classes/User";
+import { IUser, IVehicleSettings } from "../../classes/User";
 import { IGameScene } from "../../game/IGameScene";
 import { IMultiplayerRaceGameScene } from "../../game/MultiplayerRaceGameScene";
+import { VehicleSetup } from "../../shared-backend/vehicleItems";
 import BackdropButton from "../button/BackdropButton";
 import CollabsibleCard from "../inputs/CollapsibleCard";
 import FullscreenButton from "../inputs/FullscreenButton";
@@ -33,6 +34,8 @@ interface IGameSettingsModal {
   showVehicleSettings?: boolean;
   onlyLeaderCanSeeRoomSettings?: boolean;
   multiplayer?: boolean;
+  onVehicleSettingsChange?: (vehicleSettings: IVehicleSettings) => void;
+  onVehicleSetupChange?: (vehicleSetup: VehicleSetup) => void;
 }
 
 const GameSettingsModal = (props: IGameSettingsModal) => {
@@ -88,7 +91,10 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <Grid item xs={12}>
             <RoomSettingsComponent
               roomSettings={props.store.roomSettings}
-              onChange={props.updateRoomSettings}
+              onChange={(rs) => {
+                props.updateRoomSettings(rs);
+                props.store.setRoomSettings(rs);
+              }}
               inTestMode={props.isTestMode}
               store={props.store}
               multiplayer={props.multiplayer}
@@ -99,7 +105,10 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
           <CollabsibleCard header="Game Settings">
             <GameSettingsComponent
               gameSettings={props.store.gameSettings}
-              onChange={props.updateGameSettings}
+              onChange={(gs) => {
+                props.updateGameSettings(gs);
+                props.store.setGameSettings(gs);
+              }}
               inTestMode={props.isTestMode}
               store={props.store}
               multiplayer={props.multiplayer}
@@ -142,6 +151,8 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               maxWidth={"100%"}
               store={props.store}
               user={props.user}
+              onVehicleSettingsChange={props.onVehicleSettingsChange}
+              onVehicleSetupChange={props.onVehicleSetupChange}
             />
           </Grid>
         )}

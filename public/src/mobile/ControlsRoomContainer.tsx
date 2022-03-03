@@ -21,6 +21,7 @@ const ControlsRoomContainer = (props: IControlsRoomContainer) => {
   const socket = getSocket();
 
   const handleUnload = (e: BeforeUnloadEvent) => {
+    // check if socket is disconnected?
     // this string cannot be shown
     e.preventDefault();
     const msg = "Are you sure you want to close the controller?";
@@ -32,7 +33,6 @@ const ControlsRoomContainer = (props: IControlsRoomContainer) => {
     if (roomId && !socket) {
       history.push(getConnectPagePath(roomId));
     }
-    console.log("in controls container");
     window.addEventListener("beforeunload", handleUnload);
 
     clearBackdropCanvas();

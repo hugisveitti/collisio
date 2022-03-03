@@ -10,6 +10,7 @@ import {
   aboutPagePath,
   multiplayerConnectPagePath,
   mobileOnlyWaitingRoomPath,
+  singlePlayerWaitingRoomPath,
 } from "../Routes";
 
 interface IExtraFrontPageComponent {
@@ -31,7 +32,7 @@ const ExtraFrontPageComponent = (props: IExtraFrontPageComponent) => {
       >
         Settings
       </BackdropButton>
-      <BackdropButton link={multiplayerConnectPagePath} width={btnWidth}>
+      <BackdropButton link={singlePlayerWaitingRoomPath} width={btnWidth}>
         Play with keyboard
       </BackdropButton>
       {onMobile && (

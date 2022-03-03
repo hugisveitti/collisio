@@ -442,6 +442,11 @@ export class LowPolyTestScene extends GameScene {
     }
 
 
+    _resetVehicles() {
+        this.vehicle.setCanDrive(true)
+        this.vehicle.start()
+        this.vehicle.unpause()
+    }
 
     getGameType() {
         return getGameTypeFromTrackName(this.trackName)

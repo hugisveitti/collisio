@@ -8,10 +8,9 @@ import {
 } from "../../game/MultiplayerRaceGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import {
-  m_ts_room_settings_changed,
   m_ts_restart_game,
+  m_ts_room_settings_changed,
 } from "../../shared-backend/multiplayer-shared-stuff";
-import { stopMusic } from "../../sounds/gameSounds";
 import { getSocket } from "../../utils/connectSocket";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
@@ -53,7 +52,6 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   }
 
   const handleEscPressed = () => {
-    console.log("Esc");
     setSettingsModalOpen(true);
   };
 
@@ -84,7 +82,9 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
     return () => {
       console.log("game room umounted");
       socket.disconnect();
-      gameObject?.destroyGame();
+      gameObject?.destroyGame().then(() => {
+        gameObject = null;
+      });
     };
   }, []);
 

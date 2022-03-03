@@ -24,9 +24,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getGeoInfo = exports.deleteUndefined = exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
 var firestore_1 = require("@firebase/firestore");
-var firebase_config_1 = require("./firebase-config");
-var geoip = __importStar(require("geoip-lite"));
 var firestore_2 = require("firebase-admin/firestore");
+var geoip = __importStar(require("geoip-lite"));
+var europe_1 = require("./europe");
+var firebase_config_1 = require("./firebase-config");
 var availableRoomsRefPath = "availableRooms";
 var createdRoomsPath = "created-rooms";
 var removeAvailableRoom = function (userId) {
@@ -86,6 +87,7 @@ var getGeoInfo = function (socket) {
         ip = ip.join("");
     }
     var geo = geoip.lookup(ip);
-    return { geo: geo, ip: ip };
+    var inEurope = (geo === null || geo === void 0 ? void 0 : geo.country) ? (geo === null || geo === void 0 ? void 0 : geo.country) in europe_1.europeArray : false;
+    return { geo: geo, ip: ip, inEurope: inEurope };
 };
 exports.getGeoInfo = getGeoInfo;

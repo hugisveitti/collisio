@@ -23,6 +23,7 @@ import {
 } from "../../shared-backend/shared-stuff";
 import {
   createSocket,
+  getCountryInfo,
   getSocket,
   ISocketCallback,
 } from "../../utils/connectSocket";
@@ -33,6 +34,7 @@ import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import { getControlsRoomPath, loginPagePath, waitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
+import NotCorrectCountryComponent from "./NotCorrectCountryComponent";
 
 interface IConnectToWaitingRoomComponent {
   store: IStore;
@@ -50,6 +52,8 @@ const ConnectToWaitingRoomComponent = (
 ) => {
   const user = props.user;
 
+  const [inEurope, setInEurope] = useState(true);
+  const [country, setCountry] = useState("");
   const history = useHistory();
   const [playerName, setPlayerName] = useState(
     user?.displayName ?? getLocalDisplayName() ?? ""
@@ -174,9 +178,14 @@ const ConnectToWaitingRoomComponent = (
       props.store.setRoomId(roomId);
     }
 
-    if (props.quickConnection) {
-      connectButtonClicked(roomId);
-    }
+    getCountryInfo().then(({ inEurope: _inEurope, country: _country }) => {
+      setInEurope(_inEurope);
+      console.log("country info", _country, "inEurope", _inEurope);
+      if (props.quickConnection && _inEurope) {
+        connectButtonClicked(roomId);
+      }
+    });
+
     return () => {
       if (socket) {
         socket.off(stm_player_connected_callback);
@@ -188,6 +197,11 @@ const ConnectToWaitingRoomComponent = (
   if (connectingToRoom) {
     return (
       <React.Fragment>
+        <NotCorrectCountryComponent
+          onClose={() => connectButtonClicked(props.store.roomId)}
+          inEurope={inEurope}
+          country={country}
+        />
         <Grid item xs={12} style={{ textAlign: "center" }}>
           <CircularProgress />
         </Grid>
