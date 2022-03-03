@@ -180,6 +180,7 @@ const ConnectToWaitingRoomComponent = (
 
     getCountryInfo().then(({ inEurope: _inEurope, country: _country }) => {
       setInEurope(_inEurope);
+      setCountry(_country);
       console.log("country info", _country, "inEurope", _inEurope);
       if (props.quickConnection && _inEurope) {
         connectButtonClicked(roomId);

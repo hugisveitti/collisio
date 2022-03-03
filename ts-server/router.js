@@ -80,7 +80,13 @@ var router = function (app) {
             console.log(geo); // location of the user
             if (geo) {
                 country = geo === null || geo === void 0 ? void 0 : geo.country;
-                inEurope = country ? country in europe_1.europeArray : false;
+                for (var _i = 0, europeArray_1 = europe_1.europeArray; _i < europeArray_1.length; _i++) {
+                    var c = europeArray_1[_i];
+                    if (c === country) {
+                        inEurope = true;
+                        break;
+                    }
+                }
             }
         }
         res.send(JSON.stringify({ inEurope: inEurope, country: country }));

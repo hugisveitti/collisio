@@ -30,7 +30,7 @@ const NotCorrectCountryComponent = (props: INotCorrectCountryComponent) => {
         </Grid>
         <Grid item xs={12} sm={6} lg={2}>
           <BackdropButton link={singlePlayerWaitingRoomPath}>
-            Play keyboard
+            Play with keyboard
           </BackdropButton>
         </Grid>
         <Grid item xs={12} sm={6} lg={6}>

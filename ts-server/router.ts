@@ -73,7 +73,12 @@ const router = (app: any) => {
             if (geo) {
 
                 country = geo?.country
-                inEurope = country ? country in europeArray : false
+                for (let c of europeArray) {
+                    if (c === country) {
+                        inEurope = true;
+                        break;
+                    }
+                }
             }
         }
         res.send(JSON.stringify({ inEurope, country }))
