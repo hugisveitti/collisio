@@ -1,27 +1,17 @@
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Step,
-  StepContent,
-  StepLabel,
-  Stepper,
-  Typography,
-} from "@mui/material";
+import { Divider, IconButton, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
 import {
   getLocalStorageItem,
   saveLocalStorageItem,
 } from "../../classes/localStorage";
-import { getDeviceType } from "../../utils/settings";
-import BackdropButton from "../button/BackdropButton";
-import BasicModal from "../modal/BasicModal";
 import step1Img from "../../images/how-to-connect/1.png";
 import step2Img from "../../images/how-to-connect/2.png";
 import step3Img from "../../images/how-to-connect/3.png";
 import step4Img from "../../images/how-to-connect/4.png";
+import { getDeviceType } from "../../utils/settings";
+import BackdropButton from "../button/BackdropButton";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
 
 const steps = [

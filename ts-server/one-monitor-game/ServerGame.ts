@@ -375,10 +375,10 @@ export class Room {
     setupPingListener() {
         this.socket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
 
-            this.dataCollection.roomTicks += (roomTicks ?? 0)
-            this.dataCollection.gameTicks += (gameTicks ?? 0)
-            this.dataCollection.totalPing += (totalPing ?? 0)
-            this.dataCollection.totalPingsGotten += (totalPingsGotten ?? 0)
+            this.dataCollection.roomTicks = (roomTicks ?? 0)
+            this.dataCollection.gameTicks = (gameTicks ?? 0)
+            this.dataCollection.totalPing = (totalPing ?? 0)
+            this.dataCollection.totalPingsGotten = (totalPingsGotten ?? 0)
             this.socket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

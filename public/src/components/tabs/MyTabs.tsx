@@ -1,7 +1,12 @@
+import { SettingsSystemDaydreamTwoTone } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  getLocalStorageItem,
+  saveLocalStorageItem,
+} from "../../classes/localStorage";
 import { getStyledColors } from "../../providers/theme";
 
 const a11yProps = (index: number) => {
@@ -16,17 +21,31 @@ interface IMyTabs {
   onTabChange?: (newTab: number) => void;
   subtabs?: boolean;
   defaultTab?: number;
+  id: string;
 }
 
 const MyTabs = (props: IMyTabs) => {
-  const [selectedTab, setSelectedTab] = useState(props.defaultTab ?? 0);
+  const [selectedTab, setSelectedTab] = useState(0);
   const { color, backgroundColor } = getStyledColors("black");
+  const tabStorageKey = `tab-${props.id}`;
+  useEffect(() => {
+    const tab =
+      props.defaultTab ??
+      getLocalStorageItem<number>(tabStorageKey, "number") ??
+      0;
+
+    setSelectedTab(tab);
+    if (props.onTabChange) {
+      props.onTabChange(tab);
+    }
+  }, []);
 
   const handleChange = (
     event: React.SyntheticEvent,
     newSelectedTab: number
   ) => {
     setSelectedTab(newSelectedTab);
+    saveLocalStorageItem(tabStorageKey, newSelectedTab.toString());
     if (props.onTabChange) {
       props.onTabChange(newSelectedTab);
     }

@@ -4,20 +4,26 @@ import { getDeviceType } from "../utils/settings";
 import "./loadingManager.css"
 
 
-// const loadImage = document.createElement("img")
+const loadImage = document.createElement("img")
 const loadDiv = document.createElement("div")
 const loadDivText = document.createElement("div")
 const loadingBarContainer = document.createElement("div")
 const loadingBarInner = document.createElement("div")
 
+const controllerImg = "https://imgur.com/raqOTkA.png"
+const gamesettingsImg = "https://imgur.com/63DUaJx.png"
+const lockOrientationImg = "https://imgur.com/6JaOzSR.png"
+
+const tipImgs = [controllerImg, gamesettingsImg, lockOrientationImg]
 
 if (getDeviceType() === "desktop") {
-
     // loadImage.src = "https://imgur.com/rpPch3m.jpg"
-    // loadImage.setAttribute("id", "load-image")
     loadDiv.classList.add("hide")
 
+    loadDiv.appendChild(loadImage)
 
+    loadImage.src = controllerImg // controllerImg
+    loadImage.setAttribute("id", "load-image")
 
     document.body.appendChild(loadDiv)
     // loadDivText.appendChild(loadImage)
@@ -61,5 +67,17 @@ export const setLoaderProgress = (ratio: number) => {
 }
 
 export const hideLoadDiv = () => {
+    const rIndex = Math.floor(Math.random() * tipImgs.length)
+    loadImage.src = tipImgs[rIndex]
     loadDiv.classList.remove("show")
 }
+
+
+// setLoaderProgress(.3)
+
+
+// setInterval(() => {
+//     setLoaderProgress(.8)
+//     hideLoadDiv()
+//     loadDiv.classList.add("show")
+// }, 2000)

@@ -1,35 +1,35 @@
 import Grid from "@mui/material/Grid";
 import React from "react";
-import basic1Image from "../../images/tracks/basic1.png";
-import basic2Image from "../../images/tracks/basic2.png";
-import basic3Image from "../../images/tracks/basic3.png";
-import basic4Image from "../../images/tracks/basic4.png";
-import basic5Image from "../../images/tracks/basic5.png";
-import f12TrackImage from "../../images/tracks/f1-track-2.PNG";
-import f1TrackImage from "../../images/tracks/f1-track.PNG";
-import farmTrackImage from "../../images/tracks/farm-track.PNG";
-import ferrariTrackImage from "../../images/tracks/ferrari-top.png";
-import nurnImage from "../../images/tracks/nurn-track.png";
-import basic1MinImage from "../../images/tracks/min/min-basic1.png";
-import basic2MinImage from "../../images/tracks/min/min-basic2.png";
-import basic3MinImage from "../../images/tracks/min/min-basic3.png";
-import basic4MinImage from "../../images/tracks/min/min-basic4.png";
-import basic5MinImage from "../../images/tracks/min/min-basic5.png";
-import f12TrackMinImage from "../../images/tracks/min/min-f1-track-2.png";
-import f1TrackMinImage from "../../images/tracks/min/min-f1-track.PNG";
-import farmTrackMinImage from "../../images/tracks/min/min-farm-track.png";
-import ferrariTrackMinImage from "../../images/tracks/min/min-ferrari-top.png";
-import nurnMinImage from "../../images/tracks/min/min-nurn-track.png";
-import russiaTrackMinImage from "../../images/tracks/min/min-russia-top.png";
-import seaSideTrackMinImage from "../../images/tracks/min/min-sea-side-track.PNG";
-import spaTrackMinImage from "../../images/tracks/min/min-spa-track.png";
-import russiaTrackImage from "../../images/tracks/russia-top.png";
-import seaSideTrackImage from "../../images/tracks/sea-side-track.PNG";
-import spaTrackImage from "../../images/tracks/spa-track.png";
-import simpleTagImage from "../../images/tracks/simple-tag-course.png";
-import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.png";
-import basicTagImage from "../../images/tracks/basic-tag-course.png";
-import basicTagMinImage from "../../images/tracks/min/min-basic-tag-course.png";
+import basic1Image from "../../images/tracks/basic1.jpg";
+import basic2Image from "../../images/tracks/basic2.jpg";
+import basic3Image from "../../images/tracks/basic3.jpg";
+import basic4Image from "../../images/tracks/basic4.jpg";
+import basic5Image from "../../images/tracks/basic5.jpg";
+import f12TrackImage from "../../images/tracks/f1-track-2.jpg";
+import f1TrackImage from "../../images/tracks/f1-track.jpg";
+import farmTrackImage from "../../images/tracks/farm-track.jpg";
+import ferrariTrackImage from "../../images/tracks/ferrari-top.jpg";
+import nurnImage from "../../images/tracks/nurn-track.jpg";
+import basic1MinImage from "../../images/tracks/min/min-basic1.jpg";
+import basic2MinImage from "../../images/tracks/min/min-basic2.jpg";
+import basic3MinImage from "../../images/tracks/min/min-basic3.jpg";
+import basic4MinImage from "../../images/tracks/min/min-basic4.jpg";
+import basic5MinImage from "../../images/tracks/min/min-basic5.jpg";
+import f12TrackMinImage from "../../images/tracks/min/min-f1-track-2.jpg";
+import f1TrackMinImage from "../../images/tracks/min/min-f1-track.jpg";
+import farmTrackMinImage from "../../images/tracks/min/min-farm-track.jpg";
+import ferrariTrackMinImage from "../../images/tracks/min/min-ferrari-top.jpg";
+import nurnMinImage from "../../images/tracks/min/min-nurn-track.jpg";
+import russiaTrackMinImage from "../../images/tracks/min/min-russia-top.jpg";
+import seaSideTrackMinImage from "../../images/tracks/min/min-sea-side-track.jpg";
+import spaTrackMinImage from "../../images/tracks/min/min-spa-track.jpg";
+import russiaTrackImage from "../../images/tracks/russia-top.jpg";
+import seaSideTrackImage from "../../images/tracks/sea-side-track.jpg";
+import spaTrackImage from "../../images/tracks/spa-track.jpg";
+import simpleTagImage from "../../images/tracks/simple-tag-course.jpg";
+import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.jpg";
+import basicTagImage from "../../images/tracks/basic-tag-course.jpg";
+import basicTagMinImage from "../../images/tracks/min/min-basic-tag-course.jpg";
 
 import {
   getTrackInfos,
@@ -192,7 +192,7 @@ const TrackItems = (props: ITrackItems) => {
   };
   return (
     <MyTabs
-      defaultTab={0}
+      id="Track-select"
       tabs={possibleTrackCategories.map((item) => {
         return {
           label: item.name,

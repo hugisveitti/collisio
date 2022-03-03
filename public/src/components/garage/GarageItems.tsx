@@ -101,7 +101,7 @@ const GarageItems = (props: IGarageItems) => {
 
   return (
     <MyTabs
-      defaultTab={0}
+      id="vehicle-items"
       subtabs
       tabs={possibleVehicleItemTypes.map((itemType) => {
         return {

@@ -181,10 +181,10 @@ export class MulitplayerPlayer {
 
     setupPingListener() {
         this.desktopSocket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
-            this.dataCollection.roomTicks += (roomTicks ?? 0)
-            this.dataCollection.gameTicks += (gameTicks ?? 0)
-            this.dataCollection.totalPing += (totalPing ?? 0)
-            this.dataCollection.totalPingsGotten += (totalPingsGotten ?? 0)
+            this.dataCollection.roomTicks = (roomTicks ?? 0)
+            this.dataCollection.gameTicks = (gameTicks ?? 0)
+            this.dataCollection.totalPing = (totalPing ?? 0)
+            this.dataCollection.totalPingsGotten = (totalPingsGotten ?? 0)
             this.desktopSocket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

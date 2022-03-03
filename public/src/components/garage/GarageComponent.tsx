@@ -4,6 +4,10 @@ import { height } from "@mui/material/node_modules/@mui/system";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import {
+  getLocalStorageItem,
+  saveLocalStorageItem,
+} from "../../classes/localStorage";
+import {
   buyItem,
   getOwnership,
   getVehicleItemsOwnership,
@@ -80,10 +84,11 @@ function getScrollParent(node) {
 }
 
 let scrollParent: HTMLElement | Window;
-
+let garageTabKey = "garageTab";
 const GarageComponent = (props: IGarageComponent) => {
   const onMobile = getDeviceType() === "mobile";
   const user = useContext(UserContext);
+
   const [selectedTab, setSelectedTab] = useState(0);
 
   const [selectedVehicleType, setSelectedVehicleType] = useState(
@@ -518,7 +523,10 @@ const GarageComponent = (props: IGarageComponent) => {
       </Grid>
       <Grid item xs={12} sm={6} lg={5} style={{}}>
         <MyTabs
-          onTabChange={(newTab) => setSelectedTab(newTab)}
+          id="garage-tabs"
+          onTabChange={(newTab) => {
+            setSelectedTab(newTab);
+          }}
           tabs={[
             {
               label: "Cars",
