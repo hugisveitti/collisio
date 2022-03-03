@@ -182,6 +182,7 @@ var router = function (app) {
     app.get("/multiplayer/*", sendIndexHTML);
     app.get("/cookies", sendIndexHTML);
     app.get("/termsOfUse", sendIndexHTML);
+    app.get("/singleplayer", sendIndexHTML);
     app.get("/singleplayer/*", sendIndexHTML);
     var adminHTMLPath = "../public/" + buildFolder + "/admin.html";
     app.get("/admin", function (req, res) {

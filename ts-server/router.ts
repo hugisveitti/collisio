@@ -182,6 +182,7 @@ const router = (app: any) => {
     app.get("/multiplayer/*", sendIndexHTML);
     app.get("/cookies", sendIndexHTML);
     app.get("/termsOfUse", sendIndexHTML);
+    app.get("/singleplayer", sendIndexHTML);
     app.get("/singleplayer/*", sendIndexHTML);
 
 
