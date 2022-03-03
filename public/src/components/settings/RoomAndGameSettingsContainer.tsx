@@ -65,6 +65,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
           });
         }}
         store={props.store}
+        multiplayer={props.multiplayer}
       />
       <Grid item xs={12}>
         <CollabsibleCard header="Game Settings">

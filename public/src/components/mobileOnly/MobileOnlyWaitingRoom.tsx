@@ -75,7 +75,7 @@ const MobileOnlyWaitingRoom = (props: IMobileOnlyWaitingRoom) => {
           <img style={{ maxWidth: "80%", width: 400 }} src={settingsImage} />
         </Grid>
         <Grid item xs={12}>
-          <RoomAndGameSettingsContainer store={props.store} />
+          <RoomAndGameSettingsContainer store={props.store} multiplayer />
         </Grid>
       </Grid>
     </BackdropContainer>
