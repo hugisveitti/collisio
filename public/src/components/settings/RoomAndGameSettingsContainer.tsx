@@ -21,6 +21,8 @@ import RoomSettingsComponent from "./RoomSettingsComponent";
 
 interface IRoomAndGameSettingsContainer {
   store: IStore;
+  /** Multiplayer disables ghost, recording and tag */
+  multiplayer?: boolean;
 }
 
 const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
@@ -75,6 +77,7 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
               });
             }}
             store={props.store}
+            multiplayer={props.multiplayer}
           />
         </CollabsibleCard>
       </Grid>

@@ -156,8 +156,7 @@ export default class RoomMaster {
 
         //   this.allSocketIds.push(socket.id)
 
-        const { inEurope } = getGeoInfo(socket)
-        console.log("in europe", inEurope)
+
         socket.once(mdts_device_type, ({ deviceType, mode, userId }) => {
             isTestMode = mode === "test"
             onMobile = deviceType === "mobile"
@@ -189,11 +188,11 @@ export default class RoomMaster {
                             delete this.rooms[roomId]
                         }
                     })
-                    socket.emit(stmd_socket_ready, { inEurope })
+                    socket.emit(stmd_socket_ready,)
                 } else {
 
                     this.setupPlayerConnectedListener(socket)
-                    socket.emit(stmd_socket_ready, { inEurope })
+                    socket.emit(stmd_socket_ready,)
                 }
 
                 socket.on(mdts_players_in_room, ({ roomId }) => {

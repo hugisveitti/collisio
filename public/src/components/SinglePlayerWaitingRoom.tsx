@@ -39,7 +39,12 @@ const SinglePlayerWaitingRoom = (props: ISinglePlayerWaitingRoom) => {
               </BackdropButton>
             </Grid>
             <Grid item xs={12}>
-              <RoomAndGameSettingsContainer store={props.store} />
+              <Typography>
+                Bot difficulty {props.store.gameSettings.botDifficulty}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <RoomAndGameSettingsContainer store={props.store} multiplayer />
             </Grid>
             <Grid item xs={12}>
               <VehicleSettingsComponent
