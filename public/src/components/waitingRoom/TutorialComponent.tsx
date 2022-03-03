@@ -18,6 +18,7 @@ const TutorialComponent = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setHide(getLocalStorageItem<boolean>(tutorialKey, "boolean") ?? false);
+      saveLocalStorageItem(tutorialKey, true + "");
     }, 3000);
     return () => {
       clearTimeout(timeout);
@@ -29,7 +30,6 @@ const TutorialComponent = () => {
       style={{ maxWidth: "90%" }}
       open={!hide}
       onClose={() => {
-        saveLocalStorageItem(tutorialKey, true + "");
         setHide(true);
       }}
     >
@@ -41,7 +41,6 @@ const TutorialComponent = () => {
           <IconButton
             style={{ float: "right", color: "white" }}
             onClick={() => {
-              saveLocalStorageItem(tutorialKey, true + "");
               setHide(true);
             }}
           >

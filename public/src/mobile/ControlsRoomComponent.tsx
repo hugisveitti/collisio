@@ -54,15 +54,24 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     const gamma = e.gamma ?? 0;
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
-    if (e.gamma === null && e.beta === 0 && e.alpha === null) {
+    // console.log(
+    //   "alpha",
+    //   alpha.toFixed(0),
+    //   "beta",
+    //   beta.toFixed(0),
+    //   "gamma",
+    //   gamma.toFixed()
+    // );
+    if (e.gamma === null && e.beta === null && e.alpha === null) {
       toast.error(
         "Your device orientation is not working. Please reset orientation in settings."
       );
+      window.removeEventListener("orientationchange", handleDeviceOrientChange);
+      return;
     }
-
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
-    controller.beta = Math.round(beta);
+    controller.beta = Math.round(beta) * -Math.sign(gamma);
   };
 
   const getSteeringDirection = () => {
