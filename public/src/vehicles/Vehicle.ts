@@ -87,7 +87,7 @@ export class Vehicle implements IVehicle {
     protected _canDrive: boolean;
     isPaused: boolean;
     vehicleSettings: IVehicleSettings;
-    isReady: boolean;
+    protected isReady: boolean;
     vehicleNumber: number;
     vehicleType: VehicleType;
 
@@ -135,6 +135,10 @@ export class Vehicle implements IVehicle {
 
     getCanDrive() {
         return this._canDrive
+    }
+
+    getIsReady() {
+        return this.isReady
     }
 
     setCanDrive(_canDrive: boolean) {
@@ -231,7 +235,7 @@ export class Vehicle implements IVehicle {
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
 
         return new Promise<void>(async (resolve, reject) => {
-
+            console.log("this.isUpdatingVehicleSetup", this.isUpdatingVehicleSetup, "is ready", this.isReady)
             if (this.isUpdatingVehicleSetup) return
             if (this.isReady) {
 

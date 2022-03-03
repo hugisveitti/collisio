@@ -377,7 +377,7 @@ export class LowPolyVehicle extends Vehicle {
             this.stop()
 
             if (this.vehicleSetup) {
-                console.log("setting vehicle setup", this.name)
+                console.log("setting vehicle setup", this.name, this.vehicleSetup)
                 await this.updateVehicleSetup(this.vehicleSetup)
             }
             // think I need this, going through walls in multiplayer

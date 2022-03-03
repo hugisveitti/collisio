@@ -42,8 +42,7 @@ export interface IVehicle {
     steeringSensitivity: number
     breakingForce: number
 
-    /* Has model loaded */
-    isReady: boolean
+    getIsReady: () => boolean
 
     /** same as playerNumber */
     vehicleNumber: number

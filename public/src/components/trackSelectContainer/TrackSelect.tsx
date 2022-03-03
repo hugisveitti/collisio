@@ -12,7 +12,6 @@ import {
   activeRaceTrackNames,
   activeTagTrackNames,
   getTrackInfo,
-  getTrackNameFromType,
 } from "../../classes/Game";
 import {
   buyItem,
@@ -32,7 +31,6 @@ import {
   ITrackInfo,
   TrackName,
 } from "../../shared-backend/shared-stuff";
-import { defaultItemsOwnership } from "../../shared-backend/vehicleItems";
 import { itemInArray } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import BuyItemComponent from "../garage/BuyItemComponent";

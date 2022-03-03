@@ -578,7 +578,7 @@ export class GameScene extends MyScene implements IGameScene {
         pauseMusic()
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
-            if (this.vehicles[i].isReady) {
+            if (this.vehicles[i].getIsReady()) {
                 this.vehicles[i].pause()
             }
         }
@@ -592,7 +592,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.startGameSong()
         this.songIsPlaying = false
         for (let i = 0; i < this.vehicles.length; i++) {
-            if (this.vehicles[i].isReady) {
+            if (this.vehicles[i].getIsReady()) {
                 this.vehicles[i].unpause()
             }
         }
@@ -633,18 +633,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     everythingReady(): boolean {
         return this.isReady
-        if (!this.courseLoaded) {
-            this._everythingReady = false
-            return false
-        }
-        if (this._everythingReady) return true
 
-        for (let vehicle of this.vehicles) {
-            if (!vehicle.isReady) return false
-        }
-
-        this._everythingReady = true
-        return true
     }
 
     saveDriveRecording(playerId: string) {
@@ -886,7 +875,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     userSettingsListener() {
         this.socket?.on(std_user_settings_changed, (data: IUserSettingsMessage) => {
-            if (this.vehicles?.length > 0 && this.vehicles[0].isReady) {
+            if (this.vehicles?.length > 0 && this.vehicles[0].getIsReady()) {
                 if (this.vehicles.length >= data.playerNumber - 1) {
                     /* 
                     * There could be a situation when the leader resets and vehicles are destroyed and in the same moment a non leader changes his vehicleType

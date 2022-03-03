@@ -270,6 +270,7 @@ var Player = /** @class */ (function () {
             // if user is the only player and logs in from a different browser, it will push the current user out, delete the game and thus there needs to be a check or something better?
             if (_this.game) {
                 _this.game.userSettingsChanged({ userSettings: _this.userSettings, playerNumber: _this.playerNumber, vehicleSetup: _this.vehicleSetup });
+                _this.game.alertWaitingRoom();
             }
         });
     };

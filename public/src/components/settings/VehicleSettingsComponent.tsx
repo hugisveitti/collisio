@@ -114,10 +114,12 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
     vehiclesSetupToSave = newVehiclesSetup;
 
     sendVehicleSetupToServer(newVehiclesSetup[vehicleSettings.vehicleType]);
+
     setAnythingChanged(true);
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
+    console.log("sending vehicle setup to server", vehicleSetup);
     socket?.emit(mts_user_settings_changed, {
       userSettings: undefined,
       vehicleSetup,

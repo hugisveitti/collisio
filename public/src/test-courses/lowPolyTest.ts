@@ -400,7 +400,7 @@ export class LowPolyTestScene extends GameScene {
 
             this.course.setStartPositions(allVehicles)
             for (let v of allVehicles) {
-                if (v.isReady) {
+                if (v.getIsReady()) {
                     v.unpause()
                 }
                 v.setCanDrive(true)
@@ -715,7 +715,7 @@ export class LowPolyTestScene extends GameScene {
 
     togglePauseGame() {
 
-        if (!this.vehicle.isReady || !this.everythingReady()) return
+        if (!this.vehicle.getIsReady() || !this.everythingReady()) return
         if (this.isPaused) {
             this.gameTime.stop()
             this.vehicle.unpause()
@@ -733,7 +733,7 @@ export class LowPolyTestScene extends GameScene {
     }
 
     pauseGame() {
-        if (this.vehicle.isReady) {
+        if (this.vehicle.getIsReady()) {
             this.vehicle.pause()
         }
         this.isPaused = true

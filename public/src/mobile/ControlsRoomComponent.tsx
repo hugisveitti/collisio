@@ -54,14 +54,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     const gamma = e.gamma ?? 0;
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
-    // console.log(
-    //   "alpha",
-    //   alpha.toFixed(0),
-    //   "beta",
-    //   beta.toFixed(0),
-    //   "gamma",
-    //   gamma.toFixed()
-    // );
+
     if (e.gamma === null && e.beta === null && e.alpha === null) {
       toast.error(
         "Your device orientation is not working. Please reset orientation in settings."

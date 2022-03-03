@@ -1,6 +1,5 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router";
 import "react-toastify/dist/ReactToastify.css";
 import { getLocalGameSetting } from "../../classes/localGameSettings";
 import { createClassNames } from "../../utils/utilFunctions";
@@ -26,9 +25,7 @@ interface IBackdropContainer {
 
 let _pressedStartGame = false;
 const BackdropContainer = (props: IBackdropContainer) => {
-  const history = useHistory();
-
-  const canvasWrapperRef = useRef();
+  const canvasWrapperRef = useRef<HTMLDivElement>();
 
   const [camPosNum, setCamPosNum] = useState(0);
 
@@ -52,7 +49,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
       setPressedStartGame(alreadyExisted);
       let num = 1;
 
-      if (history.location.pathname !== "/") {
+      if (window.location.pathname !== "/") {
         num += 1;
       }
       changeCameraPosition(num, volume);

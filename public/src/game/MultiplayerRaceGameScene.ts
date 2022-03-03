@@ -719,7 +719,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
 
     updateVehicle(delta: number) {
-        if (this.vehicle.isReady) {
+        if (this.vehicle.getIsReady()) {
             this.vehicle.update(delta)
             this.vehicle.cameraLookAt(this.camera, delta)
         }

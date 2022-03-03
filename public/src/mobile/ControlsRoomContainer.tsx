@@ -20,12 +20,25 @@ const ControlsRoomContainer = (props: IControlsRoomContainer) => {
   const { roomId } = params;
   const socket = getSocket();
 
+  const handleUnload = (e: BeforeUnloadEvent) => {
+    // this string cannot be shown
+    e.preventDefault();
+    const msg = "Are you sure you want to close the controller?";
+    e.returnValue = msg;
+    return msg;
+  };
+
   useEffect(() => {
     if (roomId && !socket) {
       history.push(getConnectPagePath(roomId));
     }
+    console.log("in controls container");
+    window.addEventListener("beforeunload", handleUnload);
 
     clearBackdropCanvas();
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
   }, []);
 
   return <ControlsRoom store={props.store} />;

@@ -93,9 +93,9 @@ class SpeedTestScene extends GameScene {
 
             this.vehicles[0].addCamera(this.camera)
             this.vehicles[0].useChaseCamera = false
-            for (let v of this.vehicles) {
-                v.isReady = true
-            }
+            // for (let v of this.vehicles) {
+            //     v.isReady = true
+            // }
 
 
             this.resetVehicles()

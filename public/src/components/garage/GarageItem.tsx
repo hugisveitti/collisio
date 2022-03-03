@@ -28,7 +28,7 @@ const GarageItem = (props: IGarageItem) => {
       }}
       onClick={props.onClick}
     >
-      {!props.loggedIn && (
+      {!props.loggedIn && !props.owned && (
         <div className="garage__item__not-loged-in">You need to login.</div>
       )}
       {props.thumbnail}
