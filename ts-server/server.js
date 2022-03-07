@@ -22,16 +22,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-/** toDO fix this shit */
-var express = require("express");
-var _a = require("@socket.io/sticky"), setupMaster = _a.setupMaster, setupWorker = _a.setupWorker;
-var _b = require("@socket.io/cluster-adapter"), createAdapter = _b.createAdapter, setupPrimary = _b.setupPrimary;
-var helperFunctions_1 = require("./utils/helperFunctions");
-var router_1 = __importStar(require("./router"));
+var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
 var adminTools_1 = require("./adminTools");
 var ServerGame_1 = __importDefault(require("./one-monitor-game/ServerGame"));
-var shared_stuff_1 = require("../public/src/shared-backend/shared-stuff");
-var process_1 = __importDefault(require("process"));
+var router_1 = __importStar(require("./router"));
+var helperFunctions_1 = require("./utils/helperFunctions");
+/** toDO fix this shit */
+var express = require("express");
 var createApp = function (isPrimary) {
     var app = express();
     (0, adminTools_1.adminFunctions)(app);
@@ -44,8 +41,7 @@ var createApp = function (isPrimary) {
     });
     return { server: server, app: app };
 };
-console.log("Primary " + process_1.default.pid + " is running");
-var _c = createApp(true), app = _c.app, server = _c.server;
+var _a = createApp(true), app = _a.app, server = _a.server;
 var io = require("socket.io")(server); // { cors: { origin: "*" } })
 var roomMaster = new ServerGame_1.default(io);
 io.on("connection", function (socket) {

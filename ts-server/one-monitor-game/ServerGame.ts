@@ -331,7 +331,6 @@ export class Room {
     }
 
     setupLeftWebsiteListener() {
-
         this.socket.on("disconnect", () => {
             console.log("disconnected", this.roomId)
             for (let player of this.players) {
@@ -622,9 +621,7 @@ export class Room {
     }
 
     quitGame() {
-        console.log("Quit game with mobile")
         this.socket.emit(std_quit_game, {})
-
     }
 
     isFull() {

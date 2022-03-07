@@ -23,7 +23,6 @@ export default class TestRoom {
         this.desktopSocket = socket
         this.setupControlsListener()
         this.desktopSocket.on("disconnected", () => {
-            console.log("test room desktop disconnected")
         })
 
         if (this.mobileSocket) {

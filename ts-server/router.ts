@@ -6,7 +6,6 @@ import { europeArray } from "./europe";
 import { buyItem } from "./firebaseCoinFunctions";
 /** toDO fix this shit */
 const express = require("express")
-console.log("router")
 
 export const getPortLocalhost = () => {
     let port = process.env.PORT || 80
@@ -81,21 +80,6 @@ const router = (app: any) => {
         }
         res.send(JSON.stringify({ inEurope, country }))
     })
-    // app.post("/buyvehicleitem", (req: Request, res: Response) => {
-    //     const { userId, item, vehicleType } = req.body
-    //     console.log("Buy item", userId, item)
-    //     if (userId && item) {
-
-    //         buyItem(userId, item, vehicleType).then((data) => {
-    //             res.status(200).send(data)
-    //         })
-    //     } else {
-    //         res.status(404).send({
-    //             message: "Unknown user or item",
-    //             completed: false
-    //         })
-    //     }
-    // })
 
     const buildFolder = "dist"
 
@@ -118,7 +102,6 @@ const router = (app: any) => {
 
     const sendTestHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-        //   console.log("Sending test")
         //     printRequestInfo(req)
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, `../public/${buildFolder}/test.html`));
@@ -141,12 +124,9 @@ const router = (app: any) => {
     })
     const sendIndexHTML = (req: Request, res: Response) => {
         const host = req.get("host")
-        //   console.log("reqest to index")
         if (isValidHost(host)) {
-            //      printRequestInfo(req)
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         } else {
-            //   console.log("Not valid host")
             res.status(500).send("ERROR")
         }
     }
@@ -200,13 +180,11 @@ const router = (app: any) => {
 
     app.get("*", (req: Request, res: Response) => {
         const host = req.get("host")
-        // console.log("Request to star")
         //  printRequestInfo(req)
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
         } else {
-            // console.log("ERROR")
             res.send("ERROR")
         }
     });

@@ -78,7 +78,6 @@ var MultiplayerRoomMaster = /** @class */ (function () {
                     room.addPlayerMobileSocket(socket, config.userId);
                 }
                 else {
-                    console.log("All splitscreen rooms", Object.keys(_this.rooms));
                     socket.emit(multiplayer_shared_stuff_1.m_fs_connect_to_room_callback, {
                         message: "Room does not exists",
                         status: "error"
@@ -89,7 +88,6 @@ var MultiplayerRoomMaster = /** @class */ (function () {
                 var player = new MultiplayerPlayer_1.MulitplayerPlayer(socket, config);
                 if (!roomId) {
                     var newRoom = new MultiplayerRoom(io, player, config.gameSettings, config.roomSettings, function (roomId) { return _this.deleteRoomCallback(roomId); });
-                    console.log("creating multiplayer room", newRoom.roomId);
                     _this.rooms[newRoom.roomId] = newRoom;
                     return;
                 }

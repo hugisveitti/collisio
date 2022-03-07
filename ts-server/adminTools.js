@@ -44,6 +44,7 @@ var buildFolder = "dist";
 var adminFunctions = function (app) {
     var adminsRefPath = "admins";
     var roomDataPath = "roomData";
+    var singleplayerRoomDataPath = "singleplayerRoomData";
     var gameDataPath = "allGames";
     var createdRoomsPath = "created-rooms";
     var getIsAdmin = function (userId, callback) { return __awaiter(void 0, void 0, void 0, function () {
@@ -103,7 +104,7 @@ var adminFunctions = function (app) {
                 switch (_a.label) {
                     case 0:
                         if (!isAdmin) return [3 /*break*/, 5];
-                        path = queryParams.useCreatedRooms ? createdRoomsPath : roomDataPath;
+                        path = queryParams.useCreatedRooms ? createdRoomsPath : singleplayerRoomDataPath;
                         console.log("path", path);
                         roomDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, path);
                         q = (0, firestore_1.query)(roomDataRef, (0, firestore_1.orderBy)("date", "desc"));
@@ -202,7 +203,6 @@ var adminFunctions = function (app) {
     };
     var getQueryParams = function (req) {
         var _a = req.query, n = _a.n, useCreatedRooms = _a.useCreatedRooms;
-        console.log("useCreatedRooms", useCreatedRooms);
         var queryParams = {
             useCreatedRooms: eval(useCreatedRooms),
             n: n && !isNaN(+n) ? +n : undefined

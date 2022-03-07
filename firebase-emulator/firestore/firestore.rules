@@ -53,6 +53,10 @@ service cloud.firestore {
     	allow create: if !exists(/databases/$(database)/documents/roomData/$(request.resource.id));
       allow read; //: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
+    match /singleplayerRoomData/{id} {
+      allow create;
+      
+    }
     match /availableRooms/{userId} {
       allow create, update: if request.auth.uid == userId;
       allow delete; // change

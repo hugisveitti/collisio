@@ -1,20 +1,11 @@
-import { Request, Response } from "express";
+import { Socket } from "socket.io";
+import { mdts_number_connected, stmd_number_connected } from "../public/src/shared-backend/shared-stuff";
+import { adminFunctions } from "./adminTools";
+import RoomMaster from "./one-monitor-game/ServerGame";
+import router, { getPortLocalhost } from "./router";
+import { printMemoryInfo } from "./utils/helperFunctions";
 /** toDO fix this shit */
 const express = require("express")
-
-const { setupMaster, setupWorker } = require("@socket.io/sticky");
-const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
-
-import { Socket } from "socket.io";
-import { printMemoryInfo, byteToGig } from "./utils/helperFunctions"
-import router, { getPortLocalhost } from "./router";
-import { adminFunctions } from "./adminTools";
-import RoomMaster from "./one-monitor-game/ServerGame"
-import { mdts_number_connected, stmd_number_connected } from "../public/src/shared-backend/shared-stuff";
-// import cluster from "cluster";
-// import http from 'http';
-import { cpus } from 'os';
-import process from 'process';
 
 
 
@@ -38,14 +29,7 @@ const createApp = (isPrimary: boolean) => {
     return { server, app }
 }
 
-
-console.log(`Primary ${process.pid} is running`);
-
-
 const { app, server } = createApp(true)
-
-
-
 const io = require("socket.io")(server) // { cors: { origin: "*" } })
 
 

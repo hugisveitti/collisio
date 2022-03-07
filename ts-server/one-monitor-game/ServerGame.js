@@ -532,7 +532,6 @@ var Room = /** @class */ (function () {
         this.socket.emit(shared_stuff_1.std_game_data_info, data);
     };
     Room.prototype.quitGame = function () {
-        console.log("Quit game with mobile");
         this.socket.emit(shared_stuff_1.std_quit_game, {});
     };
     Room.prototype.isFull = function () {

@@ -9,7 +9,6 @@ var TestRoom = /** @class */ (function () {
         this.desktopSocket = socket;
         this.setupControlsListener();
         this.desktopSocket.on("disconnected", function () {
-            console.log("test room desktop disconnected");
         });
         if (this.mobileSocket) {
             this.mobileSocket.emit("test-made-connection", {});

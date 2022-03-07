@@ -14,6 +14,7 @@ export const adminFunctions = (app: any) => {
 
     const adminsRefPath = "admins"
     const roomDataPath = "roomData"
+    const singleplayerRoomDataPath = "singleplayerRoomData"
     const gameDataPath = "allGames"
     const createdRoomsPath = "created-rooms"
 
@@ -77,7 +78,7 @@ export const adminFunctions = (app: any) => {
             if (isAdmin) {
                 // const queries = createFirebaseQueries(queryParams)
                 // queries.push(orderByChild("date"))
-                const path = queryParams.useCreatedRooms ? createdRoomsPath : roomDataPath
+                const path = queryParams.useCreatedRooms ? createdRoomsPath : singleplayerRoomDataPath
                 console.log("path", path)
                 const roomDataRef = collection(firestore, path)
                 let q = query(roomDataRef, orderBy("date", "desc"))
@@ -172,7 +173,6 @@ export const adminFunctions = (app: any) => {
 
     const getQueryParams = (req: Request): IQueryParams => {
         const { n, useCreatedRooms } = req.query
-        console.log("useCreatedRooms", useCreatedRooms)
         const queryParams = {
             useCreatedRooms: eval(useCreatedRooms as string),
             n: n && !isNaN(+n) ? +n : undefined
@@ -195,7 +195,6 @@ export const adminFunctions = (app: any) => {
 
         admin.auth().verifyIdToken(userTokenId).then((decodedToken: any) => {
             getRoomData(decodedToken.uid, queryParams, (roomDataRes => {
-
                 res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));
             }))
 

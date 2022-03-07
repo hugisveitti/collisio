@@ -29,7 +29,6 @@ interface ICreateRoom {
 
 export const addCreatedRooms = (roomId: string, userId: string, extraData?: any) => {
     if (onLocalHost) {
-        console.log("on local host")
         return
     }
     const ref = adminFirestore.collection(createdRoomsPath).doc()
@@ -44,12 +43,11 @@ export const addCreatedRooms = (roomId: string, userId: string, extraData?: any)
     try {
 
         ref.set(obj).then(() => {
-            console.log("Saved created room")
         }).catch((err) => {
             console.warn("Error saving created room", err)
         })
     } catch (err) {
-        console.log("ERROR SAVING ROOM", err)
+        console.warn("ERROR SAVING ROOM", err)
     }
 }
 

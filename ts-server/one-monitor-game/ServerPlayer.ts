@@ -133,7 +133,6 @@ export class Player {
 
         this.setupDisconnectListener()
         this.setupUserSettingsListener()
-        this.setupReconnectListener()
         this.setupWaitingRoomListener()
         this.setupGameSettingsListener()
         this.setupGameStartedListener()
@@ -261,12 +260,6 @@ export class Player {
 
     setGame(game: Room) {
         this.game = game
-    }
-
-    setupReconnectListener() {
-        // this.socket.on("player-reconnect", () => {
-        //  //   console.log("player reconnected not implemented")
-        // })
     }
 
     setupControler() {

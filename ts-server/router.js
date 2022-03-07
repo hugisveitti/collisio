@@ -27,7 +27,6 @@ var europe_1 = require("./europe");
 var firebaseCoinFunctions_1 = require("./firebaseCoinFunctions");
 /** toDO fix this shit */
 var express = require("express");
-console.log("router");
 var getPortLocalhost = function () {
     var port = process.env.PORT || 80;
     /** only works on my PC */
@@ -89,20 +88,6 @@ var router = function (app) {
         }
         res.send(JSON.stringify({ inEurope: inEurope, country: country }));
     });
-    // app.post("/buyvehicleitem", (req: Request, res: Response) => {
-    //     const { userId, item, vehicleType } = req.body
-    //     console.log("Buy item", userId, item)
-    //     if (userId && item) {
-    //         buyItem(userId, item, vehicleType).then((data) => {
-    //             res.status(200).send(data)
-    //         })
-    //     } else {
-    //         res.status(404).send({
-    //             message: "Unknown user or item",
-    //             completed: false
-    //         })
-    //     }
-    // })
     var buildFolder = "dist";
     var encrypt = require("../public/src/shared-backend/encryption.json");
     var _loop_1 = function (key) {
@@ -123,7 +108,6 @@ var router = function (app) {
     var indexHTMLPath = "../public/" + buildFolder + "/index.html";
     var sendTestHTML = function (req, res) {
         var host = req.get("host");
-        //   console.log("Sending test")
         //     printRequestInfo(req)
         if (isValidHost(host)) {
             res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/test.html"));
@@ -140,13 +124,10 @@ var router = function (app) {
     });
     var sendIndexHTML = function (req, res) {
         var host = req.get("host");
-        //   console.log("reqest to index")
         if (isValidHost(host)) {
-            //      printRequestInfo(req)
             res.status(200).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
-            //   console.log("Not valid host")
             res.status(500).send("ERROR");
         }
     };
@@ -194,14 +175,12 @@ var router = function (app) {
     });
     app.get("*", function (req, res) {
         var host = req.get("host");
-        // console.log("Request to star")
         //  printRequestInfo(req)
         if (isValidHost(host)) {
             // res.sendFile(path.join(__dirname, indexHTMLPath));
             res.status(404).sendFile(path.join(__dirname, indexHTMLPath));
         }
         else {
-            // console.log("ERROR")
             res.send("ERROR");
         }
     });

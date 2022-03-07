@@ -86,7 +86,6 @@ var Player = /** @class */ (function () {
         this.setupPlayerInfoListener();
         this.setupDisconnectListener();
         this.setupUserSettingsListener();
-        this.setupReconnectListener();
         this.setupWaitingRoomListener();
         this.setupGameSettingsListener();
         this.setupGameStartedListener();
@@ -210,11 +209,6 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.setGame = function (game) {
         this.game = game;
-    };
-    Player.prototype.setupReconnectListener = function () {
-        // this.socket.on("player-reconnect", () => {
-        //  //   console.log("player reconnected not implemented")
-        // })
     };
     Player.prototype.setupControler = function () {
         var _this = this;

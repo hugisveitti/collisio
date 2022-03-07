@@ -39,7 +39,6 @@ var removeAvailableRoom = function (userId) {
 exports.removeAvailableRoom = removeAvailableRoom;
 var addCreatedRooms = function (roomId, userId, extraData) {
     if (firebase_config_1.onLocalHost) {
-        console.log("on local host");
         return;
     }
     var ref = firebase_config_1.adminFirestore.collection(createdRoomsPath).doc();
@@ -52,13 +51,12 @@ var addCreatedRooms = function (roomId, userId, extraData) {
     obj = (0, exports.deleteUndefined)(obj);
     try {
         ref.set(obj).then(function () {
-            console.log("Saved created room");
         }).catch(function (err) {
             console.warn("Error saving created room", err);
         });
     }
     catch (err) {
-        console.log("ERROR SAVING ROOM", err);
+        console.warn("ERROR SAVING ROOM", err);
     }
 };
 exports.addCreatedRooms = addCreatedRooms;
