@@ -28,7 +28,6 @@ const PreviousTournamentsComponent = (props: IPreviousTournamentsComponent) => {
     setShowTournaments(true);
     getPreviousTournaments(props.user.uid)
       .then((_tournaments) => {
-        console.log("previous tournaments", _tournaments);
         setTournements(_tournaments);
       })
       .catch(() => {

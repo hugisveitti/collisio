@@ -48,7 +48,6 @@ const TrophyRoomComponent = (props: ITrophyRoomComponent) => {
   useEffect(() => {
     createTrophyRoomCanvas(props.id)
       .then((renderer) => {
-        console.log("got renderer");
         if (canvasWrapperRef.current && renderer) {
           // @ts-ignore
           while (canvasWrapperRef.current.children.length > 0) {
@@ -72,7 +71,6 @@ const TrophyRoomComponent = (props: ITrophyRoomComponent) => {
       });
 
     return () => {
-      console.log("component unmounted");
       removeTrophyRoomCanvas();
     };
   }, []);

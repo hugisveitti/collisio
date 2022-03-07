@@ -169,7 +169,6 @@ export class BracketTree {
         const orderdPlayers = orderPlayers(unorderedPlayers, 1)
 
         orderdPlayers.reverse()
-        console.log("ordered players", orderdPlayers)
 
         let i = 0
         // let node: BracketTree = this
@@ -205,7 +204,6 @@ export class BracketTree {
 
     setWinner(winner: 1 | 2) {
         if (!this.parent) {
-            console.log("Tournament over")
         } else {
 
             if (winner === 1) {
@@ -326,19 +324,14 @@ export class BracketTree {
 
     static FindActiveBracketNode(list: IFlattendBracketNode[], playerId: string): IFlattendBracketNode | undefined {
         let currentItem: IFlattendBracketNode
-        console.log("player id", playerId)
         for (let item of list) {
-            console.log("item.player1?.uid === playerId || item.player2?.uid", item.player1?.uid === playerId, item.player2?.uid === playerId,)
             if (!item.seriesFinished && (item.player1?.uid === playerId || item.player2?.uid === playerId)) {
-                console.log("currentiiitttem", item)
                 if (!currentItem) {
-                    console.log("current item", item)
 
                     currentItem = item
                 }
                 else if (currentItem.height < item.height) {
                     // this func should probably not be reached..
-                    console.log("current item", item)
                     currentItem = item
                 }
             }
@@ -434,7 +427,6 @@ export const createBracketTree = (numberOfPlayers: number) => {
             }
         }
     }
-    console.log("number of players", numberOfPlayers)
     if (numberOfPlayers > 2) {
 
         recurseSplit(root)

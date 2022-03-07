@@ -60,10 +60,8 @@ export const buyCoins = (userId: string, productId: string): Promise<void> => {
 
         const createStripeCheckout = httpsCallable<IStripeCheckoutData, IStripeCheckoutCallback>(functions, "createStripeCheckout")
         createStripeCheckout({ userId, productId }).then(async (response) => {
-            console.log("results of checkout", response)
             const sessionId = response.data.id
             stripe.redirectToCheckout({ sessionId }).then((res) => {
-                console.log("Checkout finished", res)
             }).catch((err) => {
                 console.warn("Error redirecting to checkout", err)
             })

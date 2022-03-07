@@ -77,7 +77,7 @@ const CreateGameComponent = (props: ICreateGameComponent) => {
             width="100%"
             style={btnStyles}
           >
-            Play mobile version
+            Play mobile only
           </BackdropButton>
         )}
       </Grid>

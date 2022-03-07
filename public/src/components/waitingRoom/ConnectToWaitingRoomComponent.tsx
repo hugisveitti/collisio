@@ -134,8 +134,6 @@ const ConnectToWaitingRoomComponent = (
     const vehicleSetup = props.store.vehiclesSetup?.[vehicleType] ?? {
       vehicleType,
     };
-    console.log("vehicle setup", vehicleSetup);
-    console.log("user settings", props.store.userSettings);
     socket.emit(mts_player_connected, {
       roomId: roomId.toLowerCase(),
       playerName,
@@ -181,7 +179,6 @@ const ConnectToWaitingRoomComponent = (
     getCountryInfo().then(({ inEurope: _inEurope, country: _country }) => {
       setInEurope(_inEurope);
       setCountry(_country);
-      console.log("country info", _country, "inEurope", _inEurope);
       if (props.quickConnection && _inEurope) {
         connectButtonClicked(roomId);
       }

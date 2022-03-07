@@ -33,7 +33,6 @@ const numberOfFakeGames = 20
 const possibleTracks: TrackName[] = ["f1-track", "farm-track", "sea-side-track"]
 
 export const createFakeHighscoreData = () => {
-    console.log("Creating fake data")
     for (let i = 0; i < numberOfFakeGames; i++) {
         const trackName: TrackName = possibleTracks[Math.floor(Math.random() * possibleTracks.length)]
         const gameId = `test-fakeGameId-${trackName}-${i}`
@@ -115,7 +114,6 @@ export const createFakeHighscoreData = () => {
 
 
         saveRaceDataGame(gameData, res => {
-            console.log("res", res)
         })
 
         //  saveRaceData(playerData[1].playerId, playerData[1])

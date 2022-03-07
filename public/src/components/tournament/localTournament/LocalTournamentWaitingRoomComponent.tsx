@@ -108,7 +108,6 @@ const LocalTournamentWaitingRoomComponent = (
                 if (val.status === "error") {
                   toast.error(val.message);
                 } else {
-                  console.log("players", players);
                   const root = createBracketTree(players.length);
                   root.populateTree(players);
                   const startTournament: LocalTournament = {
@@ -117,7 +116,6 @@ const LocalTournamentWaitingRoomComponent = (
                     flattenBracket: root.flatten(),
                   };
 
-                  console.log("starting tournament", startTournament);
                   setTournament(startTournament);
                 }
               }}

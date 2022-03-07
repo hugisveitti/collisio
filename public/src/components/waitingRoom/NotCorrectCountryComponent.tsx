@@ -36,11 +36,11 @@ const NotCorrectCountryComponent = (props: INotCorrectCountryComponent) => {
         </Grid>
         <Grid item xs={12} sm={6} lg={2}>
           {onMobile ? (
-            <BackdropButton link={mobileOnlyWaitingRoomPath}>
-              Play mobile version
+            <BackdropButton link={mobileOnlyWaitingRoomPath} color="white">
+              Play mobile only
             </BackdropButton>
           ) : (
-            <BackdropButton link={singlePlayerWaitingRoomPath}>
+            <BackdropButton link={singlePlayerWaitingRoomPath} color="white">
               Play with keyboard
             </BackdropButton>
           )}

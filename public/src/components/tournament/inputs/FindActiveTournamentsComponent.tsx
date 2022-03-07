@@ -55,7 +55,6 @@ const FindActiveTournamentComponent = (
       if (props.store.roomSettings.tournamentId) {
         getTournamentWithId(props.store.roomSettings.tournamentId).then(
           (tournament) => {
-            console.log("new tournament gotten", tournament);
             props.store.setTournament(tournament);
             if (props.store.players.length > 0) {
               handleGetBracketNode(tournament);
@@ -87,7 +86,6 @@ const FindActiveTournamentComponent = (
       props.store.setTournament(tournament);
       handleGetBracketNode(tournament);
     }
-    console.log("new room settings", newRoomSettings);
 
     props.store.setRoomSettings(newRoomSettings);
     socket.emit(mdts_game_settings_changed, {
@@ -121,7 +119,6 @@ const FindActiveTournamentComponent = (
           }
           setActiveTournamnets(undefined);
           getActiveTournaments(props.store.players[0].id).then((_t) => {
-            console.log("_t active tour", _t);
             setActiveTournamnets(_t);
             if (_t?.length > 0) {
               handleChangeSettings(_t[0]);

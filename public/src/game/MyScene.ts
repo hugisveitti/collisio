@@ -250,12 +250,8 @@ export class MyScene extends Scene3D {
 
             this.gameTicks += 1
             this.roomTicks += 1
-            // try {
             this.physics?.update(delta)
             this.physics?.updateDebugger()
-            // } catch (err) {
-            //     console.log("Error updating physics", err)
-            // }
 
             this.update?.(+(time.toFixed(8)), delta)
 

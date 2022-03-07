@@ -25,12 +25,10 @@ export const createFakeBrackets = () => {
 
 
     let game = root.findLatestUnplayedGame(players[players.length - 1].uid)
-    console.log("game", game)
     if (game) {
 
         game.setWinner(2)
     }
-    console.log("root", root)
     return root
 }
 
@@ -52,7 +50,6 @@ export const addFakesToTournament = async (tournamentId: string, numberOfFakes: 
 
     for (let p of players) {
         joinTournament(p, tournamentId).then(() => {
-            console.log("p joined", p.displayName)
         })
     }
 

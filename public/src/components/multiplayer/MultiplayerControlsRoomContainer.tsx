@@ -32,7 +32,6 @@ export const MultiplayerControlsRoomContainer = (
   const history = useHistory();
 
   const params = useParams<WaitParamType>();
-  console.log("params", params);
   const roomId = params?.roomId;
   const user = useContext(UserContext);
 
@@ -40,7 +39,6 @@ export const MultiplayerControlsRoomContainer = (
   const [isConnecting, setIsConnecting] = useState(!socket);
 
   if (!roomId && !socket) {
-    console.log("No socket and no room", roomId);
     history.push(multiplayerConnectPagePath);
     return null;
   }
@@ -49,10 +47,8 @@ export const MultiplayerControlsRoomContainer = (
     props.store.setRoomId(roomId);
     // create a socket, try to connect to this room, or create it
     const config = getUserConfig(props.store, user);
-    console.log("sending connect to room from mobile controls room", roomId);
     socket.emit(m_ts_connect_to_room, { roomId, config });
     socket.once(m_fs_connect_to_room_callback, (res: ISocketCallback) => {
-      console.log("m_fs_connect_to_room_callback, res:", res);
       if (res.status === "error") {
         history.push(multiplayerConnectPagePath);
         return;

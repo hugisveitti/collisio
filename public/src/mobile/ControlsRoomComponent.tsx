@@ -117,7 +117,6 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
 
   // useEffect(() => {
   //   const fBtn = document.getElementById("fBtn");
-  //   console.log("fBtn", fBtn);
 
   //   if (fBtn) {
   //     fBtn.addEventListener("touchforcechange", (e) => {

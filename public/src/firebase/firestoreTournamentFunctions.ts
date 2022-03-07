@@ -12,7 +12,6 @@ const tournamentPlayersPath = "players"
 
 export const setTournament = async (tournament: ITournament): Promise<void> => {
     const p = new Promise<void>(async (resolve, reject) => {
-        console.log("tournament to add", tournament)
 
         try {
             await setDoc(doc(firestore, tournamentPath, tournament.id), tournament)
@@ -87,10 +86,8 @@ export const joinTournament = (user: IUser, tournamentId: string): Promise<void>
                 ranking: -1
             }
             await setDoc(d, tournamentUser)
-            console.log("joined tournament")
             resolve()
         } catch (e) {
-            console.log("Error joining tournament:", e)
             reject()
         }
     })
@@ -104,7 +101,6 @@ export const leaveTournament = (user: IUser, tournamentId: string): Promise<void
             await deleteDoc(d)
             resolve()
         } catch (e) {
-            console.log("Error joining tournament:", e)
             reject()
         }
     })
@@ -155,7 +151,6 @@ export const updatePlayersInTournament = (tournamentId: string, players: ITourna
     })
 
     batch.commit().then(() => {
-        console.log("successfully commited players batch")
     }).catch((err) => {
         console.warn("Error updating players:", err)
     })
@@ -221,7 +216,6 @@ export const getAvailableTournaments = async (userId: string): Promise<ITourname
 
 export const getActiveTournaments = async (userId: string): Promise<ITournament[]> => {
     return new Promise<ITournament[]>(async (resolve, reject) => {
-        console.log("userId", userId)
         const q = query(collection(firestore, tournamentPath), where("playersIds", "array-contains", userId), where("isFinished", "==", false), where("hasStarted", "==", true))
 
         try {
@@ -242,7 +236,6 @@ export const getActiveTournaments = async (userId: string): Promise<ITournament[
 
 export const getPreviousTournaments = async (userId: string): Promise<ITournament[]> => {
     return new Promise<ITournament[]>(async (resolve, reject) => {
-        console.log("userId", userId)
         const q = query(collection(firestore, tournamentPath), where("playersIds", "array-contains", userId), where("isFinished", "==", true))
 
         try {
@@ -284,7 +277,6 @@ export const getAllUserTournaments = async (userId: string): Promise<Tournament[
 // to save individual runs by players
 // must for global, but also nice to have for local
 export const saveTournamentRaceDataPlayer = async (data: IEndOfRaceInfoPlayer) => {
-    console.log("saving to tournament", data)
 
     if (data.tournamentId && data.isAuthenticated) {
         const ref = doc(firestore, tournamentPath, data.tournamentId, tournamentPlayersPath, data.playerId)
@@ -295,7 +287,6 @@ export const saveTournamentRaceDataPlayer = async (data: IEndOfRaceInfoPlayer) =
             lapTimes: data.lapTimes,
         }
 
-        console.log("single race", singleRace)
 
         try {
             await updateDoc(ref, {
@@ -306,7 +297,6 @@ export const saveTournamentRaceDataPlayer = async (data: IEndOfRaceInfoPlayer) =
         }
 
     } else {
-        console.log("No tournament id and not saving tournament")
     }
 }
 
@@ -380,8 +370,6 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
         }
     }
 
-    console.log("player1", player1)
-    console.log("player2", player2)
     if (!player1 || !player2) {
 
         console.warn("player1 or player2 undefined", player1, player2)
@@ -425,10 +413,6 @@ const saveTournamentLocalRaceGame = async (gameInfo: IEndOfRaceInfoGame, activeB
         }
     }
 
-    console.log("bracket to save", bracket)
-
-
-    console.log("setting the tournament", tournament)
     setTournament(tournament)
 
 
@@ -463,7 +447,6 @@ export const getTorunamentBestTime = (tournamentId: string) => {
         const ref = doc(firestore, tournamentPath, tournamentId, "metaData", "metaData")
         getDoc(ref).then(val => {
             if (val.exists()) {
-                console.log("val", val)
                 resolve(val.data().bestTime)
             } else {
                 resolve(undefined)
@@ -484,13 +467,4 @@ export const setTorunamentBestTime = (tournamentId: string, totalTime) => {
     } catch (err) {
         console.warn("Error setting tournament best time", err)
     }
-    // getDoc(ref).then(val => {
-    //     if (val.exists()) {
-    //         console.log("val", val)
-    //         resolve(val.data().bestTime)
-    //     } else {
-    //         reject()
-    //     }
-    // })
-
 }

@@ -48,7 +48,7 @@ export class StoryCourse extends Course {
                 console.warn("Unknown vehicle type in name", child.name)
             }
         }
-        console.log("I TOOK OUT CREATE EXTRA VEHICLES")
+        console.warn("I TOOK OUT CREATE EXTRA VEHICLES")
         //   this.gameScene.createExtraVehicles(vehicleTypes, positions, rotations)
     }
 
@@ -67,7 +67,7 @@ export class StoryCourse extends Course {
                 console.warn("Unknown vehicle type in name", child.name)
             }
         }
-        console.log("I TOOK OUT CREATE WAGONS")
+        console.warn("I TOOK OUT CREATE WAGONS")
 
         //     this.gameScene.createWagons(wagonTypes, positions, rotations)
     }

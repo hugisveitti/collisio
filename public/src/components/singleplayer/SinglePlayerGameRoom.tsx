@@ -1,8 +1,10 @@
+import { Timestamp } from "@firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
 import { getLocalUid } from "../../classes/localStorage";
 import { defaultUserSettings } from "../../classes/User";
+import { saveSinglePlayerData } from "../../firebase/firestoreFunctions";
 import {
   createMultiplayerGameScene,
   MultiplayerRaceGameScene,
@@ -10,6 +12,7 @@ import {
 import { UserContext } from "../../providers/UserProvider";
 import { m_ts_restart_game } from "../../shared-backend/multiplayer-shared-stuff";
 import { IPlayerInfo } from "../../shared-backend/shared-stuff";
+import { getCountryInfo } from "../../utils/connectSocket";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import GameSettingsModal from "../gameRoom/GameSettingsModal";
@@ -65,7 +68,17 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
       isLeader: true,
     };
     props.store.setPlayer(player);
-    console.log("player", player, user, props.store);
+
+    getCountryInfo().then((res) => {
+      saveSinglePlayerData({
+        country: res.country,
+        inEurope: res.inEurope,
+        player,
+        roomSettings: props.store.roomSettings,
+        gameSettings: props.store.gameSettings,
+        date: Timestamp.now(),
+      });
+    });
 
     const config: ISingleplayerGameSceneConfig = {
       gameSettings: props.store.gameSettings,
@@ -88,14 +101,10 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   }, [user]);
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
-    console.log("update game settings", newGameSettings);
-
     gameObject.setGameSettings(newGameSettings);
   };
 
   const updateRoomSettings = (newRoomSettings: IRoomSettings) => {
-    console.log("update room settings", newRoomSettings);
-
     gameObject.setRoomSettings(newRoomSettings);
   };
 

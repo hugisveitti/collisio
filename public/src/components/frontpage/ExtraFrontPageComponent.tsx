@@ -33,7 +33,7 @@ const ExtraFrontPageComponent = (props: IExtraFrontPageComponent) => {
       </BackdropButton>
       {onMobile ? (
         <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
-          Play mobile version
+          Play mobile only
         </BackdropButton>
       ) : (
         <BackdropButton link={singlePlayerWaitingRoomPath} width={btnWidth}>

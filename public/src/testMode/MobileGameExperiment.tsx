@@ -114,7 +114,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    console.log("player finished", data);
     if (data.isAuthenticated) {
       saveBestRaceData(data.playerId, data).then(
         ([setPersonalBest, gameInfo]) => {
@@ -123,7 +122,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
           };
           newGameInfo.bestTimesInfo[props.store.player.id] = gameInfo;
           setGameDataInfo(newGameInfo);
-          console.log("game info", gameInfo);
           setEndOfGameModalOpen(true);
         }
       );
@@ -144,7 +142,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
 
   useEffect(() => {
     if (socket) {
-      console.log("disconnecting socket");
       disconnectSocket();
     }
   }, [socket]);
@@ -175,7 +172,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
               vehicleSetup: setups[settings.vehicleSettings.vehicleType],
               vehicleSettings: props.store.userSettings.vehicleSettings,
             };
-            console.log("player", player);
 
             props.store.setPlayer(player);
           });
@@ -204,14 +200,12 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         },
         vehicleSettings: defaultVehicleSettings,
       };
-      console.log("player", player);
 
       props.store.setPlayer(player);
     }
   }, [user]);
 
   useEffect(() => {
-    console.log("store", props.store);
     if (!props.store.player) return;
     const CurrGameScene = getGameSceneClass(props.store.roomSettings.gameType);
 
@@ -240,7 +234,6 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   }, [props.store.player]);
 
   const handleGameActions = () => {
-    console.log("Game actions", gameActions);
     // const newPlayer = {
     //   ...props.store.player,
     //   vehi

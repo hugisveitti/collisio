@@ -19,10 +19,7 @@ const MyDateInput = (props: IMyDateInput) => {
         name={props.label}
         value={props.value}
         onChange={(e) => {
-          console.log("change", e);
-          console.log("val", e.target.value);
           const newStart = new Date(e.target.value);
-          console.log("new start", newStart);
           props.onChange(newStart);
         }}
         min={props.min}

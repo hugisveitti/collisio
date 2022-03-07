@@ -9,7 +9,6 @@ import { getDeviceType, getStaticPath } from "../utils/settings";
 
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
     const audioLoader = new AudioLoader();
-    console.log("load engine sound buffer")
     let engineSoundPath = "engine.mp3"
     //   let engineSoundPath = "f1engine2.mp3" // "engine.mp3"
     return new Promise((resolve, reject) => {
@@ -24,12 +23,10 @@ export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
 }
 
 export const loadSkidSoundBuffer = (): Promise<AudioBuffer> => {
-    console.log("load skid sound buffer")
     const audioLoader = new AudioLoader();
     return new Promise<AudioBuffer>((resolve, reject) => {
         audioLoader.loadAsync(getStaticPath("sound/skid5.ogg")).then((buffer: AudioBuffer) => {
             //  engineBuffer = buffer
-            console.log("skid5 loaded")
 
             resolve(buffer)
         }).catch((err) => {
@@ -53,7 +50,6 @@ export const getBeep = async (path: string, listener: AudioListener, callback: (
 export const loadMusic = (file: string): Promise<AudioBuffer> => {
     const audioLoader = new AudioLoader();
     return new Promise<AudioBuffer>((resolve, reject) => {
-        console.log("loading async music", file)
         audioLoader.loadAsync(getStaticPath(`music/${file}`)).then((buffer: AudioBuffer) => {
             //      engineBuffer = buffer
 
@@ -69,7 +65,6 @@ let music: Audio
 
 export const addMusic = async (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
     if (music && music.isPlaying) {
-        console.log("removing music")
         music.stop()
         music = undefined
     }
@@ -86,7 +81,6 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
                 return
             }
             music.setVolume(volume)
-            console.log("music:", music, " isPlaying", music.isPlaying, "notAutostart:", notAutoStart, "volume:", volume)
             if (!notAutoStart && volume > 0) {
                 if (music.isPlaying) {
                     music?.stop()
@@ -115,7 +109,6 @@ export const setMusicVolume = (volume: number) => {
 }
 
 export const stopMusic = () => {
-    console.log("stopping music", "music", music, "isplaying", music?.isPlaying)
     if (!music || !music.isPlaying) return
 
     music?.stop()

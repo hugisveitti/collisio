@@ -75,7 +75,6 @@ export class RaceGameScene extends GameScene {
         this.courseLoaded = true
 
         await this.createVehicles()
-        console.log("created vehicles, going to create bot")
         await this.createBot()
         hideLoadDiv()
 

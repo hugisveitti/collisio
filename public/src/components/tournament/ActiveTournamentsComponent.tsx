@@ -22,7 +22,6 @@ const ActiveTournamentsComponent = (props: IActiveTournamentsComponent) => {
 
     getActiveTournaments(props.user.uid)
       .then((_tournaments) => {
-        console.log("active tournaments", _tournaments);
         setTournements(_tournaments);
       })
       .catch(() => {

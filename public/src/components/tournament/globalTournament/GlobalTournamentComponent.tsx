@@ -42,16 +42,6 @@ const GlobalTournamentComponent = (props: IGlobalTournamentComponent) => {
         </Collapse>
       </Grid>
 
-      {/* <Grid item xs={12}>
-        <TournamentPlayersList
-          user={props.user}
-          tournament={props.tournament}
-          editingRanking={false}
-          players={dictToArray(props.tournament.players)}
-          setPlayers={() => console.log("do nothing")}
-        />
-      </Grid> */}
-
       <Grid item xs={12}>
         <GlobalTournamentScoreboard tournamentId={props.tournament.id} />
       </Grid>

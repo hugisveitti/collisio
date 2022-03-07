@@ -112,8 +112,7 @@ let currentItems: CurrentItemProps = {
 let currentColor: string
 
 export const changeVehicleSetup = async (vehicleSetup: VehicleSetup) => {
-    console.log("changing vehicle setup", vehicleSetup)
-    console.log("current items", currentItems)
+
     if (!currentChassis || !vehicleSetup) return
 
     for (let item of possibleVehicleItemTypes) {

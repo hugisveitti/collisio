@@ -62,13 +62,6 @@ const TournamentPlayersComponent = (props: ITournamentPlayersComponent) => {
     }
   }, [props.players]);
 
-  useEffect(() => {
-    // setTimeout(() => {
-    //   console.log("creating fakes");
-    //   addFakesToTournament(props.tournament.id, 6);
-    // }, 2000);
-  }, []);
-
   if (!props.tournament) return null;
 
   return (

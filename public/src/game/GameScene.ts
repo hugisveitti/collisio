@@ -431,7 +431,7 @@ export class GameScene extends MyScene implements IGameScene {
                 height:${viewDivHeight}px;
             `)
 
-            const fontSize = window.innerWidth < 1500 ? 32 : 82
+            const fontSize = viewDivWidth < 1500 ? 32 : 82
 
             kmInfo.setAttribute("style", `
                 position:absolute;
@@ -533,7 +533,7 @@ export class GameScene extends MyScene implements IGameScene {
 
     startGameSong() {
         // not use game song right now...
-        if ((!this.songIsPlaying) && !this.isPaused && this.gameSettings.musicVolume > 0) {
+        if (this.gameSettings.musicVolume > 0) {
             this.songIsPlaying = true
             startMusic()
         }
@@ -614,7 +614,6 @@ export class GameScene extends MyScene implements IGameScene {
     _setRoomSettings() { }
 
     setRoomSettings(roomSettings: IRoomSettings) {
-        console.log("set room settings", this.courseLoaded, this.getTrackName(), roomSettings)
         if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
             this.setNeedsReload(true)
         }
@@ -736,7 +735,9 @@ export class GameScene extends MyScene implements IGameScene {
 
     async restartGame() {
         this.clearImportantInfo()
+        this.clearSecondaryInfo()
         this.clearViewsImportantInfo()
+        this.totalTimeDiv.textContent = ""
 
         this.isPaused = false
         this.gameStarted = false

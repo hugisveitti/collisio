@@ -17,19 +17,6 @@ interface FrontPageProps {
 }
 
 const FrontPage = (props: FrontPageProps) => {
-  // useEffect(() => {
-  //   const id = "test";
-  //   getTournamentGhost(id)
-  //     .then((val) => {
-  //       console.log("val");
-  //     })
-  //     .catch((err) => {
-  //       console.log("err", err);
-  //     });
-
-  //   // uploadTournamentGhost(id, ["1 1 1 1 2 2 2", "2 2 2 2 3 2 1"]);
-  // }, []);
-
   return (
     <AppContainer>
       <Grid container spacing={5}>

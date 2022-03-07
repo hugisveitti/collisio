@@ -92,7 +92,6 @@ const GlobalTournamentScoreboard = (props: IGlobalTournamentScoreboard) => {
         );
       });
       setPlayers(_p);
-      console.log("_p", _p);
     });
 
     return () => {

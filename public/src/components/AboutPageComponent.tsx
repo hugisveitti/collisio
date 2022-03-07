@@ -53,7 +53,7 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
         <Grid item xs={12}>
           <img src={logo} style={{ width: 500, maxWidth: "90%" }} />
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <Typography variant="body1">
             Welcome to Collisio club, I am Hugi Hólm the founder of Collisio.
             Collisio's development started in quarantine after I contracted the
@@ -79,6 +79,9 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
             After graduating I decided to work on Collisio instead of finding a
             job, as the development was too fun.
           </Typography>
+        </Grid> */}
+        <Grid item xs={12}>
+          Made by <a href="https://lazylemon.games">Lazy Lemon Games</a>
         </Grid>
         <Grid item xs={12}>
           The music in this game, is made by Teitur Skúlason.

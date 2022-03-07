@@ -140,7 +140,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.renderer.render(this.scene, this.camera)
         hideLoadDiv()
 
-        console.log("adding music", "volume", this.gameSettings?.musicVolume, "song:", this.getRaceSong())
 
         addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
@@ -450,7 +449,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     vehicleSettingsChanged(vehicleSettings: IVehicleSettings) {
-        console.log("change vehicle settings", vehicleSettings)
         this.vehicle.updateVehicleSettings(vehicleSettings, this.config?.player.vehicleSetup)
         this.config.player.vehicleType = vehicleSettings.vehicleType
         this.config.player.vehicleSettings = vehicleSettings

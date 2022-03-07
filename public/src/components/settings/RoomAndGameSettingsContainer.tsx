@@ -34,7 +34,6 @@ const RoomAndGameSettingsContainer = (props: IRoomAndGameSettingsContainer) => {
     socket?.on(
       stmd_game_settings_changed,
       (data: { gameSettings: IGameSettings; roomSettings: IRoomSettings }) => {
-        console.log("settings change", data);
         if (data.gameSettings) {
           props.store.setGameSettings(data.gameSettings);
           setAllLocalGameSettings(data.gameSettings);

@@ -311,3 +311,14 @@ export const getUserTokens = async (userId: string): Promise<ITokenData> => {
         })
     })
 }
+
+const singlePlayerRoomRef = "singleplayerRoomData"
+
+export const saveSinglePlayerData = (data: any) => {
+    const ref = doc(collection(firestore, singlePlayerRoomRef))
+    try {
+        setDoc(ref, data)
+    } catch (err) {
+        console.warn("Error saving single player data:", err)
+    }
+}

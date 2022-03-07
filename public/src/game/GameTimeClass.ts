@@ -125,7 +125,6 @@ export class GameTime {
     getCheckpointTime(checkpointNumber: number, _lapNumber: number): number | undefined {
         const lapNumberIndex = _lapNumber - 1
         const checkpointIndex = checkpointNumber - 1
-        console.log("checkpoint times", this.checkpointTimes)
         if (this.checkpointTimes.length > checkpointIndex && this.checkpointTimes[checkpointIndex].length > lapNumberIndex) {
             return this.checkpointTimes[checkpointIndex][lapNumberIndex]
         }

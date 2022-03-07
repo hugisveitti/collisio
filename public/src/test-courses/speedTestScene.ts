@@ -120,7 +120,6 @@ class SpeedTestScene extends GameScene {
 
     async loadAssets(): Promise<void> {
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
-        console.log("camera", this.camera)
         await this.course.createCourse()
         this.courseLoaded = true
         hideLoadDiv()
@@ -129,7 +128,6 @@ class SpeedTestScene extends GameScene {
     }
 
     _restartGame(): void {
-        console.log("restarting test scene")
         // this.gameStarted = true
         for (let vehicle of this.vehicles) {
             vehicle.unpause()
@@ -146,7 +144,6 @@ class SpeedTestScene extends GameScene {
             this.vehicles[i].update(delta)
             if (i === 0) {
                 this.vehicles[i].cameraLookAt(this.camera, delta)
-                //       console.log("x", this.vehicles[i].getPosition().x.toFixed(2), this.vehicles[i].getPosition().z.toFixed(2))
             }
         }
     }

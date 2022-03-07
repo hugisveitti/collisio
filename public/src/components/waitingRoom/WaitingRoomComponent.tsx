@@ -74,9 +74,7 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
         .then((url) => {
           setRoomQrCode(url);
         })
-        .catch((err) => {
-          console.log("error generating qr code", err);
-        });
+        .catch((err) => {});
     }
 
     return () => {

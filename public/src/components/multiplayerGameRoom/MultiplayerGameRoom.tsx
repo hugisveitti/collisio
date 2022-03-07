@@ -58,7 +58,6 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   useEffect(() => {
     clearBackdropCanvas();
 
-    console.log("store", props.store);
     const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
     const vehicleSetup =
       props.store.vehiclesSetup?.[vehicleType] ??
@@ -80,7 +79,6 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
     });
 
     return () => {
-      console.log("game room umounted");
       socket.disconnect();
       gameObject?.destroyGame().then(() => {
         gameObject = null;
@@ -89,13 +87,10 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   }, []);
 
   const updateGameSettings = (newGameSettings: IGameSettings) => {
-    console.log("update game settings", newGameSettings);
-
     gameObject.setGameSettings(newGameSettings);
   };
 
   const updateRoomSettings = (newRoomSettings: IRoomSettings) => {
-    console.log("update room settings", newRoomSettings);
     socket.emit(m_ts_room_settings_changed, { roomSettings: newRoomSettings });
     gameObject.setRoomSettings(newRoomSettings);
   };

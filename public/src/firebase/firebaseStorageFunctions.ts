@@ -12,7 +12,6 @@ export const uploadGhost = (filename: string, ghostRecording: string[]) => {
     const blob = new Blob([ghostRecording.join("\n")], { type: "text/plain" })
 
     uploadBytes(storageRef, blob).then((snap) => {
-        console.log("Uploaded ghost:", filename)
     }).catch(err => {
         console.warn("Error uploading ghost:", err)
     })
@@ -25,7 +24,6 @@ export const uploadTournamentGhost = (tournamentId: string, ghostRecording: stri
             uploadGhost(tournamentRef + "/" + tournamentId, ghostRecording)
             setTorunamentBestTime(tournamentId, totalTime)
         }
-        console.log(" the best time:", bestTime, "total time:", totalTime)
     }).catch((err) => {
         console.warn("Error getting best time:", err)
     })
@@ -39,10 +37,8 @@ export const downloadGhost = (filename: string) => {
         }
 
         const storageRef = ref(storage, ghostRef + "/" + filename)
-        console.log("downloading ghost", filename)
 
         getBlob(storageRef).then(async (resBlob) => {
-            console.log("Got ghost", resBlob)
             const text = await (new Response(resBlob)).text()
             resolve(text.split("\n"))
         }).catch((err) => {
@@ -92,7 +88,6 @@ export const getTournamentGhost = async (tournamentId: string) => {
 export const getFastestGhostFilename = (trackName: TrackName, numberOfLaps: number): Promise<string | undefined> => {
     return new Promise<string | undefined>(async (resolve, reject) => {
         const bestScores = await getBestScoresOnTrackAndLap(trackName, numberOfLaps, 0, 5)
-        console.log("best scores", bestScores)
         if (!bestScores) {
             resolve(undefined)
             return
@@ -105,7 +100,6 @@ export const getFastestGhostFilename = (trackName: TrackName, numberOfLaps: numb
                 bestScore = score.totalTime
             }
         }
-        console.log("best score and bestscore file", bestScore, bestScoreFile)
         resolve(bestScoreFile)
     })
 }

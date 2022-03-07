@@ -19,7 +19,6 @@ const LocalTournamentComponent = (props: ILocalTournamentComponent) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bracket, setBracket] = useState({} as BracketTree);
 
-
   useEffect(() => {
     setBracket(
       BracketTree.Deflatten(
@@ -58,7 +57,7 @@ const LocalTournamentComponent = (props: ILocalTournamentComponent) => {
           tournament={props.tournament}
           editingRanking={false}
           players={dictToArray(props.tournament.players)}
-          setPlayers={() => console.log("do nothing")}
+          setPlayers={() => {}}
         />
       </Grid>
 

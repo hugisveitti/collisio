@@ -121,7 +121,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
     });
 
     return () => {
-      console.log("disconnecting socket");
       window.clearInterval(sendControlsInterval);
       disconnectSocket();
       props.store.setPlayer(undefined);
@@ -140,22 +139,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
   }, [settingsModalOpen]);
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   // still need to send the stuff to the server
-    //   // hacky way
-    //   // should have some emit from the game to the devices telling them to send info such as userSettings
-    //   // 5000 ms then send it is hackkkky
-    //   const vehicleType = props.store.userSettings.vehicleSettings.vehicleType;
-    //   console.log(
-    //     "props.store.vehiclesSetup?.[vehicleType]",
-    //     props.store.vehiclesSetup?.[vehicleType]
-    //   );
-    //   socket.emit(mts_user_settings_changed, {
-    //     userSettings: props.store.userSettings,
-    //     vehicleSetup: props.store.vehiclesSetup?.[vehicleType],
-    //   });
-    // }, 1000);
-
     socket.on(stm_player_finished, (data: IEndOfRaceInfoPlayer) => {
       const md = getMedalAndTokens(
         data.trackName,
@@ -172,13 +155,6 @@ const ControlsRoom = (props: IControlsRoomProps) => {
             props.store.setTokenData(defaultTokenData);
           });
       }
-      // const newTokenData: ITokenData = {
-      //   ...tokenData,
-      //   coins: tokenData.coins + md.coins,
-      //   XP: tokenData.XP + md.XP,
-      // };
-      // newTokenData[md.medal] += 1;
-      // props.store.setTokenData(newTokenData);
 
       const medalDiv = document.getElementById("medal-data");
       medalDiv.classList.remove("hide");
@@ -248,11 +224,7 @@ const ControlsRoom = (props: IControlsRoomProps) => {
       setGameSettingsLoading(false);
       return;
     }
-    console.log(
-      "sending game settings",
-      props.store.gameSettings,
-      props.store.roomSettings
-    );
+
     socket.emit(mdts_game_settings_changed, {
       gameSettings: props.store.gameSettings,
       roomSettings: props.store.roomSettings,

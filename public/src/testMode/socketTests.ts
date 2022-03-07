@@ -102,7 +102,6 @@ const connectToRoom = (roomId: string, mobileSockets: Socket[], callback: () => 
                     oneConnect(i + 1)
                 }
             } else {
-                console.log("Error connecting in stress test, roomId:", roomId)
             }
         })
     }
@@ -121,7 +120,6 @@ const createRoom = (desktopSocket: Socket, callback: (roomId: string) => void) =
             const { roomId } = response.data
             callback(roomId)
         } else {
-            console.log("Error connecting", response.message)
         }
     })
 }

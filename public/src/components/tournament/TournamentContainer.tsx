@@ -53,15 +53,12 @@ const TournamentContainer = (props: ITournamentContainer) => {
         .then((url) => {
           setTournamentQrCode(url);
         })
-        .catch((err) => {
-          console.log("error generating qr code", err);
-        });
+        .catch((err) => {});
     }
 
     const unsub = createGetTournametListener(
       props.tournamentId,
       (_t: ITournament | undefined) => {
-        console.log("_T", _t);
         setTournament(_t);
       }
     );

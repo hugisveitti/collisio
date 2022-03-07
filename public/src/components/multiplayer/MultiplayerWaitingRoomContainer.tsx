@@ -52,10 +52,8 @@ const MultiplayerWaitingRoomContainer = (
       roomId = "";
     }
     const config = getUserConfig(props.store, user);
-    console.log("sending connect to room", roomId);
     socket.emit(m_ts_connect_to_room, { roomId, config });
     socket.once(m_fs_connect_to_room_callback, (res: ISocketCallback) => {
-      console.log("m_fs_connect_to_room_callback, res:", res);
       if (res.status === "error") {
         history.push(multiplayerConnectPagePath);
         return;
@@ -65,9 +63,7 @@ const MultiplayerWaitingRoomContainer = (
         //  props.store.setGameSettings(res.data.gameSettings);
         props.store.setRoomSettings(res.data.roomSettings);
         props.store.setPlayers(res.data.players);
-        console.log("got players", res.data.players);
         const userId = user?.uid ?? getLocalUid();
-        console.log("userid", userId);
         for (let i = 0; i < res.data.players.length; i++) {
           if (res.data.players[i].id === userId) {
             props.store.setPlayer(res.data.players[i]);
@@ -79,7 +75,6 @@ const MultiplayerWaitingRoomContainer = (
           history.push(getMultiplayerGameRoomPath(res.data.roomId));
         }
       } else if (roomId === "") {
-        console.log("change route");
         history.push(getMultiplayerWaitingRoom(res.data.roomId));
       }
       setIsConnecting(false);
@@ -90,21 +85,17 @@ const MultiplayerWaitingRoomContainer = (
 
   useEffect(() => {
     if (!roomId && !props.store.roomId) {
-      console.log("no room id", roomId && props.store.roomId);
       history.push(multiplayerConnectPagePath);
       return;
     }
 
     if (user === null) return;
-    console.log("user", user, "socket", socket);
     if (!socket) {
-      console.log("no socket");
       createSocket(
         getDeviceType(),
         user?.uid ?? getLocalUid(),
         "multiplayer"
       ).then((_socket) => {
-        console.log("socket created");
         socket = _socket;
         handleConnectToRoom();
       });

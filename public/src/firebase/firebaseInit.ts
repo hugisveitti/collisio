@@ -34,7 +34,6 @@ export const firestore = getMyFirestore()
 export const auth = getAuth(app)
 
 if (inDevelopment) {
-    console.log("connecting to emulator")
 
     connectFirestoreEmulator(firestore, "localhost", 8000)
     connectFunctionsEmulator(functions, "localhost", 5001)
@@ -43,7 +42,6 @@ if (inDevelopment) {
 }
 
 getRedirectResult(auth).then(res => {
-    // console.log("redirect res", res)
 }).catch(err => {
     console.warn("error getting redirect res", err)
 })

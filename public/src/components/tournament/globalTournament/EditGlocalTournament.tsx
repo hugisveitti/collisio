@@ -17,8 +17,6 @@ const EditGlobalTournamentComponent = (
   const [useRunsPerPlayer, setUseRunsPerPlayer] = useState(
     !!props.editTournament.runsPerPlayer
   );
-  console.log("edit torunament", props.editTournament);
-  console.log("start", props.editTournament.tournamentStart.toISOString());
 
   const startString = props.editTournament.tournamentStart
     .toISOString()
@@ -29,7 +27,6 @@ const EditGlobalTournamentComponent = (
 
   const nowString = new Date().toISOString().slice(0, 16);
 
-  console.log("start string", startString);
   return (
     <React.Fragment>
       <Grid item xs={12} lg={3}>

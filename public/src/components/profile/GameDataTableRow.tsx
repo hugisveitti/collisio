@@ -19,7 +19,6 @@ const GameDataTableRow = (props: IProps) => {
   const [open, setOpen] = useState(false);
   // let open = false;
   const { playerData } = props;
-  // console.log("props in gamedata row", props);
   if (!props.playerData) return null;
 
   const raceDate =

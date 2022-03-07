@@ -75,7 +75,6 @@ const MultiplayerConnectRoomContainer = (
       saveLocalStorageItem("roomId", res.data.roomId);
       props.store.setRoomId(res.data.roomId);
 
-      console.log("res", res);
       if (res.data.gameStarted) {
         if (res.data.roomSettings) {
           props.store.setRoomSettings(res.data.roomSettings);

@@ -27,10 +27,10 @@ interface IAdminComponent {
 }
 
 const AdminComponent = (props: IAdminComponent) => {
-  const [roomsInfo, setRoomsInfo] = useState([]);
+  const [singleplayerInfo, setSingleplayerInfo] = useState([]);
   const [createdRoomsInfo, setCreatedRoomsInfo] = useState([]);
   const [nRoomEntires, setNRoomEntires] = useState(5);
-  const [roomCardOpen, setRoomCardOpen] = useState(false);
+  const [singleplayerCardOpen, setSingleplayerCardOpen] = useState(false);
   const [createdRoomsCardOpen, setCreatedRoomCardOpen] = useState(false);
 
   const [gamesData, setGamesData] = useState([] as IEndOfRaceInfoGame[]);
@@ -69,7 +69,7 @@ const AdminComponent = (props: IAdminComponent) => {
             if (useCreatedRooms) {
               setCreatedRoomsInfo(arr);
             } else {
-              setRoomsInfo(arr);
+              setSingleplayerInfo(arr);
             }
           } else if (resData.statusCode === 403) {
             toast.error("Unauthorized user");
@@ -136,25 +136,27 @@ const AdminComponent = (props: IAdminComponent) => {
         </ul>
       </Grid>
 
-      {/* <Grid item xs={12}>
+      <Grid item xs={12}>
         <Card>
           <CardHeader
-            header="Room data"
-            title="Room data"
-            subheader="See data about the rooms"
+            header="Singleplayer data"
+            title="Singleplayer data"
+            subheader="See data about the started singleplayer games"
             action={
-              <IconButton onClick={() => setRoomCardOpen(!roomCardOpen)}>
-                {roomCardOpen ? <ExpandLess /> : <ExpandMore />}
+              <IconButton
+                onClick={() => setSingleplayerCardOpen(!singleplayerCardOpen)}
+              >
+                {singleplayerCardOpen ? <ExpandLess /> : <ExpandMore />}
               </IconButton>
             }
           />
 
           <CardContent>
-            <Collapse in={roomCardOpen}>
+            <Collapse in={singleplayerCardOpen}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Typography>
-                    Rooms fetched: {roomsInfo?.length ?? "-"}{" "}
+                    Rooms fetched: {singleplayerInfo?.length ?? "-"}{" "}
                   </Typography>
                 </Grid>
                 <Grid item xs={4} sm={3}>
@@ -181,13 +183,13 @@ const AdminComponent = (props: IAdminComponent) => {
                 <Grid item xs={false} sm={3} />
 
                 <Grid item xs={12}>
-                  <RoomDataTable roomsInfo={roomsInfo} />
+                  <RoomDataTable roomsInfo={singleplayerInfo} />
                 </Grid>
               </Grid>
             </Collapse>
           </CardContent>
         </Card>
-      </Grid> */}
+      </Grid>
 
       <Grid item xs={12}>
         <Card>

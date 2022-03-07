@@ -82,7 +82,6 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
     if (props.data.endOfRaceInfo) {
       const { trackName, numberOfLaps } = props.data.endOfRaceInfo.roomSettings;
       getBestScoresOnTrackAndLap(trackName, numberOfLaps, 0, 5).then((data) => {
-        console.log("got best scores on track", data);
         setTrackData(data);
       });
     }

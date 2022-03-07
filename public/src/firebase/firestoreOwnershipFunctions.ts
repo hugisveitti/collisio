@@ -34,7 +34,6 @@ export const getOwnership = (userId: string): Promise<AllOwnership> => {
 
             } else {
                 // set ownership to default
-                console.log("no ownership")
             }
             resolve(ownership)
         } catch (err) {

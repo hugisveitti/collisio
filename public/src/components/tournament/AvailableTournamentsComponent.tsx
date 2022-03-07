@@ -26,7 +26,6 @@ const AvailableTournamentsComponent = (
     setGettingTournaments(true);
     getAvailableTournaments(props.user.uid)
       .then((_tournaments) => {
-        console.log("tournaments", _tournaments);
         setTournements(_tournaments);
         setGettingTournaments(false);
       })

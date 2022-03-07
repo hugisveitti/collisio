@@ -161,8 +161,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.renderer.render(this.scene, this.camera)
         hideLoadDiv()
 
-        console.log("adding music", "volume", this.gameSettings?.musicVolume, "song:", this.getRaceSong())
-
         addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
 
@@ -325,7 +323,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
         this.setupVehiclesPositionInfo()
         this.setupRaceFinishedListener()
         this.setupReloadGameListener()
-        this.setupUserSettingsChangedListener()
+        // this.setupUserSettingsChangedListener()
         this.setupGamesSettingsChangedListener()
         this.setupMobileControlsListener()
         this.setupMobileControllerDisconnectedListener()
@@ -372,20 +370,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setupUserSettingsChangedListener() {
-        // this.socket.on(mts_user_settings_changed, (data: { userSettings: IUserSettings, vehicleSetup: VehicleSetup }) => {
-        //     const { userSettings, vehicleSetup } = data
-        //     console.log("usersettings changed", data)
-        //     this.vehicle.updateVehicleSettings(userSettings.vehicleSettings, vehicleSetup)
-        //     if (userSettings?.vehicleSettings.vehicleType) {
-        //         this.config.userSettings = userSettings
 
-        //         this.config.player.vehicleType = userSettings?.vehicleSettings.vehicleType
-        //     }
-        //     if (vehicleSetup) {
-
-        //         this.config.player.vehicleSetup = vehicleSetup
-        //     }
-        // })
     }
 
     setupReloadGameListener() {
@@ -507,7 +492,6 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
             //   this.lastOVUpdate = Math.max(0.01, this.lastOVUpdate)
             this.numNoUpdate = 0
             for (let o of this.otherVehicles) {
-                //  console.log("saving pos", info[o.id].pos)
 
                 o.saveCurrentPosition(info[o.id].pos)
             }

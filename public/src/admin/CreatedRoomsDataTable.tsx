@@ -65,7 +65,6 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   const multiplayer = extraData?.multiplayer;
   const players = extraData?.players ?? [];
   const dataCollection = extraData.dataCollection ?? {};
-  console.log("extraData", extraData);
   return (
     <>
       <TableRow>
@@ -133,7 +132,6 @@ interface ICreatedRoomsDataTable {
 }
 
 const CreatedRoomsDataTable = (props: ICreatedRoomsDataTable) => {
-  console.log("props", props);
   return (
     <TableContainer
       component={Paper}

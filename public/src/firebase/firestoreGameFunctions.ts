@@ -151,31 +151,7 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer)
         }).catch(e => {
             console.warn("error saving race", e)
         })
-
-        // const bestScores = await getBestScoresOnTrackAndLap(data.trackName, data.numberOfLaps, 0, 3)
-
-        // if (bestScores && bestScores.length > 0) {
-        //     let place = -1
-        //     for (let i = 0; i < bestScores.length; i++) {
-        //         if (data.totalTime < bestScores[i].totalTime) {
-        //             place = i + 1
-        //             break
-        //         }
-        //     }
-        //     if (place !== -1) {
-        //         gameDataInfo.push(`${data.playerName}'s time was number ${place} of all time`)
-        //     }
-        //     gameDataInfo.push(
-        //         `${data.playerName}'s time was ${(data.totalTime - bestScores[0].totalTime).toFixed(2)} sec from the all time best record.`
-        //     )
-        // } else {
-        //     gameDataInfo.push(`${data.playerName} set a all time best record!`)
-        // }
-
         saveBestRaceData(playerId, data).then(([setPersonalBest, _gameInfo]) => {
-
-            //  gameDataInfo = gameDataInfo.concat(_gameInfo)
-            console.log("Set personal best", setPersonalBest)
             resolve([setPersonalBest, _gameInfo])
         }).catch((err) => {
             console.warn("Error saving data", err)
@@ -259,7 +235,6 @@ export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps
             arr.push(val)
 
         })
-        console.log("arr", arr)
         resolve(arr)
     })
 }
@@ -293,23 +268,7 @@ export const deletePlayerGameData = (userId: string, gameId: string) => {
     })
 }
 
-// export const moveHighscores = () => {
-//     const ref = collection(firestore, bestHighscoresRefPath)
-
-//     const scores = {}
-
-//     getDocs(ref).then(docs => {
-//         docs.forEach(d => {
-//             scores[d.id] = d.data()
-//             const newRef = doc(firestore, bestHighscoresRefPath + "19012021", d.id)
-//             setDoc(newRef, d.data())
-//         })
-//         console.log("moved", Object.keys(scores).length)
-//     })
-// }
-
 export const deleteBestScore = (playerId: string, trackName: TrackName, numberOfLaps: number) => {
-    console.log("`${playerId}#${trackName}#${numberOfLaps}`", `${playerId}#${trackName}#${numberOfLaps}`)
     return new Promise<void>((resolve, reject) => {
 
         const gameRef = doc(firestore, bestHighscoresRefPath, `${playerId}#${trackName}#${numberOfLaps}`)

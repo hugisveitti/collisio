@@ -128,7 +128,6 @@ const VehicleSettingsComponent = (props: IVehicleSettingsComponent) => {
   };
 
   const sendVehicleSetupToServer = (vehicleSetup: VehicleSetup) => {
-    console.log("sending vehicle setup to server", vehicleSetup);
     socket?.emit(mts_user_settings_changed, {
       userSettings: undefined,
       vehicleSetup,
