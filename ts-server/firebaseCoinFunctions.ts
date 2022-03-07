@@ -61,7 +61,10 @@ const isValidRace = (run: IEndOfRaceInfoPlayerServer): boolean => {
         }
     }
 
-    if (!run.isAuthenticated) return false
+    if (!run.isAuthenticated) {
+        console.warn("Not vailid race: player not authenticated")
+        return false
+    }
 
 
     return true
@@ -96,9 +99,7 @@ const updateTrackNumberOfLapsMedal = (userId: string, trackName: string, numberO
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
  */
 export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
-    if (!isValidRace(data)) {
-        console.warn("Not vaild race:", data)
-    }
+
     if (isValidRace(data)) {
         const { medal, XP, coins } = getMedalAndTokens(data.trackName, data.numberOfLaps, data.totalTime)
 

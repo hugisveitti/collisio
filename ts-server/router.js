@@ -100,7 +100,6 @@ var router = function (app) {
         _loop_1(key);
     }
     app.get("/models/front-page.glb", function (req, res) {
-        console.log("getting model");
         res.sendFile(path.join(__dirname, "../public/" + buildFolder + "/models/front-page.glb"));
     });
     app.use(express.static(path.join(__dirname, "../public/" + buildFolder), { index: false }));

@@ -20,6 +20,7 @@ import AdminGameDataTable from "./AdminGameDataTable";
 import StressTestComponent from "../testMode/StressTestComponent";
 import { calculateGamesDataStats } from "./statisticsFunctions";
 import CreatedRoomsDataTable from "./CreatedRoomsDataTable";
+import SingleplayerDataTable from "./SingleplayerDataTable";
 
 interface IAdminComponent {
   userTokenId: string;
@@ -177,13 +178,13 @@ const AdminComponent = (props: IAdminComponent) => {
                     variant="contained"
                     onClick={() => handleGetRoomData(false)}
                   >
-                    Get room data
+                    Get singleplayer data
                   </Button>
                 </Grid>
                 <Grid item xs={false} sm={3} />
 
                 <Grid item xs={12}>
-                  <RoomDataTable roomsInfo={singleplayerInfo} />
+                  <SingleplayerDataTable roomsInfo={singleplayerInfo} />
                 </Grid>
               </Grid>
             </Collapse>

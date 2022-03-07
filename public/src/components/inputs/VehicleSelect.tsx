@@ -75,10 +75,15 @@ const VehicleSelect = ({ ...props }: IVehicleSelect) => {
     <React.Fragment>
       {!props.user && (
         <div>
-          <BackdropButton link={loginPagePath}>Login</BackdropButton>
           <span className="select__label" style={{ color, fontSize: 16 }}>
-            <i>Vehicle selection is only available for logged in users.</i>
+            <i>
+              Vehicle selection is only available for logged in users. Click
+              below to create a free account.
+            </i>
           </span>
+          <BackdropButton link={loginPagePath}>
+            Create a free account.
+          </BackdropButton>
         </div>
       )}
       <span className="select__label" style={{ color, fontSize: 16 }}>

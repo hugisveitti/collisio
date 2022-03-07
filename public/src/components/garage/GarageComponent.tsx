@@ -374,7 +374,9 @@ const GarageComponent = (props: IGarageComponent) => {
     if (!user) {
       return (
         <div className="background">
-          <span>Only logged in players can buy items.</span>
+          <span style={{ color: "white" }}>
+            Only logged in players can buy items.
+          </span>
           <BackdropButton link={loginPagePath} color="white">
             Create free account
           </BackdropButton>

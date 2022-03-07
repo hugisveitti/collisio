@@ -386,7 +386,6 @@ export class LowPolyVehicle extends Vehicle {
             this.stop()
 
             if (this.vehicleSetup) {
-                console.log("setting vehicle setup", this.name, this.vehicleSetup)
                 await this.updateVehicleSetup(this.vehicleSetup)
             }
             // think I need this, going through walls in multiplayer
@@ -1130,7 +1129,6 @@ export class LowPolyVehicle extends Vehicle {
     // set to default vehicle config
     async _updateVehicleSetup() {
         return new Promise<void>((resolve, reject) => {
-            console.log("updated vehicle config", this.name, this.vehicleConfig)
 
             this.currentEngineForce = this.vehicleConfig.engineForce
             this.updateMass(this.vehicleConfig.mass)

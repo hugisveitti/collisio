@@ -91,7 +91,6 @@ const router = (app: any) => {
     }
 
     app.get("/models/front-page.glb", (req: Request, res: Response) => {
-        console.log("getting model")
         res.sendFile(path.join(__dirname, `../public/${buildFolder}/models/front-page.glb`));
     });
 

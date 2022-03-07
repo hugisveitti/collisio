@@ -1,7 +1,6 @@
-import { collection, deleteDoc, doc, endBefore, getDocs, limit, limitToLast, onSnapshot, orderBy, query, setDoc, startAfter, startAt, where } from "@firebase/firestore"
+import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, setDoc, startAt, where } from "@firebase/firestore"
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game"
 import { IFlattendBracketNode } from "../classes/Tournament"
-import { getMedalAndTokens, IMedalAndToken, MedalType } from "../shared-backend/medalFuncions"
 import { TrackName, VehicleType } from "../shared-backend/shared-stuff"
 import { itemInArray } from "../utils/utilFunctions"
 import { firestore } from "./firebaseInit"

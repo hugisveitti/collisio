@@ -72,7 +72,6 @@ export class Wagon {
         return new Promise<void>(async (resolve, reject) => {
             await this.loadModels()
             this.createWagonWithAxis()
-            console.log("created wagon with axis")
             resolve()
         })
     }
@@ -176,11 +175,6 @@ export class Wagon {
         const awp0 = wR.y + dAngle
         const awp1 = wR.y - dAngle
 
-        // console.log("awp1 < awv && awv < awp0 && isBetweenAngles(smallerAngle, biggerAngle, vR.y)")
-        // console.log(awp1 < awv)
-        // console.log(awv < awp0)
-
-        console.log(isBetweenAngles(smallerAngle, biggerAngle, vR.y))
         // TODO: there is a bug here
         // the or (||) is just a temp fix to make it atleast possible to connect
         if ((awp1 < awv || awv < awp0) && isBetweenAngles(smallerAngle, biggerAngle, vR.y)) {

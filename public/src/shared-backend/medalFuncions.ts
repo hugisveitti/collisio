@@ -156,7 +156,8 @@ const times: { [trackName in TrackName]: TrackTimes } = {
 }
 
 
-export const getMedal = (trackName: TrackName, numberOfLaps: number, totalTime: number) => {
+
+export const getMedal = (trackName: TrackName, numberOfLaps: number, totalTime: number): { medal: MedalType, secToNext: number | undefined } => {
 
     if (trackName in times) {
         const { gold, silver, bronze } = times[trackName]
@@ -164,36 +165,37 @@ export const getMedal = (trackName: TrackName, numberOfLaps: number, totalTime: 
         // first lap is slowest
         if (numberOfLaps === 1) {
             if (totalTime < gold + 3) {
-                return "gold"
+                return { medal: "gold", secToNext: undefined }
             }
             if (totalTime < silver + 3) {
-                return "silver"
+                return { medal: "silver", secToNext: totalTime - (gold + 3) }
             }
             if (totalTime < bronze + 3) {
-                return "bronze"
+                return { medal: "bronze", secToNext: totalTime - (silver + 3) }
             }
-            return "none"
+            return { medal: "none", secToNext: totalTime - (bronze + 3) }
         }
 
         if (totalTime < gold * numberOfLaps) {
-            return "gold"
+            return { medal: "gold", secToNext: undefined }
         }
         if (totalTime < silver * numberOfLaps) {
-            return "silver"
+            return { medal: "silver", secToNext: totalTime - (gold) }
         }
         if (totalTime < bronze * numberOfLaps) {
-            return "bronze"
+            return { medal: "bronze", secToNext: totalTime - (silver) }
         }
-        return "none"
+        return { medal: "none", secToNext: totalTime - (bronze) }
     }
 
-    return "none"
+    return { medal: "none", secToNext: undefined }
 }
 
 export interface IMedalAndToken {
     medal: MedalType
     XP: number
     coins: number
+    secToNext: number
 }
 /**
  * It makes the most sense to have <medal>Coins * numberOfLaps be the
@@ -203,6 +205,18 @@ export interface IMedalAndToken {
  * 
  */
 
+export const getNextMedal = (medal: MedalType): MedalType | undefined => {
+    switch (medal) {
+        case "none":
+            return "bronze"
+        case "bronze":
+            return "silver"
+        case "silver":
+            return "gold"
+        case "gold":
+            return undefined
+    }
+}
 
 const coinsAmount: { [coin in MedalType]: number } = {
     "gold": 200,
@@ -226,13 +240,14 @@ const getXP = (trackName: TrackName, numberOfLaps: number) => {
  *  
  */
 export const getMedalAndTokens = (trackName: TrackName, numberOfLaps: number, totalTime: number): IMedalAndToken => {
-    const medal = getMedal(trackName, numberOfLaps, totalTime)
+    const { medal, secToNext } = getMedal(trackName, numberOfLaps, totalTime)
 
     const trackWeight = times[trackName].weight
     return {
         coins: Math.floor(coinsAmount[medal] * (numberOfLaps ** 1.1)) * trackWeight,
         XP: getXP(trackName, numberOfLaps),
-        medal
+        medal,
+        secToNext
     }
 }
 

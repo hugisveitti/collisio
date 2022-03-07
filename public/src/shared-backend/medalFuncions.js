@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultTokenData = exports.getMedalAndTokens = exports.getMedal = void 0;
+exports.defaultTokenData = exports.getMedalAndTokens = exports.getNextMedal = exports.getMedal = void 0;
 var times = {
     "farm-track": {
         gold: 20,
@@ -150,28 +150,28 @@ var getMedal = function (trackName, numberOfLaps, totalTime) {
         // first lap is slowest
         if (numberOfLaps === 1) {
             if (totalTime < gold + 3) {
-                return "gold";
+                return { medal: "gold", secToNext: undefined };
             }
             if (totalTime < silver + 3) {
-                return "silver";
+                return { medal: "silver", secToNext: totalTime - (gold + 3) };
             }
             if (totalTime < bronze + 3) {
-                return "bronze";
+                return { medal: "bronze", secToNext: totalTime - (silver + 3) };
             }
-            return "none";
+            return { medal: "none", secToNext: totalTime - (bronze + 3) };
         }
         if (totalTime < gold * numberOfLaps) {
-            return "gold";
+            return { medal: "gold", secToNext: undefined };
         }
         if (totalTime < silver * numberOfLaps) {
-            return "silver";
+            return { medal: "silver", secToNext: totalTime - (gold) };
         }
         if (totalTime < bronze * numberOfLaps) {
-            return "bronze";
+            return { medal: "bronze", secToNext: totalTime - (silver) };
         }
-        return "none";
+        return { medal: "none", secToNext: totalTime - (bronze) };
     }
-    return "none";
+    return { medal: "none", secToNext: undefined };
 };
 exports.getMedal = getMedal;
 /**
@@ -181,6 +181,19 @@ exports.getMedal = getMedal;
  * But then if I show ads after every third game it would make sense to make players play more games instead of longer ones.
  *
  */
+var getNextMedal = function (medal) {
+    switch (medal) {
+        case "none":
+            return "bronze";
+        case "bronze":
+            return "silver";
+        case "silver":
+            return "gold";
+        case "gold":
+            return undefined;
+    }
+};
+exports.getNextMedal = getNextMedal;
 var coinsAmount = {
     "gold": 200,
     "silver": 100,
@@ -201,12 +214,13 @@ var getXP = function (trackName, numberOfLaps) {
  *
  */
 var getMedalAndTokens = function (trackName, numberOfLaps, totalTime) {
-    var medal = (0, exports.getMedal)(trackName, numberOfLaps, totalTime);
+    var _a = (0, exports.getMedal)(trackName, numberOfLaps, totalTime), medal = _a.medal, secToNext = _a.secToNext;
     var trackWeight = times[trackName].weight;
     return {
         coins: Math.floor(coinsAmount[medal] * (Math.pow(numberOfLaps, 1.1))) * trackWeight,
         XP: getXP(trackName, numberOfLaps),
-        medal: medal
+        medal: medal,
+        secToNext: secToNext
     };
 };
 exports.getMedalAndTokens = getMedalAndTokens;

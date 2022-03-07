@@ -64,7 +64,6 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
             this.isReady = true
             this._canDrive = true
             if (this.vehicleSetup) {
-                console.log("setting vehicle setup", this.name)
                 await this.updateVehicleSetup(this.vehicleSetup)
             }
 

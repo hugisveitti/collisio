@@ -15,6 +15,7 @@ import {
 import { IEndOfGameData } from "../../game/IGameScene";
 import {
   getMedalAndTokens,
+  getNextMedal,
   IMedalAndToken,
 } from "../../shared-backend/medalFuncions";
 import { itemInArray } from "../../utils/utilFunctions";
@@ -39,6 +40,7 @@ interface IPlayerRaceInfo extends IBestTime {
   medal?: IMedalAndToken;
   playerName: string;
   totalTime: number;
+  isAuthenticated: boolean;
 }
 
 interface IMoreBestTimeInfo {
@@ -98,6 +100,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
         playerId: player.id,
         playerName: player.name,
         totalTime: player.totalTime,
+        isAuthenticated: player.isAuthenticated,
       };
       if (
         player.isAuthenticated &&
@@ -127,8 +130,8 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
         {!anyoneAuth && (
           <Grid item xs={12}>
             <Typography>
-              You need to login on your phone for your score to be saved on the
-              leaderboard.
+              Players need to be logged in on the phone for the score to be
+              saved on the leaderboard.
             </Typography>
           </Grid>
         )}
@@ -145,8 +148,15 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
               <h4>{data.playerName} Race info</h4>
               <div style={{ marginLeft: 15 }}>
                 <Typography>
-                  Won the {data.medal?.medal} medal, {data.medal?.coins} coins
-                  and {data.medal?.XP} XP.
+                  Won{" "}
+                  {data.medal?.medal === "none"
+                    ? "no"
+                    : `the ${data.medal?.medal}`}{" "}
+                  medal, {data.medal?.coins} coins and {data.medal?.XP} XP.{" "}
+                  {data.medal?.secToNext &&
+                    `${
+                      data.medal.secToNext
+                    } seconds from getting ${getNextMedal(data.medal.medal)}`}
                 </Typography>
                 {trackData.length > 0 ? (
                   <>
@@ -165,19 +175,23 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                 ) : (
                   <Typography>Set and all time best record!</Typography>
                 )}
-                <React.Fragment>
-                  {getPersonalBestInfo(
-                    { playerId: data.playerId, bestTime: data.bestTime },
-                    { playerName: data.playerName, totalTime: data.totalTime }
-                  ).map((str, idx: number) => (
-                    <Typography
-                      key={`${data.playerName}-${i}-personal-info`}
-                      style={{ marginRight: 10 }}
-                    >
-                      {str}
-                    </Typography>
-                  ))}
-                </React.Fragment>
+                {data.isAuthenticated ? (
+                  <React.Fragment>
+                    {getPersonalBestInfo(
+                      { playerId: data.playerId, bestTime: data.bestTime },
+                      { playerName: data.playerName, totalTime: data.totalTime }
+                    ).map((str, idx: number) => (
+                      <Typography
+                        key={`${data.playerName}-${i}-personal-info`}
+                        style={{ marginRight: 10 }}
+                      >
+                        {str}
+                      </Typography>
+                    ))}
+                  </React.Fragment>
+                ) : (
+                  <Typography>Is not logged in.</Typography>
+                )}
               </div>
             </Grid>
           );

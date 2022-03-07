@@ -81,7 +81,13 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
           </Typography>
         </Grid> */}
         <Grid item xs={12}>
-          Made by <a href="https://lazylemon.games">Lazy Lemon Games</a>
+          Collisio is a game by{" "}
+          <a
+            style={{ backgroundColor: "white", color: "black" }}
+            href="https://lazylemon.games"
+          >
+            Lazy Lemon Games
+          </a>
         </Grid>
         <Grid item xs={12}>
           The music in this game, is made by Teitur Skúlason.

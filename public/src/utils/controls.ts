@@ -57,7 +57,6 @@ export const addControls = (socket: Socket | undefined, vehicles: IVehicle[]) =>
 let vehicleControls: VehicleControls = new VehicleControls()
 
 const keyAction = (e: KeyboardEvent, isDown: boolean) => {
-    // console.log("e key", e.key, e.isComposing)
 
     switch (e.key) {
         case "w":
@@ -91,7 +90,6 @@ const keyAction = (e: KeyboardEvent, isDown: boolean) => {
 }
 
 export const addKeyboardControls = () => {
-    console.log("ADDING KEYBOARD CONTROLS")
     removeKeyboardControls()
     vehicleControls = new VehicleControls()
     document.addEventListener("keydown", e => keyAction(e, true))
@@ -99,7 +97,6 @@ export const addKeyboardControls = () => {
 }
 
 export const removeKeyboardControls = () => {
-    console.log("removing keyboard controls")
     document.removeEventListener("keydown", e => keyAction(e, true))
     document.removeEventListener("keyup", e => keyAction(e, false))
 }

@@ -95,8 +95,10 @@ var isValidRace = function (run) {
             return false;
         }
     }
-    if (!run.isAuthenticated)
+    if (!run.isAuthenticated) {
+        console.warn("Not vailid race: player not authenticated");
         return false;
+    }
     return true;
 };
 var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, medal) {
@@ -120,9 +122,6 @@ var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, me
  * This might be vaunerable since playerId isn't verified with admin.auth().verifyIdToken(userTokenId)
  */
 var updatePlayersTokens = function (data) {
-    if (!isValidRace(data)) {
-        console.warn("Not vaild race:", data);
-    }
     if (isValidRace(data)) {
         var _a = (0, medalFuncions_1.getMedalAndTokens)(data.trackName, data.numberOfLaps, data.totalTime), medal_1 = _a.medal, XP_1 = _a.XP, coins_1 = _a.coins;
         updateTrackNumberOfLapsMedal(data.playerId, data.trackName, data.numberOfLaps, medal_1);

@@ -105,7 +105,6 @@ var adminFunctions = function (app) {
                     case 0:
                         if (!isAdmin) return [3 /*break*/, 5];
                         path = queryParams.useCreatedRooms ? createdRoomsPath : singleplayerRoomDataPath;
-                        console.log("path", path);
                         roomDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, path);
                         q = (0, firestore_1.query)(roomDataRef, (0, firestore_1.orderBy)("date", "desc"));
                         if (queryParams.n) {

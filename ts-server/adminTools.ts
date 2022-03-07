@@ -79,7 +79,6 @@ export const adminFunctions = (app: any) => {
                 // const queries = createFirebaseQueries(queryParams)
                 // queries.push(orderByChild("date"))
                 const path = queryParams.useCreatedRooms ? createdRoomsPath : singleplayerRoomDataPath
-                console.log("path", path)
                 const roomDataRef = collection(firestore, path)
                 let q = query(roomDataRef, orderBy("date", "desc"))
                 if (queryParams.n) {
