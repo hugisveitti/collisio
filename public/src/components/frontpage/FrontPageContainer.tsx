@@ -15,23 +15,16 @@ import VolumeInput from "../inputs/VolumeInput";
 import AdSense from "../monitary/AdSense";
 import MyRadio from "../radio/MyRadio";
 import {
-  aboutPagePath,
   buyCoinsPagePath,
   connectPagePath,
   frontPagePath,
   garagePagePath,
-  highscorePagePath,
-  howToPlayPagePath,
   loginPagePath,
-  mobileOnlyWaitingRoomPath,
-  multiplayerConnectPagePath,
   privateProfilePagePath,
-  tournamentPagePath,
   trackPagePath,
 } from "../Routes";
 import { IStore } from "../store";
 import TokenComponent from "../tokenComponent/TokenComponent";
-import CreateGameComponent from "./CreateGameComponent";
 import TutorialComponent from "../waitingRoom/TutorialComponent";
 import ExtraFrontPageComponent from "./ExtraFrontPageComponent";
 

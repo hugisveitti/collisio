@@ -3,14 +3,13 @@ import { IUser } from "../../classes/User";
 import { getDeviceType } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
 import {
-  privateProfilePagePath,
-  highscorePagePath,
-  tournamentPagePath,
-  howToPlayPagePath,
   aboutPagePath,
-  multiplayerConnectPagePath,
+  highscorePagePath,
+  howToPlayPagePath,
   mobileOnlyWaitingRoomPath,
+  privateProfilePagePath,
   singlePlayerWaitingRoomPath,
+  tournamentPagePath,
 } from "../Routes";
 
 interface IExtraFrontPageComponent {
@@ -32,12 +31,13 @@ const ExtraFrontPageComponent = (props: IExtraFrontPageComponent) => {
       >
         Settings
       </BackdropButton>
-      <BackdropButton link={singlePlayerWaitingRoomPath} width={btnWidth}>
-        Play with keyboard
-      </BackdropButton>
-      {onMobile && (
-        <BackdropButton link={mobileOnlyWaitingRoomPath}>
+      {onMobile ? (
+        <BackdropButton link={mobileOnlyWaitingRoomPath} width={btnWidth}>
           Play mobile version
+        </BackdropButton>
+      ) : (
+        <BackdropButton link={singlePlayerWaitingRoomPath} width={btnWidth}>
+          Play with keyboard
         </BackdropButton>
       )}
       <BackdropButton link={highscorePagePath} width={btnWidth}>

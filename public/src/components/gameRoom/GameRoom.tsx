@@ -12,7 +12,10 @@ import {
   setAllLocalGameSettings,
   setAllLocalRoomSettings,
 } from "../../classes/localGameSettings";
-import { saveRaceDataGame } from "../../firebase/firestoreGameFunctions";
+import {
+  IBestTime,
+  saveRaceDataGame,
+} from "../../firebase/firestoreGameFunctions";
 import { startGame } from "../../game/GameScene";
 import { IEndOfGameData, IGameScene } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
@@ -32,7 +35,7 @@ import { inTestMode } from "../../utils/settings";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import { connectPagePath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
-import EndOfGameModal from "./EndOfGameModal";
+import EndOfGameModal, { IGameDataInfo } from "./EndOfGameModal";
 import GameSettingsModal from "./GameSettingsModal";
 
 interface IGameRoom {
@@ -41,21 +44,24 @@ interface IGameRoom {
   isTestMode?: boolean;
 }
 
-let currentRaceInfo = [];
+let currentRaceInfo: IGameDataInfo = {
+  bestTimesInfo: {},
+};
 let gameObject: IGameScene | undefined;
 
 const GameRoom = React.memo((props: IGameRoom) => {
   // this breaks iphone
-  // if (!props.store.roomId) {
-  //   window.location.href = frontPagePath;
-  // }
+
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   // const [gameObject, setGameObject] = useState(undefined as IGameScene);
   const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
   const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
   const [scoreInfo, setScoreInfo] = useState({} as IScoreInfo);
   /** interesting information about the game that can be retrieved when saving the data */
-  const [gameDataInfo, setGameDataInfo] = useState([] as string[]);
+
+  const [gameDataInfo, setGameDataInfo] = useState({
+    bestTimesInfo: {},
+  } as IGameDataInfo);
   const [gameActions, setGameActions] = useState(new GameActions());
 
   const user = useContext(UserContext);
@@ -76,8 +82,14 @@ const GameRoom = React.memo((props: IGameRoom) => {
       data.endOfRaceInfo,
       (res) => {
         if (res.status === "success") {
-          currentRaceInfo = [res.message].concat(currentRaceInfo);
+          currentRaceInfo.tournamentInfo = res.message;
+          //   currentRaceInfo = [res.message].concat(currentRaceInfo);
+          // const newGameDataInfo: IGameDataInfo = {
+          //   ...gameDataInfo,
+          //   tournamentInfo: res.message,
+          // };
           setGameDataInfo(currentRaceInfo);
+          //    setGameDataInfo(currentRaceInfo);
         }
         if (res.activeBracketNode) {
           // will this work?
@@ -122,8 +134,12 @@ const GameRoom = React.memo((props: IGameRoom) => {
   };
 
   const handleCloseModals = () => {
-    currentRaceInfo = [];
-    setGameDataInfo([]);
+    currentRaceInfo = {
+      bestTimesInfo: {},
+    };
+    setGameDataInfo({
+      bestTimesInfo: {},
+    });
     setEndOfGameModalOpen(false);
     setEndOfGameData({});
     setSettingsModalOpen(false);
@@ -189,7 +205,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
       (data: {
         playerId: string;
         setPersonalBest: boolean;
-        gameDataInfo: string[];
+        gameDataInfo: IBestTime;
       }) => {
         const {
           setPersonalBest,
@@ -199,7 +215,8 @@ const GameRoom = React.memo((props: IGameRoom) => {
         if (setPersonalBest) {
           gameObject.saveDriveRecording(playerId);
         }
-        currentRaceInfo = currentRaceInfo.concat(newGameDataInfo);
+        // currentRaceInfo = currentRaceInfo.concat(newGameDataInfo);
+        currentRaceInfo.bestTimesInfo[playerId] = newGameDataInfo;
         setGameDataInfo(currentRaceInfo);
       }
     );
@@ -311,6 +328,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
         }}
       />
       <EndOfGameModal
+        store={props.store}
         open={endOfGameModalOpen}
         onClose={() => handleCloseModals()}
         data={endOfGameData}

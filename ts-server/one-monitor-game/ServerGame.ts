@@ -93,11 +93,8 @@ export default class RoomMaster {
 
 
     setupPlayerConnectedListener(mobileSocket: Socket) {
-        console.log("setting player connected listener, socketId:", mobileSocket.id)
         mobileSocket.on(mts_player_connected, ({ roomId, playerName, playerId, isAuthenticated, photoURL, isStressTest, userSettings, vehicleSetup }: IPlayerConnectedData) => {
-            console.log("connecting to room", mobileSocket.id, roomId, playerName)
             if (!this.roomExists(roomId)) {
-                console.log("room does not exist", roomId, mobileSocket.id, stm_player_connected_callback)
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus })
             } else if (!isStressTest && this.rooms[roomId].isFull() && !this.rooms[roomId].gameStarted && !this.rooms[roomId].playerIsInRoom(playerId)) {
                 mobileSocket.emit(stm_player_connected_callback, { message: "Room is full.", status: errorStatus })
@@ -107,7 +104,6 @@ export default class RoomMaster {
             }
         })
         mobileSocket.on("disconnect", () => {
-            console.log("mobile socket disconnected , socketId:", mobileSocket.id)
         })
     }
 
@@ -430,7 +426,7 @@ export class Room {
     }
 
     alertWaitingRoom() {
-        this.io.to(this.roomId).emit(stmd_waiting_room_alert, { players: this.getPlayersInfo() })
+        this.io.to(this.roomId).emit(stmd_waiting_room_alert, { players: this.getPlayersInfo(), roomSettings: this.roomSettings })
     }
 
     setupGameSettingsListener() {

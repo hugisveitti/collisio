@@ -66,12 +66,9 @@ var RoomMaster = /** @class */ (function () {
     };
     RoomMaster.prototype.setupPlayerConnectedListener = function (mobileSocket) {
         var _this = this;
-        console.log("setting player connected listener, socketId:", mobileSocket.id);
         mobileSocket.on(shared_stuff_1.mts_player_connected, function (_a) {
             var roomId = _a.roomId, playerName = _a.playerName, playerId = _a.playerId, isAuthenticated = _a.isAuthenticated, photoURL = _a.photoURL, isStressTest = _a.isStressTest, userSettings = _a.userSettings, vehicleSetup = _a.vehicleSetup;
-            console.log("connecting to room", mobileSocket.id, roomId, playerName);
             if (!_this.roomExists(roomId)) {
-                console.log("room does not exist", roomId, mobileSocket.id, shared_stuff_1.stm_player_connected_callback);
                 mobileSocket.emit(shared_stuff_1.stm_player_connected_callback, { message: "Room does not exist, please create a game on a desktop first.", status: errorStatus });
             }
             else if (!isStressTest && _this.rooms[roomId].isFull() && !_this.rooms[roomId].gameStarted && !_this.rooms[roomId].playerIsInRoom(playerId)) {
@@ -83,7 +80,6 @@ var RoomMaster = /** @class */ (function () {
             }
         });
         mobileSocket.on("disconnect", function () {
-            console.log("mobile socket disconnected , socketId:", mobileSocket.id);
         });
     };
     RoomMaster.prototype.socketHasRoom = function (socket) {
@@ -360,7 +356,7 @@ var Room = /** @class */ (function () {
         }
     };
     Room.prototype.alertWaitingRoom = function () {
-        this.io.to(this.roomId).emit(shared_stuff_1.stmd_waiting_room_alert, { players: this.getPlayersInfo() });
+        this.io.to(this.roomId).emit(shared_stuff_1.stmd_waiting_room_alert, { players: this.getPlayersInfo(), roomSettings: this.roomSettings });
     };
     Room.prototype.setupGameSettingsListener = function () {
         var _this = this;

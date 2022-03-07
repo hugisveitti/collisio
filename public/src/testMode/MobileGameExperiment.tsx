@@ -10,7 +10,9 @@ import {
   setAllLocalGameSettings,
 } from "../classes/localGameSettings";
 import { defaultVehicleSettings } from "../classes/User";
-import EndOfGameModal from "../components/gameRoom/EndOfGameModal";
+import EndOfGameModal, {
+  IGameDataInfo,
+} from "../components/gameRoom/EndOfGameModal";
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
@@ -51,7 +53,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
   // const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [gameDataInfo, setGameDataInfo] = useState([] as string[]);
+  const [gameDataInfo, setGameDataInfo] = useState({} as IGameDataInfo);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const [gameSettingsLoading, setGameSettingsLoading] = useState(false);
@@ -116,7 +118,11 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
     if (data.isAuthenticated) {
       saveBestRaceData(data.playerId, data).then(
         ([setPersonalBest, gameInfo]) => {
-          setGameDataInfo(gameInfo);
+          const newGameInfo: IGameDataInfo = {
+            bestTimesInfo: {},
+          };
+          newGameInfo.bestTimesInfo[props.store.player.id] = gameInfo;
+          setGameDataInfo(newGameInfo);
           console.log("game info", gameInfo);
           setEndOfGameModalOpen(true);
         }
@@ -299,6 +305,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       />
 
       <EndOfGameModal
+        store={props.store}
         open={endOfGameModalOpen}
         onClose={() => {
           setEndOfGameModalOpen(false);
@@ -309,7 +316,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
             gameObject.restartGame();
             setEndOfGameModalOpen(false);
           }
-          setGameDataInfo([]);
+          setGameDataInfo({ bestTimesInfo: {} });
         }}
         scoreInfo={scoreInfo}
         gameDataInfo={gameDataInfo}

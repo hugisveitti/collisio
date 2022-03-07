@@ -124,7 +124,9 @@ const TrackSelect = (props: ITrackSelect) => {
 
   const handleBuyTrack = (trackName: TrackName) => {
     if (!user) {
-      toast.error("Only logged in players can buy tracks.");
+      toast.error(
+        "Only logged in players can buy tracks. You can create a free account."
+      );
       return;
     }
     setIsBuying(true);

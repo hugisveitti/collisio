@@ -37,11 +37,10 @@ export type TrackName =
     | "test-course"
 
 export type TrackCategory = "basic" | "long" | "short"
-export const possibleTrackCategories: { category: TrackCategory, name: string }[] = [
-    { category: "basic", name: "Basic" },
-    { category: "long", name: "Long" },
-    { category: "short", name: "Short" },
-
+export const possibleTrackCategories: { category: TrackCategory, name: string, description: string }[] = [
+    { category: "short", name: "Short", description: "Short tracks are usually shorter and take good players around 30 sec to finish, they often have tight corners and are more idea for single player grinds." },
+    { category: "basic", name: "Basic", description: "Basic tracks have fewer objects and are thus easier for slow computers to run." },
+    { category: "long", name: "Long", description: "Long tracks take around 1 minute for good players to finish, they have bigger roads and are fun to play in splitscreen." },
 ]
 
 type TrackDifficulty = "easy" | "medium" | "hard"

@@ -111,7 +111,7 @@ var updateTrackNumberOfLapsMedal = function (userId, trackName, numberOfLaps, me
     update[trackName][numberOfLaps] = {};
     update[trackName][numberOfLaps][medal] = firestore_1.FieldValue.increment(1);
     ref.set(update, { merge: true }).then(function () {
-        console.log("updated medals! userId:", userId);
+        console.log("updated medals! userId:", userId, "medal:", medal);
     }).catch(function (err) {
         console.warn("Error updating medals", err);
     });
@@ -144,7 +144,7 @@ var updatePlayersTokens = function (data) {
                 update.lastUpdate = Date.now();
                 try {
                     ref_1.set(update).then(function () {
-                        console.log("Updated coins!");
+                        console.log("Updated coins!", update.coins);
                     }).catch(function (err) {
                         console.warn("Error updating tokens:", err);
                     });

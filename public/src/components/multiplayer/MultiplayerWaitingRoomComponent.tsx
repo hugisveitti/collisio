@@ -77,7 +77,6 @@ const MultiplayerWaitingRoomComponent = (
       if (Object.keys(roomSettings).length > 0) {
         props.store.setRoomSettings(roomSettings);
       }
-      console.log("setting players", _players);
       props.store.setPlayers(_players);
       for (let i = 0; i < _players.length; i++) {
         if (_players[i].id === userId) {

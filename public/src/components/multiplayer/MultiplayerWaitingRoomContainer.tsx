@@ -70,7 +70,6 @@ const MultiplayerWaitingRoomContainer = (
         console.log("userid", userId);
         for (let i = 0; i < res.data.players.length; i++) {
           if (res.data.players[i].id === userId) {
-            console.log("setting player");
             props.store.setPlayer(res.data.players[i]);
           }
         }

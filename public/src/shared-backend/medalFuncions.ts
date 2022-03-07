@@ -190,7 +190,7 @@ export const getMedal = (trackName: TrackName, numberOfLaps: number, totalTime: 
     return "none"
 }
 
-interface IMedalAndToken {
+export interface IMedalAndToken {
     medal: MedalType
     XP: number
     coins: number

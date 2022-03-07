@@ -86,7 +86,7 @@ const updateTrackNumberOfLapsMedal = (userId: string, trackName: string, numberO
 
     ref.set(update, { merge: true }
     ).then(() => {
-        console.log("updated medals! userId:", userId)
+        console.log("updated medals! userId:", userId, "medal:", medal)
     }).catch((err) => {
         console.warn("Error updating medals", err)
     })
@@ -132,7 +132,7 @@ export const updatePlayersTokens = (data: IEndOfRaceInfoPlayerServer) => {
                 update.lastUpdate = Date.now()
                 try {
                     ref.set(update).then(() => {
-                        console.log("Updated coins!")
+                        console.log("Updated coins!", update.coins)
                     }).catch(err => {
                         console.warn("Error updating tokens:", err)
                     })

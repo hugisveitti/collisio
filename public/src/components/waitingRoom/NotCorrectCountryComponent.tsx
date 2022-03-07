@@ -1,9 +1,13 @@
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React from "react";
+import { getDeviceType } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
-import { singlePlayerWaitingRoomPath } from "../Routes";
+import {
+  mobileOnlyWaitingRoomPath,
+  singlePlayerWaitingRoomPath,
+} from "../Routes";
 
 interface INotCorrectCountryComponent {
   inEurope: boolean;
@@ -12,6 +16,8 @@ interface INotCorrectCountryComponent {
 }
 
 const NotCorrectCountryComponent = (props: INotCorrectCountryComponent) => {
+  const onMobile = getDeviceType() === "mobile";
+
   return (
     <BasicDesktopModal onClose={props.onClose} open={!props.inEurope}>
       <Grid container spacing={3}>
@@ -29,9 +35,15 @@ const NotCorrectCountryComponent = (props: INotCorrectCountryComponent) => {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={6} lg={2}>
-          <BackdropButton link={singlePlayerWaitingRoomPath}>
-            Play with keyboard
-          </BackdropButton>
+          {onMobile ? (
+            <BackdropButton link={mobileOnlyWaitingRoomPath}>
+              Play mobile version
+            </BackdropButton>
+          ) : (
+            <BackdropButton link={singlePlayerWaitingRoomPath}>
+              Play with keyboard
+            </BackdropButton>
+          )}
         </Grid>
         <Grid item xs={12} sm={6} lg={6}>
           <BackdropButton onClick={() => props.onClose()}>

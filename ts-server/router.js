@@ -69,15 +69,13 @@ var router = function (app) {
     });
     app.get("/country", function (req, res) {
         var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        console.log(ip); // ip address of the user
         if (Array.isArray(ip)) {
             ip = ip.join("");
         }
-        var inEurope = false;
+        var inEurope = onLocalhost;
         var country = "unknown";
         if (ip) {
             var geo = (0, geoip_lite_1.lookup)(ip);
-            console.log(geo); // location of the user
             if (geo) {
                 country = geo === null || geo === void 0 ? void 0 : geo.country;
                 for (var _i = 0, europeArray_1 = europe_1.europeArray; _i < europeArray_1.length; _i++) {

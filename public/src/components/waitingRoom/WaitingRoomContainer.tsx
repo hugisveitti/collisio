@@ -113,10 +113,14 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
       props.store.setPlayers([]);
     }
 
-    socket.on(stmd_waiting_room_alert, ({ players: _players }) => {
-      props.store.setPlayers(_players);
-      toSavePlayers = _players;
-    });
+    socket.on(
+      stmd_waiting_room_alert,
+      ({ players: _players, roomSettings }) => {
+        props.store.setPlayers(_players);
+        props.store.setRoomSettings(roomSettings);
+        toSavePlayers = _players;
+      }
+    );
 
     socket.on(stmd_game_starting, () => {
       if (onMobile) {

@@ -376,7 +376,7 @@ const GarageComponent = (props: IGarageComponent) => {
         <div className="background">
           <span>Only logged in players can buy items.</span>
           <BackdropButton link={loginPagePath} color="white">
-            Login
+            Create free account
           </BackdropButton>
         </div>
       );

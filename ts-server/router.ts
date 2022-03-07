@@ -60,16 +60,14 @@ const router = (app: any) => {
 
     app.get("/country", (req: Request, res: Response) => {
         let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        console.log(ip); // ip address of the user
         if (Array.isArray(ip)) {
 
             ip = ip.join("")
         }
-        let inEurope = false
+        let inEurope = onLocalhost
         let country = "unknown"
         if (ip) {
             const geo = lookup(ip)
-            console.log(geo); // location of the user
             if (geo) {
 
                 country = geo?.country

@@ -4,6 +4,7 @@ import { getLocalUid } from "../classes/localStorage";
 import { UserContext } from "../providers/UserProvider";
 import BackdropContainer from "./backdrop/BackdropContainer";
 import BackdropButton from "./button/BackdropButton";
+import ToFrontPageButton from "./inputs/ToFrontPageButton";
 import { singlePlayerGameRoomPath } from "./Routes";
 import RoomAndGameSettingsContainer from "./settings/RoomAndGameSettingsContainer";
 import VehicleSettingsComponent from "./settings/VehicleSettingsComponent";
@@ -30,6 +31,9 @@ const SinglePlayerWaitingRoom = (props: ISinglePlayerWaitingRoom) => {
           </>
         ) : (
           <React.Fragment>
+            <Grid item xs={12}>
+              <ToFrontPageButton />
+            </Grid>
             <Grid item xs={12}>
               <Typography>Single player with keyboard</Typography>
             </Grid>

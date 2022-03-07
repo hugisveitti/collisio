@@ -73,7 +73,7 @@ const LoginComponent = (props: ILoginComponent) => {
   return (
     <MyCard>
       <CardHeader
-        title="Login"
+        title="Login or create a free account."
         subheader="Login or signup with one of the methods below."
         subheaderTypographyProps={
           {
