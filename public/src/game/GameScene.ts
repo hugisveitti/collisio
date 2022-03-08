@@ -127,7 +127,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.addLights()
         removeMusic()
 
-        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
+        addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), true)
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
 
@@ -160,6 +160,7 @@ export class GameScene extends MyScene implements IGameScene {
         //  this.renderer.capabilities.precision = "lowp"
         this.renderer.autoClear = false
         this.renderer.shadowMap.autoUpdate = false
+        this.startGameSong()
     }
 
     async loadAssets() { }

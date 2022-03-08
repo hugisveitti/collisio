@@ -155,7 +155,8 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                   {data.medal?.medal === "none"
                     ? "no"
                     : `the ${data.medal?.medal}`}{" "}
-                  medal, {data.medal?.coins} coins and {data.medal?.XP} XP.{" "}
+                  medal, {data.medal?.coins.toFixed(0)} coins and{" "}
+                  {data.medal?.XP.toFixed(2)} XP.{" "}
                   {data.medal?.secToNext &&
                     `${
                       data.medal.secToNext
