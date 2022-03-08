@@ -22,6 +22,8 @@ import ferrariTrackMinImage from "../../images/tracks/min/min-ferrari-top.jpg";
 import nurnMinImage from "../../images/tracks/min/min-nurn-track.jpg";
 import russiaTrackMinImage from "../../images/tracks/min/min-russia-top.jpg";
 import seaSideTrackMinImage from "../../images/tracks/min/min-sea-side-track.jpg";
+import silverstoneTrackMinImage from "../../images/tracks/min/min-silverstone-track.jpg";
+import silverstoneTrackImage from "../../images/tracks/silverstone-track.jpg";
 import spaTrackMinImage from "../../images/tracks/min/min-spa-track.jpg";
 import russiaTrackImage from "../../images/tracks/russia-top.jpg";
 import seaSideTrackImage from "../../images/tracks/sea-side-track.jpg";
@@ -66,6 +68,11 @@ const trackImagePair: ITrackMinImagePair[] = [
     trackName: "sea-side-track",
     minImage: seaSideTrackMinImage,
     largeImage: seaSideTrackImage,
+  },
+  {
+    trackName: "silverstone-track",
+    minImage: silverstoneTrackMinImage,
+    largeImage: silverstoneTrackImage,
   },
   {
     trackName: "russia-track",

@@ -63,7 +63,9 @@ const BuyCoinsComponent = (props: IBuyCoinsComponent) => {
             <div className="background">
               <p>You need to be logged in to buy coins</p>
             </div>
-            <BackdropButton link={loginPagePath}>Login</BackdropButton>
+            <BackdropButton link={loginPagePath}>
+              Create a free account
+            </BackdropButton>
           </Grid>
         )}
         {!buyOptions || isBuying ? (

@@ -1,7 +1,7 @@
 import { Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
-import { Audio, AudioListener, AmbientLight, PerspectiveCamera, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
+import { Audio, AudioListener, AmbientLight, PerspectiveCamera, SpotLight, HemisphereLightHelper, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
 import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../classes/Game";
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
@@ -154,9 +154,6 @@ export class MyScene extends Scene3D {
         window.addEventListener("resize", () => this.handleResizeWindow())
 
         document.body.classList.add("hidden-overflow")
-
-
-
     }
 
     _handleResizeWindow() { }
@@ -178,6 +175,7 @@ export class MyScene extends Scene3D {
         // this gravity seems to work better
         // -30 gives weird behaviour and -10 makes the vehicle fly sometimes
         this.physics.setGravity(0, -9.82, 0)
+        // this.physics.setGravity(0, -2, 0)
 
         const listener = new AudioListener()
         this.camera.add(listener)
@@ -189,8 +187,6 @@ export class MyScene extends Scene3D {
         getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
             this.beepE4 = beepE4
         })
-
-
     }
 
 
@@ -332,22 +328,51 @@ export class MyScene extends Scene3D {
             ambientLightIntesity
         } = getTimeOfDayColors(this.timeOfDay)
 
-        // this.pLight = new PointLight(0xffffff, 1, 0, 1)
-        // maybe if evening then dont show shadows?
-        this.pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
-        this.pLight.position.set(100, 150, 100);
-        if (this.useShadows && this.timeOfDay === "day") {
+        //  this.pLight = new PointLight(0xffffff, 1, 0, 1)
+        // maybe if night then dont show shadows?
+        this.pLight = new PointLight(0xffffff, pointLightIntesity, 0, 2)
+        this.pLight.scale.set(10000, 10000, 10000)
+        //this.pLight.position.set(100, 150, 100);
+        this.pLight.position.set(100, 500, 100);
+        this.pLight.shadow.camera.far = 2500
+        window.addEventListener("keypress", (e) => {
+            if (e.key === "j") {
+                const p = this.pLight.position
+                this.pLight.position.set(p.x, p.y + 10, p.z)
+            } else if (e.key === "f") {
+                const p = this.pLight.position
+                this.pLight.position.set(p.x, p.y - 10, p.z)
+            }
+        })
+
+        if (this.useShadows && this.timeOfDay !== "night") {
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
+        this.pLight.shadow.mapSize.height = 2048
+        this.pLight.shadow.mapSize.width = 2048
 
         this.scene.add(this.pLight)
+
+        // const pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
+        // pLight.position.set(-200, 150, -200);
+
+        // if (this.useShadows && this.timeOfDay === "day") {
+        //     pLight.castShadow = true
+        //     pLight.shadow.bias = 0.01
+        // }
+        // this.scene.add(pLight)
+
+
 
 
         const hLight = new HemisphereLight(hemisphereTopColor, 1)
         hLight.position.set(0, 1, 0);
         hLight.color.setHSL(0.6, 1, 0.4);
+
         this.scene.add(hLight)
+
+
 
         const aLight = new AmbientLight(ambientLightColor, ambientLightIntesity)
         aLight.position.set(0, 0, 0)

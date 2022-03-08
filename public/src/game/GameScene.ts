@@ -643,7 +643,7 @@ export class GameScene extends MyScene implements IGameScene {
 
         this.timeOfDay = this.getTimeOfDay()
         if (this.pLight && this.course) {
-            this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
+            this.pLight.castShadow = this.useShadows && this.timeOfDay !== "night"
             this.pLight.shadow.bias = 0.1
             this.course.toggleShadows(this.useShadows)
         }
@@ -737,6 +737,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.clearImportantInfo()
         this.clearSecondaryInfo()
         this.clearViewsImportantInfo()
+        this.course.restartCourse()
         this.totalTimeDiv.textContent = ""
 
         this.isPaused = false

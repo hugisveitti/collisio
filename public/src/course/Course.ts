@@ -63,6 +63,8 @@ export class Course implements ICourse {
 
     isReady: boolean
     cloudSpeed: number[]
+    asteroids: ExtendedObject3D[]
+    asteroidsOriginalPosition: Vector3[]
 
     ray = new Raycaster()
     botDirections: Object3D[]
@@ -85,6 +87,8 @@ export class Course implements ICourse {
         this.isReady = false
         this.clouds = []
         this.botDirections = []
+        this.asteroids = []
+        this.asteroidsOriginalPosition = []
     }
 
 
@@ -213,6 +217,9 @@ export class Course implements ICourse {
                     }
                 }
 
+                for (let ast of this.asteroids) {
+                    this.asteroidsOriginalPosition.push(ast.position.clone())
+                }
 
                 resolve()
             })
@@ -355,6 +362,18 @@ export class Course implements ICourse {
     }
 
     restartCourse() {
+
+        const info = gameItems["asteroid"]
+        for (let i = 0; i < this.asteroids.length; i++) {
+
+
+            this.gameScene.physics.destroy(this.asteroids[i].body)
+            this.asteroids[i].position.set(this.asteroidsOriginalPosition[i].x, this.asteroidsOriginalPosition[i].y, this.asteroidsOriginalPosition[i].z)
+            this.gameScene.physics.add.existing(this.asteroids[i], { mass: CourseItemsLoader.GetMassFromName(this.asteroids[i].name) ?? info.mass, collisionFlags: 0, shape: info.shape })
+            this.asteroids[i].body.setBounciness(info.bounciness)
+            this.asteroids[i].body.setGravity(0, info.gravityY, 0)
+        }
+
         this._restartCourse()
     }
 

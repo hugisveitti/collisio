@@ -49,6 +49,10 @@ exports.allTrackNames = [
         song: "desert.mp3"
     },
     {
+        name: "Space", type: "silverstone-track", gameType: "race", category: "long", difficulty: "medium",
+        song: "desert.mp3", hemisphereRadius: 2000, timeOfDay: "evening"
+    },
+    {
         name: "Town track", type: "town-track", gameType: "race", category: "long", difficulty: "easy"
     },
     {
@@ -62,7 +66,7 @@ exports.allTrackNames = [
         song: "desert.mp3"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard",
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "night", category: "long", difficulty: "hard",
         song: "desert.mp3"
     },
     {

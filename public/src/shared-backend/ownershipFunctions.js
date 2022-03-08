@@ -80,6 +80,7 @@ var trackCosts = {
     "russia-track": 10000,
     "ferrari-track": 1000,
     "spa-track": 10000,
+    "silverstone-track": 20000,
     "nurn-track": 0,
     "speed-test-track": 0,
     "small-track": 0,

@@ -23,7 +23,7 @@ const addLights = (scene: Scene) => {
     } = getTimeOfDayColors(timeOfDay)
 
     // this.pLight = new PointLight(0xffffff, 1, 0, 1)
-    // maybe if evening then dont show shadows?
+    // maybe if night then dont show shadows?
     const pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
     pLight.position.set(100, 150, 100);
 

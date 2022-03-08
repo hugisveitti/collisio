@@ -125,7 +125,7 @@ export class CourseItemsLoader {
     }
 
     // if a number is before the name then that is its mass 
-    getMassFromName(name: string): number | undefined {
+    static GetMassFromName(name: string): number | undefined {
         let split = name.split("-")
         return !isNaN(+split[0]) ? +split[0] : undefined
     }
@@ -133,12 +133,15 @@ export class CourseItemsLoader {
     handleCreatePhysicsObject(child: Object3D, key: string) {
         const eObject = (child as ExtendedObject3D)
 
-        let mass = this.getMassFromName(child.name) ?? gameItems[key].mass
+        let mass = CourseItemsLoader.GetMassFromName(child.name) ?? gameItems[key].mass
 
 
         this.course.gameScene.physics.add.existing(eObject, { collisionFlags: gameItems[key].collisionFlags, shape: gameItems[key].shape, mass });
         eObject.castShadow = this.course.gameScene.useShadows && Boolean(gameItems[key].castsShadow);
         eObject.receiveShadow = this.course.gameScene.useShadows && Boolean(gameItems[key].receiveShadow);
+
+        //  eObject.body.setGravity(0, -5, 0)
+
         //  eObject.visible = !Boolean(gameItems[key].notVisible);
         eObject.body.checkCollisions = true
         if (gameItems[key].bounciness) {

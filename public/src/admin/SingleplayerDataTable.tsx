@@ -35,7 +35,9 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
           </IconButton>
         </TableCell>
 
-        <TableCell>{getDateFromNumber(props.roomInfo.date.seconds)}</TableCell>
+        <TableCell>
+          {getDateFromNumber(props.roomInfo.date.seconds * 1000)}
+        </TableCell>
         <TableCell>{props.roomInfo.player?.id ?? "-"}</TableCell>
         <TableCell>{props.roomInfo.roomSettings?.trackName}</TableCell>
         <TableCell>{props.roomInfo.roomSettings?.numberOfLaps}</TableCell>

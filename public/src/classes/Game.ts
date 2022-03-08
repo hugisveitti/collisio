@@ -70,8 +70,15 @@ const dayColors: ITimeOfDayColors = {
     pointLightIntesity: 1,
     ambientLightIntesity: 1
 }
-
 const eveningColors: ITimeOfDayColors = {
+    ambientLightColor: 0x3392FF, // 0x5aa2cc,
+    hemisphereBottomColor: 0x387ea6,
+    hemisphereTopColor: 0x0077ff,
+    pointLightIntesity: 1,
+    ambientLightIntesity: .8
+}
+
+const nightColors: ITimeOfDayColors = {
     ambientLightColor: 0x3392FF,
     hemisphereBottomColor: 0x003168,
     hemisphereTopColor: 0x0077ff,
@@ -82,10 +89,12 @@ const eveningColors: ITimeOfDayColors = {
 export const getTimeOfDayColors = (timeOfDay: TimeOfDay | undefined): ITimeOfDayColors => {
     if (!timeOfDay) return dayColors
     switch (timeOfDay) {
-        case "evening":
-            return eveningColors
+        case "night":
+            return nightColors
         case "day":
             return dayColors
+        case "evening":
+            return eveningColors
         default:
             return dayColors
     }
@@ -102,6 +111,7 @@ export const activeTrackNames: TrackName[] = [
     "ferrari-track",
     "farmers-little-helper-map",
     "spa-track",
+    "silverstone-track",
     "small-track",
     "basic-track1",
     "basic-track2",

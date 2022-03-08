@@ -132,13 +132,12 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
             <p
               style={{ fontSize: 24, backgroundColor: orange2, color: "black" }}
             >
-              On your mobile go to collisio.club, press 'Join game' and write in
-              the room id:{" "}
+              On your mobile go to collisio.club, press 'Start game' and write
+              in the room id:{" "}
               <span
                 style={{
                   backgroundColor: green4,
                   color: "white",
-
                   fontSize: 28,
                 }}
               >

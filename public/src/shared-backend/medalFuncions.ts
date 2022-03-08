@@ -66,6 +66,12 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         bronze: 69,
         weight: 2.1
     },
+    "silverstone-track": {
+        gold: 52,
+        silver: 62,
+        bronze: 69,
+        weight: 2.1
+    },
     // Mountain
     "russia-track": {
         gold: 28.5,
@@ -195,7 +201,7 @@ export interface IMedalAndToken {
     medal: MedalType
     XP: number
     coins: number
-    secToNext: number
+    secToNext: number | undefined
 }
 /**
  * It makes the most sense to have <medal>Coins * numberOfLaps be the

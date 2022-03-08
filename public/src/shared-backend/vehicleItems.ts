@@ -320,7 +320,111 @@ const testItems: CarItems = {
 }
 
 const tractorItems: CarItems = {
-
+    exhaust1: {
+        path: "exhaust1",
+        id: "tractor-exhaust1",
+        name: "Willie",
+        type: "exhaust",
+        cost: 10,
+        engineForce: 100,
+        maxSpeed: 10,
+    },
+    exhaust2: {
+        path: "exhaust2",
+        id: "tractor-exhaust2",
+        type: "exhaust",
+        name: "Jonny",
+        engineForce: 200,
+        cost: 200,
+        maxSpeed: 11
+    },
+    exhaust3: {
+        id: "tractor-exhaust3",
+        path: "exhaust3",
+        name: "Executive",
+        type: "exhaust",
+        cost: 800,
+        engineForce: 300,
+        mass: 110,
+        frictionSlip: -1,
+        maxSpeed: -5
+    },
+    exhaust4: {
+        id: "tractor-exhaust4",
+        path: "exhaust4",
+        type: "exhaust",
+        name: "Ernie Johnson",
+        engineForce: 350,
+        mass: 80,
+        maxSpeed: -5,
+        cost: 1000,
+    },
+    exhaust5: {
+        id: "tractor-exhaust5",
+        path: "exhaust5",
+        type: "exhaust",
+        name: "Sad Charlie",
+        engineForce: 380,
+        frictionSlip: -0.5,
+        maxSpeed: -1,
+        mass: 100,
+        cost: 200000
+    },
+    spoiler1: {
+        id: "tractor-spoiler1",
+        path: "spoiler1",
+        type: "spoiler",
+        name: "Steve",
+        cost: 150,
+        frictionSlip: .5,
+        mass: 100,
+        engineForce: -100,
+        maxSpeed: -15
+    },
+    spoiler2: {
+        id: "tractor-spoiler2",
+        path: "spoiler2",
+        type: "spoiler",
+        name: "Stonie",
+        cost: 2500,
+        frictionSlip: .6,
+        mass: 80,
+        engineForce: -50,
+        maxSpeed: 10
+    },
+    spoiler3: {
+        id: "tractor-spoiler3",
+        path: "spoiler3",
+        type: "spoiler",
+        name: "Stonie",
+        cost: 5000,
+        frictionSlip: .6,
+        mass: -80,
+        engineForce: -75,
+        maxSpeed: 25
+    },
+    wheelGuards1: {
+        id: "tractor-wheelGuards1",
+        path: "wheelGuards1",
+        type: "wheelGuards",
+        name: "Willis",
+        cost: 500,
+        frictionSlip: 0.8,//2,
+        mass: -75,
+        engineForce: -150,
+        suspensionRestLength: .2
+    },
+    wheelGuards2: {
+        id: "tractor-wheelGuards2",
+        path: "wheelGuards2",
+        type: "wheelGuards",
+        name: "Billis",
+        cost: 2500,
+        frictionSlip: 0.8,//2,
+        mass: -100,
+        engineForce: -50,
+        suspensionRestLength: .2
+    },
 }
 
 const normal2Items: CarItems = {

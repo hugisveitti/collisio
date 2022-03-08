@@ -24,6 +24,7 @@ export type TrackName =
     | "basic-track4"
     | "basic-track5"
     | "spa-track"
+    | "silverstone-track"
     | "nurn-track"
     | "speed-test-track"
     | "small-track"
@@ -44,7 +45,7 @@ export const possibleTrackCategories: { category: TrackCategory, name: string, d
 ]
 
 type TrackDifficulty = "easy" | "medium" | "hard"
-export type TimeOfDay = "day" | "evening"
+export type TimeOfDay = "day" | "night" | "evening"
 
 
 export type RaceSong = "desert.mp3" | "racing.mp3"
@@ -99,6 +100,10 @@ export const allTrackNames: ITrackInfo[] = [
         song: "desert.mp3"
     },
     {
+        name: "Space", type: "silverstone-track", gameType: "race", category: "long", difficulty: "medium",
+        song: "desert.mp3", hemisphereRadius: 2000, timeOfDay: "evening"
+    },
+    {
         name: "Town track", type: "town-track", gameType: "race", category: "long", difficulty: "easy"
     },
     {
@@ -112,7 +117,7 @@ export const allTrackNames: ITrackInfo[] = [
         song: "desert.mp3"
     },
     {
-        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "evening", category: "long", difficulty: "hard",
+        name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "night", category: "long", difficulty: "hard",
         song: "desert.mp3"
     },
     {

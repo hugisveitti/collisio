@@ -378,7 +378,7 @@ const GarageComponent = (props: IGarageComponent) => {
             Only logged in players can buy items.
           </span>
           <BackdropButton link={loginPagePath} color="white">
-            Create free account
+            Create a free account
           </BackdropButton>
         </div>
       );

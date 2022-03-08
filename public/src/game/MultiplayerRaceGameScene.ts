@@ -566,7 +566,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
 
         this.timeOfDay = this.getTimeOfDay()
         if (this.pLight && this.course) {
-            this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
+            this.pLight.castShadow = this.useShadows && this.timeOfDay !== "night"
             this.pLight.shadow.bias = 0.1
             this.course.toggleShadows(this.useShadows)
         }
@@ -585,6 +585,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     async restartGame() {
+        this.course.restartCourse()
         // restart game with sockets
         this.clearImportantInfo()
         this.clearSecondaryInfo()

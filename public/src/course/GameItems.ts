@@ -175,6 +175,19 @@ export const gameItems = {
         notAddPhysics: false,
         gravityY: -50
     },
+    "asteroid": {
+        // collisionFlag:0, cannot have convex shape (I think)
+        collisionFlags: 0,
+        shape: "convex",
+        bounciness: .75,
+        castsShadow: true,
+        receiveShadow: false,
+        mass: 2,
+        notAddPhysics: false,
+        gravityY: -25,
+        isCourseObjectArray: true,
+        objectName: "asteroids"
+    },
     "water": {
         collisionFlags: 5,
         shape: "concave",

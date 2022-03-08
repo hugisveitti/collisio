@@ -1,5 +1,5 @@
 import { ExtendedObject3D } from "@enable3d/ammo-physics";
-import { Euler, PerspectiveCamera, TextureLoader, FlatShading, MeshLambertMaterial, MeshStandardMaterial, IcosahedronGeometry, Quaternion, Mesh, MeshPhongMaterial, PlaneGeometry, Vector3 } from "three";
+import { Euler, PerspectiveCamera, SpotLight, TextureLoader, FlatShading, MeshLambertMaterial, MeshStandardMaterial, IcosahedronGeometry, Quaternion, Mesh, MeshPhongMaterial, PlaneGeometry, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
@@ -90,6 +90,8 @@ export class LowPolyVehicle extends Vehicle {
 
     wheelInfos: Ammo.btWheelInfo[]
 
+    light: SpotLight
+
     constructor(config: IVehicleClassConfig) {
         super(config)
 
@@ -145,9 +147,16 @@ export class LowPolyVehicle extends Vehicle {
             changeVehicleBodyColor(this.vehicleBody, [this.vehicleSetup.vehicleColor] as VehicleColorType[])
 
             await this.createVehicle()
+            // this.createLights()
             resolve()
         })
     }
+
+    // createLights() {
+    //     this.light = new SpotLight(0xffffff, 0.5, 500)
+    //     this.scene.scene.add(this.light)
+    //     this.light.target = this.vehicleBody
+    // }
 
     async createTireSmokeParticles() {
 
@@ -372,6 +381,7 @@ export class LowPolyVehicle extends Vehicle {
 
             // not sure what to have the gravity, the auto is -20
             this.vector.setValue(0, -30, 0)
+            //  this.vector.setValue(0, -20, 0)
             this.vehicle.getRigidBody().setGravity(this.vector)
             this.vehicle.getRigidBody().setFriction(3.0)
             // I suspect that 0 means infinity, so 0 inertia is actually inf intertia, and the vehicle cannot move on that axis
@@ -727,7 +737,21 @@ export class LowPolyVehicle extends Vehicle {
                 this.seeVehicle(this.cameraTarget)
             }
         }
+
+        // this.updateLight()
     };
+
+    // updateLight() {
+    //     const pos = this.vehicleBody.position
+    //     const rot = this.vehicleBody.rotation
+
+    //     this.light.position.set(
+    //         pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
+    //         pos.y + this.staticCameraPos.y,
+    //         pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
+    //     )
+
+    // }
 
 
     checkIfSpinning(log?: boolean) {

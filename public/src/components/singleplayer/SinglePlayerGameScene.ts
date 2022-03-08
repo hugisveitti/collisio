@@ -366,6 +366,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     restartGame() {
+        this.course.restartCourse()
         this.clearImportantInfo()
         this.clearSecondaryInfo()
         this.gameStarted = false
@@ -420,7 +421,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
 
         this.timeOfDay = this.getTimeOfDay()
         if (this.pLight && this.course) {
-            this.pLight.castShadow = this.useShadows && this.timeOfDay === "day"
+            this.pLight.castShadow = this.useShadows && this.timeOfDay !== "night"
             this.pLight.shadow.bias = 0.1
             this.course.toggleShadows(this.useShadows)
         }

@@ -36,7 +36,7 @@ export const adminFirestore = getAdminFirestore(aa)
 
 export const firestore = getFirestore(firebaseApp)
 
-export const onLocalHost = false // os.hostname().includes("Lisa")
+export const onLocalHost = os.hostname().includes("Lisa")
 
 /** only works on my PC */
 if (onLocalHost) {
