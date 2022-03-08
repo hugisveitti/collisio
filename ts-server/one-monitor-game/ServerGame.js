@@ -206,6 +206,8 @@ var Room = /** @class */ (function () {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            playersAdded: [],
+            trackNames: []
         };
         for (var _i = 0, dataKeys_1 = dataKeys; _i < dataKeys_1.length; _i++) {
             var key = dataKeys_1[_i];
@@ -249,7 +251,7 @@ var Room = /** @class */ (function () {
         });
     };
     Room.prototype.deleteRoom = function () {
-        var _a;
+        var _a, _b;
         var extraData = {
             geoIp: (0, serverFirebaseFunctions_1.deleteUndefined)(this.geoIp),
             roomDeletedDate: Date.now(),
@@ -259,10 +261,11 @@ var Room = /** @class */ (function () {
             players: this.players.map(function (p) { return p.getEndOfRoomInfo(); }),
             gameStarted: this.gameStarted,
             roomSettings: this.roomSettings,
-            dataCollection: this.dataCollection
+            dataCollection: this.dataCollection,
+            desktopUserId: (_a = this.desktopUserId) !== null && _a !== void 0 ? _a : "undef"
         };
         extraData = (0, serverFirebaseFunctions_1.deleteUndefined)(extraData);
-        (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, (_a = this.desktopUserId) !== null && _a !== void 0 ? _a : "undef", extraData);
+        (0, serverFirebaseFunctions_1.addCreatedRooms)(this.roomId, (_b = this.desktopUserId) !== null && _b !== void 0 ? _b : "undef", extraData);
         this.deleteRoomCallback();
         if (this.desktopUserId) {
             (0, serverFirebaseFunctions_1.removeAvailableRoom)(this.desktopUserId);
@@ -312,6 +315,7 @@ var Room = /** @class */ (function () {
     Room.prototype.addPlayer = function (player) {
         console.log("adding player", player.toString());
         var playerExists = false;
+        this.dataCollection.playersAdded.push(player.toString());
         for (var i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 // disconnect old socket always
@@ -361,15 +365,19 @@ var Room = /** @class */ (function () {
     Room.prototype.setupGameSettingsListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mdts_game_settings_changed, function (_a) {
+            var _b;
             var gameSettings = _a.gameSettings, roomSettings = _a.roomSettings;
             if (gameSettings) {
                 _this.gameSettings = gameSettings;
             }
             if (roomSettings) {
+                if (((_b = _this.roomSettings) === null || _b === void 0 ? void 0 : _b.trackName) !== roomSettings.trackName) {
+                    _this.dataCollection.trackNames.push(roomSettings.trackName);
+                }
                 _this.roomSettings = roomSettings;
             }
-            for (var _i = 0, _b = _this.players; _i < _b.length; _i++) {
-                var player = _b[_i];
+            for (var _i = 0, _c = _this.players; _i < _c.length; _i++) {
+                var player = _c[_i];
                 player.sendGameSettings(_this.gameSettings, _this.roomSettings);
             }
         });

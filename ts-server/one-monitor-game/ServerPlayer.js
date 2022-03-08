@@ -312,7 +312,7 @@ var Player = /** @class */ (function () {
         return "vehicleType:" + this.vehicleSetup.vehicleType + ", exhaust: " + ((_b = (_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.exhaust) === null || _b === void 0 ? void 0 : _b.id) + ", spoiler: " + ((_d = (_c = this.vehicleSetup) === null || _c === void 0 ? void 0 : _c.spoiler) === null || _d === void 0 ? void 0 : _d.id) + ", wheel guards: " + ((_f = (_e = this.vehicleSetup) === null || _e === void 0 ? void 0 : _e.wheelGuards) === null || _f === void 0 ? void 0 : _f.id);
     };
     Player.prototype.toString = function () {
-        return this.playerName + ": number: " + this.playerNumber + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetupString();
+        return this.playerName + ": number: " + this.playerNumber + ", id: " + this.id + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetupString();
     };
     return Player;
 }());

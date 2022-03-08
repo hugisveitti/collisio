@@ -374,7 +374,7 @@ export class Player {
     }
 
     toString() {
-        return `${this.playerName}: number: ${this.playerNumber}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetupString()}`
+        return `${this.playerName}: number: ${this.playerNumber}, id: ${this.id}, vehicletype:${this.vehicleType}, vehicleSetup:${this.vehicleSetupString()}`
     }
 }
 

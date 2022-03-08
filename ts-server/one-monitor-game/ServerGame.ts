@@ -221,6 +221,8 @@ interface IRoomDataCollection {
     totalPingsGotten: number
     gameTicks: number
     roomTicks: number
+    playersAdded: string[]
+    trackNames: string[]
 }
 
 export class Room {
@@ -230,8 +232,8 @@ export class Room {
     socket!: Socket
     gameStarted: boolean
 
-    gameSettings
-    roomSettings
+    gameSettings: any
+    roomSettings: any
     isConnected
     deleteRoomCallback
 
@@ -267,6 +269,8 @@ export class Room {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            playersAdded: [],
+            trackNames: []
         }
 
         for (let key of dataKeys) {
@@ -320,7 +324,8 @@ export class Room {
             players: this.players.map(p => p.getEndOfRoomInfo()),
             gameStarted: this.gameStarted,
             roomSettings: this.roomSettings,
-            dataCollection: this.dataCollection
+            dataCollection: this.dataCollection,
+            desktopUserId: this.desktopUserId ?? "undef"
         }
         extraData = deleteUndefined(extraData)
         addCreatedRooms(this.roomId, this.desktopUserId ?? "undef", extraData)
@@ -371,7 +376,7 @@ export class Room {
     addPlayer(player: Player) {
         console.log("adding player", player.toString())
         let playerExists = false
-
+        this.dataCollection.playersAdded.push(player.toString())
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].id === player.id) {
                 // disconnect old socket always
@@ -434,6 +439,9 @@ export class Room {
                 this.gameSettings = gameSettings
             }
             if (roomSettings) {
+                if (this.roomSettings?.trackName !== roomSettings.trackName) {
+                    this.dataCollection.trackNames.push(roomSettings.trackName)
+                }
                 this.roomSettings = roomSettings
             }
             for (let player of this.players) {
@@ -570,7 +578,6 @@ export class Room {
     }
 
     playerReconnected() {
-
 
         if (this.players.length === 1) {
             this.players[0].setLeader()

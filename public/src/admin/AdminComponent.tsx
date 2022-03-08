@@ -67,6 +67,7 @@ const AdminComponent = (props: IAdminComponent) => {
             // arr.sort((a: IEndOfRaceInfoGame, b: IEndOfRaceInfoGame) =>
             //   a.date < b.date ? 1 : -1
             // );
+            console.log("got arr, useCreatedRooms:", useCreatedRooms, arr);
             if (useCreatedRooms) {
               setCreatedRoomsInfo(arr);
             } else {
