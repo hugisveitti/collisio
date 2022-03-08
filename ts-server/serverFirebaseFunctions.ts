@@ -79,7 +79,18 @@ export const getGeoInfo = (socket: Socket) => {
     }
     const geo = geoip.lookup(ip)
 
-    const inEurope = geo?.country ? geo?.country in europeArray : false
+    const inEurope = isInEurope(geo?.country)
     return { geo, ip, inEurope }
 }
 
+export const isInEurope = (country: string | undefined) => {
+    if (!country) return false
+    let inEurope = false
+    for (let c of europeArray) {
+        if (c === country) {
+            inEurope = true;
+            break;
+        }
+    }
+    return inEurope
+}

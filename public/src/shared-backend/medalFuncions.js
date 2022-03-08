@@ -58,10 +58,10 @@ var times = {
         weight: 2.1
     },
     "silverstone-track": {
-        gold: 52,
-        silver: 62,
-        bronze: 69,
-        weight: 2.1
+        gold: 130,
+        silver: 145,
+        bronze: 180,
+        weight: 4.1
     },
     // Mountain
     "russia-track": {

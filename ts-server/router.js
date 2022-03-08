@@ -23,8 +23,8 @@ exports.getPortLocalhost = void 0;
 var geoip_lite_1 = require("geoip-lite");
 var os = __importStar(require("os"));
 var path = __importStar(require("path"));
-var europe_1 = require("./europe");
 var firebaseCoinFunctions_1 = require("./firebaseCoinFunctions");
+var serverFirebaseFunctions_1 = require("./serverFirebaseFunctions");
 /** toDO fix this shit */
 var express = require("express");
 var getPortLocalhost = function () {
@@ -77,13 +77,7 @@ var router = function (app) {
             var geo = (0, geoip_lite_1.lookup)(ip);
             if (geo) {
                 country = geo === null || geo === void 0 ? void 0 : geo.country;
-                for (var _i = 0, europeArray_1 = europe_1.europeArray; _i < europeArray_1.length; _i++) {
-                    var c = europeArray_1[_i];
-                    if (c === country) {
-                        inEurope = true;
-                        break;
-                    }
-                }
+                inEurope = (0, serverFirebaseFunctions_1.isInEurope)(country);
             }
         }
         res.send(JSON.stringify({ inEurope: inEurope, country: country }));

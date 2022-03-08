@@ -4,6 +4,7 @@ import * as os from "os";
 import * as path from "path";
 import { europeArray } from "./europe";
 import { buyItem } from "./firebaseCoinFunctions";
+import { isInEurope } from "./serverFirebaseFunctions";
 /** toDO fix this shit */
 const express = require("express")
 
@@ -70,12 +71,7 @@ const router = (app: any) => {
             if (geo) {
 
                 country = geo?.country
-                for (let c of europeArray) {
-                    if (c === country) {
-                        inEurope = true;
-                        break;
-                    }
-                }
+                inEurope = isInEurope(country)
             }
         }
         res.send(JSON.stringify({ inEurope, country }))

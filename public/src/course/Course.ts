@@ -279,6 +279,31 @@ export class Course implements ICourse {
         return undefined
     }
 
+    findClosestDir(pos: Vector3) {
+        let closestIdx = -1
+        let closestDist = Infinity
+        for (let i = 0; i < this.botDirections.length; i++) {
+            const dist = pos.distanceTo(this.botDirections[i].position)
+            if (dist < closestDist) {
+                closestIdx = i
+                closestDist = dist
+            }
+        }
+        console.log("closest dist", closestDist)
+        return closestIdx
+    }
+
+    needsNewPosRot(vehicle: IVehicle) {
+        const idx = this.findClosestDir(vehicle.vehicleBody.position)
+        const nextIdx = idx === this.botDirections.length - 1 ? 0 : idx + 1
+        console.log("idx", idx, "next idx:", nextIdx)
+
+        const rotation = this.calcSpawnAngle(this.botDirections[nextIdx].position, this.botDirections[idx].position)
+        const position = this.botDirections[idx].position
+        vehicle.setCheckpointPositionRotation({ position, rotation })
+        vehicle.resetPosition()
+    }
+
     createPossibleIntersectObjectArray() {
 
         const createArray = (group: Group) => {

@@ -140,12 +140,15 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             {info.tournamentInfo}
           </Grid>
         )}
+        <Grid item xs={12}>
+          <h3>Race info</h3>
+        </Grid>
         {Object.keys(info.bestTimesInfo).map((playerId, i: number) => {
           const data = info.bestTimesInfo[playerId];
 
           return (
             <Grid item xs={12} key={`gamedata-info-${i}`}>
-              <h4>{data.playerName} Race info</h4>
+              <h4>{data.playerName}</h4>
               <div style={{ marginLeft: 15 }}>
                 <Typography>
                   Won{" "}

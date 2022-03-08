@@ -297,10 +297,10 @@ var Room = /** @class */ (function () {
         var _this = this;
         this.socket.on(shared_stuff_1.dts_ping_test, function (_a) {
             var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten;
-            _this.dataCollection.roomTicks = (roomTicks !== null && roomTicks !== void 0 ? roomTicks : 0);
-            _this.dataCollection.gameTicks = (gameTicks !== null && gameTicks !== void 0 ? gameTicks : 0);
-            _this.dataCollection.totalPing = (totalPing !== null && totalPing !== void 0 ? totalPing : 0);
-            _this.dataCollection.totalPingsGotten = (totalPingsGotten !== null && totalPingsGotten !== void 0 ? totalPingsGotten : 0);
+            _this.dataCollection.roomTicks = (roomTicks || _this.dataCollection.roomTicks);
+            _this.dataCollection.gameTicks = (gameTicks || _this.dataCollection.gameTicks);
+            _this.dataCollection.totalPing = (totalPing || _this.dataCollection.totalPing);
+            _this.dataCollection.totalPingsGotten = (totalPingsGotten || _this.dataCollection.totalPingsGotten);
             _this.socket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
         });
     };

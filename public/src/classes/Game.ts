@@ -72,7 +72,7 @@ const dayColors: ITimeOfDayColors = {
 }
 const eveningColors: ITimeOfDayColors = {
     ambientLightColor: 0x3392FF, // 0x5aa2cc,
-    hemisphereBottomColor: 0x387ea6,
+    hemisphereBottomColor: 0x000000, //0x387ea6,
     hemisphereTopColor: 0x0077ff,
     pointLightIntesity: 1,
     ambientLightIntesity: .8

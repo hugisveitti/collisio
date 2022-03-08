@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGeoInfo = exports.deleteUndefined = exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
+exports.isInEurope = exports.getGeoInfo = exports.deleteUndefined = exports.addCreatedRooms = exports.removeAvailableRoom = void 0;
 var firestore_1 = require("@firebase/firestore");
 var firestore_2 = require("firebase-admin/firestore");
 var geoip = __importStar(require("geoip-lite"));
@@ -85,7 +85,21 @@ var getGeoInfo = function (socket) {
         ip = ip.join("");
     }
     var geo = geoip.lookup(ip);
-    var inEurope = (geo === null || geo === void 0 ? void 0 : geo.country) ? (geo === null || geo === void 0 ? void 0 : geo.country) in europe_1.europeArray : false;
+    var inEurope = (0, exports.isInEurope)(geo === null || geo === void 0 ? void 0 : geo.country);
     return { geo: geo, ip: ip, inEurope: inEurope };
 };
 exports.getGeoInfo = getGeoInfo;
+var isInEurope = function (country) {
+    if (!country)
+        return false;
+    var inEurope = false;
+    for (var _i = 0, europeArray_1 = europe_1.europeArray; _i < europeArray_1.length; _i++) {
+        var c = europeArray_1[_i];
+        if (c === country) {
+            inEurope = true;
+            break;
+        }
+    }
+    return inEurope;
+};
+exports.isInEurope = isInEurope;

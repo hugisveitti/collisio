@@ -699,7 +699,8 @@ export class LowPolyTestScene extends GameScene {
 
     resetPlayer(idx: number, y?: number) {
         if (this.vehicle) {
-            this.vehicle.resetPosition()
+            this.course.needsNewPosRot(this.vehicle)
+            //  this.vehicle.resetPosition()
         }
     }
 
