@@ -158,9 +158,9 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                   medal, {data.medal?.coins.toFixed(0)} coins and{" "}
                   {data.medal?.XP.toFixed(2)} XP.{" "}
                   {data.medal?.secToNext &&
-                    `${
-                      data.medal.secToNext
-                    } seconds from getting ${getNextMedal(data.medal.medal)}`}
+                    `${data.medal.secToNext.toFixed(
+                      2
+                    )} seconds from getting ${getNextMedal(data.medal.medal)}`}
                 </Typography>
                 {trackData.length > 0 ? (
                   <>

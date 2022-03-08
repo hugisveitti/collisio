@@ -127,6 +127,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.addLights()
         removeMusic()
 
+        console.log("race song", this.getRaceSong())
         addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), true)
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         // this.physics.debug.enable()
