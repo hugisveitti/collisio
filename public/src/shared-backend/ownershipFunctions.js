@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allCosts = exports.getDefaultOwnership = exports.getDefaultVehicleColorOwnership = exports.getDefaultTrackOwnership = exports.getDefaultVehicleOwnership = void 0;
+exports.allCosts = exports.getDefaultOwnership = exports.getDefaultVehicleColorOwnership = exports.getDefaultTrackOwnership = exports.defaultOwnedTracks = exports.getDefaultVehicleOwnership = void 0;
 var shared_stuff_1 = require("./shared-stuff");
 function itemInArray(st, arr) {
     for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
@@ -49,7 +49,7 @@ var vehicleCosts = {
     gokart: 3000,
     future: 40000
 };
-var defaultOwnedTracks = [
+exports.defaultOwnedTracks = [
     "farm-track",
     "nurn-track",
     "f1-track",
@@ -62,7 +62,7 @@ var getDefaultTrackOwnership = function () {
     var defaultTrackOwnership = {};
     for (var _i = 0, allTrackNames_1 = shared_stuff_1.allTrackNames; _i < allTrackNames_1.length; _i++) {
         var v = allTrackNames_1[_i];
-        defaultTrackOwnership[v.type] = itemInArray(v.type, defaultOwnedTracks);
+        defaultTrackOwnership[v.type] = itemInArray(v.type, exports.defaultOwnedTracks);
     }
     return defaultTrackOwnership;
 };

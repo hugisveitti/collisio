@@ -359,6 +359,7 @@ export class Vehicle implements IVehicle {
             console.warn("Engine sound not loaded")
             return
         }
+        this.startEngineSound()
     }
 
     stopEngineSound() {
@@ -370,13 +371,15 @@ export class Vehicle implements IVehicle {
 
     startEngineSound() {
         if (this.isPaused) return
-
+        this.engineSound.setVolume(0.25)
         if (this.engineSound && !this.engineSound?.isPlaying && this.useSoundEffects) {
+            console.log("starting sound")
             this.engineSound.play()
         }
     }
 
     updateEngineSound() {
+
         if (!!this.engineSound && this.useSoundEffects && this.engineSound.isPlaying) {
             const playbackRate = +soundScaler(Math.abs(this.getCurrentSpeedKmHour()))
             if (!isFinite(playbackRate)) {
@@ -388,27 +391,23 @@ export class Vehicle implements IVehicle {
     }
 
     createCarSounds() {
-
-
-
         const listener = new AudioListener()
         this.camera.add(listener)
-
         this.engineSound = new Audio(listener)
         const batch = []
 
         batch.push(
 
             loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
-
+                console.log("loding engine ound buffer")
                 try {
 
                     this.engineSound.setBuffer(engineSoundBuffer)
-                    this.engineSound.setLoop(true)
-                    this.engineSound.setVolume(0.3)
-
-                    //  this.engineSound.setLoopEnd(2.5)
                     this.engineSound.hasPlaybackControl = true
+                    this.engineSound.setLoop(true)
+                    this.engineSound.setVolume(0.25)
+
+
                 } catch (err) {
                     console.warn("Error setting engine sound:", err)
                 }
@@ -441,6 +440,7 @@ export class Vehicle implements IVehicle {
 
         Promise.all(batch).then(() => {
             this.engineSoundLoaded = true
+            console.log("loadined engine soudn")
         })
 
     }

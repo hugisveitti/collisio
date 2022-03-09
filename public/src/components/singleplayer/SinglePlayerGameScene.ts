@@ -139,8 +139,10 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.camera.rotation.set(-Math.PI / 10, Math.PI, -Math.PI / 10)
 
         await this.createVehicle()
+        this.vehicle.addCamera(this.camera)
 
         await this.createBot()
+        this.bot.update(16)
         this.renderer.render(this.scene, this.camera)
         hideLoadDiv()
 
@@ -153,7 +155,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
         this.vehicle.resetPosition()
 
-        this.vehicle.addCamera(this.camera)
 
         this.vehicle.setCanDrive(true)
 
@@ -182,6 +183,9 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.vehicle.setCanDrive(false)
         this.vehicle.stop()
         this.vehicle.start()
+
+
+        this.vehicle.toggleSound(this.gameSettings.useSound)
         this.bot?.restartBot()
         this.gameStarted = false
         this.currentNumberOfLaps = this.roomSettings.numberOfLaps
@@ -248,7 +252,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             }
             // need some backup of the vehicle type, if it doesnt load
             const vehicleType = this.config.player?.vehicleType ?? defaultVehicleType
-
             const vehicleConfig: IVehicleClassConfig = {
                 id: this.config.player.id,
                 scene: this,
@@ -405,6 +408,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     toggleUseSound() {
+        console.log("toggle use sound", this.useSound)
         this.vehicle?.toggleSound(this.useSound)
     }
 
@@ -432,10 +436,10 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         }
 
         setMusicVolume(this.gameSettings.musicVolume)
-        if (this.isReady) {
-            this.toggleUseSound()
-            this.startGameSong()
-        }
+        //    if (this.isReady) {
+        this.toggleUseSound()
+        this.startGameSong()
+        //  }
 
         this.camera.far = this.getDrawDistance()
 
@@ -524,7 +528,8 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
-            vehicleSetup: this.vehicle.vehicleSetup
+            vehicleSetup: this.vehicle.vehicleSetup,
+            singleplayer: true
         }
         if (this.gameRoomActions.playerFinished) {
             this.gameRoomActions.playerFinished(playerData)

@@ -179,18 +179,21 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                   {data.medal?.medal === "none"
                     ? "no"
                     : `the ${data.medal?.medal}`}{" "}
-                  medal, {data.medal?.coins.toFixed(0)} coins and{" "}
-                  {data.medal?.XP.toFixed(2)} XP.{" "}
+                  medal
                   {data.medal?.secToNext &&
-                    `${data.medal.secToNext.toFixed(
+                    ` and was ${data.medal.secToNext.toFixed(
                       2
                     )} seconds from getting ${getNextMedal(data.medal.medal)}`}
+                  .{}
+                  {!props.singleplayer && (
+                    <>
+                      Won
+                      {data.medal?.coins.toFixed(0)} coins and{" "}
+                      {data.medal?.XP.toFixed(2)} XP.
+                    </>
+                  )}
                 </Typography>
-                {props.singleplayer && (
-                  <Typography fontSize={8}>
-                    Coins and XP can only be earned with the mobile controller.
-                  </Typography>
-                )}
+
                 {trackData.length > 0 ? (
                   <>
                     {getScoreInfo(trackData, {
@@ -237,7 +240,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             />
           </Grid>
         )}
-        <Grid item xs={6} md={4} xl={2}>
+        <Grid item xs={6} md={4} xl={3}>
           <BackdropButton
             color="white"
             width={btnWidth}
@@ -246,7 +249,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             Random track
           </BackdropButton>
         </Grid>
-        <Grid item xs={6} md={4} xl={2}>
+        <Grid item xs={6} md={4} xl={3}>
           <BackdropButton
             color="white"
             width={btnWidth}
@@ -255,14 +258,14 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             Restart
           </BackdropButton>
         </Grid>
-        <Grid item xs={6} md={4} xl={2}>
+        <Grid item xs={6} md={4} xl={3}>
           <ToFrontPageButton
             color="white"
             width={btnWidth}
             text="To Frontpage"
           />
         </Grid>
-        <Grid item xs={6} md={4} xl={2}>
+        <Grid item xs={6} md={4} xl={3}>
           <BackdropButton
             width={btnWidth}
             color="white"

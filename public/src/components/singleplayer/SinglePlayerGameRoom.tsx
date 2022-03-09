@@ -60,6 +60,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
+    console.log("game is fin", data);
     if (data.isAuthenticated) {
       saveRaceData(data.playerId, data).then(([setPB, pb]) => {
         const bestTimesInfo = {};
@@ -84,7 +85,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     const vehicleSetup =
       props.store.vehiclesSetup?.[vehicleType] ??
       defaultVehiclesSetup[vehicleType];
-
+    console.log("starting game", user);
     const player: IPlayerInfo = props.store.player ?? {
       id: user?.uid ?? getLocalUid(),
       playerName: user?.displayName ?? "Guest",
@@ -99,6 +100,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
       isLeader: true,
     };
     props.store.setPlayer(player);
+    props.store.setPlayers([player]);
 
     getCountryInfo().then((res) => {
       saveSinglePlayerData({

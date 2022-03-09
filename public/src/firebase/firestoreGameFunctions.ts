@@ -158,7 +158,7 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer)
         setDoc(highscoresRef, data).then(() => {
 
         }).catch(e => {
-            console.warn("error saving race", e)
+            console.warn("error saving saveRaceData", e)
         })
         saveBestRaceData(playerId, data).then(([setPersonalBest, _gameInfo]) => {
             resolve([setPersonalBest, _gameInfo])
@@ -206,7 +206,7 @@ export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame, callback: (
     try {
         await setDoc(gameRef, gameInfo)
     } catch (e) {
-        console.warn("Error saving race:", e)
+        console.warn("Error saving saveRaceDataGame:", e)
     }
 }
 
