@@ -581,8 +581,8 @@ export class RaceGameScene extends GameScene {
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
             vehicleSetup: this.vehicles[i].vehicleSetup
-
         }
+
         if (this.gameSettings.record && this.driverRecorder) {
             playerData.recordingFilename = this.driverRecorder.getRecordingFilename()
         }
@@ -599,7 +599,6 @@ export class RaceGameScene extends GameScene {
         if (i === 0 && this.driverRecorder && this.roomSettings?.tournamentId) {
             this.driverRecorder.saveTournamentRecording(+this.gameTimers[i].getTotalTime().toFixed(2), this.players[i].playerName, this.players[i].id,)
         }
-
     }
 
 

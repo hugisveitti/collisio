@@ -1,3 +1,5 @@
+import SettingsIcon from "@mui/icons-material/Settings";
+import IconButton from "@mui/material/IconButton";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
@@ -98,6 +100,20 @@ const MultiplayerGameRoom = (props: IMultiplayerGameRoom) => {
   // gamesettings modal only for LEADEr?
   return (
     <React.Fragment>
+      <IconButton
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          zIndex: 9999,
+          fontSize: 32,
+        }}
+        onClick={() => {
+          setSettingsModalOpen(!settingsModalOpen);
+        }}
+      >
+        <SettingsIcon />
+      </IconButton>
       <GameSettingsModal
         multiplayer
         gameObject={gameObject}

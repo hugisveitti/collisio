@@ -7,12 +7,17 @@ import { firestore } from "./firebaseInit"
 import { saveTournamentRaceDataPlayer, saveTournamentRaceGame, TournamentFinishedResponse } from "./firestoreTournamentFunctions"
 
 
-const highscoresRefPath = "highscores"
+
 const bestHighscoresRefPath = "bestHighscores"
+const singleplayerBestHighscoresRefPath = "singleplayerBestHighscores"
 // for special vehicles such as simple sphere
 const bestSpecialHighscoresRefPath = "bestSpecialHighscores"
+const singleplayerBestSpecialHighscoresRefPath = "singleplayerBestSpecialHighscores"
+
 const allHighscoresRefPath = "allHighscores"
 const allGamesRefPath = "allGames"
+const singleplayerAllHighscoresRefPath = "singleplayerAllHighscores"
+const singleplayerAllGamesRefPath = "singleplayerAllGames"
 
 
 export interface IBestTime {
@@ -69,7 +74,10 @@ export const saveBestRaceData = async (playerId: string, data: IEndOfRaceInfoPla
         let setPersonalBest = false
         //  const gameDataInfo: string[] = []
         const specialVehicle = itemInArray(data.vehicleType, specialVehicleTypes)
-        const highscoreRef = specialVehicle ? bestSpecialHighscoresRefPath : bestHighscoresRefPath
+        let highscoreRef = specialVehicle ? bestSpecialHighscoresRefPath : bestHighscoresRefPath
+        if (data.singleplayer) {
+            highscoreRef = specialVehicle ? singleplayerBestSpecialHighscoresRefPath : singleplayerBestHighscoresRefPath
+        }
         getPlayerBestScoreOnTrackAndLap(playerId, data.trackName, data.numberOfLaps, specialVehicle).then((pb) => {
 
             const highscoresRef = doc(firestore, highscoreRef, `${playerId}#${data.trackName}#${data.numberOfLaps}`)
@@ -143,7 +151,9 @@ export const saveRaceData = async (playerId: string, data: IEndOfRaceInfoPlayer)
         //  let gameDataInfo: IGameDataInfo = {}
         // const highscoresRef = doc(firestore, highscoresRefPath, playerId, allHighscoresRefPath, data.gameId)
         // const highscoresRef = doc(firestore, highscoresRefPath, allHighscoresRefPath, playerId, data.gameId)
-        const highscoresRef = doc(firestore, allHighscoresRefPath, getAllHighscoreKey(playerId, data.gameId))
+
+        const path = data.singleplayer ? singleplayerAllHighscoresRefPath : allHighscoresRefPath
+        const highscoresRef = doc(firestore, path, getAllHighscoreKey(playerId, data.gameId))
 
         setDoc(highscoresRef, data).then(() => {
 
@@ -191,7 +201,8 @@ export const saveRaceDataGame = async (gameInfo: IEndOfRaceInfoGame, callback: (
 
     saveTournamentRaceGame(gameInfo, activeBracketNode, callback)
 
-    const gameRef = doc(firestore, allGamesRefPath, gameInfo.gameId)
+    const path = gameInfo.singleplayer ? singleplayerAllGamesRefPath : allGamesRefPath
+    const gameRef = doc(firestore, path, gameInfo.gameId)
     try {
         await setDoc(gameRef, gameInfo)
     } catch (e) {
@@ -220,9 +231,10 @@ export const getPlayerBestScores = async (playerId: string, callback: (data: IEn
 
 export type BestTrackScore = IEndOfRaceInfoPlayer[]
 
-export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number): Promise<IEndOfRaceInfoPlayer[]> => {
+export const getBestScoresOnTrackAndLap = async (trackName: string, numberOfLaps: number, startNumber: number, numberOfItems: number, singleplayer: boolean): Promise<IEndOfRaceInfoPlayer[]> => {
     return new Promise<IEndOfRaceInfoPlayer[]>(async (resolve, reject) => {
-        const bestScoreRef = collection(firestore, bestHighscoresRefPath)
+        const path = singleplayer ? singleplayerBestHighscoresRefPath : bestHighscoresRefPath
+        const bestScoreRef = collection(firestore, path)
         // TODO maybe have list of vehicles that are in a different highscore list
         const q = query(bestScoreRef, where("trackName", "==", trackName), where("numberOfLaps", "==", numberOfLaps), orderBy("totalTime", "asc"), startAt(startNumber), limit(numberOfItems))
 

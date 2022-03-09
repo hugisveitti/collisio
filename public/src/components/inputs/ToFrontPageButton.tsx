@@ -5,6 +5,8 @@ import { frontPagePath } from "../Routes";
 interface IToFrontPageButton {
   color?: "black" | "white";
   beforeClick?: () => void;
+  text?: string;
+  width?: number | string;
 }
 
 const ToFrontPageButton = (props: IToFrontPageButton) => {
@@ -13,8 +15,9 @@ const ToFrontPageButton = (props: IToFrontPageButton) => {
       link={frontPagePath}
       color={props.color}
       beforeClick={props.beforeClick}
+      width={props.width}
     >
-      &lt; Back
+      {props.text ? props.text : <>&lt; Back</>}
     </BackdropButton>
   );
 };

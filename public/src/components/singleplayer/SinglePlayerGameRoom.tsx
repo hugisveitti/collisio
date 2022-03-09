@@ -1,20 +1,30 @@
 import { Timestamp } from "@firebase/firestore";
+import SettingsIcon from "@mui/icons-material/Settings";
+import IconButton from "@mui/material/IconButton";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
+import { IEndOfRaceInfoPlayer } from "../../classes/Game";
+import {
+  IGameSettings,
+  IRoomSettings,
+  setLocalRoomSetting,
+} from "../../classes/localGameSettings";
 import { getLocalUid } from "../../classes/localStorage";
 import { defaultUserSettings } from "../../classes/User";
 import { saveSinglePlayerData } from "../../firebase/firestoreFunctions";
 import {
-  createMultiplayerGameScene,
-  MultiplayerRaceGameScene,
-} from "../../game/MultiplayerRaceGameScene";
+  saveRaceData,
+  saveRaceDataGame,
+} from "../../firebase/firestoreGameFunctions";
+import { IEndOfGameData } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
-import { m_ts_restart_game } from "../../shared-backend/multiplayer-shared-stuff";
+import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
 import { IPlayerInfo } from "../../shared-backend/shared-stuff";
 import { getCountryInfo } from "../../utils/connectSocket";
+import { getRandomItem } from "../../utils/utilFunctions";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
+import EndOfGameModal, { IGameDataInfo } from "../gameRoom/EndOfGameModal";
 import GameSettingsModal from "../gameRoom/GameSettingsModal";
 import { singlePlayerWaitingRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -34,8 +44,29 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const history = useHistory();
 
+  const [gameDataInfo, setGameDataInfo] = useState({
+    bestTimesInfo: {},
+  } as IGameDataInfo);
+  const [endOfGameModalOpen, setEndOfGameModalOpen] = useState(false);
+  const [endOfGameData, setEndOfGameData] = useState({} as IEndOfGameData);
   const handleEscPressed = () => {
     setSettingsModalOpen(true);
+  };
+
+  const handleGameFinished = (data: IEndOfGameData) => {
+    setEndOfGameModalOpen(true);
+    setEndOfGameData(data);
+    saveRaceDataGame(data.endOfRaceInfo, () => {});
+  };
+
+  const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
+    if (data.isAuthenticated) {
+      saveRaceData(data.playerId, data).then(([setPB, pb]) => {
+        const bestTimesInfo = {};
+        bestTimesInfo[data.playerId] = pb;
+        setGameDataInfo({ bestTimesInfo });
+      });
+    }
   };
 
   useEffect(() => {
@@ -87,6 +118,8 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
 
       gameRoomActions: {
         escPressed: handleEscPressed,
+        gameFinished: handleGameFinished,
+        playerFinished: handlePlayerFinished,
       },
     };
     createSingleplayerGameScene(SingleplayerGameScene, config).then((g) => {
@@ -108,8 +141,28 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     gameObject.setRoomSettings(newRoomSettings);
   };
 
+  const handleCloseModals = () => {
+    setEndOfGameModalOpen(false);
+    setEndOfGameData({});
+    setSettingsModalOpen(false);
+  };
+
   return (
     <React.Fragment>
+      <IconButton
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          zIndex: 9999,
+          fontSize: 32,
+        }}
+        onClick={() => {
+          setSettingsModalOpen(!settingsModalOpen);
+        }}
+      >
+        <SettingsIcon />
+      </IconButton>
       <GameSettingsModal
         multiplayer
         gameObject={gameObject}
@@ -144,6 +197,43 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         onVehicleSetupChange={(vehicleSetup) => {
           gameObject.vehicleSetupChanged(vehicleSetup);
         }}
+      />
+      <EndOfGameModal
+        store={props.store}
+        open={endOfGameModalOpen}
+        onClose={() => handleCloseModals()}
+        data={endOfGameData}
+        restartGame={() => {
+          if (gameObject) {
+            gameObject.restartGame();
+          }
+          handleCloseModals();
+        }}
+        scoreInfo={undefined}
+        gameDataInfo={gameDataInfo}
+        quitGame={(newPath: string) => {
+          gameObject.destroyGame().then(() => {
+            history.push(newPath);
+          });
+        }}
+        randomTrack={() => {
+          // start by just getting one of the default owend tracks
+          // TODO extend to all owned tracks
+          let newTrack = getRandomItem(
+            defaultOwnedTracks,
+            props.store.roomSettings.trackName
+          );
+          const newRoomSettings: IRoomSettings = {
+            ...props.store.roomSettings,
+            trackName: newTrack,
+          };
+          props.store.setRoomSettings(newRoomSettings);
+          gameObject.setRoomSettings(newRoomSettings);
+          gameObject.restartGame();
+          setLocalRoomSetting("trackName", newTrack);
+          handleCloseModals();
+        }}
+        singleplayer
       />
     </React.Fragment>
   );

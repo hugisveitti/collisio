@@ -33,6 +33,7 @@ export const getGameTypeNameFromType = (gameType: GameType) => {
 
 
 
+
 export const getTrackInfo = (trackName: TrackName) => {
     for (let track of allTrackNames) {
         if (track.type === trackName) return track
@@ -219,6 +220,7 @@ export interface IEndOfRaceInfoPlayer {
     tournamentId?: string
     recordingFilename?: string
     vehicleSetup: VehicleSetup
+    singleplayer?: boolean
 }
 
 export interface IPlayerGameInfo {
@@ -246,6 +248,7 @@ export interface IEndOfRaceInfoGame {
     avgPing: number
     time: number
     avgFps: number
+    singleplayer?: boolean
 }
 
 /** while race is going on */

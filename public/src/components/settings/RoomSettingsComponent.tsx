@@ -1,21 +1,21 @@
 import { Grid } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
-  defaultTagTrack,
   defaultRaceTrack,
   defaultStoryTrack,
-  numberOfLapsPossibilities,
+  defaultTagTrack,
   getTrackNameFromType,
   nonActiveTrackNames,
+  numberOfLapsPossibilities,
 } from "../../classes/Game";
 import {
   IRoomSettings,
-  setLocalGameSetting,
   setLocalRoomSetting,
 } from "../../classes/localGameSettings";
 import { getStyledColors } from "../../providers/theme";
 import { GameType } from "../../shared-backend/shared-stuff";
 import { getDeviceType, inTestMode } from "../../utils/settings";
+import { itemInArray } from "../../utils/utilFunctions";
 import NumberSelect from "../inputs/NumberSelect";
 import MyRadio from "../radio/MyRadio";
 import { IStore } from "../store";
@@ -29,6 +29,7 @@ interface IRoomSettingsComponent {
   store: IStore;
   multiplayer?: boolean;
   disableInputs?: boolean;
+  excluededSettings?: (keyof IRoomSettings)[];
 }
 
 const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
@@ -132,20 +133,21 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
 
   return (
     <React.Fragment>
-      {!props.multiplayer && (
-        <Grid item xs={12} lg={4}>
-          <MyRadio<GameType>
-            label="Type of game"
-            checked={props.roomSettings.gameType}
-            onChange={(newType) => updateRoomSettings("gameType", newType)}
-            options={[
-              { label: "Race", value: "race" },
-              { label: "Tag", value: "tag" },
-            ]}
-            disabled={disableInputs}
-          />
-        </Grid>
-      )}
+      {!props.multiplayer &&
+        !itemInArray("gameType", props.excluededSettings ?? []) && (
+          <Grid item xs={12} lg={4}>
+            <MyRadio<GameType>
+              label="Type of game"
+              checked={props.roomSettings.gameType}
+              onChange={(newType) => updateRoomSettings("gameType", newType)}
+              options={[
+                { label: "Race", value: "race" },
+                { label: "Tag", value: "tag" },
+              ]}
+              disabled={disableInputs}
+            />
+          </Grid>
+        )}
       {renderGameTypeInputs()}
       <Grid item xs={12} lg={4}>
         <p>

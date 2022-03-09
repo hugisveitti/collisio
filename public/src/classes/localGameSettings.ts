@@ -43,21 +43,22 @@ export interface IGameSettings {
 }
 
 
+
 export const defaultGameSettings: IGameSettings = {
     useShadows: false,
     useSound: true,
     musicVolume: .1,
-    graphics: "low",
-    drawDistance: 3000,
+    graphics: Math.random() < .5 ? "low" : "high",
+    drawDistance: 4500,
     record: false,
     useGhost: false,
     targetFPS: 30,
-    botDifficulty: "easy"
+    botDifficulty: Math.random() < .5 ? "easy" : "hard"
 }
 export const defaultRoomSettings: IRoomSettings = {
     numberOfLaps: 1,
     tagGameLength: 2,
-    trackName: "basic-track1",
+    trackName: Math.random() < .5 ? "basic-track1" : "nurn-track",
     gameType: "race",
 }
 

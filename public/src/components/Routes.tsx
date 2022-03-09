@@ -75,6 +75,7 @@ export const controlsRoomPath = "/controls";
 export const controlsRoomIdPath = "/controls/:roomId";
 export const howToPlayPagePath = "/how-to-play";
 export const highscorePagePath = "/highscores";
+export const singleplayerHighscorePagePath = "/highscores/singleplayer";
 export const privateProfilePagePath = "/private-profile";
 export const privateProfileTournamentsPagePath = "/private-profile/tournaments";
 export const publicProfilePagePath = "/user/:profileId";
@@ -271,7 +272,7 @@ const Routes = () => {
           render={(props) => <HowToPlayPage {...props} />}
         />
         <Route
-          path={highscorePagePath}
+          path={[singleplayerHighscorePagePath, highscorePagePath]}
           render={(props) => <HighscorePage {...props} />}
         />
         <Route

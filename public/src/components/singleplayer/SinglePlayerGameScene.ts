@@ -1,23 +1,25 @@
-import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d"
-import { Clock, PerspectiveCamera, Quaternion, Vector3 } from "three";
-import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings"
-import { IUserSettings, IVehicleSettings } from "../../classes/User"
-import { hideLoadDiv } from "../../course/loadingManager"
-import { RaceCourse } from "../../course/RaceCourse"
-import { GameTime } from "../../game/GameTimeClass"
-import { IGameRoomActions } from "../../game/IGameScene"
-import { MyScene } from "../../game/MyScene"
-import { defaultVehicleType, IPlayerInfo, VehicleColorType, VehicleControls } from "../../shared-backend/shared-stuff"
-import { VehicleSetup } from "../../shared-backend/vehicleItems"
-import { addMusic, removeMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds"
-import { addKeyboardControls, driveVehicleWithKeyboard } from "../../utils/controls"
-import { BotVehicle } from "../../vehicles/BotVehicle"
-import { IVehicle } from "../../vehicles/IVehicle"
-import { LowPolyVehicle, loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle"
-import { SphereVehicle, loadSphereModel } from "../../vehicles/SphereVehicle"
-import { IVehicleClassConfig } from "../../vehicles/Vehicle"
-import { getVehicleClassFromType } from "../../vehicles/VehicleConfigs"
-
+import { ExtendedObject3D, PhysicsLoader, Project } from "enable3d";
+import { PerspectiveCamera } from "three";
+import { v4 as uuid } from "uuid";
+import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../../classes/Game";
+import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
+import { IVehicleSettings } from "../../classes/User";
+import { hideLoadDiv } from "../../course/loadingManager";
+import { RaceCourse } from "../../course/RaceCourse";
+import { GameTime } from "../../game/GameTimeClass";
+import { IGameRoomActions } from "../../game/IGameScene";
+import { MyScene } from "../../game/MyScene";
+import { defaultVehicleType, IPlayerInfo, VehicleColorType, VehicleControls } from "../../shared-backend/shared-stuff";
+import { VehicleSetup } from "../../shared-backend/vehicleItems";
+import { addMusic, removeMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds";
+import { addKeyboardControls, driveVehicleWithKeyboard } from "../../utils/controls";
+import { getDateNow } from "../../utils/utilFunctions";
+import { BotVehicle } from "../../vehicles/BotVehicle";
+import { IVehicle } from "../../vehicles/IVehicle";
+import { loadLowPolyVehicleModels, LowPolyVehicle } from "../../vehicles/LowPolyVehicle";
+import { loadSphereModel, SphereVehicle } from "../../vehicles/SphereVehicle";
+import { IVehicleClassConfig } from "../../vehicles/Vehicle";
+import { getVehicleClassFromType } from "../../vehicles/VehicleConfigs";
 
 export interface ISingleplayerGameSceneConfig {
     gameSettings: IGameSettings
@@ -52,9 +54,11 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     gameStarted: boolean
     raceCountdownTime: number
     countDownInterval: NodeJS.Timer
+    gameId: string
 
     constructor() {
         super()
+        this.gameId = uuid()
         this.raceCountdownTime = 5
         addKeyboardControls()
         this.gameTime = new GameTime(2, 2)
@@ -314,6 +318,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             this.vehicle.setCheckpointPositionRotation({ position, rotation })
 
             if (this.gameTime.finished()) {
+                this.prepareEndOfGameData()
                 this.gameStarted = false
                 this.showSecondaryInfo(`You finished with time ${this.gameTime.getTotalTime().toFixed(2)}!`)
                 // TODO: vehicle stop, some celebration sound, camera angle change, maybe some confetti
@@ -495,6 +500,74 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.updateBot(_delta)
         this.checkIfVehicleIsOffCourse()
         this.updatePlayerRaceInfo(_delta)
+    }
+
+    prepareEndOfRacePlayer() {
+        const playerData: IEndOfRaceInfoPlayer = {
+            totalTime: this.gameTime.getTotalTime(),
+            numberOfLaps: this.currentNumberOfLaps,
+            playerName: this.config.player.playerName,
+            playerId: this.config.player.id,
+            bestLapTime: this.gameTime.getBestLapTime(),
+            trackName: this.getTrackName(),
+            lapTimes: this.gameTime.getLapTimes(),
+            gameId: this.gameId,
+            date: getDateNow(),
+            private: false,
+            isAuthenticated: this.config.player.isAuthenticated,
+            vehicleType: this.vehicle.vehicleType,
+            engineForce: this.vehicle.engineForce,
+            breakingForce: this.vehicle.breakingForce,
+            steeringSensitivity: this.vehicle.steeringSensitivity,
+            roomTicks: this.roomTicks,
+            gameTicks: this.gameTicks,
+            totalPing: this.totalPing,
+            totalPingsGotten: this.totalPingsGotten,
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
+            vehicleSetup: this.vehicle.vehicleSetup
+        }
+        if (this.gameRoomActions.playerFinished) {
+            this.gameRoomActions.playerFinished(playerData)
+        }
+    }
+
+    prepareEndOfGameData() {
+        this.prepareEndOfRacePlayer()
+        const playerGameInfos: IPlayerGameInfo[] = []
+
+        playerGameInfos.push({
+            id: this.config.player.id,
+            name: this.config.player.playerName,
+            totalTime: +this.gameTime.getTotalTime().toFixed(2),
+            lapTimes: this.gameTime.getLapTimes(),
+            vehicleType: this.config.player.vehicleType,
+            engineForce: this.vehicle.engineForce,
+            breakingForce: this.vehicle.breakingForce,
+            steeringSensitivity: this.vehicle.steeringSensitivity,
+            isAuthenticated: this.config.player.isAuthenticated
+        })
+
+
+        const endOfRaceInfo: IEndOfRaceInfoGame = {
+            playersInfo: playerGameInfos,
+            gameSettings: this.gameSettings,
+            roomSettings: this.roomSettings,
+            gameId: this.gameId,
+            roomId: "singleplayer",
+            date: getDateNow(),
+            roomTicks: this.roomTicks,
+            gameTicks: this.gameTicks,
+            avgPing: this.totalPingsGotten === 0 ? -1 : this.totalPing / this.totalPingsGotten,
+            time: this.time,
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
+            singleplayer: true
+        }
+        if (this.gameRoomActions.gameFinished) {
+            this.gameRoomActions.gameFinished({ endOfRaceInfo })
+        }
+        // wa
+        // if save then update gameId
+        this.gameId = uuid()
     }
 
 

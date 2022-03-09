@@ -1,3 +1,5 @@
+import SettingsIcon from "@mui/icons-material/Settings";
+import { IconButton } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify/";
@@ -11,6 +13,7 @@ import {
   IRoomSettings,
   setAllLocalGameSettings,
   setAllLocalRoomSettings,
+  setLocalRoomSetting,
 } from "../../classes/localGameSettings";
 import {
   IBestTime,
@@ -19,6 +22,7 @@ import {
 import { startGame } from "../../game/GameScene";
 import { IEndOfGameData, IGameScene } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
+import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
 import {
   dts_back_to_waiting_room,
   dts_player_finished,
@@ -32,6 +36,7 @@ import {
 import { startLowPolyTest } from "../../test-courses/lowPolyTest";
 import { disconnectSocket, getSocket } from "../../utils/connectSocket";
 import { inTestMode } from "../../utils/settings";
+import { getRandomItem } from "../../utils/utilFunctions";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import { connectPagePath, frontPagePath, gameRoomPath } from "../Routes";
 import { IStore } from "../store";
@@ -280,14 +285,6 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
   useEffect(() => {
     if (gameObject) {
-      // never pause from phone
-      // if (gameActions.pause) {
-      //   setSettingsModalOpen(true);
-      //   gameObject.pauseGame();
-      // } else {
-      //   setSettingsModalOpen(false);
-      //   gameObject.unpauseGame();
-      // }
       if (gameActions.restart) {
         gameObject.restartGame();
         handleCloseModals();
@@ -297,6 +294,20 @@ const GameRoom = React.memo((props: IGameRoom) => {
 
   return (
     <React.Fragment>
+      <IconButton
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          zIndex: 9999,
+          fontSize: 32,
+        }}
+        onClick={() => {
+          setSettingsModalOpen(!settingsModalOpen);
+        }}
+      >
+        <SettingsIcon />
+      </IconButton>
       <GameSettingsModal
         gameObject={gameObject}
         open={settingsModalOpen}
@@ -342,13 +353,27 @@ const GameRoom = React.memo((props: IGameRoom) => {
         gameDataInfo={gameDataInfo}
         quitGame={(newPath: string) => {
           gameObject.destroyGame().then(() => {
-            socket.disconnect();
-            //     props.store.setSocket(undefined);
-            //   setGameObject(undefined);
+            disconnectSocket();
             gameObject = undefined;
-            //   window.location.href = connectPagePath;
             history.push(newPath);
           });
+        }}
+        randomTrack={() => {
+          // start by just getting one of the default owend tracks
+          // TODO extend to all owned tracks
+          let newTrack = getRandomItem(
+            defaultOwnedTracks,
+            props.store.roomSettings.trackName
+          );
+          const newRoomSettings: IRoomSettings = {
+            ...props.store.roomSettings,
+            trackName: newTrack,
+          };
+          props.store.setRoomSettings(newRoomSettings);
+          gameObject.setRoomSettings(newRoomSettings);
+          gameObject.restartGame();
+          setLocalRoomSetting("trackName", newTrack);
+          handleCloseModals();
         }}
       />
       {/* <ScoreInfoContainer scoreInfo={scoreInfo} /> */}

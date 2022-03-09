@@ -26,7 +26,6 @@ service cloud.firestore {
     match /bestHighscores {
     	match/{docs=**}{
       	allow read;
-   
       }
       match /{gameId} {
       	allow update, delete: if resource.data.playerId == request.auth.uid ;
@@ -43,12 +42,49 @@ service cloud.firestore {
         allow create: if !exists(/databases/$(database)/documents/allHighscores/$(request.resource.id));
       }
     }
+   
+
     match /allGames {
     	match /{gameId} {
      		allow read;
     		allow write;
    	 }
     }
+
+    match /singleplayerAllGames {
+    	match /{gameId} {
+     		allow read;
+    		allow write;
+   	 }
+    }
+     match /singleplayerBestHighscores {
+      	match/{docs=**}{
+      	allow read;
+      }
+      match /{gameId} {
+      	allow update, delete: if resource.data.playerId == request.auth.uid ;
+        allow create: if !exists(/databases/$(database)/documents/singleplayerBestHighscores/$(request.resource.id));
+      }
+    }
+    match /bestSpecialHighscores {
+      	match/{docs=**}{
+      	allow read;
+      }
+      match /{gameId} {
+      	allow update, delete: if resource.data.playerId == request.auth.uid ;
+        allow create: if !exists(/databases/$(database)/documents/bestSpecialHighscores/$(request.resource.id));
+      }
+    }
+      match /singleplayerBestSpecialHighscores {
+      	match/{docs=**}{
+      	allow read;
+      }
+      match /{gameId} {
+      	allow update, delete: if resource.data.playerId == request.auth.uid ;
+        allow create: if !exists(/databases/$(database)/documents/singleplayerBestSpecialHighscores/$(request.resource.id));
+      }
+    }
+
     match /roomData/{roomId} {
     	allow create: if !exists(/databases/$(database)/documents/roomData/$(request.resource.id));
       allow read; //: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));

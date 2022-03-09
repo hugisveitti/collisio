@@ -7,6 +7,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import {
+  defaultRaceTrack,
   IEndOfRaceInfoPlayer,
   nonActiveTrackNames,
   numberOfLapsPossibilities,
@@ -20,6 +21,7 @@ import BackdropContainer from "../backdrop/BackdropContainer";
 import NumberSelect from "../inputs/NumberSelect";
 import "../inputs/select.css";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
+import MyRadio from "../radio/MyRadio";
 import TrackSelect from "../trackSelectContainer/TrackSelect";
 import HighscoreTable from "./HighscoreTable";
 
@@ -28,6 +30,10 @@ interface IHighscorePage {}
 let nextStartTotalTime = 0;
 let startTotalTimes = [];
 const HighscorePage = (props: IHighscorePage) => {
+  const _singleplayer =
+    window.location.pathname.split("/")?.[2] === "singleplayer";
+  console.log("_singleplayer", _singleplayer);
+  const [singleplayer, setSingleplayer] = useState(_singleplayer);
   // const [numberOfLapsKeys, setNumberOfLapsKeys] = useState([]);
   const [numberOfLapsKey, setNumberOfLapsKey] = useState(2);
   const [trackKey, setTrackKey] = useState("");
@@ -49,6 +55,8 @@ const HighscorePage = (props: IHighscorePage) => {
       window.localStorage.getItem("numberOfLapsKey");
     if (storageTrackKey) {
       setTrackKey(storageTrackKey as TrackName);
+    } else {
+      setTrackKey(defaultRaceTrack);
     }
     if (storageNumberOfLapsKey && !isNaN(+storageNumberOfLapsKey)) {
       setNumberOfLapsKey(+storageNumberOfLapsKey);
@@ -66,7 +74,8 @@ const HighscorePage = (props: IHighscorePage) => {
       trackKey,
       numberOfLapsKey,
       startTotalTime,
-      rowsPerPage
+      rowsPerPage,
+      singleplayer
     ).then((data) => {
       setHighscoreHasLoaded(true);
 
@@ -76,7 +85,7 @@ const HighscorePage = (props: IHighscorePage) => {
         nextStartTotalTime = data[data.length - 1].totalTime + 0.01;
       }
     });
-  }, [trackKey, numberOfLapsKey]);
+  }, [trackKey, numberOfLapsKey, singleplayer]);
 
   const handleChangePage = (
     event: unknown,
@@ -95,17 +104,21 @@ const HighscorePage = (props: IHighscorePage) => {
 
     setPage(newPage);
 
-    getBestScoresOnTrackAndLap(trackKey, numberOfLapsKey, startTime, rpp).then(
-      (data) => {
-        setHighscoreList(data);
-        if (data?.length) {
-          if (newPage > page) {
-            startTotalTimes[newPage] = data[0].totalTime;
-          }
-          nextStartTotalTime = data[data.length - 1].totalTime + 0.01;
+    getBestScoresOnTrackAndLap(
+      trackKey,
+      numberOfLapsKey,
+      startTime,
+      rpp,
+      singleplayer
+    ).then((data) => {
+      setHighscoreList(data);
+      if (data?.length) {
+        if (newPage > page) {
+          startTotalTimes[newPage] = data[0].totalTime;
         }
+        nextStartTotalTime = data[data.length - 1].totalTime + 0.01;
       }
-    );
+    });
   };
 
   const handleChangeRowsPerPage = (
@@ -170,34 +183,6 @@ const HighscorePage = (props: IHighscorePage) => {
                   backgroundColor,
                 }}
               />
-              {/* <span style={{ display: "block", color: backgroundColor }}>
-                Track
-              </span>
-              <FormControl fullWidth>
-                <Select
-                  className="select"
-                  label="No. laps"
-                  style={{
-                    minWidth: 100,
-                    backgroundColor,
-                    color,
-                  }}
-                  value={
-                    itemInArray(numberOfLapsKey, numberOfLapsKeys)
-                      ? numberOfLapsKey
-                      : ""
-                  }
-                  onChange={(e) => {
-                    setNumberOfLapsKey(e.target.value);
-                  }}
-                >
-                  {numberOfLapsKeys.map((key) => (
-                    <MenuItem key={key} value={key}>
-                      {key}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> */}
             </Grid>
             <Grid item xs={3} sm={1}>
               <Tooltip
@@ -240,6 +225,17 @@ const HighscorePage = (props: IHighscorePage) => {
             </Grid>
           </>
         )}
+        <Grid item xs={12}>
+          <MyRadio<boolean>
+            label="See keyboard or mobile controller highscore?"
+            checked={singleplayer}
+            options={[
+              { label: "Keyboard", value: true },
+              { label: "Mobile controller", value: false },
+            ]}
+            onChange={(newVal) => setSingleplayer(newVal)}
+          />
+        </Grid>
       </Grid>
     </BackdropContainer>
   );

@@ -243,6 +243,8 @@ const TrackSelect = (props: ITrackSelect) => {
       <BackdropButton
         startIcon={showLargeContainer ? <ExpandLess /> : <ExpandMore />}
         onClick={() => setShowLargeContainer(!showLargeContainer)}
+        color="white"
+        width={180}
       >
         Track select
       </BackdropButton>

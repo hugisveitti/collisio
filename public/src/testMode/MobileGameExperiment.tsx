@@ -6,8 +6,8 @@ import {
   IScoreInfo,
 } from "../classes/Game";
 import {
-  IGameSettings,
-  setAllLocalGameSettings,
+  IRoomSettings,
+  setLocalRoomSetting,
 } from "../classes/localGameSettings";
 import { defaultVehicleSettings } from "../classes/User";
 import EndOfGameModal, {
@@ -27,6 +27,7 @@ import { IEndOfGameData, IGameScene } from "../game/IGameScene";
 import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
 import ControlsRoomComponent from "../mobile/ControlsRoomComponent";
 import { UserContext } from "../providers/UserProvider";
+import { defaultOwnedTracks } from "../shared-backend/ownershipFunctions";
 import {
   defaultVehicleColorType,
   GameActions,
@@ -35,7 +36,7 @@ import {
 } from "../shared-backend/shared-stuff";
 import { disconnectSocket, getSocket } from "../utils/connectSocket";
 import { isIphone } from "../utils/settings";
-import { getSteerAngleFromBeta } from "../utils/utilFunctions";
+import { getRandomItem, getSteerAngleFromBeta } from "../utils/utilFunctions";
 import "./MobileExperiment.css";
 
 interface IMobileGameExperiment {
@@ -315,6 +316,21 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         gameDataInfo={gameDataInfo}
         quitGame={() => {
           window.location.href = frontPagePath;
+        }}
+        randomTrack={() => {
+          let newTrack = getRandomItem(
+            defaultOwnedTracks,
+            props.store.roomSettings.trackName
+          );
+          const newRoomSettings: IRoomSettings = {
+            ...props.store.roomSettings,
+            trackName: newTrack,
+          };
+          props.store.setRoomSettings(newRoomSettings);
+          gameObject.setRoomSettings(newRoomSettings);
+          gameObject.restartGame();
+          setLocalRoomSetting("trackName", newTrack);
+          handleCloseModals();
         }}
       />
 

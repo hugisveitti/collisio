@@ -45,6 +45,8 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
     ? true
     : props.store.player?.isLeader;
 
+  const btnWidth = 180;
+
   return (
     <BasicDesktopModal open={props.open} onClose={props.onClose}>
       <Grid container spacing={3}>
@@ -71,7 +73,11 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
         )}
 
         <Grid item xs={12} md={4}>
-          <BackdropButton color="white" onClick={props.restarBtnPressed}>
+          <BackdropButton
+            color="white"
+            onClick={props.restarBtnPressed}
+            width={btnWidth}
+          >
             Reset game
           </BackdropButton>
         </Grid>
@@ -82,6 +88,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
             onClick={() => {
               props.quitGame(connectPagePath);
             }}
+            width={btnWidth}
           >
             To waiting room
           </BackdropButton>
@@ -98,6 +105,7 @@ const GameSettingsModal = (props: IGameSettingsModal) => {
               inTestMode={props.isTestMode}
               store={props.store}
               multiplayer={props.multiplayer}
+              excluededSettings={["gameType"]}
             />
           </Grid>
         )}

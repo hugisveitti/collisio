@@ -206,6 +206,14 @@ export const getSteerAngleFromBeta = (beta: number, noSteerNumber: number) => {
     return angle
 }
 
+export const getRandomItem = <T extends string>(items: T[], exclude: T) => {
+    let rI = Math.floor(Math.random() * items.length)
+    while (items[rI] === exclude) {
+        rI = Math.floor(Math.random() * items.length)
+    }
+    return items[rI]
+}
+
 /**
  * 
  * @param q Quaterniton, Threejs

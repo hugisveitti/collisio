@@ -46,7 +46,7 @@ const vehicleCosts: { [vehicleType in VehicleType]: number } = {
 }
 
 
-const defaultOwnedTracks: TrackName[] = [
+export const defaultOwnedTracks: TrackName[] = [
     "farm-track",
     "nurn-track",
     "f1-track",

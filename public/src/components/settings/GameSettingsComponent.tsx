@@ -142,29 +142,7 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           {props.gameSettings.useSound ? <VolumeUpIcon /> : <VolumeOffIcon />}
         </IconButton>
       </Grid>
-      <Grid item xs={6} sm={4}>
-        <MyRadio<boolean>
-          label="Shadows"
-          options={[
-            { label: "Off", value: false },
-            { label: "On", value: true },
-          ]}
-          checked={props.gameSettings.useShadows}
-          onChange={(newVal) => updateGameSettings("useShadows", newVal)}
-        />
-      </Grid>
-      <Grid item xs={12} sm={4}>
-        <MyRadio<GraphicsType>
-          label="Graphics"
-          checked={props.gameSettings.graphics}
-          options={[
-            { label: "Low", value: "low" },
-            { label: "High", value: "high" },
-          ]}
-          onChange={(newVal) => updateGameSettings("graphics", newVal)}
-        />
-      </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={6} sm={8}>
         <MySlider
           startIcon={
             <IconButton
@@ -195,6 +173,28 @@ const GameSettingsComponent = (props: IGameSettingsComponent) => {
           max={1}
           min={0}
           color="black"
+        />
+      </Grid>
+      <Grid item xs={6} sm={6}>
+        <MyRadio<boolean>
+          label="Shadows"
+          options={[
+            { label: "Off", value: false },
+            { label: "On", value: true },
+          ]}
+          checked={props.gameSettings.useShadows}
+          onChange={(newVal) => updateGameSettings("useShadows", newVal)}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <MyRadio<GraphicsType>
+          label="Graphics"
+          checked={props.gameSettings.graphics}
+          options={[
+            { label: "Low", value: "low" },
+            { label: "High", value: "high" },
+          ]}
+          onChange={(newVal) => updateGameSettings("graphics", newVal)}
         />
       </Grid>
 

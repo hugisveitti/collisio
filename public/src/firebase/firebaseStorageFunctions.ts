@@ -87,7 +87,8 @@ export const getTournamentGhost = async (tournamentId: string) => {
  */
 export const getFastestGhostFilename = (trackName: TrackName, numberOfLaps: number): Promise<string | undefined> => {
     return new Promise<string | undefined>(async (resolve, reject) => {
-        const bestScores = await getBestScoresOnTrackAndLap(trackName, numberOfLaps, 0, 5)
+        // ghost not on singleplayer yet
+        const bestScores = await getBestScoresOnTrackAndLap(trackName, numberOfLaps, 0, 5, false)
         if (!bestScores) {
             resolve(undefined)
             return

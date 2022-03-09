@@ -1,11 +1,9 @@
 import CloseIcon from "@mui/icons-material/Close";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { IEndOfRaceInfoPlayer, IScoreInfo } from "../../classes/Game";
-import { IUser } from "../../classes/User";
 import {
   getBestScoresOnTrackAndLap,
   getPersonalBestInfo,
@@ -22,7 +20,11 @@ import { itemInArray } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import ToFrontPageButton from "../inputs/ToFrontPageButton";
 import BasicDesktopModal from "../modal/BasicDesktopModal";
-import { highscorePagePath } from "../Routes";
+import {
+  highscorePagePath,
+  loginPagePath,
+  singleplayerHighscorePagePath,
+} from "../Routes";
 import { IStore } from "../store";
 import RaceTimeTable from "./RaceTimeTable";
 
@@ -62,11 +64,13 @@ interface IEndOfGameModal {
   /** Data from game */
   data: IEndOfGameData;
   restartGame: () => void;
-  scoreInfo: IScoreInfo;
+  scoreInfo: IScoreInfo | undefined;
   /** General info about race, such as secs from all time best */
   gameDataInfo: IGameDataInfo;
   quitGame: (newPath: string) => void;
   store: IStore;
+  randomTrack: () => void;
+  singleplayer?: boolean;
 }
 
 const EndOfGameModal = (props: IEndOfGameModal) => {
@@ -79,11 +83,17 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
 
   /** All time best data */
   const [trackData, setTrackData] = useState([] as IEndOfRaceInfoPlayer[]);
-
+  const btnWidth = 180;
   useEffect(() => {
     if (props.data.endOfRaceInfo) {
       const { trackName, numberOfLaps } = props.data.endOfRaceInfo.roomSettings;
-      getBestScoresOnTrackAndLap(trackName, numberOfLaps, 0, 5).then((data) => {
+      getBestScoresOnTrackAndLap(
+        trackName,
+        numberOfLaps,
+        0,
+        5,
+        props.data.endOfRaceInfo.singleplayer
+      ).then((data) => {
         setTrackData(data);
       });
     }
@@ -117,9 +127,9 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
 
   return (
     <BasicDesktopModal open={props.open} onClose={props.onClose}>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={6}>
-          <h3>Race over</h3>
+          <h3>Race information</h3>
         </Grid>
 
         <Grid item xs={6} style={{ textAlign: "right" }}>
@@ -129,10 +139,26 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
         </Grid>
         {!anyoneAuth && (
           <Grid item xs={12}>
-            <Typography>
-              Players need to be logged in on the phone for the score to be
-              saved on the leaderboard.
-            </Typography>
+            {!props.singleplayer ? (
+              <Typography>
+                Players need to be logged in on the phone for the score to be
+                saved on the leaderboard and coins updated.
+              </Typography>
+            ) : (
+              <>
+                <Typography>
+                  You need to be logged in for your score to be saved and coins
+                  updated.
+                </Typography>
+                <BackdropButton
+                  color="white"
+                  width={btnWidth}
+                  onClick={() => props.quitGame(loginPagePath)}
+                >
+                  Create a free account
+                </BackdropButton>
+              </>
+            )}
           </Grid>
         )}
         {info.tournamentInfo && (
@@ -140,9 +166,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             {info.tournamentInfo}
           </Grid>
         )}
-        <Grid item xs={12}>
-          <h3>Race info</h3>
-        </Grid>
+
         {Object.keys(info.bestTimesInfo).map((playerId, i: number) => {
           const data = info.bestTimesInfo[playerId];
 
@@ -162,6 +186,11 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                       2
                     )} seconds from getting ${getNextMedal(data.medal.medal)}`}
                 </Typography>
+                {props.singleplayer && (
+                  <Typography fontSize={8}>
+                    Coins and XP can only be earned with the mobile controller.
+                  </Typography>
+                )}
                 {trackData.length > 0 ? (
                   <>
                     {getScoreInfo(trackData, {
@@ -194,7 +223,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                     ))}
                   </React.Fragment>
                 ) : (
-                  <Typography>Is not logged in.</Typography>
+                  <Typography>Not logged in, data not saved.</Typography>
                 )}
               </div>
             </Grid>
@@ -208,16 +237,42 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             />
           </Grid>
         )}
-        <Grid item xs={6} xl={2}>
-          <BackdropButton onClick={props.restartGame}>Restart</BackdropButton>
-        </Grid>
-        <Grid item xs={6} xl={2}>
-          <ToFrontPageButton />
-        </Grid>
-        <Grid item xs={6} xl={2}>
+        <Grid item xs={6} md={4} xl={2}>
           <BackdropButton
             color="white"
-            onClick={() => props.quitGame(highscorePagePath)}
+            width={btnWidth}
+            onClick={props.randomTrack}
+          >
+            Random track
+          </BackdropButton>
+        </Grid>
+        <Grid item xs={6} md={4} xl={2}>
+          <BackdropButton
+            color="white"
+            width={btnWidth}
+            onClick={props.restartGame}
+          >
+            Restart
+          </BackdropButton>
+        </Grid>
+        <Grid item xs={6} md={4} xl={2}>
+          <ToFrontPageButton
+            color="white"
+            width={btnWidth}
+            text="To Frontpage"
+          />
+        </Grid>
+        <Grid item xs={6} md={4} xl={2}>
+          <BackdropButton
+            width={btnWidth}
+            color="white"
+            onClick={() =>
+              props.quitGame(
+                props.singleplayer
+                  ? singleplayerHighscorePagePath
+                  : highscorePagePath
+              )
+            }
           >
             See highscores
           </BackdropButton>
