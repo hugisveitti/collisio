@@ -527,7 +527,6 @@ export class Vehicle implements IVehicle {
     setPowerup(powerup: Powerup) {
         this.clearPowerups()
         clearTimeout(this.powerupTimeout)
-        console.log("Power up", powerup)
         this.powerup = powerup
         if (!this.isBot) {
             this.scene.addPowerupColor(this.vehicleNumber, this.powerup.type)

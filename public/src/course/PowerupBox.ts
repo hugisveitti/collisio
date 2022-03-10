@@ -144,7 +144,8 @@ export class PowerupBox {
             width: 2,
             height: 3,
             depth: 2,
-            x: this.position.x, y: this.position.y, z: this.position.z
+
+            x: this.position.x, y: this.position.y + 1.9, z: this.position.z
         }, { visible: false });
         (this.box.material as MeshStandardMaterial).visible = false
         this.setupCollision()

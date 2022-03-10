@@ -22,7 +22,6 @@ import {
   mts_game_data_info,
   MTS_SENDINTERVAL_MS,
   mts_send_game_actions,
-  mts_user_settings_changed,
   stm_desktop_disconnected,
   stm_game_finished,
   stm_game_settings_changed_callback,

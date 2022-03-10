@@ -246,7 +246,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
             width={btnWidth}
             onClick={props.randomTrack}
           >
-            Random track
+            Play Random track
           </BackdropButton>
         </Grid>
         <Grid item xs={6} md={4} xl={3}>

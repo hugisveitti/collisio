@@ -27,6 +27,7 @@ import {
   dts_back_to_waiting_room,
   dts_player_finished,
   GameActions,
+  mdts_game_settings_changed,
   std_game_data_info,
   std_player_disconnected,
   std_quit_game,
@@ -369,10 +370,15 @@ const GameRoom = React.memo((props: IGameRoom) => {
             ...props.store.roomSettings,
             trackName: newTrack,
           };
+
           props.store.setRoomSettings(newRoomSettings);
           gameObject.setRoomSettings(newRoomSettings);
           gameObject.restartGame();
+
           setLocalRoomSetting("trackName", newTrack);
+          socket?.emit(mdts_game_settings_changed, {
+            roomSettings: newRoomSettings,
+          });
           handleCloseModals();
         }}
       />
