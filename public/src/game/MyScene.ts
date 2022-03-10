@@ -6,7 +6,7 @@ import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
-import { Powerup } from "../course/PowerupBox";
+import { Powerup, PowerupType } from "../course/PowerupBox";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
 import { getBeep, removeMusic, stopMusic } from "../sounds/gameSounds";
 import { removeKeyboardControls } from "../utils/controls";
@@ -160,6 +160,19 @@ export class MyScene extends Scene3D {
 
     hitPowerup(vehicle: ExtendedObject3D, powerup: Powerup) { }
 
+    removePowerupColor(vehicleNumber: number) {
+        this.gameInfoDiv.classList.remove("bad-power")
+        this.gameInfoDiv.classList.remove("good-power")
+    }
+
+    addPowerupColor(vehicleNumber: number, power: PowerupType) {
+        if (power === "good") {
+            this.gameInfoDiv.classList.add("good-power")
+        } else {
+            this.gameInfoDiv.classList.add("bad-power")
+
+        }
+    }
     _handleResizeWindow() { }
 
     handleResizeWindow() {

@@ -62,7 +62,7 @@ export const inDevelopment = window.location.href.includes("127.0.0.1") || windo
  * Not being redirected from pages
  * can play the game with keyboard and no phone
  */
-export const inTestMode = false
+export const inTestMode = true
 
 
 export const testGameSettings: IGameSettings = {

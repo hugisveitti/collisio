@@ -519,6 +519,9 @@ export class Vehicle implements IVehicle {
         this.onlyForward = false
         this.accelerationMult = 1
         this.powerup = undefined
+        if (!this.isBot) {
+            this.scene.removePowerupColor(this.vehicleNumber)
+        }
     }
 
     setPowerup(powerup: Powerup) {
@@ -526,6 +529,9 @@ export class Vehicle implements IVehicle {
         clearTimeout(this.powerupTimeout)
         console.log("Power up", powerup)
         this.powerup = powerup
+        if (!this.isBot) {
+            this.scene.addPowerupColor(this.vehicleNumber, this.powerup.type)
+        }
         if (this.powerup.speedMult) {
             this.maxSpeedMult = this.powerup.speedMult
         }

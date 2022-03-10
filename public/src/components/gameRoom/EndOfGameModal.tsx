@@ -187,8 +187,8 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                   .{}
                   {!props.singleplayer && (
                     <>
-                      Won
-                      {data.medal?.coins.toFixed(0)} coins and{" "}
+                      {" "}
+                      Won {data.medal?.coins.toFixed(0)} coins and{" "}
                       {data.medal?.XP.toFixed(2)} XP.
                     </>
                   )}

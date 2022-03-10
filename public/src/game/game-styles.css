@@ -6,6 +6,10 @@
   color: white;
 }
 
+#game-info {
+  transition: 0.3s;
+}
+
 #fps-count {
   position: absolute;
   top: 0;
@@ -96,4 +100,16 @@
 
 .hidden-overflow {
   overflow: hidden;
+}
+
+.bad-power {
+  background-color: rgba(255, 0, 0, 0.18);
+}
+
+.good-power {
+  background-color: rgba(0, 255, 0, 0.1);
+}
+
+.view-div {
+  transition: 0.3s;
 }

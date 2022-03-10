@@ -5,7 +5,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../..
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
 import { IVehicleSettings } from "../../classes/User";
 import { hideLoadDiv } from "../../course/loadingManager";
-import { Powerup } from "../../course/PowerupBox";
+import { Powerup, PowerupType } from "../../course/PowerupBox";
 import { RaceCourse } from "../../course/RaceCourse";
 import { GameTime } from "../../game/GameTimeClass";
 import { IGameRoomActions } from "../../game/IGameScene";
@@ -191,6 +191,8 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             }
         }
     }
+
+
 
     async startRaceCountdown() {
 

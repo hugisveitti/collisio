@@ -10,7 +10,7 @@ import { isVehicle } from "../vehicles/LowPolyVehicle"
  * green is on you and good for you
  * purple is on others and bad for them
  */
-type PowerupType = "good" | "bad" | "others"
+export type PowerupType = "good" | "bad" | "others"
 type PowerupColor = "red" | "green" | "purple"
 export interface Powerup {
     name: string
@@ -116,7 +116,7 @@ export class PowerupBox {
     box: ExtendedObject3D
     gameScene: MyScene
     power: Powerup
-    dy = 0.02
+    dy = 0.025
     model: ExtendedObject3D
 
     active: boolean
@@ -164,12 +164,15 @@ export class PowerupBox {
 
     loadSounds() {
         getBeep("sound/powerup-good.ogg", this.gameScene.listener, (sound) => {
+            sound.setVolume(0.1)
             this.soundGood = sound
         })
         getBeep("sound/powerup-bad.ogg", this.gameScene.listener, (sound) => {
+            sound.setVolume(0.1)
             this.soundBad = sound
         })
         getBeep("sound/powerup-others.ogg", this.gameScene.listener, (sound) => {
+            sound.setVolume(0.1)
             this.soundOthers = sound
         })
     }
@@ -212,7 +215,7 @@ export class PowerupBox {
     update() {
         const p = this.model.position
         this.model.position.setY(p.y + this.dy)
-        if (p.y > this.position.y + 1.5 || p.y < this.position.y - .3) {
+        if (p.y > this.position.y + .5 || p.y < this.position.y - .3) {
             this.dy = -this.dy
         }
 

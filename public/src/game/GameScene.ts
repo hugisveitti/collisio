@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
-import { Powerup } from "../course/PowerupBox";
+import { Powerup, PowerupType } from "../course/PowerupBox";
 import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
@@ -399,6 +399,7 @@ export class GameScene extends MyScene implements IGameScene {
             const viewDivHeight = viewHeight * window.innerHeight
 
             const viewDiv = document.createElement("div")
+            viewDiv.classList.add("view-div")
             this.viewDivs.push(viewDiv)
             const nameInfo = document.createElement("span")
 
@@ -650,6 +651,26 @@ export class GameScene extends MyScene implements IGameScene {
             // change background color of view?
         }
     }
+
+    removePowerupColor(vehicleNumber: number) {
+        if (vehicleNumber < this.viewDivs.length) {
+
+            this.viewDivs[vehicleNumber].classList.remove("bad-power")
+            this.viewDivs[vehicleNumber].classList.remove("good-power")
+        }
+    }
+
+    addPowerupColor(vehicleNumber: number, power: PowerupType) {
+        if (vehicleNumber < this.viewDivs.length) {
+
+            if (power === "good") {
+                this.viewDivs[vehicleNumber].classList.add("good-power")
+            } else {
+                this.viewDivs[vehicleNumber].classList.add("bad-power")
+            }
+        }
+    }
+
 
     setGameSettings(gameSettings: IGameSettings) {
 
