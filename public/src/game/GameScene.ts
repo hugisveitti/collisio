@@ -638,7 +638,7 @@ export class GameScene extends MyScene implements IGameScene {
                 for (let i = 0; i < this.vehicles.length; i++) {
                     if (i !== idx) {
                         this.vehicles[i].setPowerup(powerup)
-                        this.setViewImportantInfo(`${powerup.name}`, idx, true, powerup.time)
+                        this.setViewImportantInfo(`${powerup.name}`, i, true, powerup.time)
                     } else {
                         this.setViewImportantInfo(`Opponents ${powerup.name}`, idx, true, powerup.time)
                     }

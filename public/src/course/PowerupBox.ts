@@ -38,10 +38,10 @@ const fasterPowerup: Powerup = {
 }
 
 const accelerationPowerup: Powerup = {
-    name: "Acceleration",
-    accelerationMult: 1.2,
+    name: "More Acceleration",
+    accelerationMult: 1.8,
     color: "green",
-    time: 5,
+    time: 7,
     type: "good",
     speedMult: 1.2,
 }
@@ -54,8 +54,20 @@ const slowerPowerup: Powerup = {
     type: "bad"
 }
 
+const outofControlPowerup: Powerup = {
+    name: "Turbo!!",
+    speedMult: 1.7,
+    noBreaks: true,
+    color: "purple",
+    onlyForward: true,
+    toOthers: true,
+    time: 1,
+    type: "others",
+    accelerationMult: 1.1,
+}
+
 const otherSlowerPowerup: Powerup = {
-    name: "Speed set to 0.5",
+    name: "Slower",
     speedMult: 0.5,
     color: "purple",
     toOthers: true,
@@ -68,7 +80,7 @@ const otherInvertedControllerPowerup: Powerup = {
     invertedController: true,
     color: "purple",
     toOthers: true,
-    time: 3,
+    time: 2,
     type: "others",
 }
 
@@ -83,20 +95,20 @@ const otherNoBreaksPowerup: Powerup = {
 }
 
 const otherOnlyForwardPowerup: Powerup = {
-    name: "Out of controls",
-    speedMult: 3,
+    name: "Turbo!!",
+    speedMult: 2.4,
     noBreaks: true,
     color: "purple",
     onlyForward: true,
     toOthers: true,
-    time: 1.5,
+    time: 1,
     type: "others",
     accelerationMult: 1.3,
 }
 
 
 const goodPowers = [fasterPowerup, accelerationPowerup]
-const badPowers = [slowerPowerup]
+const badPowers = [slowerPowerup, outofControlPowerup]
 const otherPowers = [otherSlowerPowerup, otherInvertedControllerPowerup, otherNoBreaksPowerup, otherOnlyForwardPowerup]
 const powers: Powerup[][] = [goodPowers, badPowers, otherPowers]
 
