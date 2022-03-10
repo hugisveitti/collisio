@@ -206,6 +206,7 @@ var Room = /** @class */ (function () {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            avgFps: 0,
             playersAdded: [],
             trackNames: []
         };
@@ -296,11 +297,12 @@ var Room = /** @class */ (function () {
     Room.prototype.setupPingListener = function () {
         var _this = this;
         this.socket.on(shared_stuff_1.dts_ping_test, function (_a) {
-            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten;
+            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten, avgFps = _a.avgFps;
             _this.dataCollection.roomTicks = (roomTicks || _this.dataCollection.roomTicks);
             _this.dataCollection.gameTicks = (gameTicks || _this.dataCollection.gameTicks);
             _this.dataCollection.totalPing = (totalPing || _this.dataCollection.totalPing);
             _this.dataCollection.totalPingsGotten = (totalPingsGotten || _this.dataCollection.totalPingsGotten);
+            _this.dataCollection.avgFps = (totalPingsGotten || _this.dataCollection.avgFps);
             _this.socket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
         });
     };

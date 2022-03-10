@@ -16,7 +16,7 @@ export interface IPlayerDataCollection {
     totalPingsGotten: number
     gameTicks: number
     roomTicks: number
-
+    avgFps: number
 }
 
 export interface MultiplayPlayerConfig {
@@ -96,6 +96,7 @@ export class MulitplayerPlayer {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            avgFps: 0,
         }
         this.posChanged = false
 
@@ -180,11 +181,12 @@ export class MulitplayerPlayer {
     }
 
     setupPingListener() {
-        this.desktopSocket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
+        this.desktopSocket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten, avgFps }) => {
             this.dataCollection.roomTicks = (roomTicks ?? 0)
             this.dataCollection.gameTicks = (gameTicks ?? 0)
             this.dataCollection.totalPing = (totalPing ?? 0)
             this.dataCollection.totalPingsGotten = (totalPingsGotten ?? 0)
+            this.dataCollection.avgFps = (avgFps ?? this.dataCollection.avgFps)
             this.desktopSocket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

@@ -31,10 +31,11 @@ var Player = /** @class */ (function () {
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
             numberOfRacesFinished: 0,
-            totalPing: 0,
-            totalPingsGotten: 0,
-            gameTicks: 0,
-            roomTicks: 0,
+            totalPing: -1,
+            totalPingsGotten: -1,
+            gameTicks: -1,
+            roomTicks: -1,
+            avgFps: -1,
         };
         this.mobileControls = new shared_stuff_1.MobileControls();
         this.VehicleControls = new shared_stuff_1.VehicleControls();

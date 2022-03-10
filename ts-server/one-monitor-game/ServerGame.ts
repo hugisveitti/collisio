@@ -223,6 +223,7 @@ interface IRoomDataCollection {
     roomTicks: number
     playersAdded: string[]
     trackNames: string[]
+    avgFps: number
 }
 
 export class Room {
@@ -269,6 +270,7 @@ export class Room {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            avgFps: 0,
             playersAdded: [],
             trackNames: []
         }
@@ -356,12 +358,13 @@ export class Room {
     }
 
     setupPingListener() {
-        this.socket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten }) => {
+        this.socket.on(dts_ping_test, ({ roomTicks, gameTicks, totalPing, totalPingsGotten, avgFps }) => {
 
             this.dataCollection.roomTicks = (roomTicks || this.dataCollection.roomTicks)
             this.dataCollection.gameTicks = (gameTicks || this.dataCollection.gameTicks)
             this.dataCollection.totalPing = (totalPing || this.dataCollection.totalPing)
             this.dataCollection.totalPingsGotten = (totalPingsGotten || this.dataCollection.totalPingsGotten)
+            this.dataCollection.avgFps = (totalPingsGotten || this.dataCollection.avgFps)
             this.socket.emit(std_ping_test_callback, { ping: "ping" })
         })
     }

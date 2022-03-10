@@ -48,6 +48,7 @@ var MulitplayerPlayer = /** @class */ (function () {
             totalPingsGotten: 0,
             gameTicks: 0,
             roomTicks: 0,
+            avgFps: 0,
         };
         this.posChanged = false;
         this.setupSocket();
@@ -126,11 +127,12 @@ var MulitplayerPlayer = /** @class */ (function () {
     MulitplayerPlayer.prototype.setupPingListener = function () {
         var _this = this;
         this.desktopSocket.on(shared_stuff_1.dts_ping_test, function (_a) {
-            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten;
+            var roomTicks = _a.roomTicks, gameTicks = _a.gameTicks, totalPing = _a.totalPing, totalPingsGotten = _a.totalPingsGotten, avgFps = _a.avgFps;
             _this.dataCollection.roomTicks = (roomTicks !== null && roomTicks !== void 0 ? roomTicks : 0);
             _this.dataCollection.gameTicks = (gameTicks !== null && gameTicks !== void 0 ? gameTicks : 0);
             _this.dataCollection.totalPing = (totalPing !== null && totalPing !== void 0 ? totalPing : 0);
             _this.dataCollection.totalPingsGotten = (totalPingsGotten !== null && totalPingsGotten !== void 0 ? totalPingsGotten : 0);
+            _this.dataCollection.avgFps = (avgFps !== null && avgFps !== void 0 ? avgFps : _this.dataCollection.avgFps);
             _this.desktopSocket.emit(shared_stuff_1.std_ping_test_callback, { ping: "ping" });
         });
     };
