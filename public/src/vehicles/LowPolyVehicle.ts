@@ -966,7 +966,7 @@ export class LowPolyVehicle extends Vehicle {
 
             // have these calls optional, since they are quite heavy for the machine, or maybe only perform every other tick?
             // only use vehicle assist if more than 30 fps
-            if (delta < 25 && !this.isBot) {
+            if (delta < 25 && !this.isBot && !this.scene.isLagging) {
 
                 this.checkIfSpinning()
                 this.vehicleAssist(false)

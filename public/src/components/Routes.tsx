@@ -184,7 +184,7 @@ const Routes = () => {
       const _gameSettings = getAllLocalGameSettings();
       store.setGameSettings(testGameSettings);
 
-      setPlayers([fakePlayer1, fakePlayer2, fakePlayer3, fakePlayer4]);
+      setPlayers([fakePlayer1, fakePlayer2]); //, fakePlayer3, fakePlayer4]);
       // setPlayers([fakePlayer1]);
       setPlayer(fakePlayer1);
 

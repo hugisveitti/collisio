@@ -301,13 +301,13 @@ const GameRoom = React.memo((props: IGameRoom) => {
           top: 0,
           right: 0,
           zIndex: 9999,
-          fontSize: 32,
+          fontSize: 64,
         }}
         onClick={() => {
           setSettingsModalOpen(!settingsModalOpen);
         }}
       >
-        <SettingsIcon />
+        <SettingsIcon fontSize="large" />
       </IconButton>
       <GameSettingsModal
         gameObject={gameObject}

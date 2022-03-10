@@ -203,7 +203,7 @@ export class Vehicle implements IVehicle {
    * @param cameraPos position of camera relative to the world
    */
     seeVehicle(cameraPos: Vector3) {
-        if (this.delta < 33) {
+        if (this.delta < 33 && !this.scene.isLagging) {
             this.scene.course.seeObject(cameraPos, this.getPosition()) // this.vehicleBody.position.clone())
         }
     }

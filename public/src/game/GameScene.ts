@@ -372,7 +372,8 @@ export class GameScene extends MyScene implements IGameScene {
             // maybe remove camera from warpSpeed ("-camera")
 
             const camera = i === n - 1 ? this.camera as PerspectiveCamera : new PerspectiveCamera(fov, (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight), 1, this.getDrawDistance())
-
+            camera.aspect = (window.innerWidth * viewWidth) / (window.innerHeight * viewHeight)
+            camera.updateProjectionMatrix()
             const view = {
                 left: viewLefts[i % 2],
                 bottom: viewBottoms[i],
@@ -639,7 +640,7 @@ export class GameScene extends MyScene implements IGameScene {
                         this.vehicles[i].setPowerup(powerup)
                         this.setViewImportantInfo(`${powerup.name}`, idx, true, powerup.time)
                     } else {
-                        this.setViewImportantInfo(`${powerup.name} to others`, idx, true, powerup.time)
+                        this.setViewImportantInfo(`Opponents ${powerup.name}`, idx, true, powerup.time)
                     }
                 }
                 this.bot?.setPowerup(powerup)
@@ -959,9 +960,9 @@ export class GameScene extends MyScene implements IGameScene {
             this.renderer.setClearColor(new Color(255, 255, 255))
 
 
-            // this.views[i].camera.aspect = width / height;
+            this.views[i].camera.aspect = width / height;
 
-            // this.views[i].camera.updateProjectionMatrix();
+            this.views[i].camera.updateProjectionMatrix();
 
             if (i === this.views.length - 1) {
                 this.renderer.shadowMap.needsUpdate = true

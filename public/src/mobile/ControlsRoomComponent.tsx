@@ -23,6 +23,7 @@ interface IControlsRoomComponent {
   raceMedalData: undefined | { coins: number; XP: number; medal: MedalType };
 }
 
+let isPortrait = false;
 const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   const controller = props.controller;
   const orientation = props.orientation;
@@ -35,15 +36,12 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   // change these colors!
   const downColor = "#ddd"; // blue4; // "#005c46";
   const upColor = "#111"; // orange2; // "#fcba03";
-  const [isPortrait, setIsPortrait] = useState(false);
-
-  const [steeringDirection, setSteeringDirection] = useState("");
 
   const handleDeviceOrientChange = () => {
     if (screen.orientation?.type) {
-      setIsPortrait(screen.orientation.type.slice(0, 8) === "portrait");
+      isPortrait = screen.orientation.type.slice(0, 8) === "portrait";
     } else {
-      setIsPortrait(window.orientation === 0);
+      isPortrait = window.orientation === 0;
     }
   };
 
@@ -64,7 +62,7 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
     }
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
-
+    controller.beta = Math.round(beta);
     if (isPortrait) {
       controller.beta = Math.round(beta);
     } else {

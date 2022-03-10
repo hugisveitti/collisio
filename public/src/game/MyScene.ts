@@ -81,6 +81,8 @@ export class MyScene extends Scene3D {
     beepC4: Audio
     listener: AudioListener
 
+    isLagging: boolean = false
+
     constructor() {
         super()
         // wake lock
@@ -253,7 +255,14 @@ export class MyScene extends Scene3D {
         if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused && this.isReady) {
             const time = this.clock.getElapsedTime()
             let delta = (this.updateDelta * 1000)
+            // console.log("this.deltaFPS > this.physics.config.fixedTimeStep", this.deltaFPS, this.physics.config.fixedTimeStep)
 
+            // maybe a bad metric if lagging
+            if (this.deltaFPS - this.physics.config.fixedTimeStep > 1 / 30) {
+                this.isLagging = true
+            } else {
+                this.isLagging = false
+            }
             this.updateDelta = 0
             this.deltaFPS = this.deltaFPS % this.physics.config.fixedTimeStep
 
