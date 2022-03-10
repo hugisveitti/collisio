@@ -195,7 +195,7 @@ var MultiplayerRoom = /** @class */ (function () {
         });
     };
     MultiplayerRoom.prototype.setRoomSettings = function (roomSettings) {
-        if (this.roomSettings.trackName !== roomSettings.trackName) {
+        if (this.roomSettings.trackName !== roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups) {
             this.setNeedsReload();
         }
         this.roomSettings = roomSettings;

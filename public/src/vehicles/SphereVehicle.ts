@@ -73,15 +73,16 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
 
     goForward(): void {
         if (!this._canDrive) return
-        this.zVel = -this.vehicleConfig.engineForce
+        this.zVel = (-this.vehicleConfig.engineForce * this.maxSpeedMult * this.accelerationMult)
     }
     goBackward(speed?: number): void {
         if (!this._canDrive) return
+        if (this.onlyForward) return
 
         if (this.zVel < 10) {
             this.zVel += 10
         } else {
-            this.zVel = this.vehicleConfig.engineForce
+            this.zVel = (this.vehicleConfig.engineForce * this.maxSpeedMult)
         }
     }
 
@@ -104,7 +105,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
     }
 
     turn(beta: number): void {
-        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
+        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber) * this.invertedContoller
         this.yRot %= (Math.PI * 2)
         this.yRot -= (angle * degToRad * this.steeringSensitivity * .3)
 
@@ -296,7 +297,7 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.vehicleBody.body.ammo.getCollisionShape().calculateLocalInertia(mass, this.vector)
     }
 
-    destroy() {
+    _destroy() {
         return new Promise<void>((resolve, reject) => {
             this.vehicleBody.clear()
             this.scene.destroy(this.vehicleBody)
@@ -313,6 +314,9 @@ export class SphereVehicle extends Vehicle { //implements IVehicle {
         this.delta = delta
         this.vehicleBody.body.setAngularVelocity(this.zVel * Math.cos(this.yRot) * .05, 0, this.zVel * Math.sin(this.yRot) * .05)
         this.vehicleBody.body.applyForce(-this.zVel * Math.sin(this.yRot), 0, this.zVel * Math.cos(this.yRot))
+        if (this.onlyForward) {
+            this.goForward()
+        }
     }
 }
 

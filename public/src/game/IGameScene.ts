@@ -1,11 +1,12 @@
 
-import { Scene3D } from "enable3d";
+import { ExtendedObject3D, Scene3D } from "enable3d";
 import { Socket } from "socket.io-client";
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IScoreInfo } from "../classes/Game";
 import { GraphicsType, IGameSettings, IRoomSettings } from "../classes/localGameSettings";
 import { Tournament } from "../classes/Tournament";
 import { IVehicleSettings } from "../classes/User";
 import { ICourse } from "../course/ICourse";
+import { Powerup } from "../course/PowerupBox";
 import { IPlayerInfo, MobileControls, TrackName, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 
@@ -20,6 +21,7 @@ export interface IGameRoomActions {
     updateScoreInfo?: (data: IScoreInfo) => void
     playerFinished?: (data: IEndOfRaceInfoPlayer) => void
     closeModals?: () => void
+
 }
 
 export interface IGameSceneConfig {
@@ -49,6 +51,7 @@ export interface IGameScene extends Scene3D {
     setVehicleSettings: (vehicleNumber: number, vehicleSettings: IVehicleSettings, vehicleSetup: VehicleSetup) => void
     getGraphicsType: () => GraphicsType
     saveDriveRecording: (playerId: string) => void
+    hitPowerup: (vehicle: ExtendedObject3D, powerup: Powerup) => void
 
     course: ICourse
     gameSceneConfig: IGameSceneConfig

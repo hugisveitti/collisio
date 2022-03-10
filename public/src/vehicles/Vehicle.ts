@@ -7,6 +7,7 @@ import { Audio, AudioListener, Color, MeshStandardMaterial, PerspectiveCamera, Q
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { defaultVehicleSettings, IVehicleSettings } from "../classes/User";
 import { CurrentItemProps } from "../components/showRoom/showRoomCanvas";
+import { Powerup } from "../course/PowerupBox";
 import { MyScene } from "../game/MyScene";
 import { defaultVehicleColorType, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { possibleVehicleItemTypes, possibleVehicleMods, vehicleItems, VehicleSetup } from "../shared-backend/vehicleItems";
@@ -94,6 +95,18 @@ export class Vehicle implements IVehicle {
     currentFov: number
     delta: number = 0
     isBot: boolean
+
+    /** Power up stuff */
+    powerup: Powerup | undefined
+
+    /** if more then can drive faster, if less can drive slower. */
+    maxSpeedMult: number = 1
+    invertedContoller: number = 1
+    accelerationMult: number = 1
+    noBreaks: boolean = false
+    onlyForward: boolean = false
+    powerupTimeout: NodeJS.Timeout
+
 
     constructor(config: IVehicleClassConfig) {
         this.skidVolume = 0
@@ -298,11 +311,17 @@ export class Vehicle implements IVehicle {
         changeVehicleBodyColor(this.vehicleBody, [this.vehicleColor as VehicleColorType])
     }
 
+    async _destroy() { }
+
     destroy() {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
+            await this._destroy()
+            clearTimeout(this.powerupTimeout)
             resolve()
         })
     };
+
+
     addModels(tires: ExtendedObject3D[], body: ExtendedObject3D) {
 
         return new Promise<void>((resolve, reject) => {
@@ -373,7 +392,6 @@ export class Vehicle implements IVehicle {
         if (this.isPaused) return
         this.engineSound.setVolume(0.25)
         if (this.engineSound && !this.engineSound?.isPlaying && this.useSoundEffects) {
-            console.log("starting sound")
             this.engineSound.play()
         }
     }
@@ -399,7 +417,6 @@ export class Vehicle implements IVehicle {
         batch.push(
 
             loadEngineSoundBuffer().then((engineSoundBuffer: AudioBuffer) => {
-                console.log("loding engine ound buffer")
                 try {
 
                     this.engineSound.setBuffer(engineSoundBuffer)
@@ -440,7 +457,6 @@ export class Vehicle implements IVehicle {
 
         Promise.all(batch).then(() => {
             this.engineSoundLoaded = true
-            console.log("loadined engine soudn")
         })
 
     }
@@ -494,6 +510,44 @@ export class Vehicle implements IVehicle {
             }
         }
         return true
+    }
+
+    clearPowerups() {
+        this.invertedContoller = 1
+        this.noBreaks = false
+        this.maxSpeedMult = 1
+        this.onlyForward = false
+        this.accelerationMult = 1
+        this.powerup = undefined
+    }
+
+    setPowerup(powerup: Powerup) {
+        this.clearPowerups()
+        clearTimeout(this.powerupTimeout)
+        console.log("Power up", powerup)
+        this.powerup = powerup
+        if (this.powerup.speedMult) {
+            this.maxSpeedMult = this.powerup.speedMult
+        }
+
+        if (this.powerup.invertedController) {
+            this.invertedContoller = -1
+        }
+
+        this.noBreaks = !!this.powerup.noBreaks
+        this.onlyForward = !!this.powerup.onlyForward
+
+        if (this.powerup.accelerationMult) {
+
+            this.accelerationMult = this.accelerationMult
+        }
+
+        this.powerupTimeout = setTimeout(() => {
+            this.clearPowerups()
+        }, this.powerup.time * 1000)
+
+
+
     }
 
 }

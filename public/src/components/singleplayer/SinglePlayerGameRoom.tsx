@@ -85,7 +85,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     const vehicleSetup =
       props.store.vehiclesSetup?.[vehicleType] ??
       defaultVehiclesSetup[vehicleType];
-    console.log("starting game", user);
+
     const player: IPlayerInfo = props.store.player ?? {
       id: user?.uid ?? getLocalUid(),
       playerName: user?.displayName ?? "Guest",

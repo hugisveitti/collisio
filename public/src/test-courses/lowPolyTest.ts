@@ -1,34 +1,31 @@
 import { ExtendedObject3D, PhysicsLoader, Project, THREE } from "enable3d"
-import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { getGameTypeFromTrackName } from "../classes/Game"
 import { BotDifficulty, defaultGameSettings, getLocalGameSetting, IGameSettings } from "../classes/localGameSettings"
+import { hideLoadDiv } from "../course/loadingManager"
+import { Powerup } from "../course/PowerupBox"
 import { RaceCourse } from "../course/RaceCourse"
 import { StoryCourse } from "../course/StoryCourse"
 import { Coin, itColor, notItColor, TagCourse } from "../course/TagCourse"
 import "../game/game-styles.css"
 import { GameScene } from "../game/GameScene"
 import { GameTime } from "../game/GameTimeClass"
-import { allVehicleTypes, defaultVehicleColorType, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { allVehicleTypes, defaultVehicleType, GameType, MobileControls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleControls, VehicleType } from "../shared-backend/shared-stuff"
+import { BotVehicle } from "../vehicles/BotVehicle"
 import { GhostVehicle, IGhostVehicle } from "../vehicles/GhostVehicle"
 import { ITestVehicle } from "../vehicles/IVehicle"
 import { LowPolyTestVehicle } from "../vehicles/LowPolyTestVehicle"
 import { getVehicleNumber, isVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle"
 import { SphereTestVehicle } from "../vehicles/SphereTestVehicle"
 import { loadSphereModel } from "../vehicles/SphereVehicle"
+import { IVehicleClassConfig } from "../vehicles/Vehicle"
 import { getVehicleClassFromType } from "../vehicles/VehicleConfigs"
 import { getWagonNumber, isWagon } from "../vehicles/Wagon"
+import { DriveRecorder, GhostDriver } from "./GhostDriver"
 import "./lowPolyTest.css"
 import { addTestControls } from "./testControls"
-import { DriveRecorder, GhostDriver } from "./GhostDriver"
 import { createTestVehicleInputs } from "./testVehicleInputs"
-import { defaultVehicleSettings, IVehicleSettings } from "../classes/User"
-import { ItemProperties, vehicleItems } from "../shared-backend/vehicleItems"
-import { BotVehicle } from "../vehicles/BotVehicle"
-import { IVehicleClassConfig } from "../vehicles/Vehicle"
-import { hideLoadDiv } from "../course/loadingManager"
-import { driveVehicleWithKeyboard } from "../utils/controls"
 
 const vechicleFov = 60
 
@@ -481,6 +478,22 @@ export class LowPolyTestScene extends GameScene {
                 helper(0)
             }
         })
+    }
+
+    hitPowerup(vehicle: ExtendedObject3D, powerup: Powerup) {
+        const idx = getVehicleNumber(vehicle.name)
+
+        if (idx === 0) {
+            if (powerup.toOthers) {
+                this.showSecondaryInfo(`${powerup.name} to others`, true, powerup.time)
+                this.bot.setPowerup(powerup)
+            } else {
+
+                this.vehicle.setPowerup(powerup)
+                // change background color of view?
+                this.showSecondaryInfo(`${powerup.name}`, true, powerup.time)
+            }
+        }
     }
 
     changeTrack(trackName: TrackName) {

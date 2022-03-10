@@ -2,6 +2,7 @@ import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
 import { Object3D, PointLight, MeshStandardMaterial, Matrix3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { yellow2 } from "../providers/theme";
+import { getStaticPath } from "../utils/settings";
 import { Course } from "./Course";
 import "./course.css";
 import { gameItems, keyNameMatch } from "./GameItems";
@@ -241,3 +242,16 @@ export const notSeeThroughObjects = [
     "sheep",
     "water"
 ]
+
+
+export const loadPowerbox = () => {
+    return new Promise<ExtendedObject3D>((resolve, reject) => {
+
+
+        const loader = new GLTFLoader()
+        loader.loadAsync(getStaticPath(`models/power-box.glb`)).then(gltf => {
+            resolve(gltf.scene.children[0] as ExtendedObject3D)
+            return
+        })
+    })
+}

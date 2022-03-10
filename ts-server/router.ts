@@ -140,6 +140,7 @@ const router = (app: any) => {
     app.get("/controls", sendIndexHTML);
     app.get("/how-to-play", sendIndexHTML);
     app.get("/highscores", sendIndexHTML);
+    app.get("/highscores/*", sendIndexHTML);
     app.get("/private-profile", sendIndexHTML);
     app.get("/user/:id", sendIndexHTML);
     app.get("/show-room", sendIndexHTML);

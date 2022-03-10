@@ -462,7 +462,7 @@ export class LowPolyVehicle extends Vehicle {
         const kmh = this.getCurrentSpeedKmHour(0)
         let eF = this.engineForce
         // if (kmh > this.vehicleConfig.maxSpeed + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
-        if (kmh > 10 + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)))) {
+        if (kmh > 10 + (this.extraSpeedScaler(Math.log2(this.maxSpeedTime)) * this.maxSpeedMult)) {
             //  if (kmh > this.vehicleConfig.maxSpeed + (this.maxSpeedTime / (16 * 10))) {
 
             eF = 0 // -500
@@ -490,7 +490,7 @@ export class LowPolyVehicle extends Vehicle {
             this.currentEngineForce = possibleEf
         }
 
-        eF = this.currentEngineForce
+        eF = this.currentEngineForce * this.accelerationMult
 
         if (this.is4x4) {
             this.vehicle.applyEngineForce(eF, FRONT_LEFT)
@@ -505,10 +505,13 @@ export class LowPolyVehicle extends Vehicle {
 
 
     goBackward() {
+        if (this.onlyForward) return
+
         if (!this._canDrive) {
             this.break()
             return
         }
+
         let eF = -this.engineForce
         if (this.getCurrentSpeedKmHour(0) > 10) {
             this.decreaseMaxSpeedTicks()
@@ -568,7 +571,7 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     turn(beta: number) {
-        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber)
+        const angle = getSteerAngleFromBeta(beta, this.vehicleSettings.noSteerNumber) * this.invertedContoller
         if (this._canDrive) {
             const absSteer = Math.abs(angle * degToRad * this.steeringSensitivity)
             const steer = Math.min(absSteer, this.vehicleConfig.maxSteeringAngle) * Math.sign(angle)
@@ -581,7 +584,7 @@ export class LowPolyVehicle extends Vehicle {
     };
 
     break(notBreak?: boolean) {
-
+        if (this.noBreaks) return
 
 
         let breakForce = !!notBreak ? 0 : this.breakingForce
@@ -984,6 +987,10 @@ export class LowPolyVehicle extends Vehicle {
         if (this.vehicleBody.position.y < -20) {
             this.resetPosition()
         }
+
+        if (this.onlyForward) {
+            this.goForward()
+        }
     };
 
 
@@ -1223,7 +1230,7 @@ export class LowPolyVehicle extends Vehicle {
                 resolve()
             } catch (err) {
 
-                console.warn("Error destorying:", name, "err:", err)
+                console.warn("Error destroying:", name, "err:", err)
                 resolve()
 
             }
@@ -1238,7 +1245,7 @@ export class LowPolyVehicle extends Vehicle {
         this.smokeParticles = []
     }
 
-    async destroy() {
+    async _destroy() {
         new Promise<void>(async (resolve, reject) => {
             this.stop()
             const p = this.getPosition()

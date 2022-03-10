@@ -9,7 +9,7 @@ import { getDeviceType, getStaticPath } from "../utils/settings";
 
 export const loadEngineSoundBuffer = (): Promise<AudioBuffer> => {
     const audioLoader = new AudioLoader();
-    let engineSoundPath = "engine.mp3"
+    let engineSoundPath = "engine.ogg"
     //   let engineSoundPath = "f1engine2.mp3" // "engine.mp3"
     return new Promise((resolve, reject) => {
         audioLoader.load(getStaticPath(`sound/${engineSoundPath}`), (buffer: AudioBuffer) => {
@@ -42,7 +42,7 @@ export const getBeep = async (path: string, listener: AudioListener, callback: (
         const sound = new Audio(listener)
         sound.setBuffer(buffer)
         sound.setLoop(false)
-        sound.setVolume(0.5)
+        sound.setVolume(0.25)
         callback(sound)
     })
 }

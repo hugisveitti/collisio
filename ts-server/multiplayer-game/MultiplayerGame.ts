@@ -205,7 +205,7 @@ export class MultiplayerRoom {
     }
 
     setRoomSettings(roomSettings: any) {
-        if (this.roomSettings.trackName !== roomSettings.trackName) {
+        if (this.roomSettings.trackName !== roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups) {
             this.setNeedsReload()
         }
         this.roomSettings = roomSettings

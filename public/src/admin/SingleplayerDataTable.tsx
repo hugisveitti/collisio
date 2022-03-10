@@ -42,9 +42,12 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         <TableCell>{props.roomInfo.roomSettings?.trackName}</TableCell>
         <TableCell>{props.roomInfo.roomSettings?.numberOfLaps}</TableCell>
         <TableCell>{props.roomInfo.country}</TableCell>
+        <TableCell>
+          {props.roomInfo.mobileOnly ? "Mobile only" : "Keyboard"}
+        </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open}>
             <List>
               {keys.map((k) => {
@@ -91,6 +94,7 @@ const SingleplayerDataTable = (props: ISingleplayerDataTable) => {
             <TableCell component="th">Trackname</TableCell>
             <TableCell component="th">Number of laps</TableCell>
             <TableCell component="th">Country</TableCell>
+            <TableCell component="th">Mobile only</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

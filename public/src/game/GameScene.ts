@@ -5,12 +5,13 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { IUserSettings, IVehicleSettings } from "../classes/User";
+import { Powerup } from "../course/PowerupBox";
 import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
 import { IVehicle } from "../vehicles/IVehicle";
-import { loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
+import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../vehicles/SphereVehicle";
 import { IVehicleClassConfig } from "../vehicles/Vehicle";
 import { getVehicleClassFromType } from '../vehicles/VehicleConfigs';
@@ -316,13 +317,13 @@ export class GameScene extends MyScene implements IGameScene {
      * @param clear if the function should handle clearing the text using a time out
      * 
      */
-    setViewImportantInfo(info: string, i: number, clear?: boolean) {
+    setViewImportantInfo(info: string, i: number, clear?: boolean, secs?: number) {
         // this.viewsImpornantInfo[i].textContent = info
         this.viewsImpornantInfo[i].textContent = info
         if (clear) {
             this.viewsImpornantInfoClearTimeout[i] = setTimeout(() => {
                 this.clearViewImportantInfo(i)
-            }, fadeSecs * 1000)
+            }, (secs ?? fadeSecs) * 1000)
         }
     }
 
@@ -453,7 +454,7 @@ export class GameScene extends MyScene implements IGameScene {
             imporantViewInfo.setAttribute("style", `
                 position:absolute;
                 left:50%;
-                bottom:50%;
+                bottom:70%;
                 font-size:32px;
                 transform:translate(-50%,-25px);
                 text-align:center;
@@ -616,7 +617,7 @@ export class GameScene extends MyScene implements IGameScene {
     _setRoomSettings() { }
 
     setRoomSettings(roomSettings: IRoomSettings) {
-        if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
+        if (this.courseLoaded && (this.getTrackName() !== roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups)) {
             this.setNeedsReload(true)
         }
         this.roomSettings = roomSettings
@@ -626,6 +627,28 @@ export class GameScene extends MyScene implements IGameScene {
             }
         }
         this._setRoomSettings()
+    }
+
+    hitPowerup(vehicle: ExtendedObject3D, powerup: Powerup) {
+        const idx = getVehicleNumber(vehicle.name)
+        if (idx < this.vehicles.length) {
+            if (powerup.toOthers) {
+                for (let i = 0; i < this.vehicles.length; i++) {
+                    if (i !== idx) {
+                        this.vehicles[i].setPowerup(powerup)
+                        this.setViewImportantInfo(`${powerup.name}`, idx, true, powerup.time)
+                    } else {
+                        this.setViewImportantInfo(`${powerup.name} to others`, idx, true, powerup.time)
+                    }
+                }
+                this.bot?.setPowerup(powerup)
+            } else {
+
+                this.vehicles[idx].setPowerup(powerup)
+                this.setViewImportantInfo(`${powerup.name}`, idx, true, powerup.time)
+            }
+            // change background color of view?
+        }
     }
 
     setGameSettings(gameSettings: IGameSettings) {
@@ -653,7 +676,7 @@ export class GameScene extends MyScene implements IGameScene {
         this.toggleUseSound()
 
         setMusicVolume(gameSettings.musicVolume)
-        if (gameSettings.musicVolume > 0) {
+        if (gameSettings.musicVolume > 0 && !this.isPaused) {
             this.startGameSong()
         }
 
@@ -920,9 +943,10 @@ export class GameScene extends MyScene implements IGameScene {
             // this.views[i].camera.updateProjectionMatrix();
 
             if (i === this.views.length - 1) {
-                //     this.renderer.shadowMap.needsUpdate = true
+                this.renderer.shadowMap.needsUpdate = true
                 this.renderer.info.reset()
                 this.renderer.clear()
+
             } else {
                 this.renderer.shadowMap.needsUpdate = false
                 //       this.renderer.compile(this.scene, this.views[i].camera);

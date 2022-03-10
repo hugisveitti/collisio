@@ -56,7 +56,7 @@ export const isIphone = () => {
 }
 
 // this will only work on my network
-export const inDevelopment = false//window.location.href.includes("127.0.0.1") || window.location.href.includes("localhost") || window.location.href.includes("192.168")
+export const inDevelopment = window.location.href.includes("127.0.0.1") || window.location.href.includes("localhost") || window.location.href.includes("192.168")
 
 /** test mode means:
  * Not being redirected from pages
@@ -68,7 +68,7 @@ export const inTestMode = false
 export const testGameSettings: IGameSettings = {
     botDifficulty: "medium",
     useShadows: true,
-    useSound: false,
+    useSound: true,
     graphics: "high",
     drawDistance: 5000,
     record: false,
@@ -80,8 +80,9 @@ export const testGameSettings: IGameSettings = {
 export const testRoomSettings: IRoomSettings = {
     gameType: "race",
     numberOfLaps: 2,
-    trackName: "sea-side-track",
-    tagGameLength: 2
+    trackName: "basic-track1",
+    tagGameLength: 2,
+    usePowerups: true
 }
 
 

@@ -1,21 +1,19 @@
 /** class that TrafficSchoolCourse and RaceCourse extend */
 import ExtendedObject3D from "@enable3d/common/dist/extendedObject3D";
-import { Euler, Group, MeshStandardMaterial, Object3D, RGBAFormat, PointLight, Quaternion, Raycaster, Vector2, Vector3 } from "three";
+import { Euler, Group, MeshStandardMaterial, Object3D, PointLight, Quaternion, Raycaster, RGBAFormat, Vector3 } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { GameScene } from "../game/GameScene";
 import { MyScene } from "../game/MyScene";
 import { TrackName } from "../shared-backend/shared-stuff";
 import { getStaticPath } from "../utils/settings";
-import { itemInArray, shuffleArray, substrArrayInString } from "../utils/utilFunctions";
-import { GhostVehicle } from "../vehicles/GhostVehicle";
-import { IPositionRotation, IVehicle, SimpleVector } from "../vehicles/IVehicle";
+import { shuffleArray, substrArrayInString } from "../utils/utilFunctions";
+import { IPositionRotation, IVehicle } from "../vehicles/IVehicle";
 import { getVehicleNumber, isVehicle } from "../vehicles/LowPolyVehicle";
-import { Vehicle } from "../vehicles/Vehicle";
 import "./course.css";
-import { CourseItemsLoader, notSeeThroughObjects } from "./CourseItemsLoader";
+import { CourseItemsLoader, loadPowerbox, notSeeThroughObjects } from "./CourseItemsLoader";
 import { gameItems, keyNameMatch } from "./GameItems";
 import { ICourse } from "./ICourse";
 import { courseManager, setLoaderProgress } from "./loadingManager";
+import { PowerupBox } from "./PowerupBox";
 
 
 
@@ -68,6 +66,7 @@ export class Course implements ICourse {
 
     ray = new Raycaster()
     botDirections: Object3D[]
+    powerBoxes: PowerupBox[]
 
     constructor(gameScene: MyScene, trackName: TrackName) {
         this.gameScene = gameScene
@@ -89,6 +88,7 @@ export class Course implements ICourse {
         this.botDirections = []
         this.asteroids = []
         this.asteroidsOriginalPosition = []
+        this.powerBoxes = []
     }
 
 
@@ -101,12 +101,15 @@ export class Course implements ICourse {
                 }
             }
         }
-
         for (let light of this.lights) {
             light.castShadow = useShadows
             if (useShadows) {
                 light.shadow.bias = 0.01
             }
+        }
+
+        for (let box of this.powerBoxes) {
+            box.toggleShadow(useShadows)
         }
     }
 
@@ -175,6 +178,39 @@ export class Course implements ICourse {
         return false
     }
 
+
+
+    async createPowerBoxes() {
+        return new Promise<void>(async (resolve, reject) => {
+            if (!this.gameScene.roomSettings.usePowerups) {
+                resolve()
+                return
+            }
+            this.powerBoxes = []
+            const boxObj = await loadPowerbox()
+
+            // place powerup every 5 bot dir?
+            for (let i = 2; i < this.botDirections.length; i = i + 7) {
+
+                this.powerBoxes.push(new PowerupBox(this.botDirections[i].position.clone(), boxObj.clone(), this.gameScene))
+
+                if (i + 1 < this.botDirections.length - 1) {
+
+                    const q = this.calcSpawnAngle(this.botDirections[i].position, this.botDirections[i + 1].position)
+                    const alpha = 2 * Math.asin(q.y)
+                    const offSet = 10
+                    const nextToPos = new Vector3(
+                        this.botDirections[i].position.x - ((Math.sin(alpha + Math.PI / 2) * (offSet)) * Math.sign(q.w)),
+                        this.botDirections[i].position.y,
+                        this.botDirections[i].position.z - ((Math.cos(alpha + Math.PI / 2) * (offSet)))
+                    )
+                    this.powerBoxes.push(new PowerupBox(nextToPos, boxObj.clone(), this.gameScene))
+                }
+            }
+            resolve()
+        })
+    }
+
     async createCourse(): Promise<void> {
 
         const loader = new GLTFLoader(courseManager)
@@ -220,6 +256,9 @@ export class Course implements ICourse {
                 for (let ast of this.asteroids) {
                     this.asteroidsOriginalPosition.push(ast.position.clone())
                 }
+                this.botDirections.sort((a, b) => +a.name.split("-")[1] > +b.name.split("-")[1] ? 1 : -1)
+
+                await this.createPowerBoxes()
 
                 resolve()
             })
@@ -384,13 +423,16 @@ export class Course implements ICourse {
         for (let obj of this.gamePhysicsObjects) {
             this.gameScene.destroy(obj)
         }
+
+        for (let box of this.powerBoxes) {
+            box.destroy()
+        }
     }
 
     restartCourse() {
 
         const info = gameItems["asteroid"]
         for (let i = 0; i < this.asteroids.length; i++) {
-
 
             this.gameScene.physics.destroy(this.asteroids[i].body)
             this.asteroids[i].position.set(this.asteroidsOriginalPosition[i].x, this.asteroidsOriginalPosition[i].y, this.asteroidsOriginalPosition[i].z)
@@ -578,6 +620,11 @@ export class Course implements ICourse {
                 }
             }
         }
+
+        for (let box of this.powerBoxes) {
+            box.update()
+        }
+
         this._updateCourse()
     }
     _updateCourse() {

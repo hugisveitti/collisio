@@ -541,7 +541,7 @@ export class MultiplayerRaceGameScene extends MyScene implements IMultiplayerRac
     }
 
     setRoomSettings(roomSettings: IRoomSettings) {
-        if (this.courseLoaded && this.getTrackName() !== roomSettings.trackName) {
+        if (this.courseLoaded && (this.getTrackName() !== roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups)) {
             this.setNeedsReload(true)
         }
         this.roomSettings = roomSettings

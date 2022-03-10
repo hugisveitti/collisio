@@ -5,6 +5,7 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../..
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
 import { IVehicleSettings } from "../../classes/User";
 import { hideLoadDiv } from "../../course/loadingManager";
+import { Powerup } from "../../course/PowerupBox";
 import { RaceCourse } from "../../course/RaceCourse";
 import { GameTime } from "../../game/GameTimeClass";
 import { IGameRoomActions } from "../../game/IGameScene";
@@ -16,7 +17,7 @@ import { addKeyboardControls, driveVehicleWithKeyboard } from "../../utils/contr
 import { getDateNow } from "../../utils/utilFunctions";
 import { BotVehicle } from "../../vehicles/BotVehicle";
 import { IVehicle } from "../../vehicles/IVehicle";
-import { loadLowPolyVehicleModels, LowPolyVehicle } from "../../vehicles/LowPolyVehicle";
+import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../../vehicles/LowPolyVehicle";
 import { loadSphereModel, SphereVehicle } from "../../vehicles/SphereVehicle";
 import { IVehicleClassConfig } from "../../vehicles/Vehicle";
 import { getVehicleClassFromType } from "../../vehicles/VehicleConfigs";
@@ -175,6 +176,21 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         }
     }
 
+    hitPowerup(vehicle: ExtendedObject3D, powerup: Powerup) {
+        const idx = getVehicleNumber(vehicle.name)
+
+        if (idx === 0) {
+            if (powerup.toOthers) {
+                this.showSecondaryInfo(`${powerup.name} to others`, true, powerup.time)
+                this.bot.setPowerup(powerup)
+            } else {
+
+                this.vehicle.setPowerup(powerup)
+                // change background color of view?
+                this.showSecondaryInfo(`${powerup.name}`, true, powerup.time)
+            }
+        }
+    }
 
     async startRaceCountdown() {
 
@@ -400,7 +416,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     setRoomSettings(roomSettings: IRoomSettings) {
-        if (roomSettings.trackName !== this.config.roomSettings.trackName) {
+        if (roomSettings.trackName !== this.config.roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups) {
             this.setNeedsReload(true)
         }
         this.roomSettings = roomSettings
@@ -408,7 +424,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     toggleUseSound() {
-        console.log("toggle use sound", this.useSound)
         this.vehicle?.toggleSound(this.useSound)
     }
 

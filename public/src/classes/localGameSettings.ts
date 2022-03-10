@@ -21,6 +21,7 @@ export interface IRoomSettings {
     gameType: GameType
     tournamentId?: string
     tagGameLength: number
+    usePowerups: boolean
 }
 
 /**
@@ -60,6 +61,7 @@ export const defaultRoomSettings: IRoomSettings = {
     tagGameLength: 2,
     trackName: Math.random() < .5 ? "basic-track1" : "nurn-track",
     gameType: "race",
+    usePowerups: true
 }
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {

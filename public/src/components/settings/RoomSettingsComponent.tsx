@@ -103,6 +103,20 @@ const RoomSettingsComponent = (props: IRoomSettingsComponent) => {
               }}
             />
           </Grid>
+          <Grid item xs={12} lg={4} xl={4}>
+            <MyRadio<boolean>
+              checked={props.roomSettings.usePowerups}
+              label="Use powerups?"
+              onChange={(val) => {
+                updateRoomSettings("usePowerups", val);
+              }}
+              options={[
+                { label: "Yes", value: true },
+                { label: "No", value: false },
+              ]}
+              disabled={disableInputs}
+            />
+          </Grid>
         </React.Fragment>
       );
     }

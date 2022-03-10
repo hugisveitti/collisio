@@ -1,3 +1,4 @@
+import { Timestamp } from "@firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -16,7 +17,10 @@ import EndOfGameModal, {
 import { frontPagePath } from "../components/Routes";
 import { IStore } from "../components/store";
 import DeviceOrientationPermissionComponent from "../components/waitingRoom/DeviceOrientationPermissionComponent";
-import { getDBUserSettings } from "../firebase/firestoreFunctions";
+import {
+  getDBUserSettings,
+  saveSinglePlayerData,
+} from "../firebase/firestoreFunctions";
 import {
   saveBestRaceData,
   saveRaceDataGame,
@@ -34,7 +38,11 @@ import {
   IPlayerInfo,
   MobileControls,
 } from "../shared-backend/shared-stuff";
-import { disconnectSocket, getSocket } from "../utils/connectSocket";
+import {
+  disconnectSocket,
+  getCountryInfo,
+  getSocket,
+} from "../utils/connectSocket";
 import { isIphone } from "../utils/settings";
 import { getRandomItem, getSteerAngleFromBeta } from "../utils/utilFunctions";
 import "./MobileExperiment.css";
@@ -175,6 +183,18 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
             };
 
             props.store.setPlayer(player);
+            props.store.setPlayers([player]);
+            getCountryInfo().then((res) => {
+              saveSinglePlayerData({
+                country: res.country,
+                inEurope: res.inEurope,
+                player,
+                roomSettings: props.store.roomSettings,
+                gameSettings: props.store.gameSettings,
+                onlyMobile: true,
+                date: Timestamp.now(),
+              });
+            });
           });
         })
         .catch(() => {

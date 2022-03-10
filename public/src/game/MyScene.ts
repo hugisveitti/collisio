@@ -1,4 +1,4 @@
-import { Scene3D } from "enable3d";
+import { ExtendedObject3D, Scene3D } from "enable3d";
 import { toast } from "react-toastify";
 import { Socket } from "socket.io-client";
 import { Audio, AudioListener, AmbientLight, PerspectiveCamera, SpotLight, HemisphereLightHelper, BackSide, Color, Fog, HemisphereLight, Mesh, PointLight, ShaderMaterial, SphereGeometry } from "three";
@@ -6,6 +6,7 @@ import { getRaceSong, getTimeOfDay, getTimeOfDayColors, getTrackInfo } from "../
 import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings } from '../classes/localGameSettings';
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
+import { Powerup } from "../course/PowerupBox";
 import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
 import { getBeep, removeMusic, stopMusic } from "../sounds/gameSounds";
 import { removeKeyboardControls } from "../utils/controls";
@@ -78,6 +79,7 @@ export class MyScene extends Scene3D {
 
     beepE4: Audio
     beepC4: Audio
+    listener: AudioListener
 
     constructor() {
         super()
@@ -156,6 +158,8 @@ export class MyScene extends Scene3D {
         document.body.classList.add("hidden-overflow")
     }
 
+    hitPowerup(vehicle: ExtendedObject3D, powerup: Powerup) { }
+
     _handleResizeWindow() { }
 
     handleResizeWindow() {
@@ -177,14 +181,14 @@ export class MyScene extends Scene3D {
         this.physics.setGravity(0, -9.82, 0)
         // this.physics.setGravity(0, -2, 0)
 
-        const listener = new AudioListener()
-        this.camera.add(listener)
+        this.listener = new AudioListener()
+        this.camera.add(this.listener)
 
-        getBeep(getStaticPath("sound/beepC4.mp3"), listener, (beepC4) => {
+        getBeep(getStaticPath("sound/beepC4.mp3"), this.listener, (beepC4) => {
             this.beepC4 = beepC4
         })
 
-        getBeep(getStaticPath("sound/beepE4.mp3"), listener, (beepE4) => {
+        getBeep(getStaticPath("sound/beepE4.mp3"), this.listener, (beepE4) => {
             this.beepE4 = beepE4
         })
     }
@@ -331,39 +335,20 @@ export class MyScene extends Scene3D {
         //  this.pLight = new PointLight(0xffffff, 1, 0, 1)
         // maybe if night then dont show shadows?
         this.pLight = new PointLight(0xffffff, pointLightIntesity, 0, 2)
-        this.pLight.scale.set(10000, 10000, 10000)
+
         //this.pLight.position.set(100, 150, 100);
         this.pLight.position.set(100, 500, 100);
         this.pLight.shadow.camera.far = 2500
-        window.addEventListener("keypress", (e) => {
-            if (e.key === "j") {
-                const p = this.pLight.position
-                this.pLight.position.set(p.x, p.y + 10, p.z)
-            } else if (e.key === "f") {
-                const p = this.pLight.position
-                this.pLight.position.set(p.x, p.y - 10, p.z)
-            }
-        })
+
 
         if (this.useShadows && this.timeOfDay !== "night") {
             this.pLight.castShadow = true
             this.pLight.shadow.bias = 0.01
         }
-        this.pLight.shadow.mapSize.height = 2048
-        this.pLight.shadow.mapSize.width = 2048
+        // this.pLight.shadow.mapSize.height = 2048
+        // this.pLight.shadow.mapSize.width = 2048
 
         this.scene.add(this.pLight)
-
-        // const pLight = new PointLight(0xffffff, pointLightIntesity, 0, 1)
-        // pLight.position.set(-200, 150, -200);
-
-        // if (this.useShadows && this.timeOfDay === "day") {
-        //     pLight.castShadow = true
-        //     pLight.shadow.bias = 0.01
-        // }
-        // this.scene.add(pLight)
-
-
 
 
         const hLight = new HemisphereLight(hemisphereTopColor, 1)
@@ -490,7 +475,7 @@ export class MyScene extends Scene3D {
         }
     }
 
-    showSecondaryInfo(text: string, clear?: boolean) {
+    showSecondaryInfo(text: string, clear?: boolean, secs?: number) {
         clearInterval(this.secondaryInfoTimeout)
         if (this.secondaryInfoDiv) {
             this.secondaryInfoDiv.textContent = text
@@ -498,7 +483,7 @@ export class MyScene extends Scene3D {
         if (clear) {
             this.secondaryInfoTimeout = setTimeout(() => {
                 this.clearSecondaryInfo()
-            }, fadeSecs * 1000)
+            }, (secs ?? fadeSecs) * 1000)
         }
     }
 
