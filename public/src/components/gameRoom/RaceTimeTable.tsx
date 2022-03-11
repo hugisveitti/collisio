@@ -1,13 +1,12 @@
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-import TableCell from "@mui/material/TableCell";
-import TableRow from "@mui/material/TableRow";
 import Table from "@mui/material/Table";
-import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import React from "react";
 import { IRaceTimeInfo } from "../../classes/Game";
-import { getStyledColors, inputBackgroundColor } from "../../providers/theme";
+import { getStyledColors } from "../../providers/theme";
 
 const sortRaceTimeInfo = (raceTimeInfo: IRaceTimeInfo[]) => {
   return raceTimeInfo.sort((a, b) => a.totalTime - b.totalTime);
@@ -70,6 +69,13 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
                 </TableCell>
               </>
             )}
+            <TableCell
+              size={!props.isEndOfGame ? "small" : "medium"}
+              align="right"
+              style={cellStyle}
+            >
+              Points
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -105,6 +111,7 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
                     >
                       {timeInfo.totalTime.toFixed(2)}
                     </TableCell>
+                    <TableCell>{timeInfo.points}</TableCell>
                   </>
                 )}
               </TableRow>

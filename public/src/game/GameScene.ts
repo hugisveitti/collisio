@@ -479,10 +479,10 @@ export class GameScene extends MyScene implements IGameScene {
             transform:translate(${nameRight}%, -${nameTop}%);
             transition:2s;
             `)
-            const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
 
 
             setTimeout(() => {
+                const pName = this.players[i].playerName.toUpperCase().slice(0, 3)
                 nameInfo.textContent = pName
                 nameInfo.setAttribute("style", `
                     position:absolute;

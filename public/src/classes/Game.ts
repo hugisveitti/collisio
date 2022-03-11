@@ -259,6 +259,7 @@ export interface IRaceTimeInfo {
     currentLapTime: number
     lapNumber: number /**  show "current lap / totalNumberOfLaps" */
     numberOfLaps: number
+    points: number
 }
 
 export interface ITagScoreInfo {

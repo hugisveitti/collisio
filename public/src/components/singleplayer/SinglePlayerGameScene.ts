@@ -409,8 +409,8 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             this.isReady = false
             this.restart()
         } else {
-
-            this.gameTime.restart()
+            this.currentNumberOfLaps = this.roomSettings.numberOfLaps
+            this.gameTime.restart(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints())
             this.vehicle.resetPosition()
             this.bot.restartBot()
             this.startRaceCountdown()

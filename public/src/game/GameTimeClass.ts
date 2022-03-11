@@ -22,24 +22,12 @@ export class GameTime {
     checkpointTimes: number[][]
     // if player starts when game has started
     offset: number
+    /** Points in splitscreen */
+    points: number
 
     constructor(totalNumberOfLaps: number, numberOfCheckpoints: number) {
-        this.totalNumberOfLaps = totalNumberOfLaps
-        this.offset = 0
-        this.lapNumber = 1
-        this.bestLapTime = Infinity
         this.clock = new Clock(false)
-        this.isPaused = true
-        this.currentLapTime = 0
-        this.isCheckpointCrossed = []
-        this.checkpointTimes = []
-        for (let i = 0; i < numberOfCheckpoints; i++) {
-            this.isCheckpointCrossed.push(false)
-            this.checkpointTimes.push([])
-        }
-        this.lapTimes = []
-        this.totalTime = 0
-        this.hasSendRaceData = false
+        this.restart(totalNumberOfLaps, numberOfCheckpoints)
     }
 
     resetCheckpoints() {
@@ -151,13 +139,29 @@ export class GameTime {
         return this.lapNumber > this.totalNumberOfLaps
     }
 
-    restart() {
+    restart(totalNumberOfLaps: number, numberOfCheckpoints: number) {
         this.clock.stop()
         this.totalTime = 0
         this.lapNumber = 1
         this.lapTimes = []
         this.bestLapTime = Infinity
         this.hasSendRaceData = false
+        this.totalNumberOfLaps = totalNumberOfLaps
+        this.offset = 0
+        this.lapNumber = 1
+        this.bestLapTime = Infinity
+        this.isPaused = true
+        this.currentLapTime = 0
+        this.isCheckpointCrossed = []
+        this.checkpointTimes = []
+        for (let i = 0; i < numberOfCheckpoints; i++) {
+            this.isCheckpointCrossed.push(false)
+            this.checkpointTimes.push([])
+        }
+        this.lapTimes = []
+        this.totalTime = 0
+        this.hasSendRaceData = false
+        this.points = 0
     }
 
 

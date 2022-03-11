@@ -44,6 +44,7 @@ export class RaceGameScene extends GameScene {
     driverRecorder: DriveRecorder
 
 
+
     constructor() {
         super()
 
@@ -57,6 +58,7 @@ export class RaceGameScene extends GameScene {
         this.raceFinished = false
 
         this.raceCountdownTime = 6
+
 
         if (inTestMode) {
             addKeyboardControls()
@@ -265,10 +267,17 @@ export class RaceGameScene extends GameScene {
             timer.stop()
         }
 
-        this.gameTimers = []
+        //     this.gameTimers = []
         this.currentNumberOfLaps = this.getNumberOfLaps()
-        for (let i = 0; i < this.players.length; i++) {
-            this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
+        if (this.gameTimers.length === 0) {
+
+            for (let i = 0; i < this.players.length; i++) {
+                this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
+            }
+        } else {
+            for (let time of this.gameTimers) {
+                time.restart(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints())
+            }
         }
         if (this.bot) {
             this.bot.resetPosition()
@@ -387,6 +396,16 @@ export class RaceGameScene extends GameScene {
                 }
 
                 if (!this.gameTimers[vehicleNumber].hasSendRaceData) {
+                    let numPlayersFinished = 0
+                    for (let i = 0; i < this.gameTimers.length; i++) {
+                        if (i !== vehicleNumber && this.gameTimers[i].finished()) {
+                            numPlayersFinished += 1
+                        }
+                    }
+                    this.gameTimers[vehicleNumber].points += this.players.length - 1 - numPlayersFinished
+
+                    const pName = this.players[vehicleNumber].playerName.toUpperCase().slice(0, 3)
+                    this.viewsNameInfo[vehicleNumber].textContent = `${pName} - ${this.gameTimers[vehicleNumber].points}`
 
                     this.setViewImportantInfo(`Race finished, total time: ${totalTime.toFixed(2)}`, +vehicleNumber)
                     this.prepareEndOfRacePlayer(+vehicleNumber)
@@ -473,7 +492,8 @@ export class RaceGameScene extends GameScene {
                     currentLapTime: cLapTime,
                     totalTime,
                     lapNumber: this.gameTimers[i].lapNumber,
-                    numberOfLaps: this.currentNumberOfLaps
+                    numberOfLaps: this.currentNumberOfLaps,
+                    points: this.gameTimers[i].points
                 }
                 timeInfos.push(timeInfoObject)
 
