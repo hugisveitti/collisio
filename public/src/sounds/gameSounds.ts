@@ -62,9 +62,9 @@ export const loadMusic = (file: string): Promise<AudioBuffer> => {
 }
 
 let music: Audio
-
+let musicFile: string | undefined
 export const addMusic = async (volume: number, camera: PerspectiveCamera, filename: string, notAutoStart?: boolean) => {
-    if (music && music.isPlaying) {
+    if (music && music.isPlaying && musicFile !== filename) {
         music.stop()
         music = undefined
     }
@@ -73,6 +73,7 @@ export const addMusic = async (volume: number, camera: PerspectiveCamera, filena
         camera.add(listener)
         music = new Audio(listener)
         loadMusic(filename).then((buffer) => {
+            musicFile = filename
             music.setBuffer(buffer)
             music.setLoop(true)
             if (!isFinite(volume)) {
@@ -129,4 +130,42 @@ export const startMusic = () => {
 
 export const pauseMusic = () => {
     music?.pause()
+}
+
+let playSounds = true
+
+export const setPlaySounds = (_playSounds: boolean) => {
+    playSounds = _playSounds
+}
+
+const soundsVolume = 0.15
+let gameStartSound: HTMLMediaElement
+export const createGameStartSound = () => {
+    if (gameStartSound) return
+    gameStartSound = document.createElement("audio")
+    gameStartSound.src = "/sound/game-start1.ogg"
+    gameStartSound.load()
+    gameStartSound.volume = soundsVolume
+}
+
+export const playGameStartSound = () => {
+    if (gameStartSound && playSounds) {
+        gameStartSound.play()
+    }
+}
+
+let btnClickSound: HTMLMediaElement
+export const createBtnClickSound = () => {
+    if (btnClickSound) return
+    btnClickSound = document.createElement("audio")
+    btnClickSound.src = "/sound/btn-click2.ogg"
+    btnClickSound.load()
+    btnClickSound.volume = soundsVolume
+}
+
+export const playBtnClickSound = () => {
+    if (btnClickSound && playSounds) {
+        btnClickSound.play
+        btnClickSound.play()
+    }
 }

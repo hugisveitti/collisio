@@ -17,6 +17,10 @@ import {
   mdts_start_game,
   std_start_game_callback,
 } from "../../shared-backend/shared-stuff";
+import {
+  createGameStartSound,
+  playGameStartSound,
+} from "../../sounds/gameSounds";
 import { getSocket, ISocketCallback } from "../../utils/connectSocket";
 import { requestDeviceOrientation } from "../../utils/ControlsClasses";
 import { getDeviceType, isIphone } from "../../utils/settings";
@@ -54,6 +58,9 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
   const socket = getSocket();
 
   const handleStartGame = () => {
+    if (!onMobile) {
+      playGameStartSound();
+    }
     socket.emit(mdts_start_game);
     socket.once(std_start_game_callback, (response: ISocketCallback) => {
       if (response.status === "success") {
@@ -75,6 +82,10 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           setRoomQrCode(url);
         })
         .catch((err) => {});
+    }
+
+    if (!onMobile) {
+      createGameStartSound();
     }
 
     return () => {
@@ -172,13 +183,13 @@ const WaitingRoomComponent = (props: IWaitingRoomProps) => {
           <Grid item xs={12}>
             <BackdropButton
               onClick={handleStartGame}
+              notPlaySound
               disabled={!canStartGame}
               color="white"
               center
               width={200}
               style={{
                 height: 40,
-
                 textAlign: "center",
                 fontSize: 24,
               }}

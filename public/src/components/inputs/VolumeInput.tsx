@@ -1,12 +1,16 @@
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeDownIcon from "@mui/icons-material/VolumeDown";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import React from "react";
 import {
   IGameSettings,
-  setLocalGameSetting
+  setLocalGameSetting,
 } from "../../classes/localGameSettings";
-import { setMusicVolume } from "../../sounds/gameSounds";
+import { setMusicVolume, setPlaySounds } from "../../sounds/gameSounds";
 import { IStore } from "../store";
 import MySlider from "./slider/MySlider";
 
@@ -59,6 +63,26 @@ const VolumeInput = (props: IVolumeInput) => {
         min={0}
         color="white"
       />
+      <br />
+      <Typography>Sound effects</Typography>
+      <IconButton
+        style={{ color: "white" }}
+        onClick={() => {
+          const newGameSettings: IGameSettings = {
+            ...props.store.gameSettings,
+            useSound: !props.store.gameSettings.useSound,
+          };
+
+          props.store.setGameSettings(newGameSettings);
+          setLocalGameSetting("useSound", !props.store.gameSettings.useSound);
+        }}
+      >
+        {props.store.gameSettings.useSound ? (
+          <VolumeUpIcon />
+        ) : (
+          <VolumeOffIcon />
+        )}
+      </IconButton>
     </div>
   );
 };

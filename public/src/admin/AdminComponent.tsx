@@ -81,13 +81,16 @@ const AdminComponent = (props: IAdminComponent) => {
     });
   };
 
-  const handleGetGameData = () => {
+  const handleGetGameData = (singleplayer?: boolean) => {
     auth.currentUser.getIdToken().then((userTokenId) => {
       const options = {
         method: "GET",
       };
 
-      fetch(`/game-data/${userTokenId}?n=${nGameEntires}`, options)
+      fetch(
+        `/game-data/${userTokenId}?n=${nGameEntires}&singleplayer=${!!singleplayer}`,
+        options
+      )
         .then((res) => res.json())
         .then((resData) => {
           if (resData.statusCode === 200) {
@@ -285,7 +288,7 @@ const AdminComponent = (props: IAdminComponent) => {
                   <Button
                     disableElevation
                     variant="contained"
-                    onClick={handleGetGameData}
+                    onClick={() => handleGetGameData(false)}
                   >
                     Get game data
                   </Button>

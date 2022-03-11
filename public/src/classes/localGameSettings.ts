@@ -1,4 +1,5 @@
 import { GameType, TrackName } from "../shared-backend/shared-stuff"
+import { setPlaySounds } from "../sounds/gameSounds"
 
 export type BotDifficulty = "easy" | "medium" | "hard" | "extreme" | "none"
 export const botDifficultyOptions: { name: string, value: BotDifficulty }[] = [
@@ -66,6 +67,9 @@ export const defaultRoomSettings: IRoomSettings = {
 
 export const setLocalGameSetting = (key: keyof IGameSettings, value: string | number | boolean) => {
     window.localStorage.setItem(key, value.toString())
+    if (key === "useSound") {
+        setPlaySounds(value as boolean)
+    }
 }
 
 export const getLocalGameSetting = (key: keyof IGameSettings, type: "string" | "number" | "boolean") => {
@@ -91,6 +95,8 @@ export const getAllLocalGameSettings = () => {
             gameSettings[key] = value
         }
     }
+    setPlaySounds(gameSettings.useSound)
+
     return gameSettings
 }
 
@@ -100,6 +106,8 @@ export const setAllLocalGameSettings = (gameSettings: IGameSettings) => {
         // @ts-ignore
         setLocalGameSetting(key, gameSettings[key])
     }
+
+
 }
 
 /** ROOM STUFF */

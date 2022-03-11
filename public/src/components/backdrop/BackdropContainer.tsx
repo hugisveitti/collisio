@@ -2,6 +2,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useRef, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { getLocalGameSetting } from "../../classes/localGameSettings";
+import { createBtnClickSound } from "../../sounds/gameSounds";
+import { getDeviceType } from "../../utils/settings";
 import { createClassNames } from "../../utils/utilFunctions";
 import BackdropButton from "../button/BackdropButton";
 import CookiePrompt from "../monitary/CookiePrompt";
@@ -26,6 +28,7 @@ interface IBackdropContainer {
 let _pressedStartGame = false;
 const BackdropContainer = (props: IBackdropContainer) => {
   const canvasWrapperRef = useRef<HTMLDivElement>();
+  const onMobile = getDeviceType() === "mobile";
 
   const [camPosNum, setCamPosNum] = useState(0);
 
@@ -67,10 +70,13 @@ const BackdropContainer = (props: IBackdropContainer) => {
       // @ts-ignore
       canvasWrapperRef.current.appendChild(renderer.domElement);
     }
+
+    if (!onMobile) {
+      createBtnClickSound();
+    }
   }, []);
 
   const handleChangeCameraPos = () => {
-    // startMusic();
     changeCameraPosition(camPosNum + 1, volume);
     setCamPosNum(camPosNum + 1);
   };

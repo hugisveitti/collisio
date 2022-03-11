@@ -23,6 +23,7 @@ import {
   stm_player_connected_callback,
   stm_player_info,
 } from "../../shared-backend/shared-stuff";
+import { playGameStartSound } from "../../sounds/gameSounds";
 import "../../styles/main.css";
 import {
   disconnectSocket,
@@ -127,6 +128,7 @@ const WaitingRoomContainer = (props: IWaitingRoomProps) => {
         history.push(getControlsRoomPath(roomId));
       } else {
         history.push(gameRoomPath);
+        playGameStartSound();
       }
     });
 

@@ -319,6 +319,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
       />
 
       <EndOfGameModal
+        style={{ zIndex: 10000 }}
         store={props.store}
         open={endOfGameModalOpen}
         onClose={() => {

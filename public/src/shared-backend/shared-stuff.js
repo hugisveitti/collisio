@@ -46,7 +46,7 @@ exports.allTrackNames = [
     },
     {
         name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium",
-        song: "desert.mp3"
+        //       song: "desert.mp3"
     },
     {
         name: "Space track", type: "silverstone-track", gameType: "race", category: "long", difficulty: "medium",
@@ -63,7 +63,7 @@ exports.allTrackNames = [
     },
     {
         name: "Desert track", type: "spa-track", gameType: "race", hemisphereRadius: 1200, category: "long", difficulty: "hard",
-        song: "desert.mp3"
+        //  song: "desert.mp3"
     },
     {
         name: "Winter track", type: "ferrari-track", gameType: "race", timeOfDay: "night", category: "long", difficulty: "hard",

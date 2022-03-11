@@ -71,6 +71,7 @@ interface IEndOfGameModal {
   store: IStore;
   randomTrack: () => void;
   singleplayer?: boolean;
+  style?: React.CSSProperties;
 }
 
 const EndOfGameModal = (props: IEndOfGameModal) => {
@@ -126,7 +127,11 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
   }
 
   return (
-    <BasicDesktopModal open={props.open} onClose={props.onClose}>
+    <BasicDesktopModal
+      open={props.open}
+      onClose={props.onClose}
+      style={props.style}
+    >
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <h3>Race information</h3>

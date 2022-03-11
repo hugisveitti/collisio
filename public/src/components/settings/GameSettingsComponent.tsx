@@ -1,15 +1,10 @@
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { Grid, Typography, IconButton, Tooltip, Collapse } from "@mui/material";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import { Collapse, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import {
-  defaultRaceTrack,
-  defaultStoryTrack,
-  defaultTagTrack,
-  getTrackNameFromType,
-} from "../../classes/Game";
+import { getTrackNameFromType } from "../../classes/Game";
 import {
   BotDifficulty,
   botDifficultyOptions,
@@ -20,16 +15,15 @@ import {
 import { getFastestGhostFilename } from "../../firebase/firebaseStorageFunctions";
 import { getStyledColors } from "../../providers/theme";
 import { setMusicVolume } from "../../sounds/gameSounds";
-import { DriveRecorder } from "../../test-courses/GhostDriver";
 import { getDeviceType } from "../../utils/settings";
 import BackdropButton from "../button/BackdropButton";
+import AnySelect from "../inputs/AnySelect";
 import MyCheckbox from "../inputs/checkbox/MyCheckbox";
 import InfoButton from "../inputs/info-button/InfoButton";
 import MySlider from "../inputs/slider/MySlider";
 import MyRadio from "../radio/MyRadio";
 import { IStore } from "../store";
 import MyTextField from "../textField/MyTextField";
-import AnySelect from "../inputs/AnySelect";
 
 interface IGameSettingsComponent {
   gameSettings: IGameSettings;

@@ -1,6 +1,8 @@
 import { CircularProgress } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router";
+import { playBtnClickSound } from "../../sounds/gameSounds";
+import { getDeviceType } from "../../utils/settings";
 import { createClassNames } from "../../utils/utilFunctions";
 import "./backdrop-button.css";
 
@@ -16,12 +18,13 @@ interface IBackdropButton {
   center?: boolean;
   width?: number | string;
   loading?: boolean;
+  notPlaySound?: boolean;
 }
 
 const BackdropButton = (props: IBackdropButton) => {
   const history = useHistory();
+  const onMobile = getDeviceType() === "mobile";
   const color = props.color ?? "black";
-
   return (
     <div
       className={createClassNames(
@@ -31,8 +34,12 @@ const BackdropButton = (props: IBackdropButton) => {
       )}
       onClick={() => {
         if (props.disabled) return;
+
         if (props.beforeClick) {
           props.beforeClick();
+        }
+        if (!onMobile && !props.notPlaySound) {
+          playBtnClickSound();
         }
         if (props.link) {
           history.push(props.link);

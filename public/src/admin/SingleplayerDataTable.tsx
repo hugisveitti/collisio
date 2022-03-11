@@ -43,7 +43,7 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
         <TableCell>{props.roomInfo.roomSettings?.numberOfLaps}</TableCell>
         <TableCell>{props.roomInfo.country}</TableCell>
         <TableCell>
-          {props.roomInfo.mobileOnly ? "Mobile only" : "Keyboard"}
+          {props.roomInfo.onlyMobile ? "Mobile only" : "Keyboard"}
         </TableCell>
       </TableRow>
       <TableRow>
