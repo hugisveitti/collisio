@@ -63,9 +63,10 @@ export const signInWithGoogle = (usePopup?: boolean) => {
         })
     } else {
 
-
+        // Redirect better
         signInWithRedirect(auth, googleProvider).then(user => {
-            // const displayName = user.user.displayName.split(" ")[0]
+
+            // const displayName = user.displayName.split(" ")[0]
             // updateProfile(auth.currentUser, { displayName })
         }).catch((err) => {
             toast.error("Error logging in with Google.")

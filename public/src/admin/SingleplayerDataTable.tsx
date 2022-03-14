@@ -16,6 +16,7 @@ import TableRow from "@mui/material/TableRow";
 import React, { useState } from "react";
 import { IRoomInfo } from "../classes/Game";
 import { getDateFromNumber } from "../utils/utilFunctions";
+import { ObjectDivDisplay } from "./CreatedRoomsDataTable";
 
 interface IRoomInfoRow {
   roomInfo: any;
@@ -25,7 +26,8 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
   const [open, setOpen] = useState(false);
 
   const keys = Object.keys(props.roomInfo);
-
+  const gameSettings = props.roomInfo?.gameSettings;
+  const roomSettings = props.roomInfo?.roomSettings;
   return (
     <>
       <TableRow>
@@ -65,6 +67,9 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
               })}
             </List>
             <Divider variant="middle" />
+            <ObjectDivDisplay obj={roomSettings} title="Room Settings" />
+            <Divider variant="middle" />
+            <ObjectDivDisplay obj={gameSettings} title="Game settings" />
           </Collapse>
         </TableCell>
       </TableRow>

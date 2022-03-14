@@ -246,6 +246,7 @@ export class Room {
 
     roomCreatedDate: number
     dataCollection: IRoomDataCollection
+    roomDeleted: boolean = false
 
     constructor(roomId: string, io: Socket, socket: Socket, data: any, deleteRoomCallback: () => void) {
         this.players = []
@@ -317,6 +318,8 @@ export class Room {
     }
 
     deleteRoom() {
+        if (this.roomDeleted) return
+        this.roomDeleted = true
         let extraData: any = {
             geoIp: deleteUndefined(this.geoIp),
             roomDeletedDate: Date.now(),

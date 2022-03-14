@@ -53,12 +53,10 @@ const HowToConnectComponent = (props: IHowToConnectComponent) => {
 
   const onMobile = getDeviceType() === "mobile";
 
-  const [activeStep, setActiveStep] = useState(0);
-
   useEffect(() => {
     setTimeout(() => {
       setHasShown(getLocalStorageItem<boolean>(storageKey, "boolean") ?? false);
-    }, 2000); // show after 3 secs
+    }, 500); // show after 3 secs
   }, []);
 
   // only show on desktop

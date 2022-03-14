@@ -80,7 +80,10 @@ const AvailableRoomsComponent = (props: IAvailableRoomsComponent) => {
                 </Grid>
               ) : (
                 <Grid item xs={12}>
-                  <Typography color="textInfo">No rooms available</Typography>
+                  <Typography color="textInfo">
+                    No rooms available. Login on your computer and follow the
+                    logged in user, for easier access.
+                  </Typography>
                 </Grid>
               )}
               <Grid item xs={12}>

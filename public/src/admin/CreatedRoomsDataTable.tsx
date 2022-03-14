@@ -20,12 +20,14 @@ import { getDateFromNumber } from "../utils/utilFunctions";
 
 interface IObjectDivDisplay {
   obj: any;
+  title?: string;
 }
 
-const ObjectDivDisplay = (props: IObjectDivDisplay) => {
+export const ObjectDivDisplay = (props: IObjectDivDisplay) => {
   const pKeys = Object.keys(props.obj);
   return (
     <React.Fragment>
+      {props.title && <div style={{ fontStyle: "bold" }}>{props.title}</div>}
       <div>
         {pKeys.map((k) => {
           if (typeof props.obj[k] === "object") {
@@ -43,6 +45,17 @@ const ObjectDivDisplay = (props: IObjectDivDisplay) => {
   );
 };
 
+interface IExtraData {
+  roomSettings: any;
+  gameSettings: any;
+  multiplayer?: boolean;
+  players: any[];
+  dataCollection: any;
+  roomCreatedDate?: any;
+  roomDeletedDate?: any;
+  geoIp: any;
+}
+
 interface ICreatedRoomInfo {
   userId: string;
   geo: {
@@ -50,7 +63,7 @@ interface ICreatedRoomInfo {
   };
   date: Timestamp;
   roomId: string;
-  extraData: any;
+  extraData: IExtraData;
 }
 
 interface IRoomInfoRow {
@@ -60,11 +73,13 @@ interface IRoomInfoRow {
 const RoomInfoRow = (props: IRoomInfoRow) => {
   const [open, setOpen] = useState(false);
 
-  const extraData = props.roomInfo?.extraData ?? {};
+  const extraData = props.roomInfo?.extraData;
   const keys = Object.keys(extraData);
   const multiplayer = extraData?.multiplayer;
   const players = extraData?.players ?? [];
   const dataCollection = extraData.dataCollection ?? {};
+  const roomSettings = extraData.roomSettings;
+  const gameSettings = extraData.gameSettings;
   return (
     <>
       <TableRow>
@@ -120,6 +135,10 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
                 </React.Fragment>
               );
             })}
+            <Divider variant="middle" />
+            <ObjectDivDisplay obj={roomSettings} />
+            <Divider variant="middle" />
+            <ObjectDivDisplay obj={gameSettings} />
           </Collapse>
         </TableCell>
       </TableRow>

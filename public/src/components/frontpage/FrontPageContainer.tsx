@@ -117,7 +117,7 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
 
         <Grid item xs={12}>
           <p>
-            <i>Pre alpha</i>
+            <i>Alpha</i>
           </p>
         </Grid>
         {onTablet() && (

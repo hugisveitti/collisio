@@ -41,7 +41,6 @@ export const addCreatedRooms = (roomId: string, userId: string, extraData?: any)
     obj = deleteUndefined(obj)
 
     try {
-
         ref.set(obj).then(() => {
         }).catch((err) => {
             console.warn("Error saving created room", err)

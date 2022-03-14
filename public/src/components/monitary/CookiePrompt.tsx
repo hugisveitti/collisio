@@ -1,15 +1,14 @@
-import Button from "@mui/material/Button";
-import Slide from "@mui/material/Slide";
 import Grid from "@mui/material/Grid";
+import Slide from "@mui/material/Slide";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
+import { setAllowCookies } from "../../classes/localStorage";
 import BackdropButton from "../button/BackdropButton";
 import {
   cookiesInfoPagePath,
   privacyPolicyPage,
   termsOfUsePagePath,
 } from "../Routes";
-import { setAllowCookies } from "../../classes/localStorage";
 
 /**
  * TODO:

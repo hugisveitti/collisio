@@ -187,6 +187,7 @@ var RoomMaster = /** @class */ (function () {
 exports.default = RoomMaster;
 var Room = /** @class */ (function () {
     function Room(roomId, io, socket, data, deleteRoomCallback) {
+        this.roomDeleted = false;
         this.players = [];
         this.gameSettings = {};
         this.roomSettings = {};
@@ -253,6 +254,9 @@ var Room = /** @class */ (function () {
     };
     Room.prototype.deleteRoom = function () {
         var _a, _b;
+        if (this.roomDeleted)
+            return;
+        this.roomDeleted = true;
         var extraData = {
             geoIp: (0, serverFirebaseFunctions_1.deleteUndefined)(this.geoIp),
             roomDeletedDate: Date.now(),

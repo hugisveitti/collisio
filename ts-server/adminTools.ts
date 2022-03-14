@@ -16,6 +16,7 @@ export const adminFunctions = (app: any) => {
     const roomDataPath = "roomData"
     const singleplayerRoomDataPath = "singleplayerRoomData"
     const gameDataPath = "allGames"
+    const singleplayerGameDataPath = "singleplayerAllGames"
     const createdRoomsPath = "created-rooms"
 
     const getIsAdmin = async (userId: string, callback: (isAdmin: boolean) => void) => {
@@ -68,6 +69,7 @@ export const adminFunctions = (app: any) => {
     interface IQueryParams {
         n?: number
         useCreatedRooms?: boolean
+        singleplayer?: boolean
     }
 
 
@@ -126,8 +128,8 @@ export const adminFunctions = (app: any) => {
 
         getIsAdmin(userId, async (isAdmin) => {
             if (isAdmin) {
-
-                const gameDataRef = collection(firestore, gameDataPath)
+                const path = queryParams.singleplayer ? singleplayerGameDataPath : gameDataPath
+                const gameDataRef = collection(firestore, path)
                 let q = query(gameDataRef, orderBy("date", "desc"))
                 if (queryParams.n) {
                     q = query(q, limit(queryParams.n))
@@ -171,10 +173,11 @@ export const adminFunctions = (app: any) => {
 
 
     const getQueryParams = (req: Request): IQueryParams => {
-        const { n, useCreatedRooms } = req.query
+        const { n, useCreatedRooms, singleplayer } = req.query
         const queryParams = {
             useCreatedRooms: eval(useCreatedRooms as string),
-            n: n && !isNaN(+n) ? +n : undefined
+            n: n && !isNaN(+n) ? +n : undefined,
+            singleplayer: !!singleplayer
         }
 
         return queryParams

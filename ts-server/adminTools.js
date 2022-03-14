@@ -46,6 +46,7 @@ var adminFunctions = function (app) {
     var roomDataPath = "roomData";
     var singleplayerRoomDataPath = "singleplayerRoomData";
     var gameDataPath = "allGames";
+    var singleplayerGameDataPath = "singleplayerAllGames";
     var createdRoomsPath = "created-rooms";
     var getIsAdmin = function (userId, callback) { return __awaiter(void 0, void 0, void 0, function () {
         var adminsRef, data, e_1;
@@ -151,12 +152,13 @@ var adminFunctions = function (app) {
     };
     var getGameData = function (userId, queryParams, callback) {
         getIsAdmin(userId, function (isAdmin) { return __awaiter(void 0, void 0, void 0, function () {
-            var gameDataRef, q, data, games_1, e_3;
+            var path, gameDataRef, q, data, games_1, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!isAdmin) return [3 /*break*/, 5];
-                        gameDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, gameDataPath);
+                        path = queryParams.singleplayer ? singleplayerGameDataPath : gameDataPath;
+                        gameDataRef = (0, firestore_2.collection)(firebase_config_1.firestore, path);
                         q = (0, firestore_1.query)(gameDataRef, (0, firestore_1.orderBy)("date", "desc"));
                         if (queryParams.n) {
                             q = (0, firestore_1.query)(q, (0, firestore_1.limit)(queryParams.n));
@@ -201,10 +203,11 @@ var adminFunctions = function (app) {
         }); });
     };
     var getQueryParams = function (req) {
-        var _a = req.query, n = _a.n, useCreatedRooms = _a.useCreatedRooms;
+        var _a = req.query, n = _a.n, useCreatedRooms = _a.useCreatedRooms, singleplayer = _a.singleplayer;
         var queryParams = {
             useCreatedRooms: eval(useCreatedRooms),
-            n: n && !isNaN(+n) ? +n : undefined
+            n: n && !isNaN(+n) ? +n : undefined,
+            singleplayer: !!singleplayer
         };
         return queryParams;
     };

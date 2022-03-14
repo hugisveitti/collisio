@@ -97,19 +97,25 @@ const PrivateProfilePage = (props: IPrivateProfilePage) => {
         <CardHeader
           action={
             <BackdropButton
-              onClick={() => {
+              onClick={async () => {
                 setInEditMode(false);
                 const { displayName, photoURL } = editUser;
-                updateProfile(auth.currentUser, { displayName, photoURL });
-                setFirestorePublicUser({
+
+                await updateProfile(auth.currentUser, {
+                  displayName,
+                  photoURL,
+                });
+                await setFirestorePublicUser({
                   uid: user.uid,
                   displayName,
                   photoURL,
                   latestEdit: getDateNow(),
                 });
+
                 if (user.displayName !== displayName) {
                   // TODO: fix this, so we don't need to reload when
                   // changing display name, this is neccecary because the name in the AppContianer doesnt change
+
                   window.location.reload();
                 }
               }}

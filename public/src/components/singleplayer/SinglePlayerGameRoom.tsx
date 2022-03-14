@@ -26,6 +26,7 @@ import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import EndOfGameModal, { IGameDataInfo } from "../gameRoom/EndOfGameModal";
 import GameSettingsModal from "../gameRoom/GameSettingsModal";
+import { cookiesAcceptedKey } from "../monitary/CookiePrompt";
 import { singlePlayerWaitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import {
@@ -110,6 +111,8 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         roomSettings: props.store.roomSettings,
         gameSettings: props.store.gameSettings,
         date: Timestamp.now(),
+        acceptedCookies:
+          window.localStorage.getItem(cookiesAcceptedKey) ?? false,
       });
     });
 
