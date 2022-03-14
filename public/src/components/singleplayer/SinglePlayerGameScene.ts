@@ -546,7 +546,8 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
             vehicleSetup: this.vehicle.vehicleSetup,
-            singleplayer: true
+            singleplayer: true,
+            userAgent: window.navigator.userAgent,
         }
         if (this.gameRoomActions.playerFinished) {
             this.gameRoomActions.playerFinished(playerData)

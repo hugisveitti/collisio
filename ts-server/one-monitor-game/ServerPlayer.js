@@ -31,11 +31,7 @@ var Player = /** @class */ (function () {
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
             numberOfRacesFinished: 0,
-            totalPing: -1,
-            totalPingsGotten: -1,
-            gameTicks: -1,
-            roomTicks: -1,
-            avgFps: -1,
+            restartsFromPhone: 0
         };
         this.mobileControls = new shared_stuff_1.MobileControls();
         this.VehicleControls = new shared_stuff_1.VehicleControls();
@@ -112,6 +108,9 @@ var Player = /** @class */ (function () {
         var _this = this;
         this.socket.on(shared_stuff_1.mts_send_game_actions, function (gameActions) {
             var _a;
+            if (gameActions.restart) {
+                _this.dataCollection.restartsFromPhone += 1;
+            }
             if (_this.isLeader) {
                 (_a = _this.game) === null || _a === void 0 ? void 0 : _a.sendGameActions(gameActions);
             }
@@ -309,8 +308,10 @@ var Player = /** @class */ (function () {
         });
     };
     Player.prototype.vehicleSetupString = function () {
-        var _a, _b, _c, _d, _e, _f;
-        return "vehicleType:" + this.vehicleSetup.vehicleType + ", exhaust: " + ((_b = (_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.exhaust) === null || _b === void 0 ? void 0 : _b.id) + ", spoiler: " + ((_d = (_c = this.vehicleSetup) === null || _c === void 0 ? void 0 : _c.spoiler) === null || _d === void 0 ? void 0 : _d.id) + ", wheel guards: " + ((_f = (_e = this.vehicleSetup) === null || _e === void 0 ? void 0 : _e.wheelGuards) === null || _f === void 0 ? void 0 : _f.id);
+        var _a, _b, _c, _d, _e, _f, _g;
+        if (!this.vehicleSetup)
+            return "undefined";
+        return "vehicleType:" + this.vehicleSetup.vehicleType + ", color: " + ((_a = this.vehicleSetup) === null || _a === void 0 ? void 0 : _a.vehicleColor) + ", exhaust: " + ((_c = (_b = this.vehicleSetup) === null || _b === void 0 ? void 0 : _b.exhaust) === null || _c === void 0 ? void 0 : _c.id) + ", spoiler: " + ((_e = (_d = this.vehicleSetup) === null || _d === void 0 ? void 0 : _d.spoiler) === null || _e === void 0 ? void 0 : _e.id) + ", wheel guards: " + ((_g = (_f = this.vehicleSetup) === null || _f === void 0 ? void 0 : _f.wheelGuards) === null || _g === void 0 ? void 0 : _g.id);
     };
     Player.prototype.toString = function () {
         return this.playerName + ": number: " + this.playerNumber + ", id: " + this.id + ", vehicletype:" + this.vehicleType + ", vehicleSetup:" + this.vehicleSetupString();

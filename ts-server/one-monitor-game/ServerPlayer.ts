@@ -22,15 +22,22 @@ import {
     stm_player_finished,
     stm_player_info,
     VehicleControls,
-    defaultVehicleType
+    defaultVehicleType,
+    GameActions
 } from "../../public/src/shared-backend/shared-stuff"
 import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { updatePlayersTokens } from "../firebaseCoinFunctions"
-import { IPlayerDataCollection } from "../multiplayer-game/MultiplayerPlayer"
 import { deleteUndefined } from "../serverFirebaseFunctions"
 import { Room } from "./ServerGame"
 
-
+interface IPlayerDataCollection {
+    numberOfMobileConnections: 0,
+    numberOfVehicleChanges: 0,
+    totalNumberOfLapsDone: 0,
+    numberOfReconnects: 0,
+    numberOfRacesFinished: 0,
+    restartsFromPhone: 0,
+}
 
 export class Player {
 
@@ -70,11 +77,7 @@ export class Player {
             totalNumberOfLapsDone: 0,
             numberOfReconnects: 0,
             numberOfRacesFinished: 0,
-            totalPing: -1,
-            totalPingsGotten: -1,
-            gameTicks: -1,
-            roomTicks: -1,
-            avgFps: -1,
+            restartsFromPhone: 0
         }
 
         this.mobileControls = new MobileControls()
@@ -157,7 +160,10 @@ export class Player {
      * send from mobile on to the server
      */
     setupGameActionsListener() {
-        this.socket.on(mts_send_game_actions, (gameActions: any) => {
+        this.socket.on(mts_send_game_actions, (gameActions: GameActions) => {
+            if (gameActions.restart) {
+                this.dataCollection.restartsFromPhone += 1
+            }
             if (this.isLeader) {
                 this.game?.sendGameActions(gameActions)
             } else {
@@ -371,7 +377,8 @@ export class Player {
     }
 
     vehicleSetupString() {
-        return `vehicleType:${this.vehicleSetup.vehicleType}, exhaust: ${this.vehicleSetup?.exhaust?.id}, spoiler: ${this.vehicleSetup?.spoiler?.id}, wheel guards: ${this.vehicleSetup?.wheelGuards?.id}`
+        if (!this.vehicleSetup) return "undefined"
+        return `vehicleType:${this.vehicleSetup.vehicleType}, color: ${this.vehicleSetup?.vehicleColor}, exhaust: ${this.vehicleSetup?.exhaust?.id}, spoiler: ${this.vehicleSetup?.spoiler?.id}, wheel guards: ${this.vehicleSetup?.wheelGuards?.id}`
     }
 
     toString() {

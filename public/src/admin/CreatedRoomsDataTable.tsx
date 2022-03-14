@@ -101,8 +101,8 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
                 return (
                   <ListItem key={k}>
                     <ListItemText
-                      secondary={k}
-                      primary={extraData[k].toString()}
+                      secondary={extraData[k].toString()}
+                      primary={k}
                     />
                   </ListItem>
                 );

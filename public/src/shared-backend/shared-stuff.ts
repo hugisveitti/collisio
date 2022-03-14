@@ -100,7 +100,7 @@ export const allTrackNames: ITrackInfo[] = [
         //       song: "desert.mp3"
     },
     {
-        name: "Space track", type: "silverstone-track", gameType: "race", category: "long", difficulty: "medium",
+        name: "Space track", type: "silverstone-track", gameType: "race", category: "long", difficulty: "hard",
         song: "desert.mp3", hemisphereRadius: 2000, timeOfDay: "evening"
     },
     {

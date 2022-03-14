@@ -21,8 +21,9 @@ if (getDeviceType() === "desktop") {
     loadDiv.classList.add("hide")
 
     loadDiv.appendChild(loadImage)
-
-    loadImage.src = controllerImg // controllerImg
+    const rIndex = Math.floor(Math.random() * tipImgs.length)
+    loadImage.src = tipImgs[rIndex]
+    // loadImage.src = controllerImg // controllerImg
     loadImage.setAttribute("id", "load-image")
 
     document.body.appendChild(loadDiv)
@@ -67,9 +68,9 @@ export const setLoaderProgress = (ratio: number) => {
 }
 
 export const hideLoadDiv = () => {
+    loadDiv.classList.remove("show")
     const rIndex = Math.floor(Math.random() * tipImgs.length)
     loadImage.src = tipImgs[rIndex]
-    loadDiv.classList.remove("show")
 }
 
 

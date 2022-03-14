@@ -600,7 +600,8 @@ export class RaceGameScene extends GameScene {
             totalPing: this.totalPing,
             totalPingsGotten: this.totalPingsGotten,
             avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks,
-            vehicleSetup: this.vehicles[i].vehicleSetup
+            vehicleSetup: this.vehicles[i].vehicleSetup,
+            userAgent: window.navigator?.userAgent ?? "undefined"
         }
 
         if (this.gameSettings.record && this.driverRecorder) {

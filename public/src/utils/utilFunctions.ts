@@ -36,6 +36,31 @@ export const shuffleArray = (arr: any[]) => {
     }
 }
 
+export const sameObjects = (obj1: any, obj2: any) => {
+    const keys1 = Object.keys(obj1)
+    const keys2 = Object.keys(obj2)
+    // check if have the same keys 
+    for (let key of keys1) {
+        if (!itemInArray(key, keys2)) {
+            return false
+        }
+    }
+    for (let key of keys2) {
+        if (!itemInArray(key, keys1)) {
+            return false
+        }
+    }
+
+    for (let key of keys1) {
+        const item1 = obj1[key]
+        const item2 = obj2[key]
+        if (item1 !== item2) {
+            return false
+        }
+    }
+    return true
+}
+
 /**
  * 
  * @param object, 

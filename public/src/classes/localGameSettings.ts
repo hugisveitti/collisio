@@ -44,6 +44,17 @@ export interface IGameSettings {
     botDifficulty: BotDifficulty
 }
 
+const getRandomTrack = (): TrackName => {
+    const r = Math.random()
+    if (r < .1) {
+        return "basic-track1"
+    }
+    if (r < .6) {
+        return "nurn-track"
+    }
+
+    return "farm-track"
+}
 
 
 export const defaultGameSettings: IGameSettings = {
@@ -60,7 +71,7 @@ export const defaultGameSettings: IGameSettings = {
 export const defaultRoomSettings: IRoomSettings = {
     numberOfLaps: 1,
     tagGameLength: 2,
-    trackName: Math.random() < .5 ? "basic-track1" : "nurn-track",
+    trackName: getRandomTrack(),
     gameType: "race",
     usePowerups: true
 }

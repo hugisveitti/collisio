@@ -6,7 +6,7 @@ import { VehicleSetup } from "../../public/src/shared-backend/vehicleItems"
 import { deleteUndefined, getGeoInfo } from "../serverFirebaseFunctions"
 import { MultiplayerRoom } from "./MultiplayerGame"
 
-export interface IPlayerDataCollection {
+export interface IMultiPlayerDataCollection {
     numberOfReconnects: number
     numberOfVehicleChanges: number
     numberOfMobileConnections: number
@@ -57,7 +57,7 @@ export class MulitplayerPlayer {
     mobileControls: MobileControls
     isSendingMobileControls: boolean
 
-    dataCollection: IPlayerDataCollection
+    dataCollection: IMultiPlayerDataCollection
     geoIp: { ip: string, geo: any }
     posChanged: boolean
     gameSettings: any

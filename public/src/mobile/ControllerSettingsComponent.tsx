@@ -1,13 +1,11 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { useHistory } from "react-router";
-import { Socket } from "socket.io-client";
 import { IUser } from "../classes/User";
 import BackdropButton from "../components/button/BackdropButton";
 import CollabsibleCard from "../components/inputs/CollapsibleCard";
@@ -19,6 +17,7 @@ import VehicleSettingsComponent from "../components/settings/VehicleSettingsComp
 import { IStore } from "../components/store";
 import { GameActions, mts_quit_game } from "../shared-backend/shared-stuff";
 import { disconnectSocket, getSocket } from "../utils/connectSocket";
+import { sameObjects } from "../utils/utilFunctions";
 
 export const invertedControllerKey = "invertedController";
 
@@ -57,11 +56,6 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
       </Grid>
       {props.store.player.isLeader && (
         <>
-          <Grid item xs={12} sm={6}>
-            <Typography>
-              To update the track selection you must restart the game.
-            </Typography>
-          </Grid>
           <Grid item xs={6} sm={4}>
             <BackdropButton
               color="white"
@@ -82,6 +76,9 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
             <RoomSettingsComponent
               roomSettings={props.store.roomSettings}
               onChange={(newRoomSettings) => {
+                if (!sameObjects(newRoomSettings, props.store.roomSettings)) {
+                  props.gameActions.restart = true;
+                }
                 props.store.setRoomSettings(newRoomSettings);
               }}
               store={props.store}
@@ -106,6 +103,14 @@ const ControllerSettingsComponent = (props: IControllerSettingsComponent) => {
           store={props.store}
           user={user}
           resetOrientation={props.resetOrientation}
+          onVehicleSettingsChange={(newVehicleSettings) => {
+            if (
+              newVehicleSettings.vehicleType !==
+              props.store.userSettings.vehicleSettings.vehicleType
+            ) {
+              props.gameActions.restart = true;
+            }
+          }}
         />
       </Grid>
       <Grid item xs={12}></Grid>

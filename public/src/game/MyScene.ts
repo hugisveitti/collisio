@@ -460,6 +460,8 @@ export class MyScene extends Scene3D {
 
     updateFps(time: number) {
         this.fpsTick += 1
+        // counts how many ticks occure in one second
+        // using the floor function we only increment if we reach the next integer
         if (Math.floor(time) > this.oldTime) {
             this.fpsInfo.textContent = `fps ${this.fpsTick}`
             this.totalFpsTicks += this.fpsTick

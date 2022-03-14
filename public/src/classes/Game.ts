@@ -221,6 +221,7 @@ export interface IEndOfRaceInfoPlayer {
     recordingFilename?: string
     vehicleSetup: VehicleSetup
     singleplayer?: boolean
+    userAgent: string
 }
 
 export interface IPlayerGameInfo {

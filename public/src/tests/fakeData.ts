@@ -83,7 +83,8 @@ export const createFakeHighscoreData = () => {
                 totalPing: -1,
                 totalPingsGotten: -1,
                 avgFps: -1,
-                vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" }
+                vehicleSetup: { vehicleType: "normal", vehicleColor: "#1d8a47" },
+                userAgent: "Test",
             })
             playerGameInfos.push({
                 id: player.playerId ?? "undefined",

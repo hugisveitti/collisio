@@ -271,11 +271,12 @@ var Room = /** @class */ (function () {
         if (this.desktopUserId) {
             (0, serverFirebaseFunctions_1.removeAvailableRoom)(this.desktopUserId);
         }
+        this.socket.disconnect();
     };
     Room.prototype.setupLeftWebsiteListener = function () {
         var _this = this;
         this.socket.on("disconnect", function () {
-            console.log("disconnected", _this.roomId);
+            console.log("disconnected", _this.roomId, "desktopuserId:", _this.desktopUserId);
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
                 player.desktopDisconnected();

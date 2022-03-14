@@ -335,11 +335,12 @@ export class Room {
         if (this.desktopUserId) {
             removeAvailableRoom(this.desktopUserId)
         }
+        this.socket.disconnect()
     }
 
     setupLeftWebsiteListener() {
         this.socket.on("disconnect", () => {
-            console.log("disconnected", this.roomId)
+            console.log("disconnected", this.roomId, "desktopuserId:", this.desktopUserId)
             for (let player of this.players) {
                 player.desktopDisconnected()
             }
