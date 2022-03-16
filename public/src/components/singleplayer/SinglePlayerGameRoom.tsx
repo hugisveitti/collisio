@@ -83,7 +83,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     clearBackdropCanvas();
     if (user === null) return;
 
-    if (user && props.store.vehiclesSetup === undefined) {
+    if (user && props.store.vehiclesSetup === undefined && !endless) {
       history.push(singlePlayerWaitingRoomPath);
       return;
     }
