@@ -146,6 +146,14 @@ export class Vehicle implements IVehicle {
         }
     }
 
+    setMaxSpeedMult(num: number) {
+        this.maxSpeedMult = num
+    }
+
+    setOnlyForward(b: boolean) {
+        this.onlyForward = b
+    }
+
     getCanDrive() {
         return this._canDrive
     }
@@ -485,6 +493,7 @@ export class Vehicle implements IVehicle {
     }
 
     playSkidSound(skid: number) {
+        return
         if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this._canDrive) return false
         if (skid < 0.8) {
 

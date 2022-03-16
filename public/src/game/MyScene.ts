@@ -7,18 +7,24 @@ import { defaultGameSettings, defaultRoomSettings, IGameSettings, IRoomSettings 
 import { ICourse } from "../course/ICourse";
 import { setLoaderProgress } from "../course/loadingManager";
 import { Powerup, PowerupType } from "../course/PowerupBox";
-import { dts_ping_test, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
+import { defaultVehicleType, dts_ping_test, IPlayerInfo, IPreGamePlayerInfo, std_ping_test_callback, TimeOfDay } from "../shared-backend/shared-stuff";
 import { getBeep, removeMusic, stopMusic } from "../sounds/gameSounds";
 import { removeKeyboardControls } from "../utils/controls";
 import { getStaticPath } from "../utils/settings";
 import { BotVehicle } from "../vehicles/BotVehicle";
 import { IVehicle } from "../vehicles/IVehicle";
+import { LowPolyVehicle, loadLowPolyVehicleModels } from "../vehicles/LowPolyVehicle";
+import { SphereVehicle, loadSphereModel } from "../vehicles/SphereVehicle";
+import { IVehicleClassConfig } from "../vehicles/Vehicle";
+import { getVehicleClassFromType } from "../vehicles/VehicleConfigs";
 import "./game-styles.css";
 import { IGameRoomActions, IGameSceneConfig } from "./IGameScene";
 import { skydomeFragmentShader, skydomeVertexShader } from './shaders';
 
 const fadeSecs = 2
 const vechicleFov = 60
+
+
 
 let wakeLock = null
 export class MyScene extends Scene3D {
@@ -61,6 +67,9 @@ export class MyScene extends Scene3D {
     isPaused: boolean
     isReady: boolean
 
+    player: IPlayerInfo
+    players: IPlayerInfo[]
+
     /**
   * all spans and divs become children of this element to easily delete
   * not calling it gameDiv since the game canvas doesnt go into this
@@ -82,6 +91,8 @@ export class MyScene extends Scene3D {
     listener: AudioListener
 
     isLagging: boolean = false
+
+    sky: Mesh
 
     constructor() {
         super()
@@ -175,6 +186,42 @@ export class MyScene extends Scene3D {
 
         }
     }
+
+
+    async createVehicle(player: IPreGamePlayerInfo) {
+        return new Promise<IVehicle>(async (resolve, reject) => {
+
+            const vehicleType = player?.vehicleType ?? defaultVehicleType
+            const vehicleConfig: IVehicleClassConfig = {
+                id: player.id,
+                scene: this,
+                vehicleType,
+                useSoundEffects: this.gameSettings.useSound,
+                name: player.playerName,
+                vehicleNumber: 0,
+                vehicleSetup: player.vehicleSetup,
+                vehicleSettings: player.vehicleSettings
+            }
+            let vehicle: IVehicle
+            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
+                vehicle = new LowPolyVehicle(vehicleConfig)
+            } else {
+                vehicle = new SphereVehicle(vehicleConfig)
+            }
+            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
+                const [tires, chassis] = await loadLowPolyVehicleModels(vehicleType, false)
+                vehicle.addModels(tires, chassis)
+
+            } else {
+                const [tires, chassis] = await loadSphereModel(vehicleType, false)
+                vehicle.addModels(tires, chassis)
+            }
+            const p = vehicle.getPosition()
+            vehicle.setPosition(p.x, p.y + 5, p.z)
+
+            resolve(vehicle)
+        })
+    }
     _handleResizeWindow() { }
 
     handleResizeWindow() {
@@ -211,6 +258,8 @@ export class MyScene extends Scene3D {
 
     async preload() { }
     async create() { }
+
+
 
 
 
@@ -410,9 +459,9 @@ export class MyScene extends Scene3D {
         });
 
         // move the sky?
-        const sky = new Mesh(skyGeo, skyMat);
+        this.sky = new Mesh(skyGeo, skyMat);
 
-        this.scene.add(sky);
+        this.scene.add(this.sky);
     }
 
     setSocket(socket: Socket) {
@@ -425,17 +474,24 @@ export class MyScene extends Scene3D {
 
     }
 
-    setGameSceneConfig(config: any) {
+    setGameSceneConfig(config: IGameSceneConfig) {
         this.gameSceneConfig = config
+        this.player = config.player
+        this.players = config.players
         this.setSocket(config.socket)
         this.setGameSettings(config.gameSettings)
+        this.setRoomSettings(config.roomSettings)
         // this.setPlayers(config.players)
         // this.roomId = config.roomId
-        // this.setGameRoomActions(config.gameRoomActions)
+        this.setGameRoomActions(config.gameRoomActions)
     }
 
     setGameSettings(gameSettings: IGameSettings) {
         this.gameSettings = gameSettings
+    }
+
+    setRoomSettings(roomSettings: IRoomSettings) {
+        this.roomSettings = roomSettings
     }
 
     updatePing() {

@@ -207,7 +207,7 @@ var adminFunctions = function (app) {
         var queryParams = {
             useCreatedRooms: eval(useCreatedRooms),
             n: n && !isNaN(+n) ? +n : undefined,
-            singleplayer: !!singleplayer
+            singleplayer: eval(singleplayer)
         };
         return queryParams;
     };

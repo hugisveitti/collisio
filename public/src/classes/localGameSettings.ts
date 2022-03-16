@@ -53,7 +53,7 @@ const getRandomTrack = (): TrackName => {
         return "nurn-track"
     }
 
-    return "farm-track"
+    return "nurn-track"
 }
 
 

@@ -9,13 +9,17 @@ import {
   IRoomSettings,
   setLocalRoomSetting,
 } from "../../classes/localGameSettings";
-import { getLocalUid } from "../../classes/localStorage";
+import { getCookiesAllowed, getLocalUid } from "../../classes/localStorage";
 import { defaultUserSettings } from "../../classes/User";
 import { saveSinglePlayerData } from "../../firebase/firestoreFunctions";
 import {
   saveRaceData,
   saveRaceDataGame,
 } from "../../firebase/firestoreGameFunctions";
+import {
+  createEndlessRunnerScene,
+  EndlessRunnerScene,
+} from "../../game/EndlessRunnerScene";
 import { IEndOfGameData } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
 import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
@@ -26,7 +30,6 @@ import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import EndOfGameModal, { IGameDataInfo } from "../gameRoom/EndOfGameModal";
 import GameSettingsModal from "../gameRoom/GameSettingsModal";
-import { cookiesAcceptedKey } from "../monitary/CookiePrompt";
 import { singlePlayerWaitingRoomPath } from "../Routes";
 import { IStore } from "../store";
 import {
@@ -39,11 +42,17 @@ interface ISingleplayerGameRoom {
   store: IStore;
 }
 
-let gameObject: SingleplayerGameScene;
+let gameObject: SingleplayerGameScene | EndlessRunnerScene;
 const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   const user = useContext(UserContext);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const history = useHistory();
+
+  let endless = false;
+  let split = location.pathname.split("/");
+  if (split.length >= 4 && split[3] === "endless") {
+    endless = true;
+  }
 
   const [gameDataInfo, setGameDataInfo] = useState({
     bestTimesInfo: {},
@@ -61,7 +70,6 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   };
 
   const handlePlayerFinished = (data: IEndOfRaceInfoPlayer) => {
-    console.log("game is fin", data);
     if (data.isAuthenticated) {
       saveRaceData(data.playerId, data).then(([setPB, pb]) => {
         const bestTimesInfo = {};
@@ -111,8 +119,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         roomSettings: props.store.roomSettings,
         gameSettings: props.store.gameSettings,
         date: Timestamp.now(),
-        acceptedCookies:
-          window.localStorage.getItem(cookiesAcceptedKey) ?? false,
+        acceptedCookies: getCookiesAllowed(),
       });
     });
 
@@ -127,9 +134,15 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         playerFinished: handlePlayerFinished,
       },
     };
-    createSingleplayerGameScene(SingleplayerGameScene, config).then((g) => {
-      gameObject = g;
-    });
+    if (!endless) {
+      createSingleplayerGameScene(SingleplayerGameScene, config).then((g) => {
+        gameObject = g;
+      });
+    } else {
+      createEndlessRunnerScene(EndlessRunnerScene, config).then((g) => {
+        gameObject = g;
+      });
+    }
 
     return () => {
       gameObject?.destroyGame().then(() => {

@@ -5,22 +5,20 @@ import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer, IPlayerGameInfo } from "../..
 import { IGameSettings, IRoomSettings } from "../../classes/localGameSettings";
 import { IVehicleSettings } from "../../classes/User";
 import { hideLoadDiv } from "../../course/loadingManager";
-import { Powerup, PowerupType } from "../../course/PowerupBox";
+import { Powerup } from "../../course/PowerupBox";
 import { RaceCourse } from "../../course/RaceCourse";
 import { GameTime } from "../../game/GameTimeClass";
 import { IGameRoomActions } from "../../game/IGameScene";
 import { MyScene } from "../../game/MyScene";
-import { defaultVehicleType, IPlayerInfo, VehicleColorType, VehicleControls } from "../../shared-backend/shared-stuff";
+import { IPlayerInfo, IPreGamePlayerInfo, VehicleColorType, VehicleControls } from "../../shared-backend/shared-stuff";
 import { VehicleSetup } from "../../shared-backend/vehicleItems";
 import { addMusic, removeMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds";
 import { addKeyboardControls, driveVehicleWithKeyboard } from "../../utils/controls";
 import { getDateNow } from "../../utils/utilFunctions";
 import { BotVehicle } from "../../vehicles/BotVehicle";
 import { IVehicle } from "../../vehicles/IVehicle";
-import { getVehicleNumber, loadLowPolyVehicleModels, LowPolyVehicle } from "../../vehicles/LowPolyVehicle";
-import { loadSphereModel, SphereVehicle } from "../../vehicles/SphereVehicle";
+import { getVehicleNumber, loadLowPolyVehicleModels } from "../../vehicles/LowPolyVehicle";
 import { IVehicleClassConfig } from "../../vehicles/Vehicle";
-import { getVehicleClassFromType } from "../../vehicles/VehicleConfigs";
 
 export interface ISingleplayerGameSceneConfig {
     gameSettings: IGameSettings
@@ -35,11 +33,9 @@ export interface ISingleplayerGameScene {
 }
 
 export class SingleplayerGameScene extends MyScene implements ISingleplayerGameScene {
-    config?: ISingleplayerGameSceneConfig
+    // config?: ISingleplayerGameSceneConfig
     vehicle: IVehicle
-
     isReady: boolean
-
 
     vehicleControls: VehicleControls
     // everyone at least keeps their own time
@@ -50,7 +46,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     lapsInfo: HTMLSpanElement
 
     currentNumberOfLaps: number
-
     bot: BotVehicle
     gameStarted: boolean
     raceCountdownTime: number
@@ -61,6 +56,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         super()
         this.gameId = uuid()
         this.raceCountdownTime = 5
+
         addKeyboardControls()
         this.gameTime = new GameTime(2, 2)
         this.kmhInfo = document.createElement("span")
@@ -78,13 +74,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.lapsInfo = document.createElement("span")
         this.gameInfoDiv.appendChild(this.lapsInfo)
         this.lapsInfo.classList.add("game-text")
-        this.lapsInfo.setAttribute("style", `
-        position:absolute;
-        bottom: 30px;
-        left:${window.innerWidth / 2}px;
-        transform: translate(-50%, 0);
-        font-size:24px;
-    `)
+
 
         const fontSize = window.innerWidth < 1500 ? 32 : 82
         this.lapsInfo.setAttribute("style", `
@@ -131,7 +121,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
 
 
     async preload() {
-        this.course = new RaceCourse(this, this.config.roomSettings.trackName, (v) => this.handleGoalCrossed(v), (v, num) => this.handleCheckpointCrossed(v, num))
+        this.course = new RaceCourse(this, this.roomSettings.trackName, (v) => this.handleGoalCrossed(v), (v, num) => this.handleCheckpointCrossed(v, num))
         await this.course.createCourse()
         this.courseLoaded = true
         this.addLights()
@@ -139,14 +129,13 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.camera.position.set(0, 50, 50)
         this.camera.rotation.set(-Math.PI / 10, Math.PI, -Math.PI / 10)
 
-        await this.createVehicle()
+        this.vehicle = await this.createVehicle(this.player)
         this.vehicle.addCamera(this.camera)
 
         await this.createBot()
         this.bot.update(16)
         this.renderer.render(this.scene, this.camera)
         hideLoadDiv()
-
 
         addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
         this.gameTime = new GameTime(this.roomSettings.numberOfLaps, this.course.getNumberOfCheckpoints())
@@ -156,9 +145,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
         this.vehicle.resetPosition()
 
-
         this.vehicle.setCanDrive(true)
-
     }
 
     async create(): Promise<void> {
@@ -261,44 +248,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         }, 1000)
     }
 
-    async createVehicle() {
-        return new Promise<void>(async (resolve, reject) => {
-            if (!this.config) {
-                console.warn("Can only create vehicle if config is set")
-                reject()
-                return
-            }
-            // need some backup of the vehicle type, if it doesnt load
-            const vehicleType = this.config.player?.vehicleType ?? defaultVehicleType
-            const vehicleConfig: IVehicleClassConfig = {
-                id: this.config.player.id,
-                scene: this,
-                vehicleType,
-                useSoundEffects: this.gameSettings.useSound,
-                name: this.config.player.playerName,
-                vehicleNumber: 0,
-                vehicleSetup: this.config.player.vehicleSetup,
-                vehicleSettings: this.config.player.vehicleSettings
-            }
-            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                this.vehicle = new LowPolyVehicle(vehicleConfig)
-            } else {
-                this.vehicle = new SphereVehicle(vehicleConfig)
-            }
-            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                const [tires, chassis] = await loadLowPolyVehicleModels(vehicleType, false)//.then(([tires, chassis]) => {
-                this.vehicle.addModels(tires, chassis)
-                //    })
-            } else {
-                const [tires, chassis] = await loadSphereModel(vehicleType, false) //.then(([_, body]) => {
-                this.vehicle.addModels(tires, chassis)
-            }
-            const p = this.vehicle.getPosition()
-            this.vehicle.setPosition(p.x, p.y + 5, p.z)
-
-            resolve()
-        })
-    }
 
     async createBot() {
         return new Promise<void>((resolve, reject) => {
@@ -418,11 +367,10 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     setRoomSettings(roomSettings: IRoomSettings) {
-        if (roomSettings.trackName !== this.config.roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups) {
+        if (roomSettings.trackName !== this.roomSettings.trackName || this.roomSettings.usePowerups !== roomSettings.usePowerups) {
             this.setNeedsReload(true)
         }
         this.roomSettings = roomSettings
-        this.config.roomSettings = roomSettings
     }
 
     toggleUseSound() {
@@ -430,11 +378,10 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     setGameSettings(gameSettings: IGameSettings): void {
-        if (this.courseLoaded && (gameSettings.graphics !== this.config.gameSettings.graphics || gameSettings.botDifficulty !== this.gameSettings.botDifficulty)) {
+        if (this.courseLoaded && (gameSettings.graphics !== this.gameSettings.graphics || gameSettings.botDifficulty !== this.gameSettings.botDifficulty)) {
             this.setNeedsReload(true)
         }
         // having both config.gamesettings and this.gamesettings is stupid
-        this.config.gameSettings = gameSettings
         this.gameSettings = gameSettings
 
 
@@ -466,24 +413,27 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     setGameSceneConfig(gameSceneConfig: ISingleplayerGameSceneConfig) {
-        this.config = gameSceneConfig
+        //  this.config = gameSceneConfig
 
-        this.setGameSettings(this.config.gameSettings)
-        this.setRoomSettings(this.config.roomSettings)
-        this.currentNumberOfLaps = this.config.roomSettings.numberOfLaps
-        this.gameRoomActions = this.config.gameRoomActions
+
+        this.player = gameSceneConfig.player
+
+        this.setGameSettings(gameSceneConfig.gameSettings)
+        this.setRoomSettings(gameSceneConfig.roomSettings)
+        this.currentNumberOfLaps = gameSceneConfig.roomSettings.numberOfLaps
+        this.gameRoomActions = gameSceneConfig.gameRoomActions
 
     }
 
     vehicleSettingsChanged(vehicleSettings: IVehicleSettings) {
-        this.vehicle.updateVehicleSettings(vehicleSettings, this.config?.player.vehicleSetup)
-        this.config.player.vehicleType = vehicleSettings.vehicleType
-        this.config.player.vehicleSettings = vehicleSettings
+        this.vehicle.updateVehicleSettings(vehicleSettings, this.player.vehicleSetup)
+        this.player.vehicleType = vehicleSettings.vehicleType
+        this.player.vehicleSettings = vehicleSettings
     }
 
     vehicleSetupChanged(vehicleSetup: VehicleSetup) {
         this.vehicle.updateVehicleSetup(vehicleSetup)
-        this.config.player.vehicleSetup = vehicleSetup
+        this.player.vehicleSetup = vehicleSetup
     }
 
     updateVehicle(delta: number) {
@@ -511,7 +461,6 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
 
     update(_time: number, _delta: number): void {
         this.time = _time
-        this.renderer?.render(this.scene, this.camera)
         this.updateVehicle(_delta)
 
         this.updateFps(_time)
@@ -521,21 +470,22 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.updateBot(_delta)
         this.checkIfVehicleIsOffCourse()
         this.updatePlayerRaceInfo(_delta)
+        this.renderer?.render(this.scene, this.camera)
     }
 
     prepareEndOfRacePlayer() {
         const playerData: IEndOfRaceInfoPlayer = {
             totalTime: this.gameTime.getTotalTime(),
             numberOfLaps: this.currentNumberOfLaps,
-            playerName: this.config.player.playerName,
-            playerId: this.config.player.id,
+            playerName: this.player.playerName,
+            playerId: this.player.id,
             bestLapTime: this.gameTime.getBestLapTime(),
             trackName: this.getTrackName(),
             lapTimes: this.gameTime.getLapTimes(),
             gameId: this.gameId,
             date: getDateNow(),
             private: false,
-            isAuthenticated: this.config.player.isAuthenticated,
+            isAuthenticated: this.player.isAuthenticated,
             vehicleType: this.vehicle.vehicleType,
             engineForce: this.vehicle.engineForce,
             breakingForce: this.vehicle.breakingForce,
@@ -559,15 +509,15 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         const playerGameInfos: IPlayerGameInfo[] = []
 
         playerGameInfos.push({
-            id: this.config.player.id,
-            name: this.config.player.playerName,
+            id: this.player.id,
+            name: this.player.playerName,
             totalTime: +this.gameTime.getTotalTime().toFixed(2),
             lapTimes: this.gameTime.getLapTimes(),
-            vehicleType: this.config.player.vehicleType,
+            vehicleType: this.player.vehicleType,
             engineForce: this.vehicle.engineForce,
             breakingForce: this.vehicle.breakingForce,
             steeringSensitivity: this.vehicle.steeringSensitivity,
-            isAuthenticated: this.config.player.isAuthenticated
+            isAuthenticated: this.player.isAuthenticated
         })
 
 

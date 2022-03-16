@@ -97,6 +97,9 @@ export interface IVehicle {
 
     addItemToVehicle: (filename: string) => Promise<ExtendedObject3D>
     setPowerup: (powerup: Powerup) => void
+
+    setMaxSpeedMult: (num: number) => void
+    setOnlyForward: (only: boolean) => void
 }
 
 

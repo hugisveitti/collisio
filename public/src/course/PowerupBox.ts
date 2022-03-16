@@ -54,7 +54,7 @@ const slowerPowerup: Powerup = {
     type: "bad"
 }
 
-const outofControlPowerup: Powerup = {
+export const outofControlPowerup: Powerup = {
     name: "Turbo!!",
     speedMult: 1.7,
     noBreaks: true,

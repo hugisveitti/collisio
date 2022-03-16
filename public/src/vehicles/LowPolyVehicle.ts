@@ -302,7 +302,7 @@ export class LowPolyVehicle extends Vehicle {
             // this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: "box", autoCenter: false, width: 2, depth: 6, height: 1.5, y: 2 })
 
             // this.vehicleBody.body.ammo.setActivationState(DISABLE_DEACTIVATION)
-            const bounce = .5
+            const bounce = .1
 
             this.vehicleBody.body.setBounciness(bounce)
             this.vehicleBody.body.setRestitution(bounce)
@@ -692,20 +692,21 @@ export class LowPolyVehicle extends Vehicle {
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.vehicleBody.position.clone())
-
-
         }
+
         else if (this.useChaseCamera) {
+
+            // because of ammo, the body goes into some illegal state
             const pos = this.vehicleBody.position
             const q = this.vehicleBody.quaternion
-            const alpha = 2 * Math.asin(q.y)
+            let alpha = 2 * Math.asin(q.y)
+
 
             this.cameraTarget.set(
                 pos.x + ((Math.sin(alpha) * this.staticCameraPos.z) * Math.sign(q.w)),
                 pos.y + this.staticCameraPos.y,
                 pos.z + ((Math.cos(alpha) * this.staticCameraPos.z))
             )
-
             const cs = 0.4
             this.cameraLookAtPos.x = (this.prevChaseCameraPos.x + ((pos.x + ((Math.sin(alpha) * 10) * Math.sign(q.w)) - this.prevChaseCameraPos.x) * cs))
             this.cameraLookAtPos.z = (this.prevChaseCameraPos.z + ((pos.z + ((Math.cos(alpha) * 10)) - this.prevChaseCameraPos.z) * cs))
@@ -715,6 +716,7 @@ export class LowPolyVehicle extends Vehicle {
             this.cameraDir.x = (camera.position.x + ((this.cameraTarget.x - camera.position.x) * ct)) //* this.chaseSpeedX))
             this.cameraDir.z = (camera.position.z + ((this.cameraTarget.z - camera.position.z) * ct)) //* this.chaseSpeedZ))
             this.cameraDir.y = (camera.position.y + ((this.cameraTarget.y - camera.position.y) * ct))
+
 
             camera.position.set(this.cameraDir.x, this.cameraDir.y, this.cameraDir.z)
             camera.lookAt(this.cameraLookAtPos)
@@ -913,10 +915,7 @@ export class LowPolyVehicle extends Vehicle {
         this.setPosition(undefined, groundY, undefined)
     }
 
-    update(delta: number) {
-        if (!this.isReady) return
-        this.delta = delta
-        const usingJitter = false //  this.useChaseCamera && this.detectJitter(delta)
+    updateWheels() {
 
         for (let i = 0; i < 4; i++) {
             this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
@@ -925,22 +924,41 @@ export class LowPolyVehicle extends Vehicle {
             if (i < 4) {
                 this.wheelMeshes[i].position.set(this.p0[i].x(), this.p0[i].y(), this.p0[i].z())
                 this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
-                this.vehicle.updateWheelTransform(i, usingJitter)
-            } else {
+                this.vehicle.updateWheelTransform(i, false)
             }
         }
+    }
 
-        if (!usingJitter) {
-            this.tm = this.vehicle.getChassisWorldTransform()
-            this.p = this.tm.getOrigin()
+    update(delta: number) {
+        if (!this.isReady) return
+        this.delta = delta
 
-            this.q = this.tm.getRotation()
+        this.tm = this.vehicle.getChassisWorldTransform()
+        this.p = this.tm.getOrigin()
+        this.q = this.tm.getRotation()
 
+        if (isFinite(this.p.x())) {
             this.vehicleBody.position.set(this.p.x(), this.p.y(), this.p.z())
-            this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
-
         } else {
+            console.log("Position not finite", this.p.x())
+            this.stop()
+            this.setPosition(0, 0, 0)
+            this.start()
+            // this.resetPosition()
+        }
 
+        if (isFinite(this.q.x())) {
+            this.vehicleBody.quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
+        } else {
+            // do nothing? set rotation
+            console.log("Rotation not finite", this.q.x())
+
+
+            this.stop()
+            this.setRotation(new Quaternion(0, Math.PI / 2, 0, Math.PI / 2))
+            this.start()
+            // this.resetPosition()
+            return
         }
 
 
@@ -951,6 +969,7 @@ export class LowPolyVehicle extends Vehicle {
             this.badRotationTicks = 0
         }
 
+        this.updateWheels()
 
         if (this.badRotationTicks > 60 && Math.abs(this.getCurrentSpeedKmHour(0)) < 20 && this.useBadRotationTicks) {
             // make this flip smoother ??
@@ -962,8 +981,6 @@ export class LowPolyVehicle extends Vehicle {
         }
 
         if (!this.isPaused && this.isReady) {
-
-
             // have these calls optional, since they are quite heavy for the machine, or maybe only perform every other tick?
             // only use vehicle assist if more than 30 fps
             if (delta < 25 && !this.isBot && !this.scene.isLagging) {
@@ -984,8 +1001,8 @@ export class LowPolyVehicle extends Vehicle {
         }
         this.updateTireSmoke()
 
-        if (this.vehicleBody.position.y < -20) {
-            this.resetPosition()
+        if (this.vehicleBody.position.y < -50) {
+            //   this.resetPosition()
         }
 
         if (this.onlyForward) {
@@ -1050,9 +1067,6 @@ export class LowPolyVehicle extends Vehicle {
             this.tm = this.vehicle.getWheelInfo(i).get_m_worldTransform();
             this.p0[i] = this.tm.getOrigin()
             this.q = this.tm.getRotation()
-
-
-
             this.wheelMeshes[i].position.set(this.p0[i].x(), this.p0[i].y(), this.p0[i].z())
             this.wheelMeshes[i].quaternion.set(this.q.x(), this.q.y(), this.q.z(), this.q.w())
             this.vehicle.updateWheelTransform(i, false)
@@ -1128,7 +1142,6 @@ export class LowPolyVehicle extends Vehicle {
         this.vehicleBody.body.setAngularVelocity(0, 0, 0)
         this.vehicleBody.body.setVelocity(0, 0, 0)
         const { position, rotation } = this.checkpointPositionRotation
-
 
         this.setPosition(position.x, position.y, position.z)
 

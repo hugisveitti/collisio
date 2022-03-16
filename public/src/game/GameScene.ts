@@ -4,9 +4,9 @@ import { Color, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { v4 as uuid } from "uuid";
 import { IGameSettings, IRoomSettings } from '../classes/localGameSettings';
-import { IUserSettings, IVehicleSettings } from "../classes/User";
+import { defaultVehicleSettings, IUserSettings, IVehicleSettings } from "../classes/User";
 import { Powerup, PowerupType } from "../course/PowerupBox";
-import { dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
+import { defaultVehicleColorType, dts_game_settings_changed_callback, dts_vehicles_ready, IPlayerInfo, IPreGamePlayerInfo, std_controls, std_user_settings_changed, TrackName, vehicleColors, VehicleColorType, VehicleType } from "../shared-backend/shared-stuff";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, pauseMusic, removeMusic, setMusicVolume, startMusic, stopMusic } from "../sounds/gameSounds";
 import { addControls, driveVehicle } from "../utils/controls";
@@ -202,7 +202,17 @@ export class GameScene extends MyScene implements IGameScene {
     async createExtraVehicles(vehicleTypes: VehicleType[], positions?: THREE.Vector3[], rotations?: THREE.Quaternion[]) {
         const batch: Promise<IVehicle>[] = []
         for (let i = 0; i < vehicleTypes.length; i++) {
-            batch.push(this.createVehicle(vehicleTypes[i], vehicleColors[0].value, `extra-vehicle-${i}`, i + this.players.length))
+            const fakeP: IPreGamePlayerInfo = {
+                playerName: `extra-vehicle-${i}`,
+                playerNumber: i + this.players.length,
+                id: `extra-vehicle-${i}`,
+                isAuthenticated: false,
+                vehicleType: vehicleTypes[i],
+                photoURL: "",
+                vehicleSetup: { vehicleType: vehicleTypes[i], vehicleColor: defaultVehicleColorType },
+                vehicleSettings: { ...defaultVehicleSettings, vehicleType: vehicleTypes[i] }
+            }
+            batch.push(this.createVehicle(fakeP))
         }
 
         Promise.all(batch).then(vehicles => {
@@ -222,36 +232,7 @@ export class GameScene extends MyScene implements IGameScene {
     }
 
 
-    async createVehicle(vehicleType: VehicleType, vehicleColor: string | number, name: string, vehicleNumber: number): Promise<IVehicle> {
-        return new Promise<IVehicle>(async (resolve, reject) => {
-            let newVehicle: IVehicle
-            const config = {
-                scene: this,
-                name,
-                vehicleNumber,
-                vehicleType,
-                useSoundEffects: this.useSound,
-                vehicleSetup: { vehicleColor: vehicleColor as VehicleColorType, vehicleType },
-                id: `vehicle-${vehicleNumber}-id`
-            }
-            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                newVehicle = new LowPolyVehicle(config)
-            } else {
-                newVehicle = new SphereVehicle(config)
-            }
-            this.vehicles.push(newVehicle)
-            if (getVehicleClassFromType(vehicleType) === "LowPoly") {
-                const [tires, chassis] = await loadLowPolyVehicleModels(vehicleType, false)//.then(([tires, chassis]) => {
-                newVehicle.addModels(tires, chassis)
-                //    })
-            } else {
-                const [tires, chassis] = await loadSphereModel(vehicleType, false) //.then(([_, body]) => {
-                newVehicle.addModels(tires, chassis)
 
-            }
-            resolve(newVehicle)
-        })
-    }
 
     // async loadVehicleModels(){
     //     return new Promise<void>((resolve,reject) => {

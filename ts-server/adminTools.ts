@@ -177,7 +177,7 @@ export const adminFunctions = (app: any) => {
         const queryParams = {
             useCreatedRooms: eval(useCreatedRooms as string),
             n: n && !isNaN(+n) ? +n : undefined,
-            singleplayer: !!singleplayer
+            singleplayer: eval(singleplayer as string)
         }
 
         return queryParams
