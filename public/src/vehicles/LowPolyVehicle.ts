@@ -742,22 +742,11 @@ export class LowPolyVehicle extends Vehicle {
                 this.seeVehicle(this.cameraTarget)
             }
         }
-
-        // this.updateLight()
     };
 
-    // updateLight() {
-    //     const pos = this.vehicleBody.position
-    //     const rot = this.vehicleBody.rotation
-
-    //     this.light.position.set(
-    //         pos.x + ((Math.sin(rot.y) * this.staticCameraPos.z)),
-    //         pos.y + this.staticCameraPos.y,
-    //         pos.z + ((Math.cos(rot.y) * this.staticCameraPos.z) * Math.sign(Math.cos(rot.z)))
-    //     )
-
-    // }
-
+    _clearPowerups() {
+        this.maxSpeedTime = 0
+    }
 
     checkIfSpinning(log?: boolean) {
         const vel = this.vehicle.getRigidBody().getAngularVelocity()
@@ -1104,26 +1093,6 @@ export class LowPolyVehicle extends Vehicle {
 
     getCurrentSpeedKmHour(delta?: number) {
         return this.vehicle.getCurrentSpeedKmHour()
-    };
-
-
-    createNameMesh() {
-        // const textGeo = new TextGeometry(this.name.toUpperCase().slice(0, 3), {
-        //     font: this.font!,
-        //     size: 1,
-        //     height: 0.5,
-
-        // })
-
-        // const textMesh = new Mesh(textGeo, new MeshLambertMaterial({ color: 0x667399, }))
-        // textMesh.rotateY(Math.PI)
-        // this.scene.add.existing(textMesh)
-        // textMesh.position.set(1.2, 3, 0)
-        // this.vehicleBody.add(textMesh)
-    }
-
-    lookForwardsBackwards(lookBackwards: boolean) {
-        console.warn("Not implemented")
     };
 
     /**

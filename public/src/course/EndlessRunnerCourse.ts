@@ -10,7 +10,7 @@ import { ICourse } from "./ICourse";
 const tileZ = 30;
 const tileX = 50;
 
-let pruneDistance = tileZ * 4
+let pruneDistance = tileZ * 5
 
 class BouncingObsticle {
 
@@ -22,7 +22,7 @@ class BouncingObsticle {
     constructor(course: EndlessRunnerCourse, pos: Vector3, idx: number) {
         this.course = course
 
-        this.model = this.course.gameScene.add.sphere({ x: pos.x, y: pos.y, z: pos.z, radius: 2 }, { standard: { color: "red" } })
+        this.model = this.course.gameScene.add.sphere({ x: pos.x, y: pos.y, z: pos.z, radius: 2 }, { lambert: { color: 0xff511a } })
         this.model.castShadow = true
         this.course.gameScene.physics.add.existing(this.model, { mass: 3, collisionFlags: 0 })
         this.model.name = "ball_" + idx
@@ -68,7 +68,7 @@ class Collectable {
         this.course = course
         const { x, y, z } = startPos
 
-        this.model = this.course.gameScene.add.box({ height: 4, width: 2, depth: .5, x, y: 3, z }, { standard: { color: 0x222222 } })
+        this.model = this.course.gameScene.add.box({ height: 4, width: 2, depth: .5, x, y: 3, z }, { lambert: { color: 0x222222 } })
         this.model.castShadow = true
         this.model.name = "collectable_" + idx
 
@@ -187,7 +187,7 @@ export class EndlessRunnerCourse implements ICourse {
 
         width = Math.max(width, tileX * .1)
         this.gameScene.newTilePoints()
-        const tile = this.gameScene.add.box({ width, height: 1, depth: tileZ }, { standard: { color: this.tileColor } });
+        const tile = this.gameScene.add.box({ width, height: 1, depth: tileZ }, { lambert: { color: this.tileColor } });
 
         // we drive along the Z axis
         tile.position.setZ(z)
@@ -216,7 +216,7 @@ export class EndlessRunnerCourse implements ICourse {
         const y = (Math.random() * 5) + 8
 
         x = x + (Math.random() * offset) - (offset / 2)
-        z = z + (Math.random() * offset) - (offset / 2) + 15
+        z = z + (Math.random() * offset) - (offset / 2) + 12
         const ball = new BouncingObsticle(this, new Vector3(x, y, z), this.ballsNum)
         this.ballsNum += 1
         this.balls.push(ball)
@@ -227,10 +227,8 @@ export class EndlessRunnerCourse implements ICourse {
 
             this.ground = this.gameScene.add.box({ width: 30, height: 1, depth: 30, y: -1 }, { lambert: { color: "red" } });
             this.gameScene.physics.add.existing(this.ground, { collisionFlags: 1 })
-            this.addTile(0, 0)
-            this.addTile(1)
-            this.addTile(2)
 
+            this.restart()
             resolve()
         })
     }
@@ -243,6 +241,10 @@ export class EndlessRunnerCourse implements ICourse {
         this.addTile(0, 0)
         this.addTile(1)
         this.addTile(2)
+        this.addTile(3)
+        this.tileColor.r = .2
+        this.tileColor.g = .2
+        this.tileColor.b = .2
     }
 
 
@@ -318,7 +320,7 @@ export class EndlessRunnerCourse implements ICourse {
         const index = Math.ceil(pos.z / tileZ)
 
         // this.addTile(index)
-        this.addTile(index + 1, this.xOffset)
+        this.addTile(index + 2, this.xOffset)
 
         this.pruneTiles(vehicle.vehicleBody.position)
 

@@ -521,7 +521,12 @@ export class Vehicle implements IVehicle {
         return true
     }
 
+    _clearPowerups() {
+
+    }
+
     clearPowerups() {
+        this._clearPowerups()
         this.invertedContoller = 1
         this.noBreaks = false
         this.maxSpeedMult = 1

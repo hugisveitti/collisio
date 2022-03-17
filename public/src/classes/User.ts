@@ -25,7 +25,7 @@ export interface IVehicleSettings {
     /** last selected vehicleType selected by user */
     vehicleType: VehicleType
 
-
+    /** number from 1 to 10 */
     cameraZoom: number
 
     noSteerNumber: number

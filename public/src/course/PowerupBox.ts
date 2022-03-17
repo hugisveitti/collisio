@@ -24,7 +24,7 @@ export interface Powerup {
     type: PowerupType
     onlyForward?: boolean
     accelerationMult?: number
-
+    delay?: number
 }
 
 
@@ -33,7 +33,7 @@ const fasterPowerup: Powerup = {
     name: "Faster",
     speedMult: 1.5,
     color: "green",
-    time: 5,
+    time: 2,
     type: "good"
 }
 
@@ -41,7 +41,7 @@ const accelerationPowerup: Powerup = {
     name: "More Acceleration",
     accelerationMult: 1.8,
     color: "green",
-    time: 7,
+    time: 3,
     type: "good",
     speedMult: 1.2,
 }
@@ -50,7 +50,7 @@ const slowerPowerup: Powerup = {
     name: "Slower",
     speedMult: 0.5,
     color: "red",
-    time: 2.5,
+    time: 1.5,
     type: "bad"
 }
 
@@ -71,7 +71,7 @@ const otherSlowerPowerup: Powerup = {
     speedMult: 0.5,
     color: "purple",
     toOthers: true,
-    time: 5,
+    time: 2,
     type: "others"
 
 }
@@ -80,8 +80,9 @@ const otherInvertedControllerPowerup: Powerup = {
     invertedController: true,
     color: "purple",
     toOthers: true,
-    time: 2,
+    time: 1,
     type: "others",
+    delay: 1,
 }
 
 // no breaks and speed mult?
@@ -90,7 +91,7 @@ const otherNoBreaksPowerup: Powerup = {
     noBreaks: true,
     color: "purple",
     toOthers: true,
-    time: 3,
+    time: 2,
     type: "others",
 }
 

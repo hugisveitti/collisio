@@ -1,7 +1,9 @@
+import { toast } from "react-toastify"
 import { Socket } from "socket.io-client"
 import { MobileControls, std_controls, VehicleControls } from "../shared-backend/shared-stuff"
 import { IVehicle } from "../vehicles/IVehicle"
-import { logScaler, numberScaler } from "./utilFunctions"
+import { requestDeviceOrientation } from "./ControlsClasses"
+import { numberScaler } from "./utilFunctions"
 
 
 let speed = 40
@@ -106,8 +108,6 @@ let nSteerAngle = 0
 let steerAngle = 0
 
 const getSteering = () => {
-
-
     const angle = steerScaler(Math.log2(steerAngle))
     const nAngle = -steerScaler(Math.log2(-nSteerAngle))
     return angle + nAngle
@@ -147,30 +147,120 @@ export const driveVehicleWithKeyboard = (vehicle: IVehicle) => {
         angle = 0
         vehicle.noTurn()
     }
+}
 
-    // if (vehicleControls.left) {
-    //     steerAngle += (dSteer)
-    //     nSteerAngle += (dSteer * 2)
-    //     nSteerAngle = Math.min(nSteerAngle, -1)
-    //     steerAngle = Math.min(maxNumber, steerAngle)
-    //     const angle = getSteering()
-    //     vehicle.turn(angle)
-    // } else if (vehicleControls.right) {
-    //     nSteerAngle -= (dSteer * 2)
-    //     steerAngle -= (dSteer)
-    //     steerAngle = Math.max(steerAngle, 1)
-    //     nSteerAngle = Math.max(-maxNumber, nSteerAngle)
-    //     vehicle.turn(getSteering())
-    // } else {
 
-    //     nSteerAngle += (dSteer * 4)
-    //     steerAngle -= (dSteer * 4)
-    //     steerAngle = Math.max(steerAngle, 1)
-    //     nSteerAngle = Math.min(-1, nSteerAngle)
+let isPortrait = screen?.orientation?.type.includes("portrait")
+const handleDeviceOrientChange = () => {
+    if (screen.orientation?.type) {
+        isPortrait = screen.orientation.type.slice(0, 8) === "portrait";
+    } else {
+        isPortrait = window.orientation === 0;
+    }
+};
 
-    //     steerAngle = Math.min(steerAngle, maxNumber / 3)
-    //     nSteerAngle = Math.max(nSteerAngle, -maxNumber / 3)
 
-    //     vehicle.turn(getSteering())
-    // }
+
+const createAllowOrientation = () => {
+    const div = document.createElement("div")
+
+    const info = document.createElement("div")
+    info.textContent = "Click the button to allow the use of your device orientation. (For the steering)."
+    div.appendChild(info)
+
+
+    const btn = document.createElement("button")
+    btn.textContent = "Click me"
+    btn.addEventListener("click", () => {
+        requestDeviceOrientation((permissionGranted, msg) => {
+            if (permissionGranted) {
+                console.log("removing child")
+                document.body.removeChild(div)
+                toast.success(msg)
+            } else {
+                toast.error("Permission not granted.")
+            }
+        })
+    })
+
+    div.appendChild(btn)
+    document.body.appendChild(div)
+
+    div.classList.add("modal")
+}
+
+const mControls = new MobileControls()
+let mobileControlsActive = false
+const handleDeviceOr = (e: DeviceOrientationEvent) => {
+    if (e.gamma === null) {
+        removeMobileController()
+        createAllowOrientation()
+    } else {
+
+        mControls.alpha = e.alpha
+        mControls.beta = e.beta
+        mControls.gamma = e.gamma
+        //  console.log("alpha", Math.round(e.alpha), "beta", Math.round(e.beta), "gamma", Math.round(e.gamma))
+    }
+}
+
+const handleTouch = (e: TouchEvent, start: boolean) => {
+
+    const yPos = e.changedTouches[0].clientY
+    if (yPos > screen.availHeight / 2) {
+        mControls.f = start
+        mControls.b = false
+    } else {
+        mControls.f = false
+        mControls.b = start
+    }
+}
+
+
+
+
+export const addMobileController = () => {
+    console.log("adding mobile controller")
+    removeMobileController()
+    mobileControlsActive = true
+    window.addEventListener("orientationchange", handleDeviceOrientChange);
+    window.addEventListener("deviceorientation", e => handleDeviceOr(e))
+    window.addEventListener("touchstart", (e) => handleTouch(e, true))
+    window.addEventListener("touchend", (e) => handleTouch(e, false))
+}
+
+export const removeMobileController = () => {
+    mobileControlsActive = false
+    window.removeEventListener("orientationchange", handleDeviceOrientChange);
+
+    window.removeEventListener("deviceorientation", e => handleDeviceOr(e))
+    window.removeEventListener("touchstart", (e) => handleTouch(e, true))
+    window.removeEventListener("touchend", (e) => handleTouch(e, false))
+}
+
+export const driveVehicleWithMobile = (vehicle: IVehicle) => {
+    if (!mobileControlsActive) return
+    if (isPortrait) {
+        vehicle.turn(-mControls.gamma)
+    } else {
+        vehicle.turn(mControls.beta)
+    }
+
+
+    let btnDown = false
+    if (mControls.f) {
+        vehicle.goForward()
+        btnDown = true
+    }
+    if (mControls.b) {
+        vehicle.goBackward()
+        btnDown = true
+    }
+
+    if (!btnDown) {
+        vehicle.noForce()
+
+    } else if (mControls.f) {
+        vehicle.zeroBreakForce()
+    }
 }

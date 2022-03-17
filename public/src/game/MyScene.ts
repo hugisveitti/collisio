@@ -60,7 +60,7 @@ export class MyScene extends Scene3D {
 
     // for some reason on mobile you could get much higher (100+) fps
     // but that never happened on desktop
-    targetFPS = 60
+    targetFPS = 30
     deltaFPS = 0
     updateDelta = 0
 

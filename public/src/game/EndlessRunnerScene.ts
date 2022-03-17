@@ -8,31 +8,34 @@ import { hideLoadDiv } from "../course/loadingManager";
 import { outofControlPowerup } from "../course/PowerupBox";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep } from "../sounds/gameSounds";
-import { addKeyboardControls, driveVehicleWithKeyboard } from "../utils/controls";
+import { addKeyboardControls, addMobileController, driveVehicleWithKeyboard, driveVehicleWithMobile } from "../utils/controls";
+import { getDeviceType } from "../utils/settings";
 import { IVehicle } from "../vehicles/IVehicle";
 import { IGameSceneConfig } from "./IGameScene";
 import { MyScene } from "./MyScene";
 
+const onMobile = getDeviceType() === "mobile"
+
 export class EndlessRunnerScene extends MyScene {
 
-
     vehicle: IVehicle
-
     gameId: string
-
     kmhInfo: HTMLSpanElement
     pointsInfo: HTMLSpanElement
     points: number = 0
     minSpeed: number = 100
     course: EndlessRunnerCourse
-
     isPlaying: boolean = false
     loseSound: Audio
 
     constructor() {
         super()
         this.course = new EndlessRunnerCourse(this)
-        addKeyboardControls()
+        if (!onMobile) {
+            addKeyboardControls()
+        } else {
+            addMobileController()
+        }
         this.gameId = uuid()
 
         this.kmhInfo = document.createElement("span")
@@ -71,6 +74,9 @@ export class EndlessRunnerScene extends MyScene {
                 this.restartGame()
             }
         })
+        if (onMobile) {
+            window.addEventListener("touchstart", (e) => this.restartTouchHandle(e))
+        }
     }
 
     loadSounds() {
@@ -121,30 +127,51 @@ export class EndlessRunnerScene extends MyScene {
         this.vehicle.setCheckpointPositionRotation({ position, rotation })
         this.vehicle.resetPosition()
 
+        if (onMobile) {
+            this.vehicle.updateVehicleSettings({
+                ...this.player.vehicleSettings,
+                cameraZoom: 14,
+
+            }, this.player.vehicleSetup)
+        }
+
         this.loadSounds()
         addMusic(this.gameSettings?.musicVolume || 0, this.camera as PerspectiveCamera, this.getRaceSong(), false)
 
-        this.vehicle.setCanDrive(true)
         this.restartGame()
+
         this.vehicle.setOnlyForward(true)
-        this.vehicle.setMaxSpeedMult(2)
+        this.vehicle.setMaxSpeedMult(1)
     }
 
     setupVehicleCollisionDetection() {
         this.vehicle.vehicleBody.body.on.collision((other, ev) => {
             if (other.name.split("_")[0] === "ball") {
                 console.log("Vehicle coll", other)
-
                 this.course.deleteBallByName(other.name, true)
             }
         })
     }
 
+    restartTouchHandle(e: TouchEvent) {
+        console.log("restart on touch")
+        e.preventDefault()
+
+        if (!this.isPlaying) {
+            this.restartGame()
+        }
+        window.removeEventListener("touchstart", (e) => this.restartTouchHandle(e))
+    }
+
     gameOver() {
         // play game over song
-        this.showImportantInfo(`Game over, you got ${this.points} points. Press 'r' to restart.`)
+        let info = onMobile ? "Press anywhere to restart." : "Press 'r' to restart."
+
+        this.showImportantInfo(`Game over, you got ${this.points} points. ${info}`)
         this.isPlaying = false
         this.loseSound?.play()
+
+
     }
 
     async create() {
@@ -234,17 +261,20 @@ export class EndlessRunnerScene extends MyScene {
     update(time: number, delta: number) {
         this.updateVehicle(delta)
         this.updateFps(time)
-        driveVehicleWithKeyboard(this.vehicle)
+
+        if (!onMobile) {
+            driveVehicleWithKeyboard(this.vehicle)
+        } else {
+            driveVehicleWithMobile(this.vehicle)
+        }
 
         this.course.updateCourse()
         this.renderer.render(this.scene, this.camera)
         this.endlessRun(delta)
-
         const p = this.vehicle.getPosition()
         this.sky.position.set(p.x, p.y, p.z)
         this.pLight.position.setX(p.x)
         this.pLight.position.setZ(p.z)
-
         this.checkOutOfBounds()
     }
 }

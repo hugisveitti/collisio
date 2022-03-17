@@ -13,7 +13,8 @@ import { MyScene } from "../../game/MyScene";
 import { IPlayerInfo, IPreGamePlayerInfo, VehicleColorType, VehicleControls } from "../../shared-backend/shared-stuff";
 import { VehicleSetup } from "../../shared-backend/vehicleItems";
 import { addMusic, removeMusic, setMusicVolume, startMusic } from "../../sounds/gameSounds";
-import { addKeyboardControls, driveVehicleWithKeyboard } from "../../utils/controls";
+import { addKeyboardControls, addMobileController, driveVehicleWithKeyboard, driveVehicleWithMobile } from "../../utils/controls";
+import { getDeviceType } from "../../utils/settings";
 import { getDateNow } from "../../utils/utilFunctions";
 import { BotVehicle } from "../../vehicles/BotVehicle";
 import { IVehicle } from "../../vehicles/IVehicle";
@@ -31,6 +32,8 @@ export interface ISingleplayerGameScene {
     restartGame: () => void
     setNeedsReload: (b: boolean) => void
 }
+
+const onMobile = getDeviceType() === "mobile"
 
 export class SingleplayerGameScene extends MyScene implements ISingleplayerGameScene {
     // config?: ISingleplayerGameSceneConfig
@@ -57,7 +60,11 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.gameId = uuid()
         this.raceCountdownTime = 5
 
-        addKeyboardControls()
+        if (!onMobile) {
+            addKeyboardControls()
+        } else {
+            addMobileController()
+        }
         this.gameTime = new GameTime(2, 2)
         this.kmhInfo = document.createElement("span")
         this.gameInfoDiv.appendChild(this.kmhInfo)
@@ -465,7 +472,12 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
 
         this.updateFps(_time)
 
-        driveVehicleWithKeyboard(this.vehicle)
+        if (!onMobile) {
+            driveVehicleWithKeyboard(this.vehicle)
+        } else {
+            driveVehicleWithMobile(this.vehicle)
+        }
+
 
         this.updateBot(_delta)
         this.checkIfVehicleIsOffCourse()

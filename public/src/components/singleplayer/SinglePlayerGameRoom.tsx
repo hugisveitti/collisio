@@ -1,4 +1,5 @@
 import { Timestamp } from "@firebase/firestore";
+import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
 import React, { useContext, useEffect, useState } from "react";
@@ -25,6 +26,7 @@ import { UserContext } from "../../providers/UserProvider";
 import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
 import { IPlayerInfo } from "../../shared-backend/shared-stuff";
 import { getCountryInfo } from "../../utils/connectSocket";
+import { getDeviceType } from "../../utils/settings";
 import { getRandomItem } from "../../utils/utilFunctions";
 import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
@@ -45,6 +47,7 @@ interface ISingleplayerGameRoom {
 let gameObject: SingleplayerGameScene | EndlessRunnerScene;
 const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
   const user = useContext(UserContext);
+  const onMobile = getDeviceType() === "mobile";
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const history = useHistory();
 
@@ -165,6 +168,25 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     setSettingsModalOpen(false);
   };
 
+  const renderRefreshIcon = () => {
+    return (
+      <IconButton
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 40,
+          zIndex: 9999,
+          fontSize: 32,
+        }}
+        onClick={() => {
+          gameObject.restartGame();
+        }}
+      >
+        <RefreshOutlined />
+      </IconButton>
+    );
+  };
+
   return (
     <React.Fragment>
       <IconButton
@@ -181,6 +203,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
       >
         <SettingsIcon />
       </IconButton>
+      {renderRefreshIcon()}
       <GameSettingsModal
         multiplayer
         gameObject={gameObject}

@@ -10,6 +10,13 @@
   transition: 0.3s;
 }
 
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 #fps-count {
   position: absolute;
   top: 0;
@@ -63,6 +70,13 @@
   text-shadow: 1px 1px white;
   font-size: 16px;
   font-family: monospace;
+
+  touch-action: none;
+  -ms-touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 #totalTime {
@@ -112,4 +126,17 @@
 
 .view-div {
   transition: 0.3s;
+}
+
+.modal {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  background-color: white;
+  color: black;
+  width: 80%;
+  padding: 9px;
+  text-align: center;
+  border: 1px solid black;
 }
