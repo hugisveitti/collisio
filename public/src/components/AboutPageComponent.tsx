@@ -1,6 +1,8 @@
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
 import collisioPic from "../images/collisio-fb.png";
 import logo from "../images/logo.jpg";
 import hugi from "../images/hugi.jpg";
@@ -14,6 +16,7 @@ import {
   privacyPolicyPage,
   termsOfUsePagePath,
 } from "./Routes";
+import { IconButton } from "@mui/material";
 
 interface IAboutPageComponent {}
 
@@ -121,6 +124,22 @@ const AboutPageComponent = (props: IAboutPageComponent) => {
         </Grid>
         <Grid item xs={12}>
           <DonateButton />
+        </Grid>
+        <Grid item xs={12} style={{ margin: "auto", textAlign: "center" }}>
+          <IconButton
+            onClick={() =>
+              (window.location.href = "https://www.facebook.com/collisioclub/")
+            }
+          >
+            <FacebookIcon style={{ color: "white" }} />
+          </IconButton>
+          <IconButton
+            onClick={() =>
+              (window.location.href = "https://www.instagram.com/collisioclub/")
+            }
+          >
+            <InstagramIcon style={{ color: "white" }} />
+          </IconButton>
         </Grid>
       </Grid>
     </BackdropContainer>
