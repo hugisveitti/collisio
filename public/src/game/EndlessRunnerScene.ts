@@ -2,10 +2,12 @@ import { ThirtyFpsOutlined } from "@mui/icons-material";
 import { PhysicsLoader, Project } from "enable3d";
 import { PerspectiveCamera, Quaternion, Vector3, Audio } from "three";
 import { v4 as uuid } from "uuid";
+import { getLocalStorageItem, saveLocalStorageItem } from "../classes/localStorage";
 import { IVehicleSettings } from "../classes/User";
 import { EndlessRunnerCourse } from "../course/EndlessRunnerCourse";
 import { hideLoadDiv } from "../course/loadingManager";
 import { outofControlPowerup } from "../course/PowerupBox";
+import { saveEndlessRun } from "../firebase/firestoreGameFunctions";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep } from "../sounds/gameSounds";
 import { addKeyboardControls, addMobileController, driveVehicleWithKeyboard, driveVehicleWithMobile } from "../utils/controls";
@@ -57,8 +59,8 @@ export class EndlessRunnerScene extends MyScene {
         const fontSize = window.innerWidth < 1500 ? 32 : 82
         this.pointsInfo.setAttribute("style", `
         position:absolute;
-            right:0;
-            bottom:0;
+            right:10px;
+            bottom:30px;
             font-size:${fontSize}px;
     `)
 
@@ -91,8 +93,8 @@ export class EndlessRunnerScene extends MyScene {
 
         this.pointsInfo.setAttribute("style", `
         position:absolute;
-        right:0;
-        bottom:0;
+        right:10px;
+        bottom:30px;
         font-size:${fontSize}px;
     `)
         this.kmhInfo.setAttribute("style", `
@@ -147,14 +149,14 @@ export class EndlessRunnerScene extends MyScene {
     setupVehicleCollisionDetection() {
         this.vehicle.vehicleBody.body.on.collision((other, ev) => {
             if (other.name.split("_")[0] === "ball") {
-                console.log("Vehicle coll", other)
                 this.course.deleteBallByName(other.name, true)
+                this.points -= 5
+                this.updatePointHTML()
             }
         })
     }
 
     restartTouchHandle(e: TouchEvent) {
-        console.log("restart on touch")
         e.preventDefault()
 
         if (!this.isPlaying) {
@@ -165,13 +167,40 @@ export class EndlessRunnerScene extends MyScene {
 
     gameOver() {
         // play game over song
+        let saveKey = "best-endless-run"
+        const bestScore = getLocalStorageItem<number>(saveKey)
+
         let info = onMobile ? "Press anywhere to restart." : "Press 'r' to restart."
+        if (!bestScore || this.points > bestScore) {
+            info += " You set a PB!!"
+            saveLocalStorageItem(saveKey, this.points + "")
+        }
+        if (bestScore) {
+            info += ` Previous best ${bestScore}.`
+        }
+
+        if (!this.player.isAuthenticated) {
+            info += " You need to login to save to the leaderboard."
+        }
 
         this.showImportantInfo(`Game over, you got ${this.points} points. ${info}`)
         this.isPlaying = false
         this.loseSound?.play()
 
+        this.prepareEndOfRunData()
+    }
 
+    prepareEndOfRunData() {
+        saveEndlessRun({
+            playerId: this.player.id,
+            playerName: this.player.playerName,
+            points: this.points,
+            gameTicks: this.gameTicks,
+            gameId: this.gameId,
+            onMobile: onMobile,
+            isAuthenticated: this.player.isAuthenticated,
+            vehicleType: this.vehicle.vehicleType,
+        })
     }
 
     async create() {
@@ -180,8 +209,10 @@ export class EndlessRunnerScene extends MyScene {
 
     restartGame() {
         this.clearImportantInfo()
-        this.showSecondaryInfo("Collect phones, avoid balls.", true)
+        this.showSecondaryInfo("Collect Tiles, Avoid Balls.", true)
         this.course.restart()
+        this.gameTicks = 0
+        this.gameId = uuid()
         this.minSpeed = 100
         this.points = 0
         this.updatePointHTML()
@@ -235,10 +266,7 @@ export class EndlessRunnerScene extends MyScene {
 
     checkOutOfBounds() {
         if (this.vehicle.getPosition().y < -5 && this.isPlaying) {
-            console.log("out of bounds", this.vehicle)
             this.gameOver()
-
-            // this.vehicle.resetPosition()
         }
     }
 

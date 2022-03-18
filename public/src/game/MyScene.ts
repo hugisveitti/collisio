@@ -271,7 +271,7 @@ export class MyScene extends Scene3D {
         // if (window.devicePixelRatio < ratio && lowGraphics) {
         //     ratio = Math.floor(window.devicePixelRatio)
         // }
-        this.renderer.setPixelRatio(1)
+        // this.renderer.setPixelRatio(1)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
 

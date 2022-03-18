@@ -8,6 +8,7 @@ import {
   howToPlayPagePath,
   mobileOnlyWaitingRoomPath,
   privateProfilePagePath,
+  singlePlayerGameRoomPath,
   singlePlayerWaitingRoomPath,
   tournamentPagePath,
 } from "../Routes";
@@ -40,6 +41,12 @@ const ExtraFrontPageComponent = (props: IExtraFrontPageComponent) => {
           Play with keyboard
         </BackdropButton>
       )}
+      <BackdropButton
+        link={singlePlayerGameRoomPath + "/endless"}
+        width={btnWidth}
+      >
+        Play endless runner
+      </BackdropButton>
       <BackdropButton link={highscorePagePath} width={btnWidth}>
         Highscores
       </BackdropButton>

@@ -28,12 +28,12 @@ export function getLocalStorageItem<T extends string | number | boolean>(key: st
 
 
 export const saveLocalStorageItem = (key: string, value: string) => {
-    if (!allowCookies) return
+    //   if (!allowCookies) return
     window.localStorage.setItem(key, value)
 }
 
 export const getLocalUid = () => {
-    if (!allowCookies) "nocook_" + uuid()
+    //  if (!allowCookies) "nocook_" + uuid()
     let uid = window.localStorage.getItem("uid")
     if (!uid) {
         uid = "undef_" + uuid()
@@ -44,13 +44,13 @@ export const getLocalUid = () => {
 
 const displayNameKey = "guestDisplayName"
 export const getLocalDisplayName = () => {
-    if (!allowCookies) return ""
+    //  if (!allowCookies) return ""
     let name = window.localStorage.getItem(displayNameKey)
 
     return name
 }
 
 export const setLocalDisplayName = (name: string) => {
-    if (!allowCookies) return
+    //  if (!allowCookies) return
     window.localStorage.setItem(displayNameKey, name)
 }

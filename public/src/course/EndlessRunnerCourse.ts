@@ -10,7 +10,7 @@ import { ICourse } from "./ICourse";
 const tileZ = 30;
 const tileX = 50;
 
-let pruneDistance = tileZ * 5
+let pruneDistance = tileZ * 6.5
 
 class BouncingObsticle {
 
@@ -26,13 +26,14 @@ class BouncingObsticle {
         this.model.castShadow = true
         this.course.gameScene.physics.add.existing(this.model, { mass: 3, collisionFlags: 0 })
         this.model.name = "ball_" + idx
-        this.model.body.applyForceX(1)
-        this.model.body.setBounciness(0.8)
-        this.model.body.setGravity(0, -30, 0)
-        this.model.body.applyForceZ(-30)
+        //  this.model.body.applyForceX(1)
+        this.model.body.setBounciness(.95)
+        this.model.body.setGravity(0, -40, 0)
+        this.model.body.applyForceZ(-80)
         this.loadSound()
         this.model.body.on.collision((other, ev) => {
             if (isVehicle(other)) {
+                this.destroy()
                 this.course.gameScene.vehicleHitBouncingObsticle(other.name)
                 this.sound?.play()
                 this.course.deleteBall(this)
@@ -45,6 +46,10 @@ class BouncingObsticle {
             sound.setVolume(0.1)
             this.sound = sound
         })
+    }
+
+    destroy() {
+        this.course.gameScene.physics.physicsWorld.removeCollisionObject(this.model.body.ammo)
     }
 
     update() {
@@ -84,9 +89,11 @@ class Collectable {
                 this.course.deleteCollectable(this)
             }
         })
-
     }
 
+    destroy() {
+        this.course.gameScene.physics.physicsWorld.removeCollisionObject(this.model.body.ammo)
+    }
     loadSound() {
         getBeep("/sound/powerup-good.ogg", this.course.gameScene.listener, (sound) => {
             sound.setVolume(0.1)
@@ -104,7 +111,8 @@ class Collectable {
 }
 
 const tileWidthScaler = numberScaler(tileX, tileX * .1, 0, 200, 3)
-
+// number of tiles we render ahead
+const tileRenderDistance = 4
 export class EndlessRunnerCourse implements ICourse {
 
     gameScene: EndlessRunnerScene
@@ -173,9 +181,6 @@ export class EndlessRunnerCourse implements ICourse {
         let x = j * tileX
         const z = i * tileZ
 
-
-
-
         let width = tileWidthScaler(i)
         // width = tileX
         //   x = (Math.random() * width / 4) - width / 8
@@ -235,16 +240,16 @@ export class EndlessRunnerCourse implements ICourse {
 
     restart() {
         this.clearCourse()
-        this.ballsNum = 0
-        this.collectablesNum = 0
-        this.xOffset = 0
-        this.addTile(0, 0)
-        this.addTile(1)
-        this.addTile(2)
-        this.addTile(3)
         this.tileColor.r = .2
         this.tileColor.g = .2
         this.tileColor.b = .2
+        // this.ballsNum = 0
+        // this.collectablesNum = 0
+        this.xOffset = 0
+        this.addTile(0, 0)
+        for (let i = 1; i <= tileRenderDistance; i++) {
+            this.addTile(i)
+        }
     }
 
 
@@ -320,7 +325,7 @@ export class EndlessRunnerCourse implements ICourse {
         const index = Math.ceil(pos.z / tileZ)
 
         // this.addTile(index)
-        this.addTile(index + 2, this.xOffset)
+        this.addTile(index + (tileRenderDistance - 1), this.xOffset)
 
         this.pruneTiles(vehicle.vehicleBody.position)
 

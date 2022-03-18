@@ -85,6 +85,11 @@ service cloud.firestore {
       }
     }
 
+    match /endlessRun/{playerId} {
+        allow update, create: if request.auth.uid == playerId;
+        allow read;
+    }
+
     match /roomData/{roomId} {
     	allow create: if !exists(/databases/$(database)/documents/roomData/$(request.resource.id));
       allow read; //: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));

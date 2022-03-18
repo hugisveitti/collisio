@@ -1,5 +1,6 @@
 import { Timestamp } from "@firebase/firestore";
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
 import React, { useContext, useEffect, useState } from "react";
@@ -90,9 +91,13 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
       history.push(singlePlayerWaitingRoomPath);
       return;
     }
-    const vehicleSettings =
-      props.store.userSettings?.vehicleSettings ??
-      defaultUserSettings.vehicleSettings;
+    const vehicleSettings = props.store.userSettings?.vehicleSettings ?? {
+      ...defaultUserSettings.vehicleSettings,
+    };
+    if (endless) {
+      vehicleSettings.vehicleType = "f1";
+      vehicleSettings.cameraZoom = 14;
+    }
     const vehicleType = vehicleSettings.vehicleType;
     const vehicleSetup =
       props.store.vehiclesSetup?.[vehicleType] ??
@@ -123,6 +128,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         gameSettings: props.store.gameSettings,
         date: Timestamp.now(),
         acceptedCookies: getCookiesAllowed(),
+        endless: !!endless,
       });
     });
 
@@ -187,8 +193,9 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     );
   };
 
-  return (
-    <React.Fragment>
+  const renderSettingsButton = () => {
+    // if (endless) return null;
+    return (
       <IconButton
         style={{
           position: "absolute",
@@ -198,11 +205,21 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
           fontSize: 32,
         }}
         onClick={() => {
-          setSettingsModalOpen(!settingsModalOpen);
+          if (endless) {
+            window.location.href = "/";
+          } else {
+            setSettingsModalOpen(!settingsModalOpen);
+          }
         }}
       >
-        <SettingsIcon />
+        {!endless ? <SettingsIcon /> : <ExitToAppIcon />}
       </IconButton>
+    );
+  };
+
+  return (
+    <React.Fragment>
+      {renderSettingsButton()}
       {renderRefreshIcon()}
       <GameSettingsModal
         multiplayer

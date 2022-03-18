@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, setDoc, startAt, where } from "@firebase/firestore"
+import { collection, deleteDoc, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, setDoc, startAt, Timestamp, where } from "@firebase/firestore"
 import { IEndOfRaceInfoGame, IEndOfRaceInfoPlayer } from "../classes/Game"
 import { IFlattendBracketNode } from "../classes/Tournament"
 import { TrackName, VehicleType } from "../shared-backend/shared-stuff"
@@ -291,4 +291,46 @@ export const deleteBestScore = (playerId: string, trackName: TrackName, numberOf
             reject
         })
     })
+}
+
+
+
+interface IEndlessRunData {
+    playerId: string
+    playerName: string
+    points: number
+    gameTicks: number
+    gameId: string
+    onMobile: boolean
+    isAuthenticated: boolean
+    vehicleType: VehicleType
+    numberOfPlays?: number
+}
+
+const endlessRunPath = "endlessRun"
+
+export const saveEndlessRun = async (run: IEndlessRunData) => {
+    if (!run.isAuthenticated) return
+    const gameRef = doc(firestore, endlessRunPath, run.playerId)
+
+    const saveData = (prevBest: IEndlessRunData | undefined) => {
+        if (prevBest) {
+            run.numberOfPlays = prevBest.numberOfPlays + 1
+        } else {
+            run.numberOfPlays = 1
+        }
+        console.log("saving data", run)
+
+        setDoc(gameRef, { ...run, date: Timestamp.now() })
+    }
+
+    const d = await getDoc(gameRef)
+    if (!d.exists()) {
+        saveData(undefined)
+    } else {
+        const data = d.data() as IEndlessRunData
+        if (data.points < run.points) {
+            saveData(data)
+        }
+    }
 }

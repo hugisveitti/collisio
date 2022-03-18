@@ -171,6 +171,7 @@ const createAllowOrientation = () => {
 
     const btn = document.createElement("button")
     btn.textContent = "Click me"
+    btn.classList.add("btn")
     btn.addEventListener("click", () => {
         requestDeviceOrientation((permissionGranted, msg) => {
             if (permissionGranted) {
@@ -191,12 +192,14 @@ const createAllowOrientation = () => {
 
 const mControls = new MobileControls()
 let mobileControlsActive = false
+let hasOrientationPermission = false
 const handleDeviceOr = (e: DeviceOrientationEvent) => {
+
     if (e.gamma === null) {
         removeMobileController()
         createAllowOrientation()
     } else {
-
+        hasOrientationPermission = true
         mControls.alpha = e.alpha
         mControls.beta = e.beta
         mControls.gamma = e.gamma
@@ -217,11 +220,21 @@ const handleTouch = (e: TouchEvent, start: boolean) => {
 }
 
 
-
-
 export const addMobileController = () => {
     console.log("adding mobile controller")
     removeMobileController()
+    handleDeviceOrientChange()
+    setTimeout(() => {
+        if (!hasOrientationPermission) {
+
+            requestDeviceOrientation((granted, msg) => {
+                if (!granted) {
+                    createAllowOrientation()
+                }
+            })
+        }
+    }, 500)
+
     mobileControlsActive = true
     window.addEventListener("orientationchange", handleDeviceOrientChange);
     window.addEventListener("deviceorientation", e => handleDeviceOr(e))
