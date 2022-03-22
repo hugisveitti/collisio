@@ -183,7 +183,6 @@ export class MyScene extends Scene3D {
             this.gameInfoDiv.classList.add("good-power")
         } else {
             this.gameInfoDiv.classList.add("bad-power")
-
         }
     }
 
@@ -500,7 +499,13 @@ export class MyScene extends Scene3D {
 
         this.socket?.off(std_ping_test_callback)
 
-        this.socket?.emit(dts_ping_test, { roomTicks: this.roomTicks, gameTicks: this.gameTicks, totalPing: this.totalPing, totalPingsGotten: this.totalPingsGotten, avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks })
+        this.socket?.emit(dts_ping_test, {
+            roomTicks: this.roomTicks,
+            gameTicks: this.gameTicks,
+            totalPing: this.totalPing,
+            totalPingsGotten: this.totalPingsGotten,
+            avgFps: this.totalNumberOfFpsTicks === 0 ? -1 : this.totalFpsTicks / this.totalNumberOfFpsTicks
+        })
         this.socket?.once(std_ping_test_callback, () => {
             clearTimeout(this.pingTimeout)
             this.lastPing = Date.now() - start

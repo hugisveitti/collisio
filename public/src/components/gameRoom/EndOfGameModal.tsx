@@ -85,6 +85,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
   /** All time best data */
   const [trackData, setTrackData] = useState([] as IEndOfRaceInfoPlayer[]);
   const btnWidth = 180;
+
   useEffect(() => {
     if (props.data.endOfRaceInfo) {
       const { trackName, numberOfLaps } = props.data.endOfRaceInfo.roomSettings;
@@ -206,7 +207,7 @@ const EndOfGameModal = (props: IEndOfGameModal) => {
                       totalTime: data.totalTime,
                     }).map((str, idx: number) => (
                       <Typography
-                        key={`${data.playerName}-${i}-raceinfo`}
+                        key={`${data.playerName}-${idx}-raceinfo`}
                         style={{ marginRight: 10 }}
                       >
                         {str}

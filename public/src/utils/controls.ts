@@ -165,7 +165,7 @@ const createAllowOrientation = () => {
     const div = document.createElement("div")
 
     const info = document.createElement("div")
-    info.textContent = "Click the button to allow the use of your device orientation. (For the steering)."
+    info.textContent = "Click the button to allow the use of your device orientation. (For the steering). If controls still doesn't work, try switching mobile browser, we recommend Chrome."
     div.appendChild(info)
 
 

@@ -33,7 +33,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
   const [camPosNum, setCamPosNum] = useState(0);
 
   const [pressedStartGame, setPressedStartGame] = useState(
-    _pressedStartGame || props.autoEnter
+    _pressedStartGame || props.autoEnter || onMobile
   );
   const [ratioLoaded, setRatioLoaded] = useState(0);
 

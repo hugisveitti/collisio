@@ -502,6 +502,17 @@ export class LowPolyVehicle extends Vehicle {
 
     };
 
+    setPower(engineForce: number) {
+
+        if (this.is4x4) {
+            this.vehicle.applyEngineForce(engineForce, FRONT_LEFT)
+            this.vehicle.applyEngineForce(engineForce, FRONT_RIGHT)
+        }
+
+        this.vehicle.applyEngineForce(engineForce, BACK_LEFT)
+        this.vehicle.applyEngineForce(engineForce, BACK_RIGHT)
+    }
+
 
 
     goBackward() {

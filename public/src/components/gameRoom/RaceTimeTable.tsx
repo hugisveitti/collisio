@@ -111,7 +111,7 @@ const RaceTimeTable = (props: IRaceTimeTable) => {
                     >
                       {timeInfo.totalTime.toFixed(2)}
                     </TableCell>
-                    <TableCell>{timeInfo.points}</TableCell>
+                    <TableCell align="right">{timeInfo.points}</TableCell>
                   </>
                 )}
               </TableRow>

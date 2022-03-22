@@ -41,7 +41,11 @@ const RoomInfoRow = (props: IRoomInfoRow) => {
           {getDateFromNumber(props.roomInfo.date.seconds * 1000)}
         </TableCell>
         <TableCell>{props.roomInfo.player?.id ?? "-"}</TableCell>
-        <TableCell>{props.roomInfo.roomSettings?.trackName}</TableCell>
+        <TableCell>
+          {props.roomInfo.endless
+            ? "Endless"
+            : props.roomInfo.roomSettings?.trackName}
+        </TableCell>
         <TableCell>{props.roomInfo.roomSettings?.numberOfLaps}</TableCell>
         <TableCell>{props.roomInfo.country}</TableCell>
         <TableCell>

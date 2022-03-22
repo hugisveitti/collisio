@@ -32,7 +32,6 @@ var getPortLocalhost = function () {
     /** only works on my PC */
     var onLocalhost = false;
     if (os.hostname().includes("Lisa")) {
-        console.log("On localhost");
         port = 5000;
         onLocalhost = true;
     }

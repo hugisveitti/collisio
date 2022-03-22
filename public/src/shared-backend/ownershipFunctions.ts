@@ -45,14 +45,17 @@ const vehicleCosts: { [vehicleType in VehicleType]: number } = {
     future: 40000
 }
 
-
-export const defaultOwnedTracks: TrackName[] = [
+export const defaultOwnedRaceTracks: TrackName[] = [
     "farm-track",
     "nurn-track",
     "f1-track",
     "sea-side-track",
-    "simple-tag-course",
     "basic-track1",
+]
+
+export const defaultOwnedTracks: TrackName[] = [
+    ...defaultOwnedRaceTracks,
+    "simple-tag-course",
 ]
 
 type TrackOwnership = { [trackName in TrackName]: boolean }

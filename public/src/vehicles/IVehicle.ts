@@ -64,6 +64,7 @@ export interface IVehicle {
     break: (notBreak?: boolean) => void
     zeroBreakForce: () => void
     zeroEngineForce: () => void
+    setPower: (engineForce: number) => void
     stop: () => void
     start: () => void
     pause: () => void

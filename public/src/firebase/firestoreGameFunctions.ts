@@ -295,7 +295,7 @@ export const deleteBestScore = (playerId: string, trackName: TrackName, numberOf
 
 
 
-interface IEndlessRunData {
+export interface IEndlessRunData {
     playerId: string
     playerName: string
     points: number
@@ -333,4 +333,18 @@ export const saveEndlessRun = async (run: IEndlessRunData) => {
             saveData(data)
         }
     }
+}
+
+export const getEndlessRunData = (startNumber: number, numberOfItems: number) => {
+    return new Promise<IEndlessRunData[]>(async (resolve, reject) => {
+        const gameRef = collection(firestore, endlessRunPath)
+
+        const q = query(gameRef, orderBy("points", "desc"),)
+        const docs = await getDocs(q)
+        const arr = [] as IEndlessRunData[]
+        docs.forEach(d => {
+            arr.push(d.data() as IEndlessRunData)
+        })
+        resolve(arr)
+    })
 }

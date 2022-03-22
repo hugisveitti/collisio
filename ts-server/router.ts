@@ -14,7 +14,7 @@ export const getPortLocalhost = () => {
     /** only works on my PC */
     let onLocalhost = false
     if (os.hostname().includes("Lisa")) {
-        console.log("On localhost")
+
         port = 5000
         onLocalhost = true
     }

@@ -69,7 +69,6 @@ export class RaceGameScene extends GameScene {
 
     async loadAssets(): Promise<void> {
 
-        this.gameTimers = []
         this.course = new RaceCourse(this, this.getTrackName(), (o: ExtendedObject3D) => this.handleGoalCrossed(o), (o: ExtendedObject3D, checkpointNumber: number) => this.handleCheckpointCrossed(o, checkpointNumber))
 
         await this.course.createCourse()
@@ -86,6 +85,7 @@ export class RaceGameScene extends GameScene {
 
         this.currentNumberOfLaps = this.getNumberOfLaps()
         // adds font to vehicles, which displays names
+        this.gameTimers = []
         for (let i = 0; i < this.players.length; i++) {
             this.gameTimers.push(new GameTime(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints()))
         }
@@ -471,13 +471,14 @@ export class RaceGameScene extends GameScene {
 
         const currCheckpTime = this.gameTimers[vehicleNumber].getCheckpointTime(checkpointNumber, lapNumber)
         if (!currCheckpTime || currCheckpTime < bestTime) return this.gameTimers[vehicleNumber].getCurrentLapTime().toFixed(2)
-        return (bestTime - currCheckpTime).toFixed(2)
+        return `+${(currCheckpTime - bestTime).toFixed(2)}`
     }
 
     sendScoreInfo() {
         if (this.gameRoomActions.updateScoreInfo) {
             const timeInfos: IRaceTimeInfo[] = []
             let maxTotalTime = 0
+
             for (let i = 0; i < this.gameTimers.length; i++) {
                 let cLapTime = this.gameTimers[i].getCurrentLapTime()
                 const bLT = this.gameTimers[i].getBestLapTime()
@@ -503,6 +504,8 @@ export class RaceGameScene extends GameScene {
     }
 
     updateScoreTable(time: number, delta: number) {
+
+
         const timeInfos: IRaceTimeInfo[] = []
         let maxTotalTime = 0
         for (let i = 0; i < this.gameTimers.length; i++) {
@@ -514,8 +517,10 @@ export class RaceGameScene extends GameScene {
                 cLapTime = -1
             }
 
+            if (this.viewsLapsInfo[i]?.textContent) {
 
-            this.viewsLapsInfo[i].textContent = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
+                this.viewsLapsInfo[i].textContent = `${this.gameTimers[i].lapNumber} / ${this.currentNumberOfLaps}`
+            }
         }
 
         // if (this.gameRoomActions.updateScoreTable) {

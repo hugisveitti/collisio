@@ -9,6 +9,7 @@ import { ICourse } from "./ICourse";
 
 const tileZ = 30;
 const tileX = 50;
+const tileWidthScaler = numberScaler(tileX, tileX * .25, 0, 200, 3)
 
 let pruneDistance = tileZ * 6.5
 
@@ -36,6 +37,7 @@ class BouncingObsticle {
                 this.destroy()
                 this.course.gameScene.vehicleHitBouncingObsticle(other.name)
                 this.sound?.play()
+                this.course.gameScene.addPowerupColor(0, "bad")
                 this.course.deleteBall(this)
             }
         })
@@ -87,6 +89,10 @@ class Collectable {
                 this.course.gameScene.vehicleHitCollectible(other.name)
                 this.sound?.play()
                 this.course.deleteCollectable(this)
+                this.course.gameScene.addPowerupColor(0, "good")
+                setTimeout(() => {
+                    this.course.gameScene.removePowerupColor(0)
+                }, 250)
             }
         })
     }
@@ -110,7 +116,7 @@ class Collectable {
     }
 }
 
-const tileWidthScaler = numberScaler(tileX, tileX * .1, 0, 200, 3)
+
 // number of tiles we render ahead
 const tileRenderDistance = 4
 export class EndlessRunnerCourse implements ICourse {
@@ -178,15 +184,18 @@ export class EndlessRunnerCourse implements ICourse {
         this.isAddingTile = true
 
 
-        let x = j * tileX
         const z = i * tileZ
 
         let width = tileWidthScaler(i)
+        let x = j * width
         // width = tileX
         //   x = (Math.random() * width / 4) - width / 8
 
         if (i > 4) {
-            this.addBall(x, z, width)
+            if (i < 50 || i % 5 === 0) {
+                // when the player get far, then fewer balls
+                this.addBall(x, z, width)
+            }
             this.addCollectable(x, z, width)
         }
 
@@ -209,7 +218,7 @@ export class EndlessRunnerCourse implements ICourse {
 
         // if (Math.random() < .1) {
         if (i > 10 && i % 4 === 0 && !notRecures) {
-            this.xOffset += .3 * Math.sign(Math.random() - .5)
+            this.xOffset += .5 * Math.sign(Math.random() - .5)
             this.addTile(i + 1, this.xOffset, true)
         }
         this.isAddingTile = false

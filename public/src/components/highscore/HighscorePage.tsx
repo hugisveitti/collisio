@@ -30,9 +30,10 @@ interface IHighscorePage {}
 let nextStartTotalTime = 0;
 let startTotalTimes = [];
 const HighscorePage = (props: IHighscorePage) => {
-  const _singleplayer =
-    window.location.pathname.split("/")?.[2] === "singleplayer";
-  console.log("_singleplayer", _singleplayer);
+  const lastPath = window.location.pathname.split("/")?.[2];
+  const _singleplayer = lastPath === "singleplayer";
+  const endless = lastPath === "endless";
+
   const [singleplayer, setSingleplayer] = useState(_singleplayer);
   // const [numberOfLapsKeys, setNumberOfLapsKeys] = useState([]);
   const [numberOfLapsKey, setNumberOfLapsKey] = useState(2);

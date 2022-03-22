@@ -24,6 +24,12 @@ interface IControlsRoomComponent {
 }
 
 let isPortrait = false;
+let _hasOrientationPermission = false;
+
+export const hasOrientationPermission = () => {
+  return _hasOrientationPermission;
+};
+
 const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   const controller = props.controller;
   const orientation = props.orientation;
@@ -48,18 +54,23 @@ const ControlsRoomComponent = (props: IControlsRoomComponent) => {
   const deviceOrientationHandler = (e: DeviceOrientationEvent) => {
     // -1 if inverted
     e.preventDefault();
-
+    _hasOrientationPermission = true;
     const gamma = e.gamma ?? 0;
     const beta = e.beta ?? 0;
     const alpha = e.alpha ?? 0;
-
-    if (e.gamma === null && e.beta === null && e.alpha === null) {
-      toast.error(
-        "Your device orientation is not working. Please reset orientation in settings. Or switch browsers (we recommend Firefox)."
-      );
+    if (e.beta === null) {
+      _hasOrientationPermission = false;
       window.removeEventListener("orientationchange", handleDeviceOrientChange);
       return;
     }
+
+    // if (e.gamma === null && e.beta === null && e.alpha === null) {
+    //   toast.error(
+    //     "Your device orientation is not working. Please reset orientation in settings. Or switch browsers (we recommend Firefox)."
+    //   );
+    //   window.removeEventListener("orientationchange", handleDeviceOrientChange);
+    //   return;
+    // }
     controller.alpha = Math.round(alpha);
     controller.gamma = Math.round(gamma);
     controller.beta = Math.round(beta);

@@ -22,7 +22,7 @@ import {
 import { startGame } from "../../game/GameScene";
 import { IEndOfGameData, IGameScene } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
-import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
+import { defaultOwnedRaceTracks } from "../../shared-backend/ownershipFunctions";
 import {
   dts_back_to_waiting_room,
   dts_player_finished,
@@ -363,7 +363,7 @@ const GameRoom = React.memo((props: IGameRoom) => {
           // start by just getting one of the default owend tracks
           // TODO extend to all owned tracks
           let newTrack = getRandomItem(
-            defaultOwnedTracks,
+            defaultOwnedRaceTracks,
             props.store.roomSettings.trackName
           );
           const newRoomSettings: IRoomSettings = {

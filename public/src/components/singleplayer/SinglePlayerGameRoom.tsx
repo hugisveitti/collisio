@@ -1,4 +1,5 @@
 import { Timestamp } from "@firebase/firestore";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -24,7 +25,10 @@ import {
 } from "../../game/EndlessRunnerScene";
 import { IEndOfGameData } from "../../game/IGameScene";
 import { UserContext } from "../../providers/UserProvider";
-import { defaultOwnedTracks } from "../../shared-backend/ownershipFunctions";
+import {
+  defaultOwnedRaceTracks,
+  defaultOwnedTracks,
+} from "../../shared-backend/ownershipFunctions";
 import { IPlayerInfo } from "../../shared-backend/shared-stuff";
 import { getCountryInfo } from "../../utils/connectSocket";
 import { getDeviceType } from "../../utils/settings";
@@ -33,7 +37,11 @@ import { defaultVehiclesSetup } from "../../vehicles/VehicleSetup";
 import { clearBackdropCanvas } from "../backdrop/backdropCanvas";
 import EndOfGameModal, { IGameDataInfo } from "../gameRoom/EndOfGameModal";
 import GameSettingsModal from "../gameRoom/GameSettingsModal";
-import { singlePlayerWaitingRoomPath } from "../Routes";
+import {
+  endlessLeaderboardPath,
+  highscorePagePath,
+  singlePlayerWaitingRoomPath,
+} from "../Routes";
 import { IStore } from "../store";
 import {
   createSingleplayerGameScene,
@@ -217,10 +225,34 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
     );
   };
 
+  const renderLeaderBoardButton = () => {
+    return (
+      <IconButton
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 80,
+          zIndex: 9999,
+          fontSize: 32,
+        }}
+        onClick={() => {
+          if (endless) {
+            window.location.href = endlessLeaderboardPath;
+          } else {
+            window.location.href = highscorePagePath + "/singleplayer";
+          }
+        }}
+      >
+        <LeaderboardIcon />
+      </IconButton>
+    );
+  };
+
   return (
     <React.Fragment>
       {renderSettingsButton()}
       {renderRefreshIcon()}
+      {renderLeaderBoardButton()}
       <GameSettingsModal
         multiplayer
         gameObject={gameObject}
@@ -278,7 +310,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
           // start by just getting one of the default owend tracks
           // TODO extend to all owned tracks
           let newTrack = getRandomItem(
-            defaultOwnedTracks,
+            defaultOwnedRaceTracks,
             props.store.roomSettings.trackName
           );
           const newRoomSettings: IRoomSettings = {

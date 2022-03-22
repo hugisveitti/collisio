@@ -492,8 +492,10 @@ export class Vehicle implements IVehicle {
         }
     }
 
+    setPower(engineForce: number) { }
+
     playSkidSound(skid: number) {
-        return
+
         if (!this.skidSound || !this.useSoundEffects || this.isPaused || !this._canDrive) return false
         if (skid < 0.8) {
 

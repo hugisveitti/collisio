@@ -41,9 +41,9 @@ const DeviceOrientationPermissionComponent = (
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Typography>
-                Since you steer with your phone, we need to access the
-                orientation information on your phone. Press the button below to
-                allow this information.
+                Click the button to allow the use of your device orientation.
+                (For the steering). If the controls still don't work, try
+                switching mobile browsers, we recommend Chrome.
               </Typography>
             </Grid>
             <Grid item xs={12} style={{ textAlign: "center" }}>

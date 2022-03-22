@@ -107,12 +107,18 @@ export class TagGameScene extends GameScene {
             this.vehicles[i].vehicleBody.body.on.collision((otherObject: ExtendedObject3D, ev: CollisionEvent) => {
 
 
-                if (!this.isItTimeout && !this.gameOver && this.tagObjects[i].isIt && isVehicle(otherObject)) {
-                    /** change colors */
-                    const vn = getVehicleNumber(otherObject.name)
-                    this.handleVehicleTagged(vn, i)
 
+                if (!this.isItTimeout && !this.gameOver && isVehicle(otherObject)) {
+                    const otherVN = getVehicleNumber(otherObject.name)
+                    if (this.tagObjects[i].isIt) {
+                        /** change colors */
+                        this.handleVehicleTagged(otherVN, i)
+                    } else if (this.tagObjects[otherVN].isIt) {
+                        this.handleVehicleTagged(i, otherVN)
+                    }
                 }
+
+
             })
         }
     }

@@ -40,6 +40,7 @@ import AboutPageComponent from "./AboutPageComponent";
 import FrontPageContainer from "./frontpage/FrontPageContainer";
 import GameRoom from "./gameRoom/GameRoom";
 import GarageContainer from "./garage/GarageContainer";
+import EndlessHighscorePage from "./highscore/EndlessHighscorePage";
 import HighscorePage from "./highscore/HighscorePage";
 import HowToPlayPage from "./HowToPlayPage";
 import LoginPageContainer from "./login/LoginPageContainer";
@@ -107,6 +108,7 @@ export const cookiesInfoPagePath = "/cookies";
 export const termsOfUsePagePath = "/termsOfUse";
 export const singlePlayerWaitingRoomPath = "/singleplayer";
 export const singlePlayerGameRoomPath = "/singleplayer/game";
+export const endlessLeaderboardPath = "/highscores/endless";
 
 const multiplayerGameRoomPagePath = "/multiplayer/game";
 
@@ -270,6 +272,10 @@ const Routes = () => {
         <Route
           path={howToPlayPagePath}
           render={(props) => <HowToPlayPage {...props} />}
+        />
+        <Route
+          path={endlessLeaderboardPath}
+          render={(props) => <EndlessHighscorePage {...props} />}
         />
         <Route
           path={[singleplayerHighscorePagePath, highscorePagePath]}

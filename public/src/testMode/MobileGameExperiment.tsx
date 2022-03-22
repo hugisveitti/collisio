@@ -31,7 +31,10 @@ import { IEndOfGameData, IGameScene } from "../game/IGameScene";
 import ControllerSettingsModal from "../mobile/ControllerSettingsModal";
 import ControlsRoomComponent from "../mobile/ControlsRoomComponent";
 import { UserContext } from "../providers/UserProvider";
-import { defaultOwnedTracks } from "../shared-backend/ownershipFunctions";
+import {
+  defaultOwnedRaceTracks,
+  defaultOwnedTracks,
+} from "../shared-backend/ownershipFunctions";
 import {
   defaultVehicleColorType,
   GameActions,
@@ -340,7 +343,7 @@ const MobileGameExperiment = (props: IMobileGameExperiment) => {
         }}
         randomTrack={() => {
           let newTrack = getRandomItem(
-            defaultOwnedTracks,
+            defaultOwnedRaceTracks,
             props.store.roomSettings.trackName
           );
           const newRoomSettings: IRoomSettings = {

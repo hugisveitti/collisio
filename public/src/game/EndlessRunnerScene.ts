@@ -1,18 +1,17 @@
-import { ThirtyFpsOutlined } from "@mui/icons-material";
 import { PhysicsLoader, Project } from "enable3d";
-import { PerspectiveCamera, Quaternion, Vector3, Audio } from "three";
+import { Audio, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { v4 as uuid } from "uuid";
 import { getLocalStorageItem, saveLocalStorageItem } from "../classes/localStorage";
 import { IVehicleSettings } from "../classes/User";
 import { EndlessRunnerCourse } from "../course/EndlessRunnerCourse";
 import { hideLoadDiv } from "../course/loadingManager";
-import { outofControlPowerup } from "../course/PowerupBox";
 import { saveEndlessRun } from "../firebase/firestoreGameFunctions";
 import { VehicleSetup } from "../shared-backend/vehicleItems";
 import { addMusic, getBeep } from "../sounds/gameSounds";
 import { addKeyboardControls, addMobileController, driveVehicleWithKeyboard, driveVehicleWithMobile } from "../utils/controls";
 import { getDeviceType } from "../utils/settings";
 import { IVehicle } from "../vehicles/IVehicle";
+import { vehicleConfigs } from "../vehicles/VehicleConfigs";
 import { IGameSceneConfig } from "./IGameScene";
 import { MyScene } from "./MyScene";
 
@@ -30,6 +29,7 @@ export class EndlessRunnerScene extends MyScene {
     isPlaying: boolean = false
     loseSound: Audio
 
+
     constructor() {
         super()
         this.course = new EndlessRunnerCourse(this)
@@ -39,6 +39,7 @@ export class EndlessRunnerScene extends MyScene {
             addMobileController()
         }
         this.gameId = uuid()
+        this.gameInfoDiv.classList.add("single-player-game-info")
 
         this.kmhInfo = document.createElement("span")
         this.gameInfoDiv.appendChild(this.kmhInfo)
@@ -50,8 +51,6 @@ export class EndlessRunnerScene extends MyScene {
             transform: translate(-50%, 0);
             font-size:24px;
         `)
-
-
 
         this.pointsInfo = document.createElement("span")
         this.gameInfoDiv.appendChild(this.pointsInfo)
@@ -110,13 +109,14 @@ export class EndlessRunnerScene extends MyScene {
         await this.course.createCourse()
         this.courseLoaded = true
         this.addLights()
-        //  this.physics.debug.enable()
+        // this.physics.debug.enable()
         this.camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, this.getDrawDistance())
         this.camera.position.set(0, 50, 50)
         this.camera.rotation.set(-Math.PI / 10, Math.PI, -Math.PI / 10)
         this.vehicle = await this.createVehicle(this.player)
         this.vehicle.addCamera(this.camera)
         this.vehicle.start()
+
         hideLoadDiv()
         this.setupVehicleCollisionDetection()
 
@@ -150,8 +150,7 @@ export class EndlessRunnerScene extends MyScene {
         this.vehicle.vehicleBody.body.on.collision((other, ev) => {
             if (other.name.split("_")[0] === "ball") {
                 this.course.deleteBallByName(other.name, true)
-                this.points -= 5
-                this.updatePointHTML()
+                this.vehicleHitBouncingObsticle("")
             }
         })
     }
@@ -214,6 +213,7 @@ export class EndlessRunnerScene extends MyScene {
         this.gameTicks = 0
         this.gameId = uuid()
         this.minSpeed = 100
+
         this.points = 0
         this.updatePointHTML()
         this.vehicle.resetPosition()
@@ -251,11 +251,17 @@ export class EndlessRunnerScene extends MyScene {
     vehicleHitBouncingObsticle(vehicleName: string) {
         this.points -= 5
         this.updatePointHTML()
+
+        this.addPowerupColor(0, "bad")
+        setTimeout(() => {
+            this.removePowerupColor(0)
+        }, 250)
     }
 
     endlessRun(delta: number) {
-
         if (!this.isPlaying) return
+
+
         if (this.vehicle && this.vehicle.getCurrentSpeedKmHour() < this.minSpeed) {
             this.vehicle.goForward()
         }

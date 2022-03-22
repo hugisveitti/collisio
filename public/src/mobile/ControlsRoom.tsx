@@ -33,7 +33,9 @@ import { inTestMode, isIphone } from "../utils/settings";
 import { invertedControllerKey } from "./ControllerSettingsComponent";
 import ControllerSettingsModal from "./ControllerSettingsModal";
 import "./ControlsRoom.css";
-import ControlsRoomComponent from "./ControlsRoomComponent";
+import ControlsRoomComponent, {
+  hasOrientationPermission,
+} from "./ControlsRoomComponent";
 
 interface IControlsRoomProps {
   store: IStore;
@@ -188,6 +190,13 @@ const ControlsRoom = (props: IControlsRoomProps) => {
         console.warn("Player not logged in, cannot save game");
       }
     });
+
+    setTimeout(() => {
+      console.log("hasOrientationPermission()", hasOrientationPermission());
+      if (!hasOrientationPermission()) {
+        setShowPermissionModal(true);
+      }
+    }, 1000);
 
     return () => {
       /**
