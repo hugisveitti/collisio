@@ -283,7 +283,7 @@ export class MyScene extends Scene3D {
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
-        this.physics.config.maxSubSteps = 1 + 1 + 2
+        this.physics.config.maxSubSteps = 1 + 1// + 1
 
         this.physics.config.fixedTimeStep = 1 / this.targetFPS
 
@@ -296,13 +296,22 @@ export class MyScene extends Scene3D {
         })
     }
 
+    lastTime: number
+
     private _myupdate() {
         const currDelta = this.clock.getDelta()
         this.deltaFPS += currDelta
         this.updateDelta += currDelta
         if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused && this.isReady) {
             const time = this.clock.getElapsedTime()
+            if (!this.lastTime) {
+                this.lastTime = time
+                return
+            }
+            const dt = (time - this.lastTime) * 1000
+            this.lastTime = time
             let delta = (this.updateDelta * 1000)
+            //   console.log("dt", dt, "delta", delta)
             // console.log("this.deltaFPS > this.physics.config.fixedTimeStep", this.deltaFPS, this.physics.config.fixedTimeStep)
 
             // maybe a bad metric if lagging
@@ -320,6 +329,8 @@ export class MyScene extends Scene3D {
 
             this.gameTicks += 1
             this.roomTicks += 1
+
+            delta = dt
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 

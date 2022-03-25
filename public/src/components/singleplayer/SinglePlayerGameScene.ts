@@ -140,7 +140,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.vehicle.addCamera(this.camera)
 
         await this.createBot()
-        this.bot.update(16)
+        this.bot?.update(16)
         this.renderer.render(this.scene, this.camera)
         hideLoadDiv()
 
@@ -176,7 +176,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         if (idx === 0) {
             if (powerup.toOthers) {
                 this.showSecondaryInfo(`${powerup.name} to others`, true, powerup.time)
-                this.bot.setPowerup(powerup)
+                this.bot?.setPowerup(powerup)
             } else {
 
                 this.vehicle.setPowerup(powerup)
@@ -326,6 +326,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
     }
 
     restartBotPos() {
+        if (!this.bot) return
         const { position, rotation } = this.course.getGoalCheckpoint()
         const alpha = 2 * Math.asin(rotation.y)
         this.bot.setCheckpointPositionRotation({
@@ -368,7 +369,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
             this.currentNumberOfLaps = this.roomSettings.numberOfLaps
             this.gameTime.restart(this.currentNumberOfLaps, this.course.getNumberOfCheckpoints())
             this.vehicle.resetPosition()
-            this.bot.restartBot()
+            this.bot?.restartBot()
             this.startRaceCountdown()
         }
     }
