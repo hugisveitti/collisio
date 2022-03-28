@@ -72,7 +72,7 @@ const times: { [trackName in TrackName]: TrackTimes } = {
         bronze: 180,
         weight: 4.1
     },
-    "alberta-park-track": {
+    "albert-park-track": {
         gold: 70,
         silver: 80,
         bronze: 90,

@@ -284,7 +284,7 @@ export class MyScene extends Scene3D {
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
         // having maxSubStep less than 0. we get nicer behavior
-        this.physics.config.maxSubSteps = 0.9//1// + 1// + 1
+        this.physics.config.maxSubSteps = 1 + 1//0.9//1// + 1// + 1
 
         this.physics.config.fixedTimeStep = (1 / this.targetFPS)
 

@@ -49,7 +49,7 @@ exports.allTrackNames = [
         //       song: "desert.mp3"
     },
     {
-        name: "Alberta Park", type: "alberta-park-track", gameType: "race", category: "long", difficulty: "medium",
+        name: "Albert Park", type: "albert-park-track", gameType: "race", category: "long", difficulty: "medium",
         hemisphereRadius: 1500
     },
     {

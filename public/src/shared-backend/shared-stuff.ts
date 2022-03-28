@@ -26,7 +26,7 @@ export type TrackName =
     | "spa-track"
     | "silverstone-track"
     | "nurn-track"
-    | "alberta-park-track"
+    | "albert-park-track"
     | "speed-test-track"
     | "small-track"
     | "small-jump-track"
@@ -101,7 +101,7 @@ export const allTrackNames: ITrackInfo[] = [
         //       song: "desert.mp3"
     },
     {
-        name: "Alberta Park", type: "alberta-park-track", gameType: "race", category: "long", difficulty: "medium",
+        name: "Albert Park", type: "albert-park-track", gameType: "race", category: "long", difficulty: "medium",
         hemisphereRadius: 1500
     },
     {

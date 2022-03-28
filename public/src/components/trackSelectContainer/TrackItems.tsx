@@ -32,8 +32,8 @@ import simpleTagImage from "../../images/tracks/simple-tag-course.jpg";
 import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.jpg";
 import basicTagImage from "../../images/tracks/basic-tag-course.jpg";
 import basicTagMinImage from "../../images/tracks/min/min-basic-tag-course.jpg";
-import albertaParkImage from "../../images/tracks/alberta-park.jpg";
-import albertaParkMinImage from "../../images/tracks/min/min-alberta-park.jpg";
+import albertParkImage from "../../images/tracks/albert-park.jpg";
+import albertParkMinImage from "../../images/tracks/min/min-albert-park.jpg";
 
 import {
   getTrackInfos,
@@ -72,9 +72,9 @@ const trackImagePair: ITrackMinImagePair[] = [
     largeImage: seaSideTrackImage,
   },
   {
-    trackName: "alberta-park-track",
-    minImage: albertaParkMinImage,
-    largeImage: albertaParkImage,
+    trackName: "albert-park-track",
+    minImage: albertParkMinImage,
+    largeImage: albertParkImage,
   },
   {
     trackName: "silverstone-track",

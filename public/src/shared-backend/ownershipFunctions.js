@@ -64,7 +64,7 @@ exports.defaultOwnedRaceTracks = [
     "f1-track",
     "sea-side-track",
     "basic-track1",
-    "alberta-park-track"
+    "albert-park-track"
 ];
 exports.defaultOwnedTracks = __spreadArray(__spreadArray([], exports.defaultOwnedRaceTracks, true), [
     "simple-tag-course",
@@ -88,7 +88,7 @@ var trackCosts = {
     "basic-track5": 40000,
     "f1-track": 0,
     "sea-side-track": 0,
-    "alberta-park-track": 0,
+    "albert-park-track": 0,
     "f1-track-2": 500,
     "russia-track": 10000,
     "ferrari-track": 1000,

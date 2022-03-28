@@ -106,7 +106,7 @@ export const activeTrackNames: TrackName[] = [
     "farm-track",
     "nurn-track",
     "sea-side-track",
-    "alberta-park-track",
+    "albert-park-track",
     "f1-track",
     "f1-track-2",
     "russia-track",
