@@ -57,7 +57,7 @@ export class RaceGameScene extends GameScene {
         this.hasShowStartAnimation = false
         this.raceFinished = false
 
-        this.raceCountdownTime = 6
+        this.raceCountdownTime = 5
 
 
         if (inTestMode) {

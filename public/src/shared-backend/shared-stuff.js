@@ -49,6 +49,10 @@ exports.allTrackNames = [
         //       song: "desert.mp3"
     },
     {
+        name: "Alberta Park", type: "alberta-park-track", gameType: "race", category: "long", difficulty: "medium",
+        hemisphereRadius: 1500
+    },
+    {
         name: "Space track", type: "silverstone-track", gameType: "race", category: "long", difficulty: "hard",
         song: "desert.mp3", hemisphereRadius: 2000, timeOfDay: "evening"
     },

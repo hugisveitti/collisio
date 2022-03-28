@@ -10,8 +10,17 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allCosts = exports.getDefaultOwnership = exports.getDefaultVehicleColorOwnership = exports.getDefaultTrackOwnership = exports.defaultOwnedTracks = exports.getDefaultVehicleOwnership = void 0;
+exports.allCosts = exports.getDefaultOwnership = exports.getDefaultVehicleColorOwnership = exports.getDefaultTrackOwnership = exports.defaultOwnedTracks = exports.defaultOwnedRaceTracks = exports.getDefaultVehicleOwnership = void 0;
 var shared_stuff_1 = require("./shared-stuff");
 function itemInArray(st, arr) {
     for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
@@ -49,14 +58,17 @@ var vehicleCosts = {
     gokart: 3000,
     future: 40000
 };
-exports.defaultOwnedTracks = [
+exports.defaultOwnedRaceTracks = [
     "farm-track",
     "nurn-track",
     "f1-track",
     "sea-side-track",
-    "simple-tag-course",
     "basic-track1",
+    "alberta-park-track"
 ];
+exports.defaultOwnedTracks = __spreadArray(__spreadArray([], exports.defaultOwnedRaceTracks, true), [
+    "simple-tag-course",
+], false);
 var getDefaultTrackOwnership = function () {
     // @ts-ignore
     var defaultTrackOwnership = {};
@@ -76,6 +88,7 @@ var trackCosts = {
     "basic-track5": 40000,
     "f1-track": 0,
     "sea-side-track": 0,
+    "alberta-park-track": 0,
     "f1-track-2": 500,
     "russia-track": 10000,
     "ferrari-track": 1000,

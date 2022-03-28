@@ -63,6 +63,12 @@ var times = {
         bronze: 180,
         weight: 4.1
     },
+    "alberta-park-track": {
+        gold: 70,
+        silver: 80,
+        bronze: 90,
+        weight: 2.8
+    },
     // Mountain
     "russia-track": {
         gold: 28.5,
