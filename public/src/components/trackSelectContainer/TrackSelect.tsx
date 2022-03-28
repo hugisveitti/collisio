@@ -193,7 +193,7 @@ const TrackSelect = (props: ITrackSelect) => {
                   <Typography>
                     You need to be logged in to buy tracks.
                   </Typography>
-                  <BackdropButton link={loginPagePath}>
+                  <BackdropButton link={loginPagePath} color="white">
                     Create a free account
                   </BackdropButton>
                 </div>

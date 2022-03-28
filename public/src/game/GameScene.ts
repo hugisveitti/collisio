@@ -800,9 +800,9 @@ export class GameScene extends MyScene implements IGameScene {
                 const child = this.scene.children[0]
                 this.scene.remove(child)
             }
-            this.physics.rigidBodies
 
-            this.physics.update(16)
+
+            //            this.physics.update(16)
             this.restart().then(() => {
             })
         } else {

@@ -32,6 +32,8 @@ import simpleTagImage from "../../images/tracks/simple-tag-course.jpg";
 import simpleTagMinImage from "../../images/tracks/min/min-simple-tag-course.jpg";
 import basicTagImage from "../../images/tracks/basic-tag-course.jpg";
 import basicTagMinImage from "../../images/tracks/min/min-basic-tag-course.jpg";
+import albertaParkImage from "../../images/tracks/alberta-park.jpg";
+import albertaParkMinImage from "../../images/tracks/min/min-alberta-park.jpg";
 
 import {
   getTrackInfos,
@@ -68,6 +70,11 @@ const trackImagePair: ITrackMinImagePair[] = [
     trackName: "sea-side-track",
     minImage: seaSideTrackMinImage,
     largeImage: seaSideTrackImage,
+  },
+  {
+    trackName: "alberta-park-track",
+    minImage: albertaParkMinImage,
+    largeImage: albertaParkImage,
   },
   {
     trackName: "silverstone-track",

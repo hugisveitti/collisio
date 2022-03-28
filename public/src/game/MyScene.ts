@@ -270,7 +270,7 @@ export class MyScene extends Scene3D {
         // if (window.devicePixelRatio < ratio && lowGraphics) {
         //     ratio = Math.floor(window.devicePixelRatio)
         // }
-        // this.renderer.setPixelRatio(1)
+        this.renderer.setPixelRatio(window.devicePixelRatio)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
@@ -283,9 +283,10 @@ export class MyScene extends Scene3D {
         // this.physics.config.maxSubSteps = 4
         // this.physics.config.fixedTimeStep = this.getGraphicsType() === "high" ? 1 / 120 : 1 / 60
         //https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=2315
-        this.physics.config.maxSubSteps = 1 + 1// + 1
+        // having maxSubStep less than 0. we get nicer behavior
+        this.physics.config.maxSubSteps = 0.9//1// + 1// + 1
 
-        this.physics.config.fixedTimeStep = 1 / this.targetFPS
+        this.physics.config.fixedTimeStep = (1 / this.targetFPS)
 
         this.isPaused = false
         setTimeout(() => {
@@ -301,44 +302,47 @@ export class MyScene extends Scene3D {
     private _myupdate() {
         const currDelta = this.clock.getDelta()
         this.deltaFPS += currDelta
-        this.updateDelta += currDelta
-        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused && this.isReady) {
-            const time = this.clock.getElapsedTime()
-            if (!this.lastTime) {
-                this.lastTime = time
-                return
-            }
-            const dt = (time - this.lastTime) * 1000
+        //    this.updateDelta += currDelta
+
+        const time = this.clock.getElapsedTime()
+        if (!this.lastTime) {
             this.lastTime = time
-            let delta = (this.updateDelta * 1000)
-            //   console.log("dt", dt, "delta", delta)
-            // console.log("this.deltaFPS > this.physics.config.fixedTimeStep", this.deltaFPS, this.physics.config.fixedTimeStep)
+            return
+        }
+        const dt = (time - this.lastTime)
+        // console.log("time", time, "dt", dt, "fixed time", this.physics.config.fixedTimeStep)
+        if (this.deltaFPS > this.physics.config.fixedTimeStep && !this.isPaused && this.isReady) {
+            let delta = dt * 1000
+
 
             // maybe a bad metric if lagging
-            if (this.deltaFPS - this.physics.config.fixedTimeStep > 1 / 30) {
-                this.isLagging = true
-            } else {
-                this.isLagging = false
-            }
-            this.updateDelta = 0
-            this.deltaFPS = this.deltaFPS % this.physics.config.fixedTimeStep
+
 
 
             // must always satisfy the equation timeStep < maxSubSteps * fixedTimeStep
             // update physics, then update models, opposite to enabled3d
 
+
+            this.lastTime = time
+
+            this.deltaFPS = this.deltaFPS % this.physics.config.fixedTimeStep
+            //console.log("fixed", this.physics.config.fixedTimeStep, "dt", dt)
+            // this.physics.config.fixedTimeStep = dt + 0.01
             this.gameTicks += 1
             this.roomTicks += 1
 
-            delta = dt
+
+            // if delta is bigger than 70 we get some weird shit
+            if (delta > 70) return
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 
-            this.update?.(+(time.toFixed(8)), delta)
 
             this.animationMixers.update(delta)
 
             this.preRender()
+
+            this.update?.(+(time.toFixed(8)), delta)
 
             if (this.composer) {
                 this.composer.render()
@@ -352,6 +356,8 @@ export class MyScene extends Scene3D {
 
         }
     }
+
+
 
     playCountdownBeep() {
         if (this.useSound) {
