@@ -101,7 +101,7 @@ export const allTrackNames: ITrackInfo[] = [
         //       song: "desert.mp3"
     },
     {
-        name: "Albert Park", type: "albert-park-track", gameType: "race", category: "long", difficulty: "medium",
+        name: "Albert Park (Melbourne)", type: "albert-park-track", gameType: "race", category: "long", difficulty: "medium",
         hemisphereRadius: 1500
     },
     {
