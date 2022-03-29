@@ -29,7 +29,6 @@ export default class RoomMaster {
     rooms: { [roomId: string]: Room }
     io
     testRoom
-    allSocketIds: string[]
 
 
     constructor(io: Socket) {
@@ -37,7 +36,6 @@ export default class RoomMaster {
         this.rooms = {}
         /** only one test room */
         this.testRoom = new TestRoom()
-        this.allSocketIds = []
     }
 
     getStatsString() {
@@ -109,7 +107,7 @@ export default class RoomMaster {
 
     socketHasRoom(socket: Socket) {
         for (let roomId of Object.keys(this.rooms)) {
-            if (socket === this.rooms[roomId].socket) {
+            if (socket.id === this.rooms[roomId].socket.id) {
                 return true
             }
         }
@@ -139,7 +137,7 @@ export default class RoomMaster {
             /** delete room callback */
             delete this.rooms[roomId]
         })
-        console.log("room created", roomId, this.getStatsString())
+        console.log("room created", roomId, this.getStatsString(), "number of rooms:", Object.keys(this.rooms).length)
         socket.join(roomId)
         socket.emit(std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId } })
     }
@@ -206,12 +204,6 @@ export default class RoomMaster {
                 })
 
             }
-
-
-            // socket.on("disconnect", () => {
-            //     const idx = this.allSocketIds.indexOf(socket.id)
-            //     this.allSocketIds.splice(idx, 1)
-            // })
         })
     }
 }

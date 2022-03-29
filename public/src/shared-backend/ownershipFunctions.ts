@@ -51,7 +51,8 @@ export const defaultOwnedRaceTracks: TrackName[] = [
     "f1-track",
     "sea-side-track",
     "basic-track1",
-    "albert-park-track"
+    "albert-park-track",
+    "small-track"
 ]
 
 export const defaultOwnedTracks: TrackName[] = [

@@ -256,6 +256,8 @@ export class Vehicle implements IVehicle {
     async updateVehicleSetup(vehicleSetup: VehicleSetup) {
 
         return new Promise<void>(async (resolve, reject) => {
+            // resolve()
+            // return
             if (this.isUpdatingVehicleSetup) return
             if (this.isReady) {
 

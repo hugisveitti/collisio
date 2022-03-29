@@ -31,6 +31,7 @@ export interface ISingleplayerGameSceneConfig {
 export interface ISingleplayerGameScene {
     restartGame: () => void
     setNeedsReload: (b: boolean) => void
+
 }
 
 const onMobile = getDeviceType() === "mobile"
@@ -104,6 +105,9 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
                 this.vehicle?.resetPosition()
             } else if (e.key === "r") {
                 this.restartGame()
+                if (this.gameRoomActions.closeModals) {
+                    this.gameRoomActions.closeModals()
+                }
             }
         })
     }
@@ -353,7 +357,7 @@ export class SingleplayerGameScene extends MyScene implements ISingleplayerGameS
         this.clearImportantInfo()
         this.clearSecondaryInfo()
         this.gameStarted = false
-
+        console.log("restart game, needs reload:", this.needsReload)
         if (this.needsReload) {
             this.isPaused = true
             removeMusic()

@@ -149,6 +149,7 @@ const SingleplayerGameRoom = (props: ISingleplayerGameRoom) => {
         escPressed: handleEscPressed,
         gameFinished: handleGameFinished,
         playerFinished: handlePlayerFinished,
+        closeModals: handleCloseModals,
       },
     };
     if (!endless) {

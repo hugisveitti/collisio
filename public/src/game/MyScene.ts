@@ -333,7 +333,7 @@ export class MyScene extends Scene3D {
 
 
             // if delta is bigger than 70 we get some weird shit
-            if (delta > 70) return
+            if (delta > 70 || delta < 2) return
             this.physics?.update(delta)
             this.physics?.updateDebugger()
 

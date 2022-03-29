@@ -296,7 +296,7 @@ export class LowPolyVehicle extends Vehicle {
             // box.body.ammo.setActivationState(DISABLE_DEACTIVATION)
             // box.body.skipUpdate = true
 
-
+            console.log("creating vehicle, setting center of mass", this.vehicleConfig.centerOfMassOffset)
             this.changeCenterOfMass()
             this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: this.vehicleConfig.shape ?? "convex", autoCenter: false, })
             // this.scene.physics.add.existing(this.vehicleBody, { mass: this.vehicleConfig.mass, shape: "box", autoCenter: false, width: 2, depth: 6, height: 1.5, y: 2 })
