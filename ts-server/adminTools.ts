@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, limit, orderBy, query } from "@firebase/firestore";
+import { collectionGroup, doc, getDoc, getDocs, limit, orderBy, query } from "@firebase/firestore";
 import { Request, Response } from "express";
 import { collection } from "firebase/firestore";
 import { admin, firestore } from "./firebase-config";
@@ -18,6 +18,7 @@ export const adminFunctions = (app: any) => {
     const gameDataPath = "allGames"
     const singleplayerGameDataPath = "singleplayerAllGames"
     const createdRoomsPath = "created-rooms"
+    const transactionPath = "transactions"
 
     const getIsAdmin = async (userId: string, callback: (isAdmin: boolean) => void) => {
         const adminsRef = doc(firestore, adminsRefPath, userId)
@@ -169,6 +170,54 @@ export const adminFunctions = (app: any) => {
         })
     }
 
+    const getTransactionData = (userId: string, queryParams: IQueryParams): Promise<ICallbackData> => {
+        return new Promise<ICallbackData>((resolve, reject) => {
+            getIsAdmin(userId, async (isAdmin) => {
+                if (isAdmin) {
+                    const path = transactionPath
+                    //    const gameDataRef = collection(firestore, path)
+                    const gameDataRef = collectionGroup(firestore, "items")
+                    let q = query(gameDataRef, orderBy("date", "desc"))
+
+                    if (queryParams.n) {
+                        q = query(q, limit(queryParams.n))
+                    }
+
+                    try {
+
+                        const data = await getDocs(q)
+                        const trans: any[] = []
+                        data.forEach(doc => {
+                            trans.push(doc.data())
+                        })
+
+                        resolve({
+                            status: "success",
+                            statusCode: 200,
+                            data: trans,
+                            message: "Successfully gotten room data"
+                        })
+                    } catch (e) {
+                        console.warn("Error getting transaction data", e)
+                        resolve({
+                            status: "error",
+                            statusCode: 500,
+                            message: "Error"
+                        })
+                    }
+
+                } else {
+                    resolve({
+                        status: "error",
+                        statusCode: 403,
+
+                        message: "User not admin"
+                    })
+                }
+            })
+        })
+    }
+
 
 
 
@@ -182,6 +231,25 @@ export const adminFunctions = (app: any) => {
 
         return queryParams
     }
+
+    app.get("/transaction-data/:userTokenId", (req: Request, res: Response) => {
+        const data = req.params
+
+        const { userTokenId } = data
+
+        const queryParams = getQueryParams(req)
+
+
+        admin.auth().verifyIdToken(userTokenId).then((decodedToken: any) => {
+            getTransactionData(decodedToken.uid, queryParams).then(roomDataRes => {
+                res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));
+            })
+
+        }).catch((err: any) => {
+            console.warn("error", err)
+            res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
+        })
+    })
 
     /**
      * query params 

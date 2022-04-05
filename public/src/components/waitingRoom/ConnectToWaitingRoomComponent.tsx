@@ -72,7 +72,7 @@ const ConnectToWaitingRoomComponent = (
       data: {
         gameSettings: props.store.gameSettings,
         roomSettings: props.store.roomSettings,
-        desktopUserId: user?.uid,
+        desktopUserId: user?.uid ?? getLocalUid(),
       },
     });
     socket.once(std_room_created_callback, (response: ISocketCallback) => {

@@ -250,7 +250,8 @@ export const buyItem = (userId: string, item: AllOwnableItems, vehicleType?: Veh
             date: Timestamp.now(),
             cost: itemCost,
             id: itemId,
-            name: itemName
+            name: itemName,
+            userId
         })
 
 

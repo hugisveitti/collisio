@@ -241,7 +241,8 @@ var buyItem = function (userId, item, vehicleType) {
                         date: firestore_1.Timestamp.now(),
                         cost: itemCost,
                         id: itemId,
-                        name: itemName
+                        name: itemName,
+                        userId: userId
                     });
                     // think this needs to be changed for item
                     batch.commit().then(function () {

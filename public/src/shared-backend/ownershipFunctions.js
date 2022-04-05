@@ -64,7 +64,8 @@ exports.defaultOwnedRaceTracks = [
     "f1-track",
     "sea-side-track",
     "basic-track1",
-    "albert-park-track"
+    "albert-park-track",
+    "small-track"
 ];
 exports.defaultOwnedTracks = __spreadArray(__spreadArray([], exports.defaultOwnedRaceTracks, true), [
     "simple-tag-course",

@@ -29,7 +29,6 @@ var RoomMaster = /** @class */ (function () {
         this.rooms = {};
         /** only one test room */
         this.testRoom = new TestRoom_1.default();
-        this.allSocketIds = [];
     }
     RoomMaster.prototype.getStatsString = function () {
         var _a = this.getStats(), numberOfRooms = _a.numberOfRooms, numberOfPlayers = _a.numberOfPlayers, numberOfRoomsNotSendingControls = _a.numberOfRoomsNotSendingControls, numberOfRoomsSendingControls = _a.numberOfRoomsSendingControls;
@@ -85,7 +84,7 @@ var RoomMaster = /** @class */ (function () {
     RoomMaster.prototype.socketHasRoom = function (socket) {
         for (var _i = 0, _a = Object.keys(this.rooms); _i < _a.length; _i++) {
             var roomId = _a[_i];
-            if (socket === this.rooms[roomId].socket) {
+            if (socket.id === this.rooms[roomId].socket.id) {
                 return true;
             }
         }
@@ -114,7 +113,7 @@ var RoomMaster = /** @class */ (function () {
             /** delete room callback */
             delete _this.rooms[roomId];
         });
-        console.log("room created", roomId, this.getStatsString());
+        console.log("room created", roomId, this.getStatsString(), "number of rooms:", Object.keys(this.rooms).length);
         socket.join(roomId);
         socket.emit(shared_stuff_1.std_room_created_callback, { status: successStatus, message: "Successfully created a room.", data: { roomId: roomId } });
     };
@@ -176,10 +175,6 @@ var RoomMaster = /** @class */ (function () {
                     socket.emit(shared_stuff_1.stmd_players_in_room_callback, { message: message, status: status, data: { players: players } });
                 });
             }
-            // socket.on("disconnect", () => {
-            //     const idx = this.allSocketIds.indexOf(socket.id)
-            //     this.allSocketIds.splice(idx, 1)
-            // })
         });
     };
     return RoomMaster;

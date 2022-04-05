@@ -48,6 +48,7 @@ var adminFunctions = function (app) {
     var gameDataPath = "allGames";
     var singleplayerGameDataPath = "singleplayerAllGames";
     var createdRoomsPath = "created-rooms";
+    var transactionPath = "transactions";
     var getIsAdmin = function (userId, callback) { return __awaiter(void 0, void 0, void 0, function () {
         var adminsRef, data, e_1;
         return __generator(this, function (_a) {
@@ -202,6 +203,60 @@ var adminFunctions = function (app) {
             });
         }); });
     };
+    var getTransactionData = function (userId, queryParams) {
+        return new Promise(function (resolve, reject) {
+            getIsAdmin(userId, function (isAdmin) { return __awaiter(void 0, void 0, void 0, function () {
+                var path, gameDataRef, q, data, trans_1, e_4;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!isAdmin) return [3 /*break*/, 5];
+                            path = transactionPath;
+                            gameDataRef = (0, firestore_1.collectionGroup)(firebase_config_1.firestore, "items");
+                            q = (0, firestore_1.query)(gameDataRef, (0, firestore_1.orderBy)("date", "desc"));
+                            if (queryParams.n) {
+                                q = (0, firestore_1.query)(q, (0, firestore_1.limit)(queryParams.n));
+                            }
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, (0, firestore_1.getDocs)(q)];
+                        case 2:
+                            data = _a.sent();
+                            trans_1 = [];
+                            data.forEach(function (doc) {
+                                trans_1.push(doc.data());
+                            });
+                            resolve({
+                                status: "success",
+                                statusCode: 200,
+                                data: trans_1,
+                                message: "Successfully gotten room data"
+                            });
+                            return [3 /*break*/, 4];
+                        case 3:
+                            e_4 = _a.sent();
+                            console.warn("Error getting transaction data", e_4);
+                            resolve({
+                                status: "error",
+                                statusCode: 500,
+                                message: "Error"
+                            });
+                            return [3 /*break*/, 4];
+                        case 4: return [3 /*break*/, 6];
+                        case 5:
+                            resolve({
+                                status: "error",
+                                statusCode: 403,
+                                message: "User not admin"
+                            });
+                            _a.label = 6;
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            }); });
+        });
+    };
     var getQueryParams = function (req) {
         var _a = req.query, n = _a.n, useCreatedRooms = _a.useCreatedRooms, singleplayer = _a.singleplayer;
         var queryParams = {
@@ -211,6 +266,19 @@ var adminFunctions = function (app) {
         };
         return queryParams;
     };
+    app.get("/transaction-data/:userTokenId", function (req, res) {
+        var data = req.params;
+        var userTokenId = data.userTokenId;
+        var queryParams = getQueryParams(req);
+        firebase_config_1.admin.auth().verifyIdToken(userTokenId).then(function (decodedToken) {
+            getTransactionData(decodedToken.uid, queryParams).then(function (roomDataRes) {
+                res.status(roomDataRes.statusCode).send(JSON.stringify(roomDataRes));
+            });
+        }).catch(function (err) {
+            console.warn("error", err);
+            res.status(403).send(JSON.stringify({ message: "Could not verify user", status: "error" }));
+        });
+    });
     /**
      * query params
      * n: number of latest entries to fetch
