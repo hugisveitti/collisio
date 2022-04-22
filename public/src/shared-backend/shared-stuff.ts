@@ -182,7 +182,7 @@ export const allVehicleTypes: { name: string, type: VehicleType, vehicleClass?: 
     { name: "Cylindar Jonny", type: "simpleCylindar", vehicleClass: "Sphere" }
 ]
 
-export const defaultVehicleType: VehicleType = Math.random() < .3 ? "normal2" : "f1"
+export const defaultVehicleType: VehicleType = "f1"
 
 export type GameType = "ball" | "race" | "tag" | "story"
 
@@ -441,7 +441,7 @@ export const stmd_number_connected = "stmd_number_connected"
 export const std_quit_game = "std_quit_game"
 export const mts_quit_game = "mts_quit_game"
 
-// not implmented yet
+
 export const stm_back_to_waiting_room = "stm_back_to_waiting_room"
 
 export const mdts_game_settings_changed = "mdts_game_settings_changed"

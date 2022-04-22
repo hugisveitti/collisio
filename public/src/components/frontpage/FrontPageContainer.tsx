@@ -1,4 +1,4 @@
-import { CircularProgress, Grid } from "@mui/material";
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { setLocalGameSetting } from "../../classes/localGameSettings";
 import { UserContext } from "../../providers/UserProvider";
@@ -12,7 +12,7 @@ import {
 import BackdropContainer from "../backdrop/BackdropContainer";
 import BackdropButton from "../button/BackdropButton";
 import VolumeInput from "../inputs/VolumeInput";
-import AdSense from "../monitary/AdSense";
+import DonateButton from "../monitary/DonateButton";
 import MyRadio from "../radio/MyRadio";
 import {
   buyCoinsPagePath,
@@ -120,6 +120,15 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             <i>Alpha</i>
           </p>
         </Grid>
+        <Grid item xs={12}>
+          <div className="background">
+            <Typography>
+              This game has no ads and is free to play. Please consider donating
+              to keep it going strong. 💪
+            </Typography>
+            <DonateButton />
+          </div>
+        </Grid>
         {onTablet() && (
           <Grid item xs={12}>
             <div className="background">
@@ -142,9 +151,6 @@ const FrontPageContainer = (props: IFrontPageContainer) => {
             </div>
           </Grid>
         )}
-        <Grid item xs={12}>
-          <AdSense slotId="7059022973" />
-        </Grid>
       </Grid>
 
       <TutorialComponent />

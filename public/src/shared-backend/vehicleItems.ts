@@ -127,7 +127,7 @@ const sportsCarItems: CarItems = {
         name: "Sad Charlie",
         engineForce: 380,
         frictionSlip: -0.5,
-        maxSpeed: -1,
+        maxSpeed: 50,
         mass: 100,
         cost: 200000
     },
@@ -140,7 +140,7 @@ const sportsCarItems: CarItems = {
         frictionSlip: .5,
         mass: 100,
         engineForce: -100,
-        maxSpeed: -15
+        maxSpeed: 15
     },
     spoiler2: {
         id: "sportsCar-spoiler2",
@@ -180,10 +180,11 @@ const sportsCarItems: CarItems = {
         path: "spoiler5",
         type: "spoiler",
         name: "Sylvester",
-        cost: 5000,
+        cost: 15000,
         frictionSlip: 0.8,//3,
         mass: 80,
-        engineForce: 150,
+        engineForce: 350,
+        maxSpeed: 35,
     },
     wheelGuards1: {
         id: "sportsCar-wheelGuards1",
@@ -245,10 +246,10 @@ const f1Items: CarItems = {
         path: "exhaust5",
         type: "exhaust",
         name: "Everlyn",
-        cost: 5000,
-        engineForce: 600,
+        cost: 15000,
+        engineForce: 1000,
         frictionSlip: -2,
-        maxSpeed: 25
+        maxSpeed: 75
     },
     spoiler1: {
         id: "f1-spoiler1",
@@ -282,10 +283,11 @@ const f1Items: CarItems = {
         path: "spoiler4",
         type: "spoiler",
         name: "Sarah",
-        cost: 2500,
-        frictionSlip: 0.7,//3,
-        mass: 230,
-        engineForce: 250
+        cost: 7500,
+        frictionSlip: .7,//3,
+        mass: 50,
+        engineForce: 250,
+        maxSpeed: 35
     },
     wheelGuards1: {
         id: "f1-wheelGuards1",
