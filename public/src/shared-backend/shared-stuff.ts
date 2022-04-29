@@ -94,7 +94,7 @@ export const allTrackNames: ITrackInfo[] = [
         name: "Nordic track", type: "f1-track", gameType: "race", category: "short", difficulty: "hard"
     },
     {
-        name: "Spanish track", type: "f1-track-2", gameType: "race", category: "short", difficulty: "medium"
+        name: "English track", type: "f1-track-2", gameType: "race", category: "short", difficulty: "medium"
     },
     {
         name: "Beach track", type: "sea-side-track", gameType: "race", category: "long", difficulty: "medium",
