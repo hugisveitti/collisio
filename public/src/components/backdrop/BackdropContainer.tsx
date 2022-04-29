@@ -33,7 +33,7 @@ const BackdropContainer = (props: IBackdropContainer) => {
   const [camPosNum, setCamPosNum] = useState(0);
 
   const [pressedStartGame, setPressedStartGame] = useState(
-    _pressedStartGame || props.autoEnter || onMobile || true // adding this to see if we get approved for ads
+    _pressedStartGame || props.autoEnter || onMobile  // adding this to see if we get approved for ads
   );
   const [ratioLoaded, setRatioLoaded] = useState(0);
 
