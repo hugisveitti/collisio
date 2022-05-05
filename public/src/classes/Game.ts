@@ -166,7 +166,7 @@ export const getGameTypeFromTrackName = (trackName: TrackName): GameType | undef
 }
 
 export const nonActiveTrackNames: TrackName[] = getNonActiveTrackNames()
-export const defaultRaceTrack: TrackName = "nurn-track"
+export const defaultRaceTrack: TrackName = "f1-track-2"
 export const defaultTagTrack: TrackName = "simple-tag-course"
 export const defaultStoryTrack: TrackName = "farmers-little-helper-map"
 
