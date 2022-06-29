@@ -31,6 +31,9 @@ Then
 
 ## To run server
 
+Note that in ts-server/router.ts you will need to add your computer name 
+´os.hostname().includes("<your computer name>")´
+
 ```
 npm i
 npm run dev
@@ -49,6 +52,9 @@ npm i
 npm run testMode
 ```
 and access http://localhost:5000/test
+##### To access on phone
+On windows go to cmd and write ´ipconfig´ and find the IPv4 Adderss
+Then on your phone go to that address  http:<IPv4 Adderss>:5000/test
 
 #### To access normal app
 ```
