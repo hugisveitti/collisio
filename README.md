@@ -42,7 +42,7 @@ Then
 
 ## To run server
 
-Note that in ts-server/router.ts you will need to add your computer name 
+Note that in `ts-server/router.ts` you will need to add your computer name 
 `os.hostname().includes("your computer name")`
 
 ```
