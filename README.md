@@ -1,4 +1,4 @@
-<div style="text-align:center">
+<div style="text-align:center;margin:auto;">
     <img style="width:200px;" src="./public/src/images/caroutline.png" />
     <h1>Collisio</h1>
     <h2>A browser based car game where your smartphone is the controller for a vehicle on your pc</h2>
