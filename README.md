@@ -4,6 +4,8 @@
     <h2>A browser based car game where your smartphone is the controller for a vehicle on your pc</h2>
 </div>
 
+<img src="https://www.collisio.club/images/hands2.gif" />
+
 Go to <a href="https://collisio.club">collisio.club</a> to try the game!
 
 Written for the web.
