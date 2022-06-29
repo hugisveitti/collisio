@@ -7,7 +7,7 @@ import * as os from "os"
 
 
 export const admin = require("firebase-admin");
-var serviceAccount = require("./configs/race-game-a4327-firebase-adminsdk-jw2qt-30f56f1644.json");
+var serviceAccount = require("./configs/service-account.json");
 
 const aa = adminApp({
     credential: admin.credential.cert(serviceAccount),
