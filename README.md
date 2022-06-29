@@ -4,15 +4,22 @@
     <h2>A browser based car game where your smartphone is the controller for a vehicle on your pc</h2>
 </div>
 
-<a href="https://collisio.club">collisio.club</a>
+Go to <a href="https://collisio.club">collisio.club</a> to try the game!
 
 Written for the web.
-
+<ul>
+    <li>
 Nodejs typescript on the backend.
-
+    </li>
+    <li>
+    
 Typescript + react for the frontend.
+    </li>
+    <li>
 
 Firebase for database.
+    </li>
+       </ul> 
 
 <a href="https://threejs.org/">three.js</a> for graphics and <a href="https://enable3d.io/">enable3d</a> for physics.
 
